@@ -1280,9 +1280,8 @@ INSERT INTO Submission_Experiment(submission_submissionId, experiments_experimen
 (1, 1);
 
 INSERT INTO Deliverable(deliverableId, name) VALUES
-(1, 'deliverable1'),
-(2, 'deliverable2'),
-(3, 'deliverable3');
+(100000, 'deliverable100000'),
+(100001, 'deliverable100001');
 
 INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, width, height, layout) VALUES
 (1, 'Printer', 'BRADY', 'BRADY_FTP', '{"host:"127.0.0.1","pin":"0000"}', TRUE, 25, 25, '[{"element":"text", "contents":{"use":"ALIAS"}}]');
