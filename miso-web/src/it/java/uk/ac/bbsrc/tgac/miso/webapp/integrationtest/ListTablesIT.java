@@ -1030,7 +1030,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListDeliverablesSetup() throws Exception {
     testPageSetup(ListTarget.DELIVERABLES,
-        Sets.newHashSet(Columns.SELECTOR, Columns.NAME));
+        Sets.newHashSet(Columns.NAME));
   }
 
   @Test
