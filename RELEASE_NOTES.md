@@ -7,6 +7,29 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.2.0] - 2023-06-30
+
+### Added
+
+* Option to assign assays to projects
+* Additional details field on Edit Project page
+
+### Changed
+
+* Assay options on the Edit Requisition page are now limited to the assays assigned to all of the requisitioned samples' projects
+* Group ID is now included on the library aliquot Tracking Sheet download (detailed sample)
+* When receiving a sample, if you create a new requisition, the assay options are now only those that are assigned to the selected project.
+
+### Fixed
+
+* Error messages when attempting to add duplicate tests or metrics to an assay
+* Default sorting on the bulk pages
+  * When propagating libraries from the Edit Box page, rows will be sorted by sample box column
+  * When propagating samples, libraries (with the above exception), or library aliquots, rows will be sorted by parent ID
+  * When editing items, rows will be sorted by ID
+* Some detailed sample columns were included in download sheets when using plain sample mode
+
+
 ## [2.1.0] - 2023-06-15
 
 ### Added

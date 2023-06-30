@@ -1,1 +1,0 @@
-Additional details field on Edit Project page

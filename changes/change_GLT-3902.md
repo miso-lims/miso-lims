@@ -1,1 +1,0 @@
-Assay options on the Edit Requisition page are now limited to the assays assigned to all of the requisitioned samples' projects
