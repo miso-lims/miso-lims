@@ -1281,7 +1281,8 @@ INSERT INTO Submission_Experiment(submission_submissionId, experiments_experimen
 
 INSERT INTO Deliverable(deliverableId, name) VALUES
 (1, 'deliverable1'),
-(2, 'deliverable2');
+(2, 'deliverable2'),
+(3, 'To Delete');
 
 INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, width, height, layout) VALUES
 (1, 'Printer', 'BRADY', 'BRADY_FTP', '{"host:"127.0.0.1","pin":"0000"}', TRUE, 25, 25, '[{"element":"text", "contents":{"use":"ALIAS"}}]');

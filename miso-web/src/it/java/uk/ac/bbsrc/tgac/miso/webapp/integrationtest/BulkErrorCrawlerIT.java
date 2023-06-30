@@ -324,6 +324,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                                 .put("tissuepiecetype/bulk/edit", unmodifiableMap("ids", "1"))
                                 .put("tissuetype/bulk/edit", unmodifiableMap("ids", "11,7"))
                                 .put("lab/bulk/edit", unmodifiableMap("ids", "1,2"))
+                                .put("deliverable/bulk/edit", unmodifiableMap("ids", "1,2"))
                                 .put("libraryaliquot/bulk/merge", unmodifiableMap("ids", "901,902"))
                                 .put("libraryaliquot/bulk/pool-separate", unmodifiableMap("ids", "901,902"))
                                 .put("libraryaliquot/bulk/pool",
