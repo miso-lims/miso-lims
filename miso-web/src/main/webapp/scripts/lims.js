@@ -194,6 +194,9 @@ var Utils = Utils || {
           },
         },
       },
+      open: function (event, ui) {
+        jQuery(this).parent().children().children(".ui-dialog-titlebar-close").show();
+      },
     });
   },
 
@@ -234,6 +237,9 @@ var Utils = Utils || {
       title: title,
       modal: true,
       buttons: buttons,
+      open: function (event, ui) {
+        jQuery(this).parent().children().children(".ui-dialog-titlebar-close").show();
+      },
     });
   },
   showDialog: function (title, okButton, fields, callback, backHandler) {
@@ -514,6 +520,9 @@ var Utils = Utils || {
       title: title,
       modal: true,
       buttons: buttons,
+      open: function (event, ui) {
+        jQuery(this).parent().children().children(".ui-dialog-titlebar-close").show();
+      },
     });
   },
   showWizardDialog: function (title, actions, promptText, cancelText) {
@@ -563,6 +572,9 @@ var Utils = Utils || {
             dialog.dialog("close");
           },
         },
+      },
+      open: function (event, ui) {
+        jQuery(this).parent().children().children(".ui-dialog-titlebar-close").show();
       },
     });
   },
