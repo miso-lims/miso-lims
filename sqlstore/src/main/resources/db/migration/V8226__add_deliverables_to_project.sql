@@ -1,1 +1,0 @@
-ALTER TABLE Project ADD deliverableId bigint DEFAULT NULL;

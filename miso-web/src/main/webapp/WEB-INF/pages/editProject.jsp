@@ -183,9 +183,6 @@
     var projectDto = ${projectDto};
     var config = ${formConfig};
 
-    var deliverables = ${deliverables};
-    config["deliverables"] = deliverables;
-
     var assays = [];
     for (var i = 0; i < projectDto.assayIds.length; i++) {
       var holder = Constants.assays.find(function (x) {

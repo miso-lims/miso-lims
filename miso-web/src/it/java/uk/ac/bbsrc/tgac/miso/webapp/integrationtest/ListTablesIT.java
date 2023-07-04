@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Test;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;

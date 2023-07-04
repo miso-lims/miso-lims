@@ -95,11 +95,11 @@ public class EditProjectController {
     model.put("project", project);
     model.put("projectDto", mapper.writeValueAsString(Dtos.asDto(project, true)));
 
-    model.put("deliverables", mapper.writeValueAsString(deliverableService.list()));
-
     ObjectNode formConfig = mapper.createObjectNode();
     MisoWebUtils.addJsonArray(mapper, formConfig, "statusOptions", Arrays.asList(StatusType.values()),
         StatusType::getKey);
+    MisoWebUtils.addJsonArray(mapper, formConfig, "deliverables", deliverableService.list(), Dtos::asDto);
+
     ObjectNode namingConfig = formConfig.putObject("naming");
     addNamingSchemeConfig(namingConfig, "primary", namingSchemeHolder.getPrimary(), project);
     addNamingSchemeConfig(namingConfig, "secondary", namingSchemeHolder.getSecondary(), project);

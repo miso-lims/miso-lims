@@ -52,8 +52,9 @@ public class DeliverableRestController {
   }
 
   @PostMapping(value = "/bulk-delete")
+  @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public @ResponseBody void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete(TYPE_LABEL, ids, deliverableService);
   }
 }

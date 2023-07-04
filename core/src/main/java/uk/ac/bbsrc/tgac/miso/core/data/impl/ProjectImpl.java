@@ -70,7 +70,9 @@ public class ProjectImpl implements Project {
 
   private Integer samplesExpected;
 
-  private Long deliverableId;
+  @ManyToOne
+  @JoinColumn(name = "deliverableId")
+  private Deliverable deliverable;
 
   @ManyToOne
   @JoinColumn(name = "contactId")
@@ -476,12 +478,12 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public Long getDeliverableId() {
-    return deliverableId;
+  public Deliverable getDeliverable() {
+    return deliverable;
   }
 
   @Override
-  public void setDeliverableId(Long deliverableId) {
-    this.deliverableId = deliverableId;
+  public void setDeliverable(Deliverable deliverable) {
+    this.deliverable = deliverable;
   }
 }

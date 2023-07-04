@@ -7,6 +7,7 @@ import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
@@ -124,7 +125,7 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
 
   public void setAdditionalDetails(String additionalDetails);
 
-  public Long getDeliverableId();
+  public Deliverable getDeliverable();
 
-  public void setDeliverableId(Long deliverableId);
+  public void setDeliverable(Deliverable deliverableId);
 }

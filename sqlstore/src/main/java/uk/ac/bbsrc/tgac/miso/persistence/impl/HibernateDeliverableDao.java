@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,9 +21,7 @@ public class HibernateDeliverableDao extends HibernateSaveDao<Deliverable> imple
 
   @Override
   public long getUsage(Deliverable deliverable) throws IOException {
-    return (long) currentSession().createCriteria(ProjectImpl.class)
-        .add(Restrictions.eq("deliverableId", deliverable.getId())).setProjection(Projections.rowCount())
-        .uniqueResult();
+    return getUsageBy(ProjectImpl.class, "deliverable", deliverable);
   }
 
   @Override

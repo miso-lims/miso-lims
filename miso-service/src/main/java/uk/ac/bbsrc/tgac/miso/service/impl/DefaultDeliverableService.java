@@ -12,7 +12,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.DeliverableService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.DeliverableDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
@@ -72,5 +74,20 @@ public class DefaultDeliverableService extends AbstractSaveService<Deliverable> 
         && deliverableDao.getByName(object.getName()) != null) {
       errors.add(ValidationError.forDuplicate("deliverable", "name"));
     }
+  }
+
+  @Override
+  protected void authorizeUpdate(Deliverable object) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+  }
+
+  @Override
+  public ValidationResult validateDeletion(Deliverable object) throws IOException {
+    ValidationResult result = new ValidationResult();
+    long usage = deliverableDao.getUsage(object);
+    if (usage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.projects(usage)));
+    }
+    return result;
   }
 }

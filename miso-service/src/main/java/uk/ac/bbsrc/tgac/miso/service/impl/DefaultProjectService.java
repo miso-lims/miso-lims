@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContactService;
+import uk.ac.bbsrc.tgac.miso.core.service.DeliverableService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.core.service.PipelineService;
@@ -75,6 +76,8 @@ public class DefaultProjectService implements ProjectService {
   private ContactService contactService;
   @Autowired
   private AssayService assayService;
+  @Autowired
+  private DeliverableService deliverableService;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -188,6 +191,7 @@ public class DefaultProjectService implements ProjectService {
       loadChildEntity(x -> assays.add(x), element, assayService, "assays");
     }
     project.setAssays(assays);
+    loadChildEntity(project::setDeliverable, project.getDeliverable(), deliverableService, "deliverableId");
   }
 
   private void applyChanges(Project original, Project project) {
@@ -203,7 +207,7 @@ public class DefaultProjectService implements ProjectService {
     original.setSamplesExpected(project.getSamplesExpected());
     original.setContact(project.getContact());
     original.setAdditionalDetails(project.getAdditionalDetails());
-    original.setDeliverableId(project.getDeliverableId());
+    original.setDeliverable(project.getDeliverable());
     ValidationUtils.applySetChanges(original.getAssays(), project.getAssays());
   }
 

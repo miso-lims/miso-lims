@@ -2601,7 +2601,9 @@ public class Dtos {
     dto.setCode(from.getCode());
     dto.setDescription(from.getDescription());
     dto.setAdditionalDetails(from.getAdditionalDetails());
-    setLong(dto::setDeliverableId, from.getDeliverableId(), true);
+    if (from.getDeliverable() != null) {
+      setLong(dto::setDeliverableId, from.getDeliverable().getId(), true);
+    }
     setObject(dto::setStatus, from.getStatus(), (progress) -> progress.getKey());
     if (from.getReferenceGenome() != null) {
       dto.setReferenceGenomeId(from.getReferenceGenome().getId());
@@ -2641,7 +2643,6 @@ public class Dtos {
     setString(to::setCode, dto.getCode());
     setString(to::setDescription, dto.getDescription());
     setString(to::setAdditionalDetails, dto.getAdditionalDetails());
-    setLong(to::setDeliverableId, dto.getDeliverableId(), true);
     setObject(to::setStatus, dto.getStatus(), (key) -> StatusType.get(key));
     setObject(to::setReferenceGenome, ReferenceGenomeImpl::new, dto.getReferenceGenomeId());
     setObject(to::setDefaultTargetedSequencing, TargetedSequencing::new, dto.getDefaultTargetedSequencingId());
@@ -2667,6 +2668,11 @@ public class Dtos {
         assays.add(temp);
       }
       assays.stream().forEach(x -> to.getAssays().add(x));
+    }
+    if (dto.getDeliverableId() != null) {
+      Deliverable temp = new Deliverable();
+      temp.setId(dto.getDeliverableId());
+      to.setDeliverable(temp);
     }
     return to;
   }
