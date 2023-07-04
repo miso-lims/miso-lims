@@ -1,1 +1,1 @@
-Deliverables data type, and "deliverables" field to Projects
+Deliverables data type, and deliverables field to Projects
