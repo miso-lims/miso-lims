@@ -2602,7 +2602,7 @@ public class Dtos {
     dto.setDescription(from.getDescription());
     dto.setAdditionalDetails(from.getAdditionalDetails());
     if (from.getDeliverable() != null) {
-      setLong(dto::setDeliverableId, from.getDeliverable().getId(), true);
+      setId(dto::setDeliverableId, from.getDeliverable());
     }
     setObject(dto::setStatus, from.getStatus(), (progress) -> progress.getKey());
     if (from.getReferenceGenome() != null) {
@@ -2670,9 +2670,7 @@ public class Dtos {
       assays.stream().forEach(x -> to.getAssays().add(x));
     }
     if (dto.getDeliverableId() != null) {
-      Deliverable temp = new Deliverable();
-      temp.setId(dto.getDeliverableId());
-      to.setDeliverable(temp);
+      setObject(to::setDeliverable, Deliverable::new, dto.getDeliverableId());
     }
     return to;
   }

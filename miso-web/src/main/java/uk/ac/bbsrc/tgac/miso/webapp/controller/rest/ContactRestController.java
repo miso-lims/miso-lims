@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/contacts")
-public class ContactRestController {
+public class ContactRestController extends RestController {
 
   private static final String TYPE_LABEL = "Contact";
 

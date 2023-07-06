@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/deliverables")
-public class DeliverableRestController {
+public class DeliverableRestController extends RestController {
 
   private static final String TYPE_LABEL = "Deliverable";
 
@@ -52,9 +52,8 @@ public class DeliverableRestController {
   }
 
   @PostMapping(value = "/bulk-delete")
-  @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+  public @ResponseBody void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete(TYPE_LABEL, ids, deliverableService);
   }
 }

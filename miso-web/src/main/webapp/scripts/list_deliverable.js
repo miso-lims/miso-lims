@@ -8,14 +8,16 @@ ListTarget.deliverable = (function ($) {
       throw new Error("Must be provided statically");
     },
     createBulkActions: function (config, projectId) {
-      return config.isAdmin
-        ? [
-            BulkUtils.actions.edit(Urls.ui.deliverables.bulkEdit),
-            ListUtils.createBulkDeleteAction("Deliverables", "deliverables", function (item) {
-              return item.name;
-            }),
-          ]
-        : [];
+      var actions = BulkTarget.deliverable.getBulkActions(config);
+      if (config.isAdmin) {
+        actions.push(
+          ListUtils.createBulkDeleteAction("Deliverables", "deliverables", function (item) {
+            return item.name;
+          })
+        );
+        return actions;
+      }
+      return [];
     },
     createStaticActions: function (config, projectId) {
       return config.isAdmin
