@@ -134,4 +134,5 @@ DELETE FROM Pipeline;
 DELETE FROM RunLibraryQcStatus;
 DELETE FROM WorksetCategory;
 DELETE FROM WorksetStage;
+DELETE FROM Deliverable;
 SET FOREIGN_KEY_CHECKS=1;

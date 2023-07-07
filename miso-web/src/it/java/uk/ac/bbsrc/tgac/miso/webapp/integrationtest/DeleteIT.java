@@ -416,6 +416,11 @@ public class DeleteIT extends AbstractIT {
     testDelete(ListTarget.REQUISITIONS, null, "Req Two", Columns.ALIAS, Requisition.class, 2L);
   }
 
+  @Test
+  public void testDeleteDeliverable() {
+    testAdminDelete(ListTarget.DELIVERABLES, null, "To Delete", Columns.NAME, Deliverable.class, 3L);
+  }
+
   private void testDelete(String listTarget, String tab, String search, String selectByColumn, Class<?> clazz,
       Long id) {
     testDelete(listTarget, tab, search, selectByColumn, search, clazz, id);

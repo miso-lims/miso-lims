@@ -23,6 +23,7 @@ public class ProjectDto {
   private String contactEmail;
   private List<Long> assayIds;
   private String additionalDetails;
+  private Long deliverableId;
 
   public long getId() {
     return id;
@@ -182,5 +183,13 @@ public class ProjectDto {
 
   public void setAdditionalDetails(String additionalDetails) {
     this.additionalDetails = additionalDetails;
+  }
+
+  public Long getDeliverableId() {
+    return deliverableId;
+  }
+
+  public void setDeliverableId(Long deliverableId) {
+    this.deliverableId = deliverableId;
   }
 }

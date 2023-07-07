@@ -260,10 +260,15 @@ INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`, defaultScientificNa
 (2, 'Human hg19', 1),
 (3, 'Human hg18 random', NULL);
 
-INSERT INTO `Project`(`projectId`, `created`, `description`, `name`, `status`, `title`, `code`, `lastModified`, `referenceGenomeId`, creator, lastModifier, pipelineId) VALUES
-(1,'2015-08-27 15:40:15','Test project','PRO1','ACTIVE','TEST1','TEST1','2015-08-27 19:40:40', 1, 1, 1, 1),
-(2,'2013-11-27 12:20:15','Test project2','PRO2','ACTIVE','TEST2','TEST2','2015-11-30 15:23:18', 1, 1, 1, 1),
-(3,'2016-01-27 11:11:15','Test project3','PRO3','ACTIVE','TEST3','TEST3','2016-02-22 10:43:18', 2, 1, 1, 2);
+INSERT INTO Deliverable(deliverableId, name) VALUES
+(1, 'deliverable1'),
+(2, 'deliverable2'),
+(3, 'deliverable3');
+
+INSERT INTO `Project`(`projectId`, `created`, `description`, `name`, `status`, `title`, `code`, `lastModified`, `referenceGenomeId`, creator, lastModifier, pipelineId, deliverableId) VALUES
+(1,'2015-08-27 15:40:15','Test project','PRO1','ACTIVE','TEST1','TEST1','2015-08-27 19:40:40', 1, 1, 1, 1, 1),
+(2,'2013-11-27 12:20:15','Test project2','PRO2','ACTIVE','TEST2','TEST2','2015-11-30 15:23:18', 1, 1, 1, 1, 2),
+(3,'2016-01-27 11:11:15','Test project3','PRO3','ACTIVE','TEST3','TEST3','2016-02-22 10:43:18', 2, 1, 1, 2, 3);
 
 INSERT INTO Subproject(subprojectId, projectId, alias, referenceGenomeId, priority, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 2, 'Important', 1, TRUE, 1, '2021-02-19 10:01:00', 1, '2021-02-19 10:01:00'),

@@ -21,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
+import uk.ac.bbsrc.tgac.miso.core.service.DeliverableService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -45,6 +46,8 @@ public class EditProjectController {
   private NamingSchemeHolder namingSchemeHolder;
   @Autowired
   private ObjectMapper mapper;
+  @Autowired
+  private DeliverableService deliverableService;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -95,6 +98,8 @@ public class EditProjectController {
     ObjectNode formConfig = mapper.createObjectNode();
     MisoWebUtils.addJsonArray(mapper, formConfig, "statusOptions", Arrays.asList(StatusType.values()),
         StatusType::getKey);
+    MisoWebUtils.addJsonArray(mapper, formConfig, "deliverables", deliverableService.list(), Dtos::asDto);
+
     ObjectNode namingConfig = formConfig.putObject("naming");
     addNamingSchemeConfig(namingConfig, "primary", namingSchemeHolder.getPrimary(), project);
     addNamingSchemeConfig(namingConfig, "secondary", namingSchemeHolder.getSecondary(), project);
