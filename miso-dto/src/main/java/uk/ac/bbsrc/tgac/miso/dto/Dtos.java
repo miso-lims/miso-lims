@@ -133,6 +133,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
@@ -4498,6 +4499,20 @@ public class Dtos {
 
   public static Deliverable to(DeliverableDto from) {
     Deliverable to = new Deliverable();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    return to;
+  }
+
+  public static ContactRoleDto asDto(ContactRole from) {
+    ContactRoleDto to = new ContactRoleDto();
+    to.setId(from.getId());
+    to.setName(from.getName());
+    return to;
+  }
+
+  public static ContactRole to(ContactRoleDto from) {
+    ContactRole to = new ContactRole();
     setLong(to::setId, from.getId(), false);
     setString(to::setName, from.getName());
     return to;
