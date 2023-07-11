@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ProjectChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContactsAndRole;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 
@@ -74,9 +75,11 @@ public class ProjectImpl implements Project {
   @JoinColumn(name = "deliverableId")
   private Deliverable deliverable;
 
-  @ManyToOne
-  @JoinColumn(name = "contactId")
-  private Contact contact;
+  // @ManyToOne
+  // @JoinColumn(name = "contactId")
+  // private Contact contact;
+  @OneToMany(mappedBy = "project", orphanRemoval = true, cascade = CascadeType.ALL)
+  private Set<ProjectContactsAndRole> contacts = new HashSet<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -458,13 +461,13 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public Contact getContact() {
-    return contact;
+  public Set<ProjectContactsAndRole> getContacts() {
+    return contacts;
   }
 
   @Override
-  public void setContact(Contact contact) {
-    this.contact = contact;
+  public void setContacts(Set<ProjectContactsAndRole> contacts) {
+    this.contacts = contacts;
   }
 
   @Override

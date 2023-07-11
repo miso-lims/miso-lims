@@ -218,6 +218,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContactsAndRole;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.SampleBoxableView;
@@ -2617,9 +2618,16 @@ public class Dtos {
     setString(dto::setRebNumber, from.getRebNumber());
     setDateString(dto::setRebExpiry, from.getRebExpiry());
     setInteger(dto::setSamplesExpected, from.getSamplesExpected(), true);
-    setId(dto::setContactId, from.getContact());
-    setString(dto::setContactName, maybeGetProperty(from.getContact(), Contact::getName));
-    setString(dto::setContactEmail, maybeGetProperty(from.getContact(), Contact::getEmail));
+    Set<ContactDto> contacts = new HashSet<>();
+    for (ProjectContactsAndRole item : from.getContacts()) {
+      ContactDto holder = asDto(item.getContact());
+      holder.setContactRole(item.getContactRole());
+      contacts.add(holder);
+    }
+    dto.setContacts(contacts);
+    // setId(dto::setContactId, from.getContact());
+    // setString(dto::setContactName, maybeGetProperty(from.getContact(), Contact::getName));
+    // setString(dto::setContactEmail, maybeGetProperty(from.getContact(), Contact::getEmail));
     return dto;
   }
 
@@ -2652,13 +2660,26 @@ public class Dtos {
     setString(to::setRebNumber, dto.getRebNumber());
     setLocalDate(to::setRebExpiry, dto.getRebExpiry());
     setInteger(to::setSamplesExpected, dto.getSamplesExpected(), true);
-    if (dto.getContactId() != null || !isStringEmptyOrNull(dto.getContactName())
-        || !isStringEmptyOrNull(dto.getContactEmail())) {
-      Contact contact = new Contact();
-      setLong(contact::setId, dto.getContactId(), false);
-      setString(contact::setName, dto.getContactName());
-      setString(contact::setEmail, dto.getContactEmail());
-      to.setContact(contact);
+    // if (dto.getContactId() != null || !isStringEmptyOrNull(dto.getContactName())
+    // || !isStringEmptyOrNull(dto.getContactEmail())) {
+    // Contact contact = new Contact();
+    // setLong(contact::setId, dto.getContactId(), false);
+    // setString(contact::setName, dto.getContactName());
+    // setString(contact::setEmail, dto.getContactEmail());
+    // to.setContact(contact);
+    // }
+
+    if (dto.getContacts() != null) {
+      Set<ProjectContactsAndRole> contacts = new HashSet<>();
+      for (ContactDto item : dto.getContacts()) {
+        Contact tempContact = new Contact();
+        setLong(tempContact::setId, item.getId(), false);
+        setString(tempContact::setName, item.getName());
+        setString(tempContact::setEmail, item.getEmail());
+        ProjectContactsAndRole holder = new ProjectContactsAndRole(to, tempContact, item.getContactRole());
+        contacts.add(holder);
+      }
+      to.setContacts(contacts);
     }
     if (dto.getAssayIds() != null) {
       List<Assay> assays = new ArrayList<>();

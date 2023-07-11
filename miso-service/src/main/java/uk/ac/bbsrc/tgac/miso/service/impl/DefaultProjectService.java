@@ -22,10 +22,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContactsAndRole;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
+import uk.ac.bbsrc.tgac.miso.core.service.ContactRoleService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContactService;
 import uk.ac.bbsrc.tgac.miso.core.service.DeliverableService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
@@ -78,6 +81,8 @@ public class DefaultProjectService implements ProjectService {
   private AssayService assayService;
   @Autowired
   private DeliverableService deliverableService;
+  @Autowired
+  private ContactRoleService contactRoleService;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -99,7 +104,10 @@ public class DefaultProjectService implements ProjectService {
 
   @Override
   public long create(Project project) throws IOException {
-    saveNewContact(project.getContact());
+    for (ProjectContactsAndRole item : project.getContacts()) {
+      saveNewContact(item.getContact());
+    }
+    // saveNewContact(project.getContact());
     loadChildEntities(project);
     validateChange(project, null);
     project.setChangeDetails(authorizationManager.getCurrentUser());
@@ -118,7 +126,10 @@ public class DefaultProjectService implements ProjectService {
   @Override
   public long update(Project project) throws IOException {
     Project original = projectStore.get(project.getId());
-    saveNewContact(project.getContact());
+    for (ProjectContactsAndRole item : project.getContacts()) {
+      saveNewContact(item.getContact());
+    }
+    // saveNewContact(project.getContact());
     loadChildEntities(project);
     validateChange(project, original);
     applyChanges(original, project);
@@ -185,7 +196,17 @@ public class DefaultProjectService implements ProjectService {
         targetedSequencingService,
         "defaultTargetedSequencingId");
     loadChildEntity(project::setPipeline, project.getPipeline(), pipelineService, "pipelineId");
-    loadChildEntity(project::setContact, project.getContact(), contactService, "contactId");
+    // loadChildEntity(project::setContact, project.getContact(), contactService, "contactId");
+    Set<ProjectContactsAndRole> contacts = new HashSet<>();
+    for (ProjectContactsAndRole element : project.getContacts()) {
+      Set<Contact> tempContact = new HashSet<>();
+      Set<ContactRole> tempContactRole = new HashSet<>();
+      loadChildEntity(x -> tempContact.add(x), element.getContact(), contactService, "contact");
+      loadChildEntity(x -> tempContactRole.add(x), element.getContactRole(), contactRoleService, "contactRole");
+      contacts
+          .add(new ProjectContactsAndRole(project, tempContact.iterator().next(), tempContactRole.iterator().next()));
+    }
+    project.setContacts(contacts);
     Set<Assay> assays = new HashSet<>();
     for (Assay element : project.getAssays()) {
       loadChildEntity(x -> assays.add(x), element, assayService, "assays");
@@ -205,7 +226,7 @@ public class DefaultProjectService implements ProjectService {
     original.setRebNumber(project.getRebNumber());
     original.setRebExpiry(project.getRebExpiry());
     original.setSamplesExpected(project.getSamplesExpected());
-    original.setContact(project.getContact());
+    original.setContacts(project.getContacts());
     original.setAdditionalDetails(project.getAdditionalDetails());
     original.setDeliverable(project.getDeliverable());
     ValidationUtils.applySetChanges(original.getAssays(), project.getAssays());

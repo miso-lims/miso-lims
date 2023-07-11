@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
+import java.util.Set;
 
 public class ProjectDto {
   private long id;
@@ -18,9 +19,10 @@ public class ProjectDto {
   private String rebNumber;
   private String rebExpiry;
   private Integer samplesExpected;
-  private Long contactId;
-  private String contactName;
-  private String contactEmail;
+  // private Long contactId;
+  // private String contactName;
+  // private String contactEmail;
+  private Set<ContactDto> contacts;
   private List<Long> assayIds;
   private String additionalDetails;
   private Long deliverableId;
@@ -145,28 +147,36 @@ public class ProjectDto {
     this.samplesExpected = samplesExpected;
   }
 
-  public Long getContactId() {
-    return contactId;
+  // public Long getContactId() {
+  // return contactId;
+  // }
+
+  // public void setContactId(Long contactId) {
+  // this.contactId = contactId;
+  // }
+
+  // public String getContactName() {
+  // return contactName;
+  // }
+
+  // public void setContactName(String contactName) {
+  // this.contactName = contactName;
+  // }
+
+  // public String getContactEmail() {
+  // return contactEmail;
+  // }
+
+  // public void setContactEmail(String contactEmail) {
+  // this.contactEmail = contactEmail;
+  // }
+
+  public Set<ContactDto> getContacts() {
+    return contacts;
   }
 
-  public void setContactId(Long contactId) {
-    this.contactId = contactId;
-  }
-
-  public String getContactName() {
-    return contactName;
-  }
-
-  public void setContactName(String contactName) {
-    this.contactName = contactName;
-  }
-
-  public String getContactEmail() {
-    return contactEmail;
-  }
-
-  public void setContactEmail(String contactEmail) {
-    this.contactEmail = contactEmail;
+  public void setContacts(Set<ContactDto> contacts) {
+    this.contacts = contacts;
   }
 
   public List<Long> getAssayIds() {

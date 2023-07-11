@@ -185,19 +185,48 @@ FormTarget.project = (function ($) {
               title: "Contact",
               type: "special",
               makeControls: function (form) {
-                var label = object.contactId
-                  ? Contacts.makeContactLabel(object.contactName, object.contactEmail)
-                  : "n/a";
-                return [
-                  $("<span>").attr("id", "contactLabel").text(label),
-                  makeButton("Change", function () {
-                    showContactDialog(object, form);
-                  }),
-                  makeButton("Remove", function () {
-                    setContact(null, object, form);
-                  }),
-                  $("<div>").attr("id", "projectForm_contactError").addClass("errorContainer"),
-                ];
+                console.log(object.contacts);
+                if (!object.contacts) {
+                  var label = "n/a";
+                  return [
+                    $("<span>").attr("id", "contactLabel").text(label),
+                    makeButton("Add", function () {
+                      showContactDialog(object, form);
+                    }),
+                    $("<div>").attr("id", "projectForm_contactError").addClass("errorContainer"),
+                  ];
+                } else {
+                  var toReturn = object.contacts.map(function (x, index) {
+                    var label = Contacts.makeContactLabel(x.contactName, x.contactEmail);
+                    return [
+                      $("<span>").attr("id", "contactLabel").text(label),
+                      makeButton("Add", function () {
+                        showContactDialog(object, form);
+                      }),
+                      makeButton("Remove", function () {
+                        removeContact(index, object, form);
+                      }),
+                    ];
+                  });
+                  toReturn = toReturn.map(function (x) {
+                    return x[0];
+                  });
+                  return toReturn;
+                }
+
+                // var label = object.contactId
+                //   ? Contacts.makeContactLabel(object.contactName, object.contactEmail)
+                //   : "n/a";
+                // return [
+                //   $("<span>").attr("id", "contactLabel").text(label),
+                //   makeButton("Change", function () {
+                //     showContactDialog(object, form);
+                //   }),
+                //   makeButton("Remove", function () {
+                //     setContact(null, object, form);
+                //   }),
+                //   $("<div>").attr("id", "projectForm_contactError").addClass("errorContainer"),
+                // ];
               },
             },
           ],
@@ -229,16 +258,24 @@ FormTarget.project = (function ($) {
   function setContact(contact, project, form) {
     $("#projectForm_contactError").empty();
     if (contact) {
-      project.contactId = contact.id;
-      project.contactName = contact.name;
-      project.contactEmail = contact.email;
+      project.contacts.push(contact);
+      // project.contactId = contact.id;
+      // project.contactName = contact.name;
+      // project.contactEmail = contact.email;
       $("#contactLabel").text(Contacts.makeContactLabel(contact.name, contact.email));
-    } else {
-      project.contactId = null;
-      project.contactName = null;
-      project.contactEmail = null;
-      $("#contactLabel").text("n/a");
     }
+    //  else {
+    //   project.contactId = null;
+    //   project.contactName = null;
+    //   project.contactEmail = null;
+    //   $("#contactLabel").text("n/a");
+    // }
     form.markOtherChanges();
+  }
+
+  function removeContact(index, project, form) {
+    project.contacts = project.contacts.filter(function (x, arrIndex) {
+      return arrIndex != index;
+    });
   }
 })(jQuery);
