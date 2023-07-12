@@ -48,6 +48,11 @@ public enum QcConverter {
     String qcType = rs.getString("qcType");
     for (QcConverter converter : QcConverter.values()) {
       if (qcType.matches(converter.pattern)) {
+        // There may be multiple QCs for a given attribute name. The query should return the most recent
+        // first and all others should be ignored
+        if (alreadyIncluded(converter, sample)) {
+          return;
+        }
         String result = converter.trueLabel == null ? extractBigDecimalString(rs) : converter.extractBooleanString(rs);
         if (result != null) {
           Attribute attr = new DefaultAttribute();
@@ -62,6 +67,11 @@ public enum QcConverter {
       }
     }
 
+  }
+
+  private static boolean alreadyIncluded(QcConverter converter, Sample sample) {
+    return sample.getAttributes() != null
+        && sample.getAttributes().stream().anyMatch(attr -> converter.attributeName.equals(attr.getName()));
   }
 
   private static String extractBigDecimalString(ResultSet rs) throws SQLException {
