@@ -29,6 +29,7 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.collection.internal.PersistentSet;
 
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
@@ -75,10 +76,9 @@ public class ProjectImpl implements Project {
   @JoinColumn(name = "deliverableId")
   private Deliverable deliverable;
 
-  // @ManyToOne
-  // @JoinColumn(name = "contactId")
-  // private Contact contact;
-  @OneToMany(mappedBy = "project", orphanRemoval = true, cascade = CascadeType.ALL)
+
+  @OneToMany(targetEntity = ProjectContactsAndRole.class, mappedBy = "project", orphanRemoval = true,
+      cascade = CascadeType.ALL)
   private Set<ProjectContactsAndRole> contacts = new HashSet<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
@@ -467,7 +467,12 @@ public class ProjectImpl implements Project {
 
   @Override
   public void setContacts(Set<ProjectContactsAndRole> contacts) {
-    this.contacts = contacts;
+    if (contacts instanceof PersistentSet) {
+      this.contacts = contacts;
+    } else {
+      this.contacts.clear();
+      this.contacts.addAll(contacts);
+    }
   }
 
   @Override

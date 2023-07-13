@@ -181,54 +181,65 @@ FormTarget.project = (function ($) {
               type: "int",
               min: 1,
             },
-            {
-              title: "Contact",
-              type: "special",
-              makeControls: function (form) {
-                console.log(object.contacts);
-                if (!object.contacts) {
-                  var label = "n/a";
-                  return [
-                    $("<span>").attr("id", "contactLabel").text(label),
-                    makeButton("Add", function () {
-                      showContactDialog(object, form);
-                    }),
-                    $("<div>").attr("id", "projectForm_contactError").addClass("errorContainer"),
-                  ];
-                } else {
-                  var toReturn = object.contacts.map(function (x, index) {
-                    var label = Contacts.makeContactLabel(x.contactName, x.contactEmail);
-                    return [
-                      $("<span>").attr("id", "contactLabel").text(label),
-                      makeButton("Add", function () {
-                        showContactDialog(object, form);
-                      }),
-                      makeButton("Remove", function () {
-                        removeContact(index, object, form);
-                      }),
-                    ];
-                  });
-                  toReturn = toReturn.map(function (x) {
-                    return x[0];
-                  });
-                  return toReturn;
-                }
+            //   {
+            //     title: "Contact",
+            //     type: "special",
+            //     makeControls: function (form) {
+            //       if (object.contacts.length === 0) {
+            //         console.log("first");
+            //         var label = "n/a";
+            //         return [
+            //           $("<span>").attr("id", "contactLabel").text(label),
+            //           makeButton("Add", function () {
+            //             showContactDialog(object, form);
+            //           }),
+            //           $("<div>").attr("id", "projectForm_contactError").addClass("errorContainer"),
+            //         ];
+            //       } else if (object.contacts.length !== 0) {
+            //         var toReturn = object.contacts.map(function (x, index) {
+            //           return [
+            //             $("<span>")
+            //               .attr("id", "contactLabel")
+            //               .text(Contacts.makeContactLabel(x.name, x.email)),
+            //             makeButton("Add", function () {
+            //               showContactDialog(object, form);
+            //             }),
+            //             makeButton("Remove", function () {
+            //               removeContact(index, object, form);
+            //             }),
+            //             $("<div>").attr("id", "projectForm_contactError").addClass("errorContainer"),
+            //           ];
+            //         });
+            //         console.log(toReturn);
+            //         var holder = [];
+            //         for (var i = 0; i < toReturn.length; i++) {
+            //           for (var n = 0; n < toReturn[i].length; n++) {
+            //             holder.push(toReturn[i][n]);
+            //           }
+            //         }
+            //         console.log(holder);
+            //         // toReturn = toReturn.map(function (x) {
+            //         //   return x[0];
+            //         // });
+            //         // return toReturn;
+            //         return holder;
+            //       }
 
-                // var label = object.contactId
-                //   ? Contacts.makeContactLabel(object.contactName, object.contactEmail)
-                //   : "n/a";
-                // return [
-                //   $("<span>").attr("id", "contactLabel").text(label),
-                //   makeButton("Change", function () {
-                //     showContactDialog(object, form);
-                //   }),
-                //   makeButton("Remove", function () {
-                //     setContact(null, object, form);
-                //   }),
-                //   $("<div>").attr("id", "projectForm_contactError").addClass("errorContainer"),
-                // ];
-              },
-            },
+            //       // var label = object.contactId
+            //       //   ? Contacts.makeContactLabel(object.contactName, object.contactEmail)
+            //       //   : "n/a";
+            //       // return [
+            //       //   $("<span>").attr("id", "contactLabel").text(label),
+            //       //   makeButton("Change", function () {
+            //       //     showContactDialog(object, form);
+            //       //   }),
+            //       //   makeButton("Remove", function () {
+            //       //     setContact(null, object, form);
+            //       //   }),
+            //       //   $("<div>").attr("id", "projectForm_contactError").addClass("errorContainer"),
+            //       // ];
+            //     },
+            //   },
           ],
         },
       ];
@@ -237,6 +248,8 @@ FormTarget.project = (function ($) {
       object.assayIds = Project.getAssays().map(function (x) {
         return x.id;
       });
+      object.length = 0;
+      object.contacts = Project.getContacts();
     },
   };
 
@@ -277,5 +290,6 @@ FormTarget.project = (function ($) {
     project.contacts = project.contacts.filter(function (x, arrIndex) {
       return arrIndex != index;
     });
+    form.markOtherChanges();
   }
 })(jQuery);

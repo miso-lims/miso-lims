@@ -1,5 +1,6 @@
 var Project = (function () {
   var assaysListId = "assays_section";
+  var contactsListId = "contacts_section";
 
   var form = null;
   var listConfig = {};
@@ -34,6 +35,29 @@ var Project = (function () {
         });
       });
       Project.setAssays(assays);
+    },
+
+    setContacts: function (contacts) {
+      FormUtils.setTableData(ListTarget.contact, listConfig, contactsListId, contacts, form);
+    },
+
+    getContacts: function () {
+      return FormUtils.getTableData(contactsListId);
+    },
+
+    addContact: function (addContact) {
+      var contacts = Project.getContacts();
+      contacts.push(addContact);
+      Project.setContacts(contacts);
+    },
+
+    removeContacts: function (removeContacts) {
+      var contacts = Project.getContacts().filter(function (contact) {
+        return !removeContacts.some(function (removal) {
+          return removal.id === contact.id;
+        });
+      });
+      Project.setContacts(contacts);
     },
   };
 })();

@@ -74,7 +74,18 @@
       </c:choose>
     </div>
   </c:if>
+</c:if>
+
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#contacts_section_arrowclick'), 'contactss_section');">
+  Contacts
+<div id="contacts_section_arrowclick" class="toggleLeftDown"></div>
+</div>
+<div id="projectForm_contactsError"></div>
+<div id="contacts_section" class="expandable_section">
+  <h1>Contacts</h1>
+</div>
   
+<c:if test="${project.id != 0}">
   <div id="simplebox">
     <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#upload_arrowclick'), 'uploaddiv');">
       Project Files
@@ -197,6 +208,7 @@
     Project.setForm(form);
     Project.setListConfig({projectId: projectDto.id});
     Project.setAssays(assays);
+    Project.setContacts(projectDto.contacts);
     Utils.ui.updateHelpLink(FormTarget.project.getUserManualUrl());
   });
 </script>

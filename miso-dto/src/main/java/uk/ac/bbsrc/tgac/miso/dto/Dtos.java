@@ -2660,14 +2660,6 @@ public class Dtos {
     setString(to::setRebNumber, dto.getRebNumber());
     setLocalDate(to::setRebExpiry, dto.getRebExpiry());
     setInteger(to::setSamplesExpected, dto.getSamplesExpected(), true);
-    // if (dto.getContactId() != null || !isStringEmptyOrNull(dto.getContactName())
-    // || !isStringEmptyOrNull(dto.getContactEmail())) {
-    // Contact contact = new Contact();
-    // setLong(contact::setId, dto.getContactId(), false);
-    // setString(contact::setName, dto.getContactName());
-    // setString(contact::setEmail, dto.getContactEmail());
-    // to.setContact(contact);
-    // }
 
     if (dto.getContacts() != null) {
       Set<ProjectContactsAndRole> contacts = new HashSet<>();
@@ -2676,7 +2668,10 @@ public class Dtos {
         setLong(tempContact::setId, item.getId(), false);
         setString(tempContact::setName, item.getName());
         setString(tempContact::setEmail, item.getEmail());
-        ProjectContactsAndRole holder = new ProjectContactsAndRole(to, tempContact, item.getContactRole());
+        ProjectContactsAndRole holder = new ProjectContactsAndRole(to, tempContact);
+        if (item.getContactRole() != null) {
+          holder.setContactRole(item.getContactRole());
+        }
         contacts.add(holder);
       }
       to.setContacts(contacts);

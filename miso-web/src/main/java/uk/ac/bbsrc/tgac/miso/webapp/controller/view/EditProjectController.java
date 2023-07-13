@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
@@ -21,6 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
+import uk.ac.bbsrc.tgac.miso.core.service.ContactRoleService;
 import uk.ac.bbsrc.tgac.miso.core.service.DeliverableService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
@@ -48,6 +50,8 @@ public class EditProjectController {
   private ObjectMapper mapper;
   @Autowired
   private DeliverableService deliverableService;
+  @Autowired
+  private ContactRoleService contactRoleService;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;
@@ -94,6 +98,9 @@ public class EditProjectController {
 
     model.put("project", project);
     model.put("projectDto", mapper.writeValueAsString(Dtos.asDto(project, true)));
+
+    model.put("contactRoles", mapper
+        .writeValueAsString(contactRoleService.list().stream().map(x -> Dtos.asDto(x)).collect(Collectors.toList())));
 
     ObjectNode formConfig = mapper.createObjectNode();
     MisoWebUtils.addJsonArray(mapper, formConfig, "statusOptions", Arrays.asList(StatusType.values()),

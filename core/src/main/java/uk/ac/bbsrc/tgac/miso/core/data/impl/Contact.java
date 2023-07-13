@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -66,4 +67,8 @@ public class Contact implements Deletable, Identifiable, Serializable {
     return getName();
   }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, email);
+  }
 }

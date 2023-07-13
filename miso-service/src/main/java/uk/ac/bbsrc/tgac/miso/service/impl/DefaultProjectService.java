@@ -107,7 +107,6 @@ public class DefaultProjectService implements ProjectService {
     for (ProjectContactsAndRole item : project.getContacts()) {
       saveNewContact(item.getContact());
     }
-    // saveNewContact(project.getContact());
     loadChildEntities(project);
     validateChange(project, null);
     project.setChangeDetails(authorizationManager.getCurrentUser());
@@ -129,7 +128,6 @@ public class DefaultProjectService implements ProjectService {
     for (ProjectContactsAndRole item : project.getContacts()) {
       saveNewContact(item.getContact());
     }
-    // saveNewContact(project.getContact());
     loadChildEntities(project);
     validateChange(project, original);
     applyChanges(original, project);
@@ -196,17 +194,15 @@ public class DefaultProjectService implements ProjectService {
         targetedSequencingService,
         "defaultTargetedSequencingId");
     loadChildEntity(project::setPipeline, project.getPipeline(), pipelineService, "pipelineId");
-    // loadChildEntity(project::setContact, project.getContact(), contactService, "contactId");
     Set<ProjectContactsAndRole> contacts = new HashSet<>();
     for (ProjectContactsAndRole element : project.getContacts()) {
-      Set<Contact> tempContact = new HashSet<>();
-      Set<ContactRole> tempContactRole = new HashSet<>();
-      loadChildEntity(x -> tempContact.add(x), element.getContact(), contactService, "contact");
-      loadChildEntity(x -> tempContactRole.add(x), element.getContactRole(), contactRoleService, "contactRole");
+      Contact contact = contactService.get(element.getContact().getId());
+      ContactRole contactRole = contactRoleService.get(1);
       contacts
-          .add(new ProjectContactsAndRole(project, tempContact.iterator().next(), tempContactRole.iterator().next()));
+          .add(new ProjectContactsAndRole(project, contact, contactRole));
     }
-    project.setContacts(contacts);
+    project.getContacts().clear();
+    project.getContacts().addAll(contacts);
     Set<Assay> assays = new HashSet<>();
     for (Assay element : project.getAssays()) {
       loadChildEntity(x -> assays.add(x), element, assayService, "assays");
