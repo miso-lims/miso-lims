@@ -1,4 +1,4 @@
-SELECT s.name sampleId, qt.name qcType, qc.results
+SELECT qc.qcId, qc.date, s.name sampleId, qt.name qcType, qc.results
 FROM SampleQC qc
 JOIN QCType qt ON qt.qcTypeId = qc.type
 JOIN Sample s ON s.sampleId = qc.sample_sampleId
@@ -13,7 +13,7 @@ WHERE qc.qcId IN (
 
 UNION ALL
 
-SELECT l.name sampleId, qt.name, qc.results
+SELECT qc.qcId, qc.date, l.name sampleId, qt.name, qc.results
 FROM LibraryQC qc
 JOIN QCType qt ON qt.qcTypeId = qc.type
 JOIN Library l ON l.libraryId = qc.library_libraryId
@@ -25,3 +25,6 @@ WHERE qc.qcId IN (
   WHERE qc.date = maxDates.maxDate
   GROUP BY qc.library_libraryId, qc.type
 )
+
+-- Order is important; see QcConverter.java
+ORDER BY date DESC, qcId DESC
