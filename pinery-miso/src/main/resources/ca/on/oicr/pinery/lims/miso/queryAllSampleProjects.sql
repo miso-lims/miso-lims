@@ -12,8 +12,6 @@ SELECT
   proj.rebExpiry,
   proj.description,
   proj.samplesExpected,
-  c.name contactName,
-  c.email contactEmail
 FROM Project proj
 JOIN Pipeline pipe ON pipe.pipelineId = proj.pipelineId
 LEFT JOIN (
@@ -42,4 +40,3 @@ LEFT JOIN (
   ) items
   GROUP BY project_projectId
 ) stats ON stats.project_projectId = proj.projectId
-LEFT JOIN Contact c ON c.contactId = proj.contactId

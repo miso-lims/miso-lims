@@ -31,7 +31,7 @@ public class HibernateContactRoleDaoIT extends AbstractHibernateSaveDaoTest<Cont
     return contactRole;
   }
 
-  @SuppressWarnings
+  @SuppressWarnings("unchecked")
   @Override
   public UpdateParameters<ContactRole, String> getUpdateParams() {
     return new UpdateParameters<>(1L, ContactRole::getName, ContactRole::setName, "New name");
@@ -48,7 +48,7 @@ public class HibernateContactRoleDaoIT extends AbstractHibernateSaveDaoTest<Cont
   @Test
   void testGetUsage() throws Exception {
     ContactRole contactRole = (ContactRole) currentSession().get(ContactRole.class, 1L);
-    assertEquals(1L, getTestSubject.getUsage(contactRole));
+    assertEquals(1L, getTestSubject().getUsage(contactRole));
   }
 
   @Test

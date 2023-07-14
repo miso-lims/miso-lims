@@ -27,7 +27,7 @@ ListTarget.contactRole = (function ($) {
     createColumns: function (config, projectId) {
       return [
         {
-          sTtitle: "Name",
+          sTitle: "Name",
           mData: "name",
         },
       ];
