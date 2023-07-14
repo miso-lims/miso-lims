@@ -10,11 +10,12 @@ import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContactsAndRole;
 
 public class HibernateContactRoleDaoIT extends AbstractHibernateSaveDaoTest<ContactRole, HibernateContactRoleDao> {
 
   public HibernateContactRoleDaoIT() {
-    super(ContactRole.class, 1L, 3);
+    super(ContactRole.class, 1L, 4);
   }
 
   @Override
@@ -47,7 +48,7 @@ public class HibernateContactRoleDaoIT extends AbstractHibernateSaveDaoTest<Cont
 
   @Test
   public void testGetUsage() throws Exception {
-    ContactRole contactRole = (ContactRole) currentSession().get(ContactRole.class, 1L);
+    ContactRole contactRole = (ContactRole) currentSession().get(ProjectContactsAndRole.class, 1L);
     assertEquals(1L, getTestSubject().getUsage(contactRole));
   }
 
