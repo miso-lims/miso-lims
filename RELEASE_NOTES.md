@@ -7,6 +7,17 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.3.0] - 2023-07-14
+
+### Added
+
+* Deliverables data type, and deliverables field to Projects
+
+### Fixed
+
+* An issue where it wasn't possible to close some dialogs
+
+
 ## [2.2.0] - 2023-06-30
 
 ### Added
