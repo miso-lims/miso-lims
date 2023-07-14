@@ -50,7 +50,7 @@ public class HibernateContactRoleDaoIT extends AbstractHibernateSaveDaoTest<Cont
   public void testGetUsage() throws Exception {
     ProjectContactsAndRole contactRole =
         (ProjectContactsAndRole) currentSession().get(ProjectContactsAndRole.class, 1L);
-    assertEquals(1L, getTestSubject().getUsage(contactRole));
+    assertEquals(1L, getTestSubject().getUsage(contactRole.getContactRole()));
   }
 
   @Test
