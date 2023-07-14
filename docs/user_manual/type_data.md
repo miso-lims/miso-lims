@@ -706,6 +706,15 @@ delete contacts using the standard interface.
 
 
 
+## Contact Roles
+
+A contact role is used to specify the role of a contact within a project. Assigning a contact role to a contact is done
+when creating/editing a project.
+The link to the Contact Roles list can be found in the Misc menu within the main navigation menu. Only accounts with admin
+privileges can create, edit, and delete contact roles using the standard interface.
+
+
+
 ## Metrics
 
 [Assays](../requisitions#assays) may specify requirements that must be met in order for a case to be considered

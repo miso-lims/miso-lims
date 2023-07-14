@@ -17,3 +17,10 @@ CREATE TABLE Project_Contact_and_Role (
   CONSTRAINT fk_project_contact_and_role_contact FOREIGN KEY (contactId) REFERENCES Contact (contactId),
   CONSTRAINT fk_project_contact_and_role_contactRole FOREIGN KEY (contactRoleId) REFERENCES ContactRole (contactRoleId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Migrate all contacts stored in Project table to new Project_Contact_and_Role table, set default Contact Role to "Main Contact"
+INSERT INTO Project_Contact_and_Role (projectId, contactId, contactRoleId) SELECT projectId, contactId,1 FROM Project WHERE contactId IS NOT NULL;
+
+-- Deleting now redundant contact field in Project
+ALTER TABLE Project DROP FOREIGN KEY fk_project_contact;
+ALTER TABLE Project DROP COLUMN contactId;

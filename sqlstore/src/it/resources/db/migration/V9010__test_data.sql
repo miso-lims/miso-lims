@@ -1076,3 +1076,8 @@ INSERT INTO Project_Assay(projectId, assayId) VALUES
 (1, 2),
 (2, 1),
 (3, 2);
+
+INSERT INTO Project_Contact_and_Role(projectId, contactId, contactRoleId) VALUES
+(1, 1, 2),
+(2, 1, 3),
+(3, 2, 4);

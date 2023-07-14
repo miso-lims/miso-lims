@@ -8,7 +8,6 @@ public class ContactDto {
   private String name;
   private String email;
   private ContactRole contactRole;
-  private String contactRoleName;
 
   public Long getId() {
     return id;

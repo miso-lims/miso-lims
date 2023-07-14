@@ -51,7 +51,7 @@ public class ContactRole implements Deletable, Identifiable, Serializable {
 
   @Override
   public String getDeleteType() {
-    return "ContactRole";
+    return "Contact Role";
   }
 
   @Override

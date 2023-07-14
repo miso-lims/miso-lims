@@ -1,6 +1,6 @@
 ListTarget.contactRole = (function ($) {
   return {
-    name: "ContactRoles",
+    name: "Contact Roles",
     getUserManualUrl: function () {
       return Urls.external.userManual("type_data", "contactRoles");
     },
@@ -11,7 +11,7 @@ ListTarget.contactRole = (function ($) {
       var actions = BulkTarget.contactRole.getBulkActions(config);
       if (config.isAdmin) {
         actions.push(
-          ListUtils.createBulkDeleteAction("ContactRoles", "contactRoles", function (item) {
+          ListUtils.createBulkDeleteAction("Contact Roles", "contactRoles", function (item) {
             return item.name;
           })
         );
@@ -21,7 +21,7 @@ ListTarget.contactRole = (function ($) {
     },
     createStaticActions: function (config, projectId) {
       return config.isAdmin
-        ? [ListUtils.createStaticAddAction("ContactRoles", Urls.ui.contactRoles.bulkCreate, true)]
+        ? [ListUtils.createStaticAddAction("Contact Roles", Urls.ui.contactRoles.bulkCreate, true)]
         : [];
     },
     createColumns: function (config, projectId) {

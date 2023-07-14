@@ -2625,9 +2625,6 @@ public class Dtos {
       contacts.add(holder);
     }
     dto.setContacts(contacts);
-    // setId(dto::setContactId, from.getContact());
-    // setString(dto::setContactName, maybeGetProperty(from.getContact(), Contact::getName));
-    // setString(dto::setContactEmail, maybeGetProperty(from.getContact(), Contact::getEmail));
     return dto;
   }
 

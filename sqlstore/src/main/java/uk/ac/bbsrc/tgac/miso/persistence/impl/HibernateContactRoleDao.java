@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContactsAndRole;
 import uk.ac.bbsrc.tgac.miso.persistence.ContactRoleDao;
 
 @Repository
@@ -21,7 +21,7 @@ public class HibernateContactRoleDao extends HibernateSaveDao<ContactRole> imple
 
   @Override
   public long getUsage(ContactRole contactRole) throws IOException {
-    return getUsageBy(ProjectImpl.class, "contactRole", contactRole);
+    return getUsageBy(ProjectContactsAndRole.class, "contactRole", contactRole);
   }
 
   @Override

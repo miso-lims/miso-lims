@@ -57,7 +57,6 @@ ListTarget.contact = (function ($) {
         columns.push({
           sTitle: "Contact Role",
           mData: function (item, type) {
-            console.log(item);
             return item.contactRole.name;
           },
         });

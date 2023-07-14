@@ -421,6 +421,11 @@ public class DeleteIT extends AbstractIT {
     testAdminDelete(ListTarget.DELIVERABLES, null, "To Delete", Columns.NAME, Deliverable.class, 3L);
   }
 
+  @Test
+  public void testDeleteContactRole() {
+    testAdminDelete(ListTarget.CONTACT_ROLES, null, "To Delete", Columns.NAME, ContactRole.class, 4L);
+  }
+
   private void testDelete(String listTarget, String tab, String search, String selectByColumn, Class<?> clazz,
       Long id) {
     testDelete(listTarget, tab, search, selectByColumn, search, clazz, id);

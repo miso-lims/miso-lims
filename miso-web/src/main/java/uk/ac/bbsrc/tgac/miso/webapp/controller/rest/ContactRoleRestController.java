@@ -21,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
 import uk.ac.bbsrc.tgac.miso.core.service.ContactRoleService;
 import uk.ac.bbsrc.tgac.miso.dto.ContactRoleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
@@ -33,16 +34,20 @@ public class ContactRoleRestController extends RestController {
   private ContactRoleService contactRoleService;
   @Autowired
   private AsyncOperationManager asyncOperationManager;
+  @Autowired
+  private ConstantsController constantsController;
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<ContactRoleDto> dtos) throws IOException {
+    constantsController.refreshConstants();
     return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, contactRoleService);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<ContactRoleDto> dtos) throws IOException {
+    constantsController.refreshConstants();
     return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, Dtos::to, contactRoleService);
   }
 
@@ -55,5 +60,6 @@ public class ContactRoleRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public @ResponseBody void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete(TYPE_LABEL, ids, contactRoleService);
+    constantsController.refreshConstants();
   }
 }

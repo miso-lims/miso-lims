@@ -197,7 +197,7 @@ public class DefaultProjectService implements ProjectService {
     Set<ProjectContactsAndRole> contacts = new HashSet<>();
     for (ProjectContactsAndRole element : project.getContacts()) {
       Contact contact = contactService.get(element.getContact().getId());
-      ContactRole contactRole = contactRoleService.get(1);
+      ContactRole contactRole = contactRoleService.get(element.getContactRole().getId());
       contacts
           .add(new ProjectContactsAndRole(project, contact, contactRole));
     }
@@ -222,10 +222,21 @@ public class DefaultProjectService implements ProjectService {
     original.setRebNumber(project.getRebNumber());
     original.setRebExpiry(project.getRebExpiry());
     original.setSamplesExpected(project.getSamplesExpected());
-    original.setContacts(project.getContacts());
     original.setAdditionalDetails(project.getAdditionalDetails());
     original.setDeliverable(project.getDeliverable());
+    applySetChangesContacts(original.getContacts(), project.getContacts());
     ValidationUtils.applySetChanges(original.getAssays(), project.getAssays());
+  }
+
+
+  public void applySetChangesContacts(Set<ProjectContactsAndRole> to, Set<ProjectContactsAndRole> from) {
+    to.removeIf(
+        toItem -> from.stream().noneMatch(fromItem -> fromItem.getContact().getId() == toItem.getContact().getId()));
+    from.forEach(fromItem -> {
+      if (to.stream().noneMatch(toItem -> toItem.getContact().getId() == fromItem.getContact().getId())) {
+        to.add(fromItem);
+      }
+    });
   }
 
   public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {
