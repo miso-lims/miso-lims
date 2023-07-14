@@ -11,7 +11,7 @@ SELECT
   proj.rebNumber,
   proj.rebExpiry,
   proj.description,
-  proj.samplesExpected,
+  proj.samplesExpected
 FROM Project proj
 JOIN Pipeline pipe ON pipe.pipelineId = proj.pipelineId
 LEFT JOIN (
