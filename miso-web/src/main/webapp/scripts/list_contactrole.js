@@ -1,17 +1,17 @@
-ListTarget.contactRole = (function ($) {
+ListTarget.contactrole = (function ($) {
   return {
     name: "Contact Roles",
     getUserManualUrl: function () {
-      return Urls.external.userManual("type_data", "contactRoles");
+      return Urls.external.userManual("type_data", "contactroles");
     },
     createUrl: function (config, projectId) {
       throw new Error("Must be provided statically");
     },
     createBulkActions: function (config, projectId) {
-      var actions = BulkTarget.contactRole.getBulkActions(config);
+      var actions = BulkTarget.contactrole.getBulkActions(config);
       if (config.isAdmin) {
         actions.push(
-          ListUtils.createBulkDeleteAction("Contact Roles", "contactRoles", function (item) {
+          ListUtils.createBulkDeleteAction("Contact Roles", "contactroles", function (item) {
             return item.name;
           })
         );

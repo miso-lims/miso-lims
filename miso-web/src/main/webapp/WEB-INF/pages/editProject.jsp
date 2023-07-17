@@ -50,6 +50,24 @@
   </table>
 </c:if>
 
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#contacts_section_arrowclick'), 'contactss_section');">
+  Contacts
+<div id="contacts_section_arrowclick" class="toggleLeftDown"></div>
+</div>
+<div id="projectForm_contactError"></div>
+<div id="contacts_section" class="expandable_section">
+  <h1>Contacts</h1>
+</div>
+
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#assays_section_arrowclick'), 'assays_section');">
+  Assays
+<div id="assays_section_arrowclick" class="toggleLeftDown"></div>
+</div>
+<div id="projectForm_assaysError"></div>
+<div id="assays_section" class="expandable_section">
+  <h1>Assays</h1>
+</div>
+
 <c:if test="${project.id != 0}">
   <button id="collapse_all" type="button" class="fg-button ui-state-default ui-corner-all" onclick="Utils.ui.collapseClass('expandable_section')">
       Collapse all
@@ -75,15 +93,6 @@
     </div>
   </c:if>
 </c:if>
-
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#contacts_section_arrowclick'), 'contactss_section');">
-  Contacts
-<div id="contacts_section_arrowclick" class="toggleLeftDown"></div>
-</div>
-<div id="projectForm_contactsError"></div>
-<div id="contacts_section" class="expandable_section">
-  <h1>Contacts</h1>
-</div>
   
 <c:if test="${project.id != 0}">
   <div id="simplebox">
@@ -95,19 +104,7 @@
       <miso:attachments item="${project}"/>
     </div>
   </div>
-  <!-- <br/> -->
-</c:if>
 
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#assays_section_arrowclick'), 'assays_section');">
-  Assays
-<div id="assays_section_arrowclick" class="toggleLeftDown"></div>
-</div>
-<div id="projectForm_assaysError"></div>
-<div id="assays_section" class="expandable_section">
-  <h1>Assays</h1>
-</div>
-
-<c:if test="${project.id != 0}">
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#studies_section_arrowclick'), 'studies_section');">
     Studies
   <div id="studies_section_arrowclick" class="toggleLeft"></div>

@@ -47,7 +47,6 @@
     <h2>Misc</h2>
     <div class="menu">
       <a href="<c:url value="/miso/contact/list"/>">Contacts</a>
-      <a href="<c:url value="/miso/contactRole/list"/>">Contact Roles</a>
       <a href="<c:url value="/miso/storagelocations"/>">Freezers &amp; Rooms</a>
       <a href="<c:url value="/miso/librarytemplates"/>">Library Templates</a>
       <a href="<c:url value="/miso/printers"/>">Printers</a>
@@ -74,6 +73,7 @@
       <a href="<c:url value="/miso/attachmentcategories/list"/>">Attachment Categories</a>
       <a href="<c:url value="/miso/boxsize/list"/>">Box Sizes</a>
       <a href="<c:url value="/miso/boxuse/list"/>">Box Uses</a>
+      <a href="<c:url value="/miso/contactrole/list"/>">Contact Roles</a>
       <a href="<c:url value="/miso/deliverable/list"/>">Deliverables</a>
       <a href="<c:url value="/miso/detailedqcstatus/list"/>">Detailed QC Statuses</a>
       <a href="<c:url value="/miso/indexfamily/list"/>">Index Families</a>

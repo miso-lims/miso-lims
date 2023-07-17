@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -11,16 +11,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest.LibraryQualificationMethod;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayTestService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.dto.AssayTestDto;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
-
-import java.io.IOException;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/assaytest")

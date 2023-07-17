@@ -1,5 +1,5 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.contactRole = (function () {
+BulkTarget.contactrole = (function () {
   /*
    * Expected config: {
    * pageMode: string {create, edit}
@@ -14,8 +14,8 @@ BulkTarget.contactRole = (function () {
     getSaveProgressUrl: function (operationId) {
       return Urls.rest.contactRoles.bulkSaveProgress(operationId);
     },
-    getUserManualUrls: function () {
-      return Urls.external.userManual("type_data", "contactRoles");
+    getUserManualUrl: function () {
+      return Urls.external.userManual("type_data", "contactroles");
     },
     getBulkActions: function (config) {
       return [BulkUtils.actions.edit(Urls.ui.contactRoles.bulkEdit)];

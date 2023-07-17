@@ -72,7 +72,7 @@ public class DefaultContactRoleService extends AbstractSaveService<ContactRole> 
       throws IOException {
     if (ValidationUtils.isChanged(ContactRole::getName, object, beforeChange)
         && contactRoleDao.getByName(object.getName()) != null) {
-      errors.add(ValidationError.forDuplicate("contactRole", "name"));
+      errors.add(ValidationError.forDuplicate("contact role", "name"));
     }
   }
 
@@ -86,7 +86,7 @@ public class DefaultContactRoleService extends AbstractSaveService<ContactRole> 
     ValidationResult result = new ValidationResult();
     long usage = contactRoleDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.projects(usage)));
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.contacts(usage)));
     }
     return result;
   }

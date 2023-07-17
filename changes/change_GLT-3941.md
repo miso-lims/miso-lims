@@ -1,1 +1,1 @@
-Contacts within Projects. Can now have multiple contacts per project, and are required to assign a contact role to each added contact.
+Projects can now have multiple contacts

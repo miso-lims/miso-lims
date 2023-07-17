@@ -189,7 +189,6 @@ FormTarget.project = (function ($) {
       object.assayIds = Project.getAssays().map(function (x) {
         return x.id;
       });
-      object.length = 0;
       object.contacts = Project.getContacts();
     },
   };

@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.dto.ContactRoleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
 @Controller
-@RequestMapping("/contactRole")
+@RequestMapping("/contactrole")
 public class ContactRoleController extends AbstractTypeDataController<ContactRole, ContactRoleDto> {
 
   @Autowired
@@ -29,7 +29,7 @@ public class ContactRoleController extends AbstractTypeDataController<ContactRol
   private AuthorizationManager authorizationManager;
 
   public ContactRoleController() {
-    super("ContactRoles", "contactRole", "contactRole");
+    super("Contact Roles", "contactrole", "contactrole");
   }
 
   @Override

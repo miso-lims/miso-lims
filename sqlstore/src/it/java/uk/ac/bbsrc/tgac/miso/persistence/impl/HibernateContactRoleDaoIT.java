@@ -10,7 +10,6 @@ import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContactsAndRole;
 
 public class HibernateContactRoleDaoIT extends AbstractHibernateSaveDaoTest<ContactRole, HibernateContactRoleDao> {
 

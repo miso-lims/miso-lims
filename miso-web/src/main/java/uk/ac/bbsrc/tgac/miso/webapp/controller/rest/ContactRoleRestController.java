@@ -25,10 +25,10 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
-@RequestMapping("/rest/contactRoles")
+@RequestMapping("/rest/contactroles")
 public class ContactRoleRestController extends RestController {
 
-  private static final String TYPE_LABEL = "ContactRole";
+  private static final String TYPE_LABEL = "Contact Role";
 
   @Autowired
   private ContactRoleService contactRoleService;
@@ -40,15 +40,13 @@ public class ContactRoleRestController extends RestController {
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<ContactRoleDto> dtos) throws IOException {
-    constantsController.refreshConstants();
-    return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, contactRoleService);
+    return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, contactRoleService, true);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<ContactRoleDto> dtos) throws IOException {
-    constantsController.refreshConstants();
-    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, Dtos::to, contactRoleService);
+    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, Dtos::to, contactRoleService, true);
   }
 
   @GetMapping("/bulk/{uuid}")

@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
@@ -98,9 +97,6 @@ public class EditProjectController {
 
     model.put("project", project);
     model.put("projectDto", mapper.writeValueAsString(Dtos.asDto(project, true)));
-
-    model.put("contactRoles", mapper
-        .writeValueAsString(contactRoleService.list().stream().map(x -> Dtos.asDto(x)).collect(Collectors.toList())));
 
     ObjectNode formConfig = mapper.createObjectNode();
     MisoWebUtils.addJsonArray(mapper, formConfig, "statusOptions", Arrays.asList(StatusType.values()),

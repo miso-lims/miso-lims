@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContactsAndRole;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
@@ -104,7 +104,7 @@ public class DefaultProjectService implements ProjectService {
 
   @Override
   public long create(Project project) throws IOException {
-    for (ProjectContactsAndRole item : project.getContacts()) {
+    for (ProjectContact item : project.getContacts()) {
       saveNewContact(item.getContact());
     }
     loadChildEntities(project);
@@ -125,7 +125,7 @@ public class DefaultProjectService implements ProjectService {
   @Override
   public long update(Project project) throws IOException {
     Project original = projectStore.get(project.getId());
-    for (ProjectContactsAndRole item : project.getContacts()) {
+    for (ProjectContact item : project.getContacts()) {
       saveNewContact(item.getContact());
     }
     loadChildEntities(project);
@@ -182,6 +182,15 @@ public class DefaultProjectService implements ProjectService {
       errors.add(new ValidationError("title", "There is already a project with this title"));
     }
 
+    List<Long> uniqueContacts = new ArrayList<>();
+    for (ProjectContact element : project.getContacts()) {
+      if (uniqueContacts.contains(element.getContact().getId())) {
+        errors.add(new ValidationError("contacts", "You cannot use the same contact twice"));
+        break;
+      }
+      uniqueContacts.add(element.getContact().getId());
+    }
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
@@ -194,12 +203,14 @@ public class DefaultProjectService implements ProjectService {
         targetedSequencingService,
         "defaultTargetedSequencingId");
     loadChildEntity(project::setPipeline, project.getPipeline(), pipelineService, "pipelineId");
-    Set<ProjectContactsAndRole> contacts = new HashSet<>();
-    for (ProjectContactsAndRole element : project.getContacts()) {
+    Set<ProjectContact> contacts = new HashSet<>();
+    for (ProjectContact element : project.getContacts()) {
       Contact contact = contactService.get(element.getContact().getId());
       ContactRole contactRole = contactRoleService.get(element.getContactRole().getId());
-      contacts
-          .add(new ProjectContactsAndRole(project, contact, contactRole));
+      // check to ensure the values load properly, and if they do, add it to the set
+      if (contact != null && contactRole != null) {
+        contacts.add(element);
+      }
     }
     project.getContacts().clear();
     project.getContacts().addAll(contacts);
@@ -229,7 +240,21 @@ public class DefaultProjectService implements ProjectService {
   }
 
 
-  public void applySetChangesContacts(Set<ProjectContactsAndRole> to, Set<ProjectContactsAndRole> from) {
+  public void applySetChangesContacts(List<ProjectContact> to, List<ProjectContact> from) {
+    for (int i = 0; i < to.size(); i++) {
+      boolean remover = true;
+      for (int j = 0; j < from.size(); j++) {
+        if (to.get(i).getContact().getId() == from.get(j).getContact().getId()) {
+          to.get(i).setContactRole(from.get(j).getContactRole());
+          remover = false;
+          break;
+        }
+      }
+      if (remover) {
+        to.remove(i);
+      }
+    }
+
     to.removeIf(
         toItem -> from.stream().noneMatch(fromItem -> fromItem.getContact().getId() == toItem.getContact().getId()));
     from.forEach(fromItem -> {
@@ -237,6 +262,7 @@ public class DefaultProjectService implements ProjectService {
         to.add(fromItem);
       }
     });
+
   }
 
   public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {

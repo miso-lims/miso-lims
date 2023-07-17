@@ -13,14 +13,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContactsAndRole.ProjectContactsAndRoleId;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContact.ProjectContactId;
 
 @Entity
-@Table(name = "Project_Contact_and_Role")
-@IdClass(ProjectContactsAndRoleId.class)
-public class ProjectContactsAndRole implements Serializable {
+@Table(name = "Project_Contact")
+@IdClass(ProjectContactId.class)
+public class ProjectContact implements Serializable {
 
-  public static class ProjectContactsAndRoleId implements Serializable {
+  public static class ProjectContactId implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Project project;
@@ -59,7 +59,7 @@ public class ProjectContactsAndRole implements Serializable {
         return false;
       if (getClass() != obj.getClass())
         return false;
-      ProjectContactsAndRoleId other = (ProjectContactsAndRoleId) obj;
+      ProjectContactId other = (ProjectContactId) obj;
       if (project == null) {
         if (other.project != null)
           return false;
@@ -90,16 +90,16 @@ public class ProjectContactsAndRole implements Serializable {
   @JoinColumn(name = "contactRoleId")
   private ContactRole contactRole;
 
-  public ProjectContactsAndRole() {
+  public ProjectContact() {
     // Default constructor
   }
 
-  public ProjectContactsAndRole(Project project, Contact contact) {
+  public ProjectContact(Project project, Contact contact) {
     this.project = project;
     this.contact = contact;
   }
 
-  public ProjectContactsAndRole(Project project, Contact contact, ContactRole contactRole) {
+  public ProjectContact(Project project, Contact contact, ContactRole contactRole) {
     this(project, contact);
     this.contactRole = contactRole;
   }

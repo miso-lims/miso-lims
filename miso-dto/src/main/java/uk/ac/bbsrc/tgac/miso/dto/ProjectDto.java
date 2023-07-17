@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
-import java.util.Set;
 
 public class ProjectDto {
   private long id;
@@ -19,7 +18,7 @@ public class ProjectDto {
   private String rebNumber;
   private String rebExpiry;
   private Integer samplesExpected;
-  private Set<ContactDto> contacts;
+  private List<ContactDto> contacts;
   private List<Long> assayIds;
   private String additionalDetails;
   private Long deliverableId;
@@ -144,11 +143,11 @@ public class ProjectDto {
     this.samplesExpected = samplesExpected;
   }
 
-  public Set<ContactDto> getContacts() {
+  public List<ContactDto> getContacts() {
     return contacts;
   }
 
-  public void setContacts(Set<ContactDto> contacts) {
+  public void setContacts(List<ContactDto> contacts) {
     this.contacts = contacts;
   }
 

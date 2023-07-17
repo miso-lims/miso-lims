@@ -218,7 +218,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContactsAndRole;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.SampleBoxableView;
@@ -2618,10 +2618,10 @@ public class Dtos {
     setString(dto::setRebNumber, from.getRebNumber());
     setDateString(dto::setRebExpiry, from.getRebExpiry());
     setInteger(dto::setSamplesExpected, from.getSamplesExpected(), true);
-    Set<ContactDto> contacts = new HashSet<>();
-    for (ProjectContactsAndRole item : from.getContacts()) {
+    List<ContactDto> contacts = new ArrayList<>();
+    for (ProjectContact item : from.getContacts()) {
       ContactDto holder = asDto(item.getContact());
-      holder.setContactRole(item.getContactRole());
+      holder.setContactRole(asDto(item.getContactRole()));
       contacts.add(holder);
     }
     dto.setContacts(contacts);
@@ -2659,15 +2659,15 @@ public class Dtos {
     setInteger(to::setSamplesExpected, dto.getSamplesExpected(), true);
 
     if (dto.getContacts() != null) {
-      Set<ProjectContactsAndRole> contacts = new HashSet<>();
+      List<ProjectContact> contacts = new ArrayList<>();
       for (ContactDto item : dto.getContacts()) {
         Contact tempContact = new Contact();
         setLong(tempContact::setId, item.getId(), false);
         setString(tempContact::setName, item.getName());
         setString(tempContact::setEmail, item.getEmail());
-        ProjectContactsAndRole holder = new ProjectContactsAndRole(to, tempContact);
+        ProjectContact holder = new ProjectContact(to, tempContact);
         if (item.getContactRole() != null) {
-          holder.setContactRole(item.getContactRole());
+          holder.setContactRole(to(item.getContactRole()));
         }
         contacts.add(holder);
       }
@@ -4519,8 +4519,8 @@ public class Dtos {
 
   public static ContactRoleDto asDto(ContactRole from) {
     ContactRoleDto to = new ContactRoleDto();
-    to.setId(from.getId());
-    to.setName(from.getName());
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
     return to;
   }
 

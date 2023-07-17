@@ -29,7 +29,6 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.collection.internal.PersistentSet;
 
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
@@ -39,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ProjectChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContactsAndRole;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 
@@ -77,9 +76,10 @@ public class ProjectImpl implements Project {
   private Deliverable deliverable;
 
 
-  @OneToMany(targetEntity = ProjectContactsAndRole.class, mappedBy = "project", orphanRemoval = true,
+  @OneToMany(targetEntity = ProjectContact.class, mappedBy = "project", orphanRemoval = true,
       cascade = CascadeType.ALL)
-  private Set<ProjectContactsAndRole> contacts = new HashSet<>();
+  private List<ProjectContact> contacts = new ArrayList<>();
+  // private Set<ProjectContact> contacts = new HashSet<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -461,18 +461,13 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public Set<ProjectContactsAndRole> getContacts() {
+  public List<ProjectContact> getContacts() {
     return contacts;
   }
 
   @Override
-  public void setContacts(Set<ProjectContactsAndRole> contacts) {
-    if (contacts instanceof PersistentSet) {
-      this.contacts = contacts;
-    } else {
-      this.contacts.clear();
-      this.contacts.addAll(contacts);
-    }
+  public void setContacts(List<ProjectContact> contacts) {
+    this.contacts = contacts;
   }
 
   @Override

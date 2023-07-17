@@ -1253,13 +1253,13 @@ Urls = (function () {
   };
 
   // Contact Roles
-  var contactRoleUiBase = baseUrl + "/contactRole";
+  var contactRoleUiBase = baseUrl + "/contactrole";
   ui.contactRoles = {
     bulkCreate: contactRoleUiBase + "/bulk/new",
     bulkEdit: contactRoleUiBase + "/bulk/edit",
   };
 
-  var contactRoleRestBase = restBase + "/contactRoles";
+  var contactRoleRestBase = restBase + "/contactroles";
   rest.contactRoles = {
     bulkSave: contactRoleRestBase + "/bulk",
     bulkSaveProgress: idUrlFunction(contactRoleRestBase + "/bulk"),

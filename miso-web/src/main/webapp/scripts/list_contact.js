@@ -72,9 +72,11 @@ ListTarget.contact = (function ($) {
   }
 
   function selectContactRoleDialog(contact) {
+    var byName = Utils.sorting.standardSort("name");
+    var contactRoles = Constants.contactRoles.sort(byName);
     Utils.showWizardDialog(
-      "Select Contact Role (Required)",
-      Constants.contactRoles.map(function (contactRole) {
+      "Select Contact Role",
+      contactRoles.map(function (contactRole) {
         return {
           name: contactRole.name,
           handler: function () {

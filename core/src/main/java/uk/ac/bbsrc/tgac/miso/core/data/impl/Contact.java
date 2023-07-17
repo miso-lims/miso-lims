@@ -10,6 +10,7 @@ import javax.persistence.Id;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 public class Contact implements Deletable, Identifiable, Serializable {
@@ -70,5 +71,12 @@ public class Contact implements Deletable, Identifiable, Serializable {
   @Override
   public int hashCode() {
     return Objects.hash(name, email);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return LimsUtils.equals(this, obj,
+        Contact::getName,
+        Contact::getEmail);
   }
 }

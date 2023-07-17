@@ -1,13 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
-
 public class ContactDto {
 
   private Long id;
   private String name;
   private String email;
-  private ContactRole contactRole;
+  private ContactRoleDto contactRoleDto;
 
   public Long getId() {
     return id;
@@ -33,12 +31,12 @@ public class ContactDto {
     this.email = email;
   }
 
-  public ContactRole getContactRole() {
-    return contactRole;
+  public ContactRoleDto getContactRole() {
+    return contactRoleDto;
   }
 
-  public void setContactRole(ContactRole contactRole) {
-    this.contactRole = contactRole;
+  public void setContactRole(ContactRoleDto contactRoleDto) {
+    this.contactRoleDto = contactRoleDto;
   }
 
 }

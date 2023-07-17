@@ -3,13 +3,14 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContactsAndRole;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 
 /**
@@ -117,9 +118,9 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
 
   public void setSamplesExpected(Integer samplesExpected);
 
-  public Set<ProjectContactsAndRole> getContacts();
+  public List<ProjectContact> getContacts();
 
-  public void setContacts(Set<ProjectContactsAndRole> contact);
+  public void setContacts(List<ProjectContact> contact);
 
   public String getAdditionalDetails();
 

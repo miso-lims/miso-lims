@@ -1,1 +1,1 @@
-Contact Roles data type, and can now assign a contact role to a contact when creating/editing a project
+Contact Roles data type to describe the purpose of a contact within a project
