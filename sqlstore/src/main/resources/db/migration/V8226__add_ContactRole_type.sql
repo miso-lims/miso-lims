@@ -12,7 +12,7 @@ CREATE TABLE Project_Contact (
   projectId bigint NOT NULL,
   contactId bigint NOT NULL,
   contactRoleId bigint NOT NULL,
-  PRIMARY KEY (projectId, contactId),
+  PRIMARY KEY (projectId, contactId, contactRoleId),
   CONSTRAINT fk_project_contact_project FOREIGN KEY (projectId) REFERENCES Project (projectId),
   CONSTRAINT fk_project_contact_contact FOREIGN KEY (contactId) REFERENCES Contact (contactId),
   CONSTRAINT fk_project_contact_contactRole FOREIGN KEY (contactRoleId) REFERENCES ContactRole (contactRoleId)

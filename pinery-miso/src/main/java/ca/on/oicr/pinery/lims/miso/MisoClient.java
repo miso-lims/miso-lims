@@ -1436,6 +1436,8 @@ public class MisoClient implements Lims {
         p.setSamplesExpected(null);
       }
 
+      p.setContactName(rs.getString("contactName"));
+      p.setContactEmail(rs.getString("contactEmail"));
       return p;
     }
 

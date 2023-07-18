@@ -50,19 +50,12 @@
   </table>
 </c:if>
 
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#contacts_section_arrowclick'), 'contactss_section');">
-  Contacts
-<div id="contacts_section_arrowclick" class="toggleLeftDown"></div>
-</div>
+
 <div id="projectForm_contactError"></div>
-<div id="contacts_section" class="expandable_section">
+<div id="contacts_section">
   <h1>Contacts</h1>
 </div>
 
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#assays_section_arrowclick'), 'assays_section');">
-  Assays
-<div id="assays_section_arrowclick" class="toggleLeftDown"></div>
-</div>
 <div id="projectForm_assaysError"></div>
 <div id="assays_section" class="expandable_section">
   <h1>Assays</h1>

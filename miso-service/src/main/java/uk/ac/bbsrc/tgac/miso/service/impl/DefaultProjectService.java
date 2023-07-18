@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContact;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
@@ -185,8 +185,8 @@ public class DefaultProjectService implements ProjectService {
     List<Long> uniqueContacts = new ArrayList<>();
     for (ProjectContact element : project.getContacts()) {
       if (uniqueContacts.contains(element.getContact().getId())) {
-        errors.add(new ValidationError("contacts", "You cannot use the same contact twice"));
-        break;
+        errors.add(new ValidationError("contacts",
+            "The contact " + element.getContact().getEmail() + " has been used more than once"));
       }
       uniqueContacts.add(element.getContact().getId());
     }
@@ -203,17 +203,22 @@ public class DefaultProjectService implements ProjectService {
         targetedSequencingService,
         "defaultTargetedSequencingId");
     loadChildEntity(project::setPipeline, project.getPipeline(), pipelineService, "pipelineId");
-    Set<ProjectContact> contacts = new HashSet<>();
+
     for (ProjectContact element : project.getContacts()) {
       Contact contact = contactService.get(element.getContact().getId());
+      if (contact == null) {
+        throw new ValidationException(
+            new ValidationError("contacts", "Invalid contact ID: %d".formatted(element.getContact().getId())));
+      }
       ContactRole contactRole = contactRoleService.get(element.getContactRole().getId());
-      // check to ensure the values load properly, and if they do, add it to the set
-      if (contact != null && contactRole != null) {
-        contacts.add(element);
+      if (contactRole == null) {
+        throw new ValidationException(
+            new ValidationError("contact roles",
+                "Invalid contact role ID: %d".formatted(element.getContactRole().getId())));
       }
     }
-    project.getContacts().clear();
-    project.getContacts().addAll(contacts);
+    project.setContacts(project.getContacts());
+
     Set<Assay> assays = new HashSet<>();
     for (Assay element : project.getAssays()) {
       loadChildEntity(x -> assays.add(x), element, assayService, "assays");
@@ -241,22 +246,9 @@ public class DefaultProjectService implements ProjectService {
 
 
   public void applySetChangesContacts(List<ProjectContact> to, List<ProjectContact> from) {
-    for (int i = 0; i < to.size(); i++) {
-      boolean remover = true;
-      for (int j = 0; j < from.size(); j++) {
-        if (to.get(i).getContact().getId() == from.get(j).getContact().getId()) {
-          to.get(i).setContactRole(from.get(j).getContactRole());
-          remover = false;
-          break;
-        }
-      }
-      if (remover) {
-        to.remove(i);
-      }
-    }
-
     to.removeIf(
-        toItem -> from.stream().noneMatch(fromItem -> fromItem.getContact().getId() == toItem.getContact().getId()));
+        toItem -> from.stream().noneMatch(fromItem -> fromItem.getContact().getId() == toItem.getContact().getId()
+            && fromItem.getContactRole().getId() == toItem.getContactRole().getId()));
     from.forEach(fromItem -> {
       if (to.stream().noneMatch(toItem -> toItem.getContact().getId() == fromItem.getContact().getId())) {
         to.add(fromItem);

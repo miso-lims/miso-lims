@@ -5,7 +5,7 @@ public class ContactDto {
   private Long id;
   private String name;
   private String email;
-  private ContactRoleDto contactRoleDto;
+  private ContactRoleDto contactRole;
 
   public Long getId() {
     return id;
@@ -32,11 +32,11 @@ public class ContactDto {
   }
 
   public ContactRoleDto getContactRole() {
-    return contactRoleDto;
+    return contactRole;
   }
 
-  public void setContactRole(ContactRoleDto contactRoleDto) {
-    this.contactRoleDto = contactRoleDto;
+  public void setContactRole(ContactRoleDto contactRole) {
+    this.contactRole = contactRole;
   }
 
 }

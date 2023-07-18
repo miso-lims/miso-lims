@@ -15,7 +15,7 @@ BulkTarget.contactrole = (function () {
       return Urls.rest.contactRoles.bulkSaveProgress(operationId);
     },
     getUserManualUrl: function () {
-      return Urls.external.userManual("type_data", "contactroles");
+      return Urls.external.userManual("type_data", "contact-roles");
     },
     getBulkActions: function (config) {
       return [BulkUtils.actions.edit(Urls.ui.contactRoles.bulkEdit)];

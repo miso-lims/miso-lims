@@ -11,9 +11,13 @@ SELECT
   proj.rebNumber,
   proj.rebExpiry,
   proj.description,
-  proj.samplesExpected
+  proj.samplesExpected,
+  c.name contactName,
+  c.email contactEmail
 FROM Project proj
 JOIN Pipeline pipe ON pipe.pipelineId = proj.pipelineId
+JOIN Project_Contact pc ON pc.projectId = proj.projectId WHERE pc.contactRoleId = 1 LIMIT 1
+Join Contact c ON c.contactId = pc.contactId
 LEFT JOIN (
   SELECT
     project_projectId,

@@ -2,7 +2,7 @@ ListTarget.contactrole = (function ($) {
   return {
     name: "Contact Roles",
     getUserManualUrl: function () {
-      return Urls.external.userManual("type_data", "contactroles");
+      return Urls.external.userManual("type_data", "contact-roles");
     },
     createUrl: function (config, projectId) {
       throw new Error("Must be provided statically");

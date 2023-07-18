@@ -38,7 +38,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ProjectChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 
@@ -79,7 +78,6 @@ public class ProjectImpl implements Project {
   @OneToMany(targetEntity = ProjectContact.class, mappedBy = "project", orphanRemoval = true,
       cascade = CascadeType.ALL)
   private List<ProjectContact> contacts = new ArrayList<>();
-  // private Set<ProjectContact> contacts = new HashSet<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)

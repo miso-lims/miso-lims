@@ -86,7 +86,7 @@ public class DefaultContactRoleService extends AbstractSaveService<ContactRole> 
     ValidationResult result = new ValidationResult();
     long usage = contactRoleDao.getUsage(object);
     if (usage > 0L) {
-      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.contacts(usage)));
+      result.addError(ValidationError.forDeletionUsage(object, usage, "project " + Pluralizer.contacts(usage)));
     }
     return result;
   }

@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
+package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
@@ -10,10 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContact.ProjectContactId;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact.ProjectContactId;
 
 @Entity
 @Table(name = "Project_Contact")
@@ -25,6 +22,7 @@ public class ProjectContact implements Serializable {
 
     private Project project;
     private Contact contact;
+    private ContactRole contactRole;
 
     public Project getProject() {
       return project;
@@ -42,12 +40,22 @@ public class ProjectContact implements Serializable {
       this.contact = contact;
     }
 
+    public ContactRole getContactRole() {
+      return contactRole;
+    }
+
+    public void setContactRole(ContactRole contactRole) {
+      this.contactRole = contactRole;
+    }
+
     @Override
     public int hashCode() {
       final int prime = 31;
       int result = 1;
       result = prime * result + ((project == null) ? 0 : project.hashCode());
       result = prime * result + ((contact == null) ? 0 : contact.hashCode());
+      result = prime * result + ((contact == null) ? 0 : contactRole.hashCode());
+
       return result;
     }
 
@@ -70,6 +78,11 @@ public class ProjectContact implements Serializable {
           return false;
       } else if (!contact.equals(other.contact))
         return false;
+      if (contactRole == null) {
+        if (other.contactRole != null)
+          return false;
+      } else if (!contactRole.equals(other.contactRole))
+        return false;
       return true;
     }
   }
@@ -86,6 +99,7 @@ public class ProjectContact implements Serializable {
   @JoinColumn(name = "contactId")
   private Contact contact;
 
+  @Id
   @ManyToOne(targetEntity = ContactRole.class)
   @JoinColumn(name = "contactRoleId")
   private ContactRole contactRole;

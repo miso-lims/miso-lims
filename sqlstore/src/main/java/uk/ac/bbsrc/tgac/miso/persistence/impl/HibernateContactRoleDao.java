@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectContact;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.persistence.ContactRoleDao;
 
 @Repository
