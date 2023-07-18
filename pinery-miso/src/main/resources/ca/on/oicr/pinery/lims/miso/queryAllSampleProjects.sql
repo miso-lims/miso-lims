@@ -16,8 +16,7 @@ SELECT
   c.email contactEmail
 FROM Project proj
 JOIN Pipeline pipe ON pipe.pipelineId = proj.pipelineId
-JOIN Project_Contact pc ON pc.projectId = proj.projectId WHERE pc.contactRoleId = 1 LIMIT 1
-LEFT JOIN Contact c ON c.contactId = pc.contactId
+
 LEFT JOIN (
   SELECT
     project_projectId,
@@ -44,3 +43,5 @@ LEFT JOIN (
   ) items
   GROUP BY project_projectId
 ) stats ON stats.project_projectId = proj.projectId
+LEFT JOIN Project_Contact pc ON pc.projectId = proj.projectId WHERE pc.contactRoleId = 1 LIMIT 1
+LEFT JOIN Contact c ON c.contactId = pc.contactId
