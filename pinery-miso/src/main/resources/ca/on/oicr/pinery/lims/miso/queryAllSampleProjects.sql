@@ -43,5 +43,5 @@ LEFT JOIN (
   ) items
   GROUP BY project_projectId
 ) stats ON stats.project_projectId = proj.projectId
-LEFT JOIN Project_Contact pc ON pc.projectId = proj.projectId WHERE pc.contactRoleId = 1 LIMIT 1
+LEFT JOIN Project_Contact pc ON pc.projectId = proj.projectId WHERE pc.contactRoleId = '1' LIMIT 1
 LEFT JOIN Contact c ON c.contactId = pc.contactId
