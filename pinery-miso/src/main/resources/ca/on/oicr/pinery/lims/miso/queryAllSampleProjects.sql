@@ -43,10 +43,10 @@ LEFT JOIN (
   ) items
   GROUP BY project_projectId
 ) stats ON stats.project_projectId = proj.projectId
-JOIN Project_Contact pc ON pc.projectId = (
+LEFT JOIN Project_Contact pc ON pc.projectId = (
   SELECT 
-    pc1.contactId
+    pc1.projectId
   FROM Project_Contact pc1 WHERE proj.projectId = pc1.projectId AND pc1.contactRoleId = 1
-  ORDER BY pc1.contactId LIMIT 1
+  ORDER BY pc1.projectId LIMIT 1
 )
 LEFT JOIN Contact c ON c.contactId = pc.contactId
