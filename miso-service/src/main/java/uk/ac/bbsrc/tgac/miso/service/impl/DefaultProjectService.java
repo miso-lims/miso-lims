@@ -22,7 +22,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -182,13 +181,16 @@ public class DefaultProjectService implements ProjectService {
       errors.add(new ValidationError("title", "There is already a project with this title"));
     }
 
-    List<Long> uniqueContacts = new ArrayList<>();
-    for (ProjectContact element : project.getContacts()) {
-      if (uniqueContacts.contains(element.getContact().getId())) {
-        errors.add(new ValidationError("contacts",
-            "The contact " + element.getContact().getEmail() + " has been used more than once"));
+    List<ProjectContact> contacts = project.getContacts();
+    for (int i = 0; i < contacts.size(); i++) {
+      for (int j = i + 1; j < contacts.size(); j++) {
+        if (contacts.get(i).getContact().getId() == contacts.get(j).getContact().getId()
+            && contacts.get(i).getContactRole().getId() == contacts.get(j).getContactRole().getId()) {
+          errors.add(new ValidationError("contacts", "The contact " + contacts.get(i).getContact().getEmail()
+              + " with the assigned contact role " + contacts.get(i).getContactRole().getName()
+              + " is used more than once"));
+        }
       }
-      uniqueContacts.add(element.getContact().getId());
     }
 
     if (!errors.isEmpty()) {
@@ -204,18 +206,10 @@ public class DefaultProjectService implements ProjectService {
         "defaultTargetedSequencingId");
     loadChildEntity(project::setPipeline, project.getPipeline(), pipelineService, "pipelineId");
 
-    for (ProjectContact element : project.getContacts()) {
-      Contact contact = contactService.get(element.getContact().getId());
-      if (contact == null) {
-        throw new ValidationException(
-            new ValidationError("contacts", "Invalid contact ID: %d".formatted(element.getContact().getId())));
-      }
-      ContactRole contactRole = contactRoleService.get(element.getContactRole().getId());
-      if (contactRole == null) {
-        throw new ValidationException(
-            new ValidationError("contact roles",
-                "Invalid contact role ID: %d".formatted(element.getContactRole().getId())));
-      }
+    for (ProjectContact projectContact : project.getContacts()) {
+      loadChildEntity(projectContact::setContact, projectContact.getContact(), contactService, "contact");
+      loadChildEntity(projectContact::setContactRole, projectContact.getContactRole(), contactRoleService, "contact");
+
     }
     project.setContacts(project.getContacts());
 
@@ -250,7 +244,8 @@ public class DefaultProjectService implements ProjectService {
         toItem -> from.stream().noneMatch(fromItem -> fromItem.getContact().getId() == toItem.getContact().getId()
             && fromItem.getContactRole().getId() == toItem.getContactRole().getId()));
     from.forEach(fromItem -> {
-      if (to.stream().noneMatch(toItem -> toItem.getContact().getId() == fromItem.getContact().getId())) {
+      if (to.stream().noneMatch(toItem -> toItem.getContact().getId() == fromItem.getContact().getId()
+          && fromItem.getContactRole().getId() == toItem.getContactRole().getId())) {
         to.add(fromItem);
       }
     });
