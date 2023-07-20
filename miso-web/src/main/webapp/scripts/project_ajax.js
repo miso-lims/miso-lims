@@ -5,6 +5,8 @@ var Project = (function () {
   var form = null;
   var listConfig = {};
 
+  var projectId = null;
+
   return {
     setForm: function (formApi) {
       form = formApi;
@@ -12,6 +14,10 @@ var Project = (function () {
 
     setListConfig: function (config) {
       listConfig = config;
+    },
+
+    setProjectId: function (id) {
+      projectId = id;
     },
 
     setAssays: function (assays) {
@@ -47,14 +53,28 @@ var Project = (function () {
 
     addContact: function (addContact) {
       var contacts = Project.getContacts();
-      contacts.push(addContact);
-      Project.setContacts(contacts);
+      addContact["projectId"] = projectId;
+      if (
+        contacts.find(function (contact) {
+          return (
+            contact.contactId === addContact.contactId &&
+            contact.contactRoleId === addContact.contactRoleId
+          );
+        })
+      ) {
+        Utils.showOkDialog("Error", [
+          "Duplicate: this contact and role combination is already included",
+        ]);
+      } else {
+        contacts.push(addContact);
+        Project.setContacts(contacts);
+      }
     },
 
     removeContacts: function (removeContacts) {
       var contacts = Project.getContacts().filter(function (contact) {
         return !removeContacts.some(function (removal) {
-          return removal.id === contact.id;
+          return removal.id === contact.id && removal.contactRoleId === contact.contactRoleId;
         });
       });
       Project.setContacts(contacts);

@@ -37,6 +37,29 @@ ListTarget.contact = (function ($) {
       return [ListUtils.createStaticAddAction("Contacts", Urls.ui.contacts.bulkCreate, true)];
     },
     createColumns: function (config, projectId) {
+      if (config.projectId != null && config.projectId >= 0) {
+        var columns = [
+          {
+            sTitle: "Name",
+            mData: "contactName",
+          },
+          {
+            sTitle: "Email",
+            mData: "contactEmail",
+            mRender: function (data, type, full) {
+              if (type === "display") {
+                return '<a href="mailto:' + data + '">' + data + "</a>";
+              }
+              return data;
+            },
+          },
+          {
+            sTitle: "Contact Role",
+            mData: "contactRole",
+          },
+        ];
+        return columns;
+      }
       var columns = [
         {
           sTitle: "Name",
@@ -53,14 +76,6 @@ ListTarget.contact = (function ($) {
           },
         },
       ];
-      if (config.projectId != null && config.projectId >= 0) {
-        columns.push({
-          sTitle: "Contact Role",
-          mData: function (item, type) {
-            return item.contactRole.name;
-          },
-        });
-      }
       return columns;
     },
   };
@@ -80,8 +95,15 @@ ListTarget.contact = (function ($) {
         return {
           name: contactRole.name,
           handler: function () {
-            contact.contactRole = contactRole;
-            Project.addContact(contact);
+            // setting contact variable in ProjectContactDto format
+            var projectContact = {
+              contactId: contact.id,
+              contactName: contact.name,
+              contactEmail: contact.email,
+              contactRoleId: contactRole.id,
+              contactRole: contactRole.name,
+            };
+            Project.addContact(projectContact);
           },
         };
       })

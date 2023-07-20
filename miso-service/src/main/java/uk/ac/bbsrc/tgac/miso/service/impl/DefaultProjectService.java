@@ -184,11 +184,11 @@ public class DefaultProjectService implements ProjectService {
     List<ProjectContact> contacts = project.getContacts();
     for (int i = 0; i < contacts.size(); i++) {
       for (int j = i + 1; j < contacts.size(); j++) {
-        if (contacts.get(i).getContact().getId() == contacts.get(j).getContact().getId()
-            && contacts.get(i).getContactRole().getId() == contacts.get(j).getContactRole().getId()) {
-          errors.add(new ValidationError("contacts", "The contact " + contacts.get(i).getContact().getEmail()
-              + " with the assigned contact role " + contacts.get(i).getContactRole().getName()
-              + " is used more than once"));
+        if (contactsMatch(contacts.get(i), contacts.get(j))) {
+          errors.add(new ValidationError("contact", "The contact '" + contacts.get(i).getContact().getEmail()
+              + "' with the assigned contact role '" + contacts.get(i).getContactRole().getName()
+              + "' is used more than once"));
+          continue;
         }
       }
     }
@@ -241,15 +241,16 @@ public class DefaultProjectService implements ProjectService {
 
   public void applySetChangesContacts(List<ProjectContact> to, List<ProjectContact> from) {
     to.removeIf(
-        toItem -> from.stream().noneMatch(fromItem -> fromItem.getContact().getId() == toItem.getContact().getId()
-            && fromItem.getContactRole().getId() == toItem.getContactRole().getId()));
+        toItem -> from.stream().noneMatch(fromItem -> contactsMatch(toItem, fromItem)));
     from.forEach(fromItem -> {
-      if (to.stream().noneMatch(toItem -> toItem.getContact().getId() == fromItem.getContact().getId()
-          && fromItem.getContactRole().getId() == toItem.getContactRole().getId())) {
+      if (to.stream().noneMatch(toItem -> contactsMatch(fromItem, toItem))) {
         to.add(fromItem);
       }
     });
+  }
 
+  private static boolean contactsMatch(ProjectContact a, ProjectContact b) {
+    return a.getContact().getId() == b.getContact().getId() && a.getContactRole().getId() == b.getContactRole().getId();
   }
 
   public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {

@@ -12,11 +12,10 @@ SELECT
   proj.rebExpiry,
   proj.description,
   proj.samplesExpected,
-  c.name contactName,
-  c.email contactEmail
+  GROUP_CONCAT(DISTINCT c.name ORDER BY c.name DESC SEPARATOR '; ') contactName,
+  GROUP_CONCAT(DISTINCT c.email ORDER BY c.name DESC SEPARATOR '; ') contactEmail
 FROM Project proj
 JOIN Pipeline pipe ON pipe.pipelineId = proj.pipelineId
-
 LEFT JOIN (
   SELECT
     project_projectId,
@@ -46,7 +45,8 @@ LEFT JOIN (
 LEFT JOIN Project_Contact pc ON pc.projectId = (
   SELECT 
     pc1.projectId
-  FROM Project_Contact pc1 WHERE proj.projectId = pc1.projectId AND pc1.contactRoleId = 1
-  ORDER BY pc1.projectId LIMIT 1
+  FROM Project_Contact pc1 WHERE proj.projectId = pc1.projectId AND pc.contactRoleId = 1 
+  LIMIT 1
 )
 LEFT JOIN Contact c ON c.contactId = pc.contactId
+GROUP BY proj.projectId

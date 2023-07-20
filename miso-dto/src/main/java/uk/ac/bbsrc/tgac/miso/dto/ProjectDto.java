@@ -18,7 +18,7 @@ public class ProjectDto {
   private String rebNumber;
   private String rebExpiry;
   private Integer samplesExpected;
-  private List<ContactDto> contacts;
+  private List<ProjectContactDto> contacts;
   private List<Long> assayIds;
   private String additionalDetails;
   private Long deliverableId;
@@ -143,11 +143,11 @@ public class ProjectDto {
     this.samplesExpected = samplesExpected;
   }
 
-  public List<ContactDto> getContacts() {
+  public List<ProjectContactDto> getContacts() {
     return contacts;
   }
 
-  public void setContacts(List<ContactDto> contacts) {
+  public void setContacts(List<ProjectContactDto> contacts) {
     this.contacts = contacts;
   }
 

@@ -51,15 +51,18 @@
 </c:if>
 
 
+<br>
+<h1>Contacts</h1>
 <div id="projectForm_contactError"></div>
 <div id="contacts_section">
-  <h1>Contacts</h1>
 </div>
+<br>
 
+<h1>Assays</h1>
 <div id="projectForm_assaysError"></div>
-<div id="assays_section" class="expandable_section">
-  <h1>Assays</h1>
+<div id="assays_section">
 </div>
+<br>
 
 <c:if test="${project.id != 0}">
   <button id="collapse_all" type="button" class="fg-button ui-state-default ui-corner-all" onclick="Utils.ui.collapseClass('expandable_section')">
@@ -188,15 +191,16 @@
     for (var i = 0; i < projectDto.assayIds.length; i++) {
       var holder = Constants.assays.find(function (x) {
         return x.id === projectDto.assayIds[i];
-      });
+    });
       assays.push(holder);
-    }
+  }
 
     Warning.generateHeaderWarnings('warnings', WarningTarget.project, projectDto);
     var form = FormUtils.createForm('projectForm', 'save', projectDto, 'project', config);
 
     Project.setForm(form);
     Project.setListConfig({projectId: projectDto.id});
+    Project.setProjectId(projectDto.id);
     Project.setAssays(assays);
     Project.setContacts(projectDto.contacts);
     Utils.ui.updateHelpLink(FormTarget.project.getUserManualUrl());

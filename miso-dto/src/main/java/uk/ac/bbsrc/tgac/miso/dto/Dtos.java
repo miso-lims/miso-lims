@@ -2618,11 +2618,11 @@ public class Dtos {
     setString(dto::setRebNumber, from.getRebNumber());
     setDateString(dto::setRebExpiry, from.getRebExpiry());
     setInteger(dto::setSamplesExpected, from.getSamplesExpected(), true);
-    List<ContactDto> contacts = new ArrayList<>();
+
+
+    List<ProjectContactDto> contacts = new ArrayList<>();
     for (ProjectContact item : from.getContacts()) {
-      ContactDto holder = asDto(item.getContact());
-      holder.setContactRole(asDto(item.getContactRole()));
-      contacts.add(holder);
+      contacts.add(asDto(item));
     }
     dto.setContacts(contacts);
     return dto;
@@ -2660,19 +2660,12 @@ public class Dtos {
 
     if (dto.getContacts() != null) {
       List<ProjectContact> contacts = new ArrayList<>();
-      for (ContactDto item : dto.getContacts()) {
-        Contact tempContact = new Contact();
-        setLong(tempContact::setId, item.getId(), false);
-        setString(tempContact::setName, item.getName());
-        setString(tempContact::setEmail, item.getEmail());
-        ProjectContact holder = new ProjectContact(to, tempContact);
-        if (item.getContactRole() != null) {
-          holder.setContactRole(to(item.getContactRole()));
-        }
-        contacts.add(holder);
+      for (ProjectContactDto item : dto.getContacts()) {
+        contacts.add(to(item));
       }
       to.setContacts(contacts);
     }
+
     if (dto.getAssayIds() != null) {
       List<Assay> assays = new ArrayList<>();
       for (int i = 0; i < dto.getAssayIds().size(); i++) {
@@ -4528,6 +4521,33 @@ public class Dtos {
     ContactRole to = new ContactRole();
     setLong(to::setId, from.getId(), false);
     setString(to::setName, from.getName());
+    return to;
+  }
+
+  public static ProjectContactDto asDto(ProjectContact from) {
+    ProjectContactDto to = new ProjectContactDto();
+    setLong(to::setProjectId, from.getProject().getId(), false);
+    setLong(to::setContactId, from.getContact().getId(), false);
+    setLong(to::setContactRoleId, from.getContactRole().getId(), false);
+    setString(to::setContactName, from.getContact().getName());
+    setString(to::setContactEmail, from.getContact().getEmail());
+    setString(to::setContactRole, from.getContactRole().getName());
+    return to;
+  }
+
+  public static ProjectContact to(ProjectContactDto from) {
+    ProjectContact to = new ProjectContact();
+    setObject(to::setProject, ProjectImpl::new, from.getProjectId());
+
+    // Have to set contact manually as opposed to calling 'to' method because we don't have a
+    // contact object, and will cause an error when we are sending a newly created object
+    Contact contact = new Contact();
+    setLong(contact::setId, from.getContactId(), false);
+    setString(contact::setName, from.getContactName());
+    setString(contact::setEmail, from.getContactEmail());
+    to.setContact(contact);
+
+    setObject(to::setContactRole, ContactRole::new, from.getContactRoleId());
     return to;
   }
 
