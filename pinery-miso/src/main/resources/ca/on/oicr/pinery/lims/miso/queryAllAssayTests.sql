@@ -7,6 +7,7 @@ SELECT link.assayId
   ,t.libraryQualificationMethod
   ,qldc.code AS libraryQualificationSourceTemplateType
   ,t.repeatPerTimepoint
+  ,t.permittedSamples
 FROM Assay_AssayTest link
 JOIN AssayTest t ON t.testId = link.testId
 LEFT JOIN TissueType tt ON tt.tissueTypeId = t.tissueTypeId
