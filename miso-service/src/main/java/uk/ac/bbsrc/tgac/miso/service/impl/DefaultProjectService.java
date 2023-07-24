@@ -209,9 +209,7 @@ public class DefaultProjectService implements ProjectService {
     for (ProjectContact projectContact : project.getContacts()) {
       loadChildEntity(projectContact::setContact, projectContact.getContact(), contactService, "contact");
       loadChildEntity(projectContact::setContactRole, projectContact.getContactRole(), contactRoleService, "contact");
-
     }
-    project.setContacts(project.getContacts());
 
     Set<Assay> assays = new HashSet<>();
     for (Assay element : project.getAssays()) {

@@ -4539,8 +4539,6 @@ public class Dtos {
     ProjectContact to = new ProjectContact();
     setObject(to::setProject, ProjectImpl::new, from.getProjectId());
 
-    // Have to set contact manually as opposed to calling 'to' method because we don't have a
-    // contact object, and will cause an error when we are sending a newly created object
     Contact contact = new Contact();
     setLong(contact::setId, from.getContactId(), false);
     setString(contact::setName, from.getContactName());

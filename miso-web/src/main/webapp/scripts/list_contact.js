@@ -9,7 +9,7 @@ ListTarget.contact = (function ($) {
     },
     createBulkActions: function (config, projectId) {
       var actions = BulkTarget.contact.getBulkActions(config);
-      if (config.projectId != null && config.projectId >= 0) {
+      if (isProjectPage(config)) {
         return [
           {
             name: "Remove",
@@ -26,7 +26,7 @@ ListTarget.contact = (function ($) {
       return actions;
     },
     createStaticActions: function (config, projectId) {
-      if (config.projectId != null && config.projectId >= 0) {
+      if (isProjectPage(config)) {
         return [
           {
             name: "Add",
@@ -37,37 +37,14 @@ ListTarget.contact = (function ($) {
       return [ListUtils.createStaticAddAction("Contacts", Urls.ui.contacts.bulkCreate, true)];
     },
     createColumns: function (config, projectId) {
-      if (config.projectId != null && config.projectId >= 0) {
-        var columns = [
-          {
-            sTitle: "Name",
-            mData: "contactName",
-          },
-          {
-            sTitle: "Email",
-            mData: "contactEmail",
-            mRender: function (data, type, full) {
-              if (type === "display") {
-                return '<a href="mailto:' + data + '">' + data + "</a>";
-              }
-              return data;
-            },
-          },
-          {
-            sTitle: "Contact Role",
-            mData: "contactRole",
-          },
-        ];
-        return columns;
-      }
       var columns = [
         {
           sTitle: "Name",
-          mData: "name",
+          mData: isProjectPage(config) ? "contactName" : "name",
         },
         {
           sTitle: "Email",
-          mData: "email",
+          mData: isProjectPage(config) ? "contactEmail" : "email",
           mRender: function (data, type, full) {
             if (type === "display") {
               return '<a href="mailto:' + data + '">' + data + "</a>";
@@ -76,6 +53,12 @@ ListTarget.contact = (function ($) {
           },
         },
       ];
+      if (isProjectPage(config)) {
+        columns.push({
+          sTitle: "Contact Role",
+          mData: "contactRole",
+        });
+      }
       return columns;
     },
   };
@@ -108,5 +91,9 @@ ListTarget.contact = (function ($) {
         };
       })
     );
+  }
+
+  function isProjectPage(config) {
+    return config.projectId != null && config.projectId >= 0;
   }
 })(jQuery);

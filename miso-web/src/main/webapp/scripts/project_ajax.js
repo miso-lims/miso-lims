@@ -74,7 +74,12 @@ var Project = (function () {
     removeContacts: function (removeContacts) {
       var contacts = Project.getContacts().filter(function (contact) {
         return !removeContacts.some(function (removal) {
-          return removal.id === contact.id && removal.contactRoleId === contact.contactRoleId;
+          return (
+            removal.contactId === contact.contactId &&
+            removal.contactRoleId === contact.contactRoleId &&
+            removal.contactName === contact.contactName &&
+            removal.contactEmail === contact.contactEmail
+          );
         });
       });
       Project.setContacts(contacts);

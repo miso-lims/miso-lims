@@ -46,7 +46,7 @@ LEFT JOIN (
   SELECT
     pc.projectId,
     GROUP_CONCAT(c1.name ORDER BY c1.name DESC SEPARATOR '; ') name,
-    GROUP_CONCAT(c1.email ORDER BY c1.email DESC SEPARATOR '; ') email
+    GROUP_CONCAT(c1.email ORDER BY c1.name DESC SEPARATOR '; ') email
   FROM Project_Contact pc 
   JOIN Contact c1 ON c1.contactId = pc.contactId WHERE pc.contactRoleId = 1
   GROUP BY pc.projectId
