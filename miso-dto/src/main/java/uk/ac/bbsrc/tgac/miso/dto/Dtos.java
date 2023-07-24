@@ -4164,7 +4164,7 @@ public class Dtos {
   public static ListTransferViewDto asDto(@Nonnull ListTransferView from) {
     ListTransferViewDto to = new ListTransferViewDto();
     setLong(to::setId, from.getId(), false);
-    setDateString(to::setTransferTime, from.getTransferTime());
+    setDateTimeString(to::setTransferTime, from.getTransferTime());
     setId(to::setSenderLabId, from.getSenderLab());
     setString(to::setSenderLabLabel, maybeGetProperty(from.getSenderLab(), Lab::getAlias));
     setId(to::setSenderGroupId, from.getSenderGroup());

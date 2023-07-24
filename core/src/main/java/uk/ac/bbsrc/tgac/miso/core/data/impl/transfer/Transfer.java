@@ -25,7 +25,6 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -33,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.TransferChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
-public class Transfer implements Identifiable, ChangeLoggable, Deletable, Serializable {
+public class Transfer implements ChangeLoggable, Deletable, Serializable {
 
   private static final long serialVersionUID = 1L;
 

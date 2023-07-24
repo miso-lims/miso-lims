@@ -303,21 +303,7 @@ ListTarget.sample = (function () {
         {
           sTitle: "Modified",
           mData: "lastModified",
-          mRender: function (data, type, full) {
-            if (type !== "display") {
-              return data;
-            }
-            return (
-              '<div class="tooltip">' +
-              "<span>" +
-              data.split(" ")[0] +
-              "</span>" +
-              '<span class="tooltiptext">' +
-              data +
-              "</span>" +
-              "</div>"
-            );
-          },
+          mRender: ListUtils.render.dateWithTimeTooltip,
           include: Constants.isDetailedSample,
           iSortPriority: 2,
         },

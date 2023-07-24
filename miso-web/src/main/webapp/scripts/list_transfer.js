@@ -63,6 +63,7 @@ ListTarget.transfer = (function () {
         {
           sTitle: "Transfer Time",
           mData: "transferTime",
+          mRender: ListUtils.render.dateWithTimeTooltip,
         },
         {
           sTitle: "Received",

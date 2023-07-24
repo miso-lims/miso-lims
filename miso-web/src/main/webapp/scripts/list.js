@@ -981,6 +981,21 @@ ListUtils = (function ($) {
           return data;
         };
       },
+      dateWithTimeTooltip: function (data, type, full) {
+        if (type === "display" && data) {
+          return (
+            '<div class="tooltip">' +
+            "<span>" +
+            data.split(" ")[0] +
+            "</span>" +
+            '<span class="tooltiptext">' +
+            data +
+            "</span>" +
+            "</div>"
+          );
+        }
+        return data;
+      },
     },
     createBoxField: {
       property: "createBox",
