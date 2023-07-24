@@ -190,7 +190,6 @@ FormTarget.project = (function ($) {
         return x.id;
       });
       object.contacts = Project.getContacts();
-      Project.setContacts(object.contacts);
     },
   };
 

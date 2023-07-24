@@ -56,10 +56,7 @@ var Project = (function () {
       addContact["projectId"] = projectId;
       if (
         contacts.find(function (contact) {
-          return (
-            contact.contactId === addContact.contactId &&
-            contact.contactRoleId === addContact.contactRoleId
-          );
+          return duplicateContact(contact, addContact);
         })
       ) {
         Utils.showOkDialog("Error", [
@@ -74,15 +71,19 @@ var Project = (function () {
     removeContacts: function (removeContacts) {
       var contacts = Project.getContacts().filter(function (contact) {
         return !removeContacts.some(function (removal) {
-          return (
-            removal.contactId === contact.contactId &&
-            removal.contactRoleId === contact.contactRoleId &&
-            removal.contactName === contact.contactName &&
-            removal.contactEmail === contact.contactEmail
-          );
+          return duplicateContact(removal, contact);
         });
       });
       Project.setContacts(contacts);
     },
   };
+
+  function duplicateContact(contactOne, contactTwo) {
+    return (
+      contactOne.contactId === contactTwo.contactId &&
+      contactOne.contactRoleId === contactTwo.contactRoleId &&
+      contactOne.contactName === contactTwo.contactName &&
+      contactOne.contactEmail === contactTwo.contactEmail
+    );
+  }
 })();

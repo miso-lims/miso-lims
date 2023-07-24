@@ -482,10 +482,6 @@ FormUtils = (function ($) {
         .dataTable()
         .fnGetData()
         .map(function (item) {
-          // remove temporary IDs
-          if (item.id < 0) {
-            item.id = null;
-          }
           return item.original;
         });
     },
