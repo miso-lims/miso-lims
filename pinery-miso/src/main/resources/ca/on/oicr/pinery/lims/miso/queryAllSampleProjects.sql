@@ -42,4 +42,12 @@ LEFT JOIN (
   ) items
   GROUP BY project_projectId
 ) stats ON stats.project_projectId = proj.projectId
-LEFT JOIN Contact c ON c.contactId = proj.contactId
+LEFT JOIN (
+  SELECT
+    pc.projectId,
+    GROUP_CONCAT(c1.name ORDER BY c1.name DESC SEPARATOR '; ') name,
+    GROUP_CONCAT(c1.email ORDER BY c1.name DESC SEPARATOR '; ') email
+  FROM Project_Contact pc 
+  JOIN Contact c1 ON c1.contactId = pc.contactId WHERE pc.contactRoleId = 1
+  GROUP BY pc.projectId
+) c ON c.projectId = proj.projectId

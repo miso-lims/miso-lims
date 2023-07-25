@@ -23,9 +23,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
+import uk.ac.bbsrc.tgac.miso.core.service.ContactRoleService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContactService;
 import uk.ac.bbsrc.tgac.miso.core.service.DeliverableService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
@@ -78,6 +80,8 @@ public class DefaultProjectService implements ProjectService {
   private AssayService assayService;
   @Autowired
   private DeliverableService deliverableService;
+  @Autowired
+  private ContactRoleService contactRoleService;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -99,7 +103,10 @@ public class DefaultProjectService implements ProjectService {
 
   @Override
   public long create(Project project) throws IOException {
-    saveNewContact(project.getContact());
+    for (ProjectContact item : project.getContacts()) {
+      saveNewContact(item.getContact());
+      item.setProject(project);
+    }
     loadChildEntities(project);
     validateChange(project, null);
     project.setChangeDetails(authorizationManager.getCurrentUser());
@@ -118,10 +125,16 @@ public class DefaultProjectService implements ProjectService {
   @Override
   public long update(Project project) throws IOException {
     Project original = projectStore.get(project.getId());
-    saveNewContact(project.getContact());
+    for (ProjectContact item : project.getContacts()) {
+      saveNewContact(item.getContact());
+    }
+
     loadChildEntities(project);
     validateChange(project, original);
     applyChanges(original, project);
+    for (ProjectContact item : original.getContacts()) {
+      item.setProject(original);
+    }
     project = original;
     project.setChangeDetails(authorizationManager.getCurrentUser());
     return projectStore.update(project);
@@ -173,6 +186,18 @@ public class DefaultProjectService implements ProjectService {
       errors.add(new ValidationError("title", "There is already a project with this title"));
     }
 
+    List<ProjectContact> contacts = project.getContacts();
+    for (int i = 0; i < contacts.size(); i++) {
+      for (int j = i + 1; j < contacts.size(); j++) {
+        if (contactsMatch(contacts.get(i), contacts.get(j))) {
+          errors.add(new ValidationError("contact", "The contact '" + contacts.get(i).getContact().getEmail()
+              + "' with the assigned contact role '" + contacts.get(i).getContactRole().getName()
+              + "' is used more than once"));
+          continue;
+        }
+      }
+    }
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
@@ -185,7 +210,12 @@ public class DefaultProjectService implements ProjectService {
         targetedSequencingService,
         "defaultTargetedSequencingId");
     loadChildEntity(project::setPipeline, project.getPipeline(), pipelineService, "pipelineId");
-    loadChildEntity(project::setContact, project.getContact(), contactService, "contactId");
+
+    for (ProjectContact projectContact : project.getContacts()) {
+      loadChildEntity(projectContact::setContact, projectContact.getContact(), contactService, "contact");
+      loadChildEntity(projectContact::setContactRole, projectContact.getContactRole(), contactRoleService, "contact");
+    }
+
     Set<Assay> assays = new HashSet<>();
     for (Assay element : project.getAssays()) {
       loadChildEntity(x -> assays.add(x), element, assayService, "assays");
@@ -205,10 +235,25 @@ public class DefaultProjectService implements ProjectService {
     original.setRebNumber(project.getRebNumber());
     original.setRebExpiry(project.getRebExpiry());
     original.setSamplesExpected(project.getSamplesExpected());
-    original.setContact(project.getContact());
     original.setAdditionalDetails(project.getAdditionalDetails());
     original.setDeliverable(project.getDeliverable());
+    applySetChangesContacts(original.getContacts(), project.getContacts());
     ValidationUtils.applySetChanges(original.getAssays(), project.getAssays());
+  }
+
+
+  public void applySetChangesContacts(List<ProjectContact> to, List<ProjectContact> from) {
+    to.removeIf(
+        toItem -> from.stream().noneMatch(fromItem -> contactsMatch(toItem, fromItem)));
+    from.forEach(fromItem -> {
+      if (to.stream().noneMatch(toItem -> contactsMatch(fromItem, toItem))) {
+        to.add(fromItem);
+      }
+    });
+  }
+
+  private static boolean contactsMatch(ProjectContact a, ProjectContact b) {
+    return a.getContact().getId() == b.getContact().getId() && a.getContactRole().getId() == b.getContactRole().getId();
   }
 
   public void setNamingSchemeHolder(NamingSchemeHolder namingSchemeHolder) {

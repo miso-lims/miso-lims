@@ -22,6 +22,10 @@ public class Pluralizer {
     return pluralize(count, "box", "boxes");
   }
 
+  public static String contacts(long count) {
+    return pluralize(count, "contact", "contacts");
+  }
+
   public static String containers(long count) {
     return pluralize(count, "container", "containers");
   }

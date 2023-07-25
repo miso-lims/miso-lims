@@ -265,6 +265,11 @@ INSERT INTO Deliverable(deliverableId, name) VALUES
 (2, 'deliverable2'),
 (3, 'deliverable3');
 
+INSERT INTO ContactRole(contactRoleId, name) VALUES
+(2, 'role1'),
+(3, 'role2'),
+(4, 'role3');
+
 INSERT INTO `Project`(`projectId`, `created`, `description`, `name`, `status`, `title`, `code`, `lastModified`, `referenceGenomeId`, creator, lastModifier, pipelineId, deliverableId) VALUES
 (1,'2015-08-27 15:40:15','Test project','PRO1','ACTIVE','TEST1','TEST1','2015-08-27 19:40:40', 1, 1, 1, 1, 1),
 (2,'2013-11-27 12:20:15','Test project2','PRO2','ACTIVE','TEST2','TEST2','2015-11-30 15:23:18', 1, 1, 1, 1, 2),
@@ -1071,3 +1076,8 @@ INSERT INTO Project_Assay(projectId, assayId) VALUES
 (1, 2),
 (2, 1),
 (3, 2);
+
+INSERT INTO Project_Contact (projectId, contactId, contactRoleId) VALUES
+(1, 1, 2),
+(2, 1, 3),
+(3, 2, 4);

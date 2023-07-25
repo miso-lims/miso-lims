@@ -454,8 +454,15 @@ FormUtils = (function ($) {
         $("#" + containerId).empty();
         ListState[listId] = null;
       }
-      // IDs needed for list checkboxes to work correctly
+
+      var dataCopy = [];
       data.forEach(function (item) {
+        dataCopy.push(Object.assign({}, item));
+        dataCopy[dataCopy.length - 1].original = item;
+      });
+
+      // IDs needed for list checkboxes to work correctly
+      dataCopy.forEach(function (item) {
         if (!item.id) {
           item.id = generateTemporaryId();
         }
@@ -463,7 +470,7 @@ FormUtils = (function ($) {
       $("#" + containerId).append(
         $("<table>").attr("id", listId).addClass("display no-border ui-widget-content")
       );
-      ListUtils.createStaticTable(listId, listTarget, config, data);
+      ListUtils.createStaticTable(listId, listTarget, config, dataCopy);
       initializedTables.push(containerId);
     },
 
@@ -475,11 +482,7 @@ FormUtils = (function ($) {
         .dataTable()
         .fnGetData()
         .map(function (item) {
-          // remove temporary IDs
-          if (item.id < 0) {
-            item.id = null;
-          }
-          return item;
+          return item.original;
         });
     },
 

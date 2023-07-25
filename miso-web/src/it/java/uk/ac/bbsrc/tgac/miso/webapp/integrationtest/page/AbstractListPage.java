@@ -163,6 +163,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String BOX_SIZES = "boxsize/list";
     public static final String BOX_USES = "boxuse/list";
     public static final String BOXES = "boxes";
+    public static final String CONTACT_ROLES = "contactrole/list";
     public static final String CONTAINERS = "containers";
     public static final String CONTAINER_MODELS = "containermodel/list";
     public static final String DELIVERABLES = "deliverable/list";

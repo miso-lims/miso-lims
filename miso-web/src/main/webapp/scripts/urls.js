@@ -1252,6 +1252,19 @@ Urls = (function () {
     bulkSaveProgress: idUrlFunction(deliverableRestBase + "/bulk"),
   };
 
+  // Contact Roles
+  var contactRoleUiBase = baseUrl + "/contactrole";
+  ui.contactRoles = {
+    bulkCreate: contactRoleUiBase + "/bulk/new",
+    bulkEdit: contactRoleUiBase + "/bulk/edit",
+  };
+
+  var contactRoleRestBase = restBase + "/contactroles";
+  rest.contactRoles = {
+    bulkSave: contactRoleRestBase + "/bulk",
+    bulkSaveProgress: idUrlFunction(contactRoleRestBase + "/bulk"),
+  };
+
   // Worksets
   var worksetUiBase = baseUrl + "/workset";
   ui.worksets = {

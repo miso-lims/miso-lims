@@ -74,9 +74,10 @@ public class ProjectImpl implements Project {
   @JoinColumn(name = "deliverableId")
   private Deliverable deliverable;
 
-  @ManyToOne
-  @JoinColumn(name = "contactId")
-  private Contact contact;
+
+  @OneToMany(targetEntity = ProjectContact.class, mappedBy = "project", orphanRemoval = true,
+      cascade = CascadeType.ALL)
+  private List<ProjectContact> contacts = new ArrayList<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -458,13 +459,13 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public Contact getContact() {
-    return contact;
+  public List<ProjectContact> getContacts() {
+    return contacts;
   }
 
   @Override
-  public void setContact(Contact contact) {
-    this.contact = contact;
+  public void setContacts(List<ProjectContact> contacts) {
+    this.contacts = contacts;
   }
 
   @Override

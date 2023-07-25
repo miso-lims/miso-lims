@@ -181,25 +181,6 @@ FormTarget.project = (function ($) {
               type: "int",
               min: 1,
             },
-            {
-              title: "Contact",
-              type: "special",
-              makeControls: function (form) {
-                var label = object.contactId
-                  ? Contacts.makeContactLabel(object.contactName, object.contactEmail)
-                  : "n/a";
-                return [
-                  $("<span>").attr("id", "contactLabel").text(label),
-                  makeButton("Change", function () {
-                    showContactDialog(object, form);
-                  }),
-                  makeButton("Remove", function () {
-                    setContact(null, object, form);
-                  }),
-                  $("<div>").attr("id", "projectForm_contactError").addClass("errorContainer"),
-                ];
-              },
-            },
           ],
         },
       ];
@@ -208,6 +189,7 @@ FormTarget.project = (function ($) {
       object.assayIds = Project.getAssays().map(function (x) {
         return x.id;
       });
+      object.contacts = Project.getContacts();
     },
   };
 
@@ -218,27 +200,5 @@ FormTarget.project = (function ($) {
       .css("margin-left", "4px")
       .text(text)
       .click(callback);
-  }
-
-  function showContactDialog(project, form) {
-    Contacts.selectContactDialog(false, false, function (contact) {
-      setContact(contact, project, form);
-    });
-  }
-
-  function setContact(contact, project, form) {
-    $("#projectForm_contactError").empty();
-    if (contact) {
-      project.contactId = contact.id;
-      project.contactName = contact.name;
-      project.contactEmail = contact.email;
-      $("#contactLabel").text(Contacts.makeContactLabel(contact.name, contact.email));
-    } else {
-      project.contactId = null;
-      project.contactName = null;
-      project.contactEmail = null;
-      $("#contactLabel").text("n/a");
-    }
-    form.markOtherChanges();
   }
 })(jQuery);

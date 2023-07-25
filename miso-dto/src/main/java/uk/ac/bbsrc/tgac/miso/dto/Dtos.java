@@ -133,6 +133,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
@@ -154,6 +155,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
@@ -2616,9 +2618,13 @@ public class Dtos {
     setString(dto::setRebNumber, from.getRebNumber());
     setDateString(dto::setRebExpiry, from.getRebExpiry());
     setInteger(dto::setSamplesExpected, from.getSamplesExpected(), true);
-    setId(dto::setContactId, from.getContact());
-    setString(dto::setContactName, maybeGetProperty(from.getContact(), Contact::getName));
-    setString(dto::setContactEmail, maybeGetProperty(from.getContact(), Contact::getEmail));
+
+
+    List<ProjectContactDto> contacts = new ArrayList<>();
+    for (ProjectContact item : from.getContacts()) {
+      contacts.add(asDto(item));
+    }
+    dto.setContacts(contacts);
     return dto;
   }
 
@@ -2651,14 +2657,15 @@ public class Dtos {
     setString(to::setRebNumber, dto.getRebNumber());
     setLocalDate(to::setRebExpiry, dto.getRebExpiry());
     setInteger(to::setSamplesExpected, dto.getSamplesExpected(), true);
-    if (dto.getContactId() != null || !isStringEmptyOrNull(dto.getContactName())
-        || !isStringEmptyOrNull(dto.getContactEmail())) {
-      Contact contact = new Contact();
-      setLong(contact::setId, dto.getContactId(), false);
-      setString(contact::setName, dto.getContactName());
-      setString(contact::setEmail, dto.getContactEmail());
-      to.setContact(contact);
+
+    if (dto.getContacts() != null) {
+      List<ProjectContact> contacts = new ArrayList<>();
+      for (ProjectContactDto item : dto.getContacts()) {
+        contacts.add(to(item));
+      }
+      to.setContacts(contacts);
     }
+
     if (dto.getAssayIds() != null) {
       List<Assay> assays = new ArrayList<>();
       for (int i = 0; i < dto.getAssayIds().size(); i++) {
@@ -4500,6 +4507,45 @@ public class Dtos {
     Deliverable to = new Deliverable();
     setLong(to::setId, from.getId(), false);
     setString(to::setName, from.getName());
+    return to;
+  }
+
+  public static ContactRoleDto asDto(ContactRole from) {
+    ContactRoleDto to = new ContactRoleDto();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    return to;
+  }
+
+  public static ContactRole to(ContactRoleDto from) {
+    ContactRole to = new ContactRole();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    return to;
+  }
+
+  public static ProjectContactDto asDto(ProjectContact from) {
+    ProjectContactDto to = new ProjectContactDto();
+    setLong(to::setProjectId, from.getProject().getId(), false);
+    setLong(to::setContactId, from.getContact().getId(), false);
+    setLong(to::setContactRoleId, from.getContactRole().getId(), false);
+    setString(to::setContactName, from.getContact().getName());
+    setString(to::setContactEmail, from.getContact().getEmail());
+    setString(to::setContactRole, from.getContactRole().getName());
+    return to;
+  }
+
+  public static ProjectContact to(ProjectContactDto from) {
+    ProjectContact to = new ProjectContact();
+    setObject(to::setProject, ProjectImpl::new, from.getProjectId());
+
+    Contact contact = new Contact();
+    setLong(contact::setId, from.getContactId(), false);
+    setString(contact::setName, from.getContactName());
+    setString(contact::setEmail, from.getContactEmail());
+    to.setContact(contact);
+
+    setObject(to::setContactRole, ContactRole::new, from.getContactRoleId());
     return to;
   }
 

@@ -1037,6 +1037,15 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.DELIVERABLES);
   }
 
+  @Test
+  public void testListContactRolesSetup() throws Exception {
+    testPageSetup(ListTarget.CONTACT_ROLES, Sets.newHashSet(Columns.NAME));
+  }
+
+  @Test
+  public void testListContactRolesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.CONTACT_ROLES);
+  }
 
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     testPageSetup(listTarget, targetColumns, false);

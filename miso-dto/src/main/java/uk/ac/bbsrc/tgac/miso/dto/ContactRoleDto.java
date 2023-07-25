@@ -1,10 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-public class ContactDto {
-
+public class ContactRoleDto {
   private Long id;
   private String name;
-  private String email;
 
   public Long getId() {
     return id;
@@ -20,13 +18,5 @@ public class ContactDto {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
   }
 }

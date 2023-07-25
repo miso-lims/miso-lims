@@ -110,6 +110,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 slugs.add("assaytest/list");
                 slugs.add("requisition/list");
                 slugs.add("deliverable/list");
+                slugs.add("contactrole/list");
 
                 slugs.add("studies");
                 slugs.add("experiments");
@@ -226,6 +227,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 slugs.add("storagelabel/bulk/new?quantity=3");
                 slugs.add("metric/bulk/new?quantity=3");
                 slugs.add("deliverable/bulk/new?quantity=3");
+                slugs.add("contactrole/bulk/new?quantity=3");
 
                 urlSlugs = Collections.unmodifiableSet(slugs);
 
@@ -325,6 +327,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                                 .put("tissuetype/bulk/edit", unmodifiableMap("ids", "11,7"))
                                 .put("lab/bulk/edit", unmodifiableMap("ids", "1,2"))
                                 .put("deliverable/bulk/edit", unmodifiableMap("ids", "1,2"))
+                                .put("contactrole/bulk/edit", unmodifiableMap("ids", "2,3"))
                                 .put("libraryaliquot/bulk/merge", unmodifiableMap("ids", "901,902"))
                                 .put("libraryaliquot/bulk/pool-separate", unmodifiableMap("ids", "901,902"))
                                 .put("libraryaliquot/bulk/pool",

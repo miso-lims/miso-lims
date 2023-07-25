@@ -706,6 +706,15 @@ delete contacts using the standard interface.
 
 
 
+## Contact Roles
+
+A contact role is used to specify the role of a contact within a project. Contact roles are chosen when adding contacts to a project.
+
+Only MISO administrators can create, edit, and delete contact roles using the standard interface. A contact role
+is only deletable if it is not being used by any contacts.
+
+
+
 ## Metrics
 
 [Assays](../requisitions#assays) may specify requirements that must be met in order for a case to be considered

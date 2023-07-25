@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.prometheus.client.Gauge;
 import uk.ac.bbsrc.tgac.miso.Version;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
@@ -62,17 +63,64 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ThresholdType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
-import uk.ac.bbsrc.tgac.miso.core.service.*;
+import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
+import uk.ac.bbsrc.tgac.miso.core.service.AssayTestService;
+import uk.ac.bbsrc.tgac.miso.core.service.AttachmentCategoryService;
+import uk.ac.bbsrc.tgac.miso.core.service.BoxSizeService;
+import uk.ac.bbsrc.tgac.miso.core.service.BoxUseService;
+import uk.ac.bbsrc.tgac.miso.core.service.ContactRoleService;
+import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
+import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
+import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
+import uk.ac.bbsrc.tgac.miso.core.service.LabService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibrarySelectionService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryStrategyService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.MetricService;
+import uk.ac.bbsrc.tgac.miso.core.service.MetricSubcategoryService;
+import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.PipelineService;
+import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
+import uk.ac.bbsrc.tgac.miso.core.service.ReferenceGenomeService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
+import uk.ac.bbsrc.tgac.miso.core.service.SamplePurposeService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
+import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingControlTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.service.StainService;
+import uk.ac.bbsrc.tgac.miso.core.service.StudyTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
+import uk.ac.bbsrc.tgac.miso.core.service.TargetedSequencingService;
+import uk.ac.bbsrc.tgac.miso.core.service.TissueMaterialService;
+import uk.ac.bbsrc.tgac.miso.core.service.TissueOriginService;
+import uk.ac.bbsrc.tgac.miso.core.service.TissuePieceTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorksetCategoryService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorksetStageService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.PrintableField;
 import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
-import uk.ac.bbsrc.tgac.miso.dto.*;
+import uk.ac.bbsrc.tgac.miso.dto.AssayDto;
+import uk.ac.bbsrc.tgac.miso.dto.AssayTestDto;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
+import uk.ac.bbsrc.tgac.miso.dto.MetricDto;
+import uk.ac.bbsrc.tgac.miso.dto.MetricSubcategoryDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
-
-import io.prometheus.client.Gauge;
 
 @Controller
 public class ConstantsController {
@@ -172,6 +220,8 @@ public class ConstantsController {
   private MetricSubcategoryService metricSubcategoryService;
   @Autowired
   private IndexChecker indexChecker;
+  @Autowired
+  private ContactRoleService contactRoleService;
 
   @Autowired
   private ObjectMapper mapper;
@@ -199,7 +249,8 @@ public class ConstantsController {
 
   @GetMapping(path = "/constants.js", produces = "application/javascript")
   @ResponseBody
-  public synchronized ResponseEntity<String> constantsScript(HttpServletResponse response, final UriComponentsBuilder uriBuilder)
+  public synchronized ResponseEntity<String> constantsScript(HttpServletResponse response,
+      final UriComponentsBuilder uriBuilder)
       throws IOException {
     response.setContentType("application/javascript");
     // Use a cached copy and only update every
@@ -262,7 +313,8 @@ public class ConstantsController {
       addJsonArray(mapper, node, "studyTypes", studyTypeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "sampleCategories", SampleClass.CATEGORIES, Function.identity());
       createMap(mapper, node, "sampleSubcategories", SampleClass.SUBCATEGORIES);
-      addJsonArray(mapper, node, "submissionAction", Arrays.asList(SubmissionActionType.values()), SubmissionActionType::name);
+      addJsonArray(mapper, node, "submissionAction", Arrays.asList(SubmissionActionType.values()),
+          SubmissionActionType::name);
       addJsonArray(mapper, node, "containerModels", containerModelService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "poreVersions", containerService.listPoreVersions(), Dtos::asDto);
       addJsonArray(mapper, node, "spikeIns", librarySpikeInService.list(), Dtos::asDto);
@@ -279,6 +331,7 @@ public class ConstantsController {
       addJsonArray(mapper, node, "assays", assayService.list(), AssayDto::from);
       addJsonArray(mapper, node, "assayTests", assayTestService.list(), AssayTestDto::from);
       addJsonArray(mapper, node, "sampleSheetFormats", Arrays.asList(SampleSheet.values()), SampleSheet::name);
+      addJsonArray(mapper, node, "contactRoles", contactRoleService.list(), Dtos::asDto);
 
       Collection<IndexFamily> indexFamilies = indexFamilyService.list();
       addJsonArray(mapper, node, "indexFamilies", indexFamilies, Dtos::asDto);
@@ -291,7 +344,8 @@ public class ConstantsController {
       addJsonArray(mapper, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
       addJsonArray(mapper, node, "sampleSpreadsheets", Arrays.asList(SampleSpreadSheets.values()), Dtos::asDto);
       addJsonArray(mapper, node, "librarySpreadsheets", Arrays.asList(LibrarySpreadSheets.values()), Dtos::asDto);
-      addJsonArray(mapper, node, "libraryAliquotSpreadsheets", Arrays.asList(LibraryAliquotSpreadSheets.values()), Dtos::asDto);
+      addJsonArray(mapper, node, "libraryAliquotSpreadsheets", Arrays.asList(LibraryAliquotSpreadSheets.values()),
+          Dtos::asDto);
       addJsonArray(mapper, node, "poolSpreadsheets", Arrays.asList(PoolSpreadSheets.values()), Dtos::asDto);
       addJsonArray(mapper, node, "partitionSpreadsheets", Arrays.asList(PartitionSpreadsheets.values()), Dtos::asDto);
       addJsonArray(mapper, node, "runLibrarySpreadsheets", Arrays.asList(RunLibrarySpreadsheets.values()), Dtos::asDto);
@@ -446,7 +500,8 @@ public class ConstantsController {
     if (current != null && !current.isDone()) {
       current.cancel(false);
     }
-    // This will wait a few seconds after a save of an institute default; if another save comes along, it will cancel and wait again. If
+    // This will wait a few seconds after a save of an institute default; if another save comes along,
+    // it will cancel and wait again. If
     // nothing saves again, it will rebuild the constants string.
     future = executor.schedule(this::rebuildConstants, 15, TimeUnit.SECONDS);
   }
