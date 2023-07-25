@@ -103,8 +103,9 @@ public class DefaultProjectService implements ProjectService {
 
   @Override
   public long create(Project project) throws IOException {
-    for (ProjectContact item : project.getContacts()) {
-      saveNewContact(item.getContact());
+    for (int i = 0; i < project.getContacts().size(); i++) {
+      saveNewContact(project.getContacts().get(i).getContact());
+      project.getContacts().get(i).setProject(project);
     }
     loadChildEntities(project);
     validateChange(project, null);
@@ -127,9 +128,13 @@ public class DefaultProjectService implements ProjectService {
     for (ProjectContact item : project.getContacts()) {
       saveNewContact(item.getContact());
     }
+
     loadChildEntities(project);
     validateChange(project, original);
     applyChanges(original, project);
+    for (int i = 0; i < original.getContacts().size(); i++) {
+      original.getContacts().get(i).setProject(original);
+    }
     project = original;
     project.setChangeDetails(authorizationManager.getCurrentUser());
     return projectStore.update(project);
