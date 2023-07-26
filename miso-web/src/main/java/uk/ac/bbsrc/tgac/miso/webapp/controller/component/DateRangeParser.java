@@ -1,10 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.component;
 
-import java.time.DayOfWeek;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.time.*;
+import java.util.regex.*;
 
 public enum DateRangeParser {
 
@@ -12,7 +9,7 @@ public enum DateRangeParser {
   YEAR("^(\\d{4})$") {
     @Override
     protected ZonedDateTime parseStart(Matcher matcher) {
-      return makeDate(Integer.parseInt(matcher.group(1)), 0, 1, 0, 0);
+      return makeDate(Integer.parseInt(matcher.group(1)), 1, 1, 0, 0);
     }
 
     @Override
@@ -25,8 +22,8 @@ public enum DateRangeParser {
     protected ZonedDateTime parseStart(Matcher matcher) {
       Matcher m = matcher;
       int year = Integer.parseInt(m.group(1));
-      int month = Integer.parseInt(m.group(2)) - 1;
-      return makeDate(year, month, 0, 0, 0);
+      int month = Integer.parseInt(m.group(2));
+      return makeDate(year, month, 1, 0, 0);
     }
 
     @Override
@@ -38,14 +35,14 @@ public enum DateRangeParser {
     @Override
     protected ZonedDateTime parseStart(Matcher matcher) {
       int year = Integer.parseInt(matcher.group(1));
-      int month = Integer.parseInt(matcher.group(2)) - 1;
+      int month = Integer.parseInt(matcher.group(2));
       int day = Integer.parseInt(matcher.group(3));
       return makeDate(year, month, day, 0, 0);
     }
 
     @Override
     protected ZonedDateTime parseEnd(Matcher matcher) {
-      return parseStart(matcher).plusMonths(1);
+      return parseStart(matcher).plusDays(1);
     }
   },
   LAST_HOUR("^(now|hour|thishour|lasthour)$") {
