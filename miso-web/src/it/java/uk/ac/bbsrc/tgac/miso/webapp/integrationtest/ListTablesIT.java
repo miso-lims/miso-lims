@@ -3,16 +3,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
+import java.util.regex.*;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Test;
@@ -20,12 +12,8 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.Columns;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.ListTarget;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.IdentitySearchPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.*;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.AbstractListPage.*;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ListTabbedPage.Tabs;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
@@ -1018,7 +1006,8 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListAssayTestsSetup() throws Exception {
     testPageSetup(ListTarget.ASSAY_TESTS, Sets.newHashSet(Columns.ALIAS, Columns.TISSUE_TYPE, Columns.EXTRACTION_CLASS,
-        Columns.LIBRARY_DESIGN_CODE_FULL, Columns.LIBRARY_QUALIFICATION_METHOD));
+        Columns.LIBRARY_DESIGN_CODE_FULL, Columns.LIBRARY_QUALIFICATION_METHOD, Columns.PERMITTED_SAMPLES,
+        Columns.REPEAT));
   }
 
   @Test
