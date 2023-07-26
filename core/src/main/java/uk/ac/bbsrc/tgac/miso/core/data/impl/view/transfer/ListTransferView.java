@@ -36,7 +36,7 @@ public class ListTransferView implements Identifiable, Serializable {
   @Id
   private long transferId;
 
-  @Temporal(TemporalType.DATE)
+  @Temporal(TemporalType.TIMESTAMP)
   private Date transferTime;
 
   @ManyToOne(targetEntity = LabImpl.class)
@@ -199,7 +199,8 @@ public class ListTransferView implements Identifiable, Serializable {
         + countItems(getLibraryAliquots(), predicate) + countItems(getPools(), predicate);
   }
 
-  private static long countItems(Collection<? extends ListTransferViewItem> items, Predicate<ListTransferViewItem> predicate) {
+  private static long countItems(Collection<? extends ListTransferViewItem> items,
+      Predicate<ListTransferViewItem> predicate) {
     return items.stream().filter(predicate).count();
   }
 
