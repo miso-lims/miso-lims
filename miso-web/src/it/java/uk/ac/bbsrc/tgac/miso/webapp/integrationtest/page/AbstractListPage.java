@@ -2,12 +2,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
 import java.util.function.Function;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
@@ -90,6 +87,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String ORDER_FULFILLED = "Order Fulfilled";
     public static final String PART_NUMBER = "Part Number";
     public static final String PARTITIONS = "Partitions";
+    public static final String PERMITTED_SAMPLES = "Permitted Samples";
     public static final String PLATFORM = "Platform";
     public static final String POOL = "Pool";
     public static final String POOL_DESCRIPTION = "Pool Description";
@@ -108,6 +106,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String RECIPIENT = "Recipient";
     public static final String REFERENCE_GENOME = "Reference Genome";
     public static final String REMAINING = "Remaining";
+    public static final String REPEAT = "Repeat";
     public static final String REQUESTED = "Requested";
     public static final String ROWS = "Rows";
     public static final String RUNNING = "Running";

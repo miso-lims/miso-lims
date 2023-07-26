@@ -7,14 +7,15 @@ ListTarget.assaytest = (function () {
     getQueryUrl: null,
     showNewOptionSop: true,
     createBulkActions: function (config, projectId) {
-      var actions = BulkTarget.assaytest.getBulkActions(config);
+      var actions = [];
       if (config.isAdmin) {
-        if (!config.assayId) {
+        if (config.assayId == null) {
           // for list page
+          actions = BulkTarget.assaytest.getBulkActions(config);
           actions.push(
             ListUtils.createBulkDeleteAction("Assay Tests", "assaytests", Utils.array.getAlias)
           );
-        } else if (config.pageMode === "edit") {
+        } else if (config.pageMode === "edit" || config.pageMode === "create") {
           // for Edit Assay page
           actions.push({
             name: "Remove",
@@ -113,6 +114,21 @@ ListTarget.assaytest = (function () {
             }
           },
           include: Constants.isDetailedSample,
+        },
+        {
+          sTitle: "Permitted Samples",
+          mData: "permittedSamples",
+          mRender: function (data, type, full) {
+            var permittedSamples = Utils.array.findUniqueOrThrow(function (item) {
+              return item.value === data;
+            }, Constants.permittedSamples);
+            return permittedSamples.label;
+          },
+        },
+        {
+          sTitle: "Repeat",
+          mData: "repeatPerTimepoint",
+          mRender: ListUtils.render.booleanChecks,
         },
       ];
     },

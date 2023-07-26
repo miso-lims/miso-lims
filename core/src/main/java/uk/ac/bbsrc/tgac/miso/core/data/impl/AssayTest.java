@@ -1,21 +1,47 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
+
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 public class AssayTest implements Aliasable, Deletable, Serializable {
 
   public enum LibraryQualificationMethod {
-    ALIQUOT("Aliquot"),
-    LOW_DEPTH_SEQUENCING("Low-depth Sequencing");
+    ALIQUOT("Aliquot"), LOW_DEPTH_SEQUENCING("Low-depth Sequencing");
 
     private final String label;
 
     private LibraryQualificationMethod(String label) {
+      this.label = label;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+  }
+
+  public enum PermittedSamples {
+    REQUISITIONED("Requisitioned"), SUPPLEMENTAL("Supplemental"), ALL("All");
+
+    private final String label;
+
+    private PermittedSamples(String label) {
       this.label = label;
     }
 
@@ -55,6 +81,9 @@ public class AssayTest implements Aliasable, Deletable, Serializable {
   private LibraryDesignCode libraryQualificationDesignCode;
 
   private boolean repeatPerTimepoint;
+
+  @Enumerated(EnumType.STRING)
+  private PermittedSamples permittedSamples;
 
   @Override
   public String getAlias() {
@@ -146,24 +175,31 @@ public class AssayTest implements Aliasable, Deletable, Serializable {
     this.repeatPerTimepoint = repeatPerTimepoint;
   }
 
+  public PermittedSamples getPermittedSamples() {
+    return permittedSamples;
+  }
+
+  public void setPermittedSamples(PermittedSamples permittedSamples) {
+    this.permittedSamples = permittedSamples;
+  }
+
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    AssayTest assayTest = (AssayTest) o;
-    return negateTissueType == assayTest.negateTissueType
-        && Objects.equals(alias, assayTest.alias)
-        && Objects.equals(tissueType, assayTest.tissueType)
-        && Objects.equals(extractionClass, assayTest.extractionClass)
-        && Objects.equals(libraryDesignCode, assayTest.libraryDesignCode)
-        && libraryQualificationMethod == assayTest.libraryQualificationMethod
-        && Objects.equals(libraryQualificationDesignCode, assayTest.libraryQualificationDesignCode)
-        && repeatPerTimepoint == assayTest.repeatPerTimepoint;
+    return LimsUtils.equals(this, o,
+        AssayTest::isNegateTissueType,
+        AssayTest::getAlias,
+        AssayTest::getTissueType,
+        AssayTest::getExtractionClass,
+        AssayTest::getLibraryDesignCode,
+        AssayTest::getLibraryQualificationMethod,
+        AssayTest::getLibraryQualificationDesignCode,
+        AssayTest::isRepeatPerTimepoint,
+        AssayTest::getPermittedSamples);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(alias, tissueType, negateTissueType, extractionClass, libraryDesignCode,
-        libraryQualificationMethod, libraryQualificationDesignCode, repeatPerTimepoint);
+        libraryQualificationMethod, libraryQualificationDesignCode, repeatPerTimepoint, permittedSamples);
   }
 }

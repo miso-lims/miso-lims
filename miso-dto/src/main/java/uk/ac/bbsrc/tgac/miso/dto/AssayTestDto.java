@@ -1,12 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import static uk.ac.bbsrc.tgac.miso.dto.Dtos.*;
+
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest.LibraryQualificationMethod;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest.PermittedSamples;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
-
-import static uk.ac.bbsrc.tgac.miso.dto.Dtos.*;
 
 public class AssayTestDto {
 
@@ -19,6 +20,7 @@ public class AssayTestDto {
   private String libraryQualificationMethod;
   private Long libraryQualificationDesignCodeId;
   private boolean repeatPerTimepoint;
+  private String permittedSamples;
 
   public static AssayTestDto from(AssayTest from) {
     AssayTestDto to = new AssayTestDto();
@@ -32,6 +34,7 @@ public class AssayTestDto {
         LibraryQualificationMethod::name));
     Dtos.setId(to::setLibraryQualificationDesignCodeId, from.getLibraryQualificationDesignCode());
     setBoolean(to::setRepeatPerTimepoint, from.isRepeatPerTimepoint(), false);
+    setString(to::setPermittedSamples, maybeGetProperty(from.getPermittedSamples(), PermittedSamples::name));
     return to;
   }
 
@@ -107,6 +110,14 @@ public class AssayTestDto {
     this.repeatPerTimepoint = repeatPerTimepoint;
   }
 
+  public String getPermittedSamples() {
+    return permittedSamples;
+  }
+
+  public void setPermittedSamples(String permittedSamples) {
+    this.permittedSamples = permittedSamples;
+  }
+
   public AssayTest to() {
     AssayTest to = new AssayTest();
     setLong(to::setId, getId(), false);
@@ -118,6 +129,7 @@ public class AssayTestDto {
     setObject(to::setLibraryQualificationMethod, getLibraryQualificationMethod(), LibraryQualificationMethod::valueOf);
     setObject(to::setLibraryQualificationDesignCode, LibraryDesignCode::new, getLibraryQualificationDesignCodeId());
     setBoolean(to::setRepeatPerTimepoint, isRepeatPerTimepoint(), false);
+    setObject(to::setPermittedSamples, getPermittedSamples(), PermittedSamples::valueOf);
     return to;
   }
 }

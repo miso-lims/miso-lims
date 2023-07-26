@@ -108,6 +108,15 @@ BulkTarget.assaytest = (function ($) {
             "only be completed once per identity";
           return col;
         })(),
+        {
+          title: "Permitted Samples",
+          data: "permittedSamples",
+          type: "dropdown",
+          source: Constants.permittedSamples,
+          getItemLabel: Utils.array.get("label"),
+          getItemValue: Utils.array.get("value"),
+          required: true,
+        },
       ];
     },
   };

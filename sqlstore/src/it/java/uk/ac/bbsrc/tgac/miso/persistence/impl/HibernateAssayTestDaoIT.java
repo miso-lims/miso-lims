@@ -1,15 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import org.junit.Test;
-import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
-
 import java.util.Arrays;
+
+import org.junit.Test;
+
+import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest.PermittedSamples;
 
 public class HibernateAssayTestDaoIT extends AbstractHibernateSaveDaoTest<AssayTest, HibernateAssayTestDao> {
 
@@ -35,6 +33,7 @@ public class HibernateAssayTestDaoIT extends AbstractHibernateSaveDaoTest<AssayT
     LibraryDesignCode code = (LibraryDesignCode) currentSession().get(LibraryDesignCode.class, 2L);
     test.setLibraryDesignCode(code);
     test.setLibraryQualificationMethod(AssayTest.LibraryQualificationMethod.LOW_DEPTH_SEQUENCING);
+    test.setPermittedSamples(PermittedSamples.ALL);
     return test;
   }
 

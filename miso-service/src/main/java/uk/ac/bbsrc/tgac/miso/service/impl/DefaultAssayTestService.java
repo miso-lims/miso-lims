@@ -123,6 +123,7 @@ public class DefaultAssayTestService extends AbstractSaveService<AssayTest> impl
     to.setLibraryQualificationMethod(from.getLibraryQualificationMethod());
     to.setLibraryQualificationDesignCode(from.getLibraryQualificationDesignCode());
     to.setRepeatPerTimepoint(from.isRepeatPerTimepoint());
+    to.setPermittedSamples(from.getPermittedSamples());
   }
 
   @Override
