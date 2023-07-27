@@ -7,6 +7,25 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.4.0] - 2023-07-27
+
+### Added
+
+* Contact Roles data type to describe the purpose of a contact within a project
+* Assay test field to specify which samples are permitted - requisitioned, supplemental, or all
+
+### Changed
+
+* Projects can now have multiple contacts
+
+### Fixed
+
+* Buttons appearing on the Create Assay page Tests table
+* Error when printing sample labels that include the received date
+* Errors when using some date patterns in advanced search
+* Pinery samples having multiple values for the same attribute name
+
+
 ## [2.3.0] - 2023-07-14
 
 ### Added

@@ -1,3 +1,4 @@
+-- add_ContactRole_type
 CREATE TABLE ContactRole (
   contactRoleId bigint NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
@@ -24,3 +25,7 @@ INSERT INTO Project_Contact (projectId, contactId, contactRoleId) SELECT project
 -- Deleting now redundant contact field in Project
 ALTER TABLE Project DROP FOREIGN KEY fk_project_contact;
 ALTER TABLE Project DROP COLUMN contactId;
+
+-- test_prohibit_supplemental
+ALTER TABLE AssayTest ADD COLUMN permittedSamples varchar(20) NOT NULL DEFAULT "ALL";
+
