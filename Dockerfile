@@ -78,7 +78,6 @@ COPY --from=builder /miso-lims/miso-web/src/main/resources/miso.properties  ${CA
 COPY --from=builder /miso-lims/miso-web/src/main/resources/security.properties /storage/miso/
 COPY --from=builder /miso-lims/miso-web/src/main/resources/submission.properties /storage/miso/
 
-COPY --from=builder /miso-lims/miso-web/target/ROOT/WEB-INF/lib/mysql-connector-java-*.jar ${CATALINA_HOME}/lib/
 COPY --from=builder /miso-lims/miso-web/target/ROOT.war ${CATALINA_HOME}/webapps/
 
 ENV MISO_DB_USER tgaclims
