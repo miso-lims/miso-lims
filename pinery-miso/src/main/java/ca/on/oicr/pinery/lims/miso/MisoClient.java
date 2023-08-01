@@ -890,7 +890,7 @@ public class MisoClient implements Lims {
       }
       r.setContainerModel(rs.getString("containerModel"));
       r.setSequencingKit(rs.getString("sequencingKit"));
-      r.setStatus(makeStatus(rs, "qcPassed", null, "qcDate", "qcUserId"));
+      r.setStatus(makeStatus(rs, "qcPassed", null, null, "qcDate", "qcUserId"));
 
       Boolean dataReview = rs.getBoolean("dataReview");
       if (rs.wasNull()) {
@@ -923,7 +923,7 @@ public class MisoClient implements Lims {
       p.setPoolCreated(rs.getTimestamp("pool_created"));
       p.setPoolModifiedById(rs.getInt("pool_modifiedById"));
       p.setPoolModified(rs.getTimestamp("pool_modified"));
-      p.setPoolStatus(makeStatus(rs, "pool_qc_passed", null, null, null));
+      p.setPoolStatus(makeStatus(rs, "pool_qc_passed", null, null, null, null));
       p.setAnalysisSkipped(rs.getBoolean("analysis_skipped"));
       p.setQcStatus(rs.getString("qc_status"));
       p.setRunPurpose(rs.getString("run_purpose"));
@@ -990,7 +990,7 @@ public class MisoClient implements Lims {
       if (!atts.isEmpty()) {
         s.setAttributes(atts);
       }
-      s.setStatus(makeStatus(rs, "qcPassed", "detailedQcStatus", "qcDate", "qcUserId"));
+      s.setStatus(makeStatus(rs, "qcPassed", "detailedQcStatus", "qcNote", "qcDate", "qcUserId"));
       s.setPreMigrationId(rs.getLong("premigration_id"));
       if (rs.wasNull()) {
         s.setPreMigrationId(null);
@@ -1337,7 +1337,7 @@ public class MisoClient implements Lims {
       boolean reverseComplement2 = rs.getString("dataManglingPolicy").equals("I5_RC");
       s.setBarcodeTwo(reverseComplement2 ? reverseComplement(barcode2) : barcode2);
       s.setRunPurpose(rs.getString("run_purpose"));
-      s.setStatus(makeStatus(rs, "qc_passed", "qc_description", "qc_date", "qcUserId"));
+      s.setStatus(makeStatus(rs, "qc_passed", "qc_description", "qcNote", "qc_date", "qcUserId"));
 
       Boolean dataReview = rs.getBoolean("dataReview");
       if (rs.wasNull()) {
@@ -1570,7 +1570,8 @@ public class MisoClient implements Lims {
     return req;
   };
 
-  private static Status makeStatus(ResultSet rs, String stateColumn, String nameColumn, String dateColumn,
+  private static Status makeStatus(ResultSet rs, String stateColumn, String nameColumn, String noteColumn,
+      String dateColumn,
       String userIdColumn)
       throws SQLException {
     Status status = new DefaultStatus();
@@ -1584,6 +1585,10 @@ public class MisoClient implements Lims {
     }
     String name = nameColumn == null ? null : rs.getString(nameColumn);
     status.setName(name == null ? status.getState() : name);
+
+    if (noteColumn != null) {
+      status.setNote(rs.getString(noteColumn));
+    }
 
     java.sql.Date date = dateColumn == null ? null : rs.getDate(dateColumn);
     status.setDate(date == null ? null : date.toLocalDate());
