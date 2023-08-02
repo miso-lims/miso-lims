@@ -68,7 +68,8 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
   }
 
   @Override
-  public SampleClass inferParentFromChild(long childClassId, String childCategory, String parentCategory) throws IOException {
+  public SampleClass inferParentFromChild(long childClassId, String childCategory, String parentCategory)
+      throws IOException {
     SampleClass childClass = getNotNullClass(childClassId);
     if (!childClass.getSampleCategory().equals(childCategory)) {
       throw new IllegalArgumentException(
@@ -112,13 +113,13 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
 
   private SampleClass singleResult(Collection<SampleClass> classes, SampleClass child, String parentCategory) {
     switch (classes.size()) {
-    case 0:
-      return null;
-    case 1:
-      return classes.iterator().next();
-    default:
-      throw new IllegalStateException(
-          String.format("SampleClass %s has multiple %s parents.", child.getAlias(), parentCategory));
+      case 0:
+        return null;
+      case 1:
+        return classes.iterator().next();
+      default:
+        throw new IllegalStateException(
+            String.format("SampleClass %s has multiple %s parents.", child.getAlias(), parentCategory));
     }
   }
 
@@ -163,8 +164,9 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
         loaded.setChild(object);
         SampleClass parent = loaded.getParent() == null ? null : get(loaded.getParent().getId());
         if (parent == null) {
-          throw new ValidationException(String.format("Parent sample class not found%s%s", loaded.getParent() == null ? "" : " with ID: ",
-              loaded.getParent() == null ? "" : loaded.getParent().getId()));
+          throw new ValidationException(
+              String.format("Parent sample class not found%s%s", loaded.getParent() == null ? "" : " with ID: ",
+                  loaded.getParent() == null ? "" : loaded.getParent().getId()));
         }
         loaded.setParent(parent);
       }
@@ -178,10 +180,12 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
   }
 
   @Override
-  protected void collectValidationErrors(SampleClass object, SampleClass beforeChange, List<ValidationError> errors) throws IOException {
+  protected void collectValidationErrors(SampleClass object, SampleClass beforeChange, List<ValidationError> errors)
+      throws IOException {
     long usage = beforeChange == null ? 0L : sampleClassDao.getUsage(beforeChange);
     if (beforeChange == null && SampleIdentity.CATEGORY_NAME.equals(object.getSampleCategory())
-        && list().stream().anyMatch(sampleClass -> SampleIdentity.CATEGORY_NAME.equals(sampleClass.getSampleCategory()))) {
+        && list().stream()
+            .anyMatch(sampleClass -> SampleIdentity.CATEGORY_NAME.equals(sampleClass.getSampleCategory()))) {
       errors.add(new ValidationError("sampleCategory", "There can be only one identity class"));
     }
     if (usage > 0L) {
@@ -194,8 +198,8 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
       errors.add(new ValidationError("sampleCategory", "Invalid category"));
     } else if (object.getSampleSubcategory() != null
         && !SampleClass.SUBCATEGORIES.get(object.getSampleCategory()).contains(object.getSampleSubcategory())) {
-          errors.add(new ValidationError("sampleSubcategory", "Invalid subcategory"));
-        }
+      errors.add(new ValidationError("sampleSubcategory", "Invalid subcategory"));
+    }
     if (beforeChange == null && !object.getChildRelationships().isEmpty()) {
       errors.add(new ValidationError("Cannot specify child relationships for new sample class"));
     }
@@ -213,52 +217,59 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
   private void validateParentRelationships(SampleClass sampleClass, List<ValidationError> errors) {
     Set<String> allowedParents = null;
     switch (sampleClass.getSampleCategory()) {
-    case SampleIdentity.CATEGORY_NAME:
-      allowedParents = Collections.emptySet();
-      break;
-    case SampleTissue.CATEGORY_NAME:
-      allowedParents = Sets.newHashSet(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME);
-      validateSingleParentRequirement(sampleClass, SampleIdentity.CATEGORY_NAME, errors);
-      break;
-    case SampleTissueProcessing.CATEGORY_NAME:
-      allowedParents = Sets.newHashSet(SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME);
-      long tissueParents = sampleClass.getParentRelationships().stream()
-          .filter(relationship -> SampleTissue.CATEGORY_NAME.equals(relationship.getParent().getSampleCategory())
-              && !relationship.isArchived())
-          .count();
-      if (tissueParents > 1L) {
-        errors.add(new ValidationError("parentRelationships",
-            String.format("%s classes cannot have multiple %s parents", SampleTissueProcessing.CATEGORY_NAME, SampleTissue.CATEGORY_NAME)));
-      } else if (tissueParents == 0L && !hasPathToIdentity(sampleClass)) {
-        errors.add(new ValidationError("parentRelationships",
-            String.format("Must have a direct or indirect link to the %s class", SampleIdentity.CATEGORY_NAME)));
-      }
-      break;
-    case SampleStock.CATEGORY_NAME:
-      allowedParents = Sets.newHashSet(SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME);
-      if (SampleStockSingleCell.SUBCATEGORY_NAME.equals(sampleClass.getSampleSubcategory())) {
-        // Single Cell Stocks need to be parented to a Single Cell (tissue processing) class instead of a tissue class
-        if (sampleClass.getParentRelationships().stream()
-            .filter(relationship -> SampleTissueProcessing.CATEGORY_NAME.equals(relationship.getParent().getSampleCategory())
-                && SampleSingleCell.SUBCATEGORY_NAME.equals(relationship.getParent().getSampleSubcategory()) && !relationship.isArchived())
-            .count() != 1L) {
-          errors.add(makeSingleParentRequirementError(sampleClass.getSampleSubcategory(), SampleSingleCell.SUBCATEGORY_NAME));
+      case SampleIdentity.CATEGORY_NAME:
+        allowedParents = Collections.emptySet();
+        break;
+      case SampleTissue.CATEGORY_NAME:
+        allowedParents = Sets.newHashSet(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME);
+        validateSingleParentRequirement(sampleClass, SampleIdentity.CATEGORY_NAME, errors);
+        break;
+      case SampleTissueProcessing.CATEGORY_NAME:
+        allowedParents = Sets.newHashSet(SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME);
+        long tissueParents = sampleClass.getParentRelationships().stream()
+            .filter(relationship -> SampleTissue.CATEGORY_NAME.equals(relationship.getParent().getSampleCategory())
+                && !relationship.isArchived())
+            .count();
+        if (tissueParents > 1L) {
+          errors.add(new ValidationError("parentRelationships",
+              String.format("%s classes cannot have multiple %s parents", SampleTissueProcessing.CATEGORY_NAME,
+                  SampleTissue.CATEGORY_NAME)));
+        } else if (tissueParents == 0L && !hasPathToIdentity(sampleClass)) {
+          errors.add(new ValidationError("parentRelationships",
+              String.format("Must have a direct or indirect link to the %s class", SampleIdentity.CATEGORY_NAME)));
         }
-      } else {
-        validateSingleParentRequirement(sampleClass, SampleTissue.CATEGORY_NAME, errors);
-      }
-      break;
-    case SampleAliquot.CATEGORY_NAME:
-      allowedParents = Sets.newHashSet(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
-      validateSingleParentRequirement(sampleClass, SampleStock.CATEGORY_NAME, errors);
-      break;
-    default:
-      throw new IllegalArgumentException("Unhandled sample category: " + sampleClass.getSampleCategory());
+        break;
+      case SampleStock.CATEGORY_NAME:
+        allowedParents = Sets.newHashSet(SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME,
+            SampleStock.CATEGORY_NAME);
+        if (SampleStockSingleCell.SUBCATEGORY_NAME.equals(sampleClass.getSampleSubcategory())) {
+          // Single Cell Stocks need to be parented to a Single Cell (tissue processing) class instead of a
+          // tissue class
+          if (sampleClass.getParentRelationships().stream()
+              .filter(relationship -> SampleTissueProcessing.CATEGORY_NAME
+                  .equals(relationship.getParent().getSampleCategory())
+                  && SampleSingleCell.SUBCATEGORY_NAME.equals(relationship.getParent().getSampleSubcategory())
+                  && !relationship.isArchived())
+              .count() != 1L) {
+            errors.add(makeSingleParentRequirementError(sampleClass.getSampleSubcategory(),
+                SampleSingleCell.SUBCATEGORY_NAME));
+          }
+        } else {
+          validateSingleParentRequirement(sampleClass, SampleTissue.CATEGORY_NAME, errors);
+        }
+        break;
+      case SampleAliquot.CATEGORY_NAME:
+        allowedParents = Sets.newHashSet(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME);
+        validateSingleParentRequirement(sampleClass, SampleStock.CATEGORY_NAME, errors);
+        break;
+      default:
+        throw new IllegalArgumentException("Unhandled sample category: " + sampleClass.getSampleCategory());
     }
     for (SampleValidRelationship relationship : sampleClass.getParentRelationships()) {
       if (!allowedParents.contains(relationship.getParent().getSampleCategory())) {
         errors.add(new ValidationError("parentRelationships", String.format("%s (%s) cannot be a parent of %s classes",
-            relationship.getParent().getAlias(), relationship.getParent().getSampleCategory(), sampleClass.getSampleCategory())));
+            relationship.getParent().getAlias(), relationship.getParent().getSampleCategory(),
+            sampleClass.getSampleCategory())));
       }
     }
     List<SampleClass> parents = sampleClass.getParentRelationships().stream().map(SampleValidRelationship::getParent)
@@ -267,7 +278,8 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
       for (int j = i + 1; j < parents.size(); j++) {
         if (parents.get(i).getId() == parents.get(j).getId()) {
           errors.add(new ValidationError("parentRelationships",
-              String.format("Cannot have multiple parent relationships to the same sample class (%s)", parents.get(i).getAlias())));
+              String.format("Cannot have multiple parent relationships to the same sample class (%s)",
+                  parents.get(i).getAlias())));
           break;
         }
       }
@@ -275,10 +287,18 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
   }
 
   private boolean hasPathToIdentity(SampleClass sampleClass) {
+    return hasPathToIdentity(sampleClass, new HashSet<>());
+  }
+
+  private boolean hasPathToIdentity(SampleClass sampleClass, Set<Long> checkedSampleClassIds) {
+    checkedSampleClassIds.add(sampleClass.getId());
     if (SampleIdentity.CATEGORY_NAME.equals(sampleClass.getSampleCategory())) {
       return true;
     }
     for (SampleValidRelationship parentRelationship : sampleClass.getParentRelationships()) {
+      if (checkedSampleClassIds.contains(parentRelationship.getParent().getId())) {
+        continue;
+      }
       if (hasPathToIdentity(parentRelationship.getParent())) {
         return true;
       }
@@ -286,9 +306,11 @@ public class DefaultSampleClassService extends AbstractSaveService<SampleClass> 
     return false;
   }
 
-  private void validateSingleParentRequirement(SampleClass sampleClass, String requiredParentCategory, List<ValidationError> errors) {
+  private void validateSingleParentRequirement(SampleClass sampleClass, String requiredParentCategory,
+      List<ValidationError> errors) {
     if (sampleClass.getParentRelationships().stream()
-        .filter(relationship -> requiredParentCategory.equals(relationship.getParent().getSampleCategory()) && !relationship.isArchived())
+        .filter(relationship -> requiredParentCategory.equals(relationship.getParent().getSampleCategory())
+            && !relationship.isArchived())
         .count() != 1L) {
       errors.add(makeSingleParentRequirementError(sampleClass.getSampleCategory(), requiredParentCategory));
     }
