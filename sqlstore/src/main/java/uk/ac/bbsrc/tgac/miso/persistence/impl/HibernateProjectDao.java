@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -25,8 +26,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 public class HibernateProjectDao extends HibernateSaveDao<Project>
     implements ProjectStore, HibernatePaginatedDataSource<Project> {
 
-  private static final String[] SEARCH_PROPERTIES = new String[] {"name", "title",
-      "description", "code"};
+  private static final String[] SEARCH_PROPERTIES = new String[] {ProjectImpl_.NAME, ProjectImpl_.TITLE,
+      ProjectImpl_.DESCRIPTION, ProjectImpl_.CODE};
   private final static List<AliasDescriptor> STANDARD_ALIASES = Collections.emptyList();
 
   public HibernateProjectDao() {
@@ -35,12 +36,12 @@ public class HibernateProjectDao extends HibernateSaveDao<Project>
 
   @Override
   public Project getByTitle(String title) throws IOException {
-    return getBy("title", title);
+    return getBy(ProjectImpl_.TITLE, title);
   }
 
   @Override
-  public Project getByCode(String code) throws IOException { // TODO: rename pending
-    return getBy("code", code);
+  public Project getByCode(String code) throws IOException {
+    return getBy(ProjectImpl_.CODE, code);
   }
 
   @Override
@@ -80,9 +81,9 @@ public class HibernateProjectDao extends HibernateSaveDao<Project>
     switch (type) {
       case CREATE:
       case ENTERED:
-        return "creationTime";
+        return ProjectImpl_.CREATION_TIME;
       case UPDATE:
-        return "lastModified";
+        return ProjectImpl_.LAST_MODIFIED;
       default:
         return null;
 
@@ -91,7 +92,7 @@ public class HibernateProjectDao extends HibernateSaveDao<Project>
 
   @Override
   public String propertyForUser(boolean creator) {
-    return creator ? "creator" : "lastModifier";
+    return creator ? ProjectImpl_.CREATOR : ProjectImpl_.LAST_MODIFIER;
   }
 
   @Override

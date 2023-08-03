@@ -76,7 +76,18 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
     CriteriaQuery<T> query = builder.createQuery(getResultClass());
     Root<? extends T> root = query.from(getEntityClass());
     query.select(root).where(builder.equal(root.get(property), value));
-    return currentSession().createQuery(query).getSingleResult();
+    List<T> results = currentSession().createQuery(query).getResultList();
+    return singleResultOrNull(results);
+  }
+
+  private T singleResultOrNull(List<T> results) {
+    if (results == null || results.isEmpty()) {
+      return null;
+    } else if (results.size() == 1) {
+      return results.get(0);
+    } else {
+      throw new IllegalStateException("Query unexpectedly produced multiple results");
+    }
   }
 
   protected List<T> listByIdList(String idProperty, Collection<Long> ids) {
