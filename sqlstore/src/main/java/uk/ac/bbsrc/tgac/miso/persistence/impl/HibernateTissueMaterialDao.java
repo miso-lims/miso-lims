@@ -1,7 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,16 +12,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateTissueMaterialDao extends HibernateSaveDao<TissueMaterial> implements TissueMaterialDao {
 
   public HibernateTissueMaterialDao() {
-    super(TissueMaterialImpl.class);
+    super(TissueMaterial.class, TissueMaterialImpl.class);
   }
 
   @Override

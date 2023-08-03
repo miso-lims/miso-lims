@@ -21,7 +21,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 public class HibernateDetailedQcStatusDao extends HibernateSaveDao<DetailedQcStatus> implements DetailedQcStatusDao {
 
   public HibernateDetailedQcStatusDao() {
-    super(DetailedQcStatusImpl.class);
+    super(DetailedQcStatus.class, DetailedQcStatusImpl.class);
   }
 
   @Override

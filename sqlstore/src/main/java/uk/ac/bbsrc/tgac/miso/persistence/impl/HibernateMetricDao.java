@@ -20,11 +20,12 @@ import uk.ac.bbsrc.tgac.miso.persistence.MetricDao;
 public class HibernateMetricDao extends HibernateSaveDao<Metric> implements MetricDao {
 
   public HibernateMetricDao() {
-    super(Metric.class);
+    super(Metric.class, Metric.class);
   }
 
   @Override
-  public Metric getByAliasAndCategory(String alias, MetricCategory category, MetricSubcategory subcategory) throws IOException {
+  public Metric getByAliasAndCategory(String alias, MetricCategory category, MetricSubcategory subcategory)
+      throws IOException {
     return (Metric) currentSession().createCriteria(getEntityClass())
         .add(Restrictions.eq("alias", alias))
         .add(Restrictions.eq("category", category))

@@ -4,12 +4,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.ReferenceGenomeDao;
 public class HibernateReferenceGenomeDao extends HibernateSaveDao<ReferenceGenome> implements ReferenceGenomeDao {
 
   public HibernateReferenceGenomeDao() {
-    super(ReferenceGenomeImpl.class);
+    super(ReferenceGenome.class, ReferenceGenomeImpl.class);
   }
 
   @Override

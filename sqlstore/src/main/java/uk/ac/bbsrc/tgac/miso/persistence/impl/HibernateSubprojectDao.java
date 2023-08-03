@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 public class HibernateSubprojectDao extends HibernateSaveDao<Subproject> implements SubprojectDao {
 
   public HibernateSubprojectDao() {
-    super(SubprojectImpl.class);
+    super(Subproject.class, SubprojectImpl.class);
   }
 
   @Override

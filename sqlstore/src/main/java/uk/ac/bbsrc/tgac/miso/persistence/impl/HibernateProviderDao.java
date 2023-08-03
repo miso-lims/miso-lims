@@ -5,10 +5,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,10 +24,17 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
   @Autowired
   private SessionFactory sessionFactory;
 
+  private final Class<T> resultClass;
   private final Class<? extends T> entityClass;
 
-  public HibernateProviderDao(Class<? extends T> entityClass) {
+  public HibernateProviderDao(Class<T> resultClass, Class<? extends T> entityClass) {
+    this.resultClass = resultClass;
     this.entityClass = entityClass;
+  }
+
+  public HibernateProviderDao(Class<T> resultClass) {
+    this.resultClass = resultClass;
+    this.entityClass = resultClass;
   }
 
   public SessionFactory getSessionFactory() {
@@ -34,6 +43,10 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
+  }
+
+  protected Class<T> getResultClass() {
+    return resultClass;
   }
 
   protected Class<? extends T> getEntityClass() {
@@ -51,32 +64,39 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
 
   @Override
   public List<T> list() throws IOException {
-    @SuppressWarnings("unchecked")
-    List<T> results = currentSession().createCriteria(entityClass).list();
-    return results;
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<T> query = builder.createQuery(getResultClass());
+    Root<? extends T> root = query.from(getEntityClass());
+    query.select(root);
+    return currentSession().createQuery(query).getResultList();
   }
 
   protected <V> T getBy(String property, V value) {
-    return entityClass.cast(currentSession().createCriteria(entityClass)
-        .add(Restrictions.eq(property, value))
-        .uniqueResult());
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<T> query = builder.createQuery(getResultClass());
+    Root<? extends T> root = query.from(getEntityClass());
+    query.select(root).where(builder.equal(root.get(property), value));
+    return currentSession().createQuery(query).getSingleResult();
   }
 
   protected List<T> listByIdList(String idProperty, Collection<Long> ids) {
     if (ids == null || ids.isEmpty()) {
       return Collections.emptyList();
     }
-    @SuppressWarnings("unchecked")
-    List<T> results = currentSession().createCriteria(entityClass)
-        .add(Restrictions.in(idProperty, ids))
-        .list();
-    return results;
+
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<T> query = builder.createQuery(getResultClass());
+    Root<? extends T> root = query.from(getEntityClass());
+    query.select(root).where(root.get(idProperty).in(ids));
+    return currentSession().createQuery(query).getResultList();
   }
 
   protected <U> long getUsageBy(Class<U> user, String property, T value) {
-    return (long) currentSession().createCriteria(user)
-        .add(Restrictions.eq(property, value))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<Long> query = builder.createQuery(Long.class);
+    Root<U> root = query.from(user);
+    query.select(builder.count(root)).where(builder.equal(root.get(property), value));
+    return currentSession().createQuery(query).getSingleResult();
   }
 
 }

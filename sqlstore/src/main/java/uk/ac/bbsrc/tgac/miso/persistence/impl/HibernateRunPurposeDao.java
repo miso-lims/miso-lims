@@ -1,16 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
-import uk.ac.bbsrc.tgac.miso.persistence.RunPurposeDao;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
+import uk.ac.bbsrc.tgac.miso.persistence.RunPurposeDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
@@ -37,7 +37,7 @@ public class HibernateRunPurposeDao extends HibernateSaveDao<RunPurpose> impleme
 
   @Override
   public long getUsageBySequencingOrders(RunPurpose purpose) {
-    return getUsageBy(SequencingOrder.class, "purpose", purpose);
+    return getUsageBy(SequencingOrderImpl.class, "purpose", purpose);
   }
 
 }

@@ -15,9 +15,9 @@ import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateSampleClassDao extends HibernateSaveDao<SampleClass> implements SampleClassDao {
-  
+
   public HibernateSampleClassDao() {
-    super(SampleClassImpl.class);
+    super(SampleClass.class, SampleClassImpl.class);
   }
 
   @Override

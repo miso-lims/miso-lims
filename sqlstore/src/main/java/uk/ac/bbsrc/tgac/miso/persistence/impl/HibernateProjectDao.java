@@ -30,7 +30,7 @@ public class HibernateProjectDao extends HibernateSaveDao<Project>
   private final static List<AliasDescriptor> STANDARD_ALIASES = Collections.emptyList();
 
   public HibernateProjectDao() {
-    super(ProjectImpl.class);
+    super(Project.class, ProjectImpl.class);
   }
 
   @Override

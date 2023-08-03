@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +18,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.LabDao;
 public class HibernateLabDao extends HibernateSaveDao<Lab> implements LabDao {
 
   public HibernateLabDao() {
-    super(LabImpl.class);
+    super(Lab.class, LabImpl.class);
   }
 
   @Override

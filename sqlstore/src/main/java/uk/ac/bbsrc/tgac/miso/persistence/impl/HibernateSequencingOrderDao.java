@@ -14,6 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl_;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencingOrderDao;
 
 @Repository
@@ -21,7 +22,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SequencingOrderDao;
 public class HibernateSequencingOrderDao extends HibernateSaveDao<SequencingOrder> implements SequencingOrderDao {
 
   public HibernateSequencingOrderDao() {
-    super(SequencingOrderImpl.class);
+    super(SequencingOrder.class, SequencingOrderImpl.class);
   }
 
   @Override
@@ -40,7 +41,8 @@ public class HibernateSequencingOrderDao extends HibernateSaveDao<SequencingOrde
     List<SequencingOrder> records = currentSession().createCriteria(SequencingOrderImpl.class)
         .add(Restrictions.eq("pool", pool))
         .add(Restrictions.eq("purpose", purpose))
-        .add(containerModel == null ? Restrictions.isNull("containerModel") : Restrictions.eq("containerModel", containerModel))
+        .add(containerModel == null ? Restrictions.isNull("containerModel")
+            : Restrictions.eq("containerModel", containerModel))
         .add(Restrictions.eq("parameters", parameters))
         .add(Restrictions.eq("partitions", partitions))
         .list();
@@ -49,7 +51,7 @@ public class HibernateSequencingOrderDao extends HibernateSaveDao<SequencingOrde
 
   @Override
   public List<SequencingOrder> listByIdList(Collection<Long> ids) throws IOException {
-    return listByIdList("id", ids);
+    return listByIdList(SequencingOrderImpl_.SEQUENCING_ORDER_ID, ids);
   }
 
 }

@@ -1,5 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
@@ -10,16 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateSamplePurposeDao extends HibernateSaveDao<SamplePurpose> implements SamplePurposeDao {
 
   public HibernateSamplePurposeDao() {
-    super(SamplePurposeImpl.class);
+    super(SamplePurpose.class, SamplePurposeImpl.class);
   }
 
   @Override
