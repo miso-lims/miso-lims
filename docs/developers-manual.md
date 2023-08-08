@@ -223,9 +223,17 @@ There are a few things to keep in mind when adding Flyway migrations
 
 ## Persistence Layer
 
-Hibernate is used for Object-Relational Mapping (ORM). JPA/Hibernate annotations are used in the model classes to define columns, joins,
-constraints, and other database info. The Data Access Objects (DAOs) found in the sqlstore module are then only responsible for doing
-simple reads and writes as (usually) dictated by the Service layer. DAOs should only be consumed by the Service layer.
+Hibernate is used for Object-Relational Mapping (ORM). JPA/Hibernate annotations are used in the
+entity model classes to define columns, joins, constraints, and other database info. The Hibernate
+Metamodel Generator is used to build static metamodel classes that can be used to make JPA Criteria
+queries completely typesafe. These should always be used instead of referring to fields using
+Strings. The metamodel class is built into the same package as the entity class, with a "_" appended
+to the class name. e.g. the metamodel for `uk.ac.bbsrc.tgac.miso.core.data.Index` will be
+`uk.ac.bbsrc.tgac.miso.core.data.Index_`.
+
+The Data Access Objects (DAOs) found in the sqlstore module are only responsible for doing simple
+reads and writes as (usually) dictated by the Service layer. DAOs should only be consumed by the
+Service layer.
 
 ## Service Layer
 

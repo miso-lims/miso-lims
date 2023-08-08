@@ -7,22 +7,21 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate_;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryTemplateStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateLibraryTemplateDao extends HibernateSaveDao<LibraryTemplate> implements LibraryTemplateStore, HibernatePaginatedDataSource<LibraryTemplate> {
+public class HibernateLibraryTemplateDao extends HibernateSaveDao<LibraryTemplate>
+    implements LibraryTemplateStore, HibernatePaginatedDataSource<LibraryTemplate> {
 
-  private static final String[] SEARCH_PROPERTIES = new String[] { "alias" };
+  private static final String[] SEARCH_PROPERTIES = new String[] {"alias"};
 
   public HibernateLibraryTemplateDao() {
     super(LibraryTemplate.class);
@@ -85,7 +84,7 @@ public class HibernateLibraryTemplateDao extends HibernateSaveDao<LibraryTemplat
 
   @Override
   public List<LibraryTemplate> listByIdList(Collection<Long> idList) throws IOException {
-    return listByIdList("id", idList);
+    return listByIdList(LibraryTemplate_.LIBRARY_TEMPLATE_ID, idList);
   }
 
   @Override
