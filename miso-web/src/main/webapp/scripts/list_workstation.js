@@ -21,13 +21,14 @@ ListTarget.workstation = {
   },
   createColumns: function (config, projectId) {
     return [
-      {
-        sTitle: "Alias",
-        mData: "alias",
-        include: true,
-        iSortPriority: 2,
-        bSortDirection: false,
-      },
+      ListUtils.labelHyperlinkColumn(
+        "Alias",
+        Urls.ui.workstations.view,
+        Utils.array.getId,
+        "alias",
+        1,
+        true
+      ),
       {
         sTitle: "Description",
         mData: "description",

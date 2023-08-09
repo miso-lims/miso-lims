@@ -1322,6 +1322,7 @@ Urls = (function () {
   ui.workstations = {
     bulkCreate: workstationUiBase + "/bulk/new",
     bulkEdit: workstationUiBase + "/bulk/edit",
+    view: idUrlFunction(workstationUiBase),
   };
 
   var workstationRestBase = restBase + "/workstations";

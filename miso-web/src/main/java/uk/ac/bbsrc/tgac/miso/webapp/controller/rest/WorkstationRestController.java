@@ -56,4 +56,10 @@ public class WorkstationRestController extends RestController {
     return asyncOperationManager.getAsyncProgress(uuid, Workstation.class, workstationService, Dtos::asDto);
   }
 
+  @GetMapping(value = "/{workstationId}", produces = "application/json")
+  @ResponseBody
+  public WorkstationDto getById(@PathVariable Long workstationId) throws IOException {
+    return RestUtils.getObject("Workstation", workstationId, workstationService, Dtos::asDto);
+  }
+
 }
