@@ -116,6 +116,7 @@ FormTarget.project = (function ($) {
               data: "additionalDetails",
               type: "textarea",
               description: "Long text field, can be more in-depth than the 'Description' field",
+              regex: "^[^<>]*$",
               maxLength: 65535,
             },
             {
