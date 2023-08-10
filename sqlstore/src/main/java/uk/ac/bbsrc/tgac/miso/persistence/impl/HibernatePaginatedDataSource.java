@@ -537,6 +537,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  default void restrictPaginationByWorkstationId(Criteria criteria, long workstationId, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by workstation.", getFriendlyName()));
+  }
+
+  @Override
   public default void restrictPaginationByIdentifiers(Criteria criteria, Collection<String> identifiers,
       Consumer<String> errorHandler) {
     String[] fields = getIdentifierProperties();

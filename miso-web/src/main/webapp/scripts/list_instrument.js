@@ -6,6 +6,8 @@ ListTarget.instrument = {
   createUrl: function (config, projectId) {
     if (config.instrumentType) {
       return Urls.rest.instruments.instrumentTypeDatatable(config.instrumentType);
+    } else if (config.workstationId) {
+      return Urls.rest.instruments.workstationDatatable(config.workstationId);
     } else {
       return Urls.rest.instruments.datatable;
     }

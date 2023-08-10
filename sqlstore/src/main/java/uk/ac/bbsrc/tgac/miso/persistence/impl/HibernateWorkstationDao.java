@@ -33,5 +33,4 @@ public class HibernateWorkstationDao extends HibernateSaveDao<Workstation> imple
   public List<Workstation> listByIdList(Collection<Long> ids) throws IOException {
     return listByIdList("workstationId", ids);
   }
-
 }

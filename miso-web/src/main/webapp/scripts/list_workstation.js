@@ -23,7 +23,7 @@ ListTarget.workstation = {
     return [
       ListUtils.labelHyperlinkColumn(
         "Alias",
-        Urls.ui.workstations.view,
+        Urls.ui.workstations.edit,
         Utils.array.getId,
         "alias",
         1,

@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
@@ -68,7 +70,8 @@ public class DefaultWorkstationService extends AbstractSaveService<Workstation> 
   }
 
   @Override
-  protected void collectValidationErrors(Workstation object, Workstation beforeChange, List<ValidationError> errors) throws IOException {
+  protected void collectValidationErrors(Workstation object, Workstation beforeChange, List<ValidationError> errors)
+      throws IOException {
     if ((beforeChange == null || !object.getAlias().equals(beforeChange.getAlias()))
         && workstationDao.getByAlias(object.getAlias()) != null) {
       errors.add(new ValidationError("alias", "There is already a workstation with this alias"));
@@ -90,6 +93,33 @@ public class DefaultWorkstationService extends AbstractSaveService<Workstation> 
       result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.libraries(usage)));
     }
     return result;
+  }
+
+  @Override
+  public long update(Workstation workstation) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+    Workstation newWorkstation = get(workstation.getId());
+    validateChange(workstation, newWorkstation);
+    applyChanges(newWorkstation, workstation);
+    return save(newWorkstation);
+  }
+
+  public void validateChange(Workstation workstation, Workstation newWorkstation) throws IOException {
+    List<ValidationError> errors = new ArrayList<>();
+
+    if (newWorkstation == null || !workstation.getAlias().equals(newWorkstation.getAlias())
+        && workstationDao.getByAlias(workstation.getAlias()) != null) {
+      errors.add(new ValidationError("alias", "There is already a workstation with this alias"));
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
+  }
+
+
+  private long save(Workstation workstation) throws IOException {
+    return workstationDao.update(workstation);
   }
 
 }

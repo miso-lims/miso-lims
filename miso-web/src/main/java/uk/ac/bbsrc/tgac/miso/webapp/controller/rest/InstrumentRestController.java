@@ -116,6 +116,13 @@ public class InstrumentRestController extends RestController {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.instrumentType(instrumentType));
   }
 
+  @GetMapping(value = "/dt/workstation/{id}", produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<InstrumentDto> dataTableByWorkset(@PathVariable("id") Long id,
+      HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workstationId(id));
+  }
+
   @PostMapping(value = "/bulk-delete")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)

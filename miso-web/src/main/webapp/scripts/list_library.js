@@ -12,6 +12,8 @@ ListTarget.library = {
       return Urls.rest.libraries.batchDatatable(config.batchId);
     } else if (config.requisitionId) {
       return Urls.rest.libraries.requisitionDatatable(config.requisitionId);
+    } else if (config.workstationId) {
+      return Urls.rest.libraries.workstationDatatable(config.workstationId);
     }
     return Urls.rest.libraries.datatable;
   },

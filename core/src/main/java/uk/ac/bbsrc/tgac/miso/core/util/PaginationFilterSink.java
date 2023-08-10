@@ -126,4 +126,6 @@ public interface PaginationFilterSink<T> {
 
   public void restrictPaginationByWorkstation(T item, String query, Consumer<String> errorHandler);
 
+  public void restrictPaginationByWorkstationId(T item, long workstationId, Consumer<String> errorHandler);
+
 }

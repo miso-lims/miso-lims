@@ -562,6 +562,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter workstationId(long id) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByWorkstationId(item, id, errorHandler);
+      }
+    };
+  }
+
   public abstract <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler);
 
 }

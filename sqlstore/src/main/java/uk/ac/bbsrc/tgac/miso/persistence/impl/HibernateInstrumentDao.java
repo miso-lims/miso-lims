@@ -150,6 +150,12 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   }
 
   @Override
+  public void restrictPaginationByWorkstationId(Criteria criteria, long id, Consumer<String> errorHandler) {
+    criteria.createAlias("workstation", "workstation");
+    criteria.add(Restrictions.eq("workstation.workstationId", id));
+  }
+
+  @Override
   public String propertyForSortColumn(String original) {
     switch (original) {
       case "platformType":
