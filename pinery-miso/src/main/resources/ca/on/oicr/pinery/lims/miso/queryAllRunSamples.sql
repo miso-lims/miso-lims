@@ -8,6 +8,7 @@ SELECT DISTINCT Run.runId
   ,rp.alias run_purpose
   ,rlqc.qcPassed qc_passed
   ,rlqc.description qc_description
+  ,rpa.qcNote
   ,rpa.qcDate qc_date
   ,rpa.qcUser qcUserId
   ,rpa.dataReview
