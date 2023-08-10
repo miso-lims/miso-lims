@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 
-public interface WorkstationDao extends BulkSaveDao<Workstation>, SaveDao<Workstation> {
+public interface WorkstationDao extends BulkSaveDao<Workstation> {
 
   Workstation getByAlias(String alias) throws IOException;
 

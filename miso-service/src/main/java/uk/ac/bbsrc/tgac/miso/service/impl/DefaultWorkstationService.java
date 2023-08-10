@@ -96,14 +96,6 @@ public class DefaultWorkstationService extends AbstractSaveService<Workstation> 
   }
 
   @Override
-  public long update(Workstation workstation) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-    Workstation newWorkstation = get(workstation.getId());
-    validateChange(workstation, newWorkstation);
-    applyChanges(newWorkstation, workstation);
-    return save(newWorkstation);
-  }
-
   public void validateChange(Workstation workstation, Workstation newWorkstation) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
@@ -116,10 +108,4 @@ public class DefaultWorkstationService extends AbstractSaveService<Workstation> 
       throw new ValidationException(errors);
     }
   }
-
-
-  private long save(Workstation workstation) throws IOException {
-    return workstationDao.update(workstation);
-  }
-
 }

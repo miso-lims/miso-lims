@@ -27,18 +27,16 @@
     <br>
 
 
-    <form:form id="workstationForm" data-parslet-validate="" autocomplete="off" acceptCharset="utf-8">
+    <form:form id="workstationForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8">
     </form:form>
 
     <br>
     <h1>Instruments</h1>
-    <div id="instrumentForm_testsError"></div>
     <table id="instruments_table"></table>
     <br>
 
     <br>
     <h1>Libraries</h1>
-    <div id="libraryForm_testsError"></div>
     <table id="libraries_table"></table>
     <br>
 
