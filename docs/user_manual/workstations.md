@@ -13,4 +13,4 @@ in the [Type Data section](../type_data/).
 
 ## Edit Workstation Page
 
-The Edit Workstation page shows details about the workstation and the instruments and libraries linked to it. Instruments and libraries are linked to workstations by directly editing those items. To get to the Edit Workstation page, click the workstation name on the Workstations list page. You can edit the workstation's details by changing them on this page and then clicking the "Save button to confirm. Only MISO administrators can edit workstations.
+The Edit Workstation page shows details about the workstation and the instruments and libraries linked to it. Instruments and libraries are linked to workstations by directly editing those items. To get to the Edit Workstation page, click the workstation name on the Workstations list page. You can edit the workstation's details by changing them on this page and then clicking the "Save" button to confirm. Only MISO administrators can edit workstations.
