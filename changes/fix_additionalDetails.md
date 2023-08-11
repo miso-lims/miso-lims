@@ -1,1 +1,0 @@
-Bug where line breaks don't work in Project field additional details

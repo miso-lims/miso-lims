@@ -7,6 +7,18 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.5.0] - 2023-08-11
+
+### Added
+
+* QC notes to Pinery samples and run-samples
+
+### Fixed
+
+* Bug where line breaks don't work in Project field additional details
+* Unexpected error when attempting to save some sample classes
+
+
 ## [2.4.0] - 2023-07-27
 
 ### Added
