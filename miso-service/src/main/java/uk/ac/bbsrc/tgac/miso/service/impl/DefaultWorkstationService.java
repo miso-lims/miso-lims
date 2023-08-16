@@ -68,7 +68,8 @@ public class DefaultWorkstationService extends AbstractSaveService<Workstation> 
   }
 
   @Override
-  protected void collectValidationErrors(Workstation object, Workstation beforeChange, List<ValidationError> errors) throws IOException {
+  protected void collectValidationErrors(Workstation object, Workstation beforeChange, List<ValidationError> errors)
+      throws IOException {
     if ((beforeChange == null || !object.getAlias().equals(beforeChange.getAlias()))
         && workstationDao.getByAlias(object.getAlias()) != null) {
       errors.add(new ValidationError("alias", "There is already a workstation with this alias"));
@@ -91,5 +92,4 @@ public class DefaultWorkstationService extends AbstractSaveService<Workstation> 
     }
     return result;
   }
-
 }

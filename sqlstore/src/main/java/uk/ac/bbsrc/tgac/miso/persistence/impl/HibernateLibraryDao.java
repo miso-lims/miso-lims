@@ -345,6 +345,12 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
+  public void restrictPaginationByWorkstationId(Criteria criteria, long id, Consumer<String> errorHandler) {
+    criteria.createAlias("workstation", "workstation");
+    criteria.add(Restrictions.eq("workstation.workstationId", id));
+  }
+
+  @Override
   public void restrictPaginationByKitName(Criteria criteria, String query, Consumer<String> errorHandler) {
     if (LimsUtils.isStringBlankOrNull(query)) {
       criteria.add(Restrictions.isNull("kitDescriptor"));

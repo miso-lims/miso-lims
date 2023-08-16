@@ -39,6 +39,12 @@ public class WorkstationRestController extends RestController {
     RestUtils.bulkDelete("Workstation", ids, workstationService);
   }
 
+  @PutMapping("/{workstationId}")
+  @ResponseBody
+  public WorkstationDto update(@PathVariable long workstationId, @RequestBody WorkstationDto dto) throws IOException {
+    return RestUtils.updateObject("Workstation", workstationId, dto, Dtos::to, workstationService, Dtos::asDto);
+  }
+
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<WorkstationDto> dtos) throws IOException {
@@ -55,5 +61,4 @@ public class WorkstationRestController extends RestController {
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
     return asyncOperationManager.getAsyncProgress(uuid, Workstation.class, workstationService, Dtos::asDto);
   }
-
 }

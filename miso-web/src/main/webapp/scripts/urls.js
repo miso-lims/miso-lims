@@ -346,6 +346,7 @@ Urls = (function () {
   rest.instruments = {
     create: instrumentRestBase,
     update: idUrlFunction(instrumentRestBase),
+    workstationDatatable: idUrlFunction(instrumentRestBase + "/dt/workstation"),
     datatable: instrumentRestBase + "/dt",
     instrumentTypeDatatable: idUrlFunction(instrumentRestBase + "/dt/instrument-type"),
     list: instrumentRestBase,
@@ -420,6 +421,7 @@ Urls = (function () {
     children: idUrlFunction(libraryRestBase + "/children"),
     query: libraryRestBase + "/query",
     datatable: libraryRestBase + "/dt",
+    workstationDatatable: idUrlFunction(libraryRestBase + "/dt/workstation"),
     projectDatatable: idUrlFunction(libraryRestBase + "/dt/project"),
     batchDatatable: idUrlFunction(libraryRestBase + "/dt/batch"),
     requisitionDatatable: idUrlFunction(libraryRestBase + "/dt/requisition"),
@@ -1322,10 +1324,12 @@ Urls = (function () {
   ui.workstations = {
     bulkCreate: workstationUiBase + "/bulk/new",
     bulkEdit: workstationUiBase + "/bulk/edit",
+    edit: idUrlFunction(workstationUiBase),
   };
 
   var workstationRestBase = restBase + "/workstations";
   rest.workstations = {
+    update: idUrlFunction(workstationRestBase),
     bulkSave: workstationRestBase + "/bulk",
     bulkSaveProgress: idUrlFunction(workstationRestBase + "/bulk"),
   };

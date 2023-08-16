@@ -185,6 +185,13 @@ public class LibraryRestController extends RestController {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.ids(libraryIds));
   }
 
+  @GetMapping(value = "/dt/workstation/{id}", produces = "application/json")
+  @ResponseBody
+  public DataTablesResponseDto<LibraryDto> dataTableByWorkset(@PathVariable("id") Long id,
+      HttpServletRequest request) throws IOException {
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workstationId(id));
+  }
+
   @PostMapping(value = "/query", produces = {"application/json"})
   @ResponseBody
   public List<LibraryDto> getLibrariesInBulk(@RequestBody List<String> names, HttpServletRequest request)

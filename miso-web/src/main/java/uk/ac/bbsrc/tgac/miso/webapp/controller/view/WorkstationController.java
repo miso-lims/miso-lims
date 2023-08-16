@@ -4,13 +4,17 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -29,6 +33,9 @@ public class WorkstationController extends AbstractTypeDataController<Workstatio
   @Autowired
   private AuthorizationManager authorizationManager;
 
+  @Autowired
+  private ObjectMapper mapper;
+
   public WorkstationController() {
     super("Workstations", "workstation", "workstation");
   }
@@ -46,6 +53,25 @@ public class WorkstationController extends AbstractTypeDataController<Workstatio
   @PostMapping("/bulk/edit")
   public ModelAndView edit(@RequestParam Map<String, String> formData, ModelMap model) throws IOException {
     return bulkEdit(formData, model);
+  }
+
+  @GetMapping("/{workstationId}")
+  public ModelAndView viewWorkstation(@PathVariable(value = "workstationId") Long workstationId, ModelMap model)
+      throws IOException {
+    Workstation workstation = workstationService.get(workstationId);
+    if (workstation == null) {
+      throw new NotFoundException("No workstation found for ID " + workstationId.toString());
+    }
+    model.put("title", "Workstation " + workstation.getId());
+    return setupForm(workstation, model);
+  }
+
+  private ModelAndView setupForm(Workstation workstation, ModelMap model) throws IOException {
+    WorkstationDto workstationDto = Dtos.asDto(workstation);
+    model.put("workstation", workstation);
+    model.put("workstationDto", mapper.writeValueAsString(workstationDto));
+
+    return new ModelAndView("/WEB-INF/pages/editWorkstation.jsp", model);
   }
 
   @Override
