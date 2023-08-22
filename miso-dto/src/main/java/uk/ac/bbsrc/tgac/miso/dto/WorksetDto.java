@@ -1,6 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
+import java.util.Set;
+
+import com.eaglegenomics.simlims.core.Note;
 
 public class WorksetDto {
 
@@ -14,6 +17,7 @@ public class WorksetDto {
   private List<Long> libraryAliquotIds;
   private String creator;
   private String lastModified;
+  private Set<Note> notes;
 
   public Long getId() {
     return id;
@@ -93,6 +97,14 @@ public class WorksetDto {
 
   public void setLastModified(String lastModified) {
     this.lastModified = lastModified;
+  }
+
+  public Set<Note> getNotes() {
+    return notes;
+  }
+
+  public void setNotes(Set<Note> note) {
+    this.notes = notes;
   }
 
 }

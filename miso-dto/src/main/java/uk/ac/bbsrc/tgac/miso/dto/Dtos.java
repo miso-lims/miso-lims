@@ -3723,6 +3723,7 @@ public class Dtos {
     setWorksetItemIds(from.getWorksetLibraryAliquots(), dto::setLibraryAliquotIds);
     dto.setCreator(from.getCreator().getFullName());
     dto.setLastModified(formatDateTime(from.getLastModified()));
+    dto.setNotes(from.getNotes());
     return dto;
   }
 
@@ -3746,6 +3747,8 @@ public class Dtos {
     setWorksetItems(workset::setWorksetLibraries, from.getLibraryIds(), WorksetLibrary::new, LibraryImpl::new);
     setWorksetItems(workset::setWorksetLibraryAliquots, from.getLibraryAliquotIds(), WorksetLibraryAliquot::new,
         LibraryAliquot::new);
+    workset.setNotes(from.getNotes());
+
     return workset;
   }
 
