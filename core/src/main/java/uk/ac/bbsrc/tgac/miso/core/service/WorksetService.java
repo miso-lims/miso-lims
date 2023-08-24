@@ -13,7 +13,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface WorksetService extends PaginatedDataSource<ListWorksetView>, DeleterService<Workset>, SaveService<Workset> {
+public interface WorksetService
+    extends PaginatedDataSource<ListWorksetView>, DeleterService<Workset>, SaveService<Workset>, NoteService<Workset> {
 
   public List<ListWorksetView> listBySearch(String query) throws IOException;
 

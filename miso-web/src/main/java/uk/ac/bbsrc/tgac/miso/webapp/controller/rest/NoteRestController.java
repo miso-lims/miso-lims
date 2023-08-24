@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 
 @Controller
 @RequestMapping("/rest/notes")
@@ -65,6 +66,8 @@ public class NoteRestController extends RestController {
   private SampleService sampleService;
   @Autowired
   private RequisitionService requisitionService;
+  @Autowired
+  private WorksetService worksetService;
 
   private <T extends Identifiable> void addNote(NoteService<T> service, long entityId, NoteRequest request)
       throws IOException {
@@ -112,6 +115,8 @@ public class NoteRestController extends RestController {
         return runService;
       case "requisition":
         return requisitionService;
+      case "workset":
+        return worksetService;
       default:
         throw new RestException("Unknown entity type: " + entityType, Status.NOT_FOUND);
     }
@@ -135,5 +140,9 @@ public class NoteRestController extends RestController {
 
   public void setRequisitionService(RequisitionService requisitionService) {
     this.requisitionService = requisitionService;
+  }
+
+  public void setWorksetService(WorksetService worksetService) {
+    this.worksetService = worksetService;
   }
 }

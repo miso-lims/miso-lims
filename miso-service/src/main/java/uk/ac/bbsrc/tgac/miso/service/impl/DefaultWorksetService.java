@@ -3,6 +3,8 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.loadChildEntity;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -17,6 +19,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -105,7 +109,8 @@ public class DefaultWorksetService implements WorksetService {
   }
 
   @Override
-  public List<ListWorksetView> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+  public List<ListWorksetView> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir,
+      String sortCol,
       PaginationFilter... filter) throws IOException {
     return listWorksetViewStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
@@ -181,6 +186,7 @@ public class DefaultWorksetService implements WorksetService {
     to.setDescription(from.getDescription());
     to.setCategory(from.getCategory());
     to.setStage(from.getStage());
+    ValidationUtils.applySetChanges(from.getNotes(), to.getNotes());
   }
 
   private void validateChange(Workset workset, Workset beforeChange) throws IOException {
@@ -194,6 +200,38 @@ public class DefaultWorksetService implements WorksetService {
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
+  }
+
+
+  @Override
+  public void deleteNote(Workset workset, Long noteId) throws IOException {
+    if (noteId == null) {
+      throw new IllegalArgumentException("Cannot delete an unsaved Note");
+    }
+    Workset managed = worksetStore.get(workset.getId());
+    Note deleteNote = null;
+    for (Note note : managed.getNotes()) {
+      if (note.getId() == noteId.longValue()) {
+        deleteNote = note;
+        break;
+      }
+    }
+    if (deleteNote == null) {
+      throw new IOException("Note " + noteId + " not found for Workset  " + workset.getId());
+    }
+    authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
+    managed.getNotes().remove(deleteNote);
+    worksetStore.save(managed);
+  }
+
+  @Override
+  public void addNote(Workset workset, Note note) throws IOException {
+    Workset managed = worksetStore.get(workset.getId());
+    note.setCreationDate(LocalDate.now(ZoneId.systemDefault()));
+    note.setOwner(authorizationManager.getCurrentUser());
+    managed.addNote(note);
+    managed.setLastModifier(authorizationManager.getCurrentUser());
+    worksetStore.save(managed);
   }
 
   @Override
@@ -213,17 +251,20 @@ public class DefaultWorksetService implements WorksetService {
 
   @Override
   public void addSamples(Workset workset, Collection<Sample> items) throws IOException {
-    addItems(workset, null, items, Workset::getWorksetSamples, WorksetSample::new, sampleService, Pluralizer.samples(items.size()));
+    addItems(workset, null, items, Workset::getWorksetSamples, WorksetSample::new, sampleService,
+        Pluralizer.samples(items.size()));
   }
 
   @Override
   public void addLibraries(Workset workset, Collection<Library> items) throws IOException {
-    addItems(workset, null, items, Workset::getWorksetLibraries, WorksetLibrary::new, libraryService, Pluralizer.libraries(items.size()));
+    addItems(workset, null, items, Workset::getWorksetLibraries, WorksetLibrary::new, libraryService,
+        Pluralizer.libraries(items.size()));
   }
 
   @Override
   public void addLibraryAliquots(Workset workset, Collection<LibraryAliquot> items) throws IOException {
-    addItems(workset, null, items, Workset::getWorksetLibraryAliquots, WorksetLibraryAliquot::new, libraryAliquotService,
+    addItems(workset, null, items, Workset::getWorksetLibraryAliquots, WorksetLibraryAliquot::new,
+        libraryAliquotService,
         Pluralizer.libraryAliquots(items.size()));
   }
 
@@ -244,21 +285,25 @@ public class DefaultWorksetService implements WorksetService {
 
   @Override
   public void moveSamples(Workset from, Workset to, Collection<Sample> items) throws IOException {
-    moveItems(from, to, items, Pluralizer.samples(items.size()), Workset::getWorksetSamples, WorksetSample::new, sampleService);
+    moveItems(from, to, items, Pluralizer.samples(items.size()), Workset::getWorksetSamples, WorksetSample::new,
+        sampleService);
   }
 
   @Override
   public void moveLibraries(Workset from, Workset to, Collection<Library> items) throws IOException {
-    moveItems(from, to, items, Pluralizer.libraries(items.size()), Workset::getWorksetLibraries, WorksetLibrary::new, libraryService);
+    moveItems(from, to, items, Pluralizer.libraries(items.size()), Workset::getWorksetLibraries, WorksetLibrary::new,
+        libraryService);
   }
 
   @Override
   public void moveLibraryAliquots(Workset from, Workset to, Collection<LibraryAliquot> items) throws IOException {
-    moveItems(from, to, items, Pluralizer.libraryAliquots(items.size()), Workset::getWorksetLibraryAliquots, WorksetLibraryAliquot::new,
+    moveItems(from, to, items, Pluralizer.libraryAliquots(items.size()), Workset::getWorksetLibraryAliquots,
+        WorksetLibraryAliquot::new,
         libraryAliquotService);
   }
 
-  private <T extends Boxable, J extends WorksetItem<T>> void addItems(Workset toWorkset, Workset fromWorkset, Collection<T> items,
+  private <T extends Boxable, J extends WorksetItem<T>> void addItems(Workset toWorkset, Workset fromWorkset,
+      Collection<T> items,
       Function<Workset, Set<J>> getter, Supplier<J> constructor, ProviderService<T> service, String typeLabel)
       throws IOException {
     Date now = new Date();
@@ -284,12 +329,14 @@ public class DefaultWorksetService implements WorksetService {
     }
   }
 
-  private <T extends Boxable, J extends WorksetItem<T>> void removeItems(Workset fromWorkset, Workset toWorkset, Collection<T> items,
+  private <T extends Boxable, J extends WorksetItem<T>> void removeItems(Workset fromWorkset, Workset toWorkset,
+      Collection<T> items,
       Function<Workset, Set<J>> getter, String typeLabel) throws IOException {
     Set<J> worksetItems = getter.apply(fromWorkset);
     for (T item : items) {
       if (!worksetItems.removeIf(worksetItem -> worksetItem.getItem().getId() == item.getId())) {
-        throw new ValidationException(String.format("%s %s not found in workset", item.getEntityType().getLabel(), item.getId()));
+        throw new ValidationException(
+            String.format("%s %s not found in workset", item.getEntityType().getLabel(), item.getId()));
       }
     }
     fromWorkset.setChangeDetails(authorizationManager.getCurrentUser());
@@ -300,12 +347,14 @@ public class DefaultWorksetService implements WorksetService {
   }
 
   private <T extends Boxable, J extends WorksetItem<T>> void moveItems(Workset from, Workset to, Collection<T> items,
-      String typeLabel, Function<Workset, Set<J>> getter, Supplier<J> constructor, ProviderService<T> service) throws IOException {
+      String typeLabel, Function<Workset, Set<J>> getter, Supplier<J> constructor, ProviderService<T> service)
+      throws IOException {
     removeItems(from, to, items, getter, typeLabel);
     addItems(to, from, items, getter, constructor, service, typeLabel);
   }
 
-  private static <T extends Boxable, J extends WorksetItem<T>> J makeWorksetItem(Supplier<J> constructor, T item, Workset workset,
+  private static <T extends Boxable, J extends WorksetItem<T>> J makeWorksetItem(Supplier<J> constructor, T item,
+      Workset workset,
       Date addedTime) {
     J worksetItem = constructor.get();
     worksetItem.setItem(item);
@@ -314,7 +363,8 @@ public class DefaultWorksetService implements WorksetService {
     return worksetItem;
   }
 
-  private <T extends Boxable> void addChangeLogForItems(Workset workset, Collection<T> items, String actionMessage, String typeLabel)
+  private <T extends Boxable> void addChangeLogForItems(Workset workset, Collection<T> items, String actionMessage,
+      String typeLabel)
       throws IOException {
     String message = String.format("%s: %s", actionMessage, items.stream()
         .map(item -> String.format("%s (%s)", item.getAlias(), item.getName()))

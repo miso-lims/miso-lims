@@ -94,5 +94,4 @@ public class WorksetDto {
   public void setLastModified(String lastModified) {
     this.lastModified = lastModified;
   }
-
 }

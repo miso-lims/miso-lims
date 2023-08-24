@@ -15,11 +15,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
@@ -51,7 +53,7 @@ public class Workset implements Serializable, Aliasable, ChangeLoggable, Deletab
           .findAny().orElse(null);
     }
   }
-  
+
   private static final long serialVersionUID = 1L;
 
   private static final long UNSAVED_ID = 0L;
@@ -101,6 +103,11 @@ public class Workset implements Serializable, Aliasable, ChangeLoggable, Deletab
   @OneToMany(targetEntity = WorksetChangeLog.class, mappedBy = "workset", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
+  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @JoinTable(name = "Workset_Note", joinColumns = {@JoinColumn(name = "worksetId")},
+      inverseJoinColumns = {@JoinColumn(name = "noteId")})
+  private Set<Note> notes = new HashSet<>();
+
   @Override
   public long getId() {
     return id;
@@ -149,6 +156,21 @@ public class Workset implements Serializable, Aliasable, ChangeLoggable, Deletab
       worksetSamples = new HashSet<>();
     }
     return worksetSamples;
+  }
+
+  public void addNote(Note note) {
+    this.notes.add(note);
+  }
+
+  public Set<Note> getNotes() {
+    if (notes == null) {
+      notes = new HashSet<>();
+    }
+    return notes;
+  }
+
+  public void setNotes(Set<Note> notes) {
+    this.notes = notes;
   }
 
   public void setWorksetSamples(Set<WorksetSample> worksetSamples) {
