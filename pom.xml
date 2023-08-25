@@ -418,7 +418,7 @@
       <dependency>
         <groupId>io.github.bonigarcia</groupId>
         <artifactId>webdrivermanager</artifactId>
-        <version>4.4.1</version>
+        <version>5.4.1</version>
       </dependency>
       <dependency>
         <groupId>org.flywaydb</groupId>
