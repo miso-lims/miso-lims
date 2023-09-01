@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -149,7 +150,9 @@ public class AdvancedSearchParser {
             }
           case "id":
             try {
-              if (phrase.contains(",")) {
+              if (LimsUtils.isStringBlankOrNull(phrase)) {
+                return PaginationFilter.ids(Collections.emptyList());
+              } else if (phrase.contains(",")) {
                 return PaginationFilter.ids(LimsUtils.parseIds(phrase));
               } else {
                 return PaginationFilter.id(Long.parseLong(phrase));

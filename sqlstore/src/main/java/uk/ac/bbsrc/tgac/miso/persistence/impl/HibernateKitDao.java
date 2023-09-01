@@ -1,61 +1,46 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.Criteria;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.KitImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Run_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor_;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType_;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.KitStore;
-import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<KitDescriptor> {
+public class HibernateKitDao implements KitStore, JpaCriteriaPaginatedDataSource<KitDescriptor, KitDescriptor> {
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -80,15 +65,14 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
 
   @Override
   public Kit getKitByLotNumber(String lotNumber) throws IOException {
-    Criteria criteria = currentSession().createCriteria(KitImpl.class);
-    criteria.add(Restrictions.eq("lotNumber", lotNumber));
-    return (Kit) criteria.uniqueResult();
+    QueryBuilder<Kit, KitImpl> builder = new QueryBuilder<>(currentSession(), KitImpl.class, Kit.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(KitImpl_.lotNumber), lotNumber));
+    return builder.getSingleResultOrNull();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public List<Kit> listAll() throws IOException {
-    return currentSession().createCriteria(KitImpl.class).list();
+    return new QueryBuilder<>(currentSession(), KitImpl.class, Kit.class).getResultList();
   }
 
   @Override
@@ -110,26 +94,26 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
 
   @Override
   public KitDescriptor getKitDescriptorByName(String name) throws IOException {
-    Criteria criteria = currentSession().createCriteria(KitDescriptor.class);
-    criteria.add(Restrictions.eq("name", name));
-    return (KitDescriptor) criteria.uniqueResult();
+    QueryBuilder<KitDescriptor, KitDescriptor> builder = getQueryBuilder();
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(KitDescriptor_.name), name));
+    return builder.getSingleResultOrNull();
   }
 
   @Override
-  public KitDescriptor getKitDescriptorByPartNumber(String partNumber, KitType kitType, PlatformType platformType) throws IOException {
-    return (KitDescriptor) currentSession().createCriteria(KitDescriptor.class)
-        .add(Restrictions.eq("partNumber", partNumber))
-        .add(Restrictions.eq("kitType", kitType))
-        .add(Restrictions.eq("platformType", platformType))
-        .uniqueResult();
+  public KitDescriptor getKitDescriptorByPartNumber(String partNumber, KitType kitType, PlatformType platformType)
+      throws IOException {
+    QueryBuilder<KitDescriptor, KitDescriptor> builder = getQueryBuilder();
+    builder
+        .addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(KitDescriptor_.partNumber), partNumber));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(KitDescriptor_.kitType), kitType));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(KitDescriptor_.platformType), platformType));
+    return builder.getSingleResultOrNull();
   }
 
   @Override
   public List<KitDescriptor> listAllKitDescriptors() throws IOException {
-    Criteria criteria = currentSession().createCriteria(KitDescriptor.class);
-    @SuppressWarnings("unchecked")
-    List<KitDescriptor> result = criteria.list();
-    return result;
+    return getQueryBuilder().getResultList();
   }
 
   @Override
@@ -145,13 +129,15 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   }
 
   @Override
-  public void restrictPaginationByKitType(Criteria criteria, KitType type, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("kitType", type));
+  public void restrictPaginationByKitType(QueryBuilder<?, KitDescriptor> builder, KitType type,
+      Consumer<String> errorHandler) {
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(KitDescriptor_.kitType), type));
   }
 
   @Override
-  public void restrictPaginationByKitName(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(query, "name"));
+  public void restrictPaginationByKitName(QueryBuilder<?, KitDescriptor> builder, String query,
+      Consumer<String> errorHandler) {
+    builder.addTextRestriction(builder.getRoot().get(KitDescriptor_.name), query);
   }
 
   @Override
@@ -160,99 +146,104 @@ public class HibernateKitDao implements KitStore, HibernatePaginatedDataSource<K
   }
 
   @Override
-  public String getProjectColumn() {
-    return null;
-  }
-
-  @Override
-  public Class<? extends KitDescriptor> getRealClass() {
+  public Class<KitDescriptor> getEntityClass() {
     return KitDescriptor.class;
   }
 
-  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "manufacturer", "partNumber", "description" };
+  @Override
+  public Class<KitDescriptor> getResultClass() {
+    return KitDescriptor.class;
+  }
 
   @Override
-  public String[] getSearchProperties() {
+  public SingularAttribute<KitDescriptor, ?> getIdProperty() {
+    return KitDescriptor_.kitDescriptorId;
+  }
+
+  private static final List<SingularAttribute<KitDescriptor, String>> SEARCH_PROPERTIES = Arrays
+      .asList(KitDescriptor_.name, KitDescriptor_.manufacturer, KitDescriptor_.partNumber, KitDescriptor_.description);
+
+  @Override
+  public List<SingularAttribute<KitDescriptor, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public String propertyForDate(Criteria criteria, DateType type) {
+  public SingularAttribute<KitDescriptor, ?> propertyForDate(DateType type) {
     return null;
   }
 
   @Override
-  public String propertyForSortColumn(String original) {
-    return original;
-  }
-
-  @Override
-  public String propertyForUser(boolean creator) {
-    return creator ? "creator" : "lastModifier";
+  public SingularAttribute<KitDescriptor, ? extends UserImpl> propertyForUser(boolean creator) {
+    return creator ? KitDescriptor_.creator : KitDescriptor_.lastModifier;
   }
 
   @Override
   public List<LibraryAliquot> getLibraryAliquotsForKdTsRelationship(KitDescriptor kd, TargetedSequencing ts) {
-    Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
-    criteria.createAlias("library.kitDescriptor", "kitDescriptor");
-    criteria.add(Restrictions.eq("kitDescriptor.id", kd.getId()));
-    criteria.add(Restrictions.eq("targetedSequencing.id", ts.getId()));
-    @SuppressWarnings("unchecked")
-    List<LibraryAliquot> records = criteria.list();
-    return records;
+    QueryBuilder<LibraryAliquot, LibraryAliquot> builder =
+        new QueryBuilder<>(currentSession(), LibraryAliquot.class, LibraryAliquot.class);
+    Root<LibraryAliquot> root = builder.getRoot();
+    Join<LibraryAliquot, KitDescriptor> kitJoin = builder.getJoin(root, LibraryAliquot_.kitDescriptor);
+    Join<LibraryAliquot, TargetedSequencing> tarseqJoin = builder.getJoin(root, LibraryAliquot_.targetedSequencing);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(kitJoin.get(KitDescriptor_.kitDescriptorId), kd.getId()));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(tarseqJoin.get(TargetedSequencing_.targetedSequencingId), ts.getId()));
+    return builder.getResultList();
   }
 
   @Override
   public long getUsageByLibraries(KitDescriptor kitDescriptor) throws IOException {
-    return (long) currentSession().createCriteria(LibraryImpl.class)
-        .add(Restrictions.eq("kitDescriptor", kitDescriptor))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    LongQueryBuilder<LibraryImpl> builder = new LongQueryBuilder<>(currentSession(), LibraryImpl.class);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(LibraryImpl_.kitDescriptor), kitDescriptor));
+    return builder.getCount();
   }
 
   @Override
   public long getUsageByLibraryAliquots(KitDescriptor kitDescriptor) throws IOException {
-    return (long) currentSession().createCriteria(LibraryAliquot.class)
-        .add(Restrictions.eq("kitDescriptor", kitDescriptor))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    LongQueryBuilder<LibraryAliquot> builder = new LongQueryBuilder<>(currentSession(), LibraryAliquot.class);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(LibraryAliquot_.kitDescriptor), kitDescriptor));
+    return builder.getCount();
   }
 
   @Override
   public long getUsageByContainers(KitDescriptor kitDescriptor) throws IOException {
-    return (long) currentSession().createCriteria(SequencerPartitionContainerImpl.class)
-        .add(Restrictions.or(Restrictions.eq("clusteringKit", kitDescriptor), Restrictions.eq("multiplexingKit", kitDescriptor)))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    LongQueryBuilder<SequencerPartitionContainerImpl> builder =
+        new LongQueryBuilder<>(currentSession(), SequencerPartitionContainerImpl.class);
+    builder.addPredicate(builder.getCriteriaBuilder().or(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencerPartitionContainerImpl_.clusteringKit),
+            kitDescriptor),
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencerPartitionContainerImpl_.multiplexingKit),
+            kitDescriptor)));
+    return builder.getCount();
   }
 
   @Override
   public long getUsageByRuns(KitDescriptor kitDescriptor) throws IOException {
-    return (long) currentSession().createCriteria(Run.class)
-        .add(Restrictions.eq("sequencingKit", kitDescriptor))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    LongQueryBuilder<Run> builder = new LongQueryBuilder<>(currentSession(), Run.class);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(Run_.sequencingKit), kitDescriptor));
+    return builder.getCount();
   }
 
   @Override
   public long getUsageByQcTypes(KitDescriptor kitDescriptor) throws IOException {
-    return (long) currentSession().createCriteria(QcType.class)
-        .createAlias("kitDescriptors", "kitDescriptor")
-        .add(Restrictions.eq("kitDescriptor.kitDescriptorId", kitDescriptor.getId()))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    LongQueryBuilder<QcType> builder = new LongQueryBuilder<>(currentSession(), QcType.class);
+    Join<QcType, KitDescriptor> kitJoin = builder.getJoin(builder.getRoot(), QcType_.kitDescriptors);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(kitJoin, kitDescriptor));
+    return builder.getCount();
   }
 
   @Override
   public List<KitDescriptor> search(KitType type, String search) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<KitDescriptor> results = currentSession().createCriteria(KitDescriptor.class)
-        .add(Restrictions.eq("kitType", type))
-        .add(Restrictions.or(
-            Restrictions.ilike("name", search, MatchMode.START),
-            Restrictions.ilike("partNumber", search, MatchMode.EXACT)))
-        .list();
-    return results;
+    QueryBuilder<KitDescriptor, KitDescriptor> builder = getQueryBuilder();
+    Root<KitDescriptor> root = builder.getRoot();
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(KitDescriptor_.kitType), type));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().or(builder.getCriteriaBuilder().like(root.get(KitDescriptor_.name), search + "%"),
+            builder.getCriteriaBuilder().equal(root.get(KitDescriptor_.partNumber), search)));
+    return builder.getResultList();
   }
 
 }
