@@ -7,6 +7,18 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.6.0] - 2023-09-07
+
+### Added
+
+* notes to Worksets
+* The functionality to open and edit a single work station, and see the list of instruments and libraries linked to it
+
+### Fixed
+
+* update version of ChromeDriver for tests
+
+
 ## [2.5.0] - 2023-08-11
 
 ### Added

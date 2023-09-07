@@ -1,1 +1,0 @@
-The functionality to open and edit a single work station, and see the list of instruments and libraries linked to it
