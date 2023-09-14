@@ -28,7 +28,7 @@ public class HibernateMetricDaoIT extends AbstractHibernateSaveDaoTest<Metric, H
   public Metric getCreateItem() {
     Metric metric = new Metric();
     metric.setAlias("New Metric");
-    metric.setCategory(MetricCategory.INFORMATICS);
+    metric.setCategory(MetricCategory.ANALYSIS_REVIEW);
     metric.setThresholdType(ThresholdType.BETWEEN);
     metric.setUnits("%");
     return metric;
