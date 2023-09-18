@@ -26,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.TransferType;
 
-public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
+public abstract class PaginationFilterSinkIT extends AbstractDAOTest {
 
   public enum SearchType {
     ARCHIVED, ARRAYED, BARCODE, BATCH, BOX, BOX_TYPE, BOX_USE, BULK_LOOKUP, CATEGORY, //
@@ -53,11 +53,11 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
   private final Collection<String> sortFields;
   private final String defaultSortProperty;
 
-  public HibernatePaginatedDataSourceIT(Collection<SearchType> validSearchTypes, Collection<String> sortFields) {
+  public PaginationFilterSinkIT(Collection<SearchType> validSearchTypes, Collection<String> sortFields) {
     this(validSearchTypes, sortFields, "name");
   }
 
-  public HibernatePaginatedDataSourceIT(Collection<SearchType> validSearchTypes, Collection<String> sortFields,
+  public PaginationFilterSinkIT(Collection<SearchType> validSearchTypes, Collection<String> sortFields,
       String defaultSortProperty) {
     this.validSearchTypes = validSearchTypes;
     this.sortFields = sortFields;
