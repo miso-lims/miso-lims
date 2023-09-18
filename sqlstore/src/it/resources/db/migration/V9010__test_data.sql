@@ -652,22 +652,22 @@ INSERT INTO TargetedSequencing_KitDescriptor(targetedSequencingId, kitDescriptor
 (2,1),
 (2,2);
 
-INSERT INTO LibraryAliquot(aliquotId, concentration, libraryId, alias, identificationBarcode, creationDate, creator, lastModifier, name, targetedSequencingId, discriminator, nonStandardAlias) 
-VALUES (1,2,1,'TEST_0001_Bn_P_PE_300_WG','LDI1::TEST_0001_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI1',1, 'DetailedLibraryAliquot', FALSE),
-(2,2,2,'TEST_0001_Bn_R_PE_300_WG','LDI2::TEST_0001_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI2',NULL, 'LibraryAliquot', NULL),
-(3,2,3,'TEST_0002_Bn_P_PE_300_WG','LDI3::TEST_0002_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI3',NULL, 'LibraryAliquot', NULL),
-(4,2,4,'TEST_0002_Bn_R_PE_300_WG','LDI4::TEST_0002_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI4',NULL, 'LibraryAliquot', NULL),
-(5,2,5,'TEST_0003_Bn_P_PE_300_WG','LDI5::TEST_0003_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI5',NULL, 'LibraryAliquot', NULL),
-(6,2,6,'TEST_0003_Bn_R_PE_300_WG','LDI6::TEST_0003_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI6',NULL, 'LibraryAliquot', NULL),
-(7,2,7,'TEST_0004_Bn_P_PE_300_WG','LDI7::TEST_0004_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI7',NULL, 'LibraryAliquot', NULL),
-(8,2,8,'TEST_0004_Bn_R_PE_300_WG','LDI8::TEST_0004_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI8',NULL, 'LibraryAliquot', NULL),
-(9,2,9,'TEST_0005_Bn_P_PE_300_WG','LDI9::TEST_0005_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI9',NULL, 'LibraryAliquot', NULL),
-(10,2,10,'TEST_0005_Bn_R_PE_300_WG','LDI10::TEST_0005_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI10',NULL, 'LibraryAliquot', NULL),
-(11,2,11,'TEST_0006_Bn_P_PE_300_WG','LDI11::TEST_0006_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI11',NULL, 'LibraryAliquot', NULL),
-(12,2,12,'TEST_0006_Bn_R_PE_300_WG','LDI12::TEST_0006_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI12',NULL, 'LibraryAliquot', NULL),
-(13,2,13,'TEST_0007_Bn_P_PE_300_WG','LDI13::TEST_0007_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI13',NULL, 'LibraryAliquot', NULL),
-(14,2,14,'TEST_0007_Bn_R_PE_300_WG','LDI14::TEST_0007_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI14',NULL, 'LibraryAliquot', NULL),
-(15,2,15,'TEST_0001_ALIQUOT_1_PE_300_WG','LDI15::TEST_0001_ALIQUOT_1_PE_300_WG','2018-02-15',1,1,'LDI15',NULL, 'LibraryAliquot', NULL);
+INSERT INTO LibraryAliquot(aliquotId, concentration, libraryId, alias, identificationBarcode, creationDate, creator, lastModifier, name, targetedSequencingId, kitDescriptorId, discriminator, nonStandardAlias) 
+VALUES (1,2,1,'TEST_0001_Bn_P_PE_300_WG','LDI1::TEST_0001_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI1',1,1, 'DetailedLibraryAliquot', FALSE),
+(2,2,2,'TEST_0001_Bn_R_PE_300_WG','LDI2::TEST_0001_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI2',NULL,NULL, 'LibraryAliquot', NULL),
+(3,2,3,'TEST_0002_Bn_P_PE_300_WG','LDI3::TEST_0002_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI3',NULL,NULL, 'LibraryAliquot', NULL),
+(4,2,4,'TEST_0002_Bn_R_PE_300_WG','LDI4::TEST_0002_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI4',NULL,NULL, 'LibraryAliquot', NULL),
+(5,2,5,'TEST_0003_Bn_P_PE_300_WG','LDI5::TEST_0003_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI5',NULL,NULL, 'LibraryAliquot', NULL),
+(6,2,6,'TEST_0003_Bn_R_PE_300_WG','LDI6::TEST_0003_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI6',NULL,NULL, 'LibraryAliquot', NULL),
+(7,2,7,'TEST_0004_Bn_P_PE_300_WG','LDI7::TEST_0004_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI7',NULL,NULL, 'LibraryAliquot', NULL),
+(8,2,8,'TEST_0004_Bn_R_PE_300_WG','LDI8::TEST_0004_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI8',NULL,NULL, 'LibraryAliquot', NULL),
+(9,2,9,'TEST_0005_Bn_P_PE_300_WG','LDI9::TEST_0005_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI9',NULL,NULL, 'LibraryAliquot', NULL),
+(10,2,10,'TEST_0005_Bn_R_PE_300_WG','LDI10::TEST_0005_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI10',NULL,NULL, 'LibraryAliquot', NULL),
+(11,2,11,'TEST_0006_Bn_P_PE_300_WG','LDI11::TEST_0006_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI11',NULL,NULL, 'LibraryAliquot', NULL),
+(12,2,12,'TEST_0006_Bn_R_PE_300_WG','LDI12::TEST_0006_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI12',NULL,NULL, 'LibraryAliquot', NULL),
+(13,2,13,'TEST_0007_Bn_P_PE_300_WG','LDI13::TEST_0007_Bn_P_PE_300_WG','2015-08-27',1,1,'LDI13',NULL,NULL, 'LibraryAliquot', NULL),
+(14,2,14,'TEST_0007_Bn_R_PE_300_WG','LDI14::TEST_0007_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI14',NULL,NULL, 'LibraryAliquot', NULL),
+(15,2,15,'TEST_0001_ALIQUOT_1_PE_300_WG','LDI15::TEST_0001_ALIQUOT_1_PE_300_WG','2018-02-15',1,1,'LDI15',NULL,NULL, 'LibraryAliquot', NULL);
 
 INSERT INTO `LibraryQC`(`qcId`, `library_libraryId`, `creator`, `date`, `type`, `results`, instrumentId) VALUES
  (1,1,1,'2015-08-27',4,3,NULL),

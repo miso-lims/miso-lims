@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.persistence.util;
 
 import java.util.Date;
@@ -34,8 +11,6 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-
-import com.google.common.annotations.VisibleForTesting;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
@@ -70,7 +45,8 @@ public class DbUtils {
                 textRestriction("location6.alias", query))));
   }
 
-  public static void restrictPaginationByDistributionRecipient(Criteria criteria, String query, String collectionProperty,
+  public static void restrictPaginationByDistributionRecipient(Criteria criteria, String query,
+      String collectionProperty,
       String itemIdProperty) {
     if (LimsUtils.isStringBlankOrNull(query)) {
       DetachedCriteria subquery = DetachedCriteria.forClass(ListTransferView.class)
@@ -134,35 +110,69 @@ public class DbUtils {
     }
   }
 
-  private static String sanitizeQueryString(String original) {
+  /**
+   * Escapes MySQL wildcard characters "_" and "%"
+   * 
+   * @param original the String to format
+   * @return the String with MySQL wildcard characters escaped
+   */
+  public static String sanitizeQueryString(String original) {
     // escape MySQL LIKE wildcard characters
     return original.trim()
         .replaceAll("_", Matcher.quoteReplacement("\\_"))
         .replaceAll("%", Matcher.quoteReplacement("\\%"));
   }
 
-  @VisibleForTesting
-  protected static boolean isQuoted(String query) {
+  /**
+   * Checks whether a String starts and ends with non-escaped double quotes ("), indicating that an
+   * exact match is wanted
+   * 
+   * @param query the String to check
+   * @return true if the String is quoted; false otherwise
+   */
+  public static boolean isQuoted(String query) {
     return query.matches("\"(.*[^\\\\])?\"");
   }
 
-  @VisibleForTesting
-  protected static boolean containsWildcards(String query) {
+  /**
+   * Checks whether a String contains any MISO wildcards (*), indicating that partial matching is
+   * wanted
+   * 
+   * @param query the String to check
+   * @return true if the String contains one or more wildcards; false otherwise
+   */
+  public static boolean containsWildcards(String query) {
     return query.matches(".*(^|[^\\\\])\\*.*");
   }
 
-  @VisibleForTesting
-  protected static String removeQuotes(String original) {
+  /**
+   * Removes double quotes (") from the start and end of a String, then removes any escape characters
+   * from inner double quotes and MISO wildcards (*)
+   * 
+   * @param original the String to format
+   * @return the String with quotes and escapes removed
+   */
+  public static String removeQuotes(String original) {
     return removeEscapes(original.replaceFirst("^\"(.*)\"$", "$1"));
   }
 
-  @VisibleForTesting
-  protected static String replaceWildcards(String original) {
+  /**
+   * Replaces non-escaped MISO wildcards (*) with MySQL wildcards (%)
+   * 
+   * @param original the String to format
+   * @return the formatted String
+   */
+  public static String replaceWildcards(String original) {
     return removeEscapes(original.replaceAll("(^|[^\\\\])\\*", "$1%"));
   }
 
-  @VisibleForTesting
-  protected static String removeEscapes(String original) {
+  /**
+   * Removes escape characters from double quotes (") and MISO wildcards (*)
+   * 
+   * @param original the String to format
+   * @return the formatted String
+   */
+  public static String removeEscapes(String original) {
     return original
         .replaceAll("\\\\\"", "\"")
         .replaceAll("\\\\\\*", "*");

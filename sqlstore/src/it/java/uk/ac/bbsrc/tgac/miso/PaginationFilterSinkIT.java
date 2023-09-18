@@ -22,11 +22,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.TransferType;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePaginatedDataSource;
 
-public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
+public abstract class PaginationFilterSinkIT extends AbstractDAOTest {
 
   public enum SearchType {
     ARCHIVED, ARRAYED, BARCODE, BATCH, BOX, BOX_TYPE, BOX_USE, BULK_LOOKUP, CATEGORY, //
@@ -42,7 +42,7 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
   @Rule
   public ExpectedException exception = ExpectedException.none();
 
-  private HibernatePaginatedDataSource<?> sut;
+  private PaginatedDataSource<?> sut;
 
   @Before
   public void setup() {
@@ -53,18 +53,18 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
   private final Collection<String> sortFields;
   private final String defaultSortProperty;
 
-  public HibernatePaginatedDataSourceIT(Collection<SearchType> validSearchTypes, Collection<String> sortFields) {
+  public PaginationFilterSinkIT(Collection<SearchType> validSearchTypes, Collection<String> sortFields) {
     this(validSearchTypes, sortFields, "name");
   }
 
-  public HibernatePaginatedDataSourceIT(Collection<SearchType> validSearchTypes, Collection<String> sortFields,
+  public PaginationFilterSinkIT(Collection<SearchType> validSearchTypes, Collection<String> sortFields,
       String defaultSortProperty) {
     this.validSearchTypes = validSearchTypes;
     this.sortFields = sortFields;
     this.defaultSortProperty = defaultSortProperty;
   }
 
-  protected abstract HibernatePaginatedDataSource<?> constructTestSubject();
+  protected abstract PaginatedDataSource<?> constructTestSubject();
 
   @Test
   public void testSearchByArchived() throws Exception {
@@ -128,31 +128,37 @@ public abstract class HibernatePaginatedDataSourceIT extends AbstractDAOTest {
 
   @Test
   public void testSearchByCreated() throws Exception {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-03-02"), LimsUtils.parseDate("2021-03-02"), DateType.CREATE),
+    testSearch(
+        PaginationFilter.date(LimsUtils.parseDate("2021-03-02"), LimsUtils.parseDate("2021-03-02"), DateType.CREATE),
         SearchType.CREATED);
   }
 
   @Test
   public void testSearchByEntered() throws Exception {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-03-02"), LimsUtils.parseDate("2021-03-02"), DateType.ENTERED),
+    testSearch(
+        PaginationFilter.date(LimsUtils.parseDate("2021-03-02"), LimsUtils.parseDate("2021-03-02"), DateType.ENTERED),
         SearchType.ENTERED);
   }
 
   @Test
   public void testSearchByUpdated() throws Exception {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-03-02"), LimsUtils.parseDate("2021-03-02"), DateType.UPDATE),
+    testSearch(
+        PaginationFilter.date(LimsUtils.parseDate("2021-03-02"), LimsUtils.parseDate("2021-03-02"), DateType.UPDATE),
         SearchType.UPDATED);
   }
 
   @Test
   public void testSearchByReceived() throws Exception {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-03-02"), LimsUtils.parseDate("2021-03-02"), DateType.RECEIVE),
+    testSearch(
+        PaginationFilter.date(LimsUtils.parseDate("2021-03-02"), LimsUtils.parseDate("2021-03-02"), DateType.RECEIVE),
         SearchType.RECEIVED);
   }
 
   @Test
   public void testSearchByDistributed() throws Exception {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-03-02"), LimsUtils.parseDate("2021-03-02"), DateType.DISTRIBUTED),
+    testSearch(
+        PaginationFilter.date(LimsUtils.parseDate("2021-03-02"), LimsUtils.parseDate("2021-03-02"),
+            DateType.DISTRIBUTED),
         SearchType.DISTRIBUTED);
   }
 
