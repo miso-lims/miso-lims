@@ -725,7 +725,7 @@ successful. These requirements are specified using metrics. A metric belongs to 
 * Library Preparation
 * Library Qualification
 * Full Depth Sequencing
-* Informatics
+* Analysis Review
 
 Metrics may also have [subcategories](#metric-subcategories).
 
