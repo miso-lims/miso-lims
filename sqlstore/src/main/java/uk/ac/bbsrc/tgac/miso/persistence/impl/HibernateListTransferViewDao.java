@@ -66,9 +66,13 @@ public class HibernateListTransferViewDao
   @Override
   public String propertyForDate(Criteria criteria, DateType type) {
     switch (type) {
+      case ENTERED:
+        return "created";
       case CREATE:
       case RECEIVE:
         return "transferTime";
+      case UPDATE:
+        return "lastModified";
       default:
         return null;
     }
@@ -81,7 +85,7 @@ public class HibernateListTransferViewDao
 
   @Override
   public String propertyForUser(boolean creator) {
-    return null;
+    return creator ? "creator" : "lastModifier";
   }
 
   @Override
