@@ -962,6 +962,9 @@ public class DefaultRunService implements RunService {
   public void beforeDelete(Run object) throws IOException {
     fileAttachmentService.beforeDelete(object);
     runPartitionService.deleteForRun(object);
+    for (SequencerPartitionContainer container : object.getSequencerPartitionContainers()) {
+      runPartitionAliquotService.deleteForRunContainer(object, container);
+    }
   }
 
   @Override
