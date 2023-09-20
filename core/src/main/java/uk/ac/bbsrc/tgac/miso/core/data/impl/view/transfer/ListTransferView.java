@@ -21,10 +21,12 @@ import javax.persistence.TemporalType;
 import org.hibernate.annotations.Immutable;
 
 import com.eaglegenomics.simlims.core.Group;
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 @Entity
 @Table(name = "Transfer")
@@ -52,6 +54,17 @@ public class ListTransferView implements Identifiable, Serializable {
   @ManyToOne(targetEntity = Group.class)
   @JoinColumn(name = "recipientGroupId")
   private Group recipientGroup;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator")
+  private User creator;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date created;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier")
+  private User lastModifier;
 
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastModified;
@@ -116,6 +129,30 @@ public class ListTransferView implements Identifiable, Serializable {
 
   public void setRecipientGroup(Group recipientGroup) {
     this.recipientGroup = recipientGroup;
+  }
+
+  public User getCreator() {
+    return creator;
+  }
+
+  public void setCreator(User user) {
+    this.creator = user;
+  }
+
+  public Date getCreationTime() {
+    return created;
+  }
+
+  public void setCreationTime(Date creationTime) {
+    this.created = creationTime;
+  }
+
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  public void setLastModifier(User user) {
+    this.lastModifier = user;
   }
 
   public Date getLastModified() {
