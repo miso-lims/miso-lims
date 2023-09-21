@@ -7,6 +7,22 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.7.0] - 2023-09-21
+
+### Changed
+
+* Renamed Informatics Review metric category to Analysis Review
+
+### Fixed
+
+* Error when trying to delete a run after setting run-library QC or purpose
+* The following transfer advanced search terms were not working:
+  * creator
+  * changedBy
+  * changed
+  * entered
+
+
 ## [2.6.0] - 2023-09-07
 
 ### Added
