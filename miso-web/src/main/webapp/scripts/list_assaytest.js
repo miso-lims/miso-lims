@@ -1,6 +1,9 @@
 ListTarget.assaytest = (function () {
   return {
     name: "Assay Tests",
+    getUserManualUrl: function () {
+      return Urls.external.userManual("type_data", "assay-tests");
+    },
     createUrl: function (config, projectId) {
       throw new Error("Must be provided statically");
     },

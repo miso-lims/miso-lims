@@ -15,6 +15,9 @@ BulkTarget.assaytest = (function ($) {
     getSaveProgressUrl: function (operationId) {
       return Urls.rest.assayTests.bulkSaveProgress(operationId);
     },
+    getUserManualUrl: function () {
+      return Urls.external.userManual("type_data", "assay-tests");
+    },
     getBulkActions: function (config) {
       return !config.isAdmin || config.pageMode === "view"
         ? []
