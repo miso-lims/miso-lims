@@ -81,7 +81,8 @@ Any number of quality control measures may be recorded for a requisition. For mo
 ## Assays
 
 An assay details the work intended to be performed for a requisition, and quality control requirements for that work.
-The requirements are defined using [metrics](../type_data#metrics).
+The work is defined using [assay tests](../type_data#assay-tests), and the quality control requirements are defined
+using [metrics](../type_data#metrics).
 
 ### Assays List
 
