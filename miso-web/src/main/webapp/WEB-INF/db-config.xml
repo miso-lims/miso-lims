@@ -13,7 +13,16 @@
   default-autowire="byName">
 
 
-  <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+  <bean id="flywayConfig" class="org.flywaydb.core.api.configuration.ClassicConfiguration">
+    <property name="dataSource" ref="dataSource"/>
+    <!-- TODO -->
+  </bean>
+
+<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+    <constructor-arg ref="flywayConfig"/>
+</bean>
+  
+  <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean" depends-on="flyway">
     <property name="dataSource" ref="dataSource" />
     <property name="packagesToScan">
       <list>
@@ -47,7 +56,7 @@
   <jee:jndi-lookup id="dataSource" jndi-name="/jdbc/MISODB" resource-ref="true" />
 
   <!-- Spring JDBC TEMPLATES STUFF -->
-  <bean name="interfaceTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+  <bean name="interfaceTemplate" class="org.springframework.jdbc.core.JdbcTemplate" depends-on="flyway">
     <property name="dataSource" ref="dataSource" />
   </bean>
 
