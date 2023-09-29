@@ -724,7 +724,7 @@ samples. These would be the assay tests - tumour whole genome, and normal whole 
 multiple assays.
 
 The "repeat per timepoint" field indicates whether the test should be repeated for each timepoint received, or a single
-test is sifficient. There is normally no need to repeat sequencing of a normal/reference sample, so this field would be
+test is sufficient. There is normally no need to repeat sequencing of a normal/reference sample, so this field would be
 set false for a typical normal/reference sample test.
 
 The "permitted samples" field can be used to control whether to accept work done on requisitioned, supplemental, or any
