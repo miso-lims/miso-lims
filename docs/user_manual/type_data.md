@@ -715,6 +715,28 @@ is only deletable if it is not being used by any contacts.
 
 
 
+## Assay Tests
+
+[Assays](../requisitions#assays) detail the work intended to be performed for a requisition. This work is broken down
+into one or more tests. A test describes a workflow of extraction, library preparation, library qualification, and
+full-depth sequencing. For example, an assay may involve whole genome sequencing of tumour and normal/reference
+samples. These would be the assay tests - tumour whole genome, and normal whole genome. The same test may be used for
+multiple assays.
+
+The "repeat per timepoint" field indicates whether the test should be repeated for each timepoint received, or a single
+test is sufficient. There is normally no need to repeat sequencing of a normal/reference sample, so this field would be
+set false for a typical normal/reference sample test.
+
+The "permitted samples" field can be used to control whether to accept work done on requisitioned, supplemental, or any
+samples for the test. For follow-up assays, where new results are to be compared with previous results, it may make
+sense to have one test that accepts only supplemental samples to include the previous results, and one test that only
+accepts requisitioned samples to include the new results.
+
+Only MISO administrators can create, edit, and delete assay tests using the standard interface. An assay test can only
+be deleted if it is not used by any assays.
+
+
+
 ## Metrics
 
 [Assays](../requisitions#assays) may specify requirements that must be met in order for a case to be considered
