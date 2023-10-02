@@ -95,7 +95,7 @@
   <c:if test="${issueTrackerEnabled}">
     <div id="issues">
       <c:choose>
-        <c:when test="${empty issueLookupError}">
+        <c:when test="${issueLookupError}">
           <p class="big big-error">Error retrieving issues</p>
         </c:when>
         <c:otherwise>
