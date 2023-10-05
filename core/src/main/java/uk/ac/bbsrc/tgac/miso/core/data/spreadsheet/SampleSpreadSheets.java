@@ -19,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -209,7 +210,67 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("DNA Library Alias", true, blankColumn()), // To be filled in manually
       Column.forString("DNA LDI ID", true, blankColumn()), // To be filled in manually
       Column.forString("DNA LDI Alias", true, blankColumn()) // To be filled in manually
-  );
+  ), //
+  MOH_EXTRACTION("MOH Extraction Tracker", //
+      Arrays.asList(SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME,
+          SampleAliquot.CATEGORY_NAME), //
+      Column.forString("External Identifier", true,
+          detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
+      Column.forString("Sample Type", true, mohSampleType()), //
+      Column.forString("Match Code", true, mohMatchCode()), //
+      Column.forString("Alias", Sample::getAlias), //
+      Column.forString("Type", true, dnaOrRna()), //
+      Column.forBigDecimal("Total (ng)", getInitialYield()), //
+      Column.forString("Group ID", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupId)),
+      Column.forString("Requisition", false, effectiveRequisition()));
+
+
+  private static Function<Sample, String> effectiveRequisition() {
+    return sam -> {
+      if (sam.getRequisition() != null) {
+        return sam.getRequisition().getAlias();
+      }
+      if (LimsUtils.isDetailedSample(sam)) {
+        for (DetailedSample detailed = (DetailedSample) sam; detailed != null; detailed = detailed.getParent()) {
+          if (detailed.getRequisition() != null) {
+            return detailed.getRequisition().getAlias();
+          }
+        }
+      }
+      return null;
+    };
+  }
+
+  private static Function<Sample, String> mohSampleType() {
+    return sam -> {
+      if (!LimsUtils.isDetailedSample(sam)) {
+        return null;
+      }
+      DetailedSample detailed = (DetailedSample) sam;
+      TissueType tissueType = detailed.getParentAttributes().getTissueAttributes().getTissueType();
+      if ("R".equals(tissueType.getAlias())) {
+        return "BC DNA";
+      } else if (detailed.getSampleClass().getAlias().contains("RNA")) {
+        return "RNA";
+      } else if (detailed.getSampleClass().getAlias().contains("DNA")) {
+        return "T DNA";
+      } else {
+        return "?";
+      }
+    };
+  }
+
+  private static Function<Sample, String> mohMatchCode() {
+    return sam -> {
+      if (!LimsUtils.isDetailedSample(sam)) {
+        return null;
+      }
+      DetailedSample detailed = (DetailedSample) sam;
+      String sampleType = mohSampleType().apply(detailed);
+      String externalName = detailed.getParentAttributes().getIdentityAttributes().getExternalName();
+      return externalName + " " + sampleType;
+    };
+  }
 
   private static Function<Sample, String> blankColumn() {
     return sample -> null;
@@ -242,6 +303,12 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
   private static Function<Sample, BigDecimal> getYield() {
     return sam -> (sam.getVolume() != null && sam.getConcentration() != null)
         ? sam.getVolume().multiply(sam.getConcentration())
+        : null;
+  }
+
+  private static Function<Sample, BigDecimal> getInitialYield() {
+    return sam -> (sam.getInitialVolume() != null && sam.getConcentration() != null)
+        ? sam.getInitialVolume().multiply(sam.getConcentration())
         : null;
   }
 
