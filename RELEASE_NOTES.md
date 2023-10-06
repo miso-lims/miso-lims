@@ -7,6 +7,21 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.8.0] - 2023-10-06
+
+### Added
+
+* MOH Extraction Tracker sample download sheet
+
+### Changed
+
+* Pinery sample provenance v9 now includes batch IDs
+
+### Fixed
+
+* Display of error message when there is an issue loading JIRA issues on the Edit Run page
+
+
 ## [2.7.0] - 2023-09-21
 
 ### Changed
