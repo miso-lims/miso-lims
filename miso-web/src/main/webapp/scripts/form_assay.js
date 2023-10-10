@@ -56,6 +56,40 @@ FormTarget.assay = (function () {
             },
           ],
         },
+        {
+          title: "Turn-around Time Targets",
+          fields: [
+            makeTargetDaysField("Overall Case", "caseTargetDays", editable, true),
+            makeTargetDaysField("Receipt/Inspection", "receiptTargetDays", editable, true),
+            makeTargetDaysField(
+              "Extraction",
+              "extractionTargetDays",
+              editable,
+              Constants.isDetailedSample
+            ),
+            makeTargetDaysField(
+              "Library Preparation",
+              "libraryPreparationTargetDays",
+              editable,
+              true
+            ),
+            makeTargetDaysField(
+              "Library Qualification",
+              "libraryQualificationTargetDays",
+              editable,
+              true
+            ),
+            makeTargetDaysField(
+              "Full-Depth Sequencing",
+              "fullDepthSequencingTargetDays",
+              editable,
+              true
+            ),
+            makeTargetDaysField("Analysis Review", "analysisReviewTargetDays", editable, true),
+            makeTargetDaysField("Release Approval", "releaseApprovalTargetDays", editable, true),
+            makeTargetDaysField("Release", "releaseTargetDays", editable, true),
+          ],
+        },
       ];
     },
     confirmSave: function (object, isDialog, form) {
@@ -63,4 +97,20 @@ FormTarget.assay = (function () {
       object.metrics = Assay.getMetrics();
     },
   };
+
+  function makeTargetDaysField(title, field, editable, include) {
+    return {
+      title: title,
+      type: editable ? "text" : "read-only",
+      data: field,
+      getDisplayValue: editable
+        ? undefined
+        : function (assay) {
+            return assay[field] || "?";
+          },
+      min: 0,
+      max: 365,
+      include: include,
+    };
+  }
 })();

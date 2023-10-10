@@ -99,6 +99,31 @@ public class DefaultAssayService extends AbstractSaveService<Assay> implements A
     if (object.getAssayMetrics().size() != distinctMetrics) {
       errors.add(new ValidationError("metrics", "Duplicate metrics not allowed"));
     }
+    if (object.getCaseTargetDays() != null && object.getCaseTargetDays() < getTotalTargetDays(object)) {
+      errors.add(
+          new ValidationError("caseTargetDays", "Case target must be greater than the sum of individual step targets"));
+    }
+  }
+
+  private static int getTotalTargetDays(Assay assay) {
+    int total = 0;
+    total += zeroIfNull(assay.getReceiptTargetDays());
+    total += zeroIfNull(assay.getExtractionTargetDays());
+    total += zeroIfNull(assay.getLibraryPreparationTargetDays());
+    total += zeroIfNull(assay.getLibraryQualificationTargetDays());
+    total += zeroIfNull(assay.getFullDepthSequencingTargetDays());
+    total += zeroIfNull(assay.getAnalysisReviewTargetDays());
+    total += zeroIfNull(assay.getReleaseApprovalTargetDays());
+    total += zeroIfNull(assay.getReleaseTargetDays());
+    return total;
+  }
+
+  private static int zeroIfNull(Integer integer) {
+    if (integer == null) {
+      return 0;
+    } else {
+      return integer.intValue();
+    }
   }
 
   @Override
@@ -108,6 +133,15 @@ public class DefaultAssayService extends AbstractSaveService<Assay> implements A
     to.setArchived(from.isArchived());
     ValidationUtils.applySetChanges(to.getAssayTests(), from.getAssayTests());
     applyMetricChanges(to.getAssayMetrics(), from.getAssayMetrics());
+    to.setCaseTargetDays(from.getCaseTargetDays());
+    to.setReceiptTargetDays(from.getReceiptTargetDays());
+    to.setExtractionTargetDays(from.getExtractionTargetDays());
+    to.setLibraryPreparationTargetDays(from.getLibraryPreparationTargetDays());
+    to.setLibraryQualificationTargetDays(from.getLibraryQualificationTargetDays());
+    to.setFullDepthSequencingTargetDays(from.getFullDepthSequencingTargetDays());
+    to.setAnalysisReviewTargetDays(from.getAnalysisReviewTargetDays());
+    to.setReleaseApprovalTargetDays(from.getReleaseApprovalTargetDays());
+    to.setReleaseTargetDays(from.getReleaseTargetDays());
   }
 
   private void applyMetricChanges(Set<AssayMetric> to, Set<AssayMetric> from) throws IOException {

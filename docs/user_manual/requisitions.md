@@ -84,6 +84,9 @@ An assay details the work intended to be performed for a requisition, and qualit
 The work is defined using [assay tests](../type_data#assay-tests), and the quality control requirements are defined
 using [metrics](../type_data#metrics).
 
+An assay may also specify turn-around time targets, including a total number of days for a case, and individual targets
+for each QC step such as receipt or library preparation.
+
 ### Assays List
 
 To get to the Assays list page, click to expand the Configuration menu within the main navigation menu, then click the
@@ -94,7 +97,7 @@ controls for working with assays.
 
 To create a new assay, you must be a MISO administrator. Click the "Add" button in the toolbar at the top of the Assays
 list. This takes you to the Create Assay page. In the top section of the page, you can enter the basic information for
-the assay, including its alias, version, and description.
+the assay, including its alias, version, and description, as well as turn-around time targets.
 
 Below, controls in the Metrics table allow you to define the assay's metrics. To add a metric, click the "Add" button.
 In the dialog that appears, choose the metric you wish to add. If the metric requires any threshold values, another

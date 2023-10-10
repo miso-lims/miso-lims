@@ -37,6 +37,16 @@ public class Assay implements Aliasable, Deletable, Serializable {
   private String description;
   private boolean archived = false;
 
+  private Integer caseTargetDays;
+  private Integer receiptTargetDays;
+  private Integer extractionTargetDays;
+  private Integer libraryPreparationTargetDays;
+  private Integer libraryQualificationTargetDays;
+  private Integer fullDepthSequencingTargetDays;
+  private Integer analysisReviewTargetDays;
+  private Integer releaseApprovalTargetDays;
+  private Integer releaseTargetDays;
+
   @OneToMany
   @JoinTable(name = "Assay_AssayTest", joinColumns = {@JoinColumn(name = "assayId")},
       inverseJoinColumns = {@JoinColumn(name = "testId")})
@@ -102,6 +112,78 @@ public class Assay implements Aliasable, Deletable, Serializable {
 
   public void setArchived(boolean archived) {
     this.archived = archived;
+  }
+
+  public Integer getCaseTargetDays() {
+    return caseTargetDays;
+  }
+
+  public void setCaseTargetDays(Integer caseTargetDays) {
+    this.caseTargetDays = caseTargetDays;
+  }
+
+  public Integer getReceiptTargetDays() {
+    return receiptTargetDays;
+  }
+
+  public void setReceiptTargetDays(Integer receiptTargetDays) {
+    this.receiptTargetDays = receiptTargetDays;
+  }
+
+  public Integer getExtractionTargetDays() {
+    return extractionTargetDays;
+  }
+
+  public void setExtractionTargetDays(Integer extractionTargetDays) {
+    this.extractionTargetDays = extractionTargetDays;
+  }
+
+  public Integer getLibraryPreparationTargetDays() {
+    return libraryPreparationTargetDays;
+  }
+
+  public void setLibraryPreparationTargetDays(Integer libraryPreparationTargetDays) {
+    this.libraryPreparationTargetDays = libraryPreparationTargetDays;
+  }
+
+  public Integer getLibraryQualificationTargetDays() {
+    return libraryQualificationTargetDays;
+  }
+
+  public void setLibraryQualificationTargetDays(Integer libraryQualificationTargetDays) {
+    this.libraryQualificationTargetDays = libraryQualificationTargetDays;
+  }
+
+  public Integer getFullDepthSequencingTargetDays() {
+    return fullDepthSequencingTargetDays;
+  }
+
+  public void setFullDepthSequencingTargetDays(Integer fullDepthSequencingTargetDays) {
+    this.fullDepthSequencingTargetDays = fullDepthSequencingTargetDays;
+  }
+
+  public Integer getAnalysisReviewTargetDays() {
+    return analysisReviewTargetDays;
+  }
+
+  public void setAnalysisReviewTargetDays(Integer analysisReviewTargetDays) {
+    this.analysisReviewTargetDays = analysisReviewTargetDays;
+  }
+
+  public Integer getReleaseApprovalTargetDays() {
+    return releaseApprovalTargetDays;
+  }
+
+  public void setReleaseApprovalTargetDays(Integer releaseApprovalTargetDays) {
+    this.releaseApprovalTargetDays = releaseApprovalTargetDays;
+  }
+
+  public Integer getReleaseTargetDays() {
+    return releaseTargetDays;
+  }
+
+  public void setReleaseTargetDays(Integer releaseTargetDays) {
+    this.releaseTargetDays = releaseTargetDays;
   }
 
   public Set<AssayTest> getAssayTests() {

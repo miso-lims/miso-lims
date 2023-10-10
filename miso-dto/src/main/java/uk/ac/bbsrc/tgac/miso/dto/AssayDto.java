@@ -17,6 +17,16 @@ public class AssayDto {
   private List<AssayTestDto> tests;
   private List<AssayMetricDto> metrics;
 
+  private Integer caseTargetDays;
+  private Integer receiptTargetDays;
+  private Integer extractionTargetDays;
+  private Integer libraryPreparationTargetDays;
+  private Integer libraryQualificationTargetDays;
+  private Integer fullDepthSequencingTargetDays;
+  private Integer analysisReviewTargetDays;
+  private Integer releaseApprovalTargetDays;
+  private Integer releaseTargetDays;
+
   public static AssayDto from(Assay from) {
     AssayDto to = new AssayDto();
     setLong(to::setId, from.getId(), true);
@@ -26,6 +36,15 @@ public class AssayDto {
     setBoolean(to::setArchived, from.isArchived(), false);
     to.setTests(from.getAssayTests().stream().map(AssayTestDto::from).collect(Collectors.toList()));
     to.setMetrics(from.getAssayMetrics().stream().map(AssayMetricDto::from).collect(Collectors.toList()));
+    setInteger(to::setCaseTargetDays, from.getCaseTargetDays(), true);
+    setInteger(to::setReceiptTargetDays, from.getReceiptTargetDays(), true);
+    setInteger(to::setExtractionTargetDays, from.getExtractionTargetDays(), true);
+    setInteger(to::setLibraryPreparationTargetDays, from.getLibraryPreparationTargetDays(), true);
+    setInteger(to::setLibraryQualificationTargetDays, from.getLibraryQualificationTargetDays(), true);
+    setInteger(to::setFullDepthSequencingTargetDays, from.getFullDepthSequencingTargetDays(), true);
+    setInteger(to::setAnalysisReviewTargetDays, from.getAnalysisReviewTargetDays(), true);
+    setInteger(to::setReleaseApprovalTargetDays, from.getReleaseApprovalTargetDays(), true);
+    setInteger(to::setReleaseTargetDays, from.getReleaseTargetDays(), true);
     return to;
   }
 
@@ -85,6 +104,78 @@ public class AssayDto {
     this.metrics = metrics;
   }
 
+  public Integer getCaseTargetDays() {
+    return caseTargetDays;
+  }
+
+  public void setCaseTargetDays(Integer caseTargetDays) {
+    this.caseTargetDays = caseTargetDays;
+  }
+
+  public Integer getReceiptTargetDays() {
+    return receiptTargetDays;
+  }
+
+  public void setReceiptTargetDays(Integer receiptTargetDays) {
+    this.receiptTargetDays = receiptTargetDays;
+  }
+
+  public Integer getExtractionTargetDays() {
+    return extractionTargetDays;
+  }
+
+  public void setExtractionTargetDays(Integer extractionTargetDays) {
+    this.extractionTargetDays = extractionTargetDays;
+  }
+
+  public Integer getLibraryPreparationTargetDays() {
+    return libraryPreparationTargetDays;
+  }
+
+  public void setLibraryPreparationTargetDays(Integer libraryPreparationTargetDays) {
+    this.libraryPreparationTargetDays = libraryPreparationTargetDays;
+  }
+
+  public Integer getLibraryQualificationTargetDays() {
+    return libraryQualificationTargetDays;
+  }
+
+  public void setLibraryQualificationTargetDays(Integer libraryQualificationTargetDays) {
+    this.libraryQualificationTargetDays = libraryQualificationTargetDays;
+  }
+
+  public Integer getFullDepthSequencingTargetDays() {
+    return fullDepthSequencingTargetDays;
+  }
+
+  public void setFullDepthSequencingTargetDays(Integer fullDepthSequencingTargetDays) {
+    this.fullDepthSequencingTargetDays = fullDepthSequencingTargetDays;
+  }
+
+  public Integer getAnalysisReviewTargetDays() {
+    return analysisReviewTargetDays;
+  }
+
+  public void setAnalysisReviewTargetDays(Integer analysisReviewTargetDays) {
+    this.analysisReviewTargetDays = analysisReviewTargetDays;
+  }
+
+  public Integer getReleaseApprovalTargetDays() {
+    return releaseApprovalTargetDays;
+  }
+
+  public void setReleaseApprovalTargetDays(Integer releaseApprovalTargetDays) {
+    this.releaseApprovalTargetDays = releaseApprovalTargetDays;
+  }
+
+  public Integer getReleaseTargetDays() {
+    return releaseTargetDays;
+  }
+
+  public void setReleaseTargetDays(Integer releaseTargetDays) {
+    this.releaseTargetDays = releaseTargetDays;
+  }
+
   public Assay to() {
     Assay to = new Assay();
     setLong(to::setId, getId(), false);
@@ -98,6 +189,15 @@ public class AssayDto {
     if (getMetrics() != null) {
       getMetrics().stream().map(AssayMetricDto::to).forEach(x -> to.getAssayMetrics().add(x));
     }
+    setInteger(to::setCaseTargetDays, getCaseTargetDays(), true);
+    setInteger(to::setReceiptTargetDays, getReceiptTargetDays(), true);
+    setInteger(to::setExtractionTargetDays, getExtractionTargetDays(), true);
+    setInteger(to::setLibraryPreparationTargetDays, getLibraryPreparationTargetDays(), true);
+    setInteger(to::setLibraryQualificationTargetDays, getLibraryQualificationTargetDays(), true);
+    setInteger(to::setFullDepthSequencingTargetDays, getFullDepthSequencingTargetDays(), true);
+    setInteger(to::setAnalysisReviewTargetDays, getAnalysisReviewTargetDays(), true);
+    setInteger(to::setReleaseApprovalTargetDays, getReleaseApprovalTargetDays(), true);
+    setInteger(to::setReleaseTargetDays, getReleaseTargetDays(), true);
     return to;
   }
 
