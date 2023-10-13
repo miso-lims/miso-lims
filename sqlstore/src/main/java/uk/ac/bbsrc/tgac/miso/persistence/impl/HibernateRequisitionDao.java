@@ -1,11 +1,18 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
 import org.hibernate.sql.JoinType;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +40,11 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   @Override
   public Requisition getByAlias(String alias) throws IOException {
     return getBy("alias", alias);
+  }
+
+  @Override
+  public List<Requisition> listByIdList(Collection<Long> ids) throws IOException {
+    return listByIdList(Requisition_.REQUISITION_ID, ids);
   }
 
   @Override
@@ -106,6 +118,39 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   @Override
   public String propertyForUser(boolean creator) {
     return creator ? "creator" : "lastModifier";
+  }
+
+  @Override
+  public void restrictPaginationByStatus(Criteria criteria, String status, Consumer<String> errorHandler) {
+    switch (status) {
+      case "stopped":
+        criteria.add(Restrictions.eq(Requisition_.STOPPED, true));
+        break;
+      case "paused":
+        LocalDate today = LocalDate.now(ZoneId.systemDefault());
+        criteria.createAlias(Requisition_.PAUSES, "pause")
+            .add(Restrictions.le("pause.startDate", today))
+            .add(Restrictions.or(Restrictions.isNull("pause.endDate"),
+                Restrictions.gt("pause.endDate", today)));
+        break;
+      case "ongoing":
+        criteria.add(Restrictions.eq(Requisition_.STOPPED, false))
+            .add(Subqueries.propertyNotIn(Requisition_.REQUISITION_ID, makePausedRequisitionIdsSubquery()));
+        break;
+      default:
+        errorHandler.accept("Unknown requisition status: " + status);
+        break;
+    }
+  }
+
+  private DetachedCriteria makePausedRequisitionIdsSubquery() {
+    LocalDate today = LocalDate.now(ZoneId.systemDefault());
+    return DetachedCriteria.forClass(Requisition.class)
+        .createAlias(Requisition_.PAUSES, "pause")
+        .add(Restrictions.le("pause.startDate", today))
+        .add(Restrictions.or(Restrictions.isNull("pause.endDate"),
+            Restrictions.gt("pause.endDate", today)))
+        .setProjection(Projections.id());
   }
 
 }

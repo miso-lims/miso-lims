@@ -1382,91 +1382,213 @@ BulkTarget.sample = (function ($) {
           sample.type = sampleClass.sampleSubcategory || sampleClass.sampleCategory;
         });
       }
-      if (config.pageMode === "edit") {
-        var changed = data
-          .filter(function (sample) {
-            return sample.projectId !== originalProjectIdsBySampleId[sample.id];
-          })
-          .map(function (sample) {
-            return {
-              sample: sample,
-              originalProject: Utils.array.findUniqueOrThrow(
-                Utils.array.idPredicate(originalProjectIdsBySampleId[sample.id]),
-                config.projects
-              ),
-              newProject: Utils.array.findUniqueOrThrow(
-                Utils.array.idPredicate(sample.projectId),
-                config.projects
-              ),
-            };
-          });
-
-        var projectLabel = Constants.isDetailedSample ? "code" : "name";
-        var consentWarnings = changed
-          .filter(function (change) {
-            return (
-              change.sample.identityConsentLevel &&
-              change.sample.identityConsentLevel !== "All Projects"
-            );
-          })
-          .map(function (change) {
-            return (
-              "• " +
-              (change.sample.alias || change.sample.parentAlias) +
-              ": " +
-              change.originalProject[projectLabel] +
-              " → " +
-              change.newProject[projectLabel] +
-              "; Consent: " +
-              change.sample.identityConsentLevel
-            );
-          });
-        var libraryWarnings = changed
-          .filter(function (change) {
-            return change.sample.libraryCount > 0;
-          })
-          .map(function (change) {
-            return (
-              "• " +
-              (change.sample.alias || change.sample.parentAlias) +
-              ": " +
-              change.originalProject[projectLabel] +
-              " → " +
-              change.newProject[projectLabel] +
-              "; " +
-              change.sample.libraryCount +
-              " librar" +
-              (change.sample.libraryCount > 1 ? "ies" : "y") +
-              " affected"
-            );
-          });
-        var messages = [];
-        if (consentWarnings.length) {
-          messages.push("The following project changes may violate consent:");
-          messages = messages.concat(consentWarnings);
-        }
-        if (libraryWarnings.length) {
-          messages.push("The following project changes affect existing libraries:");
-          messages = messages.concat(libraryWarnings);
-        }
-        if (messages.length) {
-          messages.push("Are you sure you wish to save?");
-          Utils.showConfirmDialog(
-            "Project Changes",
-            "Save",
-            messages,
-            deferred.resolve,
-            deferred.reject
-          );
-        } else {
-          deferred.resolve();
-        }
+      if (config.pageMode === "create") {
+        checkPausedRequisitions(data, deferred);
+      } else if (config.pageMode === "edit") {
+        showSaveWarnings(data, config, deferred);
       } else {
         deferred.resolve();
       }
       return deferred.promise();
     },
   };
+
+  function checkPausedRequisitions(data, deferred) {
+    var requisitionIds = data
+      .filter(function (sample) {
+        return sample.requisitionId;
+      })
+      .map(function (sample) {
+        return sample.requisitionId;
+      })
+      .filter(function (requisitionId, index, array) {
+        return array.indexOf(requisitionId) === index;
+      });
+    if (!requisitionIds) {
+      deferred.resolve();
+      return;
+    }
+    $.ajax({
+      url: Urls.rest.requisitions.searchPausedByIds,
+      data: JSON.stringify(requisitionIds),
+      contentType: "application/json; charset=utf8",
+      dataType: "json",
+      type: "POST",
+    })
+      .done(function (pausedRequisitions) {
+        if (!pausedRequisitions || !pausedRequisitions.length) {
+          deferred.resolve();
+          return;
+        }
+        var fields = pausedRequisitions.map(function (requisition) {
+          return "* " + requisition.alias;
+        });
+        fields.unshift(
+          "The following affected requisitions are currently paused. Do you wish to resume them all now?"
+        );
+        var yesResumeCallback = function () {
+          showResumeOptions(pausedRequisitions, deferred);
+        };
+        Utils.showConfirmDialog(
+          "Resume Requisitions",
+          "Yes",
+          fields,
+          yesResumeCallback,
+          deferred.resolve,
+          "No"
+        );
+      })
+      .fail(function (response, textStatus, serverStatus) {
+        var error = JSON.parse(response.responseText);
+        Utils.showOkDialog("Error", ["Failed looking up requisitions:", error.detail]);
+        deferred.reject();
+      });
+  }
+
+  function showResumeOptions(requisitions, deferred) {
+    var resumeFields = [
+      {
+        label: "Resume Date",
+        property: "resumeDate",
+        type: "date",
+        required: true,
+      },
+    ];
+    var confirmResumeCallback = function (resumeParameters) {
+      resumeRequisitions(requisitions, resumeParameters.resumeDate, deferred);
+    };
+    Utils.showDialog(
+      "Resume Requisitions",
+      "Resume and Continue",
+      resumeFields,
+      confirmResumeCallback,
+      null,
+      deferred.reject
+    );
+  }
+
+  function resumeRequisitions(requisitions, resumeDate, deferred) {
+    var pausedIds = requisitions.map(function (requisition) {
+      return requisition.id;
+    });
+    var saveCallback = function (update) {
+      switch (update.status) {
+        case "completed":
+          deferred.resolve();
+          break;
+        case "failed":
+          var lines = ["Failed to save samples:"];
+          if (update.detail === "Validation failed" && update.data) {
+            update.data.forEach(function (failure) {
+              var requisition = pausedRequisitions[failure.row];
+              lines.push(requisition.alias + ":");
+              failure.fields.forEach(function (field) {
+                lines.push("* " + field.field + ": " + field.errors.join("; "));
+              });
+            });
+          }
+          Utils.showOkDialog("Error", lines, deferred.reject);
+          break;
+        default:
+          Utils.showOkDialog(
+            "Error",
+            ["Unexpected operation status. The save may still be in progress or completed."],
+            deferred.reject
+          );
+      }
+    };
+    Utils.saveWithProgressDialog(
+      "POST",
+      Urls.rest.requisitions.bulkResume,
+      {
+        requisitionIds: pausedIds,
+        resumeDate: resumeDate,
+      },
+      Urls.rest.requisitions.bulkSaveProgress,
+      saveCallback
+    );
+  }
+
+  function showSaveWarnings(data, config, deferred) {
+    var changed = data
+      .filter(function (sample) {
+        return sample.projectId !== originalProjectIdsBySampleId[sample.id];
+      })
+      .map(function (sample) {
+        return {
+          sample: sample,
+          originalProject: Utils.array.findUniqueOrThrow(
+            Utils.array.idPredicate(originalProjectIdsBySampleId[sample.id]),
+            config.projects
+          ),
+          newProject: Utils.array.findUniqueOrThrow(
+            Utils.array.idPredicate(sample.projectId),
+            config.projects
+          ),
+        };
+      });
+
+    var projectLabel = Constants.isDetailedSample ? "code" : "name";
+    var consentWarnings = changed
+      .filter(function (change) {
+        return (
+          change.sample.identityConsentLevel &&
+          change.sample.identityConsentLevel !== "All Projects"
+        );
+      })
+      .map(function (change) {
+        return (
+          "• " +
+          (change.sample.alias || change.sample.parentAlias) +
+          ": " +
+          change.originalProject[projectLabel] +
+          " → " +
+          change.newProject[projectLabel] +
+          "; Consent: " +
+          change.sample.identityConsentLevel
+        );
+      });
+    var libraryWarnings = changed
+      .filter(function (change) {
+        return change.sample.libraryCount > 0;
+      })
+      .map(function (change) {
+        return (
+          "• " +
+          (change.sample.alias || change.sample.parentAlias) +
+          ": " +
+          change.originalProject[projectLabel] +
+          " → " +
+          change.newProject[projectLabel] +
+          "; " +
+          change.sample.libraryCount +
+          " librar" +
+          (change.sample.libraryCount > 1 ? "ies" : "y") +
+          " affected"
+        );
+      });
+    var messages = [];
+    if (consentWarnings.length) {
+      messages.push("The following project changes may violate consent:");
+      messages = messages.concat(consentWarnings);
+    }
+    if (libraryWarnings.length) {
+      messages.push("The following project changes affect existing libraries:");
+      messages = messages.concat(libraryWarnings);
+    }
+    if (messages.length) {
+      messages.push("Are you sure you wish to save?");
+      Utils.showConfirmDialog(
+        "Project Changes",
+        "Save",
+        messages,
+        deferred.resolve,
+        deferred.reject
+      );
+    } else {
+      deferred.resolve();
+    }
+  }
 
   function getSampleCategory(sample) {
     if (!Constants.isDetailedSample) {

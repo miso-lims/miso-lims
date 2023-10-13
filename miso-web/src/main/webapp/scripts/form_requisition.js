@@ -90,5 +90,8 @@ FormTarget.requisition = (function () {
         },
       ];
     },
+    confirmSave: function (object, isDialog, form) {
+      object.pauses = Requisition.getPauses();
+    },
   };
 })();

@@ -790,6 +790,9 @@ Urls = (function () {
       "/supplementalsamples/remove"
     ),
     search: requisitionRestBase + "/search",
+    searchPausedByIds: requisitionRestBase + "/paused",
+    bulkResume: requisitionRestBase + "/bulk-resume",
+    bulkSaveProgress: idUrlFunction(requisitionRestBase + "/bulk"),
     listRunLibraries: middleIdUrlFunction(requisitionRestBase, "/runlibraries"),
   };
 

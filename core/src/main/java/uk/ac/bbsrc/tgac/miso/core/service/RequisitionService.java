@@ -10,9 +10,11 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface RequisitionService
     extends DeleterService<Requisition>, NoteService<Requisition>, PaginatedDataSource<Requisition>,
-    SaveService<Requisition> {
+    BulkSaveService<Requisition> {
 
   Requisition getByAlias(String alias) throws IOException;
+
+  List<Requisition> listByIdList(List<Long> ids) throws IOException;
 
   Requisition moveToRequisition(Requisition requisition, List<Sample> samples) throws IOException;
 

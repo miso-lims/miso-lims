@@ -195,12 +195,16 @@ var Utils = Utils || {
         },
       },
       open: function (event, ui) {
-        jQuery(this).parent().children().children(".ui-dialog-titlebar-close").show();
+        if (cancelCallback) {
+          jQuery(this).parent().children().children(".ui-dialog-titlebar-close").hide();
+        } else {
+          jQuery(this).parent().children().children(".ui-dialog-titlebar-close").show();
+        }
       },
     });
   },
 
-  showConfirmDialog: function (title, okButton, fields, callback, cancelCallback) {
+  showConfirmDialog: function (title, okButton, fields, callback, cancelCallback, cancelButton) {
     var dialogArea = document.getElementById("dialog");
     while (dialogArea.hasChildNodes()) {
       dialogArea.removeChild(dialogArea.lastChild);
@@ -221,9 +225,9 @@ var Utils = Utils || {
         callback();
       },
     };
-    buttons["Cancel"] = {
+    buttons[cancelButton || "Cancel"] = {
       id: "cancel",
-      text: "Cancel",
+      text: cancelButton || "Cancel",
       click: function () {
         dialog.dialog("close");
         if (typeof cancelCallback == "function") {
@@ -238,11 +242,15 @@ var Utils = Utils || {
       modal: true,
       buttons: buttons,
       open: function (event, ui) {
-        jQuery(this).parent().children().children(".ui-dialog-titlebar-close").show();
+        if (cancelCallback) {
+          jQuery(this).parent().children().children(".ui-dialog-titlebar-close").hide();
+        } else {
+          jQuery(this).parent().children().children(".ui-dialog-titlebar-close").show();
+        }
       },
     });
   },
-  showDialog: function (title, okButton, fields, callback, backHandler) {
+  showDialog: function (title, okButton, fields, callback, backHandler, cancelHandler) {
     var dialogArea = document.getElementById("dialog");
     while (dialogArea.hasChildNodes()) {
       dialogArea.removeChild(dialogArea.lastChild);
@@ -506,6 +514,9 @@ var Utils = Utils || {
       text: "Cancel",
       click: function () {
         dialog.dialog("close");
+        if (cancelHandler) {
+          cancelHandler();
+        }
       },
     };
     var dialog = jQuery("#dialog").dialog({
@@ -521,7 +532,11 @@ var Utils = Utils || {
       modal: true,
       buttons: buttons,
       open: function (event, ui) {
-        jQuery(this).parent().children().children(".ui-dialog-titlebar-close").show();
+        if (cancelHandler) {
+          jQuery(this).parent().children().children(".ui-dialog-titlebar-close").hide();
+        } else {
+          jQuery(this).parent().children().children(".ui-dialog-titlebar-close").show();
+        }
       },
     });
   },

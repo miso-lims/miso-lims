@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import static uk.ac.bbsrc.tgac.miso.dto.Dtos.*;
 
+import java.util.List;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 
@@ -14,6 +16,7 @@ public class RequisitionDto {
   private String stopReason;
   private String creationTime;
   private String lastModified;
+  private List<RequisitionPauseDto> pauses;
 
   public static RequisitionDto from(Requisition from) {
     RequisitionDto to = new RequisitionDto();
@@ -24,6 +27,7 @@ public class RequisitionDto {
     setString(to::setStopReason, from.getStopReason());
     setDateTimeString(to::setCreationTime, from.getCreationTime());
     setDateTimeString(to::setLastModified, from.getLastModified());
+    to.setPauses(from.getPauses().stream().map(RequisitionPauseDto::from).toList());
     return to;
   }
 
@@ -83,6 +87,14 @@ public class RequisitionDto {
     this.lastModified = lastModified;
   }
 
+  public List<RequisitionPauseDto> getPauses() {
+    return pauses;
+  }
+
+  public void setPauses(List<RequisitionPauseDto> pauses) {
+    this.pauses = pauses;
+  }
+
   public Requisition to() {
     Requisition to = new Requisition();
     setLong(to::setId, getId(), false);
@@ -90,6 +102,9 @@ public class RequisitionDto {
     setObject(to::setAssay, Assay::new, getAssayId());
     setBoolean(to::setStopped, isStopped(), false);
     setString(to::setStopReason, getStopReason());
+    if (getPauses() != null) {
+      to.setPauses(getPauses().stream().map(RequisitionPauseDto::to).toList());
+    }
     return to;
   }
 

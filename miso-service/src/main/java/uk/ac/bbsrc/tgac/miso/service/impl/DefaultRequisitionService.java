@@ -11,13 +11,16 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
@@ -50,6 +53,8 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   private AuthorizationManager authorizationManager;
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private TransactionTemplate transactionTemplate;
 
   @Override
   public DeletionStore getDeletionStore() {
@@ -59,6 +64,11 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
+  }
+
+  @Override
+  public TransactionTemplate getTransactionTemplate() {
+    return transactionTemplate;
   }
 
   @Override
@@ -103,6 +113,36 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
         errors.add(new ValidationError("stopReason", "Invalid if the requisition is not stopped"));
       }
     }
+    validatePauses(object.getPauses(), errors);
+  }
+
+  private void validatePauses(List<RequisitionPause> pauses, List<ValidationError> errors) {
+    for (int i = 0; i < pauses.size(); i++) {
+      RequisitionPause pause = pauses.get(i);
+      if (pause.getEndDate() != null) {
+        long pauseDays = pause.getStartDate().until(pause.getEndDate()).getDays();
+        if (pauseDays < 1) {
+          errors.add(new ValidationError("pauses", "Pause length must be at least one day"));
+        }
+      }
+      for (int j = i + 1; j < pauses.size(); j++) {
+        RequisitionPause other = pauses.get(j);
+        if (isBetween(pause.getStartDate(), other.getStartDate(), other.getEndDate())
+            || isBetween(pause.getEndDate(), other.getStartDate(), other.getEndDate())) {
+          errors.add(new ValidationError("pauses", "Cannot have overlapping pauses"));
+          break;
+        }
+      }
+    }
+  }
+
+  private static boolean isBetween(LocalDate date, LocalDate start, LocalDate end) {
+    if (date == null) {
+      return end == null;
+    } else {
+      return (date.isEqual(start) || date.isAfter(start))
+          && (end == null || date.isEqual(end) || date.isBefore(end));
+    }
   }
 
   @Override
@@ -111,6 +151,48 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
     to.setAssay(from.getAssay());
     to.setStopped(from.isStopped());
     to.setStopReason(from.getStopReason());
+    applyPauseChanges(to, from);
+  }
+
+  private void applyPauseChanges(Requisition to, Requisition from) throws IOException {
+    User user = authorizationManager.getCurrentUser();
+    List<RequisitionPause> toRemove = to.getPauses().stream()
+        .filter(toPause -> from.getPauses().stream().noneMatch(fromPause -> fromPause.getId() == toPause.getId()))
+        .toList();
+    for (RequisitionPause pause : toRemove) {
+      to.getPauses().remove(pause);
+      String message = null;
+      if (pause.getEndDate() == null) {
+        message = "Cancelled pause starting %s".formatted(LimsUtils.formatDate(pause.getStartDate()));
+      } else {
+        message = "Cancelled pause from %s to %s".formatted(LimsUtils.formatDate(pause.getStartDate()),
+            LimsUtils.formatDate(pause.getEndDate()));
+      }
+      makePauseChangelog(to, user, message);
+    }
+    for (RequisitionPause fromPause : from.getPauses()) {
+      if (fromPause.isSaved()) {
+        RequisitionPause toPause =
+            to.getPauses().stream().filter(x -> x.getId() == fromPause.getId()).findFirst().orElse(null);
+        if (toPause == null) {
+          throw new ValidationException(new ValidationError("pauses", "Submitted pause ID not found"));
+        }
+        if (fromPause.getEndDate() != null
+            && (toPause.getEndDate() == null || !toPause.getEndDate().equals(fromPause.getEndDate()))) {
+          toPause.setEndDate(fromPause.getEndDate());
+          makePauseChangelog(to, user,
+              "Requisition resumed effective %s".formatted(LimsUtils.formatDate(fromPause.getEndDate())));
+        }
+      } else {
+        to.getPauses().add(fromPause);
+        makePauseChangelog(to, user,
+            "Requisition paused effective %s".formatted(LimsUtils.formatDate(fromPause.getStartDate())));
+      }
+    }
+  }
+
+  private void makePauseChangelog(Requisition requisition, User user, String message) throws IOException {
+    changeLogService.create(requisition.createChangeLog(message, "pauses", user));
   }
 
   @Override
@@ -220,6 +302,11 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
     ChangeLog change =
         requisition.createChangeLog(sb.toString(), "supplementary samples", authorizationManager.getCurrentUser());
     changeLogService.create(change);
+  }
+
+  @Override
+  public List<Requisition> listByIdList(List<Long> ids) throws IOException {
+    return requisitionDao.listByIdList(ids);
   }
 
 }

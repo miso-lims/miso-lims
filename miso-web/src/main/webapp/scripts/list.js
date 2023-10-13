@@ -182,6 +182,10 @@ ListUtils = (function ($) {
       term: "status:STATUS",
       help: "Checks whether the status matches. STATUS must be a valid status value",
     },
+    requisitionStatus: {
+      term: "status:STATUS",
+      help: "Checks whether the status matches. STATUS may be 'stopped', 'paused', or 'ongoing'",
+    },
   };
 
   var makeTooltipHelp = function (target) {

@@ -9,7 +9,8 @@ import uk.ac.bbsrc.tgac.miso.PaginationFilterSinkIT;
 public class HibernateRequisitionDaoSearchIT extends PaginationFilterSinkIT {
 
   private static final EnumSet<SearchType> VALID_SEARCH_TYPES = EnumSet.of(SearchType.QUERY, SearchType.ID,
-      SearchType.IDS, SearchType.ENTERED, SearchType.UPDATED, SearchType.CREATOR, SearchType.MODIFIER);
+      SearchType.IDS, SearchType.STATUS, SearchType.ENTERED, SearchType.UPDATED, SearchType.CREATOR,
+      SearchType.MODIFIER);
   private static final List<String> SORT_FIELDS = Arrays.asList("alias");
 
   public HibernateRequisitionDaoSearchIT() {
@@ -21,6 +22,11 @@ public class HibernateRequisitionDaoSearchIT extends PaginationFilterSinkIT {
     HibernateRequisitionDao sut = new HibernateRequisitionDao();
     sut.setSessionFactory(getSessionFactory());
     return sut;
+  }
+
+  @Override
+  public List<String> getStatusTestValues() {
+    return Arrays.asList("ongoing", "stopped", "paused");
   }
 
 }

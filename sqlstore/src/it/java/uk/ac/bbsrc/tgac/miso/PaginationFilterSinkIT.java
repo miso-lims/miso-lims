@@ -5,8 +5,10 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -310,7 +312,13 @@ public abstract class PaginationFilterSinkIT extends AbstractDAOTest {
 
   @Test
   public void testSearchByStatus() throws Exception {
-    testSearch(PaginationFilter.status("active"), SearchType.STATUS);
+    for (String value : getStatusTestValues()) {
+      testSearch(PaginationFilter.status(value), SearchType.STATUS);
+    }
+  }
+
+  public List<String> getStatusTestValues() {
+    return Collections.singletonList("active");
   }
 
   @Test

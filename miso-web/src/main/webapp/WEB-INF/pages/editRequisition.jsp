@@ -20,6 +20,11 @@
             <p>Samples can be added after saving the requisition.</p>
           </c:when>
           <c:otherwise>
+            <h1>Pauses</h1>
+            <div id="requisitionForm_pausesError"></div>
+            <div id="listPauses"></div>
+            <br>
+
             <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
               <div id="notes_arrowclick" class="toggleLeftDown"></div>
             </div>
@@ -101,6 +106,8 @@
           </c:if>
           
           var form = FormUtils.createForm('requisitionForm', 'save', requisition, 'requisition', config);
+          Requisition.setForm(form);
+          Requisition.setPauses(requisition.pauses);
           Utils.ui.updateHelpLink(FormTarget.requisition.getUserManualUrl());
 
           if ('${pageMode}' === 'edit') {
@@ -110,11 +117,11 @@
             }).done(function (data) {
               $('#list_runLibraries').empty();
               FormUtils.setTableData(ListTarget.runaliquot, { requisitionId: ${ requisition.id }}, 'list_runLibraries', data);
-          }).fail(function () {
-            Utils.showOkDialog('Error', ['Failed to load run-libraries']);
-          });
-    }
-  });
+            }).fail(function () {
+              Utils.showOkDialog('Error', ['Failed to load run-libraries']);
+            });
+          }
+        });
       </script>
 
     </div>
