@@ -2,9 +2,12 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page;
 
 import java.util.function.Function;
 
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
@@ -37,6 +40,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String DISABLE_PIPELINE = "Disable Pipeline";
     public static final String DRIVER = "Driver";
     public static final String END_DATE = "End Date";
+    public static final String ENTERED = "Entered";
     public static final String EXTERNAL_NAME = "External Name";
     public static final String EXTRACTION_CLASS = "Extraction Class";
     public static final String FAILED = "Failed";
