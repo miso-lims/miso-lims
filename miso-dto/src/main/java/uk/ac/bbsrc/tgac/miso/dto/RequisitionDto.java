@@ -12,6 +12,7 @@ public class RequisitionDto {
   private Long assayId;
   private boolean stopped = false;
   private String stopReason;
+  private String creationTime;
   private String lastModified;
 
   public static RequisitionDto from(Requisition from) {
@@ -21,6 +22,7 @@ public class RequisitionDto {
     Dtos.setId(to::setAssayId, from.getAssay());
     setBoolean(to::setStopped, from.isStopped(), false);
     setString(to::setStopReason, from.getStopReason());
+    setDateTimeString(to::setCreationTime, from.getCreationTime());
     setDateTimeString(to::setLastModified, from.getLastModified());
     return to;
   }
@@ -63,6 +65,14 @@ public class RequisitionDto {
 
   public void setStopReason(String stopReason) {
     this.stopReason = stopReason;
+  }
+
+  public String getCreationTime() {
+    return creationTime;
+  }
+
+  public void setCreationTime(String created) {
+    this.creationTime = created;
   }
 
   public String getLastModified() {

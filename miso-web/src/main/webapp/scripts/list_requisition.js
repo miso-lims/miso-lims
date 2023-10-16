@@ -53,8 +53,14 @@ ListTarget.requisition = (function () {
           },
         },
         {
+          sTitle: "Entered",
+          mData: "creationTime",
+          mRender: ListUtils.render.dateWithTimeTooltip,
+        },
+        {
           sTitle: "Modified",
           mData: "lastModified",
+          mRender: ListUtils.render.dateWithTimeTooltip,
           iSortPriority: 1,
           bSortDirection: false,
         },
