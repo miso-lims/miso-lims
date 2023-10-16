@@ -318,7 +318,7 @@ public class NotificationManager {
   private static ContainerTag makeSampleTable(Collection<TransferSample> transferSamples) {
     boolean detailed = LimsUtils.isDetailedSample(transferSamples.iterator().next().getItem());
 
-    ContainerTag headerRow = tr(makeTh("Alias"));
+    ContainerTag headerRow = tr(makeTh("Alias"), makeTh("Project"));
     if (detailed) {
       headerRow = headerRow.with(makeTh("Type"), makeTh("External Identifier"), makeTh("Tissue Attributes"),
           makeTh("Timepoint"));
@@ -333,9 +333,11 @@ public class NotificationManager {
     List<TransferSample> sorted = sortByAlias(transferSamples);
     for (TransferSample transferSample : sorted) {
       Sample sample = transferSample.getItem();
+      Project project = sample.getProject();
       DetailedSample detailedSample = detailed ? (DetailedSample) sample : null;
       List<DomContent> cells = new ArrayList<>();
       cells.add(makeTd(sample.getAlias()));
+      cells.add(makeTd(project.getCode() != null ? project.getCode() : project.getTitle()));
       if (detailed) {
         cells.add(makeTd(dnaOrRna(detailedSample)));
         cells.add(makeTd(detailedSample.getIdentityAttributes().getExternalName()));
@@ -381,15 +383,17 @@ public class NotificationManager {
 
   private static ContainerTag makeLibraryTable(Collection<TransferLibrary> transferLibraries) {
     ContainerTag headerRow =
-        tr(makeTh("Alias"), makeTh("Barcode"), makeTh("Location"), makeTh("Platform"), makeTh("Type"),
-            makeTh("i7 Index Name"), makeTh("i7 Index"), makeTh("i5 Index Name"), makeTh("i5 Index"));
+        tr(makeTh("Alias"), makeTh("Project"), makeTh("Barcode"), makeTh("Location"), makeTh("Platform"),
+            makeTh("Type"), makeTh("i7 Index Name"), makeTh("i7 Index"), makeTh("i5 Index Name"), makeTh("i5 Index"));
 
     List<ContainerTag> rows = new ArrayList<>();
     List<TransferLibrary> sorted = sortByAlias(transferLibraries);
     for (TransferLibrary transferLibrary : sorted) {
       Library library = transferLibrary.getItem();
+      Project project = library.getSample().getProject();
       List<DomContent> cells = new ArrayList<>();
       cells.add(makeTd(library.getAlias()));
+      cells.add(makeTd(project.getCode() != null ? project.getCode() : project.getTitle()));
       cells.add(makeTd(library.getIdentificationBarcode()));
       cells.add(makeTd(makeLocationLabel(transferLibrary)));
       cells.add(makeTd(library.getPlatformType().getKey()));
@@ -415,8 +419,10 @@ public class NotificationManager {
     for (TransferLibraryAliquot transferLibraryAliquot : sorted) {
       LibraryAliquot libraryAliquot = transferLibraryAliquot.getItem();
       Library library = libraryAliquot.getLibrary();
+      Project project = library.getSample().getProject();
       List<DomContent> cells = new ArrayList<>();
       cells.add(makeTd(libraryAliquot.getAlias()));
+      cells.add(makeTd(project.getCode() != null ? project.getCode() : project.getTitle()));
       cells.add(makeTd(libraryAliquot.getIdentificationBarcode()));
       cells.add(makeTd(makeLocationLabel(transferLibraryAliquot)));
       cells.add(makeTd(library.getPlatformType().getKey()));
