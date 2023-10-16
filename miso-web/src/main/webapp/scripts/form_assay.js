@@ -57,7 +57,7 @@ FormTarget.assay = (function () {
           ],
         },
         {
-          title: "Turn-around Time Targets",
+          title: "Turn-around Time Targets (Days)",
           fields: [
             makeTargetDaysField("Overall Case", "caseTargetDays", editable, true),
             makeTargetDaysField("Receipt/Inspection", "receiptTargetDays", editable, true),
