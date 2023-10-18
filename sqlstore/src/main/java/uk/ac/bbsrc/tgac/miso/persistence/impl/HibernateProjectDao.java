@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import javax.persistence.TemporalType;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -84,9 +86,18 @@ public class HibernateProjectDao extends HibernateSaveDao<Project>
         return ProjectImpl_.CREATION_TIME;
       case UPDATE:
         return ProjectImpl_.LAST_MODIFIED;
+      case REB_EXPIRY:
+        return ProjectImpl_.REB_EXPIRY;
       default:
         return null;
+    }
+  }
 
+  public TemporalType temporalTypeForDate(DateType type) {
+    if (type == DateType.REB_EXPIRY) {
+      return TemporalType.DATE;
+    } else {
+      return TemporalType.TIMESTAMP;
     }
   }
 
@@ -102,6 +113,11 @@ public class HibernateProjectDao extends HibernateSaveDao<Project>
   }
 
   @Override
+  public void restrictPaginationByRebNumber(Criteria criteria, String query, Consumer<String> errorHandler) {
+    criteria.add(DbUtils.textRestriction(query, ProjectImpl_.REB_NUMBER));
+  }
+
+  @Override
   public void restrictPaginationByStatus(Criteria criteria, String query, Consumer<String> errorHandler) {
     StatusType value = Arrays.stream(StatusType.values())
         .filter(status -> status.getKey().toLowerCase().equals(query.toLowerCase()))
@@ -109,7 +125,7 @@ public class HibernateProjectDao extends HibernateSaveDao<Project>
     if (value == null) {
       errorHandler.accept("Invalid status: %s".formatted(query));
     } else {
-      criteria.add(Restrictions.eq("status", value));
+      criteria.add(Restrictions.eq(ProjectImpl_.STATUS, value));
     }
   }
 

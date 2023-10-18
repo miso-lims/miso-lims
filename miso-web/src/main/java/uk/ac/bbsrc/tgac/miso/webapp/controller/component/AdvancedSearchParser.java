@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.component;
 
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -209,6 +208,10 @@ public class AdvancedSearchParser {
             return PaginationFilter.distributedTo(phrase);
           case "freezer":
             return PaginationFilter.freezer(phrase);
+          case "rebnumber":
+            return PaginationFilter.rebNumber(phrase);
+          case "rebexpiry":
+            return parseDate(phrase, DateType.REB_EXPIRY, errorHandler);
           case "req":
           case "requisition":
             return PaginationFilter.requisition(phrase);
@@ -258,26 +261,24 @@ public class AdvancedSearchParser {
   }
 
   private PaginationFilter parseDate(String text, DateType type, Consumer<String> errorHandler) {
-    ZonedDateTime start;
-    ZonedDateTime end;
+    ZonedDateTime start = null;
+    ZonedDateTime end = null;
     String lowerCaseText = text.toLowerCase();
     if (lowerCaseText.startsWith("before ")) {
-      start = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault()); // epoch (1970-01-01)
       end = parseDate(lowerCaseText.substring(7), DateRangePoint.START);
     } else if (lowerCaseText.startsWith("after ")) {
       start = parseDate(lowerCaseText.substring(6), DateRangePoint.END);
-      end = ZonedDateTime.now();
     } else {
       start = parseDate(lowerCaseText, DateRangePoint.START);
       end = parseDate(lowerCaseText, DateRangePoint.UNQUALIFIED_END);
     }
-    if (start != null && end != null) {
-      Date startDate = Date.from(start.toInstant());
-      Date endDate = Date.from(end.toInstant());
-      return PaginationFilter.date(startDate, endDate, type);
-    } else {
+    if (start == null && end == null) {
       errorHandler.accept("Invalid date format: " + text);
       return null;
+    } else {
+      Date startDate = start == null ? null : Date.from(start.toInstant());
+      Date endDate = end == null ? null : Date.from(end.toInstant());
+      return PaginationFilter.date(startDate, endDate, type);
     }
   }
 

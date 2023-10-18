@@ -148,6 +148,8 @@ ListTarget.project = {
       searchTerms.changed,
       searchTerms.creator,
       searchTerms.changedby,
+      searchTerms.rebnumber,
+      searchTerms.rebexpiry,
     ];
   },
 };

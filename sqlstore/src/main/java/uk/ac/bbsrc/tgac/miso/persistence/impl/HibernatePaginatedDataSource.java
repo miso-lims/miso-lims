@@ -252,20 +252,29 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
     String property = propertyForDate(criteria, type);
     TemporalType temporalType = temporalTypeForDate(type);
     if (property != null) {
-      switch (temporalType) {
-        case TIMESTAMP:
-          criteria.add(Restrictions.between(property, start, end));
-          break;
-        case DATE:
-          LocalDate startDate = LocalDate.ofInstant(start.toInstant(), ZoneId.systemDefault());
-          LocalDate endDate = LocalDate.ofInstant(end.toInstant(), ZoneId.systemDefault());
-          criteria.add(Restrictions.between(property, startDate, endDate));
-          break;
-        default:
-          throw new IllegalArgumentException("Unhandled temporal type: %s".formatted(temporalType));
+      Object startObject = start;
+      Object endObject = end;
+      if (temporalType == TemporalType.DATE) {
+        if (start != null) {
+          startObject = LocalDate.ofInstant(start.toInstant(), ZoneId.systemDefault());
+        }
+        if (end != null) {
+          endObject = LocalDate.ofInstant(end.toInstant(), ZoneId.systemDefault());
+        }
+      }
+      if (start != null) {
+        if (end != null) {
+          criteria.add(Restrictions.between(property, startObject, endObject));
+        } else {
+          criteria.add(Restrictions.ge(property, startObject));
+        }
+      } else if (end != null) {
+        criteria.add(Restrictions.le(property, endObject));
+      } else {
+        throw new IllegalArgumentException("Start and/or end date must be specified");
       }
     } else {
-      errorHandler.accept(String.format("%s has no %s date.", getFriendlyName(), type.name().toLowerCase()));
+      errorHandler.accept(String.format("%s has no %s date.", getFriendlyName(), type.getLabel()));
     }
   }
 
@@ -487,6 +496,11 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   public default void restrictPaginationBySupplementalToRequisitionId(Criteria criteria, long requisitionId,
       Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be filtered by supplemental to requisition ID.", getFriendlyName()));
+  }
+
+  @Override
+  public default void restrictPaginationByRebNumber(Criteria item, String query, Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by REB"));
   }
 
   @Override

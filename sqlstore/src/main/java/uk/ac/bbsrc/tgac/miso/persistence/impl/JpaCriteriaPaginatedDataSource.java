@@ -461,6 +461,12 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
   }
 
   @Override
+  public default void restrictPaginationByRebNumber(QueryBuilder<?, T> builder, String query,
+      Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s cannot be filtered by REB"));
+  }
+
+  @Override
   public default void restrictPaginationByRecipientGroups(QueryBuilder<?, T> builder, Collection<Group> groups,
       Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s has no recipient groups", getFriendlyName()));
