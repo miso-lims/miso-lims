@@ -352,6 +352,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter rebNumber(String rebNumber) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByRebNumber(item, rebNumber, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter sampleClass(String name) {
     return new PaginationFilter() {
 

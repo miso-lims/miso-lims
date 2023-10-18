@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.EnumSet;
 
 import org.junit.Before;
@@ -33,9 +34,9 @@ public abstract class PaginationFilterSinkIT extends AbstractDAOTest {
     CLASS, CREATED, CREATOR, DISTRIBUTED, DISTRIBUTION_RECIPIENT, DRAFT, //
     ENTERED, EXTERNAL_NAME, FULFILLED, FREEZER, GHOST, GROUP_ID, HEALTH, ID, //
     IDS, INDEX, INSTRUMENT_TYPE, KIT_NAME, KIT_TYPE, LAB, MODEL, MODIFIER, //
-    PENDING, PLATFORM_TYPE, POOL, PROJECT, QUERY, RECEIVED, RECIPIENT_GROUPS, //
-    REQUISITION, SEQUENCER, SEQUENCING_PARAMETERS_ID, //
-    SEQUENCING_PARAMETERS_NAME, SOP_CATEGORY, STAGE, SUBPROJECT, TIMEPOINT, //
+    PENDING, PIPELINE, PLATFORM_TYPE, POOL, PROJECT, QUERY, REB_EXPIRY, REB_NUMBER, //
+    RECEIVED, RECIPIENT_GROUPS, REQUISITION, SEQUENCER, SEQUENCING_PARAMETERS_ID, //
+    SEQUENCING_PARAMETERS_NAME, SOP_CATEGORY, STAGE, STATUS, SUBPROJECT, TIMEPOINT, //
     TISSUE_ORIGIN, TISSUE_TYPE, TRANSFER_TYPE, UPDATED, WORKSET, WORKSTATION;
   }
 
@@ -253,6 +254,11 @@ public abstract class PaginationFilterSinkIT extends AbstractDAOTest {
   }
 
   @Test
+  public void testSearchByPipeline() throws Exception {
+    testSearch(PaginationFilter.pipeline("pipeline"), SearchType.PIPELINE);
+  }
+
+  @Test
   public void testSearchByPlatformType() throws Exception {
     testSearch(PaginationFilter.platformType(PlatformType.ILLUMINA), SearchType.PLATFORM_TYPE);
   }
@@ -300,6 +306,11 @@ public abstract class PaginationFilterSinkIT extends AbstractDAOTest {
   @Test
   public void testSearchByNoSubproject() throws Exception {
     testSearch(PaginationFilter.subproject(""), SearchType.SUBPROJECT);
+  }
+
+  @Test
+  public void testSearchByStatus() throws Exception {
+    testSearch(PaginationFilter.status("active"), SearchType.STATUS);
   }
 
   @Test
@@ -389,6 +400,16 @@ public abstract class PaginationFilterSinkIT extends AbstractDAOTest {
   @Test
   public void testSearchByWorkstation() throws Exception {
     testSearch(PaginationFilter.workstation("station"), SearchType.WORKSTATION);
+  }
+
+  @Test
+  public void testSearchByRebExpiry() throws Exception {
+    testSearch(PaginationFilter.date(new Date(), new Date(), DateType.REB_EXPIRY), SearchType.REB_NUMBER);
+  }
+
+  @Test
+  public void testSearchByRebNumber() throws Exception {
+    testSearch(PaginationFilter.rebNumber("reb"), SearchType.REB_NUMBER);
   }
 
   /**

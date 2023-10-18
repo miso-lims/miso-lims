@@ -170,6 +170,14 @@ ListUtils = (function ($) {
       term: "pipeline:TEXT",
       help: "Checks whether the pipeline matches",
     },
+    rebexpiry: {
+      term: "rebexpiry:DATE",
+      help: "Checks whether this item's REB expires on the specified date. For rules about dates, see below.",
+    },
+    rebnumber: {
+      term: "rebnumber:TEXT",
+      help: "Checks whether this item's REB number matches",
+    },
     status: {
       term: "status:STATUS",
       help: "Checks whether the status matches. STATUS must be a valid status value",
