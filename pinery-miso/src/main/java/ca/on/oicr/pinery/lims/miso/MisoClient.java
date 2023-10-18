@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang.WordUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -36,6 +36,7 @@ import com.google.common.collect.Sets;
 import ca.on.oicr.pinery.api.Assay;
 import ca.on.oicr.pinery.api.AssayMetric;
 import ca.on.oicr.pinery.api.AssayMetricSubcategory;
+import ca.on.oicr.pinery.api.AssayTargets;
 import ca.on.oicr.pinery.api.AssayTest;
 import ca.on.oicr.pinery.api.Attribute;
 import ca.on.oicr.pinery.api.AttributeName;
@@ -61,6 +62,7 @@ import ca.on.oicr.pinery.api.User;
 import ca.on.oicr.pinery.lims.DefaultAssay;
 import ca.on.oicr.pinery.lims.DefaultAssayMetric;
 import ca.on.oicr.pinery.lims.DefaultAssayMetricSubcategory;
+import ca.on.oicr.pinery.lims.DefaultAssayTargets;
 import ca.on.oicr.pinery.lims.DefaultAssayTest;
 import ca.on.oicr.pinery.lims.DefaultAttribute;
 import ca.on.oicr.pinery.lims.DefaultAttributeName;
@@ -1495,8 +1497,26 @@ public class MisoClient implements Lims {
     assay.setName(rs.getString("name"));
     assay.setDescription(rs.getString("description"));
     assay.setVersion(rs.getString("version"));
+
+    AssayTargets targets = new DefaultAssayTargets();
+    targets.setCaseDays(intOrNull(rs, "caseTargetDays"));
+    targets.setReceiptDays(intOrNull(rs, "receiptTargetDays"));
+    targets.setExtractionDays(intOrNull(rs, "extractionTargetDays"));
+    targets.setLibraryPreparationDays(intOrNull(rs, "libraryPreparationTargetDays"));
+    targets.setLibraryQualificationDays(intOrNull(rs, "libraryQualificationTargetDays"));
+    targets.setFullDepthSequencingDays(intOrNull(rs, "fullDepthSequencingTargetDays"));
+    targets.setAnalysisReviewDays(intOrNull(rs, "analysisReviewTargetDays"));
+    targets.setReleaseApprovalDays(intOrNull(rs, "releaseApprovalTargetDays"));
+    targets.setReleaseDays(intOrNull(rs, "releaseTargetDays"));
+    assay.setTargets(targets);
+
     return assay;
   };
+
+  private static Integer intOrNull(ResultSet rs, String columnLabel) throws SQLException {
+    int value = rs.getInt(columnLabel);
+    return rs.wasNull() ? null : value;
+  }
 
   private static final RowMapper<AssayTest> assayTestRowMapper = (rs, rowNum) -> {
     AssayTest test = new DefaultAssayTest();
