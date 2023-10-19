@@ -7,6 +7,17 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.9.0] - 2023-10-19
+
+### Added
+
+* Advanced search terms to filter by REB number and REB expiry on the Projects list
+* Assay fields to specify turn-around time targets
+* Turn-around time targets in Pinery assays
+* Project column in sample, library, and library aliquot tables in transfer notification emails
+* Entry time column on the Requisitions list
+
+
 ## [2.8.0] - 2023-10-06
 
 ### Added

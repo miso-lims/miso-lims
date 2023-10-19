@@ -1,3 +1,4 @@
+-- tat_targets
 ALTER TABLE Assay
   ADD COLUMN caseTargetDays SMALLINT,
   ADD COLUMN receiptTargetDays SMALLINT,
@@ -8,3 +9,4 @@ ALTER TABLE Assay
   ADD COLUMN analysisReviewTargetDays SMALLINT,
   ADD COLUMN releaseApprovalTargetDays SMALLINT,
   ADD COLUMN releaseTargetDays SMALLINT;
+
