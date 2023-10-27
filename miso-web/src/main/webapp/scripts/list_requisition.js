@@ -9,7 +9,6 @@ ListTarget.requisition = (function () {
     createUrl: function (config, projectId) {
       return Urls.rest.requisitions.datatable;
     },
-    showNewOptionSop: true,
     createBulkActions: function (config, projectId) {
       var actions = BulkUtils.actions.qc("Requisition");
       actions.push(
