@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition_;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.RequisitionDao;
 
@@ -95,6 +96,8 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
     switch (original) {
       case "assayId":
         return "assay.alias";
+      case "creationTime":
+        return Requisition_.CREATED;
       default:
         return original;
     }
