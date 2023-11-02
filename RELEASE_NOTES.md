@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.9.1] - 2023-11-02
+
+### Fixed
+
+* Sorting the Requisition list by entered date
+
+
 ## [2.9.0] - 2023-10-19
 
 ### Added
