@@ -195,7 +195,7 @@ var Utils = Utils || {
         },
       },
       open: function (event, ui) {
-        if (cancelCallback) {
+        if (callback) {
           jQuery(this).parent().children().children(".ui-dialog-titlebar-close").hide();
         } else {
           jQuery(this).parent().children().children(".ui-dialog-titlebar-close").show();
