@@ -20,7 +20,11 @@ ListTarget.attachment = (function () {
                   {
                     name: "Upload new files",
                     handler: function () {
-                      ListTarget.attachment.showUploadDialog(config.entityType, config.entityId);
+                      ListTarget.attachment.showUploadDialog(
+                        config.entityType,
+                        config.entityId,
+                        true
+                      );
                     },
                   },
                   {
@@ -29,7 +33,8 @@ ListTarget.attachment = (function () {
                       ListTarget.attachment.showLinkDialog(
                         config.entityType,
                         config.entityId,
-                        config.projectId
+                        config.projectId,
+                        true
                       );
                     },
                   },
@@ -120,7 +125,7 @@ ListTarget.attachment = (function () {
         }
       );
     },
-    showUploadDialog: function (entityType, entityId, sharedIds) {
+    showUploadDialog: function (entityType, entityId, reloadPage, sharedIds) {
       var dialogArea = jQuery("#dialog");
       dialogArea.empty();
 
@@ -201,7 +206,7 @@ ListTarget.attachment = (function () {
                   Utils.showOkDialog(
                     "Attach Files",
                     ["File upload successful"],
-                    Utils.page.pageReload
+                    reloadPage ? Utils.page.pageReload : null
                   );
                 })
                 .fail(function (xhr, textStatus, errorThrown) {
@@ -220,7 +225,7 @@ ListTarget.attachment = (function () {
         },
       });
     },
-    showLinkDialog: function (entityType, entityId, projectId, sharedIds) {
+    showLinkDialog: function (entityType, entityId, projectId, reloadPage, sharedIds) {
       var url = Urls.rest.projects.attachments(projectId);
       Utils.ajaxWithDialog("Retrieving Project Files", "GET", url, null, function (attachments) {
         if (!attachments.length) {
@@ -265,7 +270,7 @@ ListTarget.attachment = (function () {
               Utils.showOkDialog(
                 "Link Project File",
                 ["File link successful"],
-                Utils.page.pageReload
+                reloadPage ? Utils.page.pageReload : null
               );
             });
           }
