@@ -107,10 +107,10 @@
           
           var form = FormUtils.createForm('requisitionForm', 'save', requisition, 'requisition', config);
           Requisition.setForm(form);
-          Requisition.setPauses(requisition.pauses);
           Utils.ui.updateHelpLink(FormTarget.requisition.getUserManualUrl());
 
           if ('${pageMode}' === 'edit') {
+            Requisition.setPauses(requisition.pauses);
             $.ajax({
               url: Urls.rest.requisitions.listRunLibraries(${ requisition.id }),
               dataType: 'json'
