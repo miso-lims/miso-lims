@@ -1363,13 +1363,19 @@ BulkUtils = (function ($) {
                 {
                   name: "Upload New Files",
                   handler: function () {
-                    ListTarget.attachment.showUploadDialog(entityType, "shared", ids);
+                    ListTarget.attachment.showUploadDialog(entityType, "shared", false, ids);
                   },
                 },
                 {
                   name: "Link Project File",
                   handler: function () {
-                    ListTarget.attachment.showLinkDialog(entityType, "shared", projects[0], ids);
+                    ListTarget.attachment.showLinkDialog(
+                      entityType,
+                      "shared",
+                      projects[0],
+                      false,
+                      ids
+                    );
                   },
                 },
               ]);
