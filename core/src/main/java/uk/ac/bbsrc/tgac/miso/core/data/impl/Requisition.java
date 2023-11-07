@@ -80,6 +80,10 @@ public class Requisition implements Attachable, Deletable, QualityControllable<R
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastModified;
 
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "requisitionId", nullable = false)
+  private List<RequisitionPause> pauses;
+
   @OneToMany(targetEntity = RequisitionChangeLog.class, mappedBy = "requisition", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
@@ -223,6 +227,17 @@ public class Requisition implements Attachable, Deletable, QualityControllable<R
     change.setColumnsChanged(columnsChanged);
     change.setUser(user);
     return change;
+  }
+
+  public List<RequisitionPause> getPauses() {
+    if (pauses == null) {
+      pauses = new ArrayList<>();
+    }
+    return pauses;
+  }
+
+  public void setPauses(List<RequisitionPause> pauses) {
+    this.pauses = pauses;
   }
 
   @Override

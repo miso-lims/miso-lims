@@ -44,9 +44,20 @@ ListTarget.requisition = (function () {
         {
           sTitle: "Stopped",
           mData: "stopped",
+          bSortable: false,
           mRender: function (data, type, full) {
             if (type === "display") {
-              return data ? "🛑" : "";
+              if (data) {
+                return "<span title='Stopped'>🛑</span>";
+              } else if (
+                full.pauses &&
+                full.pauses.some(function (pause) {
+                  return !pause.endDate || pause.endDate > Utils.getCurrentDate();
+                })
+              ) {
+                return "<span title='Paused'>⌛</span>";
+              }
+              return "";
             }
             return data;
           },
@@ -68,6 +79,7 @@ ListTarget.requisition = (function () {
     searchTermSelector: function (searchTerms) {
       return [
         searchTerms["id"],
+        searchTerms["requisitionStatus"],
         searchTerms["entered"],
         searchTerms["creator"],
         searchTerms["changed"],

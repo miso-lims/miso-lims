@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import org.junit.Test;
@@ -93,12 +94,18 @@ public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requ
     RequisitionSupplementalSampleId supplementalSampleId = new RequisitionSupplementalSampleId();
     supplementalSampleId.setRequisitionId(reqId);
     supplementalSampleId.setSample(sample);
-    RequisitionSupplementalSample supplementalSample = currentSession().get(RequisitionSupplementalSample.class, supplementalSampleId);
+    RequisitionSupplementalSample supplementalSample =
+        currentSession().get(RequisitionSupplementalSample.class, supplementalSampleId);
     assertNotNull(supplementalSample);
 
     getTestSubject().removeSupplementalSample(supplementalSample);
 
     assertNull(currentSession().get(RequisitionSupplementalSample.class, supplementalSampleId));
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(HibernateRequisitionDao::listByIdList, Arrays.asList(1L, 2L));
   }
 
 }

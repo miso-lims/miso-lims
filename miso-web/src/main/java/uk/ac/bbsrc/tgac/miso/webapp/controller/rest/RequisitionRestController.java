@@ -1,6 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.parseLocalDate;
+
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
@@ -135,7 +139,7 @@ public class RequisitionRestController extends RestController {
   }
 
   @GetMapping("/samplesupdate/{uuid}")
-  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
+  public @ResponseBody ObjectNode getSampleProgress(@PathVariable String uuid) throws Exception {
     return asyncOperationManager.getAsyncProgress(uuid, Sample.class);
   }
 
@@ -211,6 +215,49 @@ public class RequisitionRestController extends RestController {
     }
     Requisition saved = requisitionService.moveToRequisition(requisition, samples);
     return RequisitionDto.from(saved);
+  }
+
+  @PostMapping("/paused")
+  public @ResponseBody List<RequisitionDto> searchPaused(@RequestBody List<Long> requisitionIds) throws IOException {
+    List<Requisition> requisitions = requisitionService.list(0, 0, false, "id", PaginationFilter.status("paused"),
+        PaginationFilter.ids(requisitionIds));
+    return requisitions.stream().map(RequisitionDto::from).toList();
+  }
+
+  private static class BulkResumeRequest {
+    public List<Long> requisitionIds;
+    public String resumeDate;
+  }
+
+  @PostMapping("/bulk-resume")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public @ResponseBody ObjectNode bulkResume(@RequestBody BulkResumeRequest request) throws IOException {
+    if (request.requisitionIds == null || request.requisitionIds.isEmpty()) {
+      throw new RestException("Requisition IDs must be specified", Status.BAD_REQUEST);
+    }
+    if (request.resumeDate == null) {
+      throw new RestException("Resume date must be specified", Status.BAD_REQUEST);
+    }
+    LocalDate resumeDate = null;
+    try {
+      resumeDate = parseLocalDate(request.resumeDate);
+    } catch (IllegalArgumentException e) {
+      throw new RestException("Invalid date format: %s".formatted(request.resumeDate), Status.BAD_REQUEST, e);
+    }
+    List<Requisition> requisitions = requisitionService.listByIdList(request.requisitionIds);
+    for (Requisition requisition : requisitions) {
+      for (RequisitionPause pause : requisition.getPauses()) {
+        if (pause.getEndDate() == null) {
+          pause.setEndDate(resumeDate);
+        }
+      }
+    }
+    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, requisitions, requisitionService);
+  }
+
+  @GetMapping("/bulk/{uuid}")
+  public @ResponseBody ObjectNode getRequisitionProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, Requisition.class);
   }
 
 }

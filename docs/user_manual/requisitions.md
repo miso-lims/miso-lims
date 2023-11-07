@@ -2,8 +2,7 @@
 
 Requisitions are a way to group a set of samples that belong to the same case. Files and quality control records may be
 attached to requisitions in order to track qualitative information, progress, reports, etc. A requisition may specify
-an assay, which details the intended work and quality control requirements. There is also a "stopped" flag on
-requisitions that may be used to indicate that no further work should be done on the case.
+an assay, which details the intended work and quality control requirements. Requisitions may be paused to indicate that work should be temporarily put on hold, or stopped to permanently indicate that no further work should be done.
 
 ## Requisitions List
 
@@ -41,7 +40,9 @@ to the Edit Requisition page for existing requisitions, you can click the requis
 page, or in the Requisition field of the Edit Sample page.
 
 The Requisition Information section at the top of the page allows you to modify the requisition's alias, assay, and
-stopped status. Be sure to click the "Save" button at the top right to apply your changes.
+stopped status. Below this, there is a Pauses table showing any time ranges during which the requisition has been
+paused, and offering controls to create a new pause, or resume from an existing one. Be sure to click the "Save"
+button at the top right to apply your changes.
 
 You can add or remove samples from the requisition using the Requisitioned Samples table below. To add samples, click
 the "Add" button in the toolbar. Enter sample names, aliases, or barcodes in the dialog and click Search to find and

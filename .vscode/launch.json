@@ -7,6 +7,7 @@
     {
       "type": "java",
       "name": "Attach to local Tomcat",
+      "projectName": "miso-web",
       "request": "attach",
       "hostName": "localhost",
       "port": "5005"
