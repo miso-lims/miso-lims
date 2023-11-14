@@ -50,6 +50,7 @@ import ca.on.oicr.pinery.api.Order;
 import ca.on.oicr.pinery.api.OrderSample;
 import ca.on.oicr.pinery.api.PreparationKit;
 import ca.on.oicr.pinery.api.Requisition;
+import ca.on.oicr.pinery.api.RequisitionPause;
 import ca.on.oicr.pinery.api.Run;
 import ca.on.oicr.pinery.api.RunPosition;
 import ca.on.oicr.pinery.api.RunSample;
@@ -72,6 +73,7 @@ import ca.on.oicr.pinery.lims.DefaultInstrumentModel;
 import ca.on.oicr.pinery.lims.DefaultOrder;
 import ca.on.oicr.pinery.lims.DefaultPreparationKit;
 import ca.on.oicr.pinery.lims.DefaultRequisition;
+import ca.on.oicr.pinery.lims.DefaultRequisitionPause;
 import ca.on.oicr.pinery.lims.DefaultRun;
 import ca.on.oicr.pinery.lims.DefaultSample;
 import ca.on.oicr.pinery.lims.DefaultSampleProject;
@@ -165,6 +167,9 @@ public class MisoClient implements Lims {
   private static final String QUERY_REQUISITION_QCS_BY_ID = QUERY_ALL_REQUISITION_QCS + " WHERE requisitionId = ?";
   private static final String QUERY_ALL_REQUISITION_SUPPLEMENTAL_IDS = getResourceAsString("queryAllRequisitionSupplementalSampleIds.sql");
   private static final String QUERY_REQUISITION_SUPPLEMENTAL_IDS_BY_ID = QUERY_ALL_REQUISITION_SUPPLEMENTAL_IDS + " WHERE rs.requisitionId = ?";
+  private static final String QUERY_ALL_REQUISITION_PAUSES = getResourceAsString("queryAllRequisitionPauses.sql");
+  private static final String QUERY_REQUISITION_PAUSES_BY_ID = QUERY_ALL_REQUISITION_PAUSES + " WHERE requisitionId = ?";
+
     // @formatter:on
 
   private final RowMapper<Instrument> instrumentMapper = new InstrumentMapper();
@@ -717,6 +722,10 @@ public class MisoClient implements Lims {
       Requisition req = reqsById.get(rs.getInt("requisitionId"));
       addSignOff(req, rs);
     });
+    template.query(QUERY_ALL_REQUISITION_PAUSES, rs -> {
+      Requisition req = reqsById.get(rs.getInt("requisitionId"));
+      addPause(req, rs);
+    });
     return reqs;
   }
 
@@ -733,6 +742,17 @@ public class MisoClient implements Lims {
       so.setUserId(rs.getInt("creator"));
       requisition.addSignOff(so);
     }
+  }
+
+  private static void addPause(Requisition requisition, ResultSet rs) throws SQLException {
+    RequisitionPause pause = new DefaultRequisitionPause();
+    pause.setStartDate(rs.getDate("startDate").toLocalDate());
+    java.sql.Date endDate = rs.getDate("endDate");
+    if (endDate != null) {
+      pause.setEndDate(endDate.toLocalDate());
+    }
+    pause.setReason(rs.getString("reason"));
+    requisition.addPause(pause);
   }
 
   private static Boolean booleanFromInt(Integer value) {
@@ -752,7 +772,7 @@ public class MisoClient implements Lims {
       throw new IllegalStateException(String.format("Found multiple requisitions with ID: %d", id));
     }
     Requisition req = reqs.get(0);
-    addSampleIdsAndSignOffs(req);
+    populateCollections(req);
     return req;
   }
 
@@ -766,11 +786,11 @@ public class MisoClient implements Lims {
       throw new IllegalStateException(String.format("Found multiple requisitions with name: %s", name));
     }
     Requisition req = reqs.get(0);
-    addSampleIdsAndSignOffs(req);
+    populateCollections(req);
     return req;
   }
 
-  private void addSampleIdsAndSignOffs(Requisition requisition) {
+  private void populateCollections(Requisition requisition) {
     Object[] params = {requisition.getId()};
     template.query(QUERY_REQUISITION_SAMPLE_IDS_BY_ID, params, SINGLE_ID_PARAM_TYPES, rs -> {
       requisition.addSampleId(rs.getString("sampleId"));
@@ -780,6 +800,9 @@ public class MisoClient implements Lims {
     });
     template.query(QUERY_REQUISITION_QCS_BY_ID, params, SINGLE_ID_PARAM_TYPES, rs -> {
       addSignOff(requisition, rs);
+    });
+    template.query(QUERY_REQUISITION_PAUSES_BY_ID, params, SINGLE_ID_PARAM_TYPES, rs -> {
+      addPause(requisition, rs);
     });
   }
 

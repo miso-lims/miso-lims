@@ -1,0 +1,1 @@
+Pauses in Pinery requisitions
