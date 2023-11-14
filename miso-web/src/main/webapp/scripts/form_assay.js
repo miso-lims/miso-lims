@@ -101,7 +101,7 @@ FormTarget.assay = (function () {
   function makeTargetDaysField(title, field, editable, include) {
     return {
       title: title,
-      type: editable ? "text" : "read-only",
+      type: editable ? "int" : "read-only",
       data: field,
       getDisplayValue: editable
         ? undefined
