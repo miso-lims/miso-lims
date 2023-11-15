@@ -70,7 +70,7 @@ Launch the plain sample demo with docker-compose:
 cd miso-lims-compose
 export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && export MISO_TAG=latest
 echo "changeme" > ./.miso_db_password
-docker-compose -f demo.plain.yml up
+docker-compose -f docker-compose.plain.yml up
 ```
 
 **Detailed sample mode** has all of the features of plain sample mode, plus it
@@ -83,7 +83,7 @@ Launch the detailed sample demo with docker-compose:
 cd miso-lims-compose
 export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && export MISO_TAG=latest
 echo "changeme" > ./.miso_db_password
-docker-compose -f demo.detailed.yml up
+docker-compose -f docker-compose.detailed.yml up
 ```
 
 For both environments, navigate to [http://localhost](http://localhost)
