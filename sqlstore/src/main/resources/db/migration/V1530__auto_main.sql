@@ -1,3 +1,4 @@
+-- requisition_pausing
 CREATE TABLE RequisitionPause (
   pauseId bigint NOT NULL AUTO_INCREMENT,
   requisitionId bigint NOT NULL,
@@ -7,3 +8,4 @@ CREATE TABLE RequisitionPause (
   PRIMARY KEY (pauseId),
   CONSTRAINT fk_requisitionPause_requisition FOREIGN KEY (requisitionId) REFERENCES Requisition (requisitionId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+

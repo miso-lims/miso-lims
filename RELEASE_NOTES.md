@@ -7,6 +7,26 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.10.0] - 2023-11-16
+
+### Added
+
+* Pauses in Pinery requisitions
+* Ability to pause and resume requisitions from the Edit Requisition page. Pause status will also be
+  shown in the "stopped" column of the Requisitions list
+* Advanced search by status (stopped/paused/ongoing) on the Requisitions list
+
+### Changed
+
+* To allow using the assay target turn-around time fields in different ways, the total case target no
+  longer needs to be greater than the sum of the individiual step targets
+
+### Fixed
+
+* Assay turn-around time target fields were not validated correctly
+* List and bulk pages will no longer be reloaded after attaching files
+
+
 ## [2.9.1] - 2023-11-02
 
 ### Fixed
