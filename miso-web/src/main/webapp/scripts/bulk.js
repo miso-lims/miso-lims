@@ -1357,7 +1357,7 @@ BulkUtils = (function ($) {
             var ids = items.map(Utils.array.getId).join(",");
             var projects = Utils.array.deduplicateNumeric(items.map(getProjectId));
             if (projects.length > 1) {
-              ListTarget.attachment.showUploadDialog(entityType, "shared", ids);
+              ListTarget.attachment.showUploadDialog(entityType, "shared", false, ids);
             } else {
               Utils.showWizardDialog("Attach Files", [
                 {
