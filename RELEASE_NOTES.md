@@ -26,6 +26,10 @@ Starting with version 1.29.0, the format of this file is based on
 * Assay turn-around time target fields were not validated correctly
 * List and bulk pages will no longer be reloaded after attaching files
 
+### Known Issues
+
+* Error attaching files to multiple samples from different projects
+
 
 ## [2.9.1] - 2023-11-02
 
