@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.10.1] - 2023-11-23
+
+### Fixed
+
+* Error attaching files to multiple samples from different projects
+
+
 ## [2.10.0] - 2023-11-16
 
 ### Added
