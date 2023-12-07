@@ -21,7 +21,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
-import uk.ac.bbsrc.tgac.miso.core.service.ContactRoleService;
 import uk.ac.bbsrc.tgac.miso.core.service.DeliverableService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
@@ -49,8 +48,6 @@ public class EditProjectController {
   private ObjectMapper mapper;
   @Autowired
   private DeliverableService deliverableService;
-  @Autowired
-  private ContactRoleService contactRoleService;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;

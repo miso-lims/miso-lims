@@ -126,7 +126,7 @@ public interface Project extends Comparable<Project>, Deletable, Nameable, Seria
 
   public void setAdditionalDetails(String additionalDetails);
 
-  public Deliverable getDeliverable();
+  public Set<Deliverable> getDeliverables();
 
-  public void setDeliverable(Deliverable deliverableId);
+  public void setDeliverables(Set<Deliverable> deliverableId);
 }

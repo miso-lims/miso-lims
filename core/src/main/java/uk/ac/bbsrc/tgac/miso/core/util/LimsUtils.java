@@ -637,7 +637,11 @@ public class LimsUtils {
     T castedOther = (T) other;
 
     if (item.isSaved()) {
-      return item.getId() == castedOther.getId();
+      if (castedOther.isSaved()) {
+        return item.getId() == castedOther.getId();
+      } else {
+        return false;
+      }
     }
     return allEquals(item, castedOther, getters);
   }

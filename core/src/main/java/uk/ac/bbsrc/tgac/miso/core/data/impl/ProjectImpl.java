@@ -20,6 +20,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -70,10 +71,10 @@ public class ProjectImpl implements Project {
 
   private Integer samplesExpected;
 
-  @ManyToOne
-  @JoinColumn(name = "deliverableId")
-  private Deliverable deliverable;
-
+  @ManyToMany
+  @JoinTable(name = "Project_Deliverable", joinColumns = @JoinColumn(name = "projectId"),
+      inverseJoinColumns = @JoinColumn(name = "deliverableId"))
+  private Set<Deliverable> deliverables;
 
   @OneToMany(targetEntity = ProjectContact.class, mappedBy = "project", orphanRemoval = true,
       cascade = CascadeType.ALL)
@@ -479,12 +480,15 @@ public class ProjectImpl implements Project {
   }
 
   @Override
-  public Deliverable getDeliverable() {
-    return deliverable;
+  public Set<Deliverable> getDeliverables() {
+    if (deliverables == null) {
+      deliverables = new HashSet<>();
+    }
+    return deliverables;
   }
 
   @Override
-  public void setDeliverable(Deliverable deliverable) {
-    this.deliverable = deliverable;
+  public void setDeliverables(Set<Deliverable> deliverables) {
+    this.deliverables = deliverables;
   }
 }

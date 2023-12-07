@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -202,13 +201,13 @@ public class Assay implements Aliasable, Deletable, Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(alias, version, description, archived);
+    return LimsUtils.hashCodeByIdFirst(this, alias, version, description, archived);
   }
 
   @Override
   public boolean equals(Object obj) {
-    return LimsUtils.equals(this, obj,
-        Assay::getId,
+    return LimsUtils.equalsByIdFirst(this, obj,
+        Assay::getAlias,
         Assay::getVersion,
         Assay::getDescription,
         Assay::isArchived);

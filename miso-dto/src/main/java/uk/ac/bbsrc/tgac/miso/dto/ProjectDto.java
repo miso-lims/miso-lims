@@ -21,7 +21,7 @@ public class ProjectDto {
   private List<ProjectContactDto> contacts;
   private List<Long> assayIds;
   private String additionalDetails;
-  private Long deliverableId;
+  private List<Long> deliverableIds;
 
   public long getId() {
     return id;
@@ -167,11 +167,11 @@ public class ProjectDto {
     this.additionalDetails = additionalDetails;
   }
 
-  public Long getDeliverableId() {
-    return deliverableId;
+  public List<Long> getDeliverableIds() {
+    return deliverableIds;
   }
 
-  public void setDeliverableId(Long deliverableId) {
-    this.deliverableId = deliverableId;
+  public void setDeliverableIds(List<Long> deliverableIds) {
+    this.deliverableIds = deliverableIds;
   }
 }
