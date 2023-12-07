@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import javax.persistence.criteria.SetJoin;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl_;
 import uk.ac.bbsrc.tgac.miso.persistence.DeliverableDao;
 
 @Repository
@@ -21,7 +24,11 @@ public class HibernateDeliverableDao extends HibernateSaveDao<Deliverable> imple
 
   @Override
   public long getUsage(Deliverable deliverable) throws IOException {
-    return getUsageBy(ProjectImpl.class, "deliverable", deliverable);
+    LongQueryBuilder<ProjectImpl> queryBuilder = new LongQueryBuilder<>(currentSession(), ProjectImpl.class);
+    SetJoin<ProjectImpl, Deliverable> deliverablesJoin =
+        queryBuilder.getJoin(queryBuilder.getRoot(), ProjectImpl_.deliverables);
+    queryBuilder.addPredicate(queryBuilder.getCriteriaBuilder().equal(deliverablesJoin, deliverable));
+    return queryBuilder.getCount();
   }
 
   @Override

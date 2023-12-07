@@ -11,4 +11,6 @@ SELECT projectId, deliverableId
 FROM Project
 WHERE deliverableId IS NOT NULL;
 
-ALTER TABLE Project DROP COLUMN deliverableId;
+ALTER TABLE Project
+  DROP FOREIGN KEY fk_project_deliverableId,
+  DROP COLUMN deliverableId;
