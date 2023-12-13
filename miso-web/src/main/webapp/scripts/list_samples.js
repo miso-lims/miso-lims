@@ -132,7 +132,21 @@ ListTarget.sample = (function () {
               Utils.showSearchByNamesDialog(
                 "Add Samples",
                 Urls.rest.samples.query,
-                samplesUpdateFunction(Urls.rest.requisitions.addSamples(config.requisitionId))
+                function (data, textStatus, xhr, queryNames) {
+                  if (data.length !== queryNames.length) {
+                    var missingCount = queryNames.length - data.length;
+                    Utils.showOkDialog("Error", [
+                      missingCount +
+                        " of the items " +
+                        (missingCount === 1 ? "was" : "were") +
+                        " not found",
+                    ]);
+                    return;
+                  }
+                  samplesUpdateFunction(Urls.rest.requisitions.addSamples(config.requisitionId))(
+                    data
+                  );
+                }
               );
             },
           });

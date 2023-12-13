@@ -821,7 +821,15 @@ var Utils = Utils || {
         if (names.length == 0) {
           return;
         }
-        Utils.ajaxWithDialog("Searching", "POST", queryUrl, names, callback);
+        Utils.ajaxWithDialog(
+          "Searching",
+          "POST",
+          queryUrl,
+          names,
+          function (data, textStatus, xhr) {
+            callback(data, textStatus, xhr, names);
+          }
+        );
       }
     );
   },
