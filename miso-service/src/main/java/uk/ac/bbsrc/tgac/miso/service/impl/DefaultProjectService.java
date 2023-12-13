@@ -22,6 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -221,7 +222,12 @@ public class DefaultProjectService implements ProjectService {
       loadChildEntity(x -> assays.add(x), element, assayService, "assays");
     }
     project.setAssays(assays);
-    loadChildEntity(project::setDeliverable, project.getDeliverable(), deliverableService, "deliverableId");
+
+    Set<Deliverable> deliverables = new HashSet<>();
+    for (Deliverable element : project.getDeliverables()) {
+      loadChildEntity(x -> deliverables.add(x), element, deliverableService, "deliverableId");
+    }
+    project.setDeliverables(deliverables);
   }
 
   private void applyChanges(Project original, Project project) {
@@ -236,7 +242,7 @@ public class DefaultProjectService implements ProjectService {
     original.setRebExpiry(project.getRebExpiry());
     original.setSamplesExpected(project.getSamplesExpected());
     original.setAdditionalDetails(project.getAdditionalDetails());
-    original.setDeliverable(project.getDeliverable());
+    applySetChanges(original.getDeliverables(), project.getDeliverables());
     applySetChangesContacts(original.getContacts(), project.getContacts());
     ValidationUtils.applySetChanges(original.getAssays(), project.getAssays());
   }

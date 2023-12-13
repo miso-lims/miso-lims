@@ -2603,9 +2603,7 @@ public class Dtos {
     dto.setCode(from.getCode());
     dto.setDescription(from.getDescription());
     dto.setAdditionalDetails(from.getAdditionalDetails());
-    if (from.getDeliverable() != null) {
-      setId(dto::setDeliverableId, from.getDeliverable());
-    }
+    dto.setDeliverableIds(from.getDeliverables().stream().map(Deliverable::getId).toList());
     setObject(dto::setStatus, from.getStatus(), (progress) -> progress.getKey());
     if (from.getReferenceGenome() != null) {
       dto.setReferenceGenomeId(from.getReferenceGenome().getId());
@@ -2676,8 +2674,10 @@ public class Dtos {
       }
       assays.stream().forEach(x -> to.getAssays().add(x));
     }
-    if (dto.getDeliverableId() != null) {
-      setObject(to::setDeliverable, Deliverable::new, dto.getDeliverableId());
+    if (dto.getDeliverableIds() != null) {
+      for (Long deliverableId : dto.getDeliverableIds()) {
+        setObject(x -> to.getDeliverables().add(x), Deliverable::new, deliverableId);
+      }
     }
     return to;
   }

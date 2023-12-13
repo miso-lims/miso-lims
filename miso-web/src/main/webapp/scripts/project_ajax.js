@@ -1,6 +1,7 @@
 var Project = (function () {
   var assaysListId = "assays_section";
   var contactsListId = "contacts_section";
+  var deliverablesListId = "deliverables_section";
 
   var form = null;
   var listConfig = {};
@@ -75,6 +76,35 @@ var Project = (function () {
         });
       });
       Project.setContacts(contacts);
+    },
+
+    setDeliverables: function (deliverables) {
+      FormUtils.setTableData(
+        ListTarget.deliverable,
+        listConfig,
+        deliverablesListId,
+        deliverables,
+        form
+      );
+    },
+
+    getDeliverables: function () {
+      return FormUtils.getTableData(deliverablesListId);
+    },
+
+    addDeliverable: function (addDeliverable) {
+      var deliverables = Project.getDeliverables();
+      deliverables.push(addDeliverable);
+      Project.setDeliverables(deliverables);
+    },
+
+    removeDeliverables: function (removeDeliverables) {
+      var deliverables = Project.getDeliverables().filter(function (deliverable) {
+        return !removeDeliverables.some(function (removal) {
+          return removal.id === deliverable.id;
+        });
+      });
+      Project.setDeliverables(deliverables);
     },
   };
 

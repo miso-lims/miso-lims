@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,11 +9,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
-public class Deliverable implements Deletable, Identifiable, Serializable {
+public class Deliverable implements Deletable, Serializable {
   private static final long serialVersionUID = 1L;
 
   private static final long UNSAVED_ID = 0L;
@@ -61,12 +59,12 @@ public class Deliverable implements Deletable, Identifiable, Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(name);
+    return LimsUtils.hashCodeByIdFirst(this, name);
   }
 
   @Override
   public boolean equals(Object obj) {
-    return LimsUtils.equals(this, obj,
+    return LimsUtils.equalsByIdFirst(this, obj,
         Deliverable::getName);
   }
 }

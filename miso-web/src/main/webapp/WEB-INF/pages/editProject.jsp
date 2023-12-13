@@ -52,17 +52,24 @@
 
 
 <br>
+<h1>Assays</h1>
+<div id="projectForm_assaysError"></div>
+<div id="assays_section">
+</div>
+<br>
+
+<h1>Deliverables</h1>
+<div id="projectForm_deliverablesError"></div>
+<div id="deliverables_section">
+</div>
+<br>
+
 <h1>Contacts</h1>
 <div id="projectForm_contactError"></div>
 <div id="contacts_section">
 </div>
 <br>
 
-<h1>Assays</h1>
-<div id="projectForm_assaysError"></div>
-<div id="assays_section">
-</div>
-<br>
 
 <c:if test="${project.id != 0}">
   <button id="collapse_all" type="button" class="fg-button ui-state-default ui-corner-all" onclick="Utils.ui.collapseClass('expandable_section')">
@@ -187,21 +194,21 @@
     var projectDto = ${projectDto};
     var config = ${formConfig};
 
-    var assays = [];
-    for (var i = 0; i < projectDto.assayIds.length; i++) {
-      var holder = Constants.assays.find(function (x) {
-        return x.id === projectDto.assayIds[i];
+    var assays = projectDto.assayIds.map(function(x) {
+      return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(x), Constants.assays);
     });
-      assays.push(holder);
-  }
+    var deliverables = projectDto.deliverableIds.map(function(x) {
+      return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(x), config.deliverables);
+    });
 
     Warning.generateHeaderWarnings('warnings', WarningTarget.project, projectDto);
     var form = FormUtils.createForm('projectForm', 'save', projectDto, 'project', config);
 
     Project.setForm(form);
-    Project.setListConfig({projectId: projectDto.id});
+    Project.setListConfig({projectId: projectDto.id, deliverables: config.deliverables});
     Project.setProjectId(projectDto.id);
     Project.setAssays(assays);
+    Project.setDeliverables(deliverables);
     Project.setContacts(projectDto.contacts);
     Utils.ui.updateHelpLink(FormTarget.project.getUserManualUrl());
   });

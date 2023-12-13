@@ -18,7 +18,7 @@ BulkTarget.deliverable = (function () {
       return Urls.external.userManual("type_data", "deliverables");
     },
     getBulkActions: function (config) {
-      return [BulkUtils.actions.edit(Urls.ui.deliverables.bulkEdit)];
+      return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.deliverables.bulkEdit)];
     },
     getColumns: function (config, api) {
       return [

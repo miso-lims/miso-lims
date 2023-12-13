@@ -165,18 +165,6 @@ FormTarget.project = (function ($) {
               nullLabel: "(Choose)",
             },
             {
-              title: "Deliverable",
-              data: "deliverableId",
-              type: "dropdown",
-              source: config.deliverables,
-              getItemLabel: function (item) {
-                return item.name;
-              },
-              getItemValue: function (item) {
-                return item.id;
-              },
-            },
-            {
               title: "Samples Expected",
               data: "samplesExpected",
               type: "int",
@@ -187,19 +175,9 @@ FormTarget.project = (function ($) {
       ];
     },
     confirmSave: function (object, isDialog, form) {
-      object.assayIds = Project.getAssays().map(function (x) {
-        return x.id;
-      });
+      object.assayIds = Project.getAssays().map(Utils.array.getId);
+      object.deliverableIds = Project.getDeliverables().map(Utils.array.getId);
       object.contacts = Project.getContacts();
     },
   };
-
-  function makeButton(text, callback) {
-    return $("<button>")
-      .addClass("ui-state-default")
-      .attr("type", "button")
-      .css("margin-left", "4px")
-      .text(text)
-      .click(callback);
-  }
 })(jQuery);
