@@ -140,6 +140,7 @@ public class MisoClient implements Lims {
 
   // SampleProject queries
   private static final String QUERY_ALL_SAMPLE_PROJECTS = getResourceAsString("queryAllSampleProjects.sql");
+  private static final String QUERY_ALL_PROJECT_DELIVERABLES = getResourceAsString("queryAllProjectDeliverables.sql");
 
   // SampleChangeLog queries
   private static final String QUERY_ALL_SAMPLE_CHANGELOGS = getResourceAsString("queryAllSampleChangeLogs.sql");
@@ -235,7 +236,17 @@ public class MisoClient implements Lims {
 
   @Override
   public List<SampleProject> getSampleProjects() {
-    return template.query(QUERY_ALL_SAMPLE_PROJECTS, sampleProjectMapper);
+    List<SampleProject> projects = template.query(QUERY_ALL_SAMPLE_PROJECTS, sampleProjectMapper);
+    Map<String, SampleProject> projectsByName =
+        projects.stream().collect(Collectors.toMap(SampleProject::getName, Function.identity()));
+    template.query(QUERY_ALL_PROJECT_DELIVERABLES, rs -> {
+      SampleProject project = projectsByName.get(rs.getString("projectName"));
+      if (project.getDeliverables() == null) {
+        project.setDeliverables(new HashSet<>());
+      }
+      project.getDeliverables().add(rs.getString("deliverable"));
+    });
+    return projects;
   }
 
   @Override
