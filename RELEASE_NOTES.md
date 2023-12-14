@@ -7,6 +7,21 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.11.0] - 2023-12-14
+
+### Added
+
+* Deliverables in Pinery sample projects
+
+### Changed
+
+* Multiple deliverables can now be added to a project
+
+### Fixed
+
+* Improved error message when failing to add samples to a requisition
+
+
 ## [2.10.1] - 2023-11-23
 
 ### Fixed

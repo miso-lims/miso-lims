@@ -1,3 +1,4 @@
+-- multiple_deliverables
 CREATE TABLE Project_Deliverable (
   projectId bigint NOT NULL,
   deliverableId bigint NOT NULL,
@@ -14,3 +15,4 @@ WHERE deliverableId IS NOT NULL;
 ALTER TABLE Project
   DROP FOREIGN KEY fk_project_deliverableId,
   DROP COLUMN deliverableId;
+
