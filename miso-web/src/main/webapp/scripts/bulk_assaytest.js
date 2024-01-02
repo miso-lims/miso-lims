@@ -85,8 +85,8 @@ BulkTarget.assaytest = (function ($) {
             });
           },
           description:
-            "Describes how libraries are qualified before full depth sequencing - either via library aliquot " +
-            "QC, or low-depth sequencing",
+            "Describes how libraries are qualified before full depth sequencing - via library aliquot " +
+            "QC, low-depth sequencing, or not at all",
         },
         {
           title: "Library Qualification Design Code",

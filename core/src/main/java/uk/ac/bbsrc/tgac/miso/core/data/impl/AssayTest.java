@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public class AssayTest implements Aliasable, Deletable, Serializable {
 
   public enum LibraryQualificationMethod {
-    ALIQUOT("Aliquot"), LOW_DEPTH_SEQUENCING("Low-depth Sequencing");
+    NONE("None"), ALIQUOT("Aliquot"), LOW_DEPTH_SEQUENCING("Low-depth Sequencing");
 
     private final String label;
 
