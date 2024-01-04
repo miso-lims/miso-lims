@@ -291,6 +291,12 @@ public interface HibernatePaginatedDataSource<T> extends PaginatedDataSource<T>,
   }
 
   @Override
+  public default void restrictPaginationByDesign(Criteria criteria, String query,
+      Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no design.", getFriendlyName()));
+  }
+
+  @Override
   public default void restrictPaginationByDistributionRecipient(Criteria criteria, String query,
       Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be distributed.", getFriendlyName()));

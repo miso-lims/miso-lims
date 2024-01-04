@@ -224,6 +224,12 @@ public class HibernateListLibraryAliquotViewDao
   }
 
   @Override
+  public void restrictPaginationByDesign(Criteria criteria, String design, Consumer<String> errorHandler) {
+    criteria.createAlias("designCode", "designCode")
+        .add(Restrictions.eq("designCode.code", design));
+  }
+
+  @Override
   public void restrictPaginationByDistributionRecipient(Criteria criteria, String query,
       Consumer<String> errorHandler) {
     DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "libraryAliquots", "aliquotId");

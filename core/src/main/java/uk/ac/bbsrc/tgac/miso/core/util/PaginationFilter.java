@@ -109,6 +109,16 @@ public abstract interface PaginationFilter {
     };
   }
 
+  public static PaginationFilter design(String design) {
+    return new PaginationFilter() {
+
+      @Override
+      public <T> void apply(PaginationFilterSink<T> sink, T item, Consumer<String> errorHandler) {
+        sink.restrictPaginationByDesign(item, design, errorHandler);
+      }
+    };
+  }
+
   public static PaginationFilter distributedTo(String recipient) {
     return new PaginationFilter() {
 

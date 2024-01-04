@@ -228,6 +228,8 @@ public class AdvancedSearchParser {
             return PaginationFilter.model(phrase);
           case "workstation":
             return PaginationFilter.workstation(phrase);
+          case "design":
+            return PaginationFilter.design(phrase);
           default:
             errorHandler.accept("Unknown search term: " + term);
         }
