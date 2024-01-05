@@ -9,7 +9,7 @@ import uk.ac.bbsrc.tgac.miso.PaginationFilterSinkIT;
 public class HibernateListLibraryAliquotViewDaoSearchIT extends PaginationFilterSinkIT {
 
   private static final EnumSet<SearchType> VALID_SEARCH_TYPES =
-      EnumSet.of(SearchType.QUERY, SearchType.ID, SearchType.IDS,
+      EnumSet.of(SearchType.QUERY, SearchType.ID, SearchType.IDS, SearchType.DESIGN,
           SearchType.FREEZER, SearchType.DISTRIBUTED, SearchType.DISTRIBUTION_RECIPIENT, SearchType.TISSUE_ORIGIN,
           SearchType.TISSUE_TYPE, SearchType.PROJECT, SearchType.PLATFORM_TYPE, SearchType.BOX, SearchType.INDEX,
           SearchType.POOL, SearchType.CREATED, SearchType.UPDATED, SearchType.RECEIVED, SearchType.WORKSET,

@@ -241,6 +241,7 @@ ListTarget.libraryaliquot = {
     var detailedSampleTerms = [
       searchTerms["tissueOrigin"],
       searchTerms["tissueType"],
+      searchTerms["design"],
       searchTerms["groupid"],
     ];
     if (Constants.isDetailedSample) {

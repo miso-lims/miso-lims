@@ -12,7 +12,7 @@ public class HibernateLibraryAliquotDaoSearchIT extends PaginationFilterSinkIT {
       SearchType.IDS, SearchType.PROJECT, SearchType.POOL, SearchType.PLATFORM_TYPE, SearchType.INDEX,
       SearchType.GROUP_ID, SearchType.DISTRIBUTION_RECIPIENT, SearchType.CREATED, SearchType.ENTERED,
       SearchType.UPDATED, SearchType.CREATOR, SearchType.MODIFIER, SearchType.BOX, SearchType.FREEZER,
-      SearchType.DISTRIBUTED, SearchType.RECEIVED, SearchType.BARCODE);
+      SearchType.DISTRIBUTED, SearchType.RECEIVED, SearchType.BARCODE, SearchType.DESIGN);
   private static final List<String> SORT_FIELDS = Arrays.asList("alias");
 
   public HibernateLibraryAliquotDaoSearchIT() {

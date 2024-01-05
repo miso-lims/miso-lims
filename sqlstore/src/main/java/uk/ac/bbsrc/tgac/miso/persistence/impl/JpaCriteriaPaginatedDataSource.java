@@ -242,6 +242,12 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
   }
 
   @Override
+  public default void restrictPaginationByDesign(QueryBuilder<?, T> builder, String query,
+      Consumer<String> errorHandler) {
+    errorHandler.accept(String.format("%s has no design.", getFriendlyName()));
+  }
+
+  @Override
   public default void restrictPaginationByDistributionRecipient(QueryBuilder<?, T> builder, String query,
       Consumer<String> errorHandler) {
     errorHandler.accept(String.format("%s cannot be distributed.", getFriendlyName()));

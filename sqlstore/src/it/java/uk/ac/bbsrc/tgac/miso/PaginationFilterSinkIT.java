@@ -33,7 +33,7 @@ public abstract class PaginationFilterSinkIT extends AbstractDAOTest {
 
   public enum SearchType {
     ARCHIVED, ARRAYED, BARCODE, BATCH, BOX, BOX_TYPE, BOX_USE, BULK_LOOKUP, CATEGORY, //
-    CLASS, CREATED, CREATOR, DISTRIBUTED, DISTRIBUTION_RECIPIENT, DRAFT, //
+    CLASS, CREATED, CREATOR, DESIGN, DISTRIBUTED, DISTRIBUTION_RECIPIENT, DRAFT, //
     ENTERED, EXTERNAL_NAME, FULFILLED, FREEZER, GHOST, GROUP_ID, HEALTH, ID, //
     IDS, INDEX, INSTRUMENT_TYPE, KIT_NAME, KIT_TYPE, LAB, MODEL, MODIFIER, //
     PENDING, PIPELINE, PLATFORM_TYPE, POOL, PROJECT, QUERY, REB_EXPIRY, REB_NUMBER, //
@@ -155,6 +155,11 @@ public abstract class PaginationFilterSinkIT extends AbstractDAOTest {
     testSearch(
         PaginationFilter.date(LimsUtils.parseDate("2021-03-02"), LimsUtils.parseDate("2021-03-02"), DateType.RECEIVE),
         SearchType.RECEIVED);
+  }
+
+  @Test
+  public void testSearchByDesign() throws Exception {
+    testSearch(PaginationFilter.design("XY"), SearchType.DESIGN);
   }
 
   @Test

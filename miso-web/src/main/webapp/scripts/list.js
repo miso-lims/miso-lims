@@ -112,6 +112,10 @@ ListUtils = (function ($) {
       term: "groupid:TEXT",
       help: "Checks if an item has the specified group ID.",
     },
+    design: {
+      term: "design:TEXT",
+      help: "Checks whether an item has the specified library design code",
+    },
     distributed: {
       term: "distributed:DATE",
       help: "Checks whether this item has a distribution date that matches the provided date. For rules about dates, see below. If empty, checks whether an item has been distributed at any time.",

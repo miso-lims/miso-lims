@@ -328,6 +328,12 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
+  public void restrictPaginationByDesign(Criteria criteria, String design, Consumer<String> errorHandler) {
+    criteria.createAlias("libraryDesignCode", "libraryDesignCode")
+        .add(Restrictions.eq("libraryDesignCode.code", design));
+  }
+
+  @Override
   public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
       Consumer<String> errorHandler) {
     criteria.add(Restrictions.eq("platformType", platformType));
