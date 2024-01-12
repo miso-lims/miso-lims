@@ -282,20 +282,20 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListIdsByRequisitionIdPlain() throws Exception {
-    List<Long> ids = dao.listIdsByRequisitionId(1L);
+  public void testListIdsBySampleRequisitionIdPlain() throws Exception {
+    List<Long> ids = dao.listIdsBySampleRequisitionId(1L);
     assertEquals(2, ids.size());
     assertTrue(ids.contains(1L));
     assertTrue(ids.contains(2L));
   }
 
   @Test
-  public void testListIdsByRequisitionIdDetailedWithSupplemental() throws Exception {
+  public void testListIdsBySampleRequisitionIdDetailedWithSupplemental() throws Exception {
     Set<Long> aliquotSampleIds = Collections.singleton(19L);
     Mockito.when(sampleStore.getChildIds(Mockito.anyList(), Mockito.eq(SampleAliquot.CATEGORY_NAME)))
         .thenReturn(aliquotSampleIds);
 
-    List<Long> ids = dao.listIdsByRequisitionId(2L);
+    List<Long> ids = dao.listIdsBySampleRequisitionId(2L);
 
     @SuppressWarnings("unchecked")
     ArgumentCaptor<List<Long>> captor = ArgumentCaptor.forClass(List.class);

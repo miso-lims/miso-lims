@@ -352,6 +352,11 @@ public abstract class PaginationFilterSinkIT extends AbstractDAOTest {
   }
 
   @Test
+  public void testSearchBySupplementalToRequisition() throws Exception {
+    testSearch(PaginationFilter.supplementalToRequisitionId(1L), SearchType.REQUISITION);
+  }
+
+  @Test
   public void testSearchByRecipientGroups() throws Exception {
     Group group1 = new Group();
     group1.setId(1L);

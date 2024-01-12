@@ -26,17 +26,22 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Requisitionable;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
+import uk.ac.bbsrc.tgac.miso.core.service.BulkSaveService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.core.util.ThrowingBiFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
@@ -49,6 +54,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 public class RequisitionRestController extends RestController {
 
   private static final String TYPE_LABEL = "Requisition";
+  private static final String SAMPLE_TYPE_LABEL = "Sample";
+  private static final String LIBRARY_TYPE_LABEL = "Library";
 
   @Autowired
   private RequisitionService requisitionService;
@@ -105,37 +112,73 @@ public class RequisitionRestController extends RestController {
   @PostMapping("/{requisitionId}/samples")
   public @ResponseBody ObjectNode addSamples(@PathVariable long requisitionId, @RequestBody List<Long> ids)
       throws IOException {
-    Requisition requisition = RestUtils.retrieve(TYPE_LABEL, requisitionId, requisitionService, Status.NOT_FOUND);
-    return addSamples(requisition, ids);
+    return addRequisitionedItems(requisitionId, ids, SAMPLE_TYPE_LABEL, sampleService);
   }
 
-  private ObjectNode addSamples(Requisition requisition, List<Long> ids) throws IOException {
-    List<Sample> samples = new ArrayList<>();
+  private <T extends Requisitionable> ObjectNode addRequisitionedItems(long requisitionId, List<Long> ids,
+      String typeLabel, BulkSaveService<T> service) throws IOException {
+    Requisition requisition = RestUtils.retrieve(TYPE_LABEL, requisitionId, requisitionService, Status.NOT_FOUND);
+    List<T> items = new ArrayList<>();
     for (Long id : ids) {
-      Sample sample = RestUtils.retrieve("Sample", id, sampleService, Status.BAD_REQUEST);
-      sample.setRequisition(requisition);
-      samples.add(sample);
+      T item = RestUtils.retrieve(typeLabel, id, service, Status.BAD_REQUEST);
+      item.setRequisition(requisition);
+      items.add(item);
     }
-    return asyncOperationManager.startAsyncBulkUpdate("Sample", samples, sampleService);
+    return asyncOperationManager.startAsyncBulkUpdate(typeLabel, items, service);
   }
 
   @PostMapping("/{requisitionId}/samples/remove")
   public @ResponseBody ObjectNode removeSamples(@PathVariable long requisitionId, @RequestBody List<Long> ids)
       throws IOException {
+    return removeRequisitionedItems(requisitionId, ids, SAMPLE_TYPE_LABEL, sampleService);
+  }
+
+  public <T extends Requisitionable> ObjectNode removeRequisitionedItems(long requisitionId, List<Long> ids,
+      String typeLabel, BulkSaveService<T> service) throws IOException {
     // Retrieve requisition just to validate existence
     RestUtils.retrieve(TYPE_LABEL, requisitionId, requisitionService, Status.NOT_FOUND);
-    List<Sample> samples = new ArrayList<>();
+    List<T> items = new ArrayList<>();
     for (Long id : ids) {
-      Sample sample = RestUtils.retrieve("Sample", id, sampleService, Status.BAD_REQUEST);
-      if (sample.getRequisition() == null || sample.getRequisition().getId() != requisitionId) {
+      T item = RestUtils.retrieve(typeLabel, id, service, Status.BAD_REQUEST);
+      if (item.getRequisition() == null || item.getRequisition().getId() != requisitionId) {
         throw new RestException(
-            String.format("%s (%s) is not linked to this requisition", sample.getAlias(), sample.getName()),
+            String.format("%s (%s) is not linked to this requisition", item.getAlias(), item.getName()),
             Status.BAD_REQUEST);
       }
-      sample.setRequisition(null);
-      samples.add(sample);
+      item.setRequisition(null);
+      items.add(item);
     }
-    return asyncOperationManager.startAsyncBulkUpdate("Sample", samples, sampleService);
+    return asyncOperationManager.startAsyncBulkUpdate(typeLabel, items, service);
+  }
+
+  @PostMapping("/{requisitionId}/samples/move")
+  public @ResponseBody RequisitionDto moveSamples(@PathVariable long requisitionId,
+      @RequestBody MoveItemsRequest request) throws IOException {
+    return moveRequisitionedItems(requisitionId, request, SAMPLE_TYPE_LABEL, sampleService,
+        requisitionService::moveSamplesToRequisition);
+  }
+
+  public <T extends Requisitionable> RequisitionDto moveRequisitionedItems(long requisitionId, MoveItemsRequest request,
+      String typeLabel, ProviderService<T> service,
+      ThrowingBiFunction<Requisition, List<T>, Requisition, IOException> moveFunction) throws IOException {
+    List<T> items = new ArrayList<>();
+    for (Long id : request.itemIds) {
+      T item = RestUtils.retrieve(typeLabel, id, service, Status.BAD_REQUEST);
+      items.add(item);
+    }
+    Requisition requisition = null;
+    if (request.requisitionId != null) {
+      requisition = RestUtils.retrieve("Requisition", request.requisitionId, requisitionService, Status.BAD_REQUEST);
+    } else {
+      requisition = new Requisition();
+      requisition.setAlias(request.requisitionAlias);
+      Assay assay = new Assay();
+      assay.setId(request.assayId);
+      requisition.setAssay(assay);
+      requisition.setStopped(request.stopped);
+    }
+    Requisition saved = moveFunction.apply(requisition, items);
+    return RequisitionDto.from(saved);
   }
 
   @GetMapping("/samplesupdate/{uuid}")
@@ -165,10 +208,62 @@ public class RequisitionRestController extends RestController {
   private List<Sample> getSamples(List<Long> ids) throws IOException {
     List<Sample> samples = new ArrayList<>();
     for (Long id : ids) {
-      Sample sample = RestUtils.retrieve("Sample", id, sampleService, Status.BAD_REQUEST);
+      Sample sample = RestUtils.retrieve(SAMPLE_TYPE_LABEL, id, sampleService, Status.BAD_REQUEST);
       samples.add(sample);
     }
     return samples;
+  }
+
+  @PostMapping("/{requisitionId}/libraries")
+  public @ResponseBody ObjectNode addLibraries(@PathVariable long requisitionId, @RequestBody List<Long> ids)
+      throws IOException {
+    return addRequisitionedItems(requisitionId, ids, LIBRARY_TYPE_LABEL, libraryService);
+  }
+
+  @PostMapping("/{requisitionId}/libraries/remove")
+  public @ResponseBody ObjectNode removeLibraries(@PathVariable long requisitionId, @RequestBody List<Long> ids)
+      throws IOException {
+    return removeRequisitionedItems(requisitionId, ids, LIBRARY_TYPE_LABEL, libraryService);
+  }
+
+  @PostMapping("/{requisitionId}/libraries/move")
+  public @ResponseBody RequisitionDto moveLibraries(@PathVariable long requisitionId,
+      @RequestBody MoveItemsRequest request) throws IOException {
+    return moveRequisitionedItems(requisitionId, request, LIBRARY_TYPE_LABEL, libraryService,
+        requisitionService::moveLibrariesToRequisition);
+  }
+
+  @GetMapping("/librariesupdate/{uuid}")
+  public @ResponseBody ObjectNode getLibraryProgress(@PathVariable String uuid) throws Exception {
+    return asyncOperationManager.getAsyncProgress(uuid, Library.class);
+  }
+
+  @PostMapping("/{requisitionId}/supplementallibraries")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public @ResponseBody void addSupplementalLibraries(@PathVariable long requisitionId, @RequestBody List<Long> ids)
+      throws IOException {
+    Requisition requisition = RestUtils.retrieve(TYPE_LABEL, requisitionId, requisitionService, Status.NOT_FOUND);
+    List<Library> libraries = getLibraries(ids);
+    requisitionService.addSupplementalLibraries(requisition, libraries);
+  }
+
+  @PostMapping("/{requisitionId}/supplementallibraries/remove")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public @ResponseBody void removeSupplementalLibraries(@PathVariable long requisitionId, @RequestBody List<Long> ids)
+      throws IOException {
+    // Retrieve requisition just to validate existence
+    Requisition requisition = RestUtils.retrieve(TYPE_LABEL, requisitionId, requisitionService, Status.NOT_FOUND);
+    List<Library> libraries = getLibraries(ids);
+    requisitionService.removeSupplementalLibraries(requisition, libraries);
+  }
+
+  private List<Library> getLibraries(List<Long> ids) throws IOException {
+    List<Library> libraries = new ArrayList<>();
+    for (Long id : ids) {
+      Library library = RestUtils.retrieve(LIBRARY_TYPE_LABEL, id, libraryService, Status.BAD_REQUEST);
+      libraries.add(library);
+    }
+    return libraries;
   }
 
   @GetMapping("/search")
@@ -186,35 +281,12 @@ public class RequisitionRestController extends RestController {
     return runLibraries.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static class MoveSamplesRequest {
+  public static class MoveItemsRequest {
     public Long requisitionId;
     public String requisitionAlias;
     public Long assayId;
     public boolean stopped;
-    public List<Long> sampleIds;
-  }
-
-  @PostMapping("/{requisitionId}/samples/move")
-  public @ResponseBody RequisitionDto moveSamples(@PathVariable long requisitionId,
-      @RequestBody MoveSamplesRequest request) throws IOException {
-    List<Sample> samples = new ArrayList<>();
-    for (Long id : request.sampleIds) {
-      Sample sample = RestUtils.retrieve("Sample", id, sampleService, Status.BAD_REQUEST);
-      samples.add(sample);
-    }
-    Requisition requisition = null;
-    if (request.requisitionId != null) {
-      requisition = RestUtils.retrieve("Requisition", request.requisitionId, requisitionService, Status.BAD_REQUEST);
-    } else {
-      requisition = new Requisition();
-      requisition.setAlias(request.requisitionAlias);
-      Assay assay = new Assay();
-      assay.setId(request.assayId);
-      requisition.setAssay(assay);
-      requisition.setStopped(request.stopped);
-    }
-    Requisition saved = requisitionService.moveToRequisition(requisition, samples);
-    return RequisitionDto.from(saved);
+    public List<Long> itemIds;
   }
 
   @PostMapping("/paused")

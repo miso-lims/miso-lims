@@ -1483,13 +1483,21 @@ public class Dtos {
     setString(dto::setBatchId, from.getBatchId());
     setEffectiveQcFailure(from, dto);
 
-    Requisition requisition = from.getSample().getRequisition();
-    if (requisition == null) {
-      requisition = getParentRequisition(from.getSample());
+    Requisition requisition = from.getRequisition();
+    if (requisition != null) {
+      setId(dto::setRequisitionId, requisition);
+      setString(dto::setRequisitionAlias, requisition.getAlias());
+    } else {
+      requisition = from.getSample().getRequisition();
+      if (requisition == null) {
+        requisition = getParentRequisition(from.getSample());
+      }
     }
-    setId(dto::setRequisitionId, requisition);
-    setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
-    setId(dto::setRequisitionAssayId, maybeGetProperty(requisition, Requisition::getAssay));
+    if (requisition != null) {
+      setId(dto::setEffectiveRequisitionId, requisition);
+      setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
+      setId(dto::setRequisitionAssayId, requisition.getAssay());
+    }
 
     return dto;
   }
@@ -1568,6 +1576,15 @@ public class Dtos {
     setObject(to::setThermalCycler, InstrumentImpl::new, from.getThermalCyclerId());
     setObject(to::setSop, Sop::new, from.getSopId());
     to.setCreationReceiptInfo(toReceiptTransfer(from, to));
+
+    setObject(to::setRequisition, Requisition::new, from.getRequisitionId());
+    if (to.getRequisition() != null) {
+      Requisition toRequisition = to.getRequisition();
+      setString(toRequisition::setAlias, from.getRequisitionAlias());
+      if (from.getRequisitionAssayId() != null) {
+        setObject(toRequisition::setAssay, Assay::new, from.getRequisitionAssayId());
+      }
+    }
     return to;
   }
 

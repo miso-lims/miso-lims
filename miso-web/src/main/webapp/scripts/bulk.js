@@ -180,6 +180,58 @@ BulkUtils = (function ($) {
       });
     },
 
+    checkPausedRequisitions: function (items, deferred) {
+      var requisitionIds = items
+        .filter(function (item) {
+          return item.requisitionId;
+        })
+        .map(function (item) {
+          return item.requisitionId;
+        })
+        .filter(function (requisitionId, index, array) {
+          return array.indexOf(requisitionId) === index;
+        });
+      if (!requisitionIds) {
+        deferred.resolve();
+        return;
+      }
+      $.ajax({
+        url: Urls.rest.requisitions.searchPausedByIds,
+        data: JSON.stringify(requisitionIds),
+        contentType: "application/json; charset=utf8",
+        dataType: "json",
+        type: "POST",
+      })
+        .done(function (pausedRequisitions) {
+          if (!pausedRequisitions || !pausedRequisitions.length) {
+            deferred.resolve();
+            return;
+          }
+          var fields = pausedRequisitions.map(function (requisition) {
+            return "* " + requisition.alias;
+          });
+          fields.unshift(
+            "The following affected requisitions are currently paused. Do you wish to resume them all now?"
+          );
+          var yesResumeCallback = function () {
+            showResumeOptions(pausedRequisitions, deferred);
+          };
+          Utils.showConfirmDialog(
+            "Resume Requisitions",
+            "Yes",
+            fields,
+            yesResumeCallback,
+            deferred.resolve,
+            "No"
+          );
+        })
+        .fail(function (response, textStatus, serverStatus) {
+          var error = JSON.parse(response.responseText);
+          Utils.showOkDialog("Error", ["Failed looking up requisitions:", error.detail]);
+          deferred.reject();
+        });
+    },
+
     columns: {
       name: {
         title: "Name",
@@ -775,13 +827,127 @@ BulkUtils = (function ($) {
         };
       },
 
+      requisition: function (dataProject) {
+        return [
+          {
+            title: "Requisition Alias",
+            data: "requisitionAlias",
+            type: "text",
+            maxLength: 150,
+            description:
+              "Should usually match the ID of a requisition form stored in a separate system. Enter an alias to" +
+              "search for existing requisitions.",
+            onChange: function (rowIndex, newValue, api) {
+              if (!newValue) {
+                api.updateField(rowIndex, "requisitionId", {
+                  source: [],
+                  value: null,
+                  formatter: null,
+                  disabled: true,
+                });
+                return;
+              }
+              api.updateField(rowIndex, "requisitionId", {
+                source: [],
+                value: "(searching...)",
+                formatter: null,
+                disabled: true,
+              });
+              $.ajax({
+                url:
+                  Urls.rest.requisitions.search +
+                  "?" +
+                  Utils.page.param({
+                    q: newValue,
+                  }),
+                contentType: "application/json; charset=utf8",
+                type: "GET",
+              })
+                .done(function (data) {
+                  var setValue = null;
+                  if (
+                    data.some(function (x) {
+                      return x.alias === newValue;
+                    })
+                  ) {
+                    setValue = newValue;
+                  } else {
+                    data.unshift({
+                      id: 0,
+                      alias: "Create New",
+                    });
+                    setValue = "Create New";
+                  }
+                  api.updateField(rowIndex, "requisitionId", {
+                    source: data,
+                    value: setValue,
+                    formatter: data.length > 1 ? "multipleOptions" : null,
+                    disabled: false,
+                  });
+                })
+                .fail(function (response, textStatus, serverStatus) {
+                  var error = JSON.parse(response.responseText);
+                  api.showError(error.detail);
+                });
+            },
+          },
+          {
+            title: "Requisition",
+            type: "dropdown",
+            data: "requisitionId",
+            includeSaved: false,
+            source: [],
+            getItemLabel: Utils.array.getAlias,
+            getItemValue: Utils.array.getId,
+            disabled: true,
+            onChange: function (rowIndex, newValue, api) {
+              var requisition = api.getValueObject(rowIndex, "requisitionId");
+              var projectSelected = api.getValueObject(rowIndex, dataProject);
+              if (!requisition) {
+                api.updateField(rowIndex, "requisitionAssayId", {
+                  source: [],
+                  value: null,
+                  disabled: true,
+                });
+              } else if (requisition.id) {
+                api.updateField(rowIndex, "requisitionAssayId", {
+                  source: Constants.assays.filter(function (x) {
+                    return !x.archived || x.id === requisition.assayId;
+                  }),
+                  value: !requisition.assayId
+                    ? null
+                    : (function () {
+                        var assay = Utils.array.findUniqueOrThrow(
+                          Utils.array.idPredicate(requisition.assayId),
+                          Constants.assays
+                        );
+                        return Assay.utils.makeLabel(assay);
+                      })(),
+                  disabled: true,
+                });
+              } else if (projectSelected && projectSelected.assayIds !== null) {
+                updateProjectAssays(projectSelected, api, rowIndex);
+              } else {
+                api.updateField(rowIndex, "requisitionAssayId", {
+                  source: Constants.assays.filter(function (x) {
+                    return !x.archived;
+                  }),
+                  value: null,
+                  disabled: false,
+                });
+              }
+            },
+          },
+        ];
+      },
+
       assay: function () {
         return {
           title: "Assay",
           data: "requisitionAssayId",
           type: "dropdown",
           description:
-            "The assay assigned to the requisition that the sample belongs to. When receiving samples, the options are limited to the assays assigned to the project.",
+            "The assay assigned to the requisition that the item belongs to. For receipt, the options are limited to the assays assigned to the project.",
           source: Constants.assays.filter(function (x) {
             return !x.archived;
           }),
@@ -1439,6 +1605,60 @@ BulkUtils = (function ($) {
       },
     },
   };
+
+  function showResumeOptions(requisitions, deferred) {
+    var resumeFields = [
+      {
+        label: "Resume Date",
+        property: "resumeDate",
+        type: "date",
+        required: true,
+      },
+    ];
+    var confirmResumeCallback = function (resumeParameters) {
+      resumeRequisitions(requisitions, resumeParameters.resumeDate, deferred);
+    };
+    Utils.showDialog(
+      "Resume Requisitions",
+      "Resume and Continue",
+      resumeFields,
+      confirmResumeCallback,
+      null,
+      deferred.reject
+    );
+  }
+
+  function resumeRequisitions(requisitions, resumeDate, deferred) {
+    var pausedIds = requisitions.map(function (requisition) {
+      return requisition.id;
+    });
+    var saveCallback = function (update) {
+      switch (update.status) {
+        case "completed":
+          deferred.resolve();
+          break;
+        case "failed":
+          Utils.asyncSaveErrorsDialog(update, requisitions, Utils.array.getAlias, deferred.reject);
+          break;
+        default:
+          Utils.showOkDialog(
+            "Error",
+            ["Unexpected operation status. The save may still be in progress or completed."],
+            deferred.reject
+          );
+      }
+    };
+    Utils.saveWithProgressDialog(
+      "POST",
+      Urls.rest.requisitions.bulkResume,
+      {
+        requisitionIds: pausedIds,
+        resumeDate: resumeDate,
+      },
+      Urls.rest.requisitions.bulkSaveProgress,
+      saveCallback
+    );
+  }
 
   function makeRelations(categoryUrlFunction, relationship, relationCategories, useParentBound) {
     return {
@@ -3220,5 +3440,21 @@ BulkUtils = (function ($) {
     if (changes.length) {
       api.updateData(changes);
     }
+  }
+
+  function updateProjectAssays(projectSelected, api, rowIndex) {
+    var notArchivedProjectAssays = [];
+    for (var i = 0; i < projectSelected.assayIds.length; i++) {
+      var tempAssay = Constants.assays.find(function (x) {
+        return x.id === projectSelected.assayIds[i];
+      });
+      if (!tempAssay.archived) {
+        notArchivedProjectAssays.push(tempAssay);
+      }
+    }
+    api.updateField(rowIndex, "requisitionAssayId", {
+      source: notArchivedProjectAssays,
+      disabled: false,
+    });
   }
 })(jQuery);

@@ -94,32 +94,8 @@ FormTarget.sample = (function ($) {
               type: "text",
               maxLength: 255,
             },
-            {
-              title: "Requisition",
-              data: "requisitionId",
-              type: "read-only",
-              getDisplayValue: function (sample) {
-                return sample.requisitionAlias || "n/a";
-              },
-              getLink: function (sample) {
-                return sample.requisitionId
-                  ? Urls.ui.requisitions.edit(sample.requisitionId)
-                  : null;
-              },
-              include: !!object.requisitionId || !object.effectiveRequisitionId,
-            },
-            {
-              title: "Requisition",
-              data: "effectiveRequisitionId",
-              type: "read-only",
-              getDisplayValue: function (sample) {
-                return sample.effectiveRequisitionAlias;
-              },
-              getLink: function (sample) {
-                return Urls.ui.requisitions.edit(sample.effectiveRequisitionId);
-              },
-              include: !object.requisitionId && !!object.effectiveRequisitionId,
-            },
+            FormUtils.makeRequisitionField(object),
+            FormUtils.makeEffectiveRequisitionField(object),
             {
               title: "Assay",
               data: "requisitionAssayId",

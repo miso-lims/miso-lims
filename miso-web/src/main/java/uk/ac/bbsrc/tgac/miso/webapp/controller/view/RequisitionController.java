@@ -31,7 +31,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
-import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -54,8 +53,6 @@ public class RequisitionController {
   private LibraryService libraryService;
   @Autowired
   private RunService runService;
-  @Autowired
-  private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired

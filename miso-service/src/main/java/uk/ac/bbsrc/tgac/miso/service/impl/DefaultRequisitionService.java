@@ -18,13 +18,17 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Requisitionable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
@@ -47,6 +51,8 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   private AssayService assayService;
   @Autowired
   private SampleService sampleService;
+  @Autowired
+  private LibraryService libraryService;
   @Autowired
   private ChangeLogService changeLogService;
   @Autowired
@@ -242,7 +248,7 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   }
 
   @Override
-  public Requisition moveToRequisition(Requisition template, List<Sample> samples)
+  public Requisition moveSamplesToRequisition(Requisition template, List<Sample> samples)
       throws IOException {
     Requisition existing = null;
     if (template.isSaved()) {
@@ -260,6 +266,66 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
       Sample managedSample = sampleService.get(sample.getId());
       managedSample.setRequisition(requisition);
       sampleService.save(managedSample);
+    }
+    return requisition;
+  }
+
+  @Override
+  public void addSupplementalLibraries(Requisition requisition, Collection<Library> libraries) throws IOException {
+    for (Library library : libraries) {
+      RequisitionSupplementalLibrary supplemental = new RequisitionSupplementalLibrary(requisition.getId(), library);
+      requisitionDao.saveSupplementalLibrary(supplemental);
+    }
+    addSupplementalLibraryChange(requisition, libraries, true);
+  }
+
+  @Override
+  public void removeSupplementalLibraries(Requisition requisition, Collection<Library> libraries) throws IOException {
+    for (Library library : libraries) {
+      RequisitionSupplementalLibrary supplemental = requisitionDao.getSupplementalLibrary(requisition, library);
+      if (supplemental == null) {
+        throw new ValidationException("Supplemental library %s not found".formatted(library.getAlias()));
+      }
+      requisitionDao.removeSupplementalLibrary(supplemental);
+    }
+    addSupplementalLibraryChange(requisition, libraries, false);
+  }
+
+  private void addSupplementalLibraryChange(Requisition requisition, Collection<Library> libraries, boolean addition)
+      throws IOException {
+    StringBuilder sb = new StringBuilder();
+    sb.append(addition ? "Added" : "Removed")
+        .append(" supplemental ")
+        .append(Pluralizer.libraries(libraries.size()))
+        .append(": ")
+        .append(libraries.stream()
+            .map(sample -> "%s (%s)".formatted(sample.getName(), sample.getAlias()))
+            .collect(Collectors.joining("; ")));
+
+    ChangeLog change =
+        requisition.createChangeLog(sb.toString(), "supplemental libraries", authorizationManager.getCurrentUser());
+    changeLogService.create(change);
+  }
+
+  @Override
+  public Requisition moveLibrariesToRequisition(Requisition template, List<Library> libraries)
+      throws IOException {
+    Requisition existing = null;
+    if (template.isSaved()) {
+      existing = get(template.getId());
+    } else {
+      existing = getByAlias(template.getAlias());
+      if (existing != null) {
+        throw new ValidationException(ValidationError.forDuplicate("requisition", "alias"));
+      }
+      long savedId = create(template);
+      existing = get(savedId);
+    }
+    final Requisition requisition = existing;
+    for (Library library : libraries) {
+      Library managedLibrary = libraryService.get(library.getId());
+      managedLibrary.setRequisition(requisition);
+      libraryService.update(managedLibrary);
     }
     return requisition;
   }
@@ -292,7 +358,7 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
       throws IOException {
     StringBuilder sb = new StringBuilder();
     sb.append(addition ? "Added" : "Removed")
-        .append(" supplementary ")
+        .append(" supplemental ")
         .append(Pluralizer.samples(samples.size()))
         .append(": ")
         .append(samples.stream()
@@ -300,13 +366,26 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
             .collect(Collectors.joining("; ")));
 
     ChangeLog change =
-        requisition.createChangeLog(sb.toString(), "supplementary samples", authorizationManager.getCurrentUser());
+        requisition.createChangeLog(sb.toString(), "supplemental samples", authorizationManager.getCurrentUser());
     changeLogService.create(change);
   }
 
   @Override
   public List<Requisition> listByIdList(List<Long> ids) throws IOException {
     return requisitionDao.listByIdList(ids);
+  }
+
+  @Override
+  public void findOrCreateRequisition(Requisitionable item) throws IOException {
+    if (item.getRequisition() != null && !item.getRequisition().isSaved()) {
+      Requisition existing = getByAlias(item.getRequisition().getAlias());
+      if (existing == null) {
+        long requisitionId = create(item.getRequisition());
+        item.getRequisition().setId(requisitionId);
+      } else {
+        item.setRequisition(existing);
+      }
+    }
   }
 
 }

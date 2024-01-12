@@ -518,17 +518,17 @@ BulkTarget.sample = (function ($) {
           ? config.project[Constants.isDetailedSample ? "code" : "name"]
           : null,
         onChange: function (rowIndex, newValue, api) {
-          if (
-            targetCategory !== "Identity" &&
-            !config.isLibraryReceipt &&
-            config.pageMode === "create"
-          ) {
-            if (api.getValue(rowIndex, "requisitionId") === "Create New") {
+          if (targetCategory !== "Identity" && config.pageMode === "create") {
+            // For library receipt, the regular API is intercepted for sample columns to redirect
+            // them to access other sample properties. We want to avoid that when dealing with
+            // requisition fields, which belong to the item being received - sample or library
+            var nonInterceptApi = api.bypassIntercept || api;
+            if (nonInterceptApi.getValue(rowIndex, "requisitionId") === "Create New") {
               var projectSelected = api.getValueObject(rowIndex, "projectId");
               if (projectSelected && projectSelected.assayIds !== null) {
-                updateProjectAssays(projectSelected, api, rowIndex);
+                updateProjectAssays(projectSelected, nonInterceptApi, rowIndex);
               } else {
-                api.updateField(rowIndex, "requisitionAssayId", {
+                nonInterceptApi.updateField(rowIndex, "requisitionAssayId", {
                   source: [],
                   value: null,
                 });
@@ -571,117 +571,7 @@ BulkTarget.sample = (function ($) {
         !config.isLibraryReceipt &&
         targetCategory !== "Identity"
       ) {
-        columns.push(
-          {
-            title: "Requisition Alias",
-            data: "requisitionAlias",
-            type: "text",
-            maxLength: 150,
-            description:
-              "Should usually match the ID of a requisition form stored in a separate system. Enter an alias to" +
-              "search for existing requisitions.",
-            onChange: function (rowIndex, newValue, api) {
-              if (!newValue) {
-                api.updateField(rowIndex, "requisitionId", {
-                  source: [],
-                  value: null,
-                  formatter: null,
-                  disabled: true,
-                });
-                return;
-              }
-              api.updateField(rowIndex, "requisitionId", {
-                source: [],
-                value: "(searching...)",
-                formatter: null,
-                disabled: true,
-              });
-              $.ajax({
-                url:
-                  Urls.rest.requisitions.search +
-                  "?" +
-                  Utils.page.param({
-                    q: newValue,
-                  }),
-                contentType: "application/json; charset=utf8",
-                type: "GET",
-              })
-                .done(function (data) {
-                  var setValue = null;
-                  if (
-                    data.some(function (x) {
-                      return x.alias === newValue;
-                    })
-                  ) {
-                    setValue = newValue;
-                  } else {
-                    data.unshift({
-                      id: 0,
-                      alias: "Create New",
-                    });
-                    setValue = "Create New";
-                  }
-                  api.updateField(rowIndex, "requisitionId", {
-                    source: data,
-                    value: setValue,
-                    formatter: data.length > 1 ? "multipleOptions" : null,
-                    disabled: false,
-                  });
-                })
-                .fail(function (response, textStatus, serverStatus) {
-                  var error = JSON.parse(response.responseText);
-                  api.showError(error.detail);
-                });
-            },
-          },
-          {
-            title: "Requisition",
-            type: "dropdown",
-            data: "requisitionId",
-            includeSaved: false,
-            source: [],
-            getItemLabel: Utils.array.getAlias,
-            getItemValue: Utils.array.getId,
-            disabled: true,
-            onChange: function (rowIndex, newValue, api) {
-              var requisition = api.getValueObject(rowIndex, "requisitionId");
-              var projectSelected = api.getValueObject(rowIndex, "projectId");
-              if (!requisition) {
-                api.updateField(rowIndex, "requisitionAssayId", {
-                  source: [],
-                  value: null,
-                  disabled: true,
-                });
-              } else if (requisition.id) {
-                api.updateField(rowIndex, "requisitionAssayId", {
-                  source: Constants.assays.filter(function (x) {
-                    return !x.archived || x.id === requisition.assayId;
-                  }),
-                  value: !requisition.assayId
-                    ? null
-                    : (function () {
-                        var assay = Utils.array.findUniqueOrThrow(
-                          Utils.array.idPredicate(requisition.assayId),
-                          Constants.assays
-                        );
-                        return Assay.utils.makeLabel(assay);
-                      })(),
-                  disabled: true,
-                });
-              } else if (projectSelected && projectSelected.assayIds !== null) {
-                updateProjectAssays(projectSelected, api, rowIndex);
-              } else {
-                api.updateField(rowIndex, "requisitionAssayId", {
-                  source: Constants.assays.filter(function (x) {
-                    return !x.archived;
-                  }),
-                  value: null,
-                  disabled: false,
-                });
-              }
-            },
-          }
-        );
+        columns = columns.concat(BulkUtils.columns.requisition("projectId"));
       }
 
       if (targetCategory !== "Identity" && !config.isLibraryReceipt) {
@@ -1383,7 +1273,7 @@ BulkTarget.sample = (function ($) {
         });
       }
       if (config.pageMode === "create") {
-        checkPausedRequisitions(data, deferred);
+        BulkUtils.checkPausedRequisitions(data, deferred);
       } else if (config.pageMode === "edit") {
         showSaveWarnings(data, config, deferred);
       } else {
@@ -1392,122 +1282,6 @@ BulkTarget.sample = (function ($) {
       return deferred.promise();
     },
   };
-
-  function checkPausedRequisitions(data, deferred) {
-    var requisitionIds = data
-      .filter(function (sample) {
-        return sample.requisitionId;
-      })
-      .map(function (sample) {
-        return sample.requisitionId;
-      })
-      .filter(function (requisitionId, index, array) {
-        return array.indexOf(requisitionId) === index;
-      });
-    if (!requisitionIds) {
-      deferred.resolve();
-      return;
-    }
-    $.ajax({
-      url: Urls.rest.requisitions.searchPausedByIds,
-      data: JSON.stringify(requisitionIds),
-      contentType: "application/json; charset=utf8",
-      dataType: "json",
-      type: "POST",
-    })
-      .done(function (pausedRequisitions) {
-        if (!pausedRequisitions || !pausedRequisitions.length) {
-          deferred.resolve();
-          return;
-        }
-        var fields = pausedRequisitions.map(function (requisition) {
-          return "* " + requisition.alias;
-        });
-        fields.unshift(
-          "The following affected requisitions are currently paused. Do you wish to resume them all now?"
-        );
-        var yesResumeCallback = function () {
-          showResumeOptions(pausedRequisitions, deferred);
-        };
-        Utils.showConfirmDialog(
-          "Resume Requisitions",
-          "Yes",
-          fields,
-          yesResumeCallback,
-          deferred.resolve,
-          "No"
-        );
-      })
-      .fail(function (response, textStatus, serverStatus) {
-        var error = JSON.parse(response.responseText);
-        Utils.showOkDialog("Error", ["Failed looking up requisitions:", error.detail]);
-        deferred.reject();
-      });
-  }
-
-  function showResumeOptions(requisitions, deferred) {
-    var resumeFields = [
-      {
-        label: "Resume Date",
-        property: "resumeDate",
-        type: "date",
-        required: true,
-      },
-    ];
-    var confirmResumeCallback = function (resumeParameters) {
-      resumeRequisitions(requisitions, resumeParameters.resumeDate, deferred);
-    };
-    Utils.showDialog(
-      "Resume Requisitions",
-      "Resume and Continue",
-      resumeFields,
-      confirmResumeCallback,
-      null,
-      deferred.reject
-    );
-  }
-
-  function resumeRequisitions(requisitions, resumeDate, deferred) {
-    var pausedIds = requisitions.map(function (requisition) {
-      return requisition.id;
-    });
-    var saveCallback = function (update) {
-      switch (update.status) {
-        case "completed":
-          deferred.resolve();
-          break;
-        case "failed":
-          var lines = ["Failed to save samples:"];
-          if (update.detail === "Validation failed" && update.data) {
-            update.data.forEach(function (failure) {
-              var requisition = pausedRequisitions[failure.row];
-              lines.push(requisition.alias + ":");
-              failure.fields.forEach(function (field) {
-                lines.push("* " + field.field + ": " + field.errors.join("; "));
-              });
-            });
-          }
-          Utils.showOkDialog("Error", lines, deferred.reject);
-          break;
-        default:
-          Utils.showOkDialog(
-            "Error",
-            ["Unexpected operation status. The save may still be in progress or completed."],
-            deferred.reject
-          );
-      }
-    };
-    Utils.saveWithProgressDialog(
-      "POST",
-      Urls.rest.requisitions.bulkResume,
-      {
-        requisitionIds: pausedIds,
-        resumeDate: resumeDate,
-      },
-      Urls.rest.requisitions.bulkSaveProgress,
-      saveCallback
-    );
-  }
 
   function showSaveWarnings(data, config, deferred) {
     var changed = data
@@ -1707,22 +1481,6 @@ BulkTarget.sample = (function ($) {
   function anyMatch(arr1, arr2) {
     return arr1.some(function (x) {
       return arr2.includes(x);
-    });
-  }
-
-  function updateProjectAssays(projectSelected, api, rowIndex) {
-    var notArchivedProjectAssays = [];
-    for (var i = 0; i < projectSelected.assayIds.length; i++) {
-      var tempAssay = Constants.assays.find(function (x) {
-        return x.id === projectSelected.assayIds[i];
-      });
-      if (!tempAssay.archived) {
-        notArchivedProjectAssays.push(tempAssay);
-      }
-    }
-    api.updateField(rowIndex, "requisitionAssayId", {
-      source: notArchivedProjectAssays,
-      disabled: false,
     });
   }
 })(jQuery);

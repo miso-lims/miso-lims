@@ -87,17 +87,8 @@ FormTarget.library = (function ($) {
               type: "text",
               maxLength: 255,
             },
-            {
-              title: "Requisition",
-              data: "requisitionId",
-              type: "read-only",
-              getDisplayValue: function (item) {
-                return item.requisitionAlias || "n/a";
-              },
-              getLink: function (item) {
-                return item.requisitionId ? Urls.ui.requisitions.edit(item.requisitionId) : null;
-              },
-            },
+            FormUtils.makeRequisitionField(object),
+            FormUtils.makeEffectiveRequisitionField(object),
             {
               title: "Assay",
               data: "requisitionAssayId",

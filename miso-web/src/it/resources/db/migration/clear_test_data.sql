@@ -69,6 +69,7 @@ DELETE FROM Metric;
 DELETE FROM Requisition;
 DELETE FROM RequisitionChangeLog;
 DELETE FROM Requisition_SupplementalSample;
+DELETE FROM Requisition_SupplementalLibrary;
 DELETE FROM SampleQC;
 DELETE FROM Sample_Note;
 DELETE FROM SampleChangeLog;

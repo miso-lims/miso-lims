@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
@@ -203,7 +204,7 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   }
 
   @Override
-  public List<Long> listIdsByRequisitionId(long requisitionId) throws IOException {
+  public List<Long> listIdsBySampleRequisitionId(long requisitionId) throws IOException {
     List<Long> requisitionSampleIds = currentSession().createCriteria(Sample.class)
         .createAlias("requisition", "requisition")
         .add(Restrictions.eq("requisition.id", requisitionId))
@@ -425,6 +426,28 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
   public void restrictPaginationByWorkstation(Criteria criteria, String query, Consumer<String> errorHandler) {
     criteria.createAlias("workstation", "workstation")
         .add(DbUtils.textRestriction(query, "workstation.alias", "workstation.identificationBarcode"));
+  }
+
+  @Override
+  public void restrictPaginationByRequisitionId(Criteria criteria, long requisitionId, Consumer<String> errorHandler) {
+    criteria.createAlias("requisition", "requisition")
+        .add(Restrictions.eq("requisition.requisitionId", requisitionId));
+  }
+
+  @Override
+  public void restrictPaginationByRequisition(Criteria criteria, String query, Consumer<String> errorHandler) {
+    criteria.createAlias("requisition", "requisition")
+        .add(DbUtils.textRestriction(query, "requisition.alias"));
+  }
+
+  @Override
+  public void restrictPaginationBySupplementalToRequisitionId(Criteria criteria, long requisitionId,
+      Consumer<String> errorHandler) {
+    DetachedCriteria subquery = DetachedCriteria.forClass(RequisitionSupplementalLibrary.class)
+        .createAlias("library", "library")
+        .add(Restrictions.eq("requisitionId", requisitionId))
+        .setProjection(Projections.property("library.id"));
+    criteria.add(Property.forName("id").in(subquery));
   }
 
 }

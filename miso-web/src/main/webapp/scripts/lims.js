@@ -918,6 +918,23 @@ var Utils = Utils || {
       });
   },
 
+  asyncSaveErrorsDialog: function (update, itemsSubmitted, getLabel, callback) {
+    if (update.status !== "failed") {
+      throw Error("Unexpected update status");
+    }
+    var lines = ["Save failed:"];
+    if (update.detail === "Validation failed" && update.data) {
+      update.data.forEach(function (failure) {
+        var item = itemsSubmitted[failure.row];
+        lines.push(getLabel(item) + ":");
+        failure.fields.forEach(function (field) {
+          lines.push("* " + field.field + ": " + field.errors.join("; "));
+        });
+      });
+    }
+    Utils.showOkDialog("Error", lines, callback);
+  },
+
   warnIfConsentRevoked: function (items, callback, getLabel) {
     var consentRevoked = items.filter(function (item) {
       return item.identityConsentLevel === "Revoked";

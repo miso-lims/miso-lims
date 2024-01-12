@@ -72,11 +72,17 @@
             <miso:list-section-ajax id="list_supplementalsamples" name="Supplemental Samples" target="sample"
               config="{requisitionId: ${requisition.id}, supplemental: true, requisition: ${requisitionDto}}" />
 
+            <miso:list-section-ajax id="list_libraries" name="Requisitioned Libraries" target="library"
+              config="{requisitionId: ${requisition.id}, relation: 'requisitioned', requisition: ${requisitionDto}}" />
+            <br>
+            <miso:list-section-ajax id="list_supplementallibraries" name="Supplemental Libraries" target="library"
+              config="{requisitionId: ${requisition.id}, relation: 'supplemental', requisition: ${requisitionDto}}" />
+
             <c:if test="${detailedSample}">
               <miso:list-section id="list_extractions" name="Extractions" target="sample" items="${extractions}" />
             </c:if>
-            <miso:list-section-ajax id="list_libraries" name="Libraries" target="library"
-              config="{ requisitionId: ${requisition.id} }" />
+            <miso:list-section-ajax id="list_preparedlibraries" name="Prepared Libraries" target="library"
+              config="{ requisitionId: ${requisition.id}, relation: 'indirect' }" />
             <miso:list-section id="list_runs" name="Runs" target="run" items="${runs}"
               config="{requisitionId: ${requisition.id}}" />
 
@@ -95,16 +101,16 @@
 
       <script type="text/javascript">
         jQuery(document).ready(function () {
-          var requisition = ${requisitionDto};
+          var requisition = ${ requisitionDto };
           var config = {
             pageMode: '${pageMode}',
           };
-          
+
           <c:if test="${pageMode eq 'edit'}">
             config["potentialAssayIds"] = ${potentialAssayIds};
             config["numberOfRequisitionedSamples"] = ${numberOfRequisitionedSamples};
           </c:if>
-          
+
           var form = FormUtils.createForm('requisitionForm', 'save', requisition, 'requisition', config);
           Requisition.setForm(form);
           Utils.ui.updateHelpLink(FormTarget.requisition.getUserManualUrl());
@@ -117,9 +123,9 @@
             }).done(function (data) {
               $('#list_runLibraries').empty();
               FormUtils.setTableData(ListTarget.runaliquot, { requisitionId: ${ requisition.id }}, 'list_runLibraries', data);
-            }).fail(function () {
-              Utils.showOkDialog('Error', ['Failed to load run-libraries']);
-            });
+          }).fail(function () {
+            Utils.showOkDialog('Error', ['Failed to load run-libraries']);
+          });
           }
         });
       </script>
