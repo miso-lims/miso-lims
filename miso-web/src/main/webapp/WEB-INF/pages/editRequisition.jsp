@@ -108,7 +108,7 @@
 
           <c:if test="${pageMode eq 'edit'}">
             config["potentialAssayIds"] = ${potentialAssayIds};
-            config["numberOfRequisitionedSamples"] = ${numberOfRequisitionedSamples};
+            config["numberOfRequisitionedItems"] = ${numberOfRequisitionedItems};
           </c:if>
 
           var form = FormUtils.createForm('requisitionForm', 'save', requisition, 'requisition', config);
