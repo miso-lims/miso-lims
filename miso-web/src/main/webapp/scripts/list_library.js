@@ -111,7 +111,11 @@ ListTarget.library = (function () {
               Utils.showSearchByNamesDialog(
                 "Add Supplemental Libraries",
                 Urls.rest.libraries.query,
-                function (items) {
+                function (items, textStatus, xhr, queryNames) {
+                  if (items.length !== queryNames.length) {
+                    Utils.showSomeNotFoundError(queryNames, items);
+                    return;
+                  }
                   Utils.ajaxWithDialog(
                     "Adding Supplemental Libraries",
                     "POST",
@@ -132,13 +136,7 @@ ListTarget.library = (function () {
                 Urls.rest.libraries.query,
                 function (data, textStatus, xhr, queryNames) {
                   if (data.length !== queryNames.length) {
-                    var missingCount = queryNames.length - data.length;
-                    Utils.showOkDialog("Error", [
-                      missingCount +
-                        " of the items " +
-                        (missingCount === 1 ? "was" : "were") +
-                        " not found",
-                    ]);
+                    Utils.showSomeNotFoundError(queryNames, data);
                     return;
                   }
                   librariesUpdateFunction(

@@ -834,6 +834,13 @@ var Utils = Utils || {
     );
   },
 
+  showSomeNotFoundError: function (queryNames, items) {
+    var missingCount = queryNames.length - items.length;
+    Utils.showOkDialog("Error", [
+      missingCount + " of the items " + (missingCount === 1 ? "was" : "were") + " not found",
+    ]);
+  },
+
   saveWithProgressDialog: function (
     requestMethod,
     saveUrl,

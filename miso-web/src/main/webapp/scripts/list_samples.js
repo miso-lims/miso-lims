@@ -106,7 +106,11 @@ ListTarget.sample = (function () {
               Utils.showSearchByNamesDialog(
                 "Add Supplemental Samples",
                 Urls.rest.samples.query,
-                function (items) {
+                function (items, textStatus, xhr, queryNames) {
+                  if (items.length !== queryNames.length) {
+                    Utils.showSomeNotFoundError(queryNames, items);
+                    return;
+                  }
                   Utils.ajaxWithDialog(
                     "Adding Supplemental Samples",
                     "POST",
@@ -127,13 +131,7 @@ ListTarget.sample = (function () {
                 Urls.rest.samples.query,
                 function (data, textStatus, xhr, queryNames) {
                   if (data.length !== queryNames.length) {
-                    var missingCount = queryNames.length - data.length;
-                    Utils.showOkDialog("Error", [
-                      missingCount +
-                        " of the items " +
-                        (missingCount === 1 ? "was" : "were") +
-                        " not found",
-                    ]);
+                    Utils.showSomeNotFoundError(queryNames, data);
                     return;
                   }
                   samplesUpdateFunction(Urls.rest.requisitions.addSamples(config.requisitionId))(
