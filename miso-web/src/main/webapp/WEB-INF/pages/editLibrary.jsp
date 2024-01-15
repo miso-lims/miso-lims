@@ -61,12 +61,7 @@
 <script type="text/javascript">
   jQuery(document).ready(function () {
     Warning.generateHeaderWarnings('warnings', WarningTarget.library, ${libraryDto});
-    var dto = ${libraryDto};
-    if (Constants.isDetailedSample) {
-      dto.effectiveExternalNames = '${effectiveExternalNames}';
-    }
-    
-    FormUtils.createForm('libraryForm', 'save', dto, 'library', ${formConfig});
+    FormUtils.createForm('libraryForm', 'save', ${libraryDto}, 'library', ${formConfig});
     Utils.ui.updateHelpLink(FormTarget.library.getUserManualUrl());
   });
 </script>

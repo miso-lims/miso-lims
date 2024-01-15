@@ -15,6 +15,7 @@ public class DetailedLibraryDto extends LibraryDto {
   private String groupId;
   private String groupDescription;
   private String identityConsentLevel;
+  private String effectiveExternalNames;
   private String effectiveGroupId;
   private String effectiveGroupIdSample;
   private String effectiveTissueOriginAlias;
@@ -86,6 +87,14 @@ public class DetailedLibraryDto extends LibraryDto {
 
   public void setIdentityConsentLevel(String identityConsentLevel) {
     this.identityConsentLevel = identityConsentLevel;
+  }
+
+  public String getEffectiveExternalNames() {
+    return effectiveExternalNames;
+  }
+
+  public void setEffectiveExternalNames(String effectiveExternalNames) {
+    this.effectiveExternalNames = effectiveExternalNames;
   }
 
   public String getEffectiveGroupId() {

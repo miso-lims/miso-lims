@@ -1288,6 +1288,7 @@ public class Dtos {
       if (detailed.getIdentityAttributes() != null) {
         ParentIdentityAttributes identity = detailed.getIdentityAttributes();
         setString(dto::setIdentityConsentLevel, maybeGetProperty(identity.getConsentLevel(), ConsentLevel::getLabel));
+        setString(dto::setEffectiveExternalNames, identity.getExternalName());
       }
       if (detailed.getTissueAttributes() != null) {
         ParentTissueAttributes tissue = detailed.getTissueAttributes();

@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getParentRequisition;
 import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
 
 import java.io.IOException;
@@ -34,7 +34,6 @@ import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -45,7 +44,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotRna;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
@@ -234,11 +232,6 @@ public class EditLibraryController {
             .collect(Collectors.toList()));
     model.put("libraryDto", mapper.writeValueAsString(Dtos.asDto(library, false)));
 
-    if (LimsUtils.isDetailedLibrary(library)) {
-      DetailedLibrary detailed = (DetailedLibrary) library;
-      SampleIdentity identity = getParent(SampleIdentity.class, (DetailedSample) detailed.getSample());
-      model.put("effectiveExternalNames", identity.getExternalName());
-    }
     model.put("libraryTransfers", library.getTransferViews().stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
@@ -396,7 +389,7 @@ public class EditLibraryController {
   public ModelAndView editBulkLibraries(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
     String libraryIds = getStringInput("ids", form, true);
 
-    BulkEditTableBackend backend = new BulkEditTableBackend<Library, LibraryDto>("library", LibraryDto.class,
+    BulkEditTableBackend<Library, LibraryDto> backend = new BulkEditTableBackend<>("library", LibraryDto.class,
         "Libraries", mapper) {
       @Override
       protected Stream<Library> load(List<Long> ids) throws IOException {
