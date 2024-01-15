@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
+import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
@@ -110,6 +111,8 @@ public class DefaultSampleServiceTest {
   private ScientificNameService scientificNameService;
   @Mock
   private DetailedQcStatusService detailedQcStatusService;
+  @Mock
+  private RequisitionService requisitionService;
 
   @InjectMocks
   private DefaultSampleService sut;

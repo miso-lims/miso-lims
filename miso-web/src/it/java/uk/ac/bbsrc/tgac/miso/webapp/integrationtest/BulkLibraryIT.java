@@ -57,14 +57,12 @@ public class BulkLibraryIT extends AbstractIT {
 
   private static final Set<String> receiptColumns = Sets.newHashSet(SamColumns.SAMPLE_TYPE, SamColumns.SCIENTIFIC_NAME,
       SamColumns.SUBPROJECT, SamColumns.EXTERNAL_NAME, SamColumns.IDENTITY_ALIAS, SamColumns.DONOR_SEX,
-      SamColumns.CONSENT,
-      SamColumns.SAMPLE_CLASS, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE, SamColumns.PASSAGE_NUMBER,
-      SamColumns.TIMES_RECEIVED,
-      SamColumns.TUBE_NUMBER, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.TIMEPOINT,
-      LibColumns.RECEIVE_DATE,
-      LibColumns.RECEIVE_TIME, LibColumns.RECEIVED_FROM, LibColumns.RECEIVED_BY, LibColumns.RECEIPT_CONFIRMED,
-      LibColumns.RECEIPT_QC_PASSED,
-      LibColumns.RECEIPT_QC_NOTE, LibColumns.TEMPLATE);
+      SamColumns.CONSENT, SamColumns.SAMPLE_CLASS, SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE,
+      SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER, SamColumns.TISSUE_MATERIAL,
+      SamColumns.REGION, SamColumns.TIMEPOINT,
+      LibColumns.RECEIVE_DATE, LibColumns.RECEIVE_TIME, LibColumns.RECEIVED_FROM, LibColumns.RECEIVED_BY,
+      LibColumns.RECEIPT_CONFIRMED, LibColumns.RECEIPT_QC_PASSED, LibColumns.RECEIPT_QC_NOTE,
+      LibColumns.REQUISITION_ALIAS, LibColumns.REQUISITION, LibColumns.TEMPLATE);
 
   private static final String NO_INDEX_FAMILY = "No indices";
 
