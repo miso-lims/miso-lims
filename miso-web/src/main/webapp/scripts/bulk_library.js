@@ -286,8 +286,6 @@ BulkTarget.library = (function ($) {
       if (config.showLibraryAlias) {
         columns.push(BulkUtils.columns.generatedAlias(config));
       }
-      if (config.isLibraryReceipt) {
-      }
       columns.push({
         title: "Project",
         type: "text",

@@ -835,7 +835,7 @@ BulkUtils = (function ($) {
             type: "text",
             maxLength: 150,
             description:
-              "Should usually match the ID of a requisition form stored in a separate system. Enter an alias to" +
+              "Should usually match the ID of a requisition form stored in a separate system. Enter an alias to " +
               "search for existing requisitions.",
             onChange: function (rowIndex, newValue, api) {
               if (!newValue) {
