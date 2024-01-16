@@ -733,7 +733,7 @@ public class DefaultSampleService implements SampleService {
         "detailedQcStatusId");
     loadChildEntity(sample::setRequisition, sample.getRequisition(), requisitionService, "requisitionId");
     if (isDetailedSample(sample)) {
-      DetailedSample detailed = (DetailedSample) sample;
+      DetailedSample detailed = (DetailedSample) deproxify(sample);
       if (detailed.getSampleClass() != null && detailed.getSampleClass().isSaved()) {
         detailed.setSampleClass(sampleClassService.get(detailed.getSampleClass().getId()));
       }
@@ -766,7 +766,7 @@ public class DefaultSampleService implements SampleService {
         }
       }
       if (isStockSample(detailed)) {
-        SampleStock stock = (SampleStock) deproxify(detailed);
+        SampleStock stock = (SampleStock) detailed;
         if (stock.getReferenceSlide() != null) {
           Sample ref = deproxify(get(stock.getReferenceSlide().getId()));
           stock.setReferenceSlide((SampleSlide) ref);
