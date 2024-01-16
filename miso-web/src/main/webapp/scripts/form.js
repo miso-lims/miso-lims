@@ -417,6 +417,36 @@ FormUtils = (function ($) {
       };
     },
 
+    makeRequisitionField: function (formObject) {
+      return {
+        title: "Requisition",
+        data: "requisitionId",
+        type: "read-only",
+        getDisplayValue: function (object) {
+          return object.requisitionAlias || "n/a";
+        },
+        getLink: function (object) {
+          return object.requisitionId ? Urls.ui.requisitions.edit(object.requisitionId) : null;
+        },
+        include: formObject.requisitionId || !formObject.effectiveRequisitionId,
+      };
+    },
+
+    makeEffectiveRequisitionField: function (formObject) {
+      return {
+        title: "Requisition",
+        data: "effectiveRequisitionId",
+        type: "read-only",
+        getDisplayValue: function (object) {
+          return object.effectiveRequisitionAlias;
+        },
+        getLink: function (object) {
+          return Urls.ui.requisitions.edit(object.effectiveRequisitionId);
+        },
+        include: !formObject.requisitionId && formObject.effectiveRequisitionId,
+      };
+    },
+
     makeFieldWithButton: function (text, buttonText, onclick) {
       var container = $("<div>").css({
         width: "95%",

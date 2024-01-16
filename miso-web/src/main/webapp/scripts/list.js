@@ -1223,5 +1223,183 @@ ListUtils = (function ($) {
         },
       };
     },
+
+    createMoveToRequisitionAction: function (sourceRequisition, moveUrl) {
+      return {
+        name: "Move to Req.",
+        action: function (items) {
+          showMoveToRequisitionDialog(items, sourceRequisition, moveUrl);
+        },
+      };
+    },
   };
+
+  function showMoveToRequisitionDialog(items, sourceRequisition, moveUrl) {
+    var actions = [
+      {
+        name: "Stop",
+        handler: function () {
+          var suggestedAlias = sourceRequisitionAlias + " - STOPPED";
+          checkExistingRequisitions(
+            sourceRequisition.id,
+            suggestedAlias,
+            sourceRequisition.assayId,
+            true,
+            items,
+            moveUrl
+          );
+        },
+      },
+      {
+        name: "Change Assay",
+        handler: function () {
+          var fields = [makeAssayField(sourceRequisitionAssayId)];
+          Utils.showDialog("Choose assay", "Continue", fields, function (results) {
+            var suggestedAlias = sourceRequisition.alias + " - " + results.assay.alias;
+            checkExistingRequisitions(
+              sourceRequisition.id,
+              suggestedAlias,
+              results.assay.id,
+              false,
+              items,
+              moveUrl
+            );
+          });
+        },
+      },
+      {
+        name: "Other",
+        handler: function () {
+          var suggestedAlias = sourceRequisition.alias + " - ";
+          var fields = [
+            {
+              label: "Requisition Alias",
+              property: "alias",
+              type: "text",
+              required: true,
+              value: suggestedAlias,
+            },
+          ];
+          Utils.showDialog("Move to Another Requisition", "Continue", fields, function (results) {
+            checkExistingRequisitions(
+              sourceRequisition.id,
+              results.alias,
+              sourceRequisition.assayId,
+              false,
+              items,
+              moveUrl
+            );
+          });
+        },
+      },
+    ];
+    Utils.showWizardDialog("Move to Another Requisition", actions, "Purpose of move:");
+  }
+
+  function checkExistingRequisitions(
+    sourceRequisitionId,
+    suggestedAlias,
+    assayId,
+    stopped,
+    items,
+    moveUrl
+  ) {
+    var url =
+      Urls.rest.requisitions.search +
+      "?" +
+      Utils.page.param({
+        q: suggestedAlias,
+      });
+    var callback = function (data) {
+      if (data.length) {
+        var options = data.map(function (existing) {
+          return {
+            name: existing.alias,
+            handler: function () {
+              moveToRequisition(
+                existing.alias,
+                existing.assayId,
+                existing.stopped,
+                items,
+                existing.id,
+                moveUrl
+              );
+            },
+          };
+        });
+        options.push({
+          name: "New Requisition",
+          handler: function () {
+            showNewRequisitionDialog(
+              sourceRequisitionId,
+              suggestedAlias,
+              assayId,
+              stopped,
+              items,
+              moveUrl
+            );
+          },
+        });
+        Utils.showWizardDialog("Move to Another Requisition", options);
+      } else {
+        showNewRequisitionDialog(suggestedAlias, assayId, stopped, items, moveUrl);
+      }
+    };
+    Utils.ajaxWithDialog("Checking for existing requisition", "GET", url, null, callback);
+  }
+
+  function showNewRequisitionDialog(suggestedAlias, assayId, stopped, items, moveUrl) {
+    var fields = [
+      {
+        label: "Alias",
+        property: "alias",
+        type: "text",
+        required: true,
+        value: suggestedAlias,
+      },
+      makeAssayField(assayId),
+      {
+        label: "Stopped",
+        property: "stopped",
+        type: "checkbox",
+        value: stopped,
+      },
+    ];
+    Utils.showDialog("Move to New Requisition", "Create and Move", fields, function (results) {
+      moveToRequisition(results.alias, results.assay.id, results.stopped, items, null, moveUrl);
+    });
+  }
+
+  function moveToRequisition(targetAlias, assayId, stopped, items, existingRequisitionId, moveUrl) {
+    var data = {
+      requisitionId: existingRequisitionId,
+      requisitionAlias: targetAlias,
+      assayId: assayId,
+      stopped: stopped,
+      itemIds: items.map(Utils.array.getId),
+    };
+    var callback = function (data) {
+      Utils.page.pageRedirect(Urls.ui.requisitions.edit(data.id));
+    };
+    Utils.ajaxWithDialog("Moving Items", "POST", moveUrl, data, callback);
+  }
+
+  function makeAssayField(selectedAssayId) {
+    var selectedAssay = selectedAssayId
+      ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(selectedAssayId), Constants.assays)
+      : null;
+    return {
+      label: "Assay",
+      property: "assay",
+      type: "select",
+      required: false,
+      values: Constants.assays.filter(function (item) {
+        return !item.archived || item.id === selectedAssayId;
+      }),
+      getLabel: function (item) {
+        return item.alias + " v" + item.version;
+      },
+      value: selectedAssay ? selectedAssay.alias + " v" + selectedAssay.version : undefined,
+    };
+  }
 })(jQuery);

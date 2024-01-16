@@ -19,6 +19,7 @@ BulkTarget.library = (function ($) {
   var originalDataByRow = {};
   var parentLocationsByRow = null;
   var allowUniqueDualIndexSelectionByRow = {};
+  var metricCategories = [];
 
   return {
     getSaveUrl: function () {
@@ -120,7 +121,7 @@ BulkTarget.library = (function ($) {
           {
             name: "View Metrics",
             action: function (api) {
-              BulkUtils.actions.viewMetrics(api, ["LIBRARY_PREP"]);
+              BulkUtils.actions.viewMetrics(api, metricCategories);
             },
           }
         );
@@ -213,6 +214,17 @@ BulkTarget.library = (function ($) {
         }
         allowUniqueDualIndexSelectionByRow[index] = false;
       });
+
+      metricCategories = [];
+      if (
+        config.isLibraryReceipt ||
+        data.some(function (library) {
+          return library.requisitionId;
+        })
+      ) {
+        metricCategories.push("RECEIPT");
+      }
+      metricCategories.push("LIBRARY_PREP");
     },
     getFixedColumns: function (config) {
       switch (config.pageMode) {
@@ -274,16 +286,13 @@ BulkTarget.library = (function ($) {
       if (config.showLibraryAlias) {
         columns.push(BulkUtils.columns.generatedAlias(config));
       }
-      columns.push(
-        {
-          title: "Project",
-          type: "text",
-          data: Constants.isDetailedSample ? "projectCode" : "projectName",
-          include: !config.isLibraryReceipt,
-          disabled: true,
-        },
-        BulkUtils.columns.assay()
-      );
+      columns.push({
+        title: "Project",
+        type: "text",
+        data: Constants.isDetailedSample ? "projectCode" : "projectName",
+        include: !config.isLibraryReceipt,
+        disabled: true,
+      });
 
       if (config.isLibraryReceipt) {
         var sampleProp = function (dataProperty) {
@@ -292,6 +301,7 @@ BulkTarget.library = (function ($) {
 
         var interceptApi = function (api) {
           return {
+            bypassIntercept: api,
             getCache: api.getCache,
             showError: api.showError,
             getRowCount: api.getRowCount,
@@ -424,7 +434,9 @@ BulkTarget.library = (function ($) {
 
       if (config.isLibraryReceipt) {
         columns = columns.concat(BulkUtils.columns.receipt(config));
+        columns = columns.concat(BulkUtils.columns.requisition("sample.projectId"));
       }
+      columns.push(BulkUtils.columns.assay());
 
       columns = columns.concat(BulkUtils.columns.boxable(config, api));
       if (config.templatesByProjectId && !api.isSaved()) {
@@ -949,6 +961,16 @@ BulkTarget.library = (function ($) {
       );
 
       return columns;
+    },
+
+    confirmSave: function (data, config) {
+      var deferred = $.Deferred();
+      if (config.isLibraryReceipt) {
+        BulkUtils.checkPausedRequisitions(data, deferred);
+      } else {
+        deferred.resolve();
+      }
+      return deferred.promise();
     },
   };
 

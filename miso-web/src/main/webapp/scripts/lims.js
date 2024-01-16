@@ -834,6 +834,13 @@ var Utils = Utils || {
     );
   },
 
+  showSomeNotFoundError: function (queryNames, items) {
+    var missingCount = queryNames.length - items.length;
+    Utils.showOkDialog("Error", [
+      missingCount + " of the items " + (missingCount === 1 ? "was" : "were") + " not found",
+    ]);
+  },
+
   saveWithProgressDialog: function (
     requestMethod,
     saveUrl,
@@ -916,6 +923,23 @@ var Utils = Utils || {
         // initial start request failed (operation status unknown)
         errorCallback(response, textStatus, errorThrown, true);
       });
+  },
+
+  asyncSaveErrorsDialog: function (update, itemsSubmitted, getLabel, callback) {
+    if (update.status !== "failed") {
+      throw Error("Unexpected update status");
+    }
+    var lines = ["Save failed:"];
+    if (update.detail === "Validation failed" && update.data) {
+      update.data.forEach(function (failure) {
+        var item = itemsSubmitted[failure.row];
+        lines.push(getLabel(item) + ":");
+        failure.fields.forEach(function (field) {
+          lines.push("* " + field.field + ": " + field.errors.join("; "));
+        });
+      });
+    }
+    Utils.showOkDialog("Error", lines, callback);
   },
 
   warnIfConsentRevoked: function (items, callback, getLabel) {

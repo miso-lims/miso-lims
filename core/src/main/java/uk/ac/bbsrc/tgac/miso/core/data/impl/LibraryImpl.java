@@ -131,6 +131,10 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   private VolumeUnit volumeUnits;
 
   @ManyToOne
+  @JoinColumn(name = "requisitionId")
+  private Requisition requisition;
+
+  @ManyToOne
   @JoinColumn(name = "index1Id")
   private Index index1;
 
@@ -767,6 +771,16 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   @Override
   public void setVolumeUnits(VolumeUnit volumeUnits) {
     this.volumeUnits = volumeUnits;
+  }
+
+  @Override
+  public Requisition getRequisition() {
+    return requisition;
+  }
+
+  @Override
+  public void setRequisition(Requisition requisition) {
+    this.requisition = requisition;
   }
 
   @Override

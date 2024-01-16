@@ -22,7 +22,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -31,7 +31,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
-import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -54,8 +53,6 @@ public class RequisitionController {
   private LibraryService libraryService;
   @Autowired
   private RunService runService;
-  @Autowired
-  private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -110,18 +107,11 @@ public class RequisitionController {
   private ModelAndView setupEditForm(Requisition requisition, ModelMap model) throws IOException {
     model.put("title", "Requisition " + requisition.getId());
 
-    List<Sample> samples = sampleService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisition.getId()));
-
-    // used to ensure not all assays are available if all requisitioned samples' projects have no
-    // assigned assays
-    model.put("numberOfRequisitionedSamples", samples.size());
-    // For giving all the assays to be displayed in the assay dropdown
-    model.put("potentialAssayIds", mapper.writeValueAsString(getPotentialAssayIds(samples, requisition.getAssay())));
-
-
+    List<Sample> requisitionedSamples =
+        sampleService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisition.getId()));
     List<Sample> supplementalSamples =
         sampleService.list(0, 0, false, "id", PaginationFilter.supplementalToRequisitionId(requisition.getId()));
-    Set<Long> sampleIds = Stream.concat(samples.stream(), supplementalSamples.stream())
+    Set<Long> sampleIds = Stream.concat(requisitionedSamples.stream(), supplementalSamples.stream())
         .map(Sample::getId)
         .collect(Collectors.toSet());
     List<Sample> extractions = sampleService.getChildren(
@@ -132,7 +122,23 @@ public class RequisitionController {
         .collect(Collectors.toList());
     model.put("extractions", extractionDtos);
 
-    List<Long> libraryIds = libraryService.listIdsByAncestorSampleIds(sampleIds);
+    List<Library> requisitionedLibraries =
+        libraryService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisition.getId()));
+    List<Library> supplementalLibraries =
+        libraryService.list(0, 0, false, "id", PaginationFilter.supplementalToRequisitionId(requisition.getId()));
+    List<Long> preparedLibraryIds = libraryService.listIdsByAncestorSampleIds(sampleIds);
+    List<Long> libraryIds = Stream.concat(
+        Stream.concat(requisitionedLibraries.stream(), supplementalLibraries.stream())
+            .map(Library::getId),
+        preparedLibraryIds.stream())
+        .toList();
+
+    // used to ensure not all assays are available if all requisitioned items' projects have no
+    // assigned assays
+    model.put("numberOfRequisitionedItems", requisitionedSamples.size() + requisitionedLibraries.size());
+    model.put("potentialAssayIds", mapper.writeValueAsString(
+        getPotentialAssayIds(requisitionedSamples, requisitionedLibraries, requisition.getAssay())));
+
     List<Run> runs = runService.listByLibraryIdList(libraryIds);
     List<RunDto> runDtos = runs.stream()
         .map(Dtos::asDto)
@@ -151,27 +157,24 @@ public class RequisitionController {
   }
 
   // function to get potential assay ids to for the requisition assay dropdown
-  private List<Long> getPotentialAssayIds(List<Sample> samples, Assay requisitionAssay) {
+  private List<Long> getPotentialAssayIds(List<Sample> samples, List<Library> libraries, Assay requisitionAssay) {
     Map<Long, Integer> assayMap = new HashMap<Long, Integer>();
     List<Long> uniqueProjectIds = new ArrayList<>();
 
-    for (int i = 0; i < samples.size(); i++) {
-      Project curProject = samples.get(i).getProject();
-      if (!uniqueProjectIds.contains(curProject.getId())) {
-        uniqueProjectIds.add(curProject.getId());
-        for (Assay element : curProject.getAssays()) {
-          Long curAssayId = element.getId();
-          if (!element.isArchived()) {
-            if (assayMap.containsKey(curAssayId)) {
-              int freq = assayMap.get(curAssayId);
+    Stream.concat(samples.stream().map(Sample::getProject), libraries.stream().map(lib -> lib.getSample().getProject()))
+        .forEach(project -> {
+          if (uniqueProjectIds.contains(project.getId())) {
+            return;
+          }
+          uniqueProjectIds.add(project.getId());
+          for (Assay element : project.getAssays()) {
+            Long curAssayId = element.getId();
+            if (!element.isArchived()) {
+              Integer freq = assayMap.getOrDefault(curAssayId, 0);
               assayMap.put(curAssayId, freq + 1);
-            } else {
-              assayMap.put(curAssayId, 1);
             }
           }
-        }
-      }
-    }
+        });
 
     List<Long> assayIds = new ArrayList<>();
     for (Map.Entry<Long, Integer> entry : assayMap.entrySet()) {

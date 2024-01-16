@@ -6,7 +6,6 @@ import java.util.Collection;
 import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
@@ -27,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
  * @since 0.0.2
  */
 public interface Sample extends Attachable, Comparable<Sample>, Deletable, HierarchyEntity, Locatable,
-    QualityControllable<SampleQC> {
+    QualityControllable<SampleQC>, Requisitionable {
 
   public static final String PLAIN_CATEGORY_NAME = "Plain";
 
@@ -212,10 +211,6 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
 
   @Override
   public Sample getParent();
-
-  public Requisition getRequisition();
-
-  public void setRequisition(Requisition requisition);
 
   public SequencingControlType getSequencingControlType();
 

@@ -43,7 +43,8 @@ FOR EACH ROW
     makeChangeMessage('group id', OLD.groupId, NEW.groupId),
     makeChangeMessage('SOP', (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = OLD.sopId), (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = NEW.sopId)),
     makeChangeMessage('Index 1', (SELECT CONCAT(name, ' (', sequence, ')') FROM Indices WHERE indexId = OLD.index1Id), (SELECT CONCAT(name, ' (', sequence, ')') FROM Indices WHERE indexId = NEW.index1Id)),
-    makeChangeMessage('Index 2', (SELECT CONCAT(name, ' (', sequence, ')') FROM Indices WHERE indexId = OLD.index2Id), (SELECT CONCAT(name, ' (', sequence, ')') FROM Indices WHERE indexId = NEW.index2Id))
+    makeChangeMessage('Index 2', (SELECT CONCAT(name, ' (', sequence, ')') FROM Indices WHERE indexId = OLD.index2Id), (SELECT CONCAT(name, ' (', sequence, ')') FROM Indices WHERE indexId = NEW.index2Id)),
+    makeChangeMessage('Requisition', (SELECT alias FROM Requisition WHERE requisitionId = OLD.requisitionId), (SELECT alias FROM Requisition WHERE requisitionId = NEW.requisitionId))
   );
   IF log_message IS NOT NULL AND log_message <> '' THEN
     INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime) VALUES (
@@ -86,7 +87,8 @@ FOR EACH ROW
         makeChangeColumn('groupDescription', OLD.groupDescription, NEW.groupDescription),
         makeChangeColumn('sopId', OLD.sopId, NEW.sopId),
         makeChangeColumn('index1Id', OLD.index1Id, NEW.index1Id),
-        makeChangeColumn('index2Id', OLD.index2Id, NEW.index2Id)
+        makeChangeColumn('index2Id', OLD.index2Id, NEW.index2Id),
+        makeChangeColumn('requisitionId', OLD.requisitionId, NEW.requisitionId)
   ), ''),
       NEW.lastModifier,
       log_message,

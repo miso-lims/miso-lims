@@ -4,7 +4,9 @@ if (typeof FormTarget === "undefined") {
 FormTarget.requisition = (function () {
   /*
    * Expected config {
-   *   isAdmin: boolean
+   *   isAdmin: boolean,
+   *   numberOfRequisitionedItems: int; edit mode only,
+   *   potentialAssayIds: [int]; edit mode only
    * }
    */
 
@@ -55,7 +57,7 @@ FormTarget.requisition = (function () {
               description:
                 "If the requisition has no requisitioned samples, you may assign any assay to it. Once you add requisitioned samples, the options of available assays are limited to the assays that are assigned to all of the requisitioned samples' projects",
               source:
-                config.numberOfRequisitionedSamples > 0
+                config.numberOfRequisitionedItems > 0
                   ? assayDropdown
                   : Constants.assays.filter(function (x) {
                       return !x.archived || x.id === object.assayId;

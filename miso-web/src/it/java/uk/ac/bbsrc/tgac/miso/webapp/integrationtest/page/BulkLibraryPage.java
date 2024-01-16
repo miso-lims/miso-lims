@@ -40,6 +40,8 @@ public class BulkLibraryPage extends BulkPage {
     public static final String RECEIPT_CONFIRMED = "Receipt Confirmed";
     public static final String RECEIPT_QC_PASSED = "Receipt QC Passed";
     public static final String RECEIPT_QC_NOTE = "Receipt QC Note";
+    public static final String REQUISITION_ALIAS = "Requisition Alias";
+    public static final String REQUISITION = "Requisition";
     public static final String EFFECTIVE_GROUP_ID = "Effective Group ID";
     public static final String GROUP_ID = "Group ID";
     public static final String GROUP_DESC = "Group Desc.";
@@ -105,7 +107,8 @@ public class BulkLibraryPage extends BulkPage {
     return new BulkLibraryPage(driver);
   }
 
-  public static BulkLibraryPage getForPropagate(WebDriver driver, String baseUrl, List<Long> sampleIds, List<Integer> replicates) {
+  public static BulkLibraryPage getForPropagate(WebDriver driver, String baseUrl, List<Long> sampleIds,
+      List<Integer> replicates) {
     String ids = Joiner.on(',').join(sampleIds);
     String replicatesString = Joiner.on(',').join(replicates);
     String url = baseUrl + "miso/library/bulk/propagate";
@@ -116,7 +119,8 @@ public class BulkLibraryPage extends BulkPage {
     return new BulkLibraryPage(driver);
   }
 
-  public static BulkLibraryPage getForReceive(WebDriver driver, String baseUrl, int quantity, Long projectId, Long aliquotClassId) {
+  public static BulkLibraryPage getForReceive(WebDriver driver, String baseUrl, int quantity, Long projectId,
+      Long aliquotClassId) {
     String url = baseUrl + "miso/library/bulk/receive";
     MapBuilder<String, String> params = new MapBuilder<String, String>()
         .put("quantity", String.valueOf(quantity));

@@ -258,7 +258,7 @@ public class DefaultSampleService implements SampleService {
 
   @Override
   public long create(Sample sample) throws IOException {
-    findOrCreateRequisition(sample);
+    requisitionService.findOrCreateRequisition(sample);
     loadChildEntities(sample);
     boxService.throwIfBoxPositionIsFilled(sample);
     User changeUser = authorizationManager.getCurrentUser();
@@ -337,18 +337,6 @@ public class DefaultSampleService implements SampleService {
       addRequisitionSampleChange(sample.getRequisition(), sample, true);
     }
     return savedId;
-  }
-
-  private void findOrCreateRequisition(Sample sample) throws IOException {
-    if (sample.getRequisition() != null && !sample.getRequisition().isSaved()) {
-      Requisition existing = requisitionService.getByAlias(sample.getRequisition().getAlias());
-      if (existing == null) {
-        long requisitionId = requisitionService.create(sample.getRequisition());
-        sample.getRequisition().setId(requisitionId);
-      } else {
-        sample.setRequisition(existing);
-      }
-    }
   }
 
   private ValidationException makeDuplicateExternalNameError(String externalName) {

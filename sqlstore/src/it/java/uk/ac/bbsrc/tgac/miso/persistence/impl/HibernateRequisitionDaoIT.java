@@ -10,9 +10,13 @@ import org.junit.Test;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalLibrary.RequisitionSupplementalLibraryId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample.RequisitionSupplementalSampleId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -101,6 +105,49 @@ public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requ
     getTestSubject().removeSupplementalSample(supplementalSample);
 
     assertNull(currentSession().get(RequisitionSupplementalSample.class, supplementalSampleId));
+  }
+
+  @Test
+  public void testGetSupplementalLibrary() throws Exception {
+    long reqId = 2L;
+    long libraryId = 15L;
+    Requisition req = (Requisition) currentSession().get(Requisition.class, reqId);
+    Library library = (Library) currentSession().get(LibraryImpl.class, libraryId);
+    RequisitionSupplementalLibrary result = getTestSubject().getSupplementalLibrary(req, library);
+    assertNotNull(result);
+    assertEquals(Long.valueOf(reqId), result.getRequisitionId());
+    assertNotNull(result.getLibrary());
+    assertEquals(libraryId, result.getLibrary().getId());
+  }
+
+  @Test
+  public void testSaveSupplementalLibrary() throws Exception {
+    long reqId = 1L;
+    long libraryId = 14L;
+    Requisition req = (Requisition) currentSession().get(Requisition.class, reqId);
+    Library library = (Library) currentSession().get(LibraryImpl.class, libraryId);
+    assertNull(getTestSubject().getSupplementalLibrary(req, library));
+
+    getTestSubject().saveSupplementalLibrary(new RequisitionSupplementalLibrary(req.getId(), library));
+
+    assertNotNull(getTestSubject().getSupplementalLibrary(req, library));
+  }
+
+  @Test
+  public void testRemoveSupplementalLibrary() throws Exception {
+    long reqId = 2L;
+    long libraryId = 15L;
+    Library library = (Library) currentSession().get(LibraryImpl.class, libraryId);
+    RequisitionSupplementalLibraryId supplementalLibraryId = new RequisitionSupplementalLibraryId();
+    supplementalLibraryId.setRequisitionId(reqId);
+    supplementalLibraryId.setLibrary(library);
+    RequisitionSupplementalLibrary supplementalLibrary =
+        currentSession().get(RequisitionSupplementalLibrary.class, supplementalLibraryId);
+    assertNotNull(supplementalLibrary);
+
+    getTestSubject().removeSupplementalLibrary(supplementalLibrary);
+
+    assertNull(currentSession().get(RequisitionSupplementalLibrary.class, supplementalLibraryId));
   }
 
   @Test

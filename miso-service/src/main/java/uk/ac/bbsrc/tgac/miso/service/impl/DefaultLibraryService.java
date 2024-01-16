@@ -5,8 +5,10 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +29,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
@@ -37,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
@@ -47,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
@@ -59,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryStrategyService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTypeService;
+import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
@@ -126,6 +132,10 @@ public class DefaultLibraryService implements LibraryService {
   private SopService sopService;
   @Autowired
   private BarcodableReferenceService barcodableReferenceService;
+  @Autowired
+  private RequisitionService requisitionService;
+  @Autowired
+  private ChangeLogService changeLogService;
   @Autowired
   private TransactionTemplate transactionTemplate;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -201,6 +211,7 @@ public class DefaultLibraryService implements LibraryService {
       Long sampleId = sampleService.create(library.getSample());
       library.getSample().setId(sampleId);
     }
+    requisitionService.findOrCreateRequisition(library);
     loadChildEntities(library);
     boxService.throwIfBoxPositionIsFilled(library);
     User changeUser = authorizationManager.getCurrentUser();
@@ -242,6 +253,12 @@ public class DefaultLibraryService implements LibraryService {
       } else {
         transferService.create(transfer);
       }
+      // Don't log initial additions to requisition, as that's part of the requisition creation
+      if (library.getRequisition() != null
+          && library.getRequisition().getCreationTime().toInstant()
+              .isBefore(Instant.now().minus(1, ChronoUnit.HOURS))) {
+        addRequisitionLibraryChange(library.getRequisition(), library, true);
+      }
     }
     return savedId;
   }
@@ -257,12 +274,33 @@ public class DefaultLibraryService implements LibraryService {
     LimsUtils.updateParentVolume(library, managed, changeUser);
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
     loadChildEntities(library);
+    writeRequisitionChangelogs(library, managed);
     validateChange(library, managed, false);
     applyChanges(managed, library);
     Library saved = save(managed, validateAliasUniqueness);
     sampleStore.update(library.getParent());
     boxService.updateBoxableLocation(library);
     return saved.getId();
+  }
+
+  private void writeRequisitionChangelogs(Library library, Library beforeChange) throws IOException {
+    if (!isChanged(Library::getRequisition, library, beforeChange)) {
+      return;
+    }
+    if (beforeChange.getRequisition() != null) {
+      addRequisitionLibraryChange(beforeChange.getRequisition(), beforeChange, false);
+    }
+    if (library.getRequisition() != null) {
+      addRequisitionLibraryChange(library.getRequisition(), library, true);
+    }
+  }
+
+  private void addRequisitionLibraryChange(Requisition requisition, Library library, boolean addition)
+      throws IOException {
+    String message =
+        String.format("%s library %s (%s)", addition ? "Added" : "Removed", library.getName(), library.getAlias());
+    ChangeLog change = requisition.createChangeLog(message, "libraries", authorizationManager.getCurrentUser());
+    changeLogService.create(change);
   }
 
   @Override
@@ -362,6 +400,7 @@ public class DefaultLibraryService implements LibraryService {
     loadChildEntity(library::setSop, library.getSop(), sopService, "sopId");
     loadChildEntity(library::setDetailedQcStatus, library.getDetailedQcStatus(), detailedQcStatusService,
         "detailedQcStatusId");
+    loadChildEntity(library::setRequisition, library.getRequisition(), requisitionService, "requisitionId");
     if (isDetailedLibrary(library)) {
       DetailedLibrary lai = (DetailedLibrary) library;
       if (lai.getLibraryDesignCode() != null) {
@@ -432,6 +471,7 @@ public class DefaultLibraryService implements LibraryService {
     target.setWorkstation(source.getWorkstation());
     target.setThermalCycler(source.getThermalCycler());
     target.setSop(source.getSop());
+    target.setRequisition(source.getRequisition());
 
     if (isDetailedLibrary(target)) {
       DetailedLibrary dSource = (DetailedLibrary) source;
@@ -777,7 +817,7 @@ public class DefaultLibraryService implements LibraryService {
 
   @Override
   public List<Long> listIdsByRequisitionId(long requisitionId) throws IOException {
-    return libraryDao.listIdsByRequisitionId(requisitionId);
+    return libraryDao.listIdsBySampleRequisitionId(requisitionId);
   }
 
   @Override

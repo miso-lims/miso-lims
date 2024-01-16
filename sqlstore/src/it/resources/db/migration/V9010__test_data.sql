@@ -644,6 +644,9 @@ VALUES (1, 'qcPassed', 1, 'false -> true', '2016-07-07 13:30:49'),
 (13, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:13'),
 (14, 'qcPassed', 1, 'false -> true', '2016-07-07 13:31:15');
 
+INSERT INTO Requisition_SupplementalLibrary(requisitionId, libraryId) VALUES
+(2, 15);
+
 INSERT INTO `Kit`(`kitId`,`identificationBarcode`,`locationBarcode`,`lotNumber`,`kitDate`,`kitDescriptorId`) VALUES
 (1,'1234','Freezer2','LOT34',CURRENT_DATE(),1),
 (2,'5678','Freezer3','LOT35',CURRENT_DATE(),2);

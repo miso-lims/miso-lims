@@ -31,7 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @since 0.0.2
  */
 public interface Library extends Attachable, Comparable<Library>, Deletable, HierarchyEntity, IndexedLibrary, Locatable,
-    QualityControllable<LibraryQC> {
+    QualityControllable<LibraryQC>, Requisitionable {
 
   public static final String PREFIX = "LIB";
 
@@ -40,145 +40,145 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
    * 
    * @param name name.
    */
-  public void setName(String name);
+  void setName(String name);
 
   /**
    * Returns the description of this Library object.
    * 
    * @return String description.
    */
-  public String getDescription();
+  String getDescription();
 
   /**
    * Sets the description of this Library object.
    * 
    * @param description description.
    */
-  public void setDescription(String description);
+  void setDescription(String description);
 
   /**
    * Returns the accession of this Library object.
    * 
    * @return String accession.
    */
-  public String getAccession();
+  String getAccession();
 
   /**
    * Sets the accession of this Library object.
    * 
    * @param accession accession.
    */
-  public void setAccession(String accession);
+  void setAccession(String accession);
 
   /**
    * Returns the sample of this Library object.
    * 
    * @return Sample sample.
    */
-  public Sample getSample();
+  Sample getSample();
 
   /**
    * Sets the sample of this Library object.
    * 
    * @param sample sample.
    */
-  public void setSample(Sample sample);
+  void setSample(Sample sample);
 
   /**
    * Sets the notes of this Library object.
    * 
    * @param notes notes.
    */
-  public void setNotes(Collection<Note> notes);
+  void setNotes(Collection<Note> notes);
 
   /**
    * Adds a Note to the Set of notes of this Library object.
    * 
    * @param note Note
    */
-  public void addNote(Note note);
+  void addNote(Note note);
 
   /**
    * Returns the notes of this Library object.
    * 
    * @return Collection<Note> notes.
    */
-  public Collection<Note> getNotes();
+  Collection<Note> getNotes();
 
   /**
    * Registers that a LibraryAliquot has been carried out using this Library
    * 
    * @param libraryAliquot
    */
-  public void addLibraryAliquot(LibraryAliquot libraryAliquot);
+  void addLibraryAliquot(LibraryAliquot libraryAliquot);
 
   /**
    * @return the libraryAliquots of this Library object.
    */
-  public Collection<LibraryAliquot> getLibraryAliquots();
+  Collection<LibraryAliquot> getLibraryAliquots();
 
   /**
    * Returns the paired attribute of this Library object.
    * 
    * @return Boolean paired.
    */
-  public Boolean getPaired();
+  Boolean getPaired();
 
   /**
    * Sets the paired attribute of this Library object, i.e. true is paired, false is single.
    * 
    * @param paired paired.
    */
-  public void setPaired(Boolean paired);
+  void setPaired(Boolean paired);
 
   /**
    * Returns the libraryType of this Library object.
    * 
    * @return LibraryType libraryType.
    */
-  public LibraryType getLibraryType();
+  LibraryType getLibraryType();
 
   /**
    * Sets the libraryType of this Library object.
    * 
    * @param libraryType libraryType.
    */
-  public void setLibraryType(LibraryType libraryType);
+  void setLibraryType(LibraryType libraryType);
 
   /**
    * Returns the librarySelectionType of this Library object.
    * 
    * @return LibrarySelectionType librarySelectionType.
    */
-  public LibrarySelectionType getLibrarySelectionType();
+  LibrarySelectionType getLibrarySelectionType();
 
   /**
    * Sets the librarySelectionType of this Library object.
    * 
    * @param librarySelectionType LibrarySelectionType.
    */
-  public void setLibrarySelectionType(LibrarySelectionType librarySelectionType);
+  void setLibrarySelectionType(LibrarySelectionType librarySelectionType);
 
   /**
    * Returns the libraryStrategyType of this Library object.
    * 
    * @return LibraryStrategyType libraryStrategyType.
    */
-  public LibraryStrategyType getLibraryStrategyType();
+  LibraryStrategyType getLibraryStrategyType();
 
   /**
    * Sets the libraryStrategyType of this Library object.
    * 
    * @param libraryStrategyType LibraryStrategyType.
    */
-  public void setLibraryStrategyType(LibraryStrategyType libraryStrategyType);
+  void setLibraryStrategyType(LibraryStrategyType libraryStrategyType);
 
   /**
    * Returns the platformType of this Library object.
    * 
    * @return PlatformType platformType.
    */
-  public PlatformType getPlatformType();
+  PlatformType getPlatformType();
 
   /**
    * Sets the platformType of this Library object.
@@ -186,130 +186,130 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
    * @param PlatformType platformType.
    * 
    */
-  public void setPlatformType(PlatformType platformType);
+  void setPlatformType(PlatformType platformType);
 
   /**
    * Sets the platformType of this Library object.
    * 
    * @param String platformType
    */
-  public void setPlatformType(String platformName);
+  void setPlatformType(String platformName);
 
-  public BigDecimal getConcentration();
+  BigDecimal getConcentration();
 
-  public void setConcentration(BigDecimal concentration);
+  void setConcentration(BigDecimal concentration);
 
   @Override
-  public Collection<ChangeLog> getChangeLog();
+  Collection<ChangeLog> getChangeLog();
 
   /**
    * Set the flag that this library is sufficiently bad that it is not worth sequencing.
    */
-  public void setLowQuality(boolean lowquality);
+  void setLowQuality(boolean lowquality);
 
-  public boolean isLowQuality();
+  boolean isLowQuality();
 
-  public Integer getDnaSize();
+  Integer getDnaSize();
 
-  public void setDnaSize(Integer dnaSize);
+  void setDnaSize(Integer dnaSize);
 
-  public void setBoxPosition(LibraryBoxPosition boxPosition);
+  void setBoxPosition(LibraryBoxPosition boxPosition);
 
   /**
    * @return the user-specified date that this Library was created
    */
-  public LocalDate getCreationDate();
+  LocalDate getCreationDate();
 
   /**
    * Sets the user-specified date that this Library was created
    * 
    * @param creationDate
    */
-  public void setCreationDate(LocalDate creationDate);
+  void setCreationDate(LocalDate creationDate);
 
-  public KitDescriptor getKitDescriptor();
+  KitDescriptor getKitDescriptor();
 
-  public void setKitDescriptor(KitDescriptor prepKit);
+  void setKitDescriptor(KitDescriptor prepKit);
 
-  public String getKitLot();
+  String getKitLot();
 
-  public void setKitLot(String kitLot);
+  void setKitLot(String kitLot);
 
   /**
    * Returns the concentration units of this Library object.
    * 
    * @return ConcentrationUnit concentrationUnits.
    */
-  public ConcentrationUnit getConcentrationUnits();
+  ConcentrationUnit getConcentrationUnits();
 
   /**
    * Sets the concentrationUnits of this Library object.
    * 
    * @param concentrationUnits concentrationUnits.
    */
-  public void setConcentrationUnits(ConcentrationUnit concentrationUnits);
+  void setConcentrationUnits(ConcentrationUnit concentrationUnits);
 
-  public BigDecimal getInitialVolume();
+  BigDecimal getInitialVolume();
 
-  public void setInitialVolume(BigDecimal initialVolume);
+  void setInitialVolume(BigDecimal initialVolume);
 
-  public BigDecimal getNgUsed();
+  BigDecimal getNgUsed();
 
-  public void setNgUsed(BigDecimal ngUsed);
+  void setNgUsed(BigDecimal ngUsed);
 
   /**
    * Returns the volume units of this Library object.
    * 
    * @return VolumeUnit volumeUnits.
    */
-  public VolumeUnit getVolumeUnits();
+  VolumeUnit getVolumeUnits();
 
   /**
    * Sets the volumeUnits of this Library object.
    * 
    * @param volumeUnits volumeUnits.
    */
-  public void setVolumeUnits(VolumeUnit volumeUnits);
+  void setVolumeUnits(VolumeUnit volumeUnits);
 
-  public LibrarySpikeIn getSpikeIn();
+  LibrarySpikeIn getSpikeIn();
 
-  public void setSpikeIn(LibrarySpikeIn spikeIn);
+  void setSpikeIn(LibrarySpikeIn spikeIn);
 
-  public BigDecimal getSpikeInVolume();
+  BigDecimal getSpikeInVolume();
 
-  public void setSpikeInVolume(BigDecimal spikeInVolume);
+  void setSpikeInVolume(BigDecimal spikeInVolume);
 
-  public DilutionFactor getSpikeInDilutionFactor();
+  DilutionFactor getSpikeInDilutionFactor();
 
-  public void setSpikeInDilutionFactor(DilutionFactor dilutionFactor);
+  void setSpikeInDilutionFactor(DilutionFactor dilutionFactor);
 
   @Override
-  public Sample getParent();
+  Sample getParent();
 
-  public boolean getUmis();
+  boolean getUmis();
 
-  public void setUmis(boolean umis);
+  void setUmis(boolean umis);
 
-  public Workstation getWorkstation();
+  Workstation getWorkstation();
 
-  public void setWorkstation(Workstation workstation);
+  void setWorkstation(Workstation workstation);
 
-  public Instrument getThermalCycler();
+  Instrument getThermalCycler();
 
-  public void setThermalCycler(Instrument thermalCycler);
+  void setThermalCycler(Instrument thermalCycler);
 
   /**
    * @return information to be used for creating a receipt transfer during library creation only. This
    *         field should otherwise be null
    */
-  public TransferLibrary getCreationReceiptInfo();
+  TransferLibrary getCreationReceiptInfo();
 
-  public void setCreationReceiptInfo(TransferLibrary creationReceiptInfo);
+  void setCreationReceiptInfo(TransferLibrary creationReceiptInfo);
 
-  public Sop getSop();
+  Sop getSop();
 
-  public void setSop(Sop sop);
+  void setSop(Sop sop);
 
-  public String getBatchId();
+  String getBatchId();
 
 }

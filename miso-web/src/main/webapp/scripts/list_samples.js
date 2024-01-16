@@ -50,17 +50,10 @@ ListTarget.sample = (function () {
                 Urls.rest.requisitions.removeSamples(config.requisitionId)
               ),
             },
-            {
-              name: "Move to Req.",
-              action: function (items) {
-                showMoveToRequisitionDialog(
-                  items,
-                  config.requisitionId,
-                  config.requisition.alias,
-                  config.requisition.assayId
-                );
-              },
-            }
+            ListUtils.createMoveToRequisitionAction(
+              config.requisition,
+              Urls.rest.requisitions.moveSamples(config.requisitionId)
+            )
           );
         }
       }
@@ -113,7 +106,11 @@ ListTarget.sample = (function () {
               Utils.showSearchByNamesDialog(
                 "Add Supplemental Samples",
                 Urls.rest.samples.query,
-                function (items) {
+                function (items, textStatus, xhr, queryNames) {
+                  if (items.length !== queryNames.length) {
+                    Utils.showSomeNotFoundError(queryNames, items);
+                    return;
+                  }
                   Utils.ajaxWithDialog(
                     "Adding Supplemental Samples",
                     "POST",
@@ -134,13 +131,7 @@ ListTarget.sample = (function () {
                 Urls.rest.samples.query,
                 function (data, textStatus, xhr, queryNames) {
                   if (data.length !== queryNames.length) {
-                    var missingCount = queryNames.length - data.length;
-                    Utils.showOkDialog("Error", [
-                      missingCount +
-                        " of the items " +
-                        (missingCount === 1 ? "was" : "were") +
-                        " not found",
-                    ]);
+                    Utils.showSomeNotFoundError(queryNames, data);
                     return;
                   }
                   samplesUpdateFunction(Urls.rest.requisitions.addSamples(config.requisitionId))(
@@ -389,17 +380,9 @@ ListTarget.sample = (function () {
             Utils.page.pageReload();
             break;
           case "failed":
-            var lines = ["Failed to save samples:"];
-            if (update.detail === "Validation failed" && update.data) {
-              update.data.forEach(function (failure) {
-                var sample = items[failure.row];
-                lines.push(sample.alias + " (" + sample.name + "):");
-                failure.fields.forEach(function (field) {
-                  lines.push("* " + field.field + ": " + field.errors.join("; "));
-                });
-              });
-            }
-            Utils.showOkDialog("Error", lines);
+            Utils.asyncSaveErrorsDialog(update, items, function (sample) {
+              return sample.alias + " (" + sample.name + ")";
+            });
             break;
           default:
             Utils.showOkDialog("Error", [
@@ -414,200 +397,6 @@ ListTarget.sample = (function () {
         Urls.rest.requisitions.samplesUpdateProgress,
         callback
       );
-    };
-  }
-
-  function showMoveToRequisitionDialog(
-    samples,
-    sourceRequisitionId,
-    sourceRequisitionAlias,
-    sourceRequisitionAssayId
-  ) {
-    var actions = [
-      {
-        name: "Stop",
-        handler: function () {
-          var suggestedAlias = sourceRequisitionAlias + " - STOPPED";
-          checkExistingRequisitions(
-            sourceRequisitionId,
-            suggestedAlias,
-            sourceRequisitionAssayId,
-            true,
-            samples
-          );
-        },
-      },
-      {
-        name: "Change Assay",
-        handler: function () {
-          var fields = [makeAssayField(sourceRequisitionAssayId)];
-          Utils.showDialog("Choose assay", "Continue", fields, function (results) {
-            var suggestedAlias = sourceRequisitionAlias + " - " + results.assay.alias;
-            checkExistingRequisitions(
-              sourceRequisitionId,
-              suggestedAlias,
-              results.assay.id,
-              false,
-              samples
-            );
-          });
-        },
-      },
-      {
-        name: "Other",
-        handler: function () {
-          var suggestedAlias = sourceRequisitionAlias + " - ";
-          var fields = [
-            {
-              label: "Requisition Alias",
-              property: "alias",
-              type: "text",
-              required: true,
-              value: suggestedAlias,
-            },
-          ];
-          Utils.showDialog("Move to Another Requisition", "Continue", fields, function (results) {
-            checkExistingRequisitions(
-              sourceRequisitionId,
-              results.alias,
-              sourceRequisitionAssayId,
-              false,
-              samples
-            );
-          });
-        },
-      },
-    ];
-    Utils.showWizardDialog("Move to Another Requisition", actions, "Purpose of move:");
-  }
-
-  function checkExistingRequisitions(
-    sourceRequisitionId,
-    suggestedAlias,
-    assayId,
-    stopped,
-    samples
-  ) {
-    var url =
-      Urls.rest.requisitions.search +
-      "?" +
-      Utils.page.param({
-        q: suggestedAlias,
-      });
-    var callback = function (data) {
-      if (data.length) {
-        var options = data.map(function (existing) {
-          return {
-            name: existing.alias,
-            handler: function () {
-              moveToRequisition(
-                sourceRequisitionId,
-                existing.alias,
-                existing.assayId,
-                existing.stopped,
-                samples,
-                existing.id
-              );
-            },
-          };
-        });
-        options.push({
-          name: "New Requisition",
-          handler: function () {
-            showNewRequisitionDialog(
-              sourceRequisitionId,
-              suggestedAlias,
-              assayId,
-              stopped,
-              samples
-            );
-          },
-        });
-        Utils.showWizardDialog("Move to Another Requisition", options);
-      } else {
-        showNewRequisitionDialog(sourceRequisitionId, suggestedAlias, assayId, stopped, samples);
-      }
-    };
-    Utils.ajaxWithDialog("Checking for existing requisition", "GET", url, null, callback);
-  }
-
-  function showNewRequisitionDialog(
-    sourceRequisitionId,
-    suggestedAlias,
-    assayId,
-    stopped,
-    samples
-  ) {
-    var fields = [
-      {
-        label: "Alias",
-        property: "alias",
-        type: "text",
-        required: true,
-        value: suggestedAlias,
-      },
-      makeAssayField(assayId),
-      {
-        label: "Stopped",
-        property: "stopped",
-        type: "checkbox",
-        value: stopped,
-      },
-    ];
-    Utils.showDialog("Move to New Requisition", "Create and Move", fields, function (results) {
-      moveToRequisition(
-        sourceRequisitionId,
-        results.alias,
-        results.assay.id,
-        results.stopped,
-        samples
-      );
-    });
-  }
-
-  function moveToRequisition(
-    sourceRequisitionId,
-    targetAlias,
-    assayId,
-    stopped,
-    samples,
-    existingRequisitionId
-  ) {
-    var data = {
-      requisitionId: existingRequisitionId,
-      requisitionAlias: targetAlias,
-      assayId: assayId,
-      stopped: stopped,
-      sampleIds: samples.map(Utils.array.getId),
-    };
-    var callback = function (data) {
-      Utils.page.pageRedirect(Urls.ui.requisitions.edit(data.id));
-    };
-    Utils.ajaxWithDialog(
-      "Moving Samples",
-      "POST",
-      Urls.rest.requisitions.moveSamples(sourceRequisitionId),
-      data,
-      callback
-    );
-  }
-
-  function makeAssayField(selectedAssayId) {
-    var selectedAssay = selectedAssayId
-      ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(selectedAssayId), Constants.assays)
-      : null;
-    return {
-      label: "Assay",
-      property: "assay",
-      type: "select",
-      required: false,
-      values: Constants.assays.filter(function (item) {
-        return !item.archived || item.id === selectedAssayId;
-      }),
-      getLabel: function (item) {
-        return item.alias + " v" + item.version;
-      },
-      value: selectedAssay ? selectedAssay.alias + " v" + selectedAssay.version : undefined,
     };
   }
 })();

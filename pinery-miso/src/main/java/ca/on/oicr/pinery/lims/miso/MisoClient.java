@@ -163,11 +163,11 @@ public class MisoClient implements Lims {
   private static final String QUERY_REQUISITION_BY_ID = QUERY_ALL_REQUISITIONS + " WHERE requisitionId = ?";
   private static final String QUERY_REQUISITION_BY_NAME = QUERY_ALL_REQUISITIONS + " WHERE alias = ?";
   private static final String QUERY_ALL_REQUISITION_SAMPLE_IDS = getResourceAsString("queryAllRequisitionSampleIds.sql");
-  private static final String QUERY_REQUISITION_SAMPLE_IDS_BY_ID = QUERY_ALL_REQUISITION_SAMPLE_IDS + " AND requisitionId = ?";
+  private static final String QUERY_REQUISITION_SAMPLE_IDS_BY_ID = "SELECT * FROM (" + QUERY_ALL_REQUISITION_SAMPLE_IDS + ") combined WHERE requisitionId = ?";
   private static final String QUERY_ALL_REQUISITION_QCS = getResourceAsString("queryAllRequisitionQcs.sql");
   private static final String QUERY_REQUISITION_QCS_BY_ID = QUERY_ALL_REQUISITION_QCS + " WHERE requisitionId = ?";
   private static final String QUERY_ALL_REQUISITION_SUPPLEMENTAL_IDS = getResourceAsString("queryAllRequisitionSupplementalSampleIds.sql");
-  private static final String QUERY_REQUISITION_SUPPLEMENTAL_IDS_BY_ID = QUERY_ALL_REQUISITION_SUPPLEMENTAL_IDS + " WHERE rs.requisitionId = ?";
+  private static final String QUERY_REQUISITION_SUPPLEMENTAL_IDS_BY_ID = "SELECT * FROM (" + QUERY_ALL_REQUISITION_SUPPLEMENTAL_IDS + ") combined WHERE requisitionId = ?";
   private static final String QUERY_ALL_REQUISITION_PAUSES = getResourceAsString("queryAllRequisitionPauses.sql");
   private static final String QUERY_REQUISITION_PAUSES_BY_ID = QUERY_ALL_REQUISITION_PAUSES + " WHERE requisitionId = ?";
 

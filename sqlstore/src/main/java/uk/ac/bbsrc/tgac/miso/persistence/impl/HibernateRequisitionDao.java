@@ -17,8 +17,10 @@ import org.hibernate.sql.JoinType;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition_;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -64,6 +66,25 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   @Override
   public void removeSupplementalSample(RequisitionSupplementalSample sample) throws IOException {
     currentSession().delete(sample);
+  }
+
+  @Override
+  public RequisitionSupplementalLibrary getSupplementalLibrary(Requisition requisition, Library library)
+      throws IOException {
+    return (RequisitionSupplementalLibrary) currentSession().createCriteria(RequisitionSupplementalLibrary.class)
+        .add(Restrictions.eq("requisitionId", requisition.getId()))
+        .add(Restrictions.eq("library", library))
+        .uniqueResult();
+  }
+
+  @Override
+  public void saveSupplementalLibrary(RequisitionSupplementalLibrary library) throws IOException {
+    currentSession().save(library);
+  }
+
+  @Override
+  public void removeSupplementalLibrary(RequisitionSupplementalLibrary library) throws IOException {
+    currentSession().delete(library);
   }
 
   @Override
