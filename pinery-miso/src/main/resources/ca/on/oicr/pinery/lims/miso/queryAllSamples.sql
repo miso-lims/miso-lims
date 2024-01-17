@@ -221,7 +221,7 @@ SELECT l.alias NAME
             NULL,
             CONCAT(DATE_FORMAT(l.creationDate, '%Y-%m-%d'), '_u', l.creator, '_s', l.sopId, '_k', l.kitDescriptorId, '-', l.kitLot)
         ) batch_id
-        ,NULL requisitionId
+        ,l.requisitionId
 FROM Library l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
