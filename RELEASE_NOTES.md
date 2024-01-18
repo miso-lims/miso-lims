@@ -7,6 +7,23 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.12.0] - 2024-01-18
+
+### Added
+
+* Advanced search by design code on Library and Library Aliquot lists
+
+### Changed
+
+* Assay tests can now specify "None" as the library qualification method
+* Libraries can now be added directly to a requisition as requisitioned or supplemental libraries
+
+### Fixed
+
+* Error creating/updating transfers to include certain samples
+* Parts of the Edit Library page did not load correctly when the effective external names included certain characters (detailed sample)
+
+
 ## [2.11.0] - 2023-12-14
 
 ### Added

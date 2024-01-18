@@ -1,3 +1,4 @@
+-- requisition_libs
 ALTER TABLE Library ADD COLUMN requisitionId bigint;
 
 CREATE TABLE Requisition_SupplementalLibrary (
@@ -7,3 +8,4 @@ CREATE TABLE Requisition_SupplementalLibrary (
   FOREIGN KEY fk_supplementalLibrary_requisition (requisitionId) REFERENCES Requisition (requisitionId),
   FOREIGN KEY fk_requisition_supplementalLibrary (libraryId) REFERENCES Library (libraryId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
