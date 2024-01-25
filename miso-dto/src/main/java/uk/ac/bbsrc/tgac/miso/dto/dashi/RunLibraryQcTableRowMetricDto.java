@@ -5,6 +5,7 @@ public class RunLibraryQcTableRowMetricDto {
   private String title;
   private String thresholdType;
   private double threshold;
+  private double threshold2;
   private Double value;
 
   public static RunLibraryQcTableRowMetricDto fromRequestDto(RunLibraryQcTableRequestMetricDto from) {
@@ -12,6 +13,7 @@ public class RunLibraryQcTableRowMetricDto {
     to.setTitle(from.getTitle());
     to.setThresholdType(from.getThresholdType());
     to.setThreshold(from.getThreshold());
+    to.setThreshold2(from.getThreshold2());
     to.setValue(from.getValue());
     return to;
   }
@@ -38,6 +40,14 @@ public class RunLibraryQcTableRowMetricDto {
 
   public void setThreshold(double threshold) {
     this.threshold = threshold;
+  }
+
+  public double getThreshold2() {
+    return threshold2;
+  }
+
+  public void setThreshold2(double threshold2) {
+    this.threshold2 = threshold2;
   }
 
   public Double getValue() {

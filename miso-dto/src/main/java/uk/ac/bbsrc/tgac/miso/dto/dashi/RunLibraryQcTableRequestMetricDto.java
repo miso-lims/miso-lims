@@ -7,6 +7,7 @@ public class RunLibraryQcTableRequestMetricDto {
   private String title;
   private String thresholdType;
   private double threshold;
+  private double threshold2;
   private Double value;
 
   public String getTitle() {
@@ -32,6 +33,15 @@ public class RunLibraryQcTableRequestMetricDto {
 
   public void setThreshold(double threshold) {
     this.threshold = threshold;
+  }
+
+  @JsonProperty(value = "threshold_2")
+  public double getThreshold2() {
+    return threshold2;
+  }
+
+  public void setThreshold2(double threshold2) {
+    this.threshold2 = threshold2;
   }
 
   public Double getValue() {

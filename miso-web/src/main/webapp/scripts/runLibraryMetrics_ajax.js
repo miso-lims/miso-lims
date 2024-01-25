@@ -152,21 +152,21 @@ var RunLibraryMetrics = (function ($) {
   };
 
   function displayThreshold(metric) {
-    return $("<div>").text(
-      " (threshold: " + makeThresholdTypeLabel(metric) + " " + metric.threshold + ")"
-    );
+    return $("<div>").text(" (threshold: " + makeThresholdTypeLabel(metric) + ")");
   }
 
   function makeThresholdTypeLabel(metric) {
     switch (metric.thresholdType) {
       case "gt":
-        return ">";
+        return "> " + metric.threshold;
       case "ge":
-        return ">=";
+        return ">= " + metric.threshold;
       case "lt":
-        return "<";
+        return "< " + metric.threshold;
       case "le":
-        return "<=";
+        return "<= " + metric.threshold;
+      case "between":
+        return "between " + metric.threshold + " and " + metric.threshold2;
       default:
         throw new Error("Unknown thresholdType: metric.thresholdType");
     }
@@ -182,6 +182,8 @@ var RunLibraryMetrics = (function ($) {
         return metric.value < metric.threshold;
       case "le":
         return metric.value <= metric.threshold;
+      case "between":
+        return metric.value >= metric.threshold && metric.value <= metric.threshold2;
       default:
         throw new Error("Unknown thresholdType: metric.thresholdType");
     }
