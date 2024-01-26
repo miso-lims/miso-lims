@@ -7,6 +7,17 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.13.0] - 2024-01-26
+
+### Added
+
+* Support for metrics with a range threshold on Run-Library Metrics page
+
+### Upgrade Notes
+
+* Updated Pinery to v2.32.1
+
+
 ## [2.12.0] - 2024-01-18
 
 ### Added
