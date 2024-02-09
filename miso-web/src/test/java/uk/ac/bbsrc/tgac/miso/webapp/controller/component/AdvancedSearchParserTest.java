@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.component;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -35,7 +35,8 @@ public class AdvancedSearchParserTest {
   }
 
   @Test
-  public void testSplitCriteriaEscapes() {
+  public void testSplitCriteriaColon() {
+    // shouldn't affect criteria splitting
     testGetCriteriaDoubled("term:phrase with\\:colon");
   }
 
@@ -71,7 +72,7 @@ public class AdvancedSearchParserTest {
     List<String> results = sut.splitCriteria(search);
     assertEquals(criteria.length, results.size());
     for (int i = 0; i < criteria.length; i++) {
-      String expected = criteria[i].replace("\\:", ":");
+      String expected = criteria[i];
       assertEquals(expected, results.get(i));
     }
   }
