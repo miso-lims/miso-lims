@@ -63,7 +63,7 @@ public class AdvancedSearchParser {
       Matcher m = Pattern.compile(TERMED_CRITERION_PATTERN).matcher(x);
       if (m.matches()) {
         String term = m.group(1).toLowerCase();
-        String phrase = m.group(2);
+        String phrase = m.group(2).replace("\\:", ":");
         switch (term) {
           case "is":
           case "has":
@@ -234,7 +234,7 @@ public class AdvancedSearchParser {
             errorHandler.accept("Unknown search term: " + term);
         }
       }
-      return PaginationFilter.query(x);
+      return PaginationFilter.query(x.replace("\\:", ":"));
     }).filter(Objects::nonNull).toArray(PaginationFilter[]::new);
   }
 
@@ -252,13 +252,15 @@ public class AdvancedSearchParser {
     String currentTerm = words[0];
     for (int i = 1; i < words.length; i++) {
       if (words[i].matches(TERMED_CRITERION_PATTERN)) {
-        criteria.add(currentTerm.replace("\\:", ":"));
+        // Next word is a new search term, so the current string is finished
+        criteria.add(currentTerm);
         currentTerm = words[i];
       } else {
+        // Continue building the current term
         currentTerm += " " + words[i];
       }
     }
-    criteria.add(currentTerm.replace("\\:", ":"));
+    criteria.add(currentTerm);
     return criteria;
   }
 
