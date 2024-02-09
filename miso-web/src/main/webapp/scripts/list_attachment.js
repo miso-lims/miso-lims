@@ -13,7 +13,7 @@ ListTarget.attachment = (function () {
           name: "Upload",
           handler: !config.projectId
             ? function () {
-                ListTarget.attachment.showUploadDialog(config.entityType, config.entityId);
+                ListTarget.attachment.showUploadDialog(config.entityType, config.entityId, true);
               }
             : function () {
                 Utils.showWizardDialog("Attach Files", [
