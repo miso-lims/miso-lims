@@ -32,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 public class ListTablesIT extends AbstractIT {
 
   private static final Set<String> samplesColumns =
-      Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.EXTERNAL_NAME,
+      Sets.newHashSet(Columns.SELECTOR, Columns.NAME, Columns.ALIAS, Columns.EXTERNAL_NAME, Columns.PROJECT,
           Columns.TISSUE_ATTRIBUTES, Columns.SAMPLE_CLASS, Columns.QC, Columns.LOCATION, Columns.CREATION_DATE,
           Columns.LAST_MODIFIED);
 
