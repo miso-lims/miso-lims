@@ -38,4 +38,30 @@ FOR EACH ROW
   END IF;
 END//
 
+DROP TRIGGER IF EXISTS ProjectDeliverableInsert//
+CREATE TRIGGER ProjectDeliverableInsert AFTER INSERT ON Project_Deliverable
+FOR EACH ROW
+  INSERT INTO ProjectChangeLog(projectId, columnsChanged, userId, message, changeTime)
+  SELECT
+    NEW.projectId,
+    'deliverables',
+    lastModifier,
+    CONCAT('Added deliverable: ', (SELECT name FROM Deliverable WHERE deliverableId = NEW.deliverableId)),
+    lastModified
+  FROM Project p
+  WHERE p.projectId = NEW.projectId//
+
+DROP TRIGGER IF EXISTS ProjectDeliverableDelete//
+CREATE TRIGGER ProjectDeliverableDelete AFTER DELETE ON Project_Deliverable
+FOR EACH ROW
+  INSERT INTO ProjectChangeLog(projectId, columnsChanged, userId, message, changeTime)
+  SELECT
+    OLD.projectId,
+    'deliverables',
+    lastModifier,
+    CONCAT('Removed deliverable: ', (SELECT name FROM Deliverable WHERE deliverableId = OLD.deliverableId)),
+    lastModified
+  FROM Project
+  WHERE projectId = OLD.projectId//
+
 DELIMITER ;
