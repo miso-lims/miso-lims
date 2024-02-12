@@ -892,6 +892,16 @@ ListUtils = (function ($) {
       };
     },
     columns: {
+      project: function (projectId) {
+        return ListUtils.labelHyperlinkColumn(
+          "Project",
+          Urls.ui.projects.edit,
+          Utils.array.get("projectId"),
+          Constants.isDetailedSample ? "projectCode" : "projectName",
+          0,
+          !projectId
+        );
+      },
       detailedQcStatus: {
         sTitle: "QC",
         mData: "detailedQcStatusId",

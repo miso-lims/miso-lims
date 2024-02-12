@@ -232,6 +232,7 @@ ListTarget.sample = (function () {
           mData: "effectiveExternalNames",
           include: Constants.isDetailedSample,
         },
+        ListUtils.columns.project(projectId),
         {
           sTitle: "Tissue Attributes",
           mData: "effectiveTissueTypeAlias",

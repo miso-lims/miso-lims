@@ -234,14 +234,7 @@ ListTarget.library = (function () {
           0,
           true
         ),
-        ListUtils.labelHyperlinkColumn(
-          "Project",
-          Urls.ui.projects.edit,
-          Utils.array.get("projectId"),
-          Constants.isDetailedSample ? "projectCode" : "projectName",
-          0,
-          true
-        ),
+        ListUtils.columns.project(projectId),
         {
           sTitle: "Tissue Origin",
           mData: "effectiveTissueOriginAlias",
