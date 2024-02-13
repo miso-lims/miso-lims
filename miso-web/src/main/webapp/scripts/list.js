@@ -1249,7 +1249,7 @@ ListUtils = (function ($) {
       {
         name: "Stop",
         handler: function () {
-          var suggestedAlias = sourceRequisitionAlias + " - STOPPED";
+          var suggestedAlias = sourceRequisition.alias + " - STOPPED";
           checkExistingRequisitions(
             sourceRequisition.id,
             suggestedAlias,
@@ -1263,7 +1263,7 @@ ListUtils = (function ($) {
       {
         name: "Change Assay",
         handler: function () {
-          var fields = [makeAssayField(sourceRequisitionAssayId)];
+          var fields = [makeAssayField(sourceRequisition.assayId)];
           Utils.showDialog("Choose assay", "Continue", fields, function (results) {
             var suggestedAlias = sourceRequisition.alias + " - " + results.assay.alias;
             checkExistingRequisitions(
