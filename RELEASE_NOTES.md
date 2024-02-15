@@ -7,6 +7,28 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.14.0] - 2024-02-15
+
+### Added
+
+* Project column to Sample lists
+
+### Changed
+
+* Project deliverables will now be changelogged
+
+### Removed
+
+* Project column from tables on the Edit Project page
+
+### Fixed
+
+* Search widgets were not handling some special characters correctly
+* Errors in "Move to Req." action for requisitioned samples and libraries on the Edit Requisition page
+* In advanced searches, including a colon in a general/termless search produced an error even if the colon was properly escaped
+* Some pages showing attachment lists were not refreshed after adding new attachments
+
+
 ## [2.13.0] - 2024-01-26
 
 ### Added
