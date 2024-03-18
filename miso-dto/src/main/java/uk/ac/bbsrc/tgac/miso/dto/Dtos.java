@@ -608,7 +608,7 @@ public class Dtos {
     }
     setEffectiveQcFailure(from, dto);
 
-    Requisition requisition = from.getRequisition() == null ? getParentRequisition(from) : from.getRequisition();
+    Requisition requisition = getEffectiveRequisition(from);
     if (requisition != null) {
       setId(dto::setEffectiveRequisitionId, requisition);
       setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
@@ -1489,10 +1489,7 @@ public class Dtos {
       setId(dto::setRequisitionId, requisition);
       setString(dto::setRequisitionAlias, requisition.getAlias());
     } else {
-      requisition = from.getSample().getRequisition();
-      if (requisition == null) {
-        requisition = getParentRequisition(from.getSample());
-      }
+      requisition = getEffectiveRequisition(from);
     }
     if (requisition != null) {
       setId(dto::setEffectiveRequisitionId, requisition);
@@ -1780,10 +1777,7 @@ public class Dtos {
     setId(dto::setKitDescriptorId, from.getKitDescriptor());
     setString(dto::setKitLot, from.getKitLot());
 
-    Requisition requisition = from.getLibrary().getSample().getRequisition();
-    if (requisition == null) {
-      requisition = getParentRequisition(from.getLibrary().getSample());
-    }
+    Requisition requisition = getEffectiveRequisition(from.getLibrary());
     setId(dto::setRequisitionId, requisition);
     setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
     setId(dto::setRequisitionAssayId, maybeGetProperty(requisition, Requisition::getAssay));

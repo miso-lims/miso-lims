@@ -351,7 +351,10 @@ public class LimsUtils {
     return null;
   }
 
-  public static Requisition getParentRequisition(Sample sample) {
+  public static Requisition getEffectiveRequisition(Sample sample) {
+    if (sample.getRequisition() != null) {
+      return sample.getRequisition();
+    }
     if (!isDetailedSample(sample)) {
       return null;
     }
@@ -360,6 +363,13 @@ public class LimsUtils {
       requisitionSample = requisitionSample.getParent();
     }
     return requisitionSample == null ? null : requisitionSample.getRequisition();
+  }
+
+  public static Requisition getEffectiveRequisition(Library library) {
+    if (library.getRequisition() != null) {
+      return library.getRequisition();
+    }
+    return getEffectiveRequisition(library.getSample());
   }
 
   /**

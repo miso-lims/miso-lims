@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +34,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -46,10 +49,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.LibrarySpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -99,6 +104,8 @@ public class LibraryRestController extends RestController {
   @Autowired
   private LibraryService libraryService;
   @Autowired
+  private SampleService sampleService;
+  @Autowired
   private PoolService poolService;
   @Autowired
   private RunService runService;
@@ -110,6 +117,8 @@ public class LibraryRestController extends RestController {
   private IndexChecker indexChecker;
   @Autowired
   private AsyncOperationManager asyncOperationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -395,6 +404,42 @@ public class LibraryRestController extends RestController {
       }
     }
     return response;
+  }
+
+  public static class FindRelatedRequest {
+    public List<Long> identityIds;
+    public long libraryDesignCodeId;
+    public long excludeRequisitionId;
+  }
+
+  @PostMapping("/find-related")
+  public @ResponseBody ArrayNode findRelated(@RequestBody FindRelatedRequest request) throws IOException {
+    List<Sample> identities = sampleService.listByIdList(request.identityIds);
+    if (identities == null || identities.size() != request.identityIds.size()) {
+      throw new RestException("Invalid identity IDs", Status.BAD_REQUEST);
+    } else if (identities.stream().anyMatch(sample -> !LimsUtils.isIdentitySample(sample))) {
+      throw new RestException("Specified sample IDs are not all identities", Status.BAD_REQUEST);
+    }
+
+    List<Long> libraryIds = libraryService.listIdsByAncestorSampleIds(request.identityIds);
+    List<Library> libraries = libraryService.listByIdList(libraryIds);
+    ArrayNode results = mapper.createArrayNode();
+    for (Library library : libraries) {
+      Sample sample = library.getSample();
+      Requisition requisition = LimsUtils.getEffectiveRequisition(sample);
+      if (requisition != null && requisition.getId() == request.excludeRequisitionId) {
+        // exclude libraries already in the target requisition
+        continue;
+      } // TODO: exclude supplemental too
+      List<Run> runs = runService.listByLibraryIdList(Collections.singleton(library.getId()));
+      ObjectNode dto = results.addObject();
+      dto.put("id", library.getId());
+      dto.put("alias", library.getAlias());
+      dto.put("requisitionAlias", requisition == null ? null : requisition.getAlias());
+      dto.put("sequenced", runs != null && !runs.isEmpty());
+    }
+
+    return results;
   }
 
 }

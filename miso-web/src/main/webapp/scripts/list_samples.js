@@ -103,23 +103,11 @@ ListTarget.sample = (function () {
           actions.push({
             name: "Add",
             handler: function () {
-              Utils.showSearchByNamesDialog(
-                "Add Supplemental Samples",
-                Urls.rest.samples.query,
-                function (items, textStatus, xhr, queryNames) {
-                  if (items.length !== queryNames.length) {
-                    Utils.showSomeNotFoundError(queryNames, items);
-                    return;
-                  }
-                  Utils.ajaxWithDialog(
-                    "Adding Supplemental Samples",
-                    "POST",
-                    Urls.rest.requisitions.addSupplementalSamples(config.requisitionId),
-                    items.map(Utils.array.getId),
-                    Utils.page.pageReload
-                  );
-                }
-              );
+              if (Constants.isDetailedSample) {
+                showAddSupplementalDialog(config);
+              } else {
+                showAddSupplementalByNamesDialog();
+              }
             },
           });
         } else {
@@ -399,5 +387,165 @@ ListTarget.sample = (function () {
         callback
       );
     };
+  }
+
+  function showAddSupplementalDialog(config) {
+    Utils.showWizardDialog(
+      "Add Supplemental Samples",
+      [
+        {
+          name: "Search by names",
+          handler: function () {
+            showAddSupplementalByNamesDialog(config);
+          },
+        },
+        {
+          name: "Find related",
+          handler: function () {
+            showFindRelatedIdentitySelectDialog(config);
+          },
+        },
+      ],
+      "Choose addition method"
+    );
+  }
+
+  function showAddSupplementalByNamesDialog(config) {
+    Utils.showSearchByNamesDialog(
+      "Add Supplemental Samples",
+      Urls.rest.samples.query,
+      function (items, textStatus, xhr, queryNames) {
+        if (items.length !== queryNames.length) {
+          Utils.showSomeNotFoundError(queryNames, items);
+          return;
+        }
+        addSupplementalSamples(config, items.map(Utils.array.getId));
+      }
+    );
+  }
+
+  function addSupplementalSamples(config, sampleIds) {
+    Utils.ajaxWithDialog(
+      "Adding Supplemental Samples",
+      "POST",
+      Urls.rest.requisitions.addSupplementalSamples(config.requisitionId),
+      sampleIds,
+      Utils.page.pageReload
+    );
+  }
+
+  function showFindRelatedIdentitySelectDialog(config) {
+    var actions = config.identities.map(function (identity) {
+      return {
+        name: identity.alias + " (" + identity.externalName + ")",
+        handler: function () {
+          showFindRelatedCategorySelectDialog(config, [identity]);
+        },
+      };
+    });
+    actions.unshift({
+      name: "All identities",
+      handler: function () {
+        showFindRelatedCategorySelectDialog(config, config.identities);
+      },
+    });
+    Utils.showWizardDialog(
+      "Find Related Samples",
+      actions,
+      "Which identity would you like to supplement?"
+    );
+  }
+
+  function showFindRelatedCategorySelectDialog(config, identities) {
+    var actions = Constants.sampleCategories
+      .filter(function (x) {
+        return x !== "Identity";
+      })
+      .map(function (category) {
+        return {
+          name: category,
+          handler: function () {
+            showFindRelatedClassSelectDialog(config, identities, category);
+          },
+        };
+      });
+    Utils.showWizardDialog(
+      "Find Related Samples",
+      actions,
+      "Which sample category would you like to search?"
+    );
+  }
+
+  function showFindRelatedClassSelectDialog(config, identities, category) {
+    var actions = Constants.sampleClasses
+      .filter(function (sampleClass) {
+        return sampleClass.sampleCategory === category && !sampleClass.archived;
+      })
+      .map(function (sampleClass) {
+        return {
+          name: sampleClass.alias,
+          handler: function () {
+            findAndShowRelatedSamplesDialog(config, identities, sampleClass);
+          },
+        };
+      });
+    Utils.showWizardDialog(
+      "Find Related Samples",
+      actions,
+      "Which sample class would you like to search?"
+    );
+  }
+
+  function findAndShowRelatedSamplesDialog(config, identities, sampleClass) {
+    Utils.ajaxWithDialog(
+      "Finding Related Samples...",
+      "POST",
+      Urls.rest.samples.findRelated,
+      {
+        identityIds: identities.map(function (identity) {
+          return identity.id;
+        }),
+        sampleClassId: sampleClass.id,
+        excludeRequisitionId: config.requisitionId,
+      },
+      function (data) {
+        if (data && data.length) {
+          showFindRelatedChooseSamplesDialog(config, data);
+        } else {
+          Utils.showOkDialog("Add Supplemental Samples", [
+            "No matching samples found. Note that samples already associated with this requisition are omitted.",
+          ]);
+        }
+      }
+    );
+  }
+
+  function showFindRelatedChooseSamplesDialog(config, data) {
+    var fields = data.map(function (item) {
+      return {
+        label:
+          item.alias +
+          " (Req: " +
+          (item.requisitionAlias || "None") +
+          "; " +
+          (item.sequenced ? "" : "NOT ") +
+          "Sequenced)",
+        property: item.id,
+        type: "checkbox",
+      };
+    });
+    Utils.showDialog("Add Supplemental Samples", "Add", fields, function (results) {
+      sampleIds = [];
+      for (var id in results) {
+        if (results[id]) {
+          sampleIds.push(id);
+        }
+      }
+      if (sampleIds.length) {
+        addSupplementalSamples(config, sampleIds);
+      } else {
+        Utils.showOkDialog("Add Supplemental Samples", ["No samples selected."]);
+      }
+    });
   }
 })();

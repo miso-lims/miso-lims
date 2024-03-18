@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getParentRequisition;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getEffectiveRequisition;
 import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
 
 import java.io.IOException;
@@ -456,8 +456,7 @@ public class EditSampleController {
             || (SampleTissueProcessing.CATEGORY_NAME.equals(targetCategory))) {
           setRelatedSlideDtos(sample, dto);
         }
-        Requisition requisition = sample.getRequisition() == null ? getParentRequisition(sample)
-            : sample.getRequisition();
+        Requisition requisition = getEffectiveRequisition(item);
         if (requisition != null) {
           dto.setEffectiveRequisitionId(requisition.getId());
           dto.setEffectiveRequisitionAlias((requisition.getAlias()));
