@@ -161,8 +161,7 @@ public class EditLibraryAliquotController {
         defaultTargetedSequencingByProject.put(project.getId(), project.getDefaultTargetedSequencing().getId());
       }
 
-      Requisition requisition = sample.getRequisition() == null ? getParentRequisition(sample)
-          : sample.getRequisition();
+      Requisition requisition = getEffectiveRequisition(item);
       if (requisition != null && requisition.getAssay() != null) {
         dto.setRequisitionAssayId(requisition.getAssay().getId());
       }
@@ -248,8 +247,7 @@ public class EditLibraryAliquotController {
         defaultTargetedSequencingByProject.put(project.getId(), project.getDefaultTargetedSequencing().getId());
       }
 
-      Requisition requisition = sample.getRequisition() == null ? getParentRequisition(sample)
-          : sample.getRequisition();
+      Requisition requisition = getEffectiveRequisition(item.getLibrary());
       if (requisition != null && requisition.getAssay() != null) {
         dto.setRequisitionAssayId(requisition.getAssay().getId());
       }

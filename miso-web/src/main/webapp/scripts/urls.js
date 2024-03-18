@@ -434,6 +434,7 @@ Urls = (function () {
     bulkSave: libraryRestBase + "/bulk",
     bulkSaveProgress: idUrlFunction(libraryRestBase + "/bulk"),
     worksetDatatable: idUrlFunction(libraryRestBase + "/dt/workset"),
+    findRelated: libraryRestBase + "/find-related",
   };
 
   // Library Aliquots
@@ -896,6 +897,7 @@ Urls = (function () {
     requisitionSupplementalDatatable: idUrlFunction(
       sampleRestBase + "/dt/requisition-supplemental"
     ),
+    findRelated: sampleRestBase + "/find-related",
   };
 
   // Sample Classes

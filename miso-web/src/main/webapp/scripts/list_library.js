@@ -108,23 +108,11 @@ ListTarget.library = (function () {
           actions.push({
             name: "Add",
             handler: function () {
-              Utils.showSearchByNamesDialog(
-                "Add Supplemental Libraries",
-                Urls.rest.libraries.query,
-                function (items, textStatus, xhr, queryNames) {
-                  if (items.length !== queryNames.length) {
-                    Utils.showSomeNotFoundError(queryNames, items);
-                    return;
-                  }
-                  Utils.ajaxWithDialog(
-                    "Adding Supplemental Libraries",
-                    "POST",
-                    Urls.rest.requisitions.addSupplementalLibraries(config.requisitionId),
-                    items.map(Utils.array.getId),
-                    Utils.page.pageReload
-                  );
-                }
-              );
+              if (Constants.isDetailedSample) {
+                showAddSupplementalDialog(config);
+              } else {
+                showAddSupplementalByNamesDialog(config);
+              }
             },
           });
         } else if (config.relation == "requisitioned") {
@@ -383,5 +371,141 @@ ListTarget.library = (function () {
         callback
       );
     };
+  }
+
+  function showAddSupplementalDialog(config) {
+    Utils.showWizardDialog(
+      "Add Supplemental Libraries",
+      [
+        {
+          name: "Search by names",
+          handler: function () {
+            showAddSupplementalByNamesDialog(config);
+          },
+        },
+        {
+          name: "Find related",
+          handler: function () {
+            showFindRelatedIdentitySelectDialog(config);
+          },
+        },
+      ],
+      "Choose addition method"
+    );
+  }
+
+  function showAddSupplementalByNamesDialog(config) {
+    Utils.showSearchByNamesDialog(
+      "Add Supplemental Libraries",
+      Urls.rest.libraries.query,
+      function (items, textStatus, xhr, queryNames) {
+        if (items.length !== queryNames.length) {
+          Utils.showSomeNotFoundError(queryNames, items);
+          return;
+        }
+        addSupplementalLibraries(config, items.map(Utils.array.getId));
+      }
+    );
+  }
+
+  function addSupplementalLibraries(config, libraryIds) {
+    Utils.ajaxWithDialog(
+      "Adding Supplemental Libraries",
+      "POST",
+      Urls.rest.requisitions.addSupplementalLibraries(config.requisitionId),
+      libraryIds,
+      Utils.page.pageReload
+    );
+  }
+
+  function showFindRelatedIdentitySelectDialog(config) {
+    var actions = config.identities.map(function (identity) {
+      return {
+        name: identity.alias + " (" + identity.externalName + ")",
+        handler: function () {
+          showFindRelatedCategorySelectDialog(config, [identity]);
+        },
+      };
+    });
+    actions.unshift({
+      name: "All identities",
+      handler: function () {
+        showFindRelatedDesignSelectDialog(config, config.identities);
+      },
+    });
+    Utils.showWizardDialog(
+      "Find Related Libraries",
+      actions,
+      "Which identity would you like to supplement?"
+    );
+  }
+
+  function showFindRelatedDesignSelectDialog(config, identities) {
+    var actions = Constants.libraryDesignCodes.map(function (designCode) {
+      return {
+        name: designCode.code,
+        handler: function () {
+          findAndShowRelatedLibrariesDialog(config, identities, designCode);
+        },
+      };
+    });
+    Utils.showWizardDialog(
+      "Find Related Libraries",
+      actions,
+      "Which library design code would you like to search?"
+    );
+  }
+
+  function findAndShowRelatedLibrariesDialog(config, identities, designCode) {
+    Utils.ajaxWithDialog(
+      "Finding Related Libraries...",
+      "POST",
+      Urls.rest.libraries.findRelated,
+      {
+        identityIds: identities.map(function (identity) {
+          return identity.id;
+        }),
+        designCodeId: designCode.id,
+        excludeRequisitionId: config.requisitionId,
+      },
+      function (data) {
+        if (data && data.length) {
+          showFindRelatedChooseLibrariesDialog(config, data);
+        } else {
+          Utils.showOkDialog("Add Supplemental Libraries", [
+            "No matching libraries found. Note that libraries already associated with this requisition are omitted.",
+          ]);
+        }
+      }
+    );
+  }
+
+  function showFindRelatedChooseLibrariesDialog(config, data) {
+    var fields = data.map(function (item) {
+      return {
+        label:
+          item.alias +
+          " (Req: " +
+          (item.requisitionAlias || "None") +
+          "; " +
+          (item.sequenced ? "" : "NOT ") +
+          "Sequenced)",
+        property: item.id,
+        type: "checkbox",
+      };
+    });
+    Utils.showDialog("Add Supplemental Libraries", "Add", fields, function (results) {
+      libraryIds = [];
+      for (var id in results) {
+        if (results[id]) {
+          libraryIds.push(id);
+        }
+      }
+      if (libraryIds.length) {
+        addSupplementalLibraries(config, libraryIds);
+      } else {
+        Utils.showOkDialog("Add Supplemental Libraries", ["No libraries selected."]);
+      }
+    });
   }
 })();

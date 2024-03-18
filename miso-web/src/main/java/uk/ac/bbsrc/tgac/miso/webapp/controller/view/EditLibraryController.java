@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getParentRequisition;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getEffectiveRequisition;
 import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
 
 import java.io.IOException;
@@ -306,8 +306,7 @@ public class EditLibraryController {
       dto.setBox(newBox);
       dto.setUmis(null);
 
-      Requisition requisition = item.getRequisition() == null ? getParentRequisition(item)
-          : item.getRequisition();
+      Requisition requisition = getEffectiveRequisition(item);
       if (requisition != null && requisition.getAssay() != null) {
         dto.setRequisitionAssayId(requisition.getAssay().getId());
       }

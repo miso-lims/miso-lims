@@ -70,13 +70,13 @@
               config="{requisitionId: ${requisition.id}, supplemental: false, requisition: ${requisitionDto}}" />
             <br>
             <miso:list-section-ajax id="list_supplementalsamples" name="Supplemental Samples" target="sample"
-              config="{requisitionId: ${requisition.id}, supplemental: true, requisition: ${requisitionDto}}" />
+              config="{requisitionId: ${requisition.id}, supplemental: true, requisition: ${requisitionDto}, identities: ${empty identityDtos ? null : identityDtos}}" />
 
             <miso:list-section-ajax id="list_libraries" name="Requisitioned Libraries" target="library"
               config="{requisitionId: ${requisition.id}, relation: 'requisitioned', requisition: ${requisitionDto}}" />
             <br>
             <miso:list-section-ajax id="list_supplementallibraries" name="Supplemental Libraries" target="library"
-              config="{requisitionId: ${requisition.id}, relation: 'supplemental', requisition: ${requisitionDto}}" />
+              config="{requisitionId: ${requisition.id}, relation: 'supplemental', requisition: ${requisitionDto}, identities: ${empty identityDtos ? null : identityDtos}}" />
 
             <c:if test="${detailedSample}">
               <miso:list-section id="list_extractions" name="Extractions" target="sample" items="${extractions}" />

@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -34,8 +35,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -48,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
@@ -110,6 +115,9 @@ public class SampleRestController extends RestController {
 
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
+
+  @Autowired
+  private ObjectMapper mapper;
 
   public Boolean isDetailedSampleEnabled() {
     return detailedSample;
@@ -514,6 +522,49 @@ public class SampleRestController extends RestController {
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
     return asyncOperationManager.getAsyncProgress(uuid, Sample.class, sampleService,
         ali -> Dtos.asDto(ali, false));
+  }
+
+  public static class FindRelatedRequest {
+    public List<Long> identityIds;
+    public long sampleClassId;
+    public long excludeRequisitionId;
+  }
+
+  @PostMapping("/find-related")
+  public @ResponseBody ArrayNode findRelated(@RequestBody FindRelatedRequest request) throws IOException {
+    List<Sample> identities = sampleService.listByIdList(request.identityIds);
+    if (identities == null || identities.size() != request.identityIds.size()) {
+      throw new RestException("Invalid identity IDs", Status.BAD_REQUEST);
+    } else if (identities.stream().anyMatch(sample -> !LimsUtils.isIdentitySample(sample))) {
+      throw new RestException("Specified sample IDs are not all identities", Status.BAD_REQUEST);
+    }
+
+    List<DetailedSample> samples = identities.stream()
+        .flatMap(child -> searchChildren(request.sampleClassId, (DetailedSample) child))
+        .toList();
+    ArrayNode results = mapper.createArrayNode();
+    for (DetailedSample sample : samples) {
+      Requisition requisition = LimsUtils.getEffectiveRequisition(sample);
+      if (requisition != null && requisition.getId() == request.excludeRequisitionId) {
+        // exclude samples already in the target requisition
+        continue;
+      } // TODO: exclude supplemental too
+      List<Long> libraryIds = libraryService.listIdsByAncestorSampleIds(Collections.singleton(sample.getId()));
+      List<Run> runs = runService.listByLibraryIdList(libraryIds);
+      ObjectNode dto = results.addObject();
+      dto.put("id", sample.getId());
+      dto.put("alias", sample.getAlias());
+      dto.put("requisitionAlias", requisition == null ? null : requisition.getAlias());
+      dto.put("sequenced", runs != null && !runs.isEmpty());
+    }
+
+    return results;
+  }
+
+  private static Stream<DetailedSample> searchChildren(long sampleClassId, DetailedSample parent) {
+    return parent.getChildren().stream()
+        .flatMap(child -> Stream.concat(Stream.of(child).filter(x -> x.getSampleClass().getId() == sampleClassId),
+            searchChildren(sampleClassId, child)));
   }
 
 }
