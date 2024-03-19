@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
@@ -219,31 +220,43 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
       return Collections.emptyList();
     }
 
-    Set<Long> aliquotSampleIds = sampleStore.getChildIds(requisitionSampleIds, SampleAliquot.CATEGORY_NAME);
+    Set<Long> aliquotSampleIds =
+        sampleStore.getChildIds(requisitionSampleIds, SampleAliquot.CATEGORY_NAME, requisitionId);
 
     Set<Long> parentIds = new HashSet<>(aliquotSampleIds);
     parentIds.addAll(requisitionSampleIds);
 
     List<Long> results = currentSession().createCriteria(LibraryImpl.class)
         .createAlias("sample", "sample")
+        .createAlias(LibraryImpl_.REQUISITION, "requisition", JoinType.LEFT_OUTER_JOIN)
         .add(Restrictions.in("sample.id", parentIds))
+        .add(Restrictions.or(Restrictions.eq("requisition.id", requisitionId),
+            Restrictions.isNull(LibraryImpl_.REQUISITION)))
         .setProjection(Projections.property("id"))
         .list();
     return results;
   }
 
 
-  public List<Long> listIdsByAncestorSampleIdList(Collection<Long> sampleIds) throws IOException {
-    Set<Long> aliquotSampleIds = sampleStore.getChildIds(sampleIds, SampleAliquot.CATEGORY_NAME);
+  public List<Long> listIdsByAncestorSampleIdList(Collection<Long> sampleIds, Long effectiveRequisitionId)
+      throws IOException {
+    Set<Long> aliquotSampleIds =
+        sampleStore.getChildIds(sampleIds, SampleAliquot.CATEGORY_NAME, effectiveRequisitionId);
 
     Set<Long> parentIds = new HashSet<>(aliquotSampleIds);
     parentIds.addAll(sampleIds);
 
-    List<Long> results = currentSession().createCriteria(LibraryImpl.class)
+    Criteria criteria = currentSession().createCriteria(LibraryImpl.class)
         .createAlias("sample", "sample")
         .add(Restrictions.in("sample.id", parentIds))
-        .setProjection(Projections.property("id"))
-        .list();
+        .setProjection(Projections.property("id"));
+    if (effectiveRequisitionId != null) {
+      criteria = criteria.createAlias(LibraryImpl_.REQUISITION, "requisition", JoinType.LEFT_OUTER_JOIN)
+          .add(Restrictions.or(Restrictions.eq("requisition.id", effectiveRequisitionId),
+              Restrictions.isNull(LibraryImpl_.REQUISITION)));
+    }
+    @SuppressWarnings("unchecked")
+    List<Long> results = criteria.list();
     return results;
   }
 

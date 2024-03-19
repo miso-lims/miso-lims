@@ -3,7 +3,12 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
@@ -172,7 +177,8 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListByBarcodeList() throws Exception {
-    Collection<Sample> samples = dao.listByBarcodeList(Arrays.asList("SAM7::TEST_0004_Bn_P_nn_1-1_D_1", "SAM11::TEST_0006_Bn_P_nn_1-1_D_1"));
+    Collection<Sample> samples =
+        dao.listByBarcodeList(Arrays.asList("SAM7::TEST_0004_Bn_P_nn_1-1_D_1", "SAM11::TEST_0006_Bn_P_nn_1-1_D_1"));
     assertEquals("Sample size does not match", 2, samples.size());
 
     for (Sample sample : samples) {
@@ -281,7 +287,8 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void testGetIdentityByExternalNameAndProjectExactMatch() throws IOException {
     String externalName = "EXT15";
     long projectId = 1;
-    Collection<IdentityView> exactMatches = dao.getIdentitiesByExternalNameOrAliasAndProject(externalName, projectId, true);
+    Collection<IdentityView> exactMatches =
+        dao.getIdentitiesByExternalNameOrAliasAndProject(externalName, projectId, true);
     assertFalse(exactMatches.isEmpty());
     assertEquals(1, exactMatches.size());
   }
@@ -290,13 +297,15 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void testGetIdentityByExternalNameAndProjectNonExactMatch() throws IOException {
     String externalName = "EXT1";
     long projectId = 1;
-    Collection<IdentityView> exactMatches = dao.getIdentitiesByExternalNameOrAliasAndProject(externalName, projectId, true);
+    Collection<IdentityView> exactMatches =
+        dao.getIdentitiesByExternalNameOrAliasAndProject(externalName, projectId, true);
     assertTrue(exactMatches.isEmpty());
   }
 
   @Test
   public void getIdentityByAlias() throws IOException {
-    Collection<IdentityView> identities = dao.getIdentitiesByExternalNameOrAliasAndProject("TEST_0001_IDENTITY_1", null, true);
+    Collection<IdentityView> identities =
+        dao.getIdentitiesByExternalNameOrAliasAndProject("TEST_0001_IDENTITY_1", null, true);
     assertEquals(1, identities.size());
     assertEquals("TEST_0001_IDENTITY_1", identities.iterator().next().getAlias());
   }
@@ -309,7 +318,8 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void getIdentityByNonIdentityAlias() throws IOException {
-    Collection<IdentityView> identities = dao.getIdentitiesByExternalNameOrAliasAndProject("TEST_0001_Bn_P_nn_1-1_D_1", null, false);
+    Collection<IdentityView> identities =
+        dao.getIdentitiesByExternalNameOrAliasAndProject("TEST_0001_Bn_P_nn_1-1_D_1", null, false);
     assertTrue(identities.isEmpty());
   }
 
@@ -416,7 +426,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void testGetChildren() throws Exception {
     final long identityId = 15L;
     final long stockId = 18L;
-    List<Sample> children = dao.getChildren(Arrays.asList(identityId), SampleStock.CATEGORY_NAME);
+    List<Sample> children = dao.getChildren(Arrays.asList(identityId), SampleStock.CATEGORY_NAME, 2L);
     assertNotNull(children);
     assertEquals(1, children.size());
     assertEquals(stockId, children.get(0).getId());
@@ -426,7 +436,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void testGetChildIds() throws Exception {
     final long identityId = 15L;
     final long stockId = 18L;
-    Set<Long> ids = dao.getChildIds(Arrays.asList(identityId), SampleStock.CATEGORY_NAME);
+    Set<Long> ids = dao.getChildIds(Arrays.asList(identityId), SampleStock.CATEGORY_NAME, null);
     assertNotNull(ids);
     assertEquals(1, ids.size());
     assertTrue(ids.contains(stockId));

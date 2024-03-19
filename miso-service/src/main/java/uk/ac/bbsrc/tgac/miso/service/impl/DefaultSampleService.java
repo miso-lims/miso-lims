@@ -1232,8 +1232,9 @@ public class DefaultSampleService implements SampleService {
   }
 
   @Override
-  public List<Sample> getChildren(Collection<Long> parentIds, String targetSampleCategory) throws IOException {
-    return sampleStore.getChildren(parentIds, targetSampleCategory);
+  public List<Sample> getChildren(Collection<Long> parentIds, String targetSampleCategory, long effectiveRequisitionId)
+      throws IOException {
+    return sampleStore.getChildren(parentIds, targetSampleCategory, effectiveRequisitionId);
   }
 
   @Override

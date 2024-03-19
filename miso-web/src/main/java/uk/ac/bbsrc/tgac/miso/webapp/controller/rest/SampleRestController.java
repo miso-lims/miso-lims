@@ -542,14 +542,20 @@ public class SampleRestController extends RestController {
     List<DetailedSample> samples = identities.stream()
         .flatMap(child -> searchChildren(request.sampleClassId, (DetailedSample) child))
         .toList();
+    Set<Long> supplementalSampleIds = sampleService.list(0, 0, false, "id",
+        PaginationFilter.supplementalToRequisitionId(request.excludeRequisitionId))
+        .stream()
+        .map(Sample::getId)
+        .collect(Collectors.toSet());
     ArrayNode results = mapper.createArrayNode();
     for (DetailedSample sample : samples) {
       Requisition requisition = LimsUtils.getEffectiveRequisition(sample);
-      if (requisition != null && requisition.getId() == request.excludeRequisitionId) {
-        // exclude samples already in the target requisition
+      if ((requisition != null && requisition.getId() == request.excludeRequisitionId)
+          || supplementalSampleIds.contains(sample.getId())) {
+        // exclude samples already associated with the target requisition
         continue;
-      } // TODO: exclude supplemental too
-      List<Long> libraryIds = libraryService.listIdsByAncestorSampleIds(Collections.singleton(sample.getId()));
+      }
+      List<Long> libraryIds = libraryService.listIdsByAncestorSampleIds(Collections.singleton(sample.getId()), null);
       List<Run> runs = runService.listByLibraryIdList(libraryIds);
       ObjectNode dto = results.addObject();
       dto.put("id", sample.getId());

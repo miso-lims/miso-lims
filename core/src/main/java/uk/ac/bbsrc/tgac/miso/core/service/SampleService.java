@@ -12,7 +12,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public interface SampleService
-    extends PaginatedDataSource<Sample>, BarcodableService<Sample>, DeleterService<Sample>, NoteService<Sample>, BulkSaveService<Sample> {
+    extends PaginatedDataSource<Sample>, BarcodableService<Sample>, DeleterService<Sample>, NoteService<Sample>,
+    BulkSaveService<Sample> {
 
   @Override
   default EntityType getEntityType() {
@@ -21,10 +22,12 @@ public interface SampleService
 
   List<Sample> list() throws IOException;
 
-  List<IdentityView> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId, boolean exactMatch)
+  List<IdentityView> getIdentitiesByExternalNameOrAliasAndProject(String externalName, Long projectId,
+      boolean exactMatch)
       throws IOException;
 
-  List<IdentityView> getIdentities(Collection<String> externalNames, boolean exactMatch, Project project) throws IOException;
+  List<IdentityView> getIdentities(Collection<String> externalNames, boolean exactMatch, Project project)
+      throws IOException;
 
   void confirmExternalNameUniqueForProjectIfRequired(String externalNames, Sample sample) throws IOException;
 
@@ -38,6 +41,7 @@ public interface SampleService
 
   EntityReference getPreviousInProject(Sample sample);
 
-  List<Sample> getChildren(Collection<Long> parentIds, String targetSampleCategory) throws IOException;
+  List<Sample> getChildren(Collection<Long> parentIds, String targetSampleCategory, long effectiveRequisitionId)
+      throws IOException;
 
 }

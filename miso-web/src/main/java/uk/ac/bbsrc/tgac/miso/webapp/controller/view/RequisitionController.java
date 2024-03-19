@@ -124,9 +124,7 @@ public class RequisitionController {
     Set<Long> sampleIds = Stream.concat(requisitionedSamples.stream(), supplementalSamples.stream())
         .map(Sample::getId)
         .collect(Collectors.toSet());
-    List<Sample> extractions = sampleService.getChildren(
-        sampleIds,
-        SampleStock.CATEGORY_NAME);
+    List<Sample> extractions = sampleService.getChildren(sampleIds, SampleStock.CATEGORY_NAME, requisition.getId());
     List<SampleDto> extractionDtos = extractions.stream()
         .map(sam -> Dtos.asDto(sam, false))
         .collect(Collectors.toList());
@@ -136,7 +134,7 @@ public class RequisitionController {
         libraryService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisition.getId()));
     List<Library> supplementalLibraries =
         libraryService.list(0, 0, false, "id", PaginationFilter.supplementalToRequisitionId(requisition.getId()));
-    List<Long> preparedLibraryIds = libraryService.listIdsByAncestorSampleIds(sampleIds);
+    List<Long> preparedLibraryIds = libraryService.listIdsByAncestorSampleIds(sampleIds, requisition.getId());
     List<Long> libraryIds = Stream.concat(
         Stream.concat(requisitionedLibraries.stream(), supplementalLibraries.stream())
             .map(Library::getId),
@@ -161,7 +159,6 @@ public class RequisitionController {
     model.put("numberOfRequisitionedItems", requisitionedSamples.size() + requisitionedLibraries.size());
     model.put("potentialAssayIds", mapper.writeValueAsString(
         getPotentialAssayIds(requisitionedSamples, requisitionedLibraries, requisition.getAssay())));
-
     List<Run> runs = runService.listByLibraryIdList(libraryIds);
     List<RunDto> runDtos = runs.stream()
         .map(Dtos::asDto)
