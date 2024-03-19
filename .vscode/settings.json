@@ -13,5 +13,6 @@
     },
     "editor.tabSize": 2,
     "java.saveActions.organizeImports": true,
-    "java.sources.organizeImports.staticStarThreshold": 2
+    "java.sources.organizeImports.staticStarThreshold": 2,
+    "java.compile.nullAnalysis.mode": "automatic"
 }

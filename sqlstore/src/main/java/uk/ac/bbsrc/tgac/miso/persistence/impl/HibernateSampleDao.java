@@ -45,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
@@ -394,27 +395,34 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public List<Sample> getChildren(Collection<Long> parentIds, String targetSampleCategory) throws IOException {
-    Set<Long> childIds = getChildIds(parentIds, targetSampleCategory);
+  public List<Sample> getChildren(Collection<Long> parentIds, String targetSampleCategory, long effectiveRequisitionId)
+      throws IOException {
+    Set<Long> childIds = getChildIds(parentIds, targetSampleCategory, effectiveRequisitionId);
     return listByIdList(new ArrayList<>(childIds));
   }
 
   @Override
-  public Set<Long> getChildIds(Collection<Long> parentIds, String targetSampleCategory) throws IOException {
+  public Set<Long> getChildIds(Collection<Long> parentIds, String targetSampleCategory, Long effectiveRequisitionId)
+      throws IOException {
     if (parentIds == null || parentIds.isEmpty()) {
       return Collections.emptySet();
     }
     Set<Long> output = new HashSet<>();
-    @SuppressWarnings("unchecked")
-    List<Object[]> results = currentSession().createCriteria(SampleImpl.class)
+    Criteria criteria = currentSession().createCriteria(SampleImpl.class)
         .createAlias("parent", "parent")
         .createAlias("sampleClass", "sampleClass")
         .add(Restrictions.in("parent.sampleId", parentIds))
         .setProjection(
             Projections.projectionList()
                 .add(Projections.property("sampleId"))
-                .add(Projections.property("sampleClass.sampleCategory")))
-        .list();
+                .add(Projections.property("sampleClass.sampleCategory")));
+    if (effectiveRequisitionId != null) {
+      criteria = criteria.createAlias(SampleImpl_.REQUISITION, "requisition", JoinType.LEFT_OUTER_JOIN)
+          .add(Restrictions.or(Restrictions.eq("requisition.id", effectiveRequisitionId),
+              Restrictions.isNull("requisition")));
+    }
+    @SuppressWarnings("unchecked")
+    List<Object[]> results = criteria.list();
 
     int targetIndex = SAMPLE_CATEGORIES.indexOf(targetSampleCategory);
     Set<Long> nextParents = new HashSet<>();
@@ -429,7 +437,7 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
       }
     }
     if (!nextParents.isEmpty()) {
-      output.addAll(getChildIds(nextParents, targetSampleCategory));
+      output.addAll(getChildIds(nextParents, targetSampleCategory, effectiveRequisitionId));
     }
     return output;
   }

@@ -36,6 +36,15 @@ public interface LibraryService
    */
   List<Long> listIdsByRequisitionId(long requisitionId) throws IOException;
 
-  List<Long> listIdsByAncestorSampleIds(Collection<Long> sampleIds) throws IOException;
+  /**
+   * Get IDs of all libraries descended from the provided sample IDs
+   * 
+   * @param sampleIds the sample IDs for which to find descendants
+   * @param relatedRequisitionId if non-null, only libraries associated with this requisition will be
+   *        included
+   * @return the list of library IDs
+   * @throws IOException
+   */
+  List<Long> listIdsByAncestorSampleIds(Collection<Long> sampleIds, Long relatedRequisitionId) throws IOException;
 
 }

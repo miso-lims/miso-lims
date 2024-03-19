@@ -421,16 +421,22 @@ public class LibraryRestController extends RestController {
       throw new RestException("Specified sample IDs are not all identities", Status.BAD_REQUEST);
     }
 
-    List<Long> libraryIds = libraryService.listIdsByAncestorSampleIds(request.identityIds);
+    List<Long> libraryIds = libraryService.listIdsByAncestorSampleIds(request.identityIds, null);
     List<Library> libraries = libraryService.listByIdList(libraryIds);
     ArrayNode results = mapper.createArrayNode();
+    Set<Long> supplementalLibraryIds = libraryService.list(0, 0, false, "id",
+        PaginationFilter.supplementalToRequisitionId(request.excludeRequisitionId))
+        .stream()
+        .map(Library::getId)
+        .collect(Collectors.toSet());
     for (Library library : libraries) {
       Sample sample = library.getSample();
       Requisition requisition = LimsUtils.getEffectiveRequisition(sample);
-      if (requisition != null && requisition.getId() == request.excludeRequisitionId) {
-        // exclude libraries already in the target requisition
+      if ((requisition != null && requisition.getId() == request.excludeRequisitionId)
+          || supplementalLibraryIds.contains(library.getId())) {
+        // exclude libraries already associated with the target requisition
         continue;
-      } // TODO: exclude supplemental too
+      }
       List<Run> runs = runService.listByLibraryIdList(Collections.singleton(library.getId()));
       ObjectNode dto = results.addObject();
       dto.put("id", library.getId());

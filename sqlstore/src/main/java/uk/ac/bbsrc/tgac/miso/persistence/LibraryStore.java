@@ -76,6 +76,6 @@ public interface LibraryStore extends Store<Library>, PaginatedDataSource<Librar
    */
   List<Long> listIdsBySampleRequisitionId(long requisitionId) throws IOException;
 
-  List<Long> listIdsByAncestorSampleIdList(Collection<Long> sampleIds) throws IOException;
+  List<Long> listIdsByAncestorSampleIdList(Collection<Long> sampleIds, Long effectiveRequisitionId) throws IOException;
 
 }

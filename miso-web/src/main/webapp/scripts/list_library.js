@@ -423,7 +423,7 @@ ListTarget.library = (function () {
       return {
         name: identity.alias + " (" + identity.externalName + ")",
         handler: function () {
-          showFindRelatedCategorySelectDialog(config, [identity]);
+          showFindRelatedDesignSelectDialog(config, [identity]);
         },
       };
     });

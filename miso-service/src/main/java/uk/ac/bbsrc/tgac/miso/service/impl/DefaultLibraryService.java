@@ -821,8 +821,9 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   @Override
-  public List<Long> listIdsByAncestorSampleIds(Collection<Long> sampleIds) throws IOException {
-    return libraryDao.listIdsByAncestorSampleIdList(sampleIds);
+  public List<Long> listIdsByAncestorSampleIds(Collection<Long> sampleIds, Long relatedRequisitionId)
+      throws IOException {
+    return libraryDao.listIdsByAncestorSampleIdList(sampleIds, relatedRequisitionId);
   }
 
   @Override
