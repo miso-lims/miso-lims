@@ -112,6 +112,11 @@ ListTarget.attachment = (function () {
         },
       ];
     },
+    onFirstLoad: function (data, config) {
+      if (config.collapseId && !data.length) {
+        Utils.ui.collapse("#" + config.collapseId, "#" + config.collapseId + "_arrowclick");
+      }
+    },
     deleteFile: function (entityType, entityId, attachmentId, filename) {
       Utils.showConfirmDialog(
         "Delete file",

@@ -400,6 +400,12 @@
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
+        <attribute>
+            <description>ID of the HTML element to collapse if there are no attachments</description>
+            <name>collapseId</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
         <dynamic-attributes>false</dynamic-attributes>
     </tag>
 

@@ -343,6 +343,11 @@ ListTarget.library = (function () {
         return plainSampleTerms;
       }
     },
+    onFirstLoad: function (data, config) {
+      if (config.collapseId && !data.length) {
+        Utils.ui.collapse("#" + config.collapseId, "#" + config.collapseId + "_arrowclick");
+      }
+    },
   };
 
   function librariesUpdateFunction(saveUrl) {

@@ -1,5 +1,19 @@
 ListState = {};
 ListTarget = {};
+/**
+ * ListTarget structure: {
+ *   name: string
+ *   getUserManualUrl: string
+ *   createUrl: function (config, projectId) returning string
+ *   getQueryUrl: function() returning string
+ *   createBulkActions: function (config, projectId)
+ *   createStaticActions: function (config, projectId)
+ *   createColumns: function (config, projectId)
+ *   searchTermSelector: function (searchTerms)
+ *   onFirstLoad: function (data, config)
+ * }
+ **/
+
 ListUtils = (function ($) {
   var updateSelectedLabel = function (state) {
     var hidden = state.selected.reduce(function (acc, item) {
@@ -607,6 +621,12 @@ ListUtils = (function ($) {
         ListState[elementId].data.push(aData);
       },
     });
+    if (target.onFirstLoad) {
+      options.fnInitComplete = function (oSettings, json) {
+        var data = json && json.aaData ? json.aaData : [];
+        target.onFirstLoad(data, config);
+      };
+    }
     optionModifier(options, jqTable, errorMessage, columns);
     var dataTable = jqTable.dataTable(options);
     addHeaderMessages(target);
