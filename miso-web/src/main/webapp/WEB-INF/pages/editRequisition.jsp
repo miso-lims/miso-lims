@@ -13,17 +13,23 @@
 
       <form:form id="requisitionForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 
-      <br>
+      <br />
       <div id="samples">
         <c:choose>
           <c:when test="${pageMode eq 'create'}">
             <p>Samples can be added after saving the requisition.</p>
           </c:when>
           <c:otherwise>
-            <h1>Pauses</h1>
-            <div id="requisitionForm_pausesError"></div>
-            <div id="listPauses"></div>
-            <br>
+            <div class="sectionDivider"
+              onclick="Utils.ui.toggleLeftInfo(jQuery('#pauses_section_arrowclick'), 'pauses_section');">
+              Pauses
+              <div id="pauses_section_arrowclick" class="toggleLeftDown"></div>
+            </div>
+            <div id="pauses_section" class="expandable_section">
+              <h1>Pauses</h1>
+              <div id="requisitionForm_pausesError"></div>
+              <div id="listPauses"></div>
+            </div>
 
             <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
               <div id="notes_arrowclick" class="toggleLeftDown"></div>
@@ -62,21 +68,65 @@
               </c:if>
               <div id="addRequisitionNoteDialog" title="Create new Note"></div>
             </div>
+
+            <div class="sectionDivider"
+              onclick="Utils.ui.toggleLeftInfo(jQuery('#attachments_section_arrowclick'), 'attachments_section');">
+              Attachments
+              <div id="attachments_section_arrowclick" class="toggleLeftDown"></div>
+            </div>
+            <div id="attachments_section" class="expandable_section">
+              <miso:attachments item="${requisition}" collapseId="attachments_section" />
+            </div>
+
+            <div class="sectionDivider"
+              onclick="Utils.ui.toggleLeftInfo(jQuery('#qcs_section_arrowclick'), 'qcs_section');">
+              QCs
+              <div id="qcs_section_arrowclick" class="toggleLeftDown"></div>
+            </div>
+            <div id="qcs_section" class="expandable_section">
+              <miso:qcs id="list_qc" item="${requisition}" />
+            </div>
+
+            <div class="sectionDivider"
+              onclick="Utils.ui.toggleLeftInfo(jQuery('#req_samples_section_arrowclick'), 'req_samples_section');">
+              Requisitioned Samples
+              <div id="req_samples_section_arrowclick" class="toggleLeftDown"></div>
+            </div>
+            <div id="req_samples_section" class="expandable_section">
+              <miso:list-section-ajax id="list_samples" name="Requisitioned Samples" target="sample"
+                config="{requisitionId: ${requisition.id}, supplemental: false, requisition: ${requisitionDto}, collapseId: 'req_samples_section'}" />
+            </div>
+
+            <div class="sectionDivider"
+              onclick="Utils.ui.toggleLeftInfo(jQuery('#supl_samples_section_arrowclick'), 'supl_samples_section');">
+              Supplemental Samples
+              <div id="supl_samples_section_arrowclick" class="toggleLeftDown"></div>
+            </div>
+            <div id="supl_samples_section" class="expandable_section">
+              <miso:list-section-ajax id="list_supplementalsamples" name="Supplemental Samples" target="sample"
+                config="{requisitionId: ${requisition.id}, supplemental: true, requisition: ${requisitionDto}, identities: ${identityDtos}, collapseId: 'supl_samples_section'}" />
+            </div>
+
+            <div class="sectionDivider"
+              onclick="Utils.ui.toggleLeftInfo(jQuery('#req_libraries_section_arrowclick'), 'req_libraries_section');">
+              Requisitioned Libraries
+              <div id="req_libraries_section_arrowclick" class="toggleLeftDown"></div>
+            </div>
+            <div id="req_libraries_section" class="expandable_section">
+              <miso:list-section-ajax id="list_libraries" name="Requisitioned Libraries" target="library"
+                config="{requisitionId: ${requisition.id}, relation: 'requisitioned', requisition: ${requisitionDto}, collapseId: 'req_libraries_section'}" />
+            </div>
+
+            <div class="sectionDivider"
+              onclick="Utils.ui.toggleLeftInfo(jQuery('#supl_libraries_section_arrowclick'), 'supl_libraries_section');">
+              Supplemental Libraries
+              <div id="supl_libraries_section_arrowclick" class="toggleLeftDown"></div>
+            </div>
+            <div id="supl_libraries_section" class="expandable_section">
+              <miso:list-section-ajax id="list_supplementallibraries" name="Supplemental Libraries" target="library"
+                config="{requisitionId: ${requisition.id}, relation: 'supplemental', requisition: ${requisitionDto}, identities: ${identityDtos}, collapseId: 'supl_libraries_section'}" />
+            </div>
             <br />
-
-            <miso:attachments item="${requisition}" />
-            <miso:qcs id="list_qc" item="${requisition}" />
-            <miso:list-section-ajax id="list_samples" name="Requisitioned Samples" target="sample"
-              config="{requisitionId: ${requisition.id}, supplemental: false, requisition: ${requisitionDto}}" />
-            <br>
-            <miso:list-section-ajax id="list_supplementalsamples" name="Supplemental Samples" target="sample"
-              config="{requisitionId: ${requisition.id}, supplemental: true, requisition: ${requisitionDto}, identities: ${empty identityDtos ? null : identityDtos}}" />
-
-            <miso:list-section-ajax id="list_libraries" name="Requisitioned Libraries" target="library"
-              config="{requisitionId: ${requisition.id}, relation: 'requisitioned', requisition: ${requisitionDto}}" />
-            <br>
-            <miso:list-section-ajax id="list_supplementallibraries" name="Supplemental Libraries" target="library"
-              config="{requisitionId: ${requisition.id}, relation: 'supplemental', requisition: ${requisitionDto}, identities: ${empty identityDtos ? null : identityDtos}}" />
 
             <c:if test="${detailedSample}">
               <miso:list-section id="list_extractions" name="Extractions" target="sample" items="${extractions}" />
@@ -86,18 +136,17 @@
             <miso:list-section id="list_runs" name="Runs" target="run" items="${runs}"
               config="{requisitionId: ${requisition.id}}" />
 
-            <br>
+            <br />
             <h1>Run-Libraries</h1>
             <div id="list_runLibraries">
               <img src="/styles/images/ajax-loader.gif" class="fg-button" />
             </div>
-            <br>
 
             <miso:changelog item="${requisition}" />
           </c:otherwise>
         </c:choose>
       </div>
-      <br>
+      <br />
 
       <script type="text/javascript">
         jQuery(document).ready(function () {
@@ -117,6 +166,12 @@
 
           if ('${pageMode}' === 'edit') {
             Requisition.setPauses(requisition.pauses);
+            if (!requisition.pauses || !requisition.pauses.length) {
+              Utils.ui.collapse('#pauses_section', '#pauses_section_arrowclick');
+            }
+            <c:if test="${empty requisition.notes}">
+              Utils.ui.collapse('#notes', '#notes_arrowclick');
+            </c:if>
             $.ajax({
               url: Urls.rest.requisitions.listRunLibraries(${ requisition.id }),
               dataType: 'json'

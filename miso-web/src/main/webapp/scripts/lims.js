@@ -1196,6 +1196,17 @@ Utils.ui = {
     });
   },
 
+  collapse: function (sectionSelector, arrowDivSelector) {
+    jQuery(sectionSelector).slideUp({
+      duration: 500,
+    });
+    if (arrowDivSelector) {
+      var arrow = jQuery(arrowDivSelector);
+      arrow.removeClass("toggleLeftDown");
+      arrow.addClass("toggleLeft");
+    }
+  },
+
   goodDateFormat: "yy-mm-dd",
 
   addDatePicker: function (id) {
