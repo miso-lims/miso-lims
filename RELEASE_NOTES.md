@@ -7,6 +7,24 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.15.0] - 2024-03-28
+
+### Added
+
+* New "Find related" option when adding supplemental samples or libraries to a requisition. This
+  helps you to easily locate items related to the identities already involved in the requisition
+  (detailed sample)
+
+### Changed
+
+* Several tables on the Edit Requisition page will be collapsed by default if they contain no items
+
+### Fixed
+
+* The Edit Requisition page included some items that should have been removed from the requisition
+  because they or their parents were moved to a different requisition
+
+
 ## [2.14.0] - 2024-02-15
 
 ### Added
