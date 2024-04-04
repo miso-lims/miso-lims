@@ -106,9 +106,6 @@ public class DefaultAssayTestService extends AbstractSaveService<AssayTest> impl
         if (object.getLibraryQualificationDesignCode() == null) {
           errors.add(ValidationError.forRequired("libraryQualificationDesignCodeId"));
         }
-      } else if (object.getLibraryQualificationDesignCode() != null) {
-        errors.add(new ValidationError("libraryQualificationDesignCodeId",
-            "Invalid for the selected library qualification method"));
       }
     }
   }

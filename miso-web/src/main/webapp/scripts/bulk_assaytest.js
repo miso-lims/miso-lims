@@ -77,11 +77,12 @@ BulkTarget.assaytest = (function ($) {
           sortSource: true,
           required: true,
           onChange: function (rowIndex, newValue, api) {
+            var isNone = newValue === "None";
             var isAliquot = newValue === "Aliquot";
             api.updateField(rowIndex, "libraryQualificationDesignCodeId", {
               required: isAliquot,
-              disabled: !isAliquot,
-              value: isAliquot ? undefined : null,
+              disabled: isNone,
+              value: isNone ? null : undefined,
             });
           },
           description:
