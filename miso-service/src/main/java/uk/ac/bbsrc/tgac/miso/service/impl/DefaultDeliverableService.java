@@ -65,6 +65,7 @@ public class DefaultDeliverableService extends AbstractSaveService<Deliverable> 
   @Override
   protected void applyChanges(Deliverable to, Deliverable from) throws IOException {
     to.setName(from.getName());
+    to.setAnalysisReviewRequired(from.isAnalysisReviewRequired());
   }
 
   @Override

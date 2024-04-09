@@ -47,6 +47,11 @@ ListTarget.deliverable = (function ($) {
           sTitle: "Name",
           mData: "name",
         },
+        {
+          sTitle: "Analysis Review Required",
+          mData: "analysisReviewRequired",
+          mRender: ListUtils.render.booleanChecks,
+        },
       ];
     },
   };
