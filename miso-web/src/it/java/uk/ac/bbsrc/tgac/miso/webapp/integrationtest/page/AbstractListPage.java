@@ -18,6 +18,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String ACTIVE = "Active";
     public static final String ADMIN = "Admin";
     public static final String ALIAS = "Alias";
+    public static final String ANALYSIS_REVIEW_REQUIRED = "Analysis Review Required";
     public static final String ARCHIVED = "Archived";
     public static final String ASSAY = "Assay";
     public static final String AUTO_UPDATE_FIELD = "Auto Update Field";
