@@ -6,7 +6,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>2.15.1-SNAPSHOT</version>
+    <version>2.16.0</version>
   </parent>
   <artifactId>miso-web</artifactId>
   <packaging>war</packaging>

@@ -7,6 +7,22 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.16.0] - 2024-04-11
+
+### Added
+
+* Pinery project field to specify whether analysis review is required - true if any of the project's
+  deliverables require analysis review
+* Deliverable field to specify whether analysis review is required
+
+### Changed
+
+* Update Pinery to 2.33.0
+* Library qualification design code can now be specified for assay tests involving low-depth
+  sequencing. This is for tests where the sequenced library aliquot has a different design code than
+  the library (detailed sample)
+
+
 ## [2.15.0] - 2024-03-28
 
 ### Added
