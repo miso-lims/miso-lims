@@ -1,0 +1,1 @@
+ALTER TABLE Deliverable ADD COLUMN analysisReviewRequired BOOLEAN NOT NULL DEFAULT TRUE;

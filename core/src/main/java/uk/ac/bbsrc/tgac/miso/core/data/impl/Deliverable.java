@@ -23,6 +23,7 @@ public class Deliverable implements Deletable, Serializable {
   private long deliverableId = UNSAVED_ID;
 
   private String name;
+  private boolean analysisReviewRequired = true;
 
   @Override
   public long getId() {
@@ -45,6 +46,14 @@ public class Deliverable implements Deletable, Serializable {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public boolean isAnalysisReviewRequired() {
+    return analysisReviewRequired;
+  }
+
+  public void setAnalysisReviewRequired(boolean analysisReviewRequired) {
+    this.analysisReviewRequired = analysisReviewRequired;
   }
 
   @Override

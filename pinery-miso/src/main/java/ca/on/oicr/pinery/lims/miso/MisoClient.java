@@ -245,6 +245,10 @@ public class MisoClient implements Lims {
         project.setDeliverables(new HashSet<>());
       }
       project.getDeliverables().add(rs.getString("deliverable"));
+
+      if (rs.getBoolean("analysisReviewRequired")) {
+        project.setAnalysisReviewRequired(true);
+      }
     });
     return projects;
   }
@@ -1474,6 +1478,8 @@ public class MisoClient implements Lims {
 
       p.setContactName(rs.getString("contactName"));
       p.setContactEmail(rs.getString("contactEmail"));
+      // set analysis review required false here. updated later when populating deliverables
+      p.setAnalysisReviewRequired(false);
       return p;
     }
 

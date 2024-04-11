@@ -4511,8 +4511,9 @@ public class Dtos {
 
   public static DeliverableDto asDto(Deliverable from) {
     DeliverableDto to = new DeliverableDto();
-    to.setId(from.getId());
-    to.setName(from.getName());
+    setLong(to::setId, from.getId(), true);
+    setString(to::setName, from.getName());
+    setBoolean(to::setAnalysisReviewRequired, from.isAnalysisReviewRequired(), false);
     return to;
   }
 
@@ -4520,6 +4521,7 @@ public class Dtos {
     Deliverable to = new Deliverable();
     setLong(to::setId, from.getId(), false);
     setString(to::setName, from.getName());
+    setBoolean(to::setAnalysisReviewRequired, from.isAnalysisReviewRequired(), false);
     return to;
   }
 
