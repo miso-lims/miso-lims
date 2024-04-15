@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.transaction.support.TransactionTemplate;
+
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -31,7 +31,7 @@ import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 @Service
 public class DefaultSequencingContainerModelService extends AbstractSaveService<SequencingContainerModel>
     implements SequencingContainerModelService {
-  
+
   @Autowired
   private SequencingContainerModelStore containerModelDao;
   @Autowired
@@ -75,17 +75,20 @@ public class DefaultSequencingContainerModelService extends AbstractSaveService<
     if (isSetAndChanged(SequencingContainerModel::getPlatformType, model, beforeChange)) {
       if (usage > 0) {
         errors.add(new ValidationError("platform",
-            String.format("Cannot change because the container model is used by %d existing sequencing containers.", usage)));
+            String.format("Cannot change because the container model is used by %d existing sequencing containers.",
+                usage)));
       }
       if (!model.getInstrumentModels().isEmpty()) {
         errors.add(new ValidationError("platform", String.format(
-            "Cannot change because the container model is linked to %d instrument models", model.getInstrumentModels().size())));
+            "Cannot change because the container model is linked to %d instrument models",
+            model.getInstrumentModels().size())));
       }
     }
     if (isSetAndChanged(SequencingContainerModel::getPartitionCount, model, beforeChange)
         && usage > 0) {
       errors.add(new ValidationError("partitionCount",
-          String.format("Cannot change because the container model is used by %d existing sequencing containers.", usage)));
+          String.format("Cannot change because the container model is used by %d existing sequencing containers.",
+              usage)));
     }
   }
 
