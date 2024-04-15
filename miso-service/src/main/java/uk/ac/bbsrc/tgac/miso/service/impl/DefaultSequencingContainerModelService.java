@@ -83,7 +83,7 @@ public class DefaultSequencingContainerModelService extends AbstractSaveService<
       }
     }
     if (isSetAndChanged(SequencingContainerModel::getPartitionCount, model, beforeChange)
-        && !model.getInstrumentModels().isEmpty()) {
+        && usage > 0) {
       errors.add(new ValidationError("partitionCount",
           String.format("Cannot change because the container model is used by %d existing sequencing containers.", usage)));
     }
