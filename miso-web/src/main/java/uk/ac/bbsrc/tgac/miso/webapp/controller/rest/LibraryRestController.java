@@ -38,6 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -430,11 +431,12 @@ public class LibraryRestController extends RestController {
         .map(Library::getId)
         .collect(Collectors.toSet());
     for (Library library : libraries) {
-      Sample sample = library.getSample();
-      Requisition requisition = LimsUtils.getEffectiveRequisition(sample);
+      Requisition requisition = LimsUtils.getEffectiveRequisition(library);
       if ((requisition != null && requisition.getId() == request.excludeRequisitionId)
-          || supplementalLibraryIds.contains(library.getId())) {
-        // exclude libraries already associated with the target requisition
+          || supplementalLibraryIds.contains(library.getId())
+          || ((DetailedLibrary) library).getLibraryDesignCode().getId() != request.libraryDesignCodeId) {
+        // exclude libraries already associated with the target requisition, and libraries of the wrong
+        // design
         continue;
       }
       List<Run> runs = runService.listByLibraryIdList(Collections.singleton(library.getId()));
