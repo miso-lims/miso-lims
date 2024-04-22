@@ -121,7 +121,7 @@ BulkTarget.library = (function ($) {
           {
             name: "View Metrics",
             action: function (api) {
-              BulkUtils.actions.viewMetrics(api, metricCategories);
+              BulkUtils.actions.viewMetrics(api, metricCategories, undefined, config.pageMode);
             },
           }
         );
@@ -436,7 +436,7 @@ BulkTarget.library = (function ($) {
         columns = columns.concat(BulkUtils.columns.receipt(config));
         columns = columns.concat(BulkUtils.columns.requisition("sample.projectId"));
       }
-      columns.push(BulkUtils.columns.assay());
+      columns.push(BulkUtils.columns.assay(config.pageMode));
 
       columns = columns.concat(BulkUtils.columns.boxable(config, api));
       if (config.templatesByProjectId && !api.isSaved()) {

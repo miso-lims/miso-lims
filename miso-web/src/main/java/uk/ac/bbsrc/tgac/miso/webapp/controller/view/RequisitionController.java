@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -158,7 +159,7 @@ public class RequisitionController {
     // assigned assays
     model.put("numberOfRequisitionedItems", requisitionedSamples.size() + requisitionedLibraries.size());
     model.put("potentialAssayIds", mapper.writeValueAsString(
-        getPotentialAssayIds(requisitionedSamples, requisitionedLibraries, requisition.getAssay())));
+        getPotentialAssayIds(requisitionedSamples, requisitionedLibraries, requisition.getAssays())));
     List<Run> runs = runService.listByLibraryIdList(libraryIds);
     List<RunDto> runDtos = runs.stream()
         .map(Dtos::asDto)
@@ -177,7 +178,8 @@ public class RequisitionController {
   }
 
   // function to get potential assay ids to for the requisition assay dropdown
-  private List<Long> getPotentialAssayIds(List<Sample> samples, List<Library> libraries, Assay requisitionAssay) {
+  private List<Long> getPotentialAssayIds(List<Sample> samples, List<Library> libraries,
+      Collection<Assay> requisitionAssays) {
     Map<Long, Integer> assayMap = new HashMap<Long, Integer>();
     List<Long> uniqueProjectIds = new ArrayList<>();
 
@@ -203,8 +205,10 @@ public class RequisitionController {
       }
     }
 
-    if (requisitionAssay != null && !assayIds.contains(requisitionAssay.getId())) {
-      assayIds.add(requisitionAssay.getId());
+    for (Assay requisitionAssay : requisitionAssays) {
+      if (!assayIds.contains(requisitionAssay.getId())) {
+        assayIds.add(requisitionAssay.getId());
+      }
     }
     return assayIds;
   }

@@ -46,7 +46,8 @@ BulkTarget.sample = (function ($) {
           BulkUtils.actions.viewMetrics(
             api,
             metricCategories,
-            "Samples found for multiple metric categories:"
+            "Samples found for multiple metric categories:",
+            config.pageMode
           );
         },
       });
@@ -526,9 +527,9 @@ BulkTarget.sample = (function ($) {
             if (nonInterceptApi.getValue(rowIndex, "requisitionId") === "Create New") {
               var projectSelected = api.getValueObject(rowIndex, "projectId");
               if (projectSelected && projectSelected.assayIds !== null) {
-                updateProjectAssays(projectSelected, nonInterceptApi, rowIndex);
+                BulkUtils.updateProjectAssays(projectSelected, nonInterceptApi, rowIndex);
               } else {
-                nonInterceptApi.updateField(rowIndex, "requisitionAssayId", {
+                nonInterceptApi.updateField(rowIndex, "requisitionAssayIds", {
                   source: [],
                   value: null,
                 });
@@ -575,7 +576,7 @@ BulkTarget.sample = (function ($) {
       }
 
       if (targetCategory !== "Identity" && !config.isLibraryReceipt) {
-        columns.push(BulkUtils.columns.assay());
+        columns.push(BulkUtils.columns.assay(config.pageMode));
         columns = columns.concat(BulkUtils.columns.boxable(config, api));
       }
 

@@ -98,7 +98,7 @@ public class LibraryDto extends AbstractBoxableDto
   private String requisitionAlias;
   private Long effectiveRequisitionId;
   private String effectiveRequisitionAlias;
-  private Long requisitionAssayId;
+  private List<Long> requisitionAssayIds;
 
   public String getAlias() {
     return alias;
@@ -665,12 +665,12 @@ public class LibraryDto extends AbstractBoxableDto
     this.effectiveRequisitionAlias = effectiveRequisitionAlias;
   }
 
-  public Long getRequisitionAssayId() {
-    return requisitionAssayId;
+  public List<Long> getRequisitionAssayIds() {
+    return requisitionAssayIds;
   }
 
-  public void setRequisitionAssayId(Long requisitionAssayId) {
-    this.requisitionAssayId = requisitionAssayId;
+  public void setRequisitionAssayIds(List<Long> requisitionAssayIds) {
+    this.requisitionAssayIds = requisitionAssayIds;
   }
 
   public String getProjectName() {

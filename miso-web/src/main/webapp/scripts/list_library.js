@@ -446,14 +446,16 @@ ListTarget.library = (function () {
   }
 
   function showFindRelatedDesignSelectDialog(config, identities) {
-    var actions = Constants.libraryDesignCodes.map(function (designCode) {
-      return {
-        name: designCode.code,
-        handler: function () {
-          findAndShowRelatedLibrariesDialog(config, identities, designCode);
-        },
-      };
-    });
+    var actions = Constants.libraryDesignCodes
+      .sort(Utils.sorting.standardSort("code"))
+      .map(function (designCode) {
+        return {
+          name: designCode.code,
+          handler: function () {
+            findAndShowRelatedLibrariesDialog(config, identities, designCode);
+          },
+        };
+      });
     Utils.showWizardDialog(
       "Find Related Libraries",
       actions,

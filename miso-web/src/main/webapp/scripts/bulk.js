@@ -232,6 +232,20 @@ BulkUtils = (function ($) {
         });
     },
 
+    updateProjectAssays: function (projectSelected, api, rowIndex) {
+      var notArchivedProjectAssays = projectSelected.assayIds
+        .map(function (assayId) {
+          return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(assayId), Constants.assays);
+        })
+        .filter(function (assay) {
+          return !assay.archived;
+        });
+      api.updateField(rowIndex, "requisitionAssayIds", {
+        source: notArchivedProjectAssays,
+        disabled: false,
+      });
+    },
+
     columns: {
       name: {
         title: "Name",
@@ -904,13 +918,13 @@ BulkUtils = (function ($) {
               var requisition = api.getValueObject(rowIndex, "requisitionId");
               var projectSelected = api.getValueObject(rowIndex, dataProject);
               if (!requisition) {
-                api.updateField(rowIndex, "requisitionAssayId", {
+                api.updateField(rowIndex, "requisitionAssayIds", {
                   source: [],
                   value: null,
                   disabled: true,
                 });
               } else if (requisition.id) {
-                api.updateField(rowIndex, "requisitionAssayId", {
+                api.updateField(rowIndex, "requisitionAssayIds", {
                   source: Constants.assays.filter(function (x) {
                     return !x.archived || x.id === requisition.assayId;
                   }),
@@ -926,9 +940,9 @@ BulkUtils = (function ($) {
                   disabled: true,
                 });
               } else if (projectSelected && projectSelected.assayIds !== null) {
-                updateProjectAssays(projectSelected, api, rowIndex);
+                BulkUtils.updateProjectAssays(projectSelected, api, rowIndex);
               } else {
-                api.updateField(rowIndex, "requisitionAssayId", {
+                api.updateField(rowIndex, "requisitionAssayIds", {
                   source: Constants.assays.filter(function (x) {
                     return !x.archived;
                   }),
@@ -941,16 +955,38 @@ BulkUtils = (function ($) {
         ];
       },
 
-      assay: function () {
+      assay: function (pageMode) {
         return {
           title: "Assay",
-          data: "requisitionAssayId",
-          type: "dropdown",
+          data: "requisitionAssayIds",
+          getData: function (object, limitedApi) {
+            if (!object.requisitionAssayIds || !object.requisitionAssayIds.length) {
+              return null;
+            } else if (object.requisitionAssayIds.length === 1) {
+              var assay = Utils.array.findUniqueOrThrow(
+                Utils.array.idPredicate(object.requisitionAssayIds[0]),
+                Constants.assays
+              );
+              return Assay.utils.makeLabel(assay);
+            } else {
+              return "(" + object.requisitionAssayIds.length + " assays)";
+            }
+          },
+          omit: pageMode !== "create",
+          setData: function (object, value, rowIndex, api) {
+            if (pageMode !== "create") {
+              return;
+            }
+            var assay = api.getValueObject(rowIndex, "requisitionAssayIds");
+            if (assay) {
+              object.requisitionAssayIds = [assay.id];
+            } else {
+              object.requisitionAssayIds = null;
+            }
+          },
+          type: pageMode === "create" ? "dropdown" : "text",
           description:
-            "The assay assigned to the requisition that the item belongs to. For receipt, the options are limited to the assays assigned to the project.",
-          source: Constants.assays.filter(function (x) {
-            return !x.archived;
-          }),
+            "The assay assigned to the requisition that the item belongs to. For receipt, the options are limited to the assays assigned to the project. Additional assays may be added on the Edit Requisition page.",
           source: function (data) {
             return Constants.assays.filter(function (x) {
               return !x.archived || x.id === data.requisitionAssayId;
@@ -1170,7 +1206,7 @@ BulkUtils = (function ($) {
           },
         };
       },
-      viewMetrics: function (api, metricCategories, multipleCategoryMessage) {
+      viewMetrics: function (api, metricCategories, multipleCategoryMessage, pageMode) {
         var showMetricsDialog = function (assays) {
           var show = function (assay) {
             if (metricCategories.length > 1) {
@@ -1206,20 +1242,43 @@ BulkUtils = (function ($) {
           }
         };
 
-        var rowCount = api.getRowCount();
         var assayIds = [];
         var assays = [];
         var missingAssayCount = 0;
-        for (var row = 0; row < rowCount; row++) {
-          var assay = api.getValueObject(row, "requisitionAssayId");
-          if (assay) {
-            if (assayIds.indexOf(assay.id) === -1) {
-              assayIds.push(assay.id);
-              assays.push(assay);
+
+        if (pageMode === "create") {
+          // Get selections from table when creating
+          var rowCount = api.getRowCount();
+          for (var row = 0; row < rowCount; row++) {
+            var assay = api.getValueObject(row, "requisitionAssayIds");
+            if (assay) {
+              if (assayIds.indexOf(assay.id) === -1) {
+                assayIds.push(assay.id);
+                assays.push(assay);
+              }
+            } else {
+              missingAssayCount++;
             }
-          } else {
-            missingAssayCount++;
           }
+        } else {
+          // In other modes, the assay column is only a label, and there may be multiple assays
+          api.getData().forEach(function (x) {
+            if (x.requisitionAssayIds && x.requisitionAssayIds.length) {
+              x.requisitionAssayIds.forEach(function (assayId) {
+                if (assayIds.indexOf(assayId) === -1) {
+                  assayIds.push(assayId);
+                  assays.push(
+                    Utils.array.findUniqueOrThrow(
+                      Utils.array.idPredicate(assayId),
+                      Constants.assays
+                    )
+                  );
+                }
+              });
+            } else {
+              missingAssayCount++;
+            }
+          });
         }
 
         if (!assays.length) {
@@ -3138,28 +3197,22 @@ BulkUtils = (function ($) {
           continue;
         }
         var cellMeta = hot.getCellMeta(rowIndex, colIndex);
+        var value = tableData[rowIndex][colIndex];
         if (cellMeta.type === "dropdown") {
           if (column.validationCache) {
-            Utils.setObjectField(
-              data[rowIndex],
-              column.data,
-              getCachedValueForLabel(column.validationCache, tableData[rowIndex][colIndex])
-            );
+            value = getCachedValueForLabel(column.validationCache, tableData[rowIndex][colIndex]);
           } else {
             var source = hot.getCellMeta(rowIndex, colIndex).sourceData;
             if ((!source || !source.length) && Array.isArray(column.source)) {
               source = column.source;
             }
-            Utils.setObjectField(
-              data[rowIndex],
-              column.data,
-              getSourceValueForLabel(source, tableData[rowIndex][colIndex], column)
-            );
+            value = getSourceValueForLabel(source, tableData[rowIndex][colIndex], column);
           }
-        } else if (column.setData) {
-          column.setData(data[rowIndex], tableData[rowIndex][colIndex], rowIndex, api);
+        }
+        if (column.setData) {
+          column.setData(data[rowIndex], value, rowIndex, api);
         } else {
-          Utils.setObjectField(data[rowIndex], column.data, tableData[rowIndex][colIndex]);
+          Utils.setObjectField(data[rowIndex], column.data, value);
         }
       }
     }
@@ -3440,21 +3493,5 @@ BulkUtils = (function ($) {
     if (changes.length) {
       api.updateData(changes);
     }
-  }
-
-  function updateProjectAssays(projectSelected, api, rowIndex) {
-    var notArchivedProjectAssays = [];
-    for (var i = 0; i < projectSelected.assayIds.length; i++) {
-      var tempAssay = Constants.assays.find(function (x) {
-        return x.id === projectSelected.assayIds[i];
-      });
-      if (!tempAssay.archived) {
-        notArchivedProjectAssays.push(tempAssay);
-      }
-    }
-    api.updateField(rowIndex, "requisitionAssayId", {
-      source: notArchivedProjectAssays,
-      disabled: false,
-    });
   }
 })(jQuery);

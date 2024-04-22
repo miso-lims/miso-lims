@@ -1,11 +1,50 @@
 var Requisition = (function () {
+  var assaysListId = "listAssays";
   var pausesListId = "listPauses";
 
   var form = null;
+  var assaysListConfig = {};
+  /*
+   * Expected config: {
+   *   numberOfRequisitionedItems: int; edit mode only,
+   *   potentialAssayIds: [int]; edit mode only
+   * }
+   */
 
   return {
     setForm: function (formApi) {
       form = formApi;
+    },
+
+    setAssaysListConfig: function (config) {
+      assaysListConfig = config;
+    },
+
+    setAssays: function (assays) {
+      FormUtils.setTableData(ListTarget.assay, assaysListConfig, assaysListId, assays, form);
+    },
+
+    getAssays: function () {
+      return FormUtils.getTableData(assaysListId);
+    },
+
+    addAssay: function (assay) {
+      var assays = Requisition.getAssays();
+      if (assays.some(Utils.array.idPredicate(assay.id))) {
+        Utils.showOkDialog("Error", ["That assay is already included"]);
+        return;
+      }
+      assays.push(assay);
+      Requisition.setAssays(assays);
+    },
+
+    removeAssays: function (removeAssays) {
+      var assays = Requisition.getAssays().filter(function (assay) {
+        return !removeAssays.some(function (removeAssay) {
+          return removeAssay.id == assay.id;
+        });
+      });
+      Requisition.setAssays(assays);
     },
 
     setPauses: function (pauses) {

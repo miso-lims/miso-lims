@@ -95,8 +95,8 @@ FormTarget.libraryaliquot = (function ($) {
               },
             },
             {
-              title: "Assay",
-              data: "requisitionAssayId",
+              title: "Assays",
+              data: "requisitionAssayIds",
               type: "special",
               makeControls: function () {
                 return makeAssayControls(object);
@@ -310,37 +310,26 @@ FormTarget.libraryaliquot = (function ($) {
   };
 
   function makeAssayControls(aliquot) {
-    var assay = aliquot.requisitionAssayId
-      ? Utils.array.findUniqueOrThrow(
-          Utils.array.idPredicate(aliquot.requisitionAssayId),
-          Constants.assays
-        )
-      : null;
-    if (assay) {
-      var assayLabel = assay.alias + " v" + assay.version;
-      return FormUtils.makeFieldWithButton(assayLabel, "View Metrics", function () {
-        Utils.showWizardDialog(
-          "View Metrics",
-          [
-            {
-              name: "Library Preparation",
-              handler: function () {
-                Assay.utils.showMetrics(assay, "LIBRARY_PREP");
-              },
+    return FormUtils.makeAssaysFieldWithButtons(aliquot.requisitionAssayIds, function (assay) {
+      Utils.showWizardDialog(
+        "View Metrics",
+        [
+          {
+            name: "Library Preparation",
+            handler: function () {
+              Assay.utils.showMetrics(assay, "LIBRARY_PREP");
             },
-            {
-              name: "Library Qualification",
-              handler: function () {
-                Assay.utils.showMetrics(assay, "LIBRARY_QUALIFICATION");
-              },
+          },
+          {
+            name: "Library Qualification",
+            handler: function () {
+              Assay.utils.showMetrics(assay, "LIBRARY_QUALIFICATION");
             },
-          ],
-          "Select category to view metrics. Relevant category depends on the assay test that this library aliquot" +
-            " will be used for. Sequencing metrics may be included."
-        );
-      });
-    } else {
-      return $("<span>").text("n/a");
-    }
+          },
+        ],
+        "Select category to view metrics. Relevant category depends on the assay test that this library aliquot" +
+          " will be used for. Sequencing metrics may be included."
+      );
+    });
   }
 })(jQuery);

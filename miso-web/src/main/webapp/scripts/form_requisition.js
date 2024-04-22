@@ -5,8 +5,6 @@ FormTarget.requisition = (function () {
   /*
    * Expected config {
    *   isAdmin: boolean,
-   *   numberOfRequisitionedItems: int; edit mode only,
-   *   potentialAssayIds: [int]; edit mode only
    * }
    */
 
@@ -38,7 +36,7 @@ FormTarget.requisition = (function () {
 
       return [
         {
-          title: "Assay Information",
+          title: "Requisition Information",
           fields: [
             FormUtils.makeIdField("Requisition"),
             {
@@ -49,24 +47,6 @@ FormTarget.requisition = (function () {
               maxLength: 150,
               description:
                 "Should usually match the identifier of a requisition form stored in a separate system",
-            },
-            {
-              title: "Assay",
-              type: "dropdown",
-              data: "assayId",
-              description:
-                "If the requisition has no requisitioned samples, you may assign any assay to it. Once you add requisitioned samples, the options of available assays are limited to the assays that are assigned to all of the requisitioned samples' projects",
-              source:
-                config.numberOfRequisitionedItems > 0
-                  ? assayDropdown
-                  : Constants.assays.filter(function (x) {
-                      return !x.archived || x.id === object.assayId;
-                    }),
-              getItemLabel: function (x) {
-                return x.alias + " v" + x.version;
-              },
-              getItemValue: Utils.array.getId,
-              sortSource: Utils.sorting.standardSort("alias"),
             },
             {
               title: "Stopped",
@@ -93,6 +73,7 @@ FormTarget.requisition = (function () {
       ];
     },
     confirmSave: function (object, isDialog, form) {
+      object.assayIds = Requisition.getAssays().map(Utils.array.getId);
       object.pauses = Requisition.getPauses();
     },
   };

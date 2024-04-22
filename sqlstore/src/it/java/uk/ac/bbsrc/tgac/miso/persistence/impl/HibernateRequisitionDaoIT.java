@@ -40,7 +40,7 @@ public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requ
     Requisition req = new Requisition();
     req.setAlias("New Req");
     Assay assay = (Assay) currentSession().get(Assay.class, 1L);
-    req.setAssay(assay);
+    req.getAssays().add(assay);
     User user = (User) currentSession().get(UserImpl.class, 1L);
     Date date = new Date();
     req.setCreator(user);

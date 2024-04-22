@@ -3,8 +3,8 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -13,7 +13,6 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
-import org.hibernate.sql.JoinType;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +31,7 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
     implements HibernatePaginatedDataSource<Requisition>, RequisitionDao {
 
   private final static String[] SEARCH_PROPERTIES = new String[] {"alias"};
-  private static final List<AliasDescriptor> STANDARD_ALIASES =
-      Arrays.asList(new AliasDescriptor("assay", JoinType.LEFT_OUTER_JOIN));
+  private static final List<AliasDescriptor> STANDARD_ALIASES = Collections.emptyList();
 
   public HibernateRequisitionDao() {
     super(Requisition.class);
@@ -127,8 +125,6 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   @Override
   public String propertyForSortColumn(String original) {
     switch (original) {
-      case "assayId":
-        return "assay.alias";
       case "creationTime":
         return Requisition_.CREATED;
       default:

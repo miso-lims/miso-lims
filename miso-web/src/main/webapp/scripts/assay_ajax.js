@@ -100,6 +100,14 @@ var Assay = (function () {
 
         return category.sortPriority * 1000000 + subcategoryPriority * 1000 + metricPriority;
       },
+      getAssays: function (assayIds) {
+        if (!assayIds || !assayIds.length) {
+          return null;
+        }
+        return assayIds.map(function (assayId) {
+          return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(assayId), Constants.assays);
+        });
+      },
       showMetrics: function (assay, categoryValue) {
         var metricCategory = Utils.array.findUniqueOrThrow(function (x) {
           return x.value === categoryValue;

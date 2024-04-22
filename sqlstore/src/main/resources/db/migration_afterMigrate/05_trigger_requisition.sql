@@ -7,7 +7,6 @@ FOR EACH ROW
     DECLARE log_message longtext;
     SET log_message = CONCAT_WS(', ',
       makeChangeMessage('alias', OLD.alias, NEW.alias),
-      makeChangeMessage('assay', (SELECT alias FROM Assay WHERE assayId = OLD.assayId), (SELECT alias FROM Assay WHERE assayId = NEW.assayId)),
       makeChangeMessage('stopped', booleanToString(OLD.stopped), booleanToString(NEW.stopped)),
       makeChangeMessage('stop reason', OLD.stopReason, NEW.stopReason)
     );
@@ -16,7 +15,6 @@ FOR EACH ROW
       NEW.requisitionId,
         COALESCE(CONCAT_WS(',',
           makeChangeColumn('alias', OLD.alias, NEW.alias),
-          makeChangeColumn('assayId', OLD.assayId, NEW.assayId),
           makeChangeColumn('stopped', OLD.stopped, NEW.stopped),
           makeChangeColumn('stopReason', OLD.stopReason, NEW.stopReason)
         ), ''),
@@ -36,5 +34,31 @@ FOR EACH ROW
     NEW.lastModifier,
     'Requisition created.',
     NEW.lastModified)//
+
+DROP TRIGGER IF EXISTS RequisitionAssayInsert//
+CREATE TRIGGER RequisitionAssayInsert AFTER INSERT ON Requisition_Assay
+FOR EACH ROW
+  INSERT INTO RequisitionChangeLog(requisitionId, columnsChanged, userId, message, changeTime)
+    SELECT
+      NEW.requisitionId,
+      'assays',
+      lastModifier,
+      CONCAT('Added assay ', (SELECT alias FROM Assay WHERE assayId = NEW.assayId)),
+      lastModified
+    FROM Requisition
+    WHERE requisitionId = NEW.requisitionId//
+
+DROP TRIGGER IF EXISTS RequisitionAssayDelete//
+CREATE TRIGGER RequisitionAssayDelete AFTER DELETE ON Requisition_Assay
+FOR EACH ROW
+  INSERT INTO RequisitionChangeLog(requisitionId, columnsChanged, userId, message, changeTime)
+    SELECT
+      OLD.requisitionId,
+      'assays',
+      lastModifier,
+      CONCAT('Removed assay ', (SELECT alias FROM Assay WHERE assayId = OLD.assayId)),
+      lastModified
+    FROM Requisition
+    WHERE requisitionId = OLD.requisitionId//
 
 DELIMITER ;

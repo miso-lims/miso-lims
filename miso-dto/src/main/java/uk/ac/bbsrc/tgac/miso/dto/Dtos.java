@@ -487,7 +487,7 @@ public class Dtos {
       Requisition requisition = from.getRequisition();
       setId(dto::setRequisitionId, requisition);
       setString(dto::setRequisitionAlias, requisition.getAlias());
-      setId(dto::setRequisitionAssayId, requisition.getAssay());
+      dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
     }
 
     return dto;
@@ -612,7 +612,7 @@ public class Dtos {
     if (requisition != null) {
       setId(dto::setEffectiveRequisitionId, requisition);
       setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
-      setId(dto::setRequisitionAssayId, requisition.getAssay());
+      dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
     }
 
     return dto;
@@ -945,8 +945,12 @@ public class Dtos {
     if (to.getRequisition() != null) {
       Requisition toRequisition = to.getRequisition();
       setString(toRequisition::setAlias, from.getRequisitionAlias());
-      if (from.getRequisitionAssayId() != null) {
-        setObject(toRequisition::setAssay, Assay::new, from.getRequisitionAssayId());
+      if (from.getRequisitionAssayIds() != null) {
+        for (Long assayId : from.getRequisitionAssayIds()) {
+          Assay assay = new Assay();
+          assay.setId(assayId);
+          toRequisition.getAssays().add(assay);
+        }
       }
     }
     setObject(to::setSequencingControlType, SequencingControlType::new, from.getSequencingControlTypeId());
@@ -1494,7 +1498,7 @@ public class Dtos {
     if (requisition != null) {
       setId(dto::setEffectiveRequisitionId, requisition);
       setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
-      setId(dto::setRequisitionAssayId, requisition.getAssay());
+      dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
     }
 
     return dto;
@@ -1579,8 +1583,12 @@ public class Dtos {
     if (to.getRequisition() != null) {
       Requisition toRequisition = to.getRequisition();
       setString(toRequisition::setAlias, from.getRequisitionAlias());
-      if (from.getRequisitionAssayId() != null) {
-        setObject(toRequisition::setAssay, Assay::new, from.getRequisitionAssayId());
+      if (from.getRequisitionAssayIds() != null) {
+        for (Long assayId : from.getRequisitionAssayIds()) {
+          Assay assay = new Assay();
+          assay.setId(assayId);
+          toRequisition.getAssays().add(assay);
+        }
       }
     }
     return to;
@@ -1780,7 +1788,7 @@ public class Dtos {
     Requisition requisition = getEffectiveRequisition(from.getLibrary());
     setId(dto::setRequisitionId, requisition);
     setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
-    setId(dto::setRequisitionAssayId, maybeGetProperty(requisition, Requisition::getAssay));
+    dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
 
     return dto;
   }

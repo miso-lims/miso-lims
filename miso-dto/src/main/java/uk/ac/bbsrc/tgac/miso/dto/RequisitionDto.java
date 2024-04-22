@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import static uk.ac.bbsrc.tgac.miso.dto.Dtos.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
@@ -11,7 +12,7 @@ public class RequisitionDto {
 
   private Long id;
   private String alias;
-  private Long assayId;
+  private List<Long> assayIds;
   private boolean stopped = false;
   private String stopReason;
   private String creationTime;
@@ -22,7 +23,7 @@ public class RequisitionDto {
     RequisitionDto to = new RequisitionDto();
     setLong(to::setId, from.getId(), true);
     setString(to::setAlias, from.getAlias());
-    Dtos.setId(to::setAssayId, from.getAssay());
+    to.setAssayIds(from.getAssays().stream().map(Assay::getId).toList());
     setBoolean(to::setStopped, from.isStopped(), false);
     setString(to::setStopReason, from.getStopReason());
     setDateTimeString(to::setCreationTime, from.getCreationTime());
@@ -47,12 +48,12 @@ public class RequisitionDto {
     this.alias = alias;
   }
 
-  public Long getAssayId() {
-    return assayId;
+  public List<Long> getAssayIds() {
+    return assayIds;
   }
 
-  public void setAssayId(Long assayId) {
-    this.assayId = assayId;
+  public void setAssayIds(List<Long> assayIds) {
+    this.assayIds = assayIds;
   }
 
   public boolean isStopped() {
@@ -99,7 +100,15 @@ public class RequisitionDto {
     Requisition to = new Requisition();
     setLong(to::setId, getId(), false);
     setString(to::setAlias, getAlias());
-    setObject(to::setAssay, Assay::new, getAssayId());
+    if (getAssayIds() != null) {
+      to.setAssays(getAssayIds().stream()
+          .map(id -> {
+            Assay assay = new Assay();
+            assay.setId(id);
+            return assay;
+          })
+          .collect(Collectors.toSet()));
+    }
     setBoolean(to::setStopped, isStopped(), false);
     setString(to::setStopReason, getStopReason());
     if (getPauses() != null) {

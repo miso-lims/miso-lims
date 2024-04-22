@@ -174,7 +174,7 @@ public class RequisitionRestController extends RestController {
       requisition.setAlias(request.requisitionAlias);
       Assay assay = new Assay();
       assay.setId(request.assayId);
-      requisition.setAssay(assay);
+      requisition.getAssays().add(assay);
       requisition.setStopped(request.stopped);
     }
     Requisition saved = moveFunction.apply(requisition, items);
