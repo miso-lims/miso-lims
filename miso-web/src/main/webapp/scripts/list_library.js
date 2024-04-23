@@ -470,7 +470,7 @@ ListTarget.library = (function () {
         identityIds: identities.map(function (identity) {
           return identity.id;
         }),
-        designCodeId: designCode.id,
+        libraryDesignCodeId: designCode.id,
         excludeRequisitionId: config.requisitionId,
       },
       function (data) {
