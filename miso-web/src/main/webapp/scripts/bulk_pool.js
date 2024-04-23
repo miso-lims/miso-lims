@@ -148,7 +148,20 @@ BulkTarget.pool = (function ($) {
         BulkUtils.actions.children(Urls.rest.pools.children, [BulkUtils.relations.run()]),
       ]
         .concat(BulkUtils.actions.qc("Pool"))
-        .concat([BulkUtils.actions.transfer("poolIds")]);
+        .concat([
+          {
+            name: "Attach Files",
+            action: function (items) {
+              if (items.length === 1) {
+                ListTarget.attachment.showUploadDialog("pool", items[0].id, false);
+              } else {
+                var ids = items.map(Utils.array.getId).join(",");
+                ListTarget.attachment.showUploadDialog("pool", "shared", false, ids);
+              }
+            },
+          },
+          BulkUtils.actions.transfer("poolIds"),
+        ]);
     },
     getColumns: function (config, api) {
       return [
