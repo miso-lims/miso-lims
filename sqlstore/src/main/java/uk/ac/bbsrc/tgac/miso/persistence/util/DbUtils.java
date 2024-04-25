@@ -62,14 +62,28 @@ public class DbUtils {
 
   public static void restrictPaginationByReceiptTransferDate(Criteria criteria, Date start, Date end) {
     criteria.createAlias("listTransferViews", "transfer")
-        .add(Restrictions.isNotNull("transfer.senderLab"))
-        .add(Restrictions.between("transfer.transferTime", start, end));
+        .add(Restrictions.isNotNull("transfer.senderLab"));
+    addDateRestriction(criteria, "transfer.transferTime", start, end);
   }
 
   public static void restrictPaginationByDistributionTransferDate(Criteria criteria, Date start, Date end) {
     criteria.createAlias("listTransferViews", "transfer")
-        .add(Restrictions.isNotNull("transfer.recipient"))
-        .add(Restrictions.between("transfer.transferTime", start, end));
+        .add(Restrictions.isNotNull("transfer.recipient"));
+    addDateRestriction(criteria, "transfer.transferTime", start, end);
+  }
+
+  private static void addDateRestriction(Criteria criteria, String property, Date start, Date end) {
+    if (start != null) {
+      if (end != null) {
+        criteria.add(Restrictions.between(property, start, end));
+      } else {
+        criteria.add(Restrictions.ge(property, start));
+      }
+    } else if (end != null) {
+      criteria.add(Restrictions.le(property, end));
+    } else {
+      throw new IllegalArgumentException("Start and/or end date must be specified");
+    }
   }
 
   public static Criterion textRestriction(String query, String... searchProperties) {
