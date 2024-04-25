@@ -22,6 +22,7 @@ CREATE PROCEDURE updateSampleHierarchy(pSampleId bigint)
 BEGIN
   DECLARE vTissueId bigint;
   DECLARE vIdentityId bigint;
+  DECLARE vSampleDiscriminator varchar(50);
   
   DECLARE vDone BOOLEAN DEFAULT FALSE;
   DECLARE vChildId bigint;
@@ -31,11 +32,17 @@ BEGIN
   SELECT tissueId, identityId INTO vTissueId, vIdentityId FROM SampleHierarchy
   WHERE sampleId = (SELECT parentId FROM Sample WHERE sampleId = pSampleId);
   
-  IF vTissueId IS NULL THEN
+  SELECT discriminator INTO vSampleDiscriminator FROM Sample WHERE sampleId = pSampleId;
+
+  IF vSampleDiscriminator = 'Tissue' THEN
+    SET vTissueId = pSampleId;
+  ELSEIF vTissueId IS NULL THEN
     SET vTissueId = getParentIdByDiscriminator(pSampleId, 'Tissue');
   END IF;
   
-  IF vIdentityId IS NULL THEN
+  IF vSampleDiscriminator = 'Identity' THEN
+    SET vIdentityId = pSampleId;
+  ELSEIF vIdentityId IS NULL THEN
     IF vTissueId IS NOT NULL THEN
       SET vIdentityId = getParentIdByDiscriminator(vTissueId, 'Identity');
     ELSE
