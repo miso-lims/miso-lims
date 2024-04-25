@@ -24,6 +24,10 @@ Starting with version 1.29.0, the format of this file is based on
 * Sequencing container model validation - it should be possible to change the number of partitions as
   long as no containers have been created yet
 
+### Known Issues
+
+* Bad database migration. If you have already run migration V1570 and it has failed, you can fix by
+  running Flyway repair, moving to the next MISO version, and running Flyway migrate as usual
 
 ## [2.16.0] - 2024-04-11
 
