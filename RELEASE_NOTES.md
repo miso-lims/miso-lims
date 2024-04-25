@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.17.1] - 2024-04-25
+
+### Fixed
+
+* Bad database migration
+
+
 ## [2.17.0] - 2024-04-25
 
 ### Added
