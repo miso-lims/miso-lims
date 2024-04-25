@@ -1,3 +1,4 @@
+-- fix_sample_hierarchy
 DELIMITER //
 
 CREATE PROCEDURE rebuildSampleHierarchy()
@@ -27,3 +28,4 @@ DELIMITER ;
 CALL rebuildSampleHierarchy();
 
 DROP PROCEDURE rebuildSampleHierarchy;
+

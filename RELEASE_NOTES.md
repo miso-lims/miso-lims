@@ -7,6 +7,24 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.17.0] - 2024-04-25
+
+### Added
+
+* Bulk "Attach Files" action on the Pools list, for attaching a file to multiple pools
+
+### Fixed
+
+* The supplemental library wizard was not filtering by the selected library design (detailed sample)
+* Advanced search by received or distributed dates using "before" or "after" range formats returned no
+  results
+* When there were multiple tissue samples in the hierarchy, tissue-level attributes displayed for a
+  descendant sample were taken from the top-level tissue instead of the bottom-level tissue in the
+  hierarchy (detailed sample)
+* Sequencing container model validation - it should be possible to change the number of partitions as
+  long as no containers have been created yet
+
+
 ## [2.16.0] - 2024-04-11
 
 ### Added
