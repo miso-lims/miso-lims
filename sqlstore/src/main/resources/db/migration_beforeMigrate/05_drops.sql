@@ -62,7 +62,8 @@ DROP TRIGGER IF EXISTS TransferInsert;
 DROP TRIGGER IF EXISTS WorksetChange;
 DROP TRIGGER IF EXISTS WorksetInsert;
 
+DROP PROCEDURE IF EXISTS updateSampleHierarchy;
+
 DROP FUNCTION IF EXISTS getParentTissueId;
 DROP FUNCTION IF EXISTS getParentIdentityId;
-
-DROP PROCEDURE IF EXISTS updateSampleHierarchy;
+DROP FUNCTION IF EXISTS getParentIdByDiscriminator;

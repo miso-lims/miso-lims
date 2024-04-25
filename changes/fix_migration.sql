@@ -1,0 +1,1 @@
+Bad database migration
