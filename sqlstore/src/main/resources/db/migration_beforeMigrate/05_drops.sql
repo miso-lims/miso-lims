@@ -33,6 +33,8 @@ DROP TRIGGER IF EXISTS ProjectInsert;
 DROP TRIGGER IF EXISTS ProjectChange;
 DROP TRIGGER IF EXISTS RequisitionChange;
 DROP TRIGGER IF EXISTS RequisitionInsert;
+DROP TRIGGER IF EXISTS RequisitionAssayInsert;
+DROP TRIGGER IF EXISTS RequisitionAssayDelete;
 DROP TRIGGER IF EXISTS RequisitionQcInsert;
 DROP TRIGGER IF EXISTS RequisitionQcUpdate;
 DROP TRIGGER IF EXISTS RunChange;
