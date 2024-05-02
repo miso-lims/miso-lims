@@ -11,8 +11,14 @@ Starting with version 1.29.0, the format of this file is based on
 
 ### Fixed
 
-* Bad database migration
+* Bad database migration (failed attempt)
 
+### Known Issues
+
+* Bad database migration. If you have already run migration V1570 and it has failed, you can fix by
+  running Flyway repair, moving to the next MISO version, and running Flyway migrate as usual.
+  However, if you have been using MISO in this state, your database may be corrupt and should be
+  rolled back. Note that this version did not get an official release for this reason.
 
 ## [2.17.0] - 2024-04-25
 
@@ -34,7 +40,9 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * Bad database migration. If you have already run migration V1570 and it has failed, you can fix by
-  running Flyway repair, moving to the next MISO version, and running Flyway migrate as usual
+  running Flyway repair, moving to the next MISO version, and running Flyway migrate as usual.
+  However, if you have been using MISO in this state, your database may be corrupt and should be
+  rolled back. Note that this version did not get an official release for this reason.
 
 ## [2.16.0] - 2024-04-11
 
