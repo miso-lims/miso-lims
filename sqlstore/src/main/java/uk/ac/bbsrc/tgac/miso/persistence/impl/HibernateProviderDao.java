@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
 import org.hibernate.Session;
@@ -107,6 +108,15 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
     CriteriaQuery<Long> query = builder.createQuery(Long.class);
     Root<U> root = query.from(user);
     query.select(builder.count(root)).where(builder.equal(root.get(property), value));
+    return currentSession().createQuery(query).getSingleResult();
+  }
+
+  protected <U, V> long getUsageInCollection(Class<U> user, String collectionProperty, T value) {
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<Long> query = builder.createQuery(Long.class);
+    Root<U> root = query.from(user);
+    Join<U, T> collection = root.join(collectionProperty);
+    query.select(builder.count(root)).where(builder.equal(collection, value));
     return currentSession().createQuery(query).getSingleResult();
   }
 

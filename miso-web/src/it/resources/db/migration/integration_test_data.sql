@@ -529,9 +529,13 @@ INSERT INTO Assay_AssayTest(assayId, testId) VALUES
 (1, 2),
 (1, 3);
 
-INSERT INTO Requisition(requisitionId, alias, assayId, creator, created, lastModifier, lastModified) VALUES
-(1, 'Req One', 1, 1, '2021-07-21 11:31:00', 1, '2021-07-21 11:31:00'),
-(2, 'Req Two', 3, 3, '2021-07-21 11:31:00', 3, '2021-07-21 11:31:00');
+INSERT INTO Requisition(requisitionId, alias, creator, created, lastModifier, lastModified) VALUES
+(1, 'Req One', 1, '2021-07-21 11:31:00', 1, '2021-07-21 11:31:00'),
+(2, 'Req Two', 3, '2021-07-21 11:31:00', 3, '2021-07-21 11:31:00');
+
+INSERT INTO Requisition_Assay(requisitionId, assayId) VALUES
+(1, 1),
+(2, 3);
 
 -- Identities
 INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificNameId, volume, volumeUnits, concentration, concentrationUnits, creator, created, lastModifier, lastModified,

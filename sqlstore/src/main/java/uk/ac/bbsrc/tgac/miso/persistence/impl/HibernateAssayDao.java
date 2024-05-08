@@ -32,7 +32,7 @@ public class HibernateAssayDao extends HibernateSaveDao<Assay>
 
   @Override
   public long getUsage(Assay assay) throws IOException {
-    return getUsageBy(Requisition.class, "assay", assay);
+    return getUsageInCollection(Requisition.class, "assays", assay);
   }
 
   @Override
