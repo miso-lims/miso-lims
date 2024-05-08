@@ -1786,9 +1786,11 @@ public class Dtos {
     setString(dto::setKitLot, from.getKitLot());
 
     Requisition requisition = getEffectiveRequisition(from.getLibrary());
-    setId(dto::setRequisitionId, requisition);
-    setString(dto::setRequisitionAlias, maybeGetProperty(requisition, Requisition::getAlias));
-    dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
+    if (requisition != null) {
+      setId(dto::setRequisitionId, requisition);
+      setString(dto::setRequisitionAlias, requisition.getAlias());
+      dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
+    }
 
     return dto;
   }
