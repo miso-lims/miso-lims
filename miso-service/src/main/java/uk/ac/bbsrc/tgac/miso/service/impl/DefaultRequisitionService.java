@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -21,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Requisitionable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalLibrary;
@@ -100,7 +103,11 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
 
   @Override
   protected void loadChildEntities(Requisition object) throws IOException {
-    ValidationUtils.loadChildEntity(object::setAssay, object.getAssay(), assayService, "assayId");
+    Set<Assay> loadedAssays = new HashSet<>();
+    for (Assay assay : object.getAssays()) {
+      ValidationUtils.loadChildEntity(loadedAssays::add, assay, assayService, "assays");
+    }
+    object.setAssays(loadedAssays);
   }
 
   @Override
@@ -154,7 +161,7 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   @Override
   protected void applyChanges(Requisition to, Requisition from) throws IOException {
     to.setAlias(from.getAlias());
-    to.setAssay(from.getAssay());
+    ValidationUtils.applySetChanges(to.getAssays(), from.getAssays());
     to.setStopped(from.isStopped());
     to.setStopReason(from.getStopReason());
     applyPauseChanges(to, from);
@@ -217,6 +224,23 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
     for (Sample sample : samples) {
       sample.setRequisition(null);
       sampleService.update(sample);
+    }
+    List<Sample> supplementalSamples =
+        sampleService.list(0, 0, false, "id", PaginationFilter.supplementalToRequisitionId(object.getId()));
+    for (Sample sample : supplementalSamples) {
+      RequisitionSupplementalSample supplemental = requisitionDao.getSupplementalSample(object, sample);
+      requisitionDao.removeSupplementalSample(supplemental);
+    }
+    List<Library> libraries = libraryService.list(0, 0, false, "id", PaginationFilter.requisitionId(object.getId()));
+    for (Library library : libraries) {
+      library.setRequisition(null);
+      libraryService.update(library);
+    }
+    List<Library> supplementalLibraries =
+        libraryService.list(0, 0, false, "id", PaginationFilter.supplementalToRequisitionId(object.getId()));
+    for (Library library : supplementalLibraries) {
+      RequisitionSupplementalLibrary supplemental = requisitionDao.getSupplementalLibrary(object, library);
+      requisitionDao.removeSupplementalLibrary(supplemental);
     }
   }
 

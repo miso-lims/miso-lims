@@ -162,6 +162,8 @@ public class MisoClient implements Lims {
   private static final String QUERY_ALL_REQUISITIONS = getResourceAsString("queryAllRequisitions.sql");
   private static final String QUERY_REQUISITION_BY_ID = QUERY_ALL_REQUISITIONS + " WHERE requisitionId = ?";
   private static final String QUERY_REQUISITION_BY_NAME = QUERY_ALL_REQUISITIONS + " WHERE alias = ?";
+  private static final String QUERY_ALL_REQUISITION_ASSAY_IDS = getResourceAsString("queryAllRequisitionAssayIds.sql");
+  private static final String QUERY_REQUISITION_ASSAY_IDS_BY_ID = QUERY_ALL_REQUISITION_ASSAY_IDS + " WHERE requisitionId = ?";
   private static final String QUERY_ALL_REQUISITION_SAMPLE_IDS = getResourceAsString("queryAllRequisitionSampleIds.sql");
   private static final String QUERY_REQUISITION_SAMPLE_IDS_BY_ID = "SELECT * FROM (" + QUERY_ALL_REQUISITION_SAMPLE_IDS + ") combined WHERE requisitionId = ?";
   private static final String QUERY_ALL_REQUISITION_QCS = getResourceAsString("queryAllRequisitionQcs.sql");
@@ -725,6 +727,10 @@ public class MisoClient implements Lims {
     List<Requisition> reqs = template.query(QUERY_ALL_REQUISITIONS, requisitionRowMapper);
     Map<Integer, Requisition> reqsById =
         reqs.stream().collect(Collectors.toMap(Requisition::getId, Function.identity()));
+    template.query(QUERY_ALL_REQUISITION_ASSAY_IDS, rs -> {
+      Requisition req = reqsById.get(rs.getInt("requisitionId"));
+      req.addAssayId(rs.getInt("assayId"));
+    });
     template.query(QUERY_ALL_REQUISITION_SAMPLE_IDS, rs -> {
       Requisition req = reqsById.get(rs.getInt("requisitionId"));
       req.addSampleId(rs.getString("sampleId"));
@@ -807,6 +813,9 @@ public class MisoClient implements Lims {
 
   private void populateCollections(Requisition requisition) {
     Object[] params = {requisition.getId()};
+    template.query(QUERY_REQUISITION_ASSAY_IDS_BY_ID, params, SINGLE_ID_PARAM_TYPES, rs -> {
+      requisition.addAssayId(rs.getInt("assayId"));
+    });
     template.query(QUERY_REQUISITION_SAMPLE_IDS_BY_ID, params, SINGLE_ID_PARAM_TYPES, rs -> {
       requisition.addSampleId(rs.getString("sampleId"));
     });
@@ -1621,10 +1630,6 @@ public class MisoClient implements Lims {
     Requisition req = new DefaultRequisition();
     req.setId(rs.getInt("requisitionId"));
     req.setName(rs.getString("name"));
-    int assayId = rs.getInt("assayId");
-    if (!rs.wasNull()) {
-      req.setAssayId(assayId);
-    }
     req.setStopped(rs.getBoolean("stopped"));
     req.setStopReason(rs.getString("stopReason"));
     return req;

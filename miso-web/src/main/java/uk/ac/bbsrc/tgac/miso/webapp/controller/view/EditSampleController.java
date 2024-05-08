@@ -41,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -460,9 +461,7 @@ public class EditSampleController {
         if (requisition != null) {
           dto.setEffectiveRequisitionId(requisition.getId());
           dto.setEffectiveRequisitionAlias((requisition.getAlias()));
-          if (requisition.getAssay() != null) {
-            dto.setRequisitionAssayId(requisition.getAssay().getId());
-          }
+          dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
         }
         return dto;
       } else {

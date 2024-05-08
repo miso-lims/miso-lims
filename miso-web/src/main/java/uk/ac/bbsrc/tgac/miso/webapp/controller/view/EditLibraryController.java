@@ -44,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotRna;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryBatch;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
@@ -307,8 +308,8 @@ public class EditLibraryController {
       dto.setUmis(null);
 
       Requisition requisition = getEffectiveRequisition(item);
-      if (requisition != null && requisition.getAssay() != null) {
-        dto.setRequisitionAssayId(requisition.getAssay().getId());
+      if (requisition != null) {
+        dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
       }
       return dto;
     }

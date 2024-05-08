@@ -14,6 +14,10 @@
       <form:form id="requisitionForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 
       <br />
+      <h1>Assays</h1>
+      <div id="requisitionForm_assaysError"></div>
+      <div id="listAssays"></div>
+
       <div id="samples">
         <c:choose>
           <c:when test="${pageMode eq 'create'}">
@@ -154,15 +158,24 @@
           var config = {
             pageMode: '${pageMode}',
           };
+          var assayConfig = {
+            requisitionId: requisition.id
+          };
 
           <c:if test="${pageMode eq 'edit'}">
-            config["potentialAssayIds"] = ${potentialAssayIds};
-            config["numberOfRequisitionedItems"] = ${numberOfRequisitionedItems};
+            assayConfig["potentialAssayIds"] = ${potentialAssayIds};
+            assayConfig["numberOfRequisitionedItems"] = ${numberOfRequisitionedItems};
           </c:if>
 
           var form = FormUtils.createForm('requisitionForm', 'save', requisition, 'requisition', config);
           Requisition.setForm(form);
           Utils.ui.updateHelpLink(FormTarget.requisition.getUserManualUrl());
+
+          Requisition.setAssaysListConfig(assayConfig);
+          var assayIds = requisition.assayIds || [];
+          Requisition.setAssays(assayIds.map(function (assayId) {
+            return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(assayId), Constants.assays);
+          }));
 
           if ('${pageMode}' === 'edit') {
             Requisition.setPauses(requisition.pauses);

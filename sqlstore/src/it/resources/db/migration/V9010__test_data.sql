@@ -381,9 +381,13 @@ INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) 
 (2, 1, NULL, NULL),
 (2, 2, 12, NULL);
 
-INSERT INTO Requisition(requisitionId, alias, assayId, creator, created, lastModifier, lastModified) VALUES
-(1, 'Plain Req', 1, 1, '2021-07-13 12:30:00', 1, '2021-07-13 12:30:00'),
-(2, 'Detailed Req', 2, 1, '2021-07-13 12:30:00', 1, '2021-07-13 12:30:00');
+INSERT INTO Requisition(requisitionId, alias, creator, created, lastModifier, lastModified) VALUES
+(1, 'Plain Req', 1, '2021-07-13 12:30:00', 1, '2021-07-13 12:30:00'),
+(2, 'Detailed Req', 1, '2021-07-13 12:30:00', 1, '2021-07-13 12:30:00');
+
+INSERT INTO Requisition_Assay(requisitionId, assayId) VALUES
+(1, 1),
+(2, 2);
 
 INSERT INTO RequisitionQc(qcId, requisitionId, creator, `date`, type, results, created, lastModified) VALUES
 (1, 1, 1, '2021-07-13', 17, 123, '2021-07-13', '2021-07-13');

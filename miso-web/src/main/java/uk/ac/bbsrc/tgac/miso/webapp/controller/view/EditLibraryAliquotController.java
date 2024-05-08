@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
@@ -162,8 +163,8 @@ public class EditLibraryAliquotController {
       }
 
       Requisition requisition = getEffectiveRequisition(item);
-      if (requisition != null && requisition.getAssay() != null) {
-        dto.setRequisitionAssayId(requisition.getAssay().getId());
+      if (requisition != null) {
+        dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
       }
       return dto;
     }
@@ -248,8 +249,8 @@ public class EditLibraryAliquotController {
       }
 
       Requisition requisition = getEffectiveRequisition(item.getLibrary());
-      if (requisition != null && requisition.getAssay() != null) {
-        dto.setRequisitionAssayId(requisition.getAssay().getId());
+      if (requisition != null) {
+        dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
       }
       return dto;
     }

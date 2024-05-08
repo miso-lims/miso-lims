@@ -19,6 +19,13 @@ ListTarget.assay = (function ($) {
             action: Project.removeAssays,
           },
         ];
+      } else if (config.requisitionId != null) {
+        return [
+          {
+            name: "Remove",
+            action: Requisition.removeAssays,
+          },
+        ];
       } else if (config.isAdmin) {
         return [
           {
@@ -43,7 +50,16 @@ ListTarget.assay = (function ($) {
         return [
           {
             name: "Add",
-            handler: showAddAssayDialog,
+            handler: showAddProjectAssayDialog,
+          },
+        ];
+      } else if (config.requisitionId != null) {
+        return [
+          {
+            name: "Add",
+            handler: function () {
+              showAddRequisitionAssayDialog(config);
+            },
           },
         ];
       } else if (config.isAdmin) {
@@ -81,7 +97,7 @@ ListTarget.assay = (function ($) {
     },
   };
 
-  function showAddAssayDialog() {
+  function showAddProjectAssayDialog() {
     var nonArchivedAssays = Constants.assays.filter(function (x) {
       return !x.archived;
     });
@@ -92,6 +108,42 @@ ListTarget.assay = (function ($) {
           name: Assay.utils.makeLabel(assay),
           handler: function () {
             Project.addAssay(assay);
+          },
+        };
+      })
+    );
+  }
+
+  function showAddRequisitionAssayDialog(config) {
+    var potentialAssays = [];
+    if (config.numberOfRequisitionedItems) {
+      potentialAssays = config.potentialAssayIds.map(function (assayId) {
+        return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(assayId), Constants.assays);
+      });
+    } else {
+      potentialAssays = Constants.assays;
+    }
+    potentialAssays = potentialAssays.filter(function (potentialAssay) {
+      return (
+        !potentialAssay.archived &&
+        !Requisition.getAssays().some(function (assay) {
+          return assay.id === potentialAssay.id;
+        })
+      );
+    });
+    if (!potentialAssays.length) {
+      Utils.showOkDialog("Error", [
+        "No potential assays to add. An assay must be assigned to all projects associated with the requisition, and must not be archived.",
+      ]);
+      return;
+    }
+    Utils.showWizardDialog(
+      "Add assay",
+      potentialAssays.map(function (potentialAssay) {
+        return {
+          name: potentialAssay.alias + " v" + potentialAssay.version,
+          handler: function () {
+            Requisition.addAssay(potentialAssay);
           },
         };
       })

@@ -97,8 +97,8 @@ FormTarget.sample = (function ($) {
             FormUtils.makeRequisitionField(object),
             FormUtils.makeEffectiveRequisitionField(object),
             {
-              title: "Assay",
-              data: "requisitionAssayId",
+              title: "Assays",
+              data: "requisitionAssayIds",
               type: "special",
               makeControls: function () {
                 return makeAssayControls(object);
@@ -706,26 +706,15 @@ FormTarget.sample = (function ($) {
   };
 
   function makeAssayControls(sample) {
-    var assay = sample.requisitionAssayId
-      ? Utils.array.findUniqueOrThrow(
-          Utils.array.idPredicate(sample.requisitionAssayId),
-          Constants.assays
-        )
-      : null;
-    if (assay) {
-      var assayLabel = assay.alias + " v" + assay.version;
-      return FormUtils.makeFieldWithButton(assayLabel, "View Metrics", function () {
-        if (sample.requisitionId) {
-          // all plain samples should be caught here
-          Assay.utils.showMetrics(assay, "RECEIPT");
-        } else if (sample.sampleCategory === "Stock") {
-          Assay.utils.showMetrics(assay, "EXTRACTION");
-        } else {
-          Utils.showOkDialog("Error", ["No metrics applicable to " + sample.sampleCategory]);
-        }
-      });
-    } else {
-      return $("<span>").text("n/a");
-    }
+    return FormUtils.makeAssaysFieldWithButtons(sample.requisitionAssayIds, function (assay) {
+      if (sample.requisitionId) {
+        // all plain samples should be caught here
+        Assay.utils.showMetrics(assay, "RECEIPT");
+      } else if (sample.sampleCategory === "Stock") {
+        Assay.utils.showMetrics(assay, "EXTRACTION");
+      } else {
+        Utils.showOkDialog("Error", ["No metrics applicable to " + sample.sampleCategory]);
+      }
+    });
   }
 })(jQuery);

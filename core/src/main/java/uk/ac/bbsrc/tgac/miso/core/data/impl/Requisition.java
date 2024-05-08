@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
@@ -17,6 +18,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
@@ -49,9 +51,10 @@ public class Requisition implements Attachable, Deletable, QualityControllable<R
 
   private String alias;
 
-  @ManyToOne
-  @JoinColumn(name = "assayId")
-  private Assay assay;
+  @ManyToMany
+  @JoinTable(name = "Requisition_Assay", joinColumns = {@JoinColumn(name = "requisitionId")},
+      inverseJoinColumns = {@JoinColumn(name = "assayId")})
+  private Set<Assay> assays;
 
   private boolean stopped = false;
   private String stopReason;
@@ -120,12 +123,15 @@ public class Requisition implements Attachable, Deletable, QualityControllable<R
     this.alias = alias;
   }
 
-  public Assay getAssay() {
-    return assay;
+  public Set<Assay> getAssays() {
+    if (assays == null) {
+      assays = new HashSet<>();
+    }
+    return assays;
   }
 
-  public void setAssay(Assay assay) {
-    this.assay = assay;
+  public void setAssays(Set<Assay> assays) {
+    this.assays = assays;
   }
 
   public boolean isStopped() {
@@ -277,7 +283,7 @@ public class Requisition implements Attachable, Deletable, QualityControllable<R
 
   @Override
   public int hashCode() {
-    return Objects.hash(requisitionId, alias, assay, stopped);
+    return Objects.hash(requisitionId, alias, assays, stopped);
   }
 
   @Override
@@ -285,7 +291,7 @@ public class Requisition implements Attachable, Deletable, QualityControllable<R
     return LimsUtils.equals(this, obj,
         Requisition::getId,
         Requisition::getAlias,
-        Requisition::getAssay,
+        Requisition::getAssays,
         Requisition::isStopped);
   }
 

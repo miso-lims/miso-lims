@@ -38,8 +38,23 @@ ListTarget.requisition = (function () {
         ),
         {
           sTitle: "Assay",
-          mData: "assayId",
-          mRender: ListUtils.render.textFromId(Constants.assays, "alias", "n/a"),
+          mData: "assayIds",
+          bSortable: false,
+          mRender: function (data, type, full) {
+            if (!data || !data.length) {
+              return "n/a";
+            }
+
+            return data
+              .map(function (assayId) {
+                var assay = Utils.array.findUniqueOrThrow(
+                  Utils.array.idPredicate(assayId),
+                  Constants.assays
+                );
+                return "<div>" + assay.alias + "</div>";
+              })
+              .join("");
+          },
         },
         {
           sTitle: "Stopped",

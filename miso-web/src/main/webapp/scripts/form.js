@@ -447,27 +447,28 @@ FormUtils = (function ($) {
       };
     },
 
-    makeFieldWithButton: function (text, buttonText, onclick) {
-      var container = $("<div>").css({
-        width: "95%",
-        display: "flex",
-        "align-items": "center",
+    makeAssaysFieldWithButtons: function (assayIds, showMetrics) {
+      var assays = Assay.utils.getAssays(assayIds);
+      if (!assays || !assays.length) {
+        return $("<span>").text("n/a");
+      }
+      var container = $("<div>").addClass("assaysFieldContainer");
+      assays.forEach(function (assay) {
+        var assayContainer = $("<div>").addClass("assaysFieldItem");
+        var assayLabel = assay.alias + " v" + assay.version;
+        assayContainer.append($("<span>").text(assayLabel));
+        assayContainer.append(
+          $("<button>")
+            .addClass("ui-state-default")
+            .attr("type", "button")
+            .text("View Metrics")
+            .click(function () {
+              showMetrics(assay);
+            })
+        );
+        container.append(assayContainer);
       });
-      container.append(
-        $("<span>")
-          .css({
-            flex: 1,
-            "margin-right": "2px",
-          })
-          .text(text)
-      );
-      container.append(
-        $("<button>")
-          .addClass("ui-state-default")
-          .attr("type", "button")
-          .text(buttonText)
-          .click(onclick)
-      );
+
       return container;
     },
 
@@ -477,7 +478,6 @@ FormUtils = (function ($) {
         if (form) {
           form.markOtherChanges();
         }
-        var listSelector = "#" + containerId + "Table";
         $("#" + listId)
           .dataTable()
           .fnDestroy();

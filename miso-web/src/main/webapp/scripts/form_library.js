@@ -90,8 +90,8 @@ FormTarget.library = (function ($) {
             FormUtils.makeRequisitionField(object),
             FormUtils.makeEffectiveRequisitionField(object),
             {
-              title: "Assay",
-              data: "requisitionAssayId",
+              title: "Assays",
+              data: "requisitionAssayIds",
               type: "special",
               makeControls: function () {
                 return makeAssayControls(object);
@@ -647,19 +647,8 @@ FormTarget.library = (function ($) {
   }
 
   function makeAssayControls(library) {
-    var assay = library.requisitionAssayId
-      ? Utils.array.findUniqueOrThrow(
-          Utils.array.idPredicate(library.requisitionAssayId),
-          Constants.assays
-        )
-      : null;
-    if (assay) {
-      var assayLabel = assay.alias + " v" + assay.version;
-      return FormUtils.makeFieldWithButton(assayLabel, "View Metrics", function () {
-        Assay.utils.showMetrics(assay, "LIBRARY_PREP");
-      });
-    } else {
-      return $("<span>").text("n/a");
-    }
+    return FormUtils.makeAssaysFieldWithButtons(library.requisitionAssayIds, function (assay) {
+      Assay.utils.showMetrics(assay, "LIBRARY_PREP");
+    });
   }
 })(jQuery);
