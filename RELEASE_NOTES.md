@@ -7,6 +7,20 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.18.0] - 2024-05-09
+
+### Changed
+
+* Multiple assays can now be assigned to a single requisition
+
+### Fixed
+
+* Bad database migration
+* Deleting a requisition with requisitioned libraries left a broken link in the database, causing an
+  error when later looking up the libraries
+* Errors deleting requisitions with supplemental samples or libraries
+
+
 ## [2.17.1] - 2024-04-25
 
 ### Fixed

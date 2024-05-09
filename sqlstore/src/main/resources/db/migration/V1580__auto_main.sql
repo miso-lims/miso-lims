@@ -1,3 +1,4 @@
+-- multi-assay_req
 CREATE TABLE Requisition_Assay (
   requisitionId bigint NOT NULL,
   assayId bigint NOT NULL,
@@ -26,3 +27,4 @@ ALTER TABLE RequisitionChangeLog
   DROP FOREIGN KEY fk_requisitionChangeLog_requisition;
 ALTER TABLE RequisitionChangeLog
   ADD CONSTRAINT fk_requisitionChangeLog_requisition FOREIGN KEY (requisitionId) REFERENCES Requisition (requisitionId) ON DELETE CASCADE;
+
