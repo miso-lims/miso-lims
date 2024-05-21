@@ -764,12 +764,20 @@ BulkUtils = (function ($) {
             type: "dropdown",
             data: "detailedQcStatusId",
             required: true,
-            source: [
-              {
-                id: null,
-                description: "Not Ready",
-              },
-            ].concat(Constants.detailedQcStatuses),
+            source: function (data, api) {
+              return [
+                {
+                  id: null,
+                  description: "Not Ready",
+                },
+              ].concat(
+                Constants.detailedQcStatuses.filter(function (detailedQcStatus) {
+                  return (
+                    !detailedQcStatus.archived || detailedQcStatus.id === data.detailedQcStatusId
+                  );
+                })
+              );
+            },
             sortSource: Utils.sorting.detailedQcStatusSort,
             getItemLabel: Utils.array.get("description"),
             getItemValue: Utils.array.getId,

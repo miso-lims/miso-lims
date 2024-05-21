@@ -42,6 +42,9 @@ public class DetailedQcStatusImpl implements DetailedQcStatus {
   @Column(nullable = false)
   private Boolean noteRequired;
 
+  @Column(nullable = false)
+  private Boolean archived;
+
   @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "createdBy", nullable = false)
   private User createdBy;
@@ -136,6 +139,16 @@ public class DetailedQcStatusImpl implements DetailedQcStatus {
   @Override
   public void setNoteRequired(Boolean noteRequired) {
     this.noteRequired = noteRequired;
+  }
+
+  @Override
+  public Boolean getArchived() {
+    return archived;
+  }
+
+  @Override
+  public void setArchived(Boolean archived) {
+    this.archived = archived;
   }
 
   @Override

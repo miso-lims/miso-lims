@@ -69,6 +69,24 @@ BulkTarget.detailedqcstatus = (function ($) {
           getItemLabel: Utils.array.get("label"),
           getItemValue: Utils.array.get("value"),
         },
+        {
+          title: "Archived?",
+          data: "archived",
+          type: "dropdown",
+          required: true,
+          source: [
+            {
+              label: "True",
+              value: true,
+            },
+            {
+              label: "False",
+              value: false,
+            },
+          ],
+          getItemLabel: Utils.array.get("label"),
+          getItemValue: Utils.array.get("value"),
+        },
       ];
     },
   };

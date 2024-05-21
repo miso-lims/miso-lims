@@ -342,7 +342,7 @@ FormTarget.library = (function ($) {
                   type: "checkbox",
                 },
               ]
-                .concat(FormUtils.makeDetailedQcStatusFields())
+                .concat(FormUtils.makeDetailedQcStatusFields(object))
                 .concat([
                   {
                     title: "Low Quality Sequencing",

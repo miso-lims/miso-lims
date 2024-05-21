@@ -137,7 +137,7 @@ FormTarget.sample = (function ($) {
               required: true,
             },
           ]
-            .concat(FormUtils.makeDetailedQcStatusFields())
+            .concat(FormUtils.makeDetailedQcStatusFields(object))
             .concat([
               {
                 title: "Discarded",

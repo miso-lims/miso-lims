@@ -520,7 +520,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListDetailedQcStatusSetup() throws Exception {
     testPageSetup(ListTarget.DETAILED_QC_STATUS,
-        Sets.newHashSet(Columns.DESCRIPTION, Columns.QC_PASSED, Columns.NOTE_REQUIRED));
+        Sets.newHashSet(Columns.DESCRIPTION, Columns.QC_PASSED, Columns.NOTE_REQUIRED, Columns.ARCHIVED));
   }
 
   @Test

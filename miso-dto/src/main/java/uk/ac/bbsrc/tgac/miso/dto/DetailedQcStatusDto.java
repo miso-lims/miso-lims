@@ -6,6 +6,7 @@ public class DetailedQcStatusDto {
   private Boolean status;
   private String description;
   private boolean noteRequired;
+  private boolean archived;
   private Long createdById;
   private String creationDate;
   private Long updatedById;
@@ -73,6 +74,14 @@ public class DetailedQcStatusDto {
 
   public void setNoteRequired(boolean noteRequired) {
     this.noteRequired = noteRequired;
+  }
+
+  public boolean getArchived() {
+    return archived;
+  }
+
+  public void setArchived(boolean archived) {
+    this.archived = archived;
   }
 
 }

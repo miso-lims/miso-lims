@@ -129,7 +129,7 @@ FormTarget.libraryaliquot = (function ($) {
               },
             },
           ]
-            .concat(FormUtils.makeDetailedQcStatusFields())
+            .concat(FormUtils.makeDetailedQcStatusFields(object))
             .concat([
               FormUtils.makeDnaSizeField(),
               {

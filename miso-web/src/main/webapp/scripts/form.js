@@ -251,14 +251,16 @@ FormUtils = (function ($) {
       };
     },
 
-    makeDetailedQcStatusFields: function () {
+    makeDetailedQcStatusFields: function (object) {
       return [
         {
           title: "QC Status",
           data: "detailedQcStatusId",
           type: "dropdown",
           nullLabel: "Not Ready",
-          source: Constants.detailedQcStatuses,
+          source: Constants.detailedQcStatuses.filter(function (detailedQCStatus) {
+            return !detailedQCStatus.archived || detailedQCStatus.id === object.detailedQcStatusId;
+          }),
           sortSource: Utils.sorting.detailedQcStatusSort,
           getItemLabel: function (item) {
             return item.description;
