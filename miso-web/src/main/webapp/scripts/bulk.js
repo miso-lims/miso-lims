@@ -781,7 +781,7 @@ BulkUtils = (function ($) {
             sortSource: Utils.sorting.detailedQcStatusSort,
             getItemLabel: Utils.array.get("description"),
             getItemValue: Utils.array.getId,
-            initial: "", // user must explicitly choose if not ready (null)
+            initial: " ", // user must explicitly choose if not ready (null)
             onChange: function (rowIndex, newValue, api) {
               var status = Constants.detailedQcStatuses.find(function (item) {
                 return item.description === newValue;
