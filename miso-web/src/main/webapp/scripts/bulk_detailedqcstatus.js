@@ -69,6 +69,7 @@ BulkTarget.detailedqcstatus = (function ($) {
           getItemLabel: Utils.array.get("label"),
           getItemValue: Utils.array.get("value"),
         },
+        BulkUtils.columns.archived()
       ];
     },
   };

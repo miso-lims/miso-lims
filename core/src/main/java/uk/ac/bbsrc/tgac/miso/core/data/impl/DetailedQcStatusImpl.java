@@ -22,7 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
-@Table(name = "DetailedQcStatus", uniqueConstraints = @UniqueConstraint(columnNames = { "status", "description" }))
+@Table(name = "DetailedQcStatus", uniqueConstraints = @UniqueConstraint(columnNames = {"status", "description"}))
 public class DetailedQcStatusImpl implements DetailedQcStatus {
 
   private static final long serialVersionUID = 1L;
@@ -41,6 +41,9 @@ public class DetailedQcStatusImpl implements DetailedQcStatus {
 
   @Column(nullable = false)
   private Boolean noteRequired;
+
+  @Column(nullable = false)
+  private Boolean archived;
 
   @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "createdBy", nullable = false)
@@ -139,10 +142,22 @@ public class DetailedQcStatusImpl implements DetailedQcStatus {
   }
 
   @Override
+  public boolean getArchived() {
+    return archived;
+  }
+
+  @Override
+  public void setArchived(boolean archived) {
+    this.archived = archived;
+  }
+
+  @Override
   public String toString() {
-    return "DetailedQcStatusImpl [detailedQcStatusId=" + detailedQcStatusId + ", status=" + status + ", description=" + description
-        + ", noteRequired=" + noteRequired + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy 
-        + ", lastUpdated=" + lastUpdated + "]"; 
+    return "DetailedQcStatusImpl [detailedQcStatusId=" + detailedQcStatusId + ", status=" + status + ", description="
+        + description
+        + ", noteRequired=" + noteRequired + ", createdBy=" + createdBy + ", creationDate=" + creationDate
+        + ", updatedBy=" + updatedBy
+        + ", lastUpdated=" + lastUpdated + "]";
   }
 
   @Override

@@ -54,6 +54,13 @@ ListTarget.detailedqcstatus = {
         iSortPriority: 0,
         mRender: ListUtils.render.booleanChecks,
       },
+      {
+        sTitle: "Archived",
+        mData: "archived",
+        include: true,
+        iSortPriority: 0,
+        mRender: ListUtils.render.booleanChecks,
+      },
     ];
   },
 };

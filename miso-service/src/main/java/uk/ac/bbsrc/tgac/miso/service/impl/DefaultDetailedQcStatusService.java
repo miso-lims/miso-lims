@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
@@ -20,7 +21,8 @@ import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultDetailedQcStatusService extends AbstractSaveService<DetailedQcStatus> implements DetailedQcStatusService {
+public class DefaultDetailedQcStatusService extends AbstractSaveService<DetailedQcStatus>
+    implements DetailedQcStatusService {
 
   @Autowired
   private DetailedQcStatusDao detailedQcStatusDao;
@@ -57,9 +59,10 @@ public class DefaultDetailedQcStatusService extends AbstractSaveService<Detailed
   }
 
   @Override
-  protected void collectValidationErrors(DetailedQcStatus object, DetailedQcStatus beforeChange, List<ValidationError> errors) throws IOException {
+  protected void collectValidationErrors(DetailedQcStatus object, DetailedQcStatus beforeChange,
+      List<ValidationError> errors) throws IOException {
     if (ValidationUtils.isSetAndChanged(DetailedQcStatus::getDescription, object, beforeChange)
-            && detailedQcStatusDao.getByDescription(object.getDescription()) != null) {
+        && detailedQcStatusDao.getByDescription(object.getDescription()) != null) {
       errors.add(new ValidationError("description", "There is already a detailed QC status with this description"));
     }
   }
@@ -68,6 +71,7 @@ public class DefaultDetailedQcStatusService extends AbstractSaveService<Detailed
     to.setStatus(from.getStatus());
     to.setDescription(from.getDescription());
     to.setNoteRequired(from.getNoteRequired());
+    to.setArchived(from.getArchived());
   }
 
   @Override

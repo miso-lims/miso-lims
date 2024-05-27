@@ -55,13 +55,15 @@ public class HibernateDetailedQcStatusDaoIT extends AbstractDAOTest {
     status.setDescription(desc);
     status.setStatus(null);
     status.setNoteRequired(true);
+    status.setArchived(false);
     User user = (User) getSessionFactory().getCurrentSession().get(UserImpl.class, 1L);
     status.setChangeDetails(user);
     long savedId = sut.create(status);
 
     clearSession();
 
-    DetailedQcStatus saved = (DetailedQcStatus) getSessionFactory().getCurrentSession().get(DetailedQcStatusImpl.class, savedId);
+    DetailedQcStatus saved =
+        (DetailedQcStatus) getSessionFactory().getCurrentSession().get(DetailedQcStatusImpl.class, savedId);
     assertEquals(desc, saved.getDescription());
   }
 
@@ -69,34 +71,39 @@ public class HibernateDetailedQcStatusDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String desc = "New Desc";
-    DetailedQcStatus status = (DetailedQcStatus) getSessionFactory().getCurrentSession().get(DetailedQcStatusImpl.class, id);
+    DetailedQcStatus status =
+        (DetailedQcStatus) getSessionFactory().getCurrentSession().get(DetailedQcStatusImpl.class, id);
     assertNotEquals(desc, status.getDescription());
     status.setDescription(desc);
     sut.update(status);
 
     clearSession();
 
-    DetailedQcStatus saved = (DetailedQcStatus) getSessionFactory().getCurrentSession().get(DetailedQcStatusImpl.class, id);
+    DetailedQcStatus saved =
+        (DetailedQcStatus) getSessionFactory().getCurrentSession().get(DetailedQcStatusImpl.class, id);
     assertEquals(desc, saved.getDescription());
   }
 
   @Test
   public void testGetUsageBySamples() throws IOException {
-    DetailedQcStatus status = (DetailedQcStatus) getSessionFactory().getCurrentSession().get(DetailedQcStatusImpl.class, 1L);
+    DetailedQcStatus status =
+        (DetailedQcStatus) getSessionFactory().getCurrentSession().get(DetailedQcStatusImpl.class, 1L);
     assertEquals("Passed", status.getDescription());
     assertEquals(24L, sut.getUsageBySamples(status));
   }
 
   @Test
   public void testGetUsageByLibraries() throws IOException {
-    DetailedQcStatus status = (DetailedQcStatus) getSessionFactory().getCurrentSession().get(DetailedQcStatusImpl.class, 1L);
+    DetailedQcStatus status =
+        (DetailedQcStatus) getSessionFactory().getCurrentSession().get(DetailedQcStatusImpl.class, 1L);
     assertEquals("Passed", status.getDescription());
     assertEquals(15L, sut.getUsageByLibraries(status));
   }
 
   @Test
   public void testGetUsageByLibraryAliquots() throws IOException {
-    DetailedQcStatus status = (DetailedQcStatus) getSessionFactory().getCurrentSession().get(DetailedQcStatusImpl.class, 1L);
+    DetailedQcStatus status =
+        (DetailedQcStatus) getSessionFactory().getCurrentSession().get(DetailedQcStatusImpl.class, 1L);
     assertEquals("Passed", status.getDescription());
     assertEquals(0L, sut.getUsageByLibraryAliquots(status));
   }

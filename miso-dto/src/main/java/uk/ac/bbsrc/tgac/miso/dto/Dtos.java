@@ -414,6 +414,7 @@ public class Dtos {
     dto.setStatus(from.getStatus());
     dto.setDescription(from.getDescription());
     dto.setNoteRequired(from.getNoteRequired());
+    dto.setArchived(from.getArchived());
     dto.setCreationDate(formatDateTime(from.getCreationTime()));
     setLong(dto::setCreatedById, maybeGetProperty(from.getCreator(), User::getId), true);
     setLong(dto::setUpdatedById, maybeGetProperty(from.getLastModifier(), User::getId), true);
@@ -431,6 +432,7 @@ public class Dtos {
     setBoolean(to::setStatus, from.getStatus(), true);
     setString(to::setDescription, from.getDescription());
     setBoolean(to::setNoteRequired, from.isNoteRequired(), false);
+    setBoolean(to::setArchived, from.getArchived(), false);
     return to;
   }
 
