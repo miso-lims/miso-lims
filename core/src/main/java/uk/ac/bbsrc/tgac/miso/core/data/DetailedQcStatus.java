@@ -16,8 +16,8 @@ public interface DetailedQcStatus extends Deletable, Identifiable, Serializable,
 
   void setNoteRequired(Boolean noteRequired);
 
-  Boolean getArchived();
+  boolean getArchived();
 
-  void setArchived(Boolean archived);
+  void setArchived(boolean archived);
 
 }
