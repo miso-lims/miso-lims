@@ -17,7 +17,18 @@ BulkTarget.box = (function ($) {
       return Urls.external.userManual("boxes");
     },
     getBulkActions: function (config) {
-      return [BulkUtils.actions.edit(Urls.ui.boxes.bulkEdit), BulkUtils.actions.transfer("boxIds")];
+      return [
+        BulkUtils.actions.edit(Urls.ui.boxes.bulkEdit),
+        BulkUtils.actions.transfer("boxIds"),
+        BulkUtils.actions.download(
+          Urls.rest.boxes.boxSpreadsheet,
+          Constants.boxSpreadsheets,
+          function (boxes, spreadsheet) {
+            var errors = [];
+            return errors;
+          }
+        ),
+      ];
     },
     getColumns: function (config, api) {
       return [
