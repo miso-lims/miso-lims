@@ -95,6 +95,20 @@ FOR EACH ROW
       NEW.lastModified
       );
   END IF;
+  IF isChanged(OLD.requisitionId, NEW.requisitionId) THEN
+    IF OLD.requisitionId IS NOT NULL THEN
+      INSERT INTO RequisitionChangeLog(requisitionId, columnsChanged, userId, message, changeTime)
+      VALUES (OLD.requisitionId, "libraries", NEW.lastModifier, CONCAT("Removed library ", NEW.name,
+          " (", NEW.alias, ")"), NEW.lastModified);
+    END IF;
+    IF NEW.requisitionId IS NOT NULL
+        -- Don't log initial additions to requisition, as that's part of the requisition creation
+        AND TIMESTAMPDIFF(HOUR, (SELECT created FROM Requisition WHERE requisitionId = NEW.requisitionId), NOW()) > 0 THEN
+      INSERT INTO RequisitionChangeLog(requisitionId, columnsChanged, userId, message, changeTime)
+      VALUES (NEW.requisitionId, "libraries", NEW.lastModifier, CONCAT("Added library ", NEW.name,
+          " (", NEW.alias, ")"), NEW.lastModified);
+    END IF;
+  END IF;
   END//
 
 DROP TRIGGER IF EXISTS LibraryInsert//
