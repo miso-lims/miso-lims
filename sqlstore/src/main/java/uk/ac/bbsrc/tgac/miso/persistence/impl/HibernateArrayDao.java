@@ -48,12 +48,12 @@ public class HibernateArrayDao extends HibernateSaveDao<Array>
 
   @Override
   public Array getByAlias(String alias) throws IOException {
-    return getBy("alias", alias);
+    return getBy(Array_.ALIAS, alias);
   }
 
   @Override
   public Array getBySerialNumber(String serialNumber) throws IOException {
-    return getBy("serialNumber", serialNumber);
+    return getBy(Array_.SERIAL_NUMBER, serialNumber);
   }
 
   @Override
