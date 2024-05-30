@@ -14,6 +14,7 @@ import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.ListJoin;
+import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
@@ -22,6 +23,7 @@ import javax.persistence.criteria.SetJoin;
 import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.ListAttribute;
+import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -146,6 +148,13 @@ public class QueryBuilder<R, T> {
     @SuppressWarnings("unchecked")
     ListJoin<X, Y> result = (ListJoin<X, Y>) findJoin(from, attribute)
         .orElseGet(() -> from.join(attribute, JoinType.LEFT));
+    return result;
+  }
+
+  public <X, K, Y> MapJoin<X, K, Y> getJoin(From<?, X> from, MapAttribute<? super X, K, Y> attribute) {
+    @SuppressWarnings("unchecked")
+    MapJoin<X, K, Y> result =
+        (MapJoin<X, K, Y>) findJoin(from, attribute).orElseGet(() -> from.join(attribute, JoinType.LEFT));
     return result;
   }
 

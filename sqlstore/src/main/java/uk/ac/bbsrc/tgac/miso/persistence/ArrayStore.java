@@ -7,7 +7,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface ArrayStore extends Store<Array>, PaginatedDataSource<Array> {
+public interface ArrayStore extends SaveDao<Array>, PaginatedDataSource<Array> {
 
   public Array getByAlias(String alias) throws IOException;
 
