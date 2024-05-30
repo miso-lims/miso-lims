@@ -53,7 +53,7 @@ public class HibernateArrayDaoIT extends AbstractDAOTest {
     a.setLastModifier(user);
     a.setLastModified(now);
 
-    long savedId = sut.save(a);
+    long savedId = sut.create(a);
     Array saved = sut.get(savedId);
     assertNotNull(saved);
     assertEquals(a.getAlias(), saved.getAlias());
@@ -71,7 +71,7 @@ public class HibernateArrayDaoIT extends AbstractDAOTest {
     a.setDescription(description);
     a.setSerialNumber(serialNum);
 
-    long savedId = sut.save(a);
+    long savedId = sut.update(a);
     Array saved = sut.get(savedId);
     assertNotNull(saved);
     assertEquals(description, saved.getDescription());
@@ -103,8 +103,8 @@ public class HibernateArrayDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAll() throws Exception {
-    List<Array> arrays = sut.listAll();
+  public void testList() throws Exception {
+    List<Array> arrays = sut.list();
     assertNotNull(arrays);
     assertEquals(1, arrays.size());
   }

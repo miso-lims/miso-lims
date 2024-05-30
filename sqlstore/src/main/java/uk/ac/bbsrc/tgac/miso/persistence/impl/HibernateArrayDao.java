@@ -47,33 +47,13 @@ public class HibernateArrayDao extends HibernateSaveDao<Array>
   }
 
   @Override
-  public long save(Array array) throws IOException {
-    if (!array.isSaved()) {
-      return (long) currentSession().save(array);
-    } else {
-      currentSession().update(array);
-      return array.getId();
-    }
-  }
-
-  @Override
   public Array getByAlias(String alias) throws IOException {
-    QueryBuilder<Array, Array> builder = getQueryBuilder();
-    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(Array_.alias), alias));
-    return builder.getSingleResultOrNull();
+    return getBy("alias", alias);
   }
 
   @Override
   public Array getBySerialNumber(String serialNumber) throws IOException {
-    QueryBuilder<Array, Array> builder = getQueryBuilder();
-    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(Array_.serialNumber), serialNumber));
-    return builder.getSingleResultOrNull();
-  }
-
-  @Override
-  public List<Array> listAll() throws IOException {
-    List<Array> list = getQueryBuilder().getResultList();
-    return list;
+    return getBy("serialNumber", serialNumber);
   }
 
   @Override

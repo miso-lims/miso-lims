@@ -46,7 +46,7 @@ public class DefaultArrayService implements ArrayService {
 
   @Autowired
   private ArrayStore arrayStore;
-  
+
   @Autowired
   private ArrayRunService arrayRunService;
 
@@ -90,7 +90,8 @@ public class DefaultArrayService implements ArrayService {
   }
 
   @Override
-  public List<Array> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+  public List<Array> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter)
       throws IOException {
     return arrayStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
@@ -110,7 +111,7 @@ public class DefaultArrayService implements ArrayService {
     loadChildEntities(array);
     array.setChangeDetails(authorizationManager.getCurrentUser());
     validateChange(array, null);
-    return arrayStore.save(array);
+    return arrayStore.create(array);
   }
 
   @Override
@@ -120,7 +121,7 @@ public class DefaultArrayService implements ArrayService {
     validateChange(array, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     applyChanges(array, managed);
-    return arrayStore.save(managed);
+    return arrayStore.update(managed);
   }
 
   private void loadChildEntities(Array array) throws IOException {
@@ -136,7 +137,8 @@ public class DefaultArrayService implements ArrayService {
   }
 
   /**
-   * Checks submitted data for validity, throwing a ValidationException containing all of the errors if invalid
+   * Checks submitted data for validity, throwing a ValidationException containing all of the errors
+   * if invalid
    * 
    * @param array submitted Array to validate
    * @param beforeChange the already-persisted Array before changes
@@ -198,7 +200,8 @@ public class DefaultArrayService implements ArrayService {
     to.setSerialNumber(from.getSerialNumber());
     to.setDescription(from.getDescription());
 
-    // have to add/remove samples individually to avoid unnecessary "sample removed; sample added" changelogs for non-changes
+    // have to add/remove samples individually to avoid unnecessary "sample removed; sample added"
+    // changelogs for non-changes
     Map<String, Sample> toSamples = to.getSamples();
     Set<String> removePositions = toSamples.keySet().stream().filter(key -> !from.getSamples().containsKey(key))
         .collect(Collectors.toSet());
