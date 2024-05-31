@@ -6,9 +6,7 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
-public interface ArrayRunStore extends PaginatedDataSource<ArrayRun>, ProviderDao<ArrayRun> {
-
-  public long save(ArrayRun run) throws IOException;
+public interface ArrayRunStore extends PaginatedDataSource<ArrayRun>, SaveDao<ArrayRun> {
 
   public ArrayRun getByAlias(String alias) throws IOException;
 
