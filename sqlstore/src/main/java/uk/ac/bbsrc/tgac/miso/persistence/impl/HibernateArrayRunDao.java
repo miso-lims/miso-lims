@@ -56,15 +56,9 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
     QueryBuilder<ArrayRun, ArrayRun> builder = getQueryBuilder();
     Root<ArrayRun> root = builder.getRoot();
     Join<ArrayRun, Array> arrayJoin = builder.getJoin(root, ArrayRun_.array);
-    Join<Array, SampleImpl> sampleJoin = arrayJoin.join(Array_.samples);
+    Join<Array, SampleImpl> sampleJoin = builder.getJoin(arrayJoin, Array_.samples);
     builder.addPredicate(builder.getCriteriaBuilder().equal(sampleJoin.get(SampleImpl_.sampleId), sampleId));
     return builder.getResultList();
-  }
-
-  @Override
-  public int count() throws IOException {
-    long c = new LongQueryBuilder<>(currentSession(), ArrayRun.class).getCount();
-    return (int) c;
   }
 
   @Override
@@ -109,8 +103,8 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
   public void restrictPaginationByProjectId(QueryBuilder<?, ArrayRun> builder, long projectId,
       Consumer<String> errorHandler) {
     Join<ArrayRun, Array> arrayJoin = builder.getJoin(builder.getRoot(), ArrayRun_.array);
-    Join<Array, SampleImpl> sampleJoin = arrayJoin.join(Array_.samples);
-    Join<SampleImpl, ProjectImpl> projectJoin = sampleJoin.join(SampleImpl_.project);
+    Join<Array, SampleImpl> sampleJoin = builder.getJoin(arrayJoin, Array_.samples);
+    Join<SampleImpl, ProjectImpl> projectJoin = builder.getJoin(sampleJoin, SampleImpl_.project);
     builder.addPredicate(builder.getCriteriaBuilder().equal(projectJoin.get(ProjectImpl_.id), projectId));
   }
 
