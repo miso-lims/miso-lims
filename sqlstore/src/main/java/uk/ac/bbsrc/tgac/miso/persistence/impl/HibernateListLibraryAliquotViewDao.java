@@ -111,6 +111,8 @@ public class HibernateListLibraryAliquotViewDao
         return "tissueOrigin.alias";
       case "effectiveTissueTypeAlias":
         return "tissueType.alias";
+      case "projectCode":
+        return "sample.parentProject.id";
       default:
         return original;
     }

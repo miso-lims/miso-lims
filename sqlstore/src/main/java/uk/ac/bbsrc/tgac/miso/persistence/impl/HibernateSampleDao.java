@@ -305,6 +305,8 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
         return "tissueType.alias";
       case "sampleClassId":
         return "sampleClass.alias";
+      case "projectCode":
+        return "project.id";
       default:
         return original;
     }

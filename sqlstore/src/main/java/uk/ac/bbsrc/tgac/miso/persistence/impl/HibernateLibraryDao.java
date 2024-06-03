@@ -299,6 +299,8 @@ public class HibernateLibraryDao implements LibraryStore, HibernatePaginatedBoxa
         return "tissueOrigin.alias";
       case "effectiveTissueTypeAlias":
         return "tissueType.alias";
+      case "projectCode":
+        return "sample.project.id";
       default:
         return original;
     }

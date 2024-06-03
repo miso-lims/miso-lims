@@ -16,7 +16,7 @@ public class HibernateListLibraryAliquotViewDaoSearchIT extends PaginationFilter
           SearchType.CREATOR, SearchType.MODIFIER, SearchType.BULK_LOOKUP, SearchType.BARCODE);
   private static final List<String> SORT_FIELDS = Arrays.asList("alias", "lastModified", "library.parentSampleId",
       "library.parentSampleAlias", "libraryPlatformType", "library.platformType", "creatorName", "creationDate",
-      "effectiveTissueOriginAlias", "effectiveTissueTypeAlias");
+      "effectiveTissueOriginAlias", "effectiveTissueTypeAlias", "projectCode");
 
   public HibernateListLibraryAliquotViewDaoSearchIT() {
     super(VALID_SEARCH_TYPES, SORT_FIELDS);
