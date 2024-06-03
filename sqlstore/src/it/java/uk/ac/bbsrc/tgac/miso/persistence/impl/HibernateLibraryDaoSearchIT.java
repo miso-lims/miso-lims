@@ -17,7 +17,7 @@ public class HibernateLibraryDaoSearchIT extends PaginationFilterSinkIT {
           SearchType.PLATFORM_TYPE, SearchType.WORKSTATION, SearchType.BARCODE);
 
   private static final List<String> SORT_FIELDS = Arrays.asList("effectiveTissueOriginAlias",
-      "effectiveTissueTypeAlias", "parentSampleId", "parentSampleAlias");
+      "effectiveTissueTypeAlias", "parentSampleId", "parentSampleAlias", "projectCode");
 
   public HibernateLibraryDaoSearchIT() {
     super(VALID_SEARCH_TYPES, SORT_FIELDS);
