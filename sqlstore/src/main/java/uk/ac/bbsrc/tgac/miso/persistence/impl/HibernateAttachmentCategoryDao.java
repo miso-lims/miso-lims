@@ -4,16 +4,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment_;
 import uk.ac.bbsrc.tgac.miso.persistence.AttachmentCategoryStore;
 
 @Repository
@@ -27,20 +24,16 @@ public class HibernateAttachmentCategoryDao extends HibernateSaveDao<AttachmentC
 
   @Override
   public AttachmentCategory getByAlias(String alias) throws IOException {
-    return (AttachmentCategory) currentSession().createCriteria(AttachmentCategory.class)
-        .add(Restrictions.eq("alias", alias))
-        .uniqueResult();
+    return getBy(AttachmentCategory_.ALIAS, alias);
   }
 
   @Override
   public long getUsage(AttachmentCategory category) {
-    return (long) currentSession().createCriteria(FileAttachment.class)
-        .add(Restrictions.eq("category", category))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    return getUsageBy(FileAttachment.class, FileAttachment_.CATEGORY, category);
   }
 
   @Override
   public List<AttachmentCategory> listByIdList(Collection<Long> idList) throws IOException {
-    return listByIdList("categoryId", idList);
+    return listByIdList(AttachmentCategory_.CATEGORY_ID, idList);
   }
 }
