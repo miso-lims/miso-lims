@@ -11,7 +11,6 @@ import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -27,9 +26,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 public class HibernateArrayRunDaoIT extends AbstractDAOTest {
 
   @Autowired
-  private JdbcTemplate template;
-
-  @Autowired
   private SessionFactory sessionFactory;
 
   private HibernateArrayRunDao sut;
@@ -38,7 +34,6 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
   public void setup() {
     sut = new HibernateArrayRunDao();
     sut.setSessionFactory(sessionFactory);
-    sut.setJdbcTemplate(template);
   }
 
   @Test
@@ -57,7 +52,7 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
     run.setLastModifier(user);
     run.setLastModified(now);
 
-    long savedId = sut.save(run);
+    long savedId = sut.create(run);
 
     ArrayRun saved = sut.get(savedId);
     assertNotNull(saved);
@@ -81,7 +76,7 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
     run.setAlias(alias);
     run.setDescription(desc);
 
-    long savedId = sut.save(run);
+    long savedId = sut.update(run);
     assertEquals(runId, savedId);
 
     ArrayRun saved = sut.get(savedId);

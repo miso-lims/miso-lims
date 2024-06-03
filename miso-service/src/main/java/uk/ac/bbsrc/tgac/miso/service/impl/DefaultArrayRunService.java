@@ -32,7 +32,7 @@ public class DefaultArrayRunService implements ArrayRunService {
 
   @Autowired
   private AuthorizationManager authorizationManager;
-  
+
   @Autowired
   private DeletionStore deletionStore;
 
@@ -109,7 +109,7 @@ public class DefaultArrayRunService implements ArrayRunService {
     loadChildEntities(arrayRun);
     arrayRun.setChangeDetails(authorizationManager.getCurrentUser());
     validateChange(arrayRun, null);
-    return arrayRunStore.save(arrayRun);
+    return arrayRunStore.create(arrayRun);
   }
 
   @Override
@@ -119,11 +119,12 @@ public class DefaultArrayRunService implements ArrayRunService {
     validateChange(arrayRun, managed);
     applyChanges(arrayRun, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    return arrayRunStore.save(managed);
+    return arrayRunStore.update(managed);
   }
 
   /**
-   * Checks submitted data for validity, throwing a ValidationException containing all of the errors if invalid
+   * Checks submitted data for validity, throwing a ValidationException containing all of the errors
+   * if invalid
    * 
    * @param arrayRun submitted Array Run to validate
    * @param beforeChange the already-persisted Array Run before changes
@@ -163,7 +164,8 @@ public class DefaultArrayRunService implements ArrayRunService {
     }
   }
 
-  private void validateStartDate(ArrayRun arrayRun, ArrayRun beforeChange, List<ValidationError> errors) throws IOException {
+  private void validateStartDate(ArrayRun arrayRun, ArrayRun beforeChange, List<ValidationError> errors)
+      throws IOException {
     if (arrayRun.getStartDate() == null) {
       errors.add(new ValidationError("startDate", "Start date cannot be blank"));
     } else if (!authorizationManager.isAdminUser() && beforeChange != null && beforeChange.getStartDate() != null
@@ -172,7 +174,8 @@ public class DefaultArrayRunService implements ArrayRunService {
     }
   }
 
-  private void validateStatusAndCompletion(ArrayRun arrayRun, ArrayRun beforeChange, List<ValidationError> errors) throws IOException {
+  private void validateStatusAndCompletion(ArrayRun arrayRun, ArrayRun beforeChange, List<ValidationError> errors)
+      throws IOException {
     if (arrayRun.getHealth() == null) {
       errors.add(new ValidationError("status", "A status must be selected"));
     } else if (arrayRun.getHealth().isDone()) {
@@ -180,7 +183,8 @@ public class DefaultArrayRunService implements ArrayRunService {
         errors.add(new ValidationError(FIELD_COMPLETIONDATE, "Completion date must be entered for a completed run"));
       } else if (!authorizationManager.isAdminUser() && beforeChange != null && beforeChange.getCompletionDate() != null
           && !arrayRun.getCompletionDate().equals(beforeChange.getCompletionDate())) {
-        errors.add(new ValidationError(FIELD_COMPLETIONDATE, "Only admin may change completion date of a completed run"));
+        errors
+            .add(new ValidationError(FIELD_COMPLETIONDATE, "Only admin may change completion date of a completed run"));
       }
     } else if (arrayRun.getCompletionDate() != null) {
       errors.add(new ValidationError(FIELD_COMPLETIONDATE, "Cannot set completion date for incomplete run"));
