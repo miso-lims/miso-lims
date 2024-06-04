@@ -1,16 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
-import uk.ac.bbsrc.tgac.miso.persistence.AssayTestDao;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay_;
+import uk.ac.bbsrc.tgac.miso.persistence.AssayTestDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
@@ -22,19 +23,16 @@ public class HibernateAssayTestDao extends HibernateSaveDao<AssayTest> implement
 
   @Override
   public AssayTest getByAlias(String alias) throws IOException {
-    return getBy("alias", alias);
+    return getBy(AssayTest_.ALIAS, alias);
   }
 
   @Override
   public long getUsage(AssayTest test) throws IOException {
-    return (long) currentSession().createCriteria(Assay.class)
-        .createAlias("assayTests", "test")
-        .add(Restrictions.eq("test.id", test.getId()))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    return getUsageInCollection(Assay.class, Assay_.ASSAY_TESTS, test);
   }
 
   @Override
   public List<AssayTest> listByIdList(Collection<Long> ids) throws IOException {
-    return listByIdList("testId", ids);
+    return listByIdList(AssayTest_.TEST_ID, ids);
   }
 }
