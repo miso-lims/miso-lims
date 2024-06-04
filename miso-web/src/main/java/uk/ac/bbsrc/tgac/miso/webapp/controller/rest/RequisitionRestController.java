@@ -176,6 +176,7 @@ public class RequisitionRestController extends RestController {
       assay.setId(request.assayId);
       requisition.getAssays().add(assay);
       requisition.setStopped(request.stopped);
+      requisition.setStopReason(request.stopReason);
     }
     Requisition saved = moveFunction.apply(requisition, items);
     return RequisitionDto.from(saved);
@@ -281,12 +282,8 @@ public class RequisitionRestController extends RestController {
     return runLibraries.stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
-  public static class MoveItemsRequest {
-    public Long requisitionId;
-    public String requisitionAlias;
-    public Long assayId;
-    public boolean stopped;
-    public List<Long> itemIds;
+  public record MoveItemsRequest(Long requisitionId, String requisitionAlias, Long assayId, boolean stopped,
+      String stopReason, List<Long> itemIds) {
   }
 
   @PostMapping("/paused")

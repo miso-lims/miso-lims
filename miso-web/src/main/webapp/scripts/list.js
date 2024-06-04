@@ -1273,7 +1273,7 @@ ListUtils = (function ($) {
           checkExistingRequisitions(
             sourceRequisition.id,
             suggestedAlias,
-            sourceRequisition.assayId,
+            sourceRequisition.assayIds ? sourceRequisition.assayIds[0] : null,
             true,
             items,
             moveUrl
@@ -1283,7 +1283,9 @@ ListUtils = (function ($) {
       {
         name: "Change Assay",
         handler: function () {
-          var fields = [makeAssayField(sourceRequisition.assayId)];
+          var fields = [
+            makeAssayField(sourceRequisition.assayIds ? sourceRequisition.assayIds[0] : null),
+          ];
           Utils.showDialog("Choose assay", "Continue", fields, function (results) {
             var suggestedAlias = sourceRequisition.alias + " - " + results.assay.alias;
             checkExistingRequisitions(
@@ -1314,7 +1316,7 @@ ListUtils = (function ($) {
             checkExistingRequisitions(
               sourceRequisition.id,
               results.alias,
-              sourceRequisition.assayId,
+              sourceRequisition.assayIds ? sourceRequisition.assayIds[0] : null,
               false,
               items,
               moveUrl
@@ -1348,8 +1350,9 @@ ListUtils = (function ($) {
             handler: function () {
               moveToRequisition(
                 existing.alias,
-                existing.assayId,
+                existing.assayIds ? existing.assayIds[0] : null,
                 existing.stopped,
+                existing.stopReason,
                 items,
                 existing.id,
                 moveUrl
@@ -1394,18 +1397,40 @@ ListUtils = (function ($) {
         type: "checkbox",
         value: stopped,
       },
+      {
+        label: "Stop Reason",
+        property: "stopReason",
+        type: "text",
+      },
     ];
     Utils.showDialog("Move to New Requisition", "Create and Move", fields, function (results) {
-      moveToRequisition(results.alias, results.assay.id, results.stopped, items, null, moveUrl);
+      moveToRequisition(
+        results.alias,
+        results.assay.id,
+        results.stopped,
+        results.stopReason,
+        items,
+        null,
+        moveUrl
+      );
     });
   }
 
-  function moveToRequisition(targetAlias, assayId, stopped, items, existingRequisitionId, moveUrl) {
+  function moveToRequisition(
+    targetAlias,
+    assayId,
+    stopped,
+    stopReason,
+    items,
+    existingRequisitionId,
+    moveUrl
+  ) {
     var data = {
       requisitionId: existingRequisitionId,
       requisitionAlias: targetAlias,
       assayId: assayId,
       stopped: stopped,
+      stopReason: stopReason,
       itemIds: items.map(Utils.array.getId),
     };
     var callback = function (data) {
