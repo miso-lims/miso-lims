@@ -1,1 +1,1 @@
-Add download list for Boxes tab
+Download list for Boxes
