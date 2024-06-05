@@ -4,16 +4,18 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
 import uk.ac.bbsrc.tgac.miso.persistence.DetailedQcStatusDao;
 
 @Repository
@@ -26,33 +28,27 @@ public class HibernateDetailedQcStatusDao extends HibernateSaveDao<DetailedQcSta
 
   @Override
   public DetailedQcStatus getByDescription(String description) {
-    return getBy("description", description);
+    return getBy(DetailedQcStatusImpl_.DESCRIPTION, description);
   }
 
   @Override
   public long getUsageBySamples(DetailedQcStatus detailedQcStatus) {
-    return getUsageBy(detailedQcStatus, SampleImpl.class);
+    return getUsageBy(SampleImpl.class, SampleImpl_.DETAILED_QC_STATUS, detailedQcStatus);
   }
 
   @Override
   public long getUsageByLibraries(DetailedQcStatus detailedQcStatus) {
-    return getUsageBy(detailedQcStatus, LibraryImpl.class);
+    return getUsageBy(LibraryImpl.class, LibraryImpl_.DETAILED_QC_STATUS, detailedQcStatus);
   }
 
   @Override
   public long getUsageByLibraryAliquots(DetailedQcStatus detailedQcStatus) {
-    return getUsageBy(detailedQcStatus, LibraryAliquot.class);
+    return getUsageBy(LibraryAliquot.class, LibraryAliquot_.DETAILED_QC_STATUS, detailedQcStatus);
   }
 
   @Override
   public List<DetailedQcStatus> listByIdList(Collection<Long> ids) throws IOException {
-    return listByIdList("detailedQcStatusId", ids);
-  }
-
-  private long getUsageBy(DetailedQcStatus detailedQcStatus, Class<?> user) {
-    return (long) currentSession().createCriteria(user)
-        .add(Restrictions.eq("detailedQcStatus", detailedQcStatus))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    return listByIdList(DetailedQcStatusImpl_.DETAILED_QC_STATUS_ID, ids);
   }
 
 }
