@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -28,122 +25,85 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.persistence.criteria.CriteriaBuilder.In;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Root;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment_;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Run_;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.data.Submission_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl_;
 import uk.ac.bbsrc.tgac.miso.persistence.ExperimentStore;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateExperimentDao implements ExperimentStore {
+public class HibernateExperimentDao extends HibernateSaveDao<Experiment> implements ExperimentStore {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  private Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  @Override
-  public Experiment get(long experimentId) throws IOException {
-    return (Experiment) currentSession().get(Experiment.class, experimentId);
-  }
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  @Override
-  public List<Experiment> listAll() {
-    Criteria criteria = currentSession().createCriteria(Experiment.class);
-    @SuppressWarnings("unchecked")
-    List<Experiment> results = criteria.list();
-    return results;
+  public HibernateExperimentDao() {
+    super(Experiment.class);
   }
 
   @Override
   public List<Experiment> listAllWithLimit(long limit) throws IOException {
-    Criteria criteria = currentSession().createCriteria(Experiment.class);
-    criteria.setMaxResults((int) limit);
-    @SuppressWarnings("unchecked")
-    List<Experiment> results = criteria.list();
-    return results;
+    return new QueryBuilder<>(currentSession(), Experiment.class, Experiment.class).getResultList((int) limit, 0);
   }
 
   @Override
   public List<Experiment> listByStudyId(long studyId) {
-    Criteria criteria = currentSession().createCriteria(Experiment.class);
-    criteria.createAlias("study", "study");
-    criteria.add(Restrictions.eq("study.id", studyId));
-    @SuppressWarnings("unchecked")
-    List<Experiment> results = criteria.list();
-    return results;
-  }
-
-  /**
-   * Writes the given experiment to the database, using the default transaction strategy configured for the datasource.
-   *
-   * @param experiment
-   *          the experiment to write
-   */
-  @Override
-  public long save(Experiment experiment) throws IOException {
-    long id;
-    if (!experiment.isSaved()) {
-      id = (Long) currentSession().save(experiment);
-    } else {
-      currentSession().update(experiment);
-      id = experiment.getId();
-    }
-    return id;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+    QueryBuilder<Experiment, Experiment> builder =
+        new QueryBuilder<>(currentSession(), Experiment.class, Experiment.class);
+    Root<Experiment> root = builder.getRoot();
+    Join<Experiment, StudyImpl> studyJoin = builder.getJoin(root, Experiment_.study);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(studyJoin.get(StudyImpl_.studyId), studyId));
+    return builder.getResultList();
   }
 
   @Override
   public Collection<Experiment> listByLibrary(long id) throws IOException {
-    Criteria criteria = currentSession().createCriteria(Experiment.class);
-    criteria.createAlias("library", "library");
-    criteria.add(Restrictions.eq("library.id", id));
-    @SuppressWarnings("unchecked")
-    List<Experiment> results = criteria.list();
-    return results;
+    QueryBuilder<Experiment, Experiment> builder =
+        new QueryBuilder<>(currentSession(), Experiment.class, Experiment.class);
+    Root<Experiment> root = builder.getRoot();
+    Join<Experiment, LibraryImpl> libraryJoin = builder.getJoin(root, Experiment_.library);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(libraryJoin.get(LibraryImpl_.libraryId), id));
+    return builder.getResultList();
   }
 
   @Override
   public List<Experiment> listByRun(long runId) throws IOException {
-    Criteria idCriteria = currentSession().createCriteria(Experiment.class);
-    idCriteria.createCriteria("runPartitions").createAlias("run", "run").add(Restrictions.eq("run.id", runId));
-    idCriteria.setProjection(Projections.distinct(Projections.property("id")));
-    @SuppressWarnings("unchecked")
-    List<Long> ids = idCriteria.list();
+    QueryBuilder<Long, Experiment> idBuilder =
+        new QueryBuilder<>(currentSession(), Experiment.class, Long.class);
+    Join<Experiment, RunPartition> rpJoin = idBuilder.getJoin(idBuilder.getRoot(), Experiment_.runPartitions);
+    Join<RunPartition, Run> runJoin = idBuilder.getSingularJoin(rpJoin, "run", Run.class);
+    idBuilder.addPredicate(idBuilder.getCriteriaBuilder().equal(runJoin.get(Run_.runId), runId));
+    idBuilder.setColumns(idBuilder.getRoot().get(Experiment_.EXPERIMENT_ID));
+    List<Long> ids = idBuilder.getResultList();
     if (ids.isEmpty()) {
       return Collections.emptyList();
     }
-    Criteria criteria = currentSession().createCriteria(Experiment.class);
-    criteria.add(Restrictions.in("id", ids));
-    @SuppressWarnings("unchecked")
-    List<Experiment> results = criteria.list();
-    return results;
+
+    QueryBuilder<Experiment, Experiment> builder =
+        new QueryBuilder<>(currentSession(), Experiment.class, Experiment.class);
+    In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(Experiment_.experimentId));
+    for (Long id : ids) {
+      inClause.value(id);
+    }
+    builder.addPredicate(inClause);
+    return builder.getResultList();
   }
 
   @Override
   public long getUsage(Experiment experiment) throws IOException {
-    return (long) currentSession().createCriteria(Submission.class)
-        .createAlias("experiments", "experiment")
-        .add(Restrictions.eq("experiment.id", experiment.getId()))
-        .setProjection(Projections.rowCount())
-        .uniqueResult();
+    return getUsageInCollection(Submission.class, Submission_.EXPERIMENTS, experiment);
   }
 
 }

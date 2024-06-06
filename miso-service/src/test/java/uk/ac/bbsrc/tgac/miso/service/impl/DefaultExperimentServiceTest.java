@@ -9,8 +9,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -75,13 +75,15 @@ public class DefaultExperimentServiceTest {
   public void testSaveExperiment() throws IOException {
     final long expectedReturn = 1L;
 
-    when(experimentStore.save(experiment)).thenReturn(expectedReturn);
+    when(experimentStore.create(experiment)).thenReturn(expectedReturn);
+    when(experimentStore.update(experiment)).thenReturn(expectedReturn);
     when(platformService.get(experiment.getInstrumentModel().getId())).thenReturn(experiment.getInstrumentModel());
     when(libraryService.get(experiment.getLibrary().getId())).thenReturn(experiment.getLibrary());
     when(studyService.get(experiment.getStudy().getId())).thenReturn(experiment.getStudy());
 
     assertEquals(expectedReturn, sut.create(experiment));
-    verify(experimentStore, times(2)).save(experiment);
+    verify(experimentStore, times(1)).create(experiment);
+    verify(experimentStore, times(1)).update(experiment);
   }
 
 
