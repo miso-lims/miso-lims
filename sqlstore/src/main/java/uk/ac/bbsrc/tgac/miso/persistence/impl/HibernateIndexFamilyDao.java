@@ -2,13 +2,17 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import javax.persistence.criteria.Join;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily_;
+import uk.ac.bbsrc.tgac.miso.core.data.Index_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
 import uk.ac.bbsrc.tgac.miso.persistence.IndexFamilyDao;
 
 @Transactional(rollbackFor = Exception.class)
@@ -21,17 +25,17 @@ public class HibernateIndexFamilyDao extends HibernateSaveDao<IndexFamily> imple
 
   @Override
   public IndexFamily getByName(String name) throws IOException {
-    return getBy("name", name);
+    return getBy(IndexFamily_.NAME, name);
   }
 
   @Override
   public long getUsage(IndexFamily indexFamily) throws IOException {
-    return (long) currentSession().createCriteria(LibraryImpl.class)
-        .createAlias("index1", "index1")
-        .createAlias("index1.family", "indexFamily")
-        .add(Restrictions.eq("indexFamily.id", indexFamily.getId()))
-        .setProjection(Projections.rowCount())
-        .uniqueResult();
+    LongQueryBuilder<LibraryImpl> builder = new LongQueryBuilder<>(currentSession(), LibraryImpl.class);
+    Join<LibraryImpl, Index> indexJoin = builder.getJoin(builder.getRoot(), LibraryImpl_.index1);
+    Join<Index, IndexFamily> indexFamilyJoin = builder.getJoin(indexJoin, Index_.family);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(indexFamilyJoin.get(IndexFamily_.INDEX_FAMILY_ID), indexFamily.getId()));
+    return builder.getCount();
   }
 
 }
