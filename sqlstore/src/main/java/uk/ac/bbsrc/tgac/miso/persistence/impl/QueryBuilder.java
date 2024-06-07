@@ -29,6 +29,7 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.hibernate.transform.ResultTransformer;
 
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition_;
@@ -54,6 +55,7 @@ public class QueryBuilder<R, T> {
   private final Root<T> root;
   private List<Predicate> predicates;
   private List<Order> orders;
+  private ResultTransformer resultTransformer = null;
 
   public QueryBuilder(Session session, Class<T> entityClass, Class<R> resultClass) {
     this.session = session;
@@ -65,6 +67,12 @@ public class QueryBuilder<R, T> {
       Root<? extends R> castedRoot = (Root<? extends R>) root;
       query.select(castedRoot);
     }
+  }
+
+  public QueryBuilder(Session session, Class<T> entityClass, Class<R> resultClass,
+      ResultTransformer resultTransformer) {
+    this(session, entityClass, resultClass);
+    this.resultTransformer = resultTransformer;
   }
 
   public Session getSession() {
@@ -302,7 +310,9 @@ public class QueryBuilder<R, T> {
     if (orders != null && !orders.isEmpty()) {
       query.orderBy(orders);
     }
-    return session.createQuery(query);
+
+    return resultTransformer != null ? session.createQuery(query).setResultTransformer(resultTransformer)
+        : session.createQuery(query);
   }
 
   private void applyPredicates() {
