@@ -1,1 +1,0 @@
-Feature to make Detailed QC Statuses archivable

@@ -7,6 +7,20 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.19.0] - 2024-06-07
+
+### Added
+
+* Feature to make Detailed QC Statuses archivable
+* Download list for Boxes
+
+### Fixed
+
+* The Move to Requisition action did not allow you to enter a stop reason
+* Sort by project for samples, libraries, library aliquots fails with error and displays "No data available in table."
+* Effects of the Move to Requisition action were not recorded in the affected requisitions' changelogs
+
+
 ## [2.18.0] - 2024-05-09
 
 ### Changed

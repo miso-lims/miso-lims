@@ -1,1 +1,0 @@
-Sort by project for samples, libraries, library aliquots fails with error and displays "No data available in table."
