@@ -34,7 +34,8 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#save(uk.ac.bbsrc.tgac.miso.core.data.Experiment)}
+   * Test method for
+   * {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#save(uk.ac.bbsrc.tgac.miso.core.data.Experiment)}
    * .
    * 
    * @throws IOException
@@ -52,7 +53,7 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
 
     experiment.setChangeDetails(user);
     experiment.setTitle("Title");
-    long savedId = dao.save(experiment);
+    long savedId = dao.create(experiment);
 
     clearSession();
 
@@ -68,7 +69,7 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
     Experiment original = (Experiment) currentSession().get(Experiment.class, id);
     assertNotEquals(newAlias, original.getAlias());
     original.setAlias(newAlias);
-    dao.save(original);
+    dao.update(original);
 
     clearSession();
 
@@ -80,29 +81,9 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
    * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#listAll()}.
    */
   @Test
-  public void testListAll() {
-    List<Experiment> experiments = dao.listAll();
+  public void testList() throws IOException {
+    List<Experiment> experiments = dao.list();
     assertEquals(32, experiments.size());
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#listAllWithLimit(long)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testListAllWithLimit() throws IOException {
-    List<Experiment> experiments = dao.listAllWithLimit(3L);
-    assertEquals(3L, experiments.size());
-  }
-
-  /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#listByStudyId(long)} .
-   */
-  @Test
-  public void testListByStudyId() {
-    List<Experiment> experiments = dao.listByStudyId(1L);
-    assertEquals(25, experiments.size());
   }
 
   /**

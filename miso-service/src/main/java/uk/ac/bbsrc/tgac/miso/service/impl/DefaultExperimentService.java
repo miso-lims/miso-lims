@@ -65,17 +65,12 @@ public class DefaultExperimentService implements ExperimentService {
 
   @Override
   public List<Experiment> list() throws IOException {
-    return experimentStore.listAll();
+    return experimentStore.list();
   }
 
   @Override
   public Collection<Experiment> listAllByStudyId(long studyId) throws IOException {
     return studyService.get(studyId).getExperiments();
-  }
-
-  @Override
-  public Collection<Experiment> listAllWithLimit(long limit) throws IOException {
-    return experimentStore.listAllWithLimit(limit);
   }
 
   @Override
@@ -87,7 +82,7 @@ public class DefaultExperimentService implements ExperimentService {
     experiment.setStudy(studyService.get(experiment.getStudy().getId()));
     experiment.setChangeDetails(authorizationManager.getCurrentUser());
 
-    experimentStore.save(experiment);
+    experimentStore.create(experiment);
     String name;
     try {
       name = namingSchemeHolder.getPrimary().generateNameFor(experiment);
@@ -100,7 +95,7 @@ public class DefaultExperimentService implements ExperimentService {
     if (!nameValidation.isValid()) {
       throw new IOException("Cannot save Experiment - invalid name:" + nameValidation.getMessage());
     }
-    return experimentStore.save(experiment);
+    return experimentStore.update(experiment);
   }
 
   @Override
@@ -128,7 +123,7 @@ public class DefaultExperimentService implements ExperimentService {
     }
     original.setKits(kits);
     original.setChangeDetails(authorizationManager.getCurrentUser());
-    return experimentStore.save(original);
+    return experimentStore.update(original);
   }
 
   public void loadRunPartitions(Experiment experiment) {
@@ -200,8 +195,10 @@ public class DefaultExperimentService implements ExperimentService {
   }
 
   @Override
-  public uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult validateDeletion(Experiment object) throws IOException {
-    uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult result = new uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult();
+  public uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult validateDeletion(Experiment object)
+      throws IOException {
+    uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult result =
+        new uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult();
     long usage = experimentStore.getUsage(object);
     if (usage > 0L) {
       result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.submissions(usage)));
