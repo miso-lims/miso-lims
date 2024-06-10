@@ -74,11 +74,6 @@ public class DefaultExperimentService implements ExperimentService {
   }
 
   @Override
-  public Collection<Experiment> listAllWithLimit(long limit) throws IOException {
-    return experimentStore.listAllWithLimit(limit);
-  }
-
-  @Override
   public long create(Experiment experiment) throws IOException {
     loadRunPartitions(experiment);
     experiment.setName(LimsUtils.generateTemporaryName());

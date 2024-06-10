@@ -41,8 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl_;
 import uk.ac.bbsrc.tgac.miso.persistence.ExperimentStore;
 
 @Transactional(rollbackFor = Exception.class)
@@ -51,21 +49,6 @@ public class HibernateExperimentDao extends HibernateSaveDao<Experiment> impleme
 
   public HibernateExperimentDao() {
     super(Experiment.class);
-  }
-
-  @Override
-  public List<Experiment> listAllWithLimit(long limit) throws IOException {
-    return new QueryBuilder<>(currentSession(), Experiment.class, Experiment.class).getResultList((int) limit, 0);
-  }
-
-  @Override
-  public List<Experiment> listByStudyId(long studyId) {
-    QueryBuilder<Experiment, Experiment> builder =
-        new QueryBuilder<>(currentSession(), Experiment.class, Experiment.class);
-    Root<Experiment> root = builder.getRoot();
-    Join<Experiment, StudyImpl> studyJoin = builder.getJoin(root, Experiment_.study);
-    builder.addPredicate(builder.getCriteriaBuilder().equal(studyJoin.get(StudyImpl_.studyId), studyId));
-    return builder.getResultList();
   }
 
   @Override

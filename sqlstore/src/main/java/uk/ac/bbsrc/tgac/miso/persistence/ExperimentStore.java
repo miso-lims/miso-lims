@@ -14,23 +14,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
  */
 public interface ExperimentStore extends SaveDao<Experiment> {
 
-  /**
-   * List all Experiments that are part of a Study given a Study ID
-   * 
-   * @param studyId of type long
-   * @return Collection<Experiment>
-   * @throws IOException when the objects cannot be retrieved
-   */
-  public Collection<Experiment> listByStudyId(long studyId) throws IOException;
-
-  /**
-   * List all persisted objects
-   * 
-   * @return Collection<Experiment>
-   * @throws IOException when the objects cannot be retrieved
-   */
-  public Collection<Experiment> listAllWithLimit(long limit) throws IOException;
-
   public Collection<Experiment> listByLibrary(long id) throws IOException;
 
   public List<Experiment> listByRun(long runId) throws IOException;

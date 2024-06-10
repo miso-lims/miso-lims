@@ -87,28 +87,6 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
   }
 
   /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#listAllWithLimit(long)} .
-   * 
-   * @throws IOException
-   */
-  @Test
-  public void testListAllWithLimit() throws IOException {
-    List<Experiment> experiments = dao.listAllWithLimit(3L);
-    assertEquals(3L, experiments.size());
-  }
-
-  /**
-   * Test method for
-   * {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#listByStudyId(long)} .
-   */
-  @Test
-  public void testListByStudyId() {
-    List<Experiment> experiments = dao.listByStudyId(1L);
-    assertEquals(25, experiments.size());
-  }
-
-  /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#get(long)}.
    * 
    * @throws IOException
