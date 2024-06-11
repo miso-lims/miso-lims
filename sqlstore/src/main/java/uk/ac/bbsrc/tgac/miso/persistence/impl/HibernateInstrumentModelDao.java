@@ -1,37 +1,14 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import javax.persistence.criteria.CriteriaBuilder.In;
+import javax.persistence.criteria.Join;
+import javax.persistence.metamodel.SingularAttribute;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -40,11 +17,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel_;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition_;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Run_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.InstrumentModelStore;
@@ -59,9 +42,10 @@ import uk.ac.bbsrc.tgac.miso.persistence.InstrumentModelStore;
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentModel>
-    implements HibernatePaginatedDataSource<InstrumentModel>, InstrumentModelStore {
+    implements JpaCriteriaPaginatedDataSource<InstrumentModel, InstrumentModel>, InstrumentModelStore {
 
-  private static final String[] SEARCH_PROPERTIES = new String[] { "alias" };
+  private static final List<SingularAttribute<InstrumentModel, String>> SEARCH_PROPERTIES =
+      Arrays.asList(InstrumentModel_.alias);
 
   @Autowired
   private JdbcTemplate template;
@@ -79,15 +63,8 @@ public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentMode
   }
 
   @Override
-  public Session currentSession() {
-    return super.currentSession();
-  }
-
-  @Override
   public InstrumentModel getByAlias(String alias) throws IOException {
-    Criteria criteria = currentSession().createCriteria(InstrumentModel.class);
-    criteria.add(Restrictions.eq("alias", alias));
-    return (InstrumentModel) criteria.uniqueResult();
+    return getBy(InstrumentModel_.ALIAS, alias);
   }
 
   private static final RowMapper<PlatformType> platformTypeMapper = (rs, rowNum) -> {
@@ -102,33 +79,38 @@ public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentMode
 
   @Override
   public long getUsage(InstrumentModel model) throws IOException {
-    return getUsageBy(InstrumentImpl.class, "instrumentModel", model);
+    return getUsageBy(InstrumentImpl.class, InstrumentImpl_.INSTRUMENT_MODEL, model);
   }
 
   @Override
   public int getMaxContainersUsed(InstrumentModel model) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<Instrument> instruments = currentSession().createCriteria(InstrumentImpl.class)
-        .add(Restrictions.eq("instrumentModel", model))
-        .list();
+    QueryBuilder<InstrumentImpl, InstrumentImpl> insBuilder =
+        new QueryBuilder<>(currentSession(), InstrumentImpl.class, InstrumentImpl.class);
+    insBuilder.addPredicate(
+        insBuilder.getCriteriaBuilder().equal(insBuilder.getRoot().get(InstrumentImpl_.instrumentModel), model));
+    List<InstrumentImpl> instruments = insBuilder.getResultList();
 
     if (instruments.isEmpty()) {
       return 0;
     }
 
-    @SuppressWarnings("unchecked")
-    List<Run> runs = currentSession().createCriteria(Run.class)
-        .add(Restrictions.in("sequencer", instruments))
-        .list();
+    QueryBuilder<Run, Run> runBuilder = new QueryBuilder<>(currentSession(), Run.class, Run.class);
+    In<InstrumentImpl> inClause = runBuilder.getCriteriaBuilder().in(runBuilder.getRoot().get(Run_.sequencer));
+    for (InstrumentImpl instrument : instruments) {
+      inClause.value(instrument);
+    }
+    runBuilder.addPredicate(inClause);
+    List<Run> runs = runBuilder.getResultList();
 
     return runs.stream().mapToInt(run -> run.getRunPositions().size()).max().orElse(0);
   }
 
   @Override
   public InstrumentPosition getPosition(long id) {
-    return (InstrumentPosition) currentSession().createCriteria(InstrumentPosition.class)
-        .add(Restrictions.eq("positionId", id))
-        .uniqueResult();
+    QueryBuilder<InstrumentPosition, InstrumentPosition> builder =
+        new QueryBuilder<>(currentSession(), InstrumentPosition.class, InstrumentPosition.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(InstrumentPosition_.positionId), id));
+    return builder.getSingleResultOrNull();
   }
 
   @Override
@@ -137,37 +119,32 @@ public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentMode
   }
 
   @Override
-  public String getProjectColumn() {
-    return null;
+  public SingularAttribute<InstrumentModel, ?> getIdProperty() {
+    return InstrumentModel_.instrumentModelId;
   }
 
   @Override
-  public Class<? extends InstrumentModel> getRealClass() {
+  public Class<InstrumentModel> getEntityClass() {
     return InstrumentModel.class;
   }
 
   @Override
-  public String[] getSearchProperties() {
+  public Class<InstrumentModel> getResultClass() {
+    return InstrumentModel.class;
+  }
+
+  @Override
+  public List<SingularAttribute<InstrumentModel, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return Collections.emptyList();
-  }
-
-  @Override
-  public String propertyForDate(Criteria criteria, DateType type) {
+  public SingularAttribute<InstrumentModel, ?> propertyForDate(DateType type) {
     return null;
   }
 
   @Override
-  public String propertyForSortColumn(String original) {
-    return original;
-  }
-
-  @Override
-  public String propertyForUser(boolean creator) {
+  public SingularAttribute<InstrumentModel, ? extends UserImpl> propertyForUser(boolean creator) {
     return null;
   }
 
@@ -183,9 +160,10 @@ public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentMode
 
   @Override
   public long getPositionUsage(InstrumentPosition position) throws IOException {
-    return (long) currentSession().createCriteria(Run.class)
-        .createAlias("runPositions", "runPosition")
-        .add(Restrictions.eq("runPosition.position", position))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    LongQueryBuilder<Run> builder = new LongQueryBuilder<>(currentSession(), Run.class);
+    Join<Run, RunPosition> runJoin = builder.getJoin(builder.getRoot(), Run_.runPositions);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(runJoin.get(RunPosition_.position), position));
+    return builder.getCount();
   }
 }
