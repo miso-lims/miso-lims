@@ -38,7 +38,7 @@ public class HibernateIndexDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListIndicesByPlatform() throws Exception {
-    Collection<Index> illumina = dao.list(0, 0, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA));
+    Collection<Index> illumina = dao.list(0, 10, true, "indexId", PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertTrue(illumina.size() > 0);
   }
 
