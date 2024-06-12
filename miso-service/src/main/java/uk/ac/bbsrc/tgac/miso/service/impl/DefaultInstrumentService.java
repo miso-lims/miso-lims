@@ -50,7 +50,7 @@ public class DefaultInstrumentService implements InstrumentService {
 
   @Override
   public List<Instrument> list() throws IOException {
-    return instrumentDao.listAll();
+    return instrumentDao.list();
   }
 
   @Override
@@ -73,7 +73,7 @@ public class DefaultInstrumentService implements InstrumentService {
     authorizationManager.throwIfNonAdmin();
     loadChildEntities(instrument);
     validateChange(instrument, null);
-    return save(instrument);
+    return instrumentDao.create(instrument);
   }
 
   @Override
@@ -91,7 +91,7 @@ public class DefaultInstrumentService implements InstrumentService {
     ServiceRecord managedRecord = serviceRecordService.get(recordId);
 
     managedInstrument.getServiceRecords().add(managedRecord);
-    save(managedInstrument);
+    instrumentDao.update(managedInstrument);
 
     return managedRecord.getId();
   }
@@ -108,13 +108,8 @@ public class DefaultInstrumentService implements InstrumentService {
     loadChildEntities(instrument);
     validateChange(instrument, managed);
     applyChanges(managed, instrument);
-    return save(managed);
+    return instrumentDao.update(managed);
   }
-
-  private long save(Instrument instrument) throws IOException {
-    return instrumentDao.save(instrument);
-  }
-
 
   private void validateChange(Instrument instrument, Instrument beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();

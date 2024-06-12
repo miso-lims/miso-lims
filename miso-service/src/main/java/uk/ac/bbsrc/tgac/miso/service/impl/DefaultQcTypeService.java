@@ -125,10 +125,12 @@ public class DefaultQcTypeService implements QcTypeService {
       long usage = qcTypeStore.getUsage(beforeChange);
       if (usage > 1L) {
         if (isChanged(QcType::getInstrumentModel, qcType, beforeChange)) {
-          errors.add(new ValidationError("instrumentModelId", "Cannot change because there are already QCs of this type"));
+          errors.add(
+              new ValidationError("instrumentModelId", "Cannot change because there are already QCs of this type"));
         }
         if (!qcType.getKitDescriptors().isEmpty() && beforeChange.getKitDescriptors().isEmpty()) {
-          errors.add(new ValidationError("kitDescriptors", "Cannot add kits because there are already QCs of this type"));
+          errors
+              .add(new ValidationError("kitDescriptors", "Cannot add kits because there are already QCs of this type"));
         }
         if (!qcType.getControls().isEmpty() && beforeChange.getControls().isEmpty()) {
           errors.add(new ValidationError("controls", "Cannot add controls because there are already QCs of this type"));
@@ -157,7 +159,8 @@ public class DefaultQcTypeService implements QcTypeService {
         long kitUsage = qcTypeStore.getKitUsage(qcType, kit);
         if (kitUsage > 0L) {
           errors.add(new ValidationError("kitDescriptors",
-              String.format("Cannot remove kit '%s' because it is used in %d %s", kit.getName(), kitUsage, Pluralizer.qcs(kitUsage))));
+              String.format("Cannot remove kit '%s' because it is used in %d %s", kit.getName(), kitUsage,
+                  Pluralizer.qcs(kitUsage))));
         }
       }
     }
@@ -166,7 +169,8 @@ public class DefaultQcTypeService implements QcTypeService {
       List<QcType> dupes = qcTypeStore.listByNameAndTarget(qcType.getName(), qcType.getQcTarget());
       if (dupes.stream().anyMatch(dupe -> dupe.getId() != qcType.getId() && !dupe.isArchived())) {
         errors.add(new ValidationError("name",
-            String.format("There is already a non-archived %s QC type with this name", qcType.getQcTarget().getLabel())));
+            String.format("There is already a non-archived %s QC type with this name",
+                qcType.getQcTarget().getLabel())));
       }
     }
 
@@ -198,7 +202,8 @@ public class DefaultQcTypeService implements QcTypeService {
 
   private Set<QcControl> getControlsToDelete(QcType qcType, QcType beforeChange) {
     return beforeChange.getControls().stream()
-        .filter(toControl -> qcType.getControls().stream().noneMatch(fromControl -> fromControl.getId() == toControl.getId()))
+        .filter(toControl -> qcType.getControls().stream()
+            .noneMatch(fromControl -> fromControl.getId() == toControl.getId()))
         .collect(Collectors.toSet());
   }
 
@@ -223,24 +228,22 @@ public class DefaultQcTypeService implements QcTypeService {
     long usage = qcTypeStore.getUsage(object);
     if (usage > 0) {
       switch (object.getQcTarget()) {
-      case Container:
-        result.addError(ValidationError.forDeletionUsage(object, usage, "sequencing " + Pluralizer.containers(usage)));
-        break;
-      case Library:
-        result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.libraries(usage)));
-        break;
-      case Pool:
-        result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.pools(usage)));
-        break;
-      case Run:
-        result.addError(ValidationError.forDeletionUsage(object, usage, "sequencer " + Pluralizer.runs(usage)));
-        break;
-      case Sample:
-        result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
-        break;
-      default:
-        result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.items(usage)));
-        break;
+        case Container:
+          result
+              .addError(ValidationError.forDeletionUsage(object, usage, "sequencing " + Pluralizer.containers(usage)));
+          break;
+        case Library:
+          result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.libraries(usage)));
+          break;
+        case Pool:
+          result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.pools(usage)));
+          break;
+        case Sample:
+          result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
+          break;
+        default:
+          result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.items(usage)));
+          break;
       }
     }
     return result;

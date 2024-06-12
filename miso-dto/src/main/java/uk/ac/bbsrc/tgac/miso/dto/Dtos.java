@@ -2516,8 +2516,6 @@ public class Dtos {
           ((PoolQC) qc).getControls().add(poolQcControlRun);
           to = poolQcControlRun;
           break;
-        case Run:
-          throw new IllegalArgumentException("Unhandled QC target: Run");
         case Sample:
           SampleQcControlRun sampleQcControlRun = new SampleQcControlRun();
           sampleQcControlRun.setQc((SampleQC) qc);

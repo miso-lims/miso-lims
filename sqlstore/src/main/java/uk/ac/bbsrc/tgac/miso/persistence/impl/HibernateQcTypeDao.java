@@ -88,18 +88,17 @@ public class HibernateQcTypeDao implements QualityControlTypeStore {
 
   private Criteria getCriteriaForQcTarget(QcType qcType) {
     switch (qcType.getQcTarget()) {
-    case Container:
-      return currentSession().createCriteria(ContainerQC.class);
-    case Library:
-      return currentSession().createCriteria(LibraryQC.class);
-    case Pool:
-      return currentSession().createCriteria(PoolQC.class);
-    case Run:
-      throw new IllegalArgumentException("Unhandled QC target: Run");
-    case Sample:
-      return currentSession().createCriteria(SampleQC.class);
-    default:
-      throw new IllegalArgumentException("Unhandled QC target: " + qcType.getQcTarget() == null ? "null" : qcType.getQcTarget().getLabel());
+      case Container:
+        return currentSession().createCriteria(ContainerQC.class);
+      case Library:
+        return currentSession().createCriteria(LibraryQC.class);
+      case Pool:
+        return currentSession().createCriteria(PoolQC.class);
+      case Sample:
+        return currentSession().createCriteria(SampleQC.class);
+      default:
+        throw new IllegalArgumentException(
+            "Unhandled QC target: " + qcType.getQcTarget() == null ? "null" : qcType.getQcTarget().getLabel());
     }
   }
 
@@ -137,19 +136,18 @@ public class HibernateQcTypeDao implements QualityControlTypeStore {
 
   private Criteria getCriteriaForTargetQcControlRun(QcControl control) {
     switch (control.getQcType().getQcTarget()) {
-    case Container:
-      return currentSession().createCriteria(ContainerQcControlRun.class);
-    case Library:
-      return currentSession().createCriteria(LibraryQcControlRun.class);
-    case Pool:
-      return currentSession().createCriteria(PoolQcControlRun.class);
-    case Run:
-      throw new IllegalArgumentException("Unhandled QC target: Run");
-    case Sample:
-      return currentSession().createCriteria(SampleQcControlRun.class);
-    default:
-      throw new IllegalArgumentException(
-          "Unhandled QC target: " + control.getQcType().getQcTarget() == null ? "null" : control.getQcType().getQcTarget().getLabel());
+      case Container:
+        return currentSession().createCriteria(ContainerQcControlRun.class);
+      case Library:
+        return currentSession().createCriteria(LibraryQcControlRun.class);
+      case Pool:
+        return currentSession().createCriteria(PoolQcControlRun.class);
+      case Sample:
+        return currentSession().createCriteria(SampleQcControlRun.class);
+      default:
+        throw new IllegalArgumentException(
+            "Unhandled QC target: " + control.getQcType().getQcTarget() == null ? "null"
+                : control.getQcType().getQcTarget().getLabel());
     }
   }
 
