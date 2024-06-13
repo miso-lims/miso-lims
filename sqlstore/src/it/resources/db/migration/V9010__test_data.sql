@@ -226,8 +226,6 @@ INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`, in
 (7,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Sample','ng/µl', NULL),
 (3,'Bioanalyser','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Sample','ng/µl', NULL),
 (4,'QuBit','Quantitation of DNA, RNA and protein, manufacturered by Invitrogen','Library','ng/µl', NULL),
-(6,'SeqInfo QC','Post-run completion run QC step, undertaken by the SeqInfo team, as part of the primary analysis stage.','Run','', NULL),
-(5,'SeqOps QC','Post-run completion run QC step, undertaken by the SeqOps team, to move a run through to the primary analysis stage.','Run','', NULL),
 (1,'qPCR','Quantitative PCR','Library','mol/µl', 2),
 (8,'poolQcType1', 'qc 1 for pools', 'Pool', 'nM', NULL),
 (9,'poolQcType2', 'qc 2 for pools', 'Pool', 'nM', NULL),

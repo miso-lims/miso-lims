@@ -1,107 +1,75 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.persistence.TemporalType;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun_;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel_;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Run_;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord_;
+import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
+import uk.ac.bbsrc.tgac.miso.core.data.Workstation_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QC_;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStore;
-import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginatedDataSource<Instrument> {
+public class HibernateInstrumentDao extends HibernateSaveDao<Instrument>
+    implements InstrumentStore, JpaCriteriaPaginatedDataSource<Instrument, InstrumentImpl> {
 
-  private static final String[] SEARCH_PROPERTIES = new String[] {"name", "serialNumber", "identificationBarcode"};
-  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
-      new AliasDescriptor("instrumentModel"),
-      new AliasDescriptor("workstation", JoinType.LEFT_OUTER_JOIN));
-
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  @Override
-  public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
+  public HibernateInstrumentDao() {
+    super(Instrument.class, InstrumentImpl.class);
   }
 
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  @Override
-  public long save(Instrument instrument) throws IOException {
-    long id;
-    if (!instrument.isSaved()) {
-      id = (Long) currentSession().save(instrument);
-    } else {
-      currentSession().update(instrument);
-      id = instrument.getId();
-    }
-    return id;
-  }
-
-  @Override
-  public Instrument get(long id) throws IOException {
-    return (Instrument) currentSession().get(InstrumentImpl.class, id);
-  }
-
-  @Override
-  public List<Instrument> listAll() throws IOException {
-    @SuppressWarnings("unchecked")
-    List<Instrument> results = currentSession().createCriteria(InstrumentImpl.class).list();
-    return results;
-  }
+  private static final List<SingularAttribute<InstrumentImpl, String>> SEARCH_PROPERTIES =
+      Arrays.asList(InstrumentImpl_.name, InstrumentImpl_.serialNumber, InstrumentImpl_.identificationBarcode);
 
   @Override
   public List<Instrument> listByType(InstrumentType type) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<Instrument> results = currentSession().createCriteria(InstrumentImpl.class)
-        .createAlias("instrumentModel", "instrumentModel")
-        .add(Restrictions.eq("instrumentModel.instrumentType", type))
-        .list();
-    return results;
+    QueryBuilder<Instrument, InstrumentImpl> builder = getQueryBuilder();
+    Join<InstrumentImpl, InstrumentModel> insJoin = builder.getJoin(builder.getRoot(), InstrumentImpl_.instrumentModel);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(insJoin.get(InstrumentModel_.instrumentType), type));
+    return builder.getResultList();
   }
 
   @Override
   public Instrument getByName(String name) throws IOException {
-    Criteria criteria = currentSession().createCriteria(InstrumentImpl.class);
-    criteria.add(Restrictions.eq("name", name));
-    return (Instrument) criteria.uniqueResult();
+    return getBy(InstrumentImpl_.NAME, name);
   }
 
 
   @Override
   public Instrument getByUpgradedInstrument(long id) {
-    Criteria criteria = currentSession().createCriteria(InstrumentImpl.class);
-    criteria.add(Restrictions.eq("upgradedInstrument.id", id));
-    return (Instrument) criteria.uniqueResult();
+    QueryBuilder<Instrument, InstrumentImpl> builder = getQueryBuilder();
+    Join<InstrumentImpl, InstrumentImpl> insJoin =
+        builder.getJoin(builder.getRoot(), InstrumentImpl_.upgradedInstrument);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(insJoin.get(InstrumentImpl_.id), id));
+    return builder.getSingleResultOrNull();
   }
 
   @Override
@@ -110,126 +78,136 @@ public class HibernateInstrumentDao implements InstrumentStore, HibernatePaginat
   }
 
   @Override
-  public String getProjectColumn() {
-    return null;
+  public SingularAttribute<InstrumentImpl, ?> getIdProperty() {
+    return InstrumentImpl_.id;
   }
 
   @Override
-  public Class<? extends Instrument> getRealClass() {
+  public Class<InstrumentImpl> getEntityClass() {
     return InstrumentImpl.class;
   }
 
   @Override
-  public String[] getSearchProperties() {
+  public Class<Instrument> getResultClass() {
+    return Instrument.class;
+  }
+
+  @Override
+  public List<SingularAttribute<InstrumentImpl, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return STANDARD_ALIASES;
+  public SingularAttribute<InstrumentImpl, ?> propertyForDate(DateType type) {
+    return type == DateType.CREATE ? InstrumentImpl_.dateCommissioned : null;
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, DateType type) {
-    return type == DateType.CREATE ? "dateCommissioned" : null;
-  }
-
-  @Override
-  public TemporalType temporalTypeForDate(DateType type) {
-    return type == DateType.CREATE ? TemporalType.DATE : null;
-  }
-
-  @Override
-  public void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type,
-      Consumer<String> errorHandler) {
-    if (type == DateType.CREATE) {
-      HibernatePaginatedDataSource.super.restrictPaginationByLocalDate(criteria, start, end, type, errorHandler);
-    } else {
-      HibernatePaginatedDataSource.super.restrictPaginationByDate(criteria, start, end, type, errorHandler);
-    }
-  }
-
-  @Override
-  public void restrictPaginationByWorkstationId(Criteria criteria, long id, Consumer<String> errorHandler) {
-    criteria.createAlias("workstation", "workstation");
-    criteria.add(Restrictions.eq("workstation.workstationId", id));
-  }
-
-  @Override
-  public String propertyForSortColumn(String original) {
+  public Path<?> propertyForSortColumn(Root<InstrumentImpl> root, String original) {
     switch (original) {
       case "platformType":
-        return "instrumentModel.platformType";
+        return root.get(InstrumentImpl_.instrumentModel).get(InstrumentModel_.platformType);
       case "instrumentModelAlias":
-        return "instrumentModel.alias";
+        return root.get(InstrumentImpl_.instrumentModel).get(InstrumentModel_.alias);
       case "workstationAlias":
-        return "workstation.alias";
+        return root.get(InstrumentImpl_.workstation).get(Workstation_.alias);
       default:
-        return original;
+        return root.get(original);
     }
   }
 
   @Override
-  public String propertyForUser(boolean creator) {
+  public SingularAttribute<InstrumentImpl, ? extends UserImpl> propertyForUser(boolean creator) {
     return null;
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
+  public void restrictPaginationByDate(QueryBuilder<?, InstrumentImpl> builder, Date start, Date end, DateType type,
       Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("instrumentModel.platformType", platformType));
+    if (type == DateType.CREATE) {
+      JpaCriteriaPaginatedDataSource.super.restrictPaginationByLocalDate(builder, start, end, type,
+          errorHandler);
+    } else {
+      JpaCriteriaPaginatedDataSource.super.restrictPaginationByDate(builder, start, end, type,
+          errorHandler);
+    }
   }
 
   @Override
-  public void restrictPaginationByArchived(Criteria criteria, boolean isArchived, Consumer<String> errorHandler) {
-    criteria.add(isArchived ? Restrictions.isNotNull("dateDecommissioned") : Restrictions.isNull("dateDecommissioned"));
-  }
-
-  @Override
-  public void restrictPaginationByInstrumentType(Criteria criteria, InstrumentType type,
+  public void restrictPaginationByWorkstationId(QueryBuilder<?, InstrumentImpl> builder, long id,
       Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("instrumentModel.instrumentType", type));
+    Join<InstrumentImpl, Workstation> join = builder.getJoin(builder.getRoot(), InstrumentImpl_.workstation);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(join.get(Workstation_.workstationId), id));
   }
 
   @Override
-  public void restrictPaginationByModel(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(query, "instrumentModel.alias"));
+  public void restrictPaginationByPlatformType(QueryBuilder<?, InstrumentImpl> builder, PlatformType platformType,
+      Consumer<String> errorHandler) {
+    Join<InstrumentImpl, InstrumentModel> join = builder.getJoin(builder.getRoot(), InstrumentImpl_.instrumentModel);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(join.get(InstrumentModel_.platformType), platformType));
   }
 
   @Override
-  public void restrictPaginationByWorkstation(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(query, "workstation.alias", "workstation.identificationBarcode"));
+  public void restrictPaginationByArchived(QueryBuilder<?, InstrumentImpl> builder, boolean isArchived,
+      Consumer<String> errorHandler) {
+    if (isArchived) {
+      builder.addPredicate(
+          builder.getCriteriaBuilder().isNotNull(builder.getRoot().get(InstrumentImpl_.dateDecommissioned)));
+    } else {
+      builder
+          .addPredicate(builder.getCriteriaBuilder().isNull(builder.getRoot().get(InstrumentImpl_.dateDecommissioned)));
+    }
+  }
+
+  @Override
+  public void restrictPaginationByInstrumentType(QueryBuilder<?, InstrumentImpl> builder, InstrumentType type,
+      Consumer<String> errorHandler) {
+    Join<InstrumentImpl, InstrumentModel> join = builder.getJoin(builder.getRoot(), InstrumentImpl_.instrumentModel);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(join.get(InstrumentModel_.instrumentType), type));
+  }
+
+  @Override
+  public void restrictPaginationByModel(QueryBuilder<?, InstrumentImpl> builder, String query,
+      Consumer<String> errorHandler) {
+    builder
+        .addTextRestriction(builder.getRoot().get(InstrumentImpl_.instrumentModel).get(InstrumentModel_.alias), query);
+  }
+
+  @Override
+  public void restrictPaginationByWorkstation(QueryBuilder<?, InstrumentImpl> builder, String query,
+      Consumer<String> errorHandler) {
+    builder.addTextRestriction(Arrays.asList(builder.getRoot().get(InstrumentImpl_.workstation).get(Workstation_.alias),
+        builder.getRoot().get(InstrumentImpl_.workstation).get(Workstation_.identificationBarcode)), query);
   }
 
   @Override
   public long getUsageByRuns(Instrument instrument) throws IOException {
-    return (long) currentSession().createCriteria(Run.class)
-        .add(Restrictions.eq("sequencer", instrument))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    return getUsageInCollection(Run.class, Run_.SEQUENCER, instrument);
   }
 
   @Override
   public long getUsageByArrayRuns(Instrument instrument) throws IOException {
-    return (long) currentSession().createCriteria(ArrayRun.class)
-        .add(Restrictions.eq("instrument", instrument))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    return getUsageInCollection(ArrayRun.class, ArrayRun_.INSTRUMENT, instrument);
   }
 
   @Override
   public long getUsageByQcs(Instrument instrument) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<Long> counts = currentSession().createCriteria(QC.class)
-        .add(Restrictions.eq("instrument", instrument))
-        .setProjection(Projections.rowCount()).list(); // returns one count per QC table (samples, libraries...)
+    List<Long> counts = new ArrayList<>();
+    for (QcTarget qc : QcTarget.values()) {
+      Class<? extends QC> entityClass = qc.getEntityClass();
+      LongQueryBuilder<?> builder = new LongQueryBuilder<>(currentSession(), entityClass);
+      builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(QC_.INSTRUMENT), instrument));
+      counts.add(builder.getCount());
+    }
     return counts.stream().mapToLong(Long::longValue).sum();
   }
 
   @Override
   public Instrument getByServiceRecord(ServiceRecord record) throws IOException {
-    return (Instrument) currentSession().createCriteria(Instrument.class)
-        .createAlias("serviceRecords", "serviceRecords")
-        .add(Restrictions.eq("serviceRecords.recordId", record.getId()))
-        .uniqueResult();
+    QueryBuilder<Instrument, InstrumentImpl> builder = getQueryBuilder();
+    Join<InstrumentImpl, ServiceRecord> recordJoin = builder.getJoin(builder.getRoot(), InstrumentImpl_.serviceRecords);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(recordJoin.get(ServiceRecord_.recordId), record.getId()));
+    return builder.getSingleResultOrNull();
   }
 
 }

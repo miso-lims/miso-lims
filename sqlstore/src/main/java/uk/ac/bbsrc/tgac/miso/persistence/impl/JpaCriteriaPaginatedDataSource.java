@@ -241,6 +241,21 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     }
   }
 
+  public default void restrictPaginationByLocalDate(QueryBuilder<?, T> builder, Date start, Date end, DateType type,
+      Consumer<String> errorHandler) {
+    LocalDate startDate = LocalDate.ofInstant(start.toInstant(), ZoneId.systemDefault());
+    LocalDate endDate = LocalDate.ofInstant(end.toInstant(), ZoneId.systemDefault());
+    SingularAttribute<T, ?> property = propertyForDate(type);
+    @SuppressWarnings("unchecked")
+    Path<LocalDate> dateProperty = (Path<LocalDate>) builder.getRoot().get(property);
+    if (property != null) {
+      builder.addPredicate(builder.getCriteriaBuilder().between(dateProperty, startDate, endDate));
+    } else {
+      errorHandler.accept(String.format("%s has no %s date.", getFriendlyName(),
+          type.name().toLowerCase()));
+    }
+  }
+
   @Override
   public default void restrictPaginationByDesign(QueryBuilder<?, T> builder, String query,
       Consumer<String> errorHandler) {

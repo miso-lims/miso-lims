@@ -47,8 +47,8 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAll() throws IOException {
-    Collection<Instrument> instruments = dao.listAll();
+  public void testList() throws IOException {
+    Collection<Instrument> instruments = dao.list();
     assertEquals(6, instruments.size());
   }
 
@@ -63,11 +63,11 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
     Instrument instrument = dao.get(2);
     instrument.setName("blargh");
 
-    int sizeBefore = dao.listAll().size();
-    long id = dao.save(instrument);
+    int sizeBefore = dao.list().size();
+    long id = dao.update(instrument);
     Instrument retrieved = dao.get(id);
     assertEquals("instrument name does not match", "blargh", retrieved.getName());
-    assertEquals("did not update sample", sizeBefore, dao.listAll().size());
+    assertEquals("did not update sample", sizeBefore, dao.list().size());
   }
 
   @Test
@@ -148,7 +148,7 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
     instrument.setName("Test Instrument");
     InstrumentModel model = (InstrumentModel) currentSession().get(InstrumentModel.class, 2L);
     instrument.setInstrumentModel(model);
-    long savedId = dao.save(instrument);
+    long savedId = dao.create(instrument);
 
     clearSession();
 

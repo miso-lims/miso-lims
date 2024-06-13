@@ -5,16 +5,17 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum QcTarget {
-  Library("Library", QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION, QcCorrespondingField.VOLUME,
+  Library("Library", LibraryQC.class, QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION,
+      QcCorrespondingField.VOLUME, QcCorrespondingField.SIZE), //
+  Sample("Sample", SampleQC.class, QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION,
+      QcCorrespondingField.VOLUME), //
+  Pool("Pool", PoolQC.class, QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION, QcCorrespondingField.VOLUME,
       QcCorrespondingField.SIZE), //
-  Sample("Sample", QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION, QcCorrespondingField.VOLUME), //
-  Pool("Pool", QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION, QcCorrespondingField.VOLUME,
-      QcCorrespondingField.SIZE), //
-  Run("Run", QcCorrespondingField.NONE), //
-  Container("Container", QcCorrespondingField.NONE), //
-  Requisition("Requisition", QcCorrespondingField.NONE);
+  Container("Container", ContainerQC.class, QcCorrespondingField.NONE), //
+  Requisition("Requisition", RequisitionQC.class, QcCorrespondingField.NONE);
 
   private final String label;
+  private final Class<? extends QC> entityClass;
   private final List<QcCorrespondingField> correspondingFields;
 
   public String getLabel() {
@@ -25,8 +26,13 @@ public enum QcTarget {
     return new ArrayList<>(correspondingFields);
   }
 
-  private QcTarget(String label, QcCorrespondingField... correspondingFields) {
+  public Class<? extends QC> getEntityClass() {
+    return entityClass;
+  }
+
+  private QcTarget(String label, Class<? extends QC> entityClass, QcCorrespondingField... correspondingFields) {
     this.label = label;
+    this.entityClass = entityClass;
     this.correspondingFields = Arrays.asList(correspondingFields);
   }
 }
