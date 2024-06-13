@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +13,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStat
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPositionRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPositionRunPool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPositionRunPool_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPositionRun_;
 import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStatusStore;
 
 @Repository
@@ -33,28 +34,32 @@ public class HibernateInstrumentStatusDao implements InstrumentStatusStore {
 
   @Override
   public List<InstrumentStatus> list() throws IOException {
-    @SuppressWarnings("unchecked")
-    List<InstrumentStatus> instruments = currentSession().createCriteria(InstrumentStatus.class)
-        .list();
+    List<InstrumentStatus> instruments =
+        new QueryBuilder<>(currentSession(), InstrumentStatus.class, InstrumentStatus.class).getResultList();
 
     for (InstrumentStatus instrument : instruments) {
       for (InstrumentStatusPosition position : instrument.getPositions()) {
-        InstrumentStatusPositionRun run = (InstrumentStatusPositionRun) currentSession()
-            .createCriteria(InstrumentStatusPositionRun.class)
-            .add(Restrictions.eq("instrumentId", instrument.getId()))
-            .add(Restrictions.eq("positionId", position.getPositionId()))
-            .setMaxResults(1)
-            .uniqueResult();
 
-        if (run != null) {
+        QueryBuilder<InstrumentStatusPositionRun, InstrumentStatusPositionRun> runBuilder =
+            new QueryBuilder<>(currentSession(), InstrumentStatusPositionRun.class, InstrumentStatusPositionRun.class);
+        runBuilder.addPredicate(runBuilder.getCriteriaBuilder()
+            .equal(runBuilder.getRoot().get(InstrumentStatusPositionRun_.instrumentId), instrument.getId()));
+        runBuilder.addPredicate(runBuilder.getCriteriaBuilder()
+            .equal(runBuilder.getRoot().get(InstrumentStatusPositionRun_.positionId), position.getPositionId()));
+        List<InstrumentStatusPositionRun> runs = runBuilder.getResultList(1, 0);
+
+        if (!runs.isEmpty()) {
+          InstrumentStatusPositionRun run = runs.get(0);
           position.setRun(run);
 
-          @SuppressWarnings("unchecked")
-          List<InstrumentStatusPositionRunPool> pools = currentSession()
-              .createCriteria(InstrumentStatusPositionRunPool.class)
-              .add(Restrictions.eq("runId", run.getRunId()))
-              .add(Restrictions.eq("positionId", position.getPositionId()))
-              .list();
+          QueryBuilder<InstrumentStatusPositionRunPool, InstrumentStatusPositionRunPool> poolBuilder =
+              new QueryBuilder<>(currentSession(), InstrumentStatusPositionRunPool.class,
+                  InstrumentStatusPositionRunPool.class);
+          poolBuilder.addPredicate(poolBuilder.getCriteriaBuilder()
+              .equal(poolBuilder.getRoot().get(InstrumentStatusPositionRunPool_.runId), run.getRunId()));
+          poolBuilder.addPredicate(poolBuilder.getCriteriaBuilder()
+              .equal(poolBuilder.getRoot().get(InstrumentStatusPositionRunPool_.positionId), position.getPositionId()));
+          List<InstrumentStatusPositionRunPool> pools = poolBuilder.getResultList();
           run.setPools(pools);
         }
       }
