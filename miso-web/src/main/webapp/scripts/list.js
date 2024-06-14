@@ -668,7 +668,12 @@ ListUtils = (function ($) {
                       Utils.showOkDialog(bulkAction.name, ["Nothing selected."]);
                       return;
                     }
-                    bulkAction.action(ListState[elementId].selected);
+                    bulkAction.action(
+                      ListState[elementId].selected.map(function (item) {
+                        // Unwrap objects with temporary IDs created in form.js
+                        return item.isTemporaryId ? item.original : item;
+                      })
+                    );
                   },
                 }
               : null;
