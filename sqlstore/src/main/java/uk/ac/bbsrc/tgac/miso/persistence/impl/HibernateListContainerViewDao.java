@@ -4,27 +4,47 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.Criteria;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Index_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerView_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement_;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.ListContainerViewDao;
-import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateListContainerViewDao implements ListContainerViewDao, HibernatePaginatedDataSource<ListContainerView> {
+public class HibernateListContainerViewDao
+    implements ListContainerViewDao, JpaCriteriaPaginatedDataSource<ListContainerView, ListContainerView> {
 
-  private static final String[] SEARCH_PROPERTIES = new String[] { "identificationBarcode" };
-  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("model"));
+  private static final List<SingularAttribute<ListContainerView, String>> SEARCH_PROPERTIES =
+      Arrays.asList(ListContainerView_.identificationBarcode);
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -44,69 +64,87 @@ public class HibernateListContainerViewDao implements ListContainerViewDao, Hibe
   }
 
   @Override
-  public String getProjectColumn() {
-    return null;
+  public SingularAttribute<ListContainerView, ?> getIdProperty() {
+    return ListContainerView_.containerId;
   }
 
   @Override
-  public Class<? extends ListContainerView> getRealClass() {
+  public Class<ListContainerView> getEntityClass() {
     return ListContainerView.class;
   }
 
   @Override
-  public String[] getSearchProperties() {
+  public Class<ListContainerView> getResultClass() {
+    return ListContainerView.class;
+  }
+
+  @Override
+  public List<SingularAttribute<ListContainerView, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return STANDARD_ALIASES;
-  }
-
-  @Override
-  public String propertyForDate(Criteria criteria, DateType type) {
-    switch (type) {
-    case ENTERED:
-      return "created";
-    case UPDATE:
-      return "lastModified";
-    default:
-      return null;
+  public Path<?> propertyForSortColumn(Root<ListContainerView> root, String original) {
+    if ("id".equals(original)) {
+      return root.get(ListContainerView_.CONTAINER_ID);
+    } else {
+      return root.get(original);
     }
   }
 
   @Override
-  public String propertyForSortColumn(String original) {
-    return original;
+  public SingularAttribute<ListContainerView, ?> propertyForDate(DateType type) {
+    switch (type) {
+      case ENTERED:
+        return ListContainerView_.created;
+      case UPDATE:
+        return ListContainerView_.lastModified;
+      default:
+        return null;
+    }
   }
 
   @Override
-  public String propertyForUser(boolean creator) {
-    return creator ? "creator" : "lastModifier";
+  public SingularAttribute<ListContainerView, ? extends UserImpl> propertyForUser(boolean creator) {
+    return creator ? ListContainerView_.creator : ListContainerView_.lastModifier;
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("model.platformType", platformType));
+  public void restrictPaginationByPlatformType(QueryBuilder<?, ListContainerView> builder, PlatformType platformType,
+      Consumer<String> errorHandler) {
+    Join<ListContainerView, SequencingContainerModel> modelJoin =
+        builder.getJoin(builder.getRoot(), ListContainerView_.model);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(modelJoin.get(SequencingContainerModel_.platformType), platformType));
   }
 
   @Override
-  public void restrictPaginationByKitName(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.createAlias("clusteringKit", "clusteringKit", JoinType.LEFT_OUTER_JOIN);
-    criteria.createAlias("multiplexingKit", "multiplexingKit", JoinType.LEFT_OUTER_JOIN);
-    criteria.add(DbUtils.textRestriction(query, "clusteringKit.name", "multiplexingKit.name"));
+  public void restrictPaginationByKitName(QueryBuilder<?, ListContainerView> builder, String query,
+      Consumer<String> errorHandler) {
+    Join<ListContainerView, KitDescriptor> clusterJoin =
+        builder.getJoin(builder.getRoot(), ListContainerView_.clusteringKit);
+    Join<ListContainerView, KitDescriptor> multiplexingJoin =
+        builder.getJoin(builder.getRoot(), ListContainerView_.multiplexingKit);
+    builder.addTextRestriction(
+        Arrays.asList(clusterJoin.get(KitDescriptor_.name), multiplexingJoin.get(KitDescriptor_.name)), query);
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.createAlias("partitions", "partitions")
-        .createAlias("partitions.pool", "pool")
-        .createAlias("pool.poolElements", "poolElement")
-        .createAlias("poolElement.aliquot", "aliquot")
-        .createAlias("aliquot.parentLibrary", "library")
-        .createAlias("library.index1", "index1")
-        .createAlias("library.index2", "index2", JoinType.LEFT_OUTER_JOIN)
-        .add(DbUtils.textRestriction(query, "index1.name", "index1.sequence", "index2.name", "index2.sequence"));
+  public void restrictPaginationByIndex(QueryBuilder<?, ListContainerView> builder, String query,
+      Consumer<String> errorHandler) {
+    Join<ListContainerView, PartitionImpl> partitionJoin =
+        builder.getJoin(builder.getRoot(), ListContainerView_.partitions);
+    Join<PartitionImpl, PoolImpl> poolJoin = builder.getJoin(partitionJoin, PartitionImpl_.pool);
+    Join<PoolImpl, PoolElement> elementJoin = builder.getJoin(poolJoin, PoolImpl_.poolElements);
+    Join<PoolElement, ListLibraryAliquotView> aliquotJoin = builder.getJoin(elementJoin, PoolElement_.aliquot);
+    Join<ListLibraryAliquotView, ParentLibrary> libraryJoin =
+        builder.getJoin(aliquotJoin, ListLibraryAliquotView_.parentLibrary);
+    Join<ParentLibrary, Index> index1 = builder.getJoin(libraryJoin, ParentLibrary_.index1);
+    Join<ParentLibrary, Index> index2 = builder.getJoin(libraryJoin, ParentLibrary_.index2);
+    builder.addTextRestriction(Arrays.asList(
+        index1.get(Index_.name), index1.get(Index_.sequence),
+        index2.get(Index_.name), index2.get(Index_.sequence)),
+        query);
   }
 
 }
