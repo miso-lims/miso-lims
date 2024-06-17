@@ -13,7 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface LibraryAliquotStore extends Store<LibraryAliquot>, PaginatedDataSource<LibraryAliquot> {
+public interface LibraryAliquotStore extends SaveDao<LibraryAliquot>, PaginatedDataSource<LibraryAliquot> {
 
   /**
    * @param libraryId
