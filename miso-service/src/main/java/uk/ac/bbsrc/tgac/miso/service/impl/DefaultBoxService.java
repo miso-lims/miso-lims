@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import com.eaglegenomics.simlims.core.User;
 import com.google.common.base.Functions;
 import com.google.common.collect.Sets;
 
@@ -46,13 +47,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
+public class DefaultBoxService implements BoxService {
 
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -113,7 +113,8 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
   @Override
   public void discardAllContents(Box box) throws IOException {
     Box managed = get(box.getId());
-    addBoxContentsChangeLog(managed, String.format("Discarded all box contents (%d items)", managed.getBoxPositions().size()));
+    addBoxContentsChangeLog(managed,
+        String.format("Discarded all box contents (%d items)", managed.getBoxPositions().size()));
     for (BoxPosition bp : managed.getBoxPositions().values()) {
       discardBoxable(bp.getBoxableId());
     }
@@ -193,7 +194,8 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
   }
 
   @Override
-  public List<Box> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+  public List<Box> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter)
       throws IOException {
     return boxStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
@@ -260,6 +262,8 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
       }
 
       BoxableView oldOccupant = oldOccupants.get(newPos.getBoxableId());
+      addBoxableChangelog(oldOccupant, oldOccupant.getBoxAlias(), oldOccupant.getBoxName(),
+          oldOccupant.getBoxPosition(), newPos, box.getLastModifier());
       if (oldOccupant.getBoxId() != null) {
         if (oldOccupant.getBoxId().longValue() == box.getId()) {
           // Moved within same box
@@ -269,20 +273,24 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
         } else {
           // Moved from a different box
           Box oldBox = get(oldOccupant.getBoxId());
-          addBoxContentsChangeLog(oldBox, String.format("Removed %s (%s) from %s to %s (%s)", oldOccupant.getAlias(), oldOccupant.getName(),
-              oldOccupant.getBoxPosition(), managed.getAlias(), managed.getName()));
-          message.append(String.format("Moved %s (%s) from %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(),
-              oldOccupant.getBoxAlias(), oldOccupant.getBoxName(), entry.getKey()));
+          addBoxContentsChangeLog(oldBox,
+              String.format("Removed %s (%s) from %s to %s (%s)", oldOccupant.getAlias(), oldOccupant.getName(),
+                  oldOccupant.getBoxPosition(), managed.getAlias(), managed.getName()));
+          message
+              .append(String.format("Moved %s (%s) from %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(),
+                  oldOccupant.getBoxAlias(), oldOccupant.getBoxName(), entry.getKey()));
           movedFromOtherBoxes.add(oldOccupant);
         }
       } else {
-        message.append(String.format("Added %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(), entry.getKey()));
+        message.append(
+            String.format("Added %s (%s) to %s", oldOccupant.getAlias(), oldOccupant.getName(), entry.getKey()));
       }
     }
 
     // Process removals
     List<BoxableId> removedIds = new ArrayList<>();
-    List<BoxableId> movedWithinBoxIds = movedWithinBox.stream().map(BoxPosition::getBoxableId).collect(Collectors.toList());
+    List<BoxableId> movedWithinBoxIds =
+        movedWithinBox.stream().map(BoxPosition::getBoxableId).collect(Collectors.toList());
     for (Map.Entry<String, BoxPosition> entry : managed.getBoxPositions().entrySet()) {
       if (box.getBoxPositions().keySet().contains(entry.getKey())
           && box.getBoxPositions().get(entry.getKey()).getBoxableId().equals(entry.getValue().getBoxableId())) {
@@ -297,6 +305,7 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
         if (message.length() > 0) {
           message.append("\n");
         }
+        addBoxableChangelog(v, v.getBoxAlias(), v.getBoxName(), v.getBoxPosition(), null, box.getLastModifier());
         message.append(String.format("Removed %s (%s) from %s", v.getAlias(), v.getName(), v.getBoxPosition()));
       }
     }
@@ -314,7 +323,8 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
     for (String pos : box.getBoxPositions().keySet()) {
       if (!managed.getBoxPositions().containsKey(pos)
           || !managed.getBoxPositions().get(pos).getBoxableId().equals(box.getBoxPositions().get(pos).getBoxableId())) {
-        managed.getBoxPositions().put(pos, new BoxPosition(managed, pos, box.getBoxPositions().get(pos).getBoxableId()));
+        managed.getBoxPositions().put(pos,
+            new BoxPosition(managed, pos, box.getBoxPositions().get(pos).getBoxableId()));
       }
     }
 
@@ -323,6 +333,30 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
     }
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     return boxStore.save(managed);
+  }
+
+  private void addBoxableChangelog(BoxableView boxable, String oldBoxAlias, String oldBoxName, String oldBoxPosition,
+      BoxPosition newPosition, User user) throws IOException {
+    if (newPosition == null) {
+      addBoxableChangelog(boxable, oldBoxAlias, oldBoxName, oldBoxPosition, null, null, null, null);
+    } else {
+      addBoxableChangelog(boxable, oldBoxAlias, oldBoxName, oldBoxPosition, newPosition.getBox().getAlias(),
+          newPosition.getBox().getName(), newPosition.getPosition(), user);
+    }
+  }
+
+  private void addBoxableChangelog(BoxableView boxable, String oldBoxAlias, String oldBoxName, String oldBoxPosition,
+      String newBoxAlias, String newBoxName, String newBoxPosition, User user) throws IOException {
+    ChangeLog change = boxable.makeChangeLog();
+    change.setColumnsChanged("box position");
+    change.setSummary("Box location: %s → %s".formatted(makeBoxableLocationString(oldBoxAlias, oldBoxPosition),
+        makeBoxableLocationString(newBoxAlias, newBoxPosition)));
+    change.setUser(user);
+    changeLogService.create(change);
+  }
+
+  private String makeBoxableLocationString(String boxAlias, String boxPosition) {
+    return boxPosition == null ? "n/a" : (boxAlias + " " + boxPosition);
   }
 
   @Override
@@ -339,13 +373,15 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
       if (box.getStorageLocation().getId() > 0L) {
         box.setStorageLocation(storageLocationService.get(box.getStorageLocation().getId()));
       } else if (!LimsUtils.isStringEmptyOrNull(box.getStorageLocation().getIdentificationBarcode())) {
-        box.setStorageLocation(storageLocationService.getByBarcode(box.getStorageLocation().getIdentificationBarcode()));
+        box.setStorageLocation(
+            storageLocationService.getByBarcode(box.getStorageLocation().getIdentificationBarcode()));
       }
     }
   }
 
   /**
-   * Checks submitted data for validity, throwing a ValidationException containing all of the errors if invalid
+   * Checks submitted data for validity, throwing a ValidationException containing all of the errors
+   * if invalid
    * 
    * @param box submitted Box to validate
    * @param beforeChange the already-persisted Box before changes
@@ -425,7 +461,8 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
         addStorageChangeLog(getFreezer(box), box, true);
       } else if (original.getStorageLocation().getId() != box.getStorageLocation().getId()) {
         String message = String.format("Relocated %s (%s) from %s to %s", box.getAlias(), box.getName(),
-            original.getStorageLocation().getFreezerDisplayLocation(), box.getStorageLocation().getFreezerDisplayLocation());
+            original.getStorageLocation().getFreezerDisplayLocation(),
+            box.getStorageLocation().getFreezerDisplayLocation());
         ChangeLog change = getFreezer(box).createChangeLog(message, "", authorizationManager.getCurrentUser());
         changeLogService.create(change);
       }
@@ -434,11 +471,13 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
 
   private StorageLocation getFreezer(Box box) {
     if (box.getStorageLocation() == null) {
-      throw new IllegalArgumentException(String.format("%s (%s) does not have a storage location", box.getAlias(), box.getName()));
+      throw new IllegalArgumentException(
+          String.format("%s (%s) does not have a storage location", box.getAlias(), box.getName()));
     }
     StorageLocation location = box.getStorageLocation().getFreezerLocation();
     if (location == null) {
-      throw new IllegalArgumentException(String.format("Location %s does not have a parent freezer", box.getStorageLocation().getAlias()));
+      throw new IllegalArgumentException(
+          String.format("Location %s does not have a parent freezer", box.getStorageLocation().getAlias()));
     }
     return location;
   }
@@ -455,8 +494,9 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
     if (location.getLocationUnit() != LocationUnit.FREEZER) {
       throw new IllegalArgumentException(String.format("%s is not a freezer", location.getAlias()));
     }
-    String message = addition ?
-        String.format("Added %s (%s) to %s", box.getAlias(), box.getName(), box.getStorageLocation().getFreezerDisplayLocation())
+    String message = addition
+        ? String.format("Added %s (%s) to %s", box.getAlias(), box.getName(),
+            box.getStorageLocation().getFreezerDisplayLocation())
         : (String.format("Removed %s (%s)", box.getAlias(), box.getName()));
     ChangeLog change = location.createChangeLog(message, "", authorizationManager.getCurrentUser());
     changeLogService.create(change);
@@ -497,11 +537,14 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
     if (boxable.getBox() == null && managedOriginal.getBox() == null) {
       return;
     }
-    if ((boxable.getBox() != null && managedOriginal.getBox() != null && boxable.getBox().getId() == managedOriginal.getBox().getId()
+    if ((boxable.getBox() != null && managedOriginal.getBox() != null
+        && boxable.getBox().getId() == managedOriginal.getBox().getId()
         && boxable.getBoxPosition().equals(managedOriginal.getBoxPosition()))) {
-      // Note: for new items, boxable.box.boxPosition[boxable.boxPosition] may not match boxable.boxPosition because it doesn't (and we
-      // don't want it to) cascade update. boxable.boxPosition stays as it is because Hibernate won't overwrite the changes you've made to
-      // the object with the current session. boxable.box should be a refreshed object with the correct, persisted boxPositions though.
+      // Note: for new items, boxable.box.boxPosition[boxable.boxPosition] may not match
+      // boxable.boxPosition because it doesn't (and we don't want it to) cascade update.
+      // boxable.boxPosition stays as it is because Hibernate won't overwrite the changes you've made to
+      // the object with the current session. boxable.box should be a refreshed object with the correct,
+      // persisted boxPositions though.
       BoxPosition temp = managedOriginal.getBox().getBoxPositions().get(managedOriginal.getBoxPosition());
       if (temp != null && temp.getBoxableId().equals(boxableId)) {
         return;
@@ -534,10 +577,14 @@ public class DefaultBoxService implements BoxService, PaginatedDataSource<Box> {
 
   @Override
   public void throwIfBoxPositionIsFilled(Boxable boxable) throws IOException {
-    if (boxable.getBox() == null || boxable.getBoxPosition() == null) return;
+    if (boxable.getBox() == null || boxable.getBoxPosition() == null) {
+      return;
+    }
     Box box = get(boxable.getBox().getId());
     BoxPosition bp = box.getBoxPositions().get(boxable.getBoxPosition());
-    if (bp == null) return;
+    if (bp == null) {
+      return;
+    }
     if (!bp.getBoxableId().equals(new BoxableId(boxable.getEntityType(), boxable.getId()))) {
       throw new ValidationException(new ValidationError("boxPosition", "Position is not available"));
     }

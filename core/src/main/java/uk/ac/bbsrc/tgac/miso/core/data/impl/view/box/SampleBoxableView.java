@@ -14,6 +14,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Immutable;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
 
 @Entity
 @Immutable
@@ -21,6 +23,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 public class SampleBoxableView extends BoxableView {
 
   private static final long serialVersionUID = 1L;
+
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   private long sampleId;
@@ -34,7 +38,8 @@ public class SampleBoxableView extends BoxableView {
   private SampleBoxablePositionView boxPosition;
 
   @ManyToMany
-  @JoinTable(name = "Transfer_Sample", joinColumns = @JoinColumn(name = "sampleId"), inverseJoinColumns = @JoinColumn(name = "transferId"))
+  @JoinTable(name = "Transfer_Sample", joinColumns = @JoinColumn(name = "sampleId"),
+      inverseJoinColumns = @JoinColumn(name = "transferId"))
   private Set<BoxableTransferView> transfers;
 
   @Override
@@ -88,6 +93,18 @@ public class SampleBoxableView extends BoxableView {
   @Override
   public boolean isDistributed() {
     return getTransfers().stream().anyMatch(x -> x.getRecipient() != null);
+  }
+
+  @Override
+  public boolean isSaved() {
+    return sampleId != UNSAVED_ID;
+  }
+
+  @Override
+  public ChangeLog makeChangeLog() {
+    SampleChangeLog change = new SampleChangeLog();
+    change.setSample(this);
+    return change;
   }
 
 }

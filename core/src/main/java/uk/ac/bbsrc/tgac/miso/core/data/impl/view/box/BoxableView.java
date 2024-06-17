@@ -6,10 +6,12 @@ import java.util.function.Function;
 
 import javax.persistence.MappedSuperclass;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 
 @MappedSuperclass
-public abstract class BoxableView implements Serializable {
+public abstract class BoxableView implements Aliasable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -20,10 +22,6 @@ public abstract class BoxableView implements Serializable {
   private boolean discarded;
 
   public abstract EntityType getEntityType();
-
-  public abstract long getId();
-
-  public abstract void setId(long id);
 
   public abstract BoxablePositionView getBoxablePosition();
 
@@ -39,6 +37,7 @@ public abstract class BoxableView implements Serializable {
     this.name = name;
   }
 
+  @Override
   public String getAlias() {
     return alias;
   }
@@ -68,7 +67,9 @@ public abstract class BoxableView implements Serializable {
   }
 
   public void setDiscarded(boolean discarded) {
-    if (discarded) setVolume(BigDecimal.ZERO);
+    if (discarded) {
+      setVolume(BigDecimal.ZERO);
+    }
     this.discarded = discarded;
   }
 
@@ -95,5 +96,7 @@ public abstract class BoxableView implements Serializable {
   private <T> T getBoxProperty(Function<BoxView, T> getter) {
     return getBoxablePosition() == null ? null : getter.apply(getBoxablePosition().getBox());
   }
+
+  public abstract ChangeLog makeChangeLog();
 
 }

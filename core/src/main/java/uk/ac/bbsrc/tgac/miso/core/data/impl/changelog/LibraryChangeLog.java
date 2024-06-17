@@ -12,12 +12,14 @@ import org.hibernate.annotations.Index;
 import org.hibernate.annotations.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.LibraryBoxableView;
 
 @Entity
 @Table(appliesTo = "LibraryChangeLog", indexes = {
-    @Index(name = "LibraryChangeLog_libraryId_changeTime", columnNames = { "libraryId", "changeTime" }) })
+    @Index(name = "LibraryChangeLog_libraryId_changeTime", columnNames = {"libraryId", "changeTime"})})
 public class LibraryChangeLog extends AbstractChangeLog {
 
   private static final long serialVersionUID = 1L;
@@ -28,7 +30,7 @@ public class LibraryChangeLog extends AbstractChangeLog {
 
   @ManyToOne(fetch = FetchType.LAZY, targetEntity = LibraryImpl.class)
   @JoinColumn(name = "libraryId", nullable = false, updatable = false)
-  private Library library;
+  private Identifiable library;
 
   @Override
   public Long getId() {
@@ -44,11 +46,15 @@ public class LibraryChangeLog extends AbstractChangeLog {
     return libraryChangeLogId;
   }
 
-  public Library getLibrary() {
+  public Identifiable getLibrary() {
     return library;
   }
 
   public void setLibrary(Library library) {
+    this.library = library;
+  }
+
+  public void setLibrary(LibraryBoxableView library) {
     this.library = library;
   }
 

@@ -15,6 +15,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Immutable;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 
 @Entity
 @Immutable
@@ -22,6 +24,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 public class LibraryBoxableView extends BoxableView {
 
   private static final long serialVersionUID = 1L;
+
+  private static final long UNSAVED_ID = 0L;
 
   @Id
   private long libraryId;
@@ -33,7 +37,8 @@ public class LibraryBoxableView extends BoxableView {
   private LibraryBoxablePositionView boxPosition;
 
   @ManyToMany
-  @JoinTable(name = "Transfer_Library", joinColumns = @JoinColumn(name = "libraryId"), inverseJoinColumns = @JoinColumn(name = "transferId"))
+  @JoinTable(name = "Transfer_Library", joinColumns = @JoinColumn(name = "libraryId"),
+      inverseJoinColumns = @JoinColumn(name = "transferId"))
   private Set<BoxableTransferView> transfers;
 
   @Override
@@ -79,6 +84,18 @@ public class LibraryBoxableView extends BoxableView {
   @Override
   public boolean isDistributed() {
     return getTransfers().stream().anyMatch(x -> x.getRecipient() != null);
+  }
+
+  @Override
+  public boolean isSaved() {
+    return libraryId != UNSAVED_ID;
+  }
+
+  @Override
+  public ChangeLog makeChangeLog() {
+    LibraryChangeLog change = new LibraryChangeLog();
+    change.setLibrary(this);
+    return change;
   }
 
 }
