@@ -489,8 +489,10 @@ FormUtils = (function ($) {
 
       var dataCopy = [];
       data.forEach(function (item) {
-        dataCopy.push(Object.assign({}, item));
-        dataCopy[dataCopy.length - 1].original = item;
+        var copy = Object.assign({}, item);
+        copy.original = item;
+        copy.isTemporaryId = true;
+        dataCopy.push(copy);
       });
 
       // IDs needed for list checkboxes to work correctly
