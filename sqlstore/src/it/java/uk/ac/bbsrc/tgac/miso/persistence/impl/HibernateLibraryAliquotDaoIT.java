@@ -93,12 +93,12 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
     assertEquals(15, dao.list(0, 9999, false, "id").size());
     assertEquals(10, dao.list(0, 10, false, "id").size());
     assertEquals(5, dao.list(0, 5, false, "id").size());
-    assertEquals(0, dao.list(0, 0, false, "id").size());
+    assertEquals(15, dao.list(0, 0, false, "id").size());
   }
 
   @Test
   public void testListAllLibraryAliquotsBySearchByName() throws IOException {
-    final Collection<LibraryAliquot> list = dao.list(0, 20, false, "id", PaginationFilter.query("LDI3"),
+    final Collection<LibraryAliquot> list = dao.list(0, 0, false, "id", PaginationFilter.query("LDI3"),
         PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertEquals(1, list.size());
     assertEquals("LDI3", list.iterator().next().getName());
@@ -107,7 +107,7 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
   @Test
   public void testListAllLibraryAliquotsBySearchByIdentificationBarcode() throws IOException {
     final Collection<LibraryAliquot> list =
-        dao.list(0, 20, false, "id", PaginationFilter.query("LDI1::TEST_0001_Bn_P_PE_300_WG"),
+        dao.list(0, 0, false, "id", PaginationFilter.query("LDI1::TEST_0001_Bn_P_PE_300_WG"),
             PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertEquals(1, list.size());
     assertEquals("LDI1::TEST_0001_Bn_P_PE_300_WG", list.iterator().next().getIdentificationBarcode());
@@ -115,32 +115,32 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListAllLibraryAliquotsBySearchWithNoQueryString() throws IOException {
-    assertEquals(15, dao.list(0, 20, false, "id", PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
+    assertEquals(15, dao.list(0, 0, false, "id", PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
   @Test
   public void testListAllLibraryAliquotsBySearchNoneForPlatform() throws IOException {
-    assertEquals(0, dao.list(0, 20, false, "id", PaginationFilter.platformType(PlatformType.SOLID)).size());
+    assertEquals(0, dao.list(0, 0, false, "id", PaginationFilter.platformType(PlatformType.SOLID)).size());
   }
 
   @Test
   public void testListAllLibraryAliquotsBySearchOnlyByName() throws IOException {
-    assertEquals(1, dao.list(0, 20, false, "id", PaginationFilter.query("LDI3")).size());
+    assertEquals(1, dao.list(0, 0, false, "id", PaginationFilter.query("LDI3")).size());
   }
 
   @Test
   public void testListAllLibraryAliquotsBySearchOnlyByIdentificationBarcode() throws IOException {
-    assertEquals(1, dao.list(0, 20, false, "id", PaginationFilter.query("LDI1::TEST_0001_Bn_P_PE_300_WG")).size());
+    assertEquals(1, dao.list(0, 0, false, "id", PaginationFilter.query("LDI1::TEST_0001_Bn_P_PE_300_WG")).size());
   }
 
   @Test
   public void testListAllLibraryAliquotsBySearchOnlyWithNoQueryString() throws IOException {
-    assertEquals(15, dao.list(0, 20, false, "id").size());
+    assertEquals(15, dao.list(0, 0, false, "id").size());
   }
 
   @Test
   public void testListAllLibraryAliquotsBySearchOnlyWithNullQueryString() throws IOException {
-    assertEquals(0, dao.list(0, 20, false, "id", PaginationFilter.query(null)).size());
+    assertEquals(0, dao.list(0, 0, false, "id", PaginationFilter.query(null)).size());
   }
 
   @Test
@@ -155,41 +155,41 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListAllLibraryAliquotsByPlatform() throws IOException {
-    assertEquals(15, dao.list(0, 20, false, "id",
+    assertEquals(15, dao.list(0, 0, false, "id",
         PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
   @Test
   public void testListAllLibraryAliquotsByPlatformNone() throws IOException {
-    assertEquals(0, dao.list(0, 20, false, "id",
+    assertEquals(0, dao.list(0, 0, false, "id",
         PaginationFilter.platformType(PlatformType.SOLID)).size());
   }
 
   @Test
   public void testListAllLibraryAliquotsByProjectId() throws IOException {
-    assertEquals(15, dao.list(0, 20, false, "id", PaginationFilter.project(1L)).size());
+    assertEquals(15, dao.list(0, 0, false, "id", PaginationFilter.project(1L)).size());
   }
 
   @Test
   public void testListAllLibraryAliquotsByProjectIdNone() throws IOException {
-    assertEquals(0, dao.list(0, 20, false, "id", PaginationFilter.project(100L)).size());
+    assertEquals(0, dao.list(0, 0, false, "id", PaginationFilter.project(100L)).size());
   }
 
   @Test
   public void testListAllLibraryAliquotsByProjectAndPlatform() throws IOException {
-    assertEquals(15, dao.list(0, 20, false, "id", PaginationFilter.project(1L),
+    assertEquals(15, dao.list(0, 0, false, "id", PaginationFilter.project(1L),
         PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
   @Test
   public void testListAllLibraryAliquotsByProjectAndPlatformNoneForProject() throws IOException {
-    assertEquals(0, dao.list(0, 20, false, "id", PaginationFilter.project(100L),
+    assertEquals(0, dao.list(0, 0, false, "id", PaginationFilter.project(100L),
         PaginationFilter.platformType(PlatformType.ILLUMINA)).size());
   }
 
   @Test
   public void testListAllLibraryAliquotsByProjectAndPlatformNoneForPlatform() throws IOException {
-    assertEquals(0, dao.list(0, 20, false, "id", PaginationFilter.project(1L),
+    assertEquals(0, dao.list(0, 0, false, "id", PaginationFilter.project(1L),
         PaginationFilter.platformType(PlatformType.SOLID)).size());
   }
 

@@ -208,10 +208,6 @@ public class HibernateLibraryAliquotDao extends HibernateSaveDao<LibraryAliquot>
 
   @Override
   public List<LibraryAliquot> listByIdList(Collection<Long> idList) throws IOException {
-    if (idList.isEmpty()) {
-      return Collections.emptyList();
-    }
-
     return listByIdList(LibraryAliquot_.ALIQUOT_ID, idList);
   }
 

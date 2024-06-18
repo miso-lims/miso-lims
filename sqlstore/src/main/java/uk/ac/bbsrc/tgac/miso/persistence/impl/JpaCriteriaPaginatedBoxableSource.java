@@ -9,8 +9,9 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition_;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -20,9 +21,9 @@ public interface JpaCriteriaPaginatedBoxableSource<T extends Boxable> extends Jp
   default void restrictPaginationByBox(QueryBuilder<?, T> builder, String query, Consumer<String> errorHandler) {
     Join<T, ? extends AbstractBoxPosition> join = builder.getSingularJoin(builder.getRoot(), "boxPosition", null);
     if (LimsUtils.isStringBlankOrNull(query)) {
-      builder.addPredicate(builder.getCriteriaBuilder().isNull(join.get("box")));
+      builder.addPredicate(builder.getCriteriaBuilder().isNull(join.get(AbstractBoxPosition_.box)));
     } else {
-      Join<? extends AbstractBoxPosition, Box> boxJoin = builder.getSingularJoin(join, "box", null);
+      Join<? extends AbstractBoxPosition, BoxImpl> boxJoin = builder.getJoin(join, AbstractBoxPosition_.box);
       List<Path<String>> searchProperties = new ArrayList<>();
       for (String property : HibernateBoxDao.SEARCH_PROPERTIES) {
         searchProperties.add(boxJoin.get(property));
