@@ -84,8 +84,8 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAll() throws IOException {
-    assertEquals(15, dao.listAll().size());
+  public void testList() throws IOException {
+    assertEquals(15, dao.list().size());
   }
 
   @Test
@@ -212,7 +212,7 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
     ld.setCreationTime(now);
     ld.setName("nom de plume");
     ld.setAlias("TEST");
-    Long newId = dao.save(ld);
+    Long newId = dao.create(ld);
     final LibraryAliquot saved = dao.get(newId);
     assertNotNull(saved);
     assertEquals(new BigDecimal("12.5"), saved.getConcentration());
@@ -225,7 +225,7 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
     final Library lib = new LibraryImpl();
     lib.setId(1L);
     oldLd.setLibrary(lib);
-    assertEquals(oldLd.getId(), dao.save(oldLd));
+    assertEquals(oldLd.getId(), dao.update(oldLd));
     final LibraryAliquot newLd = dao.get(1L);
     assertEquals(oldLd.getId(), newLd.getId());
     assertEquals(oldLd.getConcentration(), newLd.getConcentration());

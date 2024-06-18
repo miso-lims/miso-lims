@@ -31,8 +31,8 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.hibernate.transform.ResultTransformer;
 
-import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition_;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
@@ -231,8 +231,8 @@ public class QueryBuilder<R, T> {
     }
   }
 
-  public void addFreezerPredicate(Join<T, BoxPosition> boxPositionJoin, String query) {
-    Join<BoxPosition, BoxImpl> boxJoin = getJoin(boxPositionJoin, BoxPosition_.box);
+  public void addFreezerPredicate(Join<T, ? extends AbstractBoxPosition> boxPositionJoin, String query) {
+    Join<? extends AbstractBoxPosition, BoxImpl> boxJoin = getJoin(boxPositionJoin, AbstractBoxPosition_.box);
     Join<BoxImpl, StorageLocation> locationJoin1 = getJoin(boxJoin, BoxImpl_.storageLocation);
     if (LimsUtils.isStringBlankOrNull(query)) {
       addPredicate(criteriaBuilder.isNull(locationJoin1));
@@ -275,6 +275,22 @@ public class QueryBuilder<R, T> {
         criteriaBuilder.between(transferJoin.get(ListTransferView_.transferTime), start, end)));
   }
 
+  public void addDistributionRecipientPredicate(String query, String collectionProperty, String itemIdProperty,
+      String id) {
+    if (LimsUtils.isStringBlankOrNull(query)) {
+      Subquery<?> subquery = createSubquery(Long.class);
+      Root<ListTransferView> subqueryRoot = subquery.from(ListTransferView.class);
+
+      Join<ListTransferView, ?> join = getSingularJoin(subqueryRoot, collectionProperty, null);
+      subquery.select(join.on(subqueryRoot.get(ListTransferView_.recipient).isNotNull()).get(itemIdProperty));
+
+      this.query.where(criteriaBuilder.not(root.get(id).in(subquery)));
+    } else {
+      Join<T, ListTransferView> transferJoin = getSetJoin(root, "listTransferViews", ListTransferView.class);
+      addTextRestriction(transferJoin.get(ListTransferView_.recipient), query);
+    }
+  }
+
   public <X> Subquery<X> createSubquery(Class<X> resultClass) {
     return query.subquery(resultClass);
   }
@@ -292,14 +308,19 @@ public class QueryBuilder<R, T> {
     return buildQuery().getResultList();
   }
 
+  /**
+   * Retrieves result list from query with a particular offset and limit
+   * 
+   * @param offset the index of the first element to retrieve
+   * @param limit the maximum number of items to retrieve. Limit of 0 indicates "no limit"
+   * @return list of result class objects from query
+   */
   public List<R> getResultList(int limit, int offset) {
     if (query.getSelection() == null) {
       throw new IllegalStateException("No selection has been specified");
     }
-    return buildQuery()
-        .setFirstResult(offset)
-        .setMaxResults(limit)
-        .getResultList();
+    return limit > 0 ? buildQuery().setFirstResult(offset).setMaxResults(limit).getResultList()
+        : buildQuery().setFirstResult(offset).getResultList();
   }
 
   private Query<R> buildQuery() {

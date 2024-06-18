@@ -7,201 +7,198 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.persistence.TemporalType;
+import javax.persistence.criteria.CriteriaBuilder.In;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Index_;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferViewLibraryAliquot_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView_;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotStore;
-import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateLibraryAliquotDao
-    implements LibraryAliquotStore, HibernatePaginatedBoxableSource<LibraryAliquot> {
+public class HibernateLibraryAliquotDao extends HibernateSaveDao<LibraryAliquot>
+    implements LibraryAliquotStore, JpaCriteriaPaginatedBoxableSource<LibraryAliquot> {
+
+  public HibernateLibraryAliquotDao() {
+    super(LibraryAliquot.class);
+  }
 
   // Make sure these match the HiberateListLibraryAliquotViewDao
-  private final static String[] SEARCH_PROPERTIES = new String[] {"name", "alias", "identificationBarcode"};
-  private final static List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("library"));
-
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  @Override
-  public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  @Override
-  public long save(LibraryAliquot aliquot) throws IOException {
-    if (aliquot.getId() == LibraryAliquot.UNSAVED_ID) {
-      return (long) currentSession().save(aliquot);
-    } else {
-      currentSession().update(aliquot);
-      return aliquot.getId();
-    }
-  }
-
-  @Override
-  public LibraryAliquot get(long id) throws IOException {
-    return (LibraryAliquot) currentSession().get(LibraryAliquot.class, id);
-  }
-
-  @Override
-  public List<LibraryAliquot> listAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
-    @SuppressWarnings("unchecked")
-    List<LibraryAliquot> records = criteria.list();
-    return records;
-  }
+  private final static List<SingularAttribute<LibraryAliquot, String>> SEARCH_PROPERTIES =
+      Arrays.asList(LibraryAliquot_.name, LibraryAliquot_.alias, LibraryAliquot_.identificationBarcode);
 
   @Override
   public List<LibraryAliquot> listByLibraryId(long libraryId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
-    criteria.add(Restrictions.eq("library.id", libraryId));
-    @SuppressWarnings("unchecked")
-    List<LibraryAliquot> records = criteria.list();
-    return records;
+    QueryBuilder<LibraryAliquot, LibraryAliquot> builder = getQueryBuilder();
+    Join<LibraryAliquot, LibraryImpl> libJoin = builder.getJoin(builder.getRoot(), LibraryAliquot_.library);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(libJoin.get(LibraryImpl_.libraryId), libraryId));
+    return builder.getResultList();
   }
 
   @Override
   public LibraryAliquot getByBarcode(String barcode) throws IOException {
     if (barcode == null)
       throw new IOException("Barcode cannot be null!");
-    Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
-    criteria.add(Restrictions.eq("identificationBarcode", barcode));
-    return (LibraryAliquot) criteria.uniqueResult();
-  }
 
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+    return getBy(LibraryAliquot_.IDENTIFICATION_BARCODE, barcode);
   }
 
   @Override
-  public String getProjectColumn() {
-    return "project.id";
+  public SingularAttribute<LibraryAliquot, ?> getIdProperty() {
+    return LibraryAliquot_.aliquotId;
   }
 
   @Override
-  public Class<? extends LibraryAliquot> getRealClass() {
+  public Class<LibraryAliquot> getEntityClass() {
     return LibraryAliquot.class;
   }
 
   @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return STANDARD_ALIASES;
+  public Class<LibraryAliquot> getResultClass() {
+    return LibraryAliquot.class;
   }
 
   @Override
-  public String propertyForSortColumn(String original) {
-    return original;
+  public Path<?> propertyForSortColumn(Root<LibraryAliquot> root, String original) {
+    if ("id".equals(original)) {
+      return root.get(LibraryAliquot_.ALIQUOT_ID);
+    } else {
+      return root.get(original);
+    }
   }
 
   @Override
-  public String[] getSearchProperties() {
+  public List<SingularAttribute<LibraryAliquot, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
-    criteria.createAlias("library.sample", "sample");
-    criteria.createAlias("sample.project", "project");
-    HibernatePaginatedBoxableSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
-  }
-
-  @Override
-  public void restrictPaginationByPoolId(Criteria criteria, long poolId, Consumer<String> errorHandler) {
-    DetachedCriteria subquery = DetachedCriteria.forClass(PoolImpl.class)
-        .createAlias("poolElements", "element")
-        .createAlias("element.aliquot", "aliquot")
-        .add(Restrictions.eq("id", poolId))
-        .setProjection(Projections.property("aliquot.id"));
-    criteria.add(Property.forName("id").in(subquery));
-  }
-
-  @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
+  public void restrictPaginationByProjectId(QueryBuilder<?, LibraryAliquot> builder, long projectId,
       Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("library.platformType", platformType));
+    Join<LibraryAliquot, LibraryImpl> libraryJoin = builder.getJoin(builder.getRoot(), LibraryAliquot_.library);
+    Join<LibraryImpl, SampleImpl> sampleJoin = builder.getJoin(libraryJoin, LibraryImpl_.sample);
+    Join<SampleImpl, ProjectImpl> projectJoin = builder.getJoin(sampleJoin, SampleImpl_.project);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(projectJoin.get(ProjectImpl_.id), projectId));
   }
 
   @Override
-  public String propertyForDate(Criteria item, DateType type) {
+  public void restrictPaginationByPoolId(QueryBuilder<?, LibraryAliquot> builder, long poolId,
+      Consumer<String> errorHandler) {
+
+    QueryBuilder<Long, PoolImpl> poolBuilder = new QueryBuilder<>(currentSession(), PoolImpl.class, Long.class);
+    Join<PoolImpl, PoolElement> elementJoin = poolBuilder.getJoin(poolBuilder.getRoot(), PoolImpl_.poolElements);
+    Join<PoolElement, ListLibraryAliquotView> aliquotJoin = poolBuilder.getJoin(elementJoin, PoolElement_.aliquot);
+    poolBuilder
+        .addPredicate(poolBuilder.getCriteriaBuilder().equal(poolBuilder.getRoot().get(PoolImpl_.poolId), poolId));
+    poolBuilder.setColumns(aliquotJoin.get(ListLibraryAliquotView_.aliquotId));
+    List<Long> ids = poolBuilder.getResultList();
+
+    In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(LibraryAliquot_.aliquotId));
+    for (Long id : ids) {
+      inClause.value(id);
+    }
+    builder.addPredicate(inClause);
+  }
+
+  @Override
+  public void restrictPaginationByPlatformType(QueryBuilder<?, LibraryAliquot> builder, PlatformType platformType,
+      Consumer<String> errorHandler) {
+    Join<LibraryAliquot, LibraryImpl> libraryJoin = builder.getJoin(builder.getRoot(), LibraryAliquot_.library);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(libraryJoin.get(LibraryImpl_.platformType), platformType));
+  }
+
+  @Override
+  public SingularAttribute<LibraryAliquot, ?> propertyForDate(DateType type) {
     switch (type) {
       case CREATE:
-        return "creationDate";
+        return LibraryAliquot_.creationDate;
       case ENTERED:
-        return "creationTime";
+        return LibraryAliquot_.creationTime;
       case UPDATE:
-        return "lastUpdated";
+        return LibraryAliquot_.lastUpdated;
       default:
         return null;
     }
   }
 
   @Override
-  public TemporalType temporalTypeForDate(DateType type) {
-    switch (type) {
-      case CREATE:
-        return TemporalType.DATE;
-      case ENTERED:
-      case UPDATE:
-        return TemporalType.TIMESTAMP;
-      default:
-        return null;
-    }
+  public SingularAttribute<LibraryAliquot, ? extends UserImpl> propertyForUser(boolean creator) {
+    return creator ? LibraryAliquot_.creator : LibraryAliquot_.lastModifier;
   }
 
   @Override
-  public String propertyForUser(boolean creator) {
-    return creator ? "creator" : "lastModifier";
-  }
-
-  @Override
-  public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
+  public void restrictPaginationByIndex(QueryBuilder<?, LibraryAliquot> builder, String query,
+      Consumer<String> errorHandler) {
     if (LimsUtils.isStringBlankOrNull(query)) {
-      criteria.add(Restrictions.isNull("library.index1"));
+      Join<LibraryAliquot, LibraryImpl> libraryJoin = builder.getJoin(builder.getRoot(), LibraryAliquot_.library);
+      builder.addPredicate(builder.getCriteriaBuilder().isNull(libraryJoin.get(LibraryImpl_.index1)));
     } else {
-      criteria.createAlias("library.index1", "index1")
-          .createAlias("library.index2", "index2", JoinType.LEFT_OUTER_JOIN)
-          .add(DbUtils.textRestriction(query, "index1.name", "index1.sequence", "index2.name", "index2.sequence"));
+      Join<LibraryAliquot, LibraryImpl> libraryJoin = builder.getJoin(builder.getRoot(), LibraryAliquot_.library);
+      Join<LibraryImpl, Index> index1 = builder.getJoin(libraryJoin, LibraryImpl_.index1);
+      Join<LibraryImpl, Index> index2 = builder.getJoin(libraryJoin, LibraryImpl_.index2);
+      builder.addTextRestriction(
+          Arrays.asList(
+              index1.get(Index_.name), index1.get(Index_.sequence),
+              index2.get(Index_.name), index2.get(Index_.sequence)),
+          query);
     }
   }
 
   @Override
-  public void restrictPaginationByGroupId(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(query, "groupId"));
-  }
-
-  @Override
-  public void restrictPaginationByDesign(Criteria criteria, String design, Consumer<String> errorHandler) {
-    criteria.createAlias("libraryDesignCode", "libraryDesignCode")
-        .add(Restrictions.eq("libraryDesignCode.code", design));
-  }
-
-  @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query,
+  public void restrictPaginationByGroupId(QueryBuilder<?, LibraryAliquot> builder, String query,
       Consumer<String> errorHandler) {
-    DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "libraryAliquots", "aliquotId");
+    Root<DetailedLibraryAliquot> root = builder.getRoot(DetailedLibraryAliquot.class);
+    builder.addTextRestriction(root.get(DetailedLibraryAliquot_.groupId), query);
+  }
+
+  @Override
+  public void restrictPaginationByDesign(QueryBuilder<?, LibraryAliquot> builder, String design,
+      Consumer<String> errorHandler) {
+    Root<DetailedLibraryAliquot> root = builder.getRoot(DetailedLibraryAliquot.class);
+    Join<DetailedLibraryAliquot, LibraryDesignCode> join =
+        builder.getJoin(root, DetailedLibraryAliquot_.libraryDesignCode);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(join.get(LibraryDesignCode_.code), design));
+  }
+
+  @Override
+  public void restrictPaginationByDistributionRecipient(QueryBuilder<?, LibraryAliquot> builder, String query,
+      Consumer<String> errorHandler) {
+    builder.addDistributionRecipientPredicate(query, ListTransferView_.LIBRARY_ALIQUOTS,
+        ListTransferViewLibraryAliquot_.ALIQUOT_ID, LibraryAliquot_.ALIQUOT_ID);
   }
 
   @Override
@@ -211,14 +208,7 @@ public class HibernateLibraryAliquotDao
 
   @Override
   public List<LibraryAliquot> listByIdList(Collection<Long> idList) throws IOException {
-    if (idList.isEmpty()) {
-      return Collections.emptyList();
-    }
-    Criteria criteria = currentSession().createCriteria(LibraryAliquot.class);
-    criteria.add(Restrictions.in("id", idList));
-    @SuppressWarnings("unchecked")
-    List<LibraryAliquot> records = criteria.list();
-    return records;
+    return listByIdList(LibraryAliquot_.ALIQUOT_ID, idList);
   }
 
   @Override
@@ -226,33 +216,39 @@ public class HibernateLibraryAliquotDao
     if (poolIds.isEmpty()) {
       return Collections.emptyList();
     }
-    DetachedCriteria subquery = DetachedCriteria.forClass(PoolImpl.class)
-        .createAlias("poolElements", "element")
-        .createAlias("element.aliquot", "aliquot")
-        .add(Restrictions.in("id", poolIds))
-        .setProjection(Projections.property("aliquot.id"));
 
-    @SuppressWarnings("unchecked")
-    List<LibraryAliquot> results = currentSession().createCriteria(LibraryAliquot.class)
-        .add(Property.forName("id").in(subquery))
-        .list();
-    return results;
+    QueryBuilder<Long, PoolImpl> poolBuilder = new QueryBuilder<>(currentSession(), PoolImpl.class, Long.class);
+    Join<PoolImpl, PoolElement> elementJoin = poolBuilder.getJoin(poolBuilder.getRoot(), PoolImpl_.poolElements);
+    Join<PoolElement, ListLibraryAliquotView> aliquotJoin = poolBuilder.getJoin(elementJoin, PoolElement_.aliquot);
+    In<Long> poolInClause = poolBuilder.getCriteriaBuilder().in(poolBuilder.getRoot().get(PoolImpl_.poolId));
+    for (Long poolId : poolIds) {
+      poolInClause.value(poolId);
+    }
+    poolBuilder.addPredicate(poolInClause);
+    poolBuilder.setColumns(aliquotJoin.get(ListLibraryAliquotView_.aliquotId));
+    List<Long> ids = poolBuilder.getResultList();
+
+    QueryBuilder<LibraryAliquot, LibraryAliquot> builder = getQueryBuilder();
+    In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(LibraryAliquot_.aliquotId));
+    for (Long id : ids) {
+      inClause.value(id);
+    }
+    builder.addPredicate(inClause);
+    return builder.getResultList();
   }
 
   @Override
   public long getUsageByPoolOrders(LibraryAliquot aliquot) throws IOException {
-    return (long) currentSession().createCriteria(PoolOrder.class)
-        .createAlias("orderLibraryAliquots", "item")
-        .add(Restrictions.eq("item.aliquot", aliquot))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    LongQueryBuilder<PoolOrder> builder = new LongQueryBuilder<>(currentSession(), PoolOrder.class);
+    Join<PoolOrder, OrderLibraryAliquot> orderJoin =
+        builder.getJoin(builder.getRoot(), PoolOrder_.orderLibraryAliquots);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(orderJoin.get(OrderLibraryAliquot_.aliquot), aliquot));
+    return builder.getCount();
   }
 
   @Override
   public long getUsageByChildAliquots(LibraryAliquot aliquot) throws IOException {
-    return (long) currentSession().createCriteria(LibraryAliquot.class)
-        .createAlias("parentAliquot", "parentAliquot")
-        .add(Restrictions.eq("parentAliquot", aliquot))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    return getUsageInCollection(LibraryAliquot.class, LibraryAliquot_.PARENT_ALIQUOT, aliquot);
   }
 
 }

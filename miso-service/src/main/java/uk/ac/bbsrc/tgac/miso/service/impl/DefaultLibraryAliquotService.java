@@ -99,7 +99,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
   private LibraryAliquot save(LibraryAliquot aliquot) throws IOException {
     try {
       NamingScheme namingScheme = getNamingScheme(aliquot);
-      Long newId = libraryAliquotDao.save(aliquot);
+      Long newId = libraryAliquotDao.create(aliquot);
       LibraryAliquot managed = libraryAliquotDao.get(newId);
 
       // post-save field generation
@@ -134,7 +134,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
         needsUpdate = true;
       }
       if (needsUpdate)
-        libraryAliquotDao.save(managed);
+        libraryAliquotDao.update(managed);
       return managed;
     } catch (ConstraintViolationException e) {
       // Send the nested root cause message to the user, since it contains the actual error.
@@ -192,7 +192,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
   private void updateParent(HierarchyEntity parent) throws IOException {
     try {
       if (parent instanceof LibraryAliquot) {
-        libraryAliquotDao.save((LibraryAliquot) parent);
+        libraryAliquotDao.update((LibraryAliquot) parent);
       } else {
         libraryStore.save((Library) parent);
       }
@@ -221,7 +221,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
 
   @Override
   public List<LibraryAliquot> list() throws IOException {
-    return libraryAliquotDao.listAll();
+    return libraryAliquotDao.list();
   }
 
   @Override
