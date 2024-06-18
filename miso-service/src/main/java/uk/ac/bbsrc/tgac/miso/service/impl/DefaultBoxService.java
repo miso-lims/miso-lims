@@ -349,14 +349,15 @@ public class DefaultBoxService implements BoxService {
       String newBoxAlias, String newBoxName, String newBoxPosition, User user) throws IOException {
     ChangeLog change = boxable.makeChangeLog();
     change.setColumnsChanged("box position");
-    change.setSummary("Box location: %s → %s".formatted(makeBoxableLocationString(oldBoxAlias, oldBoxPosition),
-        makeBoxableLocationString(newBoxAlias, newBoxPosition)));
+    change.setSummary(
+        "Box location: %s → %s".formatted(makeBoxableLocationString(oldBoxAlias, oldBoxName, oldBoxPosition),
+            makeBoxableLocationString(newBoxAlias, newBoxName, newBoxPosition)));
     change.setUser(user);
     changeLogService.create(change);
   }
 
-  private String makeBoxableLocationString(String boxAlias, String boxPosition) {
-    return boxPosition == null ? "n/a" : (boxAlias + " " + boxPosition);
+  private String makeBoxableLocationString(String boxAlias, String boxName, String boxPosition) {
+    return boxPosition == null ? "n/a" : "%s (%s) %s".formatted(boxAlias, boxName, boxPosition);
   }
 
   @Override
