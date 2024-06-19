@@ -1632,6 +1632,7 @@ public class MisoClient implements Lims {
     req.setName(rs.getString("name"));
     req.setStopped(rs.getBoolean("stopped"));
     req.setStopReason(rs.getString("stopReason"));
+    req.setCreated(rs.getTimestamp("created").toInstant());
     return req;
   };
 
