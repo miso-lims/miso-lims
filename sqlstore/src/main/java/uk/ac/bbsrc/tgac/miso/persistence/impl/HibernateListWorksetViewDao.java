@@ -1,29 +1,33 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.Criteria;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView_;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.ListWorksetViewStore;
-import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateListWorksetViewDao implements ListWorksetViewStore, HibernatePaginatedDataSource<ListWorksetView> {
+public class HibernateListWorksetViewDao
+    implements ListWorksetViewStore, JpaCriteriaPaginatedDataSource<ListWorksetView, ListWorksetView> {
 
-  private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "description" };
+  private static final List<SingularAttribute<ListWorksetView, String>> SEARCH_PROPERTIES =
+      Arrays.asList(ListWorksetView_.alias, ListWorksetView_.description);
 
   @Autowired
   private SessionFactory sessionFactory;
@@ -43,45 +47,49 @@ public class HibernateListWorksetViewDao implements ListWorksetViewStore, Hibern
   }
 
   @Override
-  public String getProjectColumn() {
-    return null;
+  public SingularAttribute<ListWorksetView, ?> getIdProperty() {
+    return ListWorksetView_.worksetId;
   }
 
   @Override
-  public Class<? extends ListWorksetView> getRealClass() {
+  public Class<ListWorksetView> getEntityClass() {
     return ListWorksetView.class;
   }
 
   @Override
-  public String[] getSearchProperties() {
+  public Class<ListWorksetView> getResultClass() {
+    return ListWorksetView.class;
+  }
+
+  @Override
+  public List<SingularAttribute<ListWorksetView, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return Collections.emptySet();
-  }
-
-  @Override
-  public String propertyForDate(Criteria criteria, DateType type) {
+  public SingularAttribute<ListWorksetView, ?> propertyForDate(DateType type) {
     switch (type) {
-    case ENTERED:
-      return "created";
-    case UPDATE:
-      return "lastModified";
-    default:
-      return null;
+      case ENTERED:
+        return ListWorksetView_.created;
+      case UPDATE:
+        return ListWorksetView_.lastModified;
+      default:
+        return null;
     }
   }
 
   @Override
-  public String propertyForSortColumn(String original) {
-    return original;
+  public Path<?> propertyForSortColumn(Root<ListWorksetView> root, String original) {
+    if ("id".equals(original)) {
+      return root.get(ListWorksetView_.worksetId);
+    } else {
+      return root.get(original);
+    }
   }
 
   @Override
-  public String propertyForUser(boolean creator) {
-    return creator ? "creator" : "lastModifier";
+  public SingularAttribute<ListWorksetView, ? extends UserImpl> propertyForUser(boolean creator) {
+    return creator ? ListWorksetView_.creator : ListWorksetView_.lastModifier;
   }
 
   @Override
@@ -89,21 +97,23 @@ public class HibernateListWorksetViewDao implements ListWorksetViewStore, Hibern
     if (query == null) {
       throw new NullPointerException("No query string provided");
     }
-    @SuppressWarnings("unchecked")
-    List<ListWorksetView> results = currentSession().createCriteria(ListWorksetView.class)
-        .add(Restrictions.ilike("alias", query, MatchMode.START))
-        .list();
-    return results;
+
+    QueryBuilder<ListWorksetView, ListWorksetView> builder = getQueryBuilder();
+    builder
+        .addPredicate(builder.getCriteriaBuilder().like(builder.getRoot().get(ListWorksetView_.alias), query + '%'));
+    return builder.getResultList();
   }
 
   @Override
-  public void restrictPaginationByCategory(Criteria item, String query, Consumer<String> errorHandler) {
-    item.add(DbUtils.textRestriction(query, "category"));
+  public void restrictPaginationByCategory(QueryBuilder<?, ListWorksetView> builder, String query,
+      Consumer<String> errorHandler) {
+    builder.addTextRestriction(builder.getRoot().get(ListWorksetView_.category), query);
   }
 
   @Override
-  public void restrictPaginationByStage(Criteria item, String query, Consumer<String> errorHandler) {
-    item.add(DbUtils.textRestriction(query, "stage"));
+  public void restrictPaginationByStage(QueryBuilder<?, ListWorksetView> builder, String query,
+      Consumer<String> errorHandler) {
+    builder.addTextRestriction(builder.getRoot().get(ListWorksetView_.stage), query);
   }
 
 }
