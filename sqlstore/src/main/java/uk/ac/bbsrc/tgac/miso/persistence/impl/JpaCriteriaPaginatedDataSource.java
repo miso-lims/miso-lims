@@ -134,8 +134,14 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     }
     // Always add second sort by IDs to ensure consistent order between pages (primary sort may not be
     // deterministic)
-    idQueryBuilder.addSort(idProperty, ascending);
-    resultQueryBuilder.addSort(idProperty, ascending);
+    if (sortProperty != null && !idProperty.equals(sortProperty)) {
+      idQueryBuilder.addSort(idProperty, true);
+      resultQueryBuilder.addSort(idProperty, true);
+    } else {
+      idQueryBuilder.addSort(idProperty, ascending);
+      resultQueryBuilder.addSort(idProperty, ascending);
+    }
+
 
     for (PaginationFilter filter : filters) {
       filter.apply(this, idQueryBuilder, errorHandler);

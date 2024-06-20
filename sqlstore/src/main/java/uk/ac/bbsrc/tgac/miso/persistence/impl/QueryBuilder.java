@@ -31,8 +31,6 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.hibernate.transform.ResultTransformer;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
@@ -231,8 +229,8 @@ public class QueryBuilder<R, T> {
     }
   }
 
-  public void addFreezerPredicate(Join<T, ? extends AbstractBoxPosition> boxPositionJoin, String query) {
-    Join<? extends AbstractBoxPosition, BoxImpl> boxJoin = getJoin(boxPositionJoin, AbstractBoxPosition_.box);
+  public void addFreezerPredicate(From<T, ?> boxPositionJoin, String query) {
+    Join<?, BoxImpl> boxJoin = getSingularJoin(boxPositionJoin, "box", BoxImpl.class);
     Join<BoxImpl, StorageLocation> locationJoin1 = getJoin(boxJoin, BoxImpl_.storageLocation);
     if (LimsUtils.isStringBlankOrNull(query)) {
       addPredicate(criteriaBuilder.isNull(locationJoin1));
