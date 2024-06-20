@@ -7,6 +7,23 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.20.0] - 2024-06-20
+
+### Added
+
+* Requisition created date in Pinery data
+
+### Changed
+
+* Box position changes are now logged in the sample/library/library aliquot/pool changelog as well as
+  the box changelog
+
+### Fixed
+
+* Attempting to add a requisition pause with an end date already set resulted in the error "Submitted
+  pause ID not found"
+
+
 ## [2.19.0] - 2024-06-07
 
 ### Added
