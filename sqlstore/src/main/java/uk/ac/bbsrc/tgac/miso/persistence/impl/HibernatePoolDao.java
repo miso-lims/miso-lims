@@ -192,15 +192,6 @@ public class HibernatePoolDao extends HibernateSaveDao<Pool>
   @Override
   public List<Pool> listByIdList(List<Long> poolIds) {
     return listByIdList(PoolImpl_.POOL_ID, poolIds);
-    // if (poolIds.isEmpty())
-    // return Collections.emptyList();
-    // QueryBuilder<Pool, PoolImpl> builder = getQueryBuilder();
-    // In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(PoolImpl_.poolId));
-    // for (Long id : poolIds) {
-    // inClause.value(id);
-    // }
-    // builder.addPredicate(inClause);
-    // return builder.getResultList();
   }
 
   @Override
