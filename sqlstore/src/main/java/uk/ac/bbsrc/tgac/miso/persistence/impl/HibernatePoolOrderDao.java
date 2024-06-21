@@ -4,31 +4,33 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implements PoolOrderDao, HibernatePaginatedDataSource<PoolOrder> {
+public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder>
+    implements PoolOrderDao, JpaCriteriaPaginatedDataSource<PoolOrder, PoolOrder> {
 
-  private static final String FIELD_POOL = "pool.id";
-  private static final String[] SEARCH_PROPERTIES = new String[] { "alias", "description" };
-  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("purpose"));
+  private static final List<SingularAttribute<PoolOrder, String>> SEARCH_PROPERTIES =
+      Arrays.asList(PoolOrder_.alias, PoolOrder_.description);
 
   public HibernatePoolOrderDao() {
     super(PoolOrder.class);
-  }
-
-  @Override
-  public Session currentSession() {
-    return super.currentSession();
   }
 
   @Override
@@ -37,75 +39,83 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder> implement
   }
 
   @Override
-  public String getProjectColumn() {
-    throw new IllegalArgumentException();
-  }
-
-  @Override
-  public Class<? extends PoolOrder> getRealClass() {
+  public Class<PoolOrder> getEntityClass() {
     return PoolOrder.class;
   }
 
   @Override
-  public String[] getSearchProperties() {
+  public Class<PoolOrder> getResultClass() {
+    return PoolOrder.class;
+  }
+
+  @Override
+  public List<SingularAttribute<PoolOrder, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return STANDARD_ALIASES;
+  public SingularAttribute<PoolOrder, ?> getIdProperty() {
+    return PoolOrder_.poolOrderId;
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, DateType type) {
+  public SingularAttribute<PoolOrder, ?> propertyForDate(DateType type) {
     switch (type) {
-    case ENTERED:
-      return "creationDate";
-    case UPDATE:
-      return "lastUpdated";
-    default:
-      return null;
+      case ENTERED:
+        return PoolOrder_.creationDate;
+      case UPDATE:
+        return PoolOrder_.lastUpdated;
+      default:
+        return null;
     }
   }
 
   @Override
-  public String propertyForSortColumn(String original) {
+  public Path<?> propertyForSortColumn(Root<PoolOrder> root, String original) {
     switch (original) {
-    case "purposeAlias":
-      return "purpose.alias";
-    default:
-      return original;
+      case "id":
+        return root.get(PoolOrder_.poolOrderId);
+      case "purposeAlias":
+        return root.get(PoolOrder_.purpose).get(RunPurpose_.alias);
+      default:
+        return root.get(original);
     }
   }
 
   @Override
-  public String propertyForUser(boolean creator) {
-    return creator ? "createdBy" : "updatedBy";
+  public SingularAttribute<PoolOrder, ? extends UserImpl> propertyForUser(boolean creator) {
+    return creator ? PoolOrder_.createdBy : PoolOrder_.updatedBy;
   }
 
   @Override
-  public void restrictPaginationByFulfilled(Criteria criteria, boolean isFulfilled, Consumer<String> errorHandler) {
+  public void restrictPaginationByFulfilled(QueryBuilder<?, PoolOrder> builder, boolean isFulfilled,
+      Consumer<String> errorHandler) {
     if (isFulfilled) {
-      criteria.add(Restrictions.isNotNull("pool"));
-      criteria.add(Restrictions.or(Restrictions.isNull("partitions"), Restrictions.isNotNull("sequencingOrder")));
+      builder.addPredicate(builder.getCriteriaBuilder().isNotNull(builder.getRoot().get(PoolOrder_.pool)));
+      builder.addPredicate(builder.getCriteriaBuilder().or(
+          builder.getCriteriaBuilder().isNull(builder.getRoot().get(PoolOrder_.partitions)),
+          builder.getCriteriaBuilder().isNotNull(builder.getRoot().get(PoolOrder_.sequencingOrder))));
     } else {
-      criteria.add(Restrictions.or(Restrictions.isNull("pool"),
-          Restrictions.and(Restrictions.isNotNull("partitions"), Restrictions.isNull("sequencingOrder"))));
+      builder.addPredicate(
+          builder.getCriteriaBuilder().or(builder.getCriteriaBuilder().isNull(builder.getRoot().get(PoolOrder_.pool)),
+              builder.getCriteriaBuilder().and(
+                  builder.getCriteriaBuilder().isNotNull(builder.getRoot().get(PoolOrder_.partitions)),
+                  builder.getCriteriaBuilder().isNull(builder.getRoot().get(PoolOrder_.sequencingOrder)))));
     }
   }
 
   @Override
-  public void restrictPaginationByDraft(Criteria criteria, boolean isDraft, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("draft", isDraft));
+  public void restrictPaginationByDraft(QueryBuilder<?, PoolOrder> builder, boolean isDraft,
+      Consumer<String> errorHandler) {
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(PoolOrder_.draft), isDraft));
   }
 
   @Override
   public List<PoolOrder> getAllByPoolId(long poolId) {
-    Criteria criteria = currentSession().createCriteria(PoolOrder.class);
-    criteria.add(Restrictions.eq(FIELD_POOL, poolId));
-    @SuppressWarnings("unchecked")
-    List<PoolOrder> list = criteria.list();
-    return list;
+    QueryBuilder<PoolOrder, PoolOrder> builder = getQueryBuilder();
+    Join<PoolOrder, PoolImpl> poolJoin = builder.getJoin(builder.getRoot(), PoolOrder_.pool);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(poolJoin.get(PoolImpl_.poolId), poolId));
+    return builder.getResultList();
   }
 
 }
