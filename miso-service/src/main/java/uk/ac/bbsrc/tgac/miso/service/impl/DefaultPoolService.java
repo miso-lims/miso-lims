@@ -162,7 +162,7 @@ public class DefaultPoolService implements PoolService {
     }
     authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
     managed.getNotes().remove(deleteNote);
-    poolStore.save(managed);
+    poolStore.update(managed);
   }
 
   @Override
@@ -182,7 +182,7 @@ public class DefaultPoolService implements PoolService {
     pool.setChangeDetails(authorizationManager.getCurrentUser());
     boxService.throwIfBoxPositionIsFilled(pool);
     validateChange(pool, null);
-    poolStore.save(pool);
+    poolStore.create(pool);
 
     try {
       NamingScheme namingScheme = namingSchemeHolder.getPrimary();
@@ -194,7 +194,7 @@ public class DefaultPoolService implements PoolService {
     if (autoGenerateIdBarcodes) {
       LimsUtils.generateAndSetIdBarcode(pool);
     }
-    long savedId = poolStore.save(pool);
+    long savedId = poolStore.update(pool);
     boxService.updateBoxableLocation(pool);
     return savedId;
   }
@@ -248,7 +248,7 @@ public class DefaultPoolService implements PoolService {
       changeLog.setUser(managed.getLastModifier());
       changeLogService.create(changeLog);
     }
-    long savedId = poolStore.save(managed);
+    long savedId = poolStore.update(managed);
     boxService.updateBoxableLocation(pool);
     return savedId;
   }
@@ -397,7 +397,7 @@ public class DefaultPoolService implements PoolService {
     note.setCreationDate(LocalDate.now(ZoneId.systemDefault()));
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
-    poolStore.save(managed);
+    poolStore.update(managed);
   }
 
   @Override

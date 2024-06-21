@@ -104,7 +104,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   public void testChangeLogFunctionality() throws Exception {
     PoolImpl testPool = getATestPool(1, new Date(), false, 0);
 
-    dao.save(testPool);
+    dao.create(testPool);
 
     testPool.setConcentration(new BigDecimal("5"));
     testPool.setName("Test Pool xxx");
@@ -120,7 +120,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     User user = new UserImpl();
     user.setId(1L);
     testPool.setLastModifier(user);
-    dao.save(testPool);
+    dao.update(testPool);
   }
 
   @Test
@@ -129,7 +129,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     final String idBarcode = testPool.getIdentificationBarcode();
     // non existing pool check
     assertNull(dao.getByBarcode(idBarcode));
-    dao.save(testPool);
+    dao.create(testPool);
     Pool result = dao.getByBarcode(idBarcode);
     assertNotNull(result);
     compareFields(testPool, result);
@@ -142,8 +142,8 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAll() throws IOException {
-    assertTrue(dao.listAll().size() > 0);
+  public void testList() throws IOException {
+    assertTrue(dao.list().size() > 0);
   }
 
   @Test
@@ -166,7 +166,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
 
     final Date creationDate = new Date();
     final PoolImpl saveMe = getATestPool(1, creationDate, true, 0);
-    final long rtn = dao.save(saveMe);
+    final long rtn = dao.create(saveMe);
 
     // check they're actually the same
     Pool freshPool = dao.get(rtn);
@@ -178,7 +178,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
 
     final Date creationDate = new Date();
     final PoolImpl saveMe = getATestPool(1, creationDate, true, 10);
-    final long rtn = dao.save(saveMe);
+    final long rtn = dao.create(saveMe);
 
     // check they're actually the same
     Pool freshPool = dao.get(rtn);
@@ -190,7 +190,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
 
     final Date creationDate = new Date();
     final Pool saveMe = getATestPool(1, creationDate, false, 0);
-    final long rtn = dao.save(saveMe);
+    final long rtn = dao.create(saveMe);
 
     // check they're actually the same
     Pool freshPool = dao.get(rtn);
@@ -298,7 +298,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     int originalSize = pool.getPoolContents().size();
     pool.getPoolContents().removeIf(pd -> pd.getAliquot().getId() == 10L);
     assertEquals("LDI8 should be removed from collection", originalSize - 1, pool.getPoolContents().size());
-    dao.save(pool);
+    dao.update(pool);
 
     sessionFactory.getCurrentSession().flush();
     sessionFactory.getCurrentSession().clear();
@@ -316,7 +316,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
         (ListLibraryAliquotView) sessionFactory.getCurrentSession().get(ListLibraryAliquotView.class, 14L);
     PoolElement element = new PoolElement(pool, ldi);
     pool.getPoolContents().add(element);
-    dao.save(pool);
+    dao.update(pool);
 
     sessionFactory.getCurrentSession().flush();
     sessionFactory.getCurrentSession().clear();
@@ -335,7 +335,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
           pd.getProportion());
       pd.setProportion(3);
     });
-    dao.save(pool);
+    dao.update(pool);
 
     sessionFactory.getCurrentSession().flush();
     sessionFactory.getCurrentSession().clear();

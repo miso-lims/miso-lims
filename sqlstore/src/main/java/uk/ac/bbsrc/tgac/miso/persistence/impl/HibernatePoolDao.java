@@ -1,211 +1,189 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.persistence.TemporalType;
+import javax.persistence.criteria.CriteriaBuilder.In;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Index_;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentProject;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentProject_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferViewPool_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView_;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolStore;
-import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSource<Pool> {
+public class HibernatePoolDao extends HibernateSaveDao<Pool>
+    implements PoolStore, JpaCriteriaPaginatedBoxableSource<Pool, PoolImpl> {
 
-  private final static String[] IDENTIFIER_PROPERTIES = {"name", "alias", "identificationBarcode"};
-  private final static String[] SEARCH_PROPERTIES = {"name", "alias", "identificationBarcode", "description"};
-
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public Criteria createCriteria() {
-    return currentSession().createCriteria(PoolImpl.class);
+  public HibernatePoolDao() {
+    super(Pool.class, PoolImpl.class);
   }
 
-  @Override
-  public Session currentSession() {
-    return sessionFactory.getCurrentSession();
-  }
+  private final static List<SingularAttribute<PoolImpl, String>> IDENTIFIER_PROPERTIES =
+      Arrays.asList(PoolImpl_.name, PoolImpl_.alias, PoolImpl_.identificationBarcode);
 
-  @Override
-  public Pool get(long poolId) throws IOException {
-    return (PoolImpl) currentSession().get(PoolImpl.class, poolId);
-  }
+  private final static List<SingularAttribute<PoolImpl, String>> SEARCH_PROPERTIES =
+      Arrays.asList(PoolImpl_.name, PoolImpl_.alias, PoolImpl_.identificationBarcode, PoolImpl_.description);
 
   @Override
   public Pool getByBarcode(String barcode) throws IOException {
     if (barcode == null)
       throw new NullPointerException("cannot look up null barcode");
-    return (Pool) createCriteria().add(Restrictions.eq("identificationBarcode", barcode)).uniqueResult();
+    return getBy(PoolImpl_.IDENTIFICATION_BARCODE, barcode);
   }
 
   @Override
   public Pool getByAlias(String alias) throws IOException {
-    return (Pool) createCriteria().add(Restrictions.eq("alias", alias)).uniqueResult();
-  }
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  @Override
-  public List<Pool> listAll() throws IOException {
-    @SuppressWarnings("unchecked")
-    List<Pool> results = createCriteria().list();
-    return results;
+    return getBy(PoolImpl_.ALIAS, alias);
   }
 
   @Override
   public List<Pool> listByLibraryId(long libraryId) throws IOException {
+    QueryBuilder<?, PoolImpl> builder =
+        new QueryBuilder<>(currentSession(), PoolImpl.class, Object[].class, Criteria.DISTINCT_ROOT_ENTITY);
+    Join<PoolImpl, PoolElement> elementJoin = builder.getJoin(builder.getRoot(), PoolImpl_.poolElements);
+    Join<PoolElement, ListLibraryAliquotView> aliquotJoin = builder.getJoin(elementJoin, PoolElement_.aliquot);
+    Join<ListLibraryAliquotView, ParentLibrary> libraryJoin =
+        builder.getJoin(aliquotJoin, ListLibraryAliquotView_.parentLibrary);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(libraryJoin.get(ParentLibrary_.libraryId), libraryId));
+    builder.setColumns(builder.getRoot());
     @SuppressWarnings("unchecked")
-    List<Pool> results = currentSession().createCriteria(PoolImpl.class)
-        .createAlias("poolElements", "element")
-        .createAlias("element.aliquot", "aliquot")
-        .createAlias("aliquot.parentLibrary", "library")
-        .add(Restrictions.eq("library.id", libraryId))
-        .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-        .list();
+    List<Pool> results = (List<Pool>) builder.getResultList();
     return results;
   }
 
   @Override
   public List<Pool> listByLibraryAliquotId(long aliquotId) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<Pool> results = currentSession().createCriteria(PoolImpl.class)
-        .createAlias("poolElements", "element")
-        .createAlias("element.aliquot", "aliquot")
-        .add(Restrictions.eq("aliquot.id", aliquotId))
-        .list();
-    return results;
+    QueryBuilder<Pool, PoolImpl> builder = getQueryBuilder();
+    Join<PoolImpl, PoolElement> elementJoin = builder.getJoin(builder.getRoot(), PoolImpl_.poolElements);
+    Join<PoolElement, ListLibraryAliquotView> aliquotJoin = builder.getJoin(elementJoin, PoolElement_.aliquot);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(aliquotJoin.get(ListLibraryAliquotView_.aliquotId), aliquotId));
+    return builder.getResultList();
   }
 
   @Override
-  public long save(final Pool pool) throws IOException {
-    if (!pool.isSaved()) {
-      return (Long) currentSession().save(pool);
-    } else {
-      currentSession().update(pool);
-      return pool.getId();
-    }
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  @Override
-  public String[] getIdentifierProperties() {
+  public List<SingularAttribute<PoolImpl, String>> getIdentifierProperties() {
     return IDENTIFIER_PROPERTIES;
   }
 
   @Override
-  public String[] getSearchProperties() {
+  public List<SingularAttribute<PoolImpl, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
+
   @Override
-  public String getProjectColumn() {
-    return "project.id";
+  public SingularAttribute<PoolImpl, ?> getIdProperty() {
+    return PoolImpl_.poolId;
   }
 
   @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return Collections.emptyList();
+  public Path<?> propertyForSortColumn(Root<PoolImpl> root, String original) {
+    original = original.replaceAll("[^\\w]", "");
+    if ("id".equals(original)) {
+      return root.get(PoolImpl_.poolId);
+    } else {
+      return root.get(original);
+    }
   }
 
   @Override
-  public String propertyForSortColumn(String sortCol) {
-    sortCol = sortCol.replaceAll("[^\\w]", "");
-    if ("id".equals(sortCol))
-      sortCol = "poolId";
-    return sortCol;
-  }
-
-  @Override
-  public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
-    criteria.createAlias("poolElements", "poolElement")
-        .createAlias("poolElement.aliquot", "aliquot")
-        .createAlias("aliquot.parentLibrary", "library")
-        .createAlias("library.parentSample", "sample")
-        .createAlias("sample.parentProject", "project");
-
-    HibernatePaginatedBoxableSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
-  }
-
-  @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
+  public void restrictPaginationByProjectId(QueryBuilder<?, PoolImpl> builder, long projectId,
       Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("platformType", platformType));
+    Join<PoolImpl, PoolElement> elementJoin = builder.getJoin(builder.getRoot(), PoolImpl_.poolElements);
+    Join<PoolElement, ListLibraryAliquotView> aliquotJoin = builder.getJoin(elementJoin, PoolElement_.aliquot);
+    Join<ListLibraryAliquotView, ParentLibrary> libraryJoin =
+        builder.getJoin(aliquotJoin, ListLibraryAliquotView_.parentLibrary);
+    Join<ParentLibrary, ParentSample> sampleJoin = builder.getJoin(libraryJoin, ParentLibrary_.parentSample);
+    Join<ParentSample, ParentProject> projectJoin = builder.getJoin(sampleJoin, ParentSample_.parentProject);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(projectJoin.get(ParentProject_.projectId), projectId));
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, DateType type) {
+  public void restrictPaginationByPlatformType(QueryBuilder<?, PoolImpl> builder, PlatformType platformType,
+      Consumer<String> errorHandler) {
+    builder
+        .addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(PoolImpl_.platformType), platformType));
+  }
+
+  @Override
+  public SingularAttribute<PoolImpl, ?> propertyForDate(DateType type) {
     switch (type) {
       case CREATE:
-        return "creationDate";
+        return PoolImpl_.creationDate;
       case ENTERED:
-        return "creationTime";
+        return PoolImpl_.creationTime;
       case UPDATE:
-        return "lastModified";
+        return PoolImpl_.lastModified;
       default:
         return null;
     }
   }
 
   @Override
-  public TemporalType temporalTypeForDate(DateType type) {
-    switch (type) {
-      case CREATE:
-        return TemporalType.DATE;
-      case ENTERED:
-      case UPDATE:
-        return TemporalType.TIMESTAMP;
-      default:
-        return null;
-    }
+  public SingularAttribute<PoolImpl, ? extends UserImpl> propertyForUser(boolean creator) {
+    return creator ? PoolImpl_.creator : PoolImpl_.lastModifier;
   }
 
   @Override
-  public String propertyForUser(boolean creator) {
-    return creator ? "creator" : "lastModifier";
-  }
-
-  @Override
-  public Class<? extends Pool> getRealClass() {
+  public Class<PoolImpl> getEntityClass() {
     return PoolImpl.class;
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.createAlias("poolElements", "poolElement")
-        .createAlias("poolElement.aliquot", "aliquot")
-        .createAlias("aliquot.parentLibrary", "library")
-        .createAlias("library.index1", "index1")
-        .createAlias("library.index2", "index2", JoinType.LEFT_OUTER_JOIN)
-        .add(DbUtils.textRestriction(query, "index1.name", "index1.sequence", "index2.name", "index2.sequence"));
+  public Class<Pool> getResultClass() {
+    return Pool.class;
   }
 
   @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query,
+  public void restrictPaginationByIndex(QueryBuilder<?, PoolImpl> builder, String query,
       Consumer<String> errorHandler) {
-    DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "pools", "poolId");
+    Join<PoolImpl, PoolElement> elementJoin = builder.getJoin(builder.getRoot(), PoolImpl_.poolElements);
+    Join<PoolElement, ListLibraryAliquotView> aliquotJoin = builder.getJoin(elementJoin, PoolElement_.aliquot);
+    Join<ListLibraryAliquotView, ParentLibrary> libraryJoin =
+        builder.getJoin(aliquotJoin, ListLibraryAliquotView_.parentLibrary);
+    Join<ParentLibrary, Index> index1 = builder.getJoin(libraryJoin, ParentLibrary_.index1);
+    Join<ParentLibrary, Index> index2 = builder.getJoin(libraryJoin, ParentLibrary_.index2);
+    builder.addTextRestriction(Arrays.asList(index1.get(Index_.name), index1.get(Index_.sequence),
+        index2.get(Index_.name), index2.get(Index_.sequence)), query);
+  }
+
+  @Override
+  public void restrictPaginationByDistributionRecipient(QueryBuilder<?, PoolImpl> builder, String query,
+      Consumer<String> errorHandler) {
+    builder.addDistributionRecipientPredicate(query, ListTransferView_.POOLS, ListTransferViewPool_.POOL_ID,
+        PoolImpl_.POOL_ID);
   }
 
   @Override
@@ -217,18 +195,18 @@ public class HibernatePoolDao implements PoolStore, HibernatePaginatedBoxableSou
   public List<Pool> listByIdList(List<Long> poolIds) {
     if (poolIds.isEmpty())
       return Collections.emptyList();
-    Criteria criteria = currentSession().createCriteria(PoolImpl.class);
-    criteria.add(Restrictions.in("id", poolIds));
-    @SuppressWarnings("unchecked")
-    List<Pool> pools = criteria.list();
-    return pools;
+    QueryBuilder<Pool, PoolImpl> builder = getQueryBuilder();
+    In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(PoolImpl_.poolId));
+    for (Long id : poolIds) {
+      inClause.value(id);
+    }
+    builder.addPredicate(inClause);
+    return builder.getResultList();
   }
 
   @Override
   public long getPartitionCount(Pool pool) {
-    return (long) currentSession().createCriteria(PartitionImpl.class)
-        .add(Restrictions.eq("pool", pool))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    return getUsageBy(PartitionImpl.class, PartitionImpl_.POOL, pool);
   }
 
 }
