@@ -2,11 +2,9 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
@@ -193,15 +191,16 @@ public class HibernatePoolDao extends HibernateSaveDao<Pool>
 
   @Override
   public List<Pool> listByIdList(List<Long> poolIds) {
-    if (poolIds.isEmpty())
-      return Collections.emptyList();
-    QueryBuilder<Pool, PoolImpl> builder = getQueryBuilder();
-    In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(PoolImpl_.poolId));
-    for (Long id : poolIds) {
-      inClause.value(id);
-    }
-    builder.addPredicate(inClause);
-    return builder.getResultList();
+    return listByIdList(PoolImpl_.POOL_ID, poolIds);
+    // if (poolIds.isEmpty())
+    // return Collections.emptyList();
+    // QueryBuilder<Pool, PoolImpl> builder = getQueryBuilder();
+    // In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(PoolImpl_.poolId));
+    // for (Long id : poolIds) {
+    // inClause.value(id);
+    // }
+    // builder.addPredicate(inClause);
+    // return builder.getResultList();
   }
 
   @Override
