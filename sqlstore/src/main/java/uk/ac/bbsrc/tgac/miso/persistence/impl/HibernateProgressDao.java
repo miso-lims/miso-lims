@@ -2,17 +2,21 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.util.List;
 
+import javax.persistence.criteria.Join;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.ProgressImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.ProgressImpl_;
 import uk.ac.bbsrc.tgac.miso.persistence.ProgressStore;
 
 @Transactional(rollbackFor = Exception.class)
@@ -52,12 +56,14 @@ public class HibernateProgressDao implements ProgressStore {
 
   @Override
   public List<Progress> listByUserId(long id) {
-    Criteria criteria = currentSession().createCriteria(ProgressImpl.class);
-    criteria.createAlias("user", "u")
-        .add(Restrictions.eq("u.userId", id));
-    criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+    QueryBuilder<?, ProgressImpl> builder =
+        new QueryBuilder<>(currentSession(), ProgressImpl.class, Object[].class, Criteria.DISTINCT_ROOT_ENTITY);
+    Join<ProgressImpl, UserImpl> userJoin = builder.getJoin(builder.getRoot(), ProgressImpl_.user);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(userJoin.get(UserImpl_.userId), id));
+    builder.setColumns(builder.getRoot());
+
     @SuppressWarnings("unchecked")
-    List<Progress> results = criteria.list();
+    List<Progress> results = (List<Progress>) builder.getResultList();
     return results;
   }
 
