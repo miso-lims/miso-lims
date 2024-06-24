@@ -33,7 +33,7 @@ public class DefaultPrinterService implements PrinterService {
   @Override
   public long create(Printer printer) throws IOException {
     authorizationManager.throwIfNonAdmin();
-    return printerStore.save(printer);
+    return printerStore.create(printer);
   }
 
   @Override
@@ -64,7 +64,7 @@ public class DefaultPrinterService implements PrinterService {
     original.setWidth(printer.getWidth());
     original.setEnabled(printer.isEnabled());
     original.setName(printer.getName());
-    return printerStore.save(original);
+    return printerStore.update(original);
   }
 
   @Override
@@ -75,8 +75,8 @@ public class DefaultPrinterService implements PrinterService {
   @Override
   public List<Printer> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filter) throws IOException {
-    if (authorizationManager.isInternalUser())  {
-    return printerStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+    if (authorizationManager.isInternalUser()) {
+      return printerStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
     } else {
       return Collections.emptyList();
     }

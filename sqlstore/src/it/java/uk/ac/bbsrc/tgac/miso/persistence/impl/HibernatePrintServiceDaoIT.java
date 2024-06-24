@@ -37,8 +37,8 @@ public class HibernatePrintServiceDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAll() throws IOException {
-    Collection<Printer> all = dao.listAll();
+  public void testList() throws IOException {
+    Collection<Printer> all = dao.list();
     assertEquals(1, all.size());
   }
 
@@ -55,7 +55,7 @@ public class HibernatePrintServiceDaoIT extends AbstractDAOTest {
     Printer printerOriginal = dao.get(1L);
     assertNotNull(printerOriginal);
     printerOriginal.setName(NEW_NAME);
-    assertTrue(dao.save(printerOriginal) > 0L);
+    assertTrue(dao.update(printerOriginal) > 0L);
     Printer printerFetched = dao.get(1L);
     assertNotNull(printerFetched);
     assertEquals(printerOriginal.getId(), printerFetched.getId());
@@ -73,7 +73,7 @@ public class HibernatePrintServiceDaoIT extends AbstractDAOTest {
     printer.setWidth(10);
     printer.setLayout("[{\"element\":\"text\", \"x\":2, \"height\":2, \"y\":2, \"contents\":{\"use\":\"NAME\"}}]");
     printer.setEnabled(true);
-    long id = dao.save(printer);
+    long id = dao.create(printer);
     Printer fetchedPrinter = dao.get(id);
     assertEquals(NEW_NAME, fetchedPrinter.getName());
   }
