@@ -67,16 +67,14 @@ public class HibernatePoolDao extends HibernateSaveDao<Pool>
 
   @Override
   public List<Pool> listByLibraryId(long libraryId) throws IOException {
-    QueryBuilder<?, PoolImpl> builder =
-        new QueryBuilder<>(currentSession(), PoolImpl.class, Object[].class, Criteria.DISTINCT_ROOT_ENTITY);
+    QueryBuilder<Pool, PoolImpl> builder =
+        new QueryBuilder<>(currentSession(), PoolImpl.class, Pool.class, Criteria.DISTINCT_ROOT_ENTITY);
     Join<PoolImpl, PoolElement> elementJoin = builder.getJoin(builder.getRoot(), PoolImpl_.poolElements);
     Join<PoolElement, ListLibraryAliquotView> aliquotJoin = builder.getJoin(elementJoin, PoolElement_.aliquot);
     Join<ListLibraryAliquotView, ParentLibrary> libraryJoin =
         builder.getJoin(aliquotJoin, ListLibraryAliquotView_.parentLibrary);
     builder.addPredicate(builder.getCriteriaBuilder().equal(libraryJoin.get(ParentLibrary_.libraryId), libraryId));
-    builder.setColumns(builder.getRoot());
-    @SuppressWarnings("unchecked")
-    List<Pool> results = (List<Pool>) builder.getResultList();
+    List<Pool> results = builder.getResultList();
     return results;
   }
 
