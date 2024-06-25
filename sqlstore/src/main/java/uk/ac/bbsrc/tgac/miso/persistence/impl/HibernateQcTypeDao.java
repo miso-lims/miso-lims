@@ -3,12 +3,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,78 +18,42 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType_;
 import uk.ac.bbsrc.tgac.miso.persistence.QualityControlTypeStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateQcTypeDao implements QualityControlTypeStore {
+public class HibernateQcTypeDao extends HibernateSaveDao<QcType> implements QualityControlTypeStore {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  private Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  @Override
-  public QcType get(long id) throws IOException {
-    return (QcType) currentSession().get(QcType.class, id);
-  }
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  @Override
-  public List<QcType> list() throws IOException {
-    Criteria criteria = currentSession().createCriteria(QcType.class);
-    @SuppressWarnings("unchecked")
-    List<QcType> records = criteria.list();
-    return records;
+  public HibernateQcTypeDao() {
+    super(QcType.class);
   }
 
   @Override
   public List<QcType> listByNameAndTarget(String name, QcTarget target) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<QcType> records = currentSession().createCriteria(QcType.class)
-        .add(Restrictions.eq("name", name))
-        .add(Restrictions.eq("qcTarget", target))
-        .list();
-    return records;
-  }
-
-  @Override
-  public long create(QcType qcType) throws IOException {
-    return (long) currentSession().save(qcType);
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
-
-  @Override
-  public void update(QcType qcType) throws IOException {
-    currentSession().update(qcType);
+    QueryBuilder<QcType, QcType> builder = new QueryBuilder<>(currentSession(), QcType.class, QcType.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(QcType_.name), name));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(QcType_.qcTarget), target));
+    return builder.getResultList();
   }
 
   @Override
   public long getUsage(QcType qcType) throws IOException {
-    return (long) getCriteriaForQcTarget(qcType)
-        .add(Restrictions.eq("type", qcType))
-        .setProjection(Projections.rowCount())
-        .uniqueResult();
+    LongQueryBuilder<?> builder = getBuilderForQcTarget(qcType);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get("type"), qcType));
+    return builder.getCount();
   }
 
-  private Criteria getCriteriaForQcTarget(QcType qcType) {
+  private LongQueryBuilder<?> getBuilderForQcTarget(QcType qcType) {
     switch (qcType.getQcTarget()) {
       case Container:
-        return currentSession().createCriteria(ContainerQC.class);
+        return new LongQueryBuilder<>(currentSession(), ContainerQC.class);
       case Library:
-        return currentSession().createCriteria(LibraryQC.class);
+        return new LongQueryBuilder<>(currentSession(), LibraryQC.class);
       case Pool:
-        return currentSession().createCriteria(PoolQC.class);
+        return new LongQueryBuilder<>(currentSession(), PoolQC.class);
       case Sample:
-        return currentSession().createCriteria(SampleQC.class);
+        return new LongQueryBuilder<>(currentSession(), SampleQC.class);
       default:
         throw new IllegalArgumentException(
             "Unhandled QC target: " + qcType.getQcTarget() == null ? "null" : qcType.getQcTarget().getLabel());
@@ -119,31 +77,29 @@ public class HibernateQcTypeDao implements QualityControlTypeStore {
 
   @Override
   public long getControlUsage(QcControl control) throws IOException {
-    return (long) getCriteriaForTargetQcControlRun(control)
-        .add(Restrictions.eq("control", control))
-        .setProjection(Projections.rowCount())
-        .uniqueResult();
+    LongQueryBuilder<?> builder = getBuilderForTargetQcControlRun(control);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get("control"), control));
+    return builder.getCount();
   }
 
   @Override
   public long getKitUsage(QcType qcType, KitDescriptor kit) throws IOException {
-    return (long) getCriteriaForQcTarget(qcType)
-        .add(Restrictions.eq("type", qcType))
-        .add(Restrictions.eq("kit", kit))
-        .setProjection(Projections.rowCount())
-        .uniqueResult();
+    LongQueryBuilder<?> builder = getBuilderForQcTarget(qcType);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get("type"), qcType));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get("kit"), kit));
+    return builder.getCount();
   }
 
-  private Criteria getCriteriaForTargetQcControlRun(QcControl control) {
+  private LongQueryBuilder<?> getBuilderForTargetQcControlRun(QcControl control) {
     switch (control.getQcType().getQcTarget()) {
       case Container:
-        return currentSession().createCriteria(ContainerQcControlRun.class);
+        return new LongQueryBuilder<>(currentSession(), ContainerQcControlRun.class);
       case Library:
-        return currentSession().createCriteria(LibraryQcControlRun.class);
+        return new LongQueryBuilder<>(currentSession(), LibraryQcControlRun.class);
       case Pool:
-        return currentSession().createCriteria(PoolQcControlRun.class);
+        return new LongQueryBuilder<>(currentSession(), PoolQcControlRun.class);
       case Sample:
-        return currentSession().createCriteria(SampleQcControlRun.class);
+        return new LongQueryBuilder<>(currentSession(), SampleQcControlRun.class);
       default:
         throw new IllegalArgumentException(
             "Unhandled QC target: " + control.getQcType().getQcTarget() == null ? "null"
