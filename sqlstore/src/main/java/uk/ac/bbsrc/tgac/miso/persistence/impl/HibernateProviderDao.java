@@ -9,6 +9,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -72,6 +73,15 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
     return currentSession().createQuery(query).getResultList();
   }
 
+  protected <V> T getBy(SingularAttribute<T, V> property, V value) {
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<T> query = builder.createQuery(getResultClass());
+    Root<? extends T> root = query.from(getEntityClass());
+    query.select(root).where(builder.equal(root.get(property), value));
+    List<T> results = currentSession().createQuery(query).getResultList();
+    return singleResultOrNull(results);
+  }
+
   protected <V> T getBy(String property, V value) {
     CriteriaBuilder builder = currentSession().getCriteriaBuilder();
     CriteriaQuery<T> query = builder.createQuery(getResultClass());
@@ -103,11 +113,28 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
     return currentSession().createQuery(query).getResultList();
   }
 
+  protected <U> long getUsageBy(Class<U> user, SingularAttribute<U, T> property, T value) {
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<Long> query = builder.createQuery(Long.class);
+    Root<U> root = query.from(user);
+    query.select(builder.count(root)).where(builder.equal(root.get(property), value));
+    return currentSession().createQuery(query).getSingleResult();
+  }
+
   protected <U> long getUsageBy(Class<U> user, String property, T value) {
     CriteriaBuilder builder = currentSession().getCriteriaBuilder();
     CriteriaQuery<Long> query = builder.createQuery(Long.class);
     Root<U> root = query.from(user);
     query.select(builder.count(root)).where(builder.equal(root.get(property), value));
+    return currentSession().createQuery(query).getSingleResult();
+  }
+
+  protected <U, V> long getUsageInCollection(Class<U> user, SingularAttribute<U, T> collectionProperty, T value) {
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<Long> query = builder.createQuery(Long.class);
+    Root<U> root = query.from(user);
+    Join<U, T> collection = root.join(collectionProperty);
+    query.select(builder.count(root)).where(builder.equal(collection, value));
     return currentSession().createQuery(query).getSingleResult();
   }
 

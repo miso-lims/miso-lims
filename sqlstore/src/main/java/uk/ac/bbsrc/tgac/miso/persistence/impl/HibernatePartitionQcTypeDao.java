@@ -23,11 +23,7 @@ public class HibernatePartitionQcTypeDao extends HibernateSaveDao<PartitionQCTyp
 
   @Override
   public PartitionQCType getByDescription(String description) throws IOException {
-    QueryBuilder<PartitionQCType, PartitionQCType> builder =
-        new QueryBuilder<>(currentSession(), PartitionQCType.class, PartitionQCType.class);
-    builder.addPredicate(
-        builder.getCriteriaBuilder().equal(builder.getRoot().get(PartitionQCType_.description), description));
-    return builder.getSingleResultOrNull();
+    return getBy(PartitionQCType_.description, description);
   }
 
   @Override
@@ -37,9 +33,7 @@ public class HibernatePartitionQcTypeDao extends HibernateSaveDao<PartitionQCTyp
 
   @Override
   public long getUsage(PartitionQCType type) throws IOException {
-    LongQueryBuilder<RunPartition> builder = new LongQueryBuilder<>(currentSession(), RunPartition.class);
-    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(RunPartition_.qcType), type));
-    return builder.getCount();
+    return getUsageBy(RunPartition.class, RunPartition_.qcType, type);
   }
 
 }
