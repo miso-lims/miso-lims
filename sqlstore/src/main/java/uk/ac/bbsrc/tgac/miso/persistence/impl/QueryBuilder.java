@@ -19,6 +19,7 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.SetJoin;
 import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.Attribute;
@@ -178,6 +179,10 @@ public class QueryBuilder<R, T> {
 
   public void setColumns(Path<?>... paths) {
     query.multiselect(paths);
+  }
+
+  public void setColumn(Selection<? extends R> selection) {
+    query.select(selection);
   }
 
   public void addPredicate(Predicate predicate) {
