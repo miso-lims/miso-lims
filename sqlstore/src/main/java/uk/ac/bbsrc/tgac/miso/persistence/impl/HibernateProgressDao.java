@@ -56,14 +56,12 @@ public class HibernateProgressDao implements ProgressStore {
 
   @Override
   public List<Progress> listByUserId(long id) {
-    QueryBuilder<?, ProgressImpl> builder =
-        new QueryBuilder<>(currentSession(), ProgressImpl.class, Object[].class, Criteria.DISTINCT_ROOT_ENTITY);
+    QueryBuilder<Progress, ProgressImpl> builder =
+        new QueryBuilder<>(currentSession(), ProgressImpl.class, Progress.class, Criteria.DISTINCT_ROOT_ENTITY);
     Join<ProgressImpl, UserImpl> userJoin = builder.getJoin(builder.getRoot(), ProgressImpl_.user);
     builder.addPredicate(builder.getCriteriaBuilder().equal(userJoin.get(UserImpl_.userId), id));
-    builder.setColumns(builder.getRoot());
 
-    @SuppressWarnings("unchecked")
-    List<Progress> results = (List<Progress>) builder.getResultList();
+    List<Progress> results = builder.getResultList();
     return results;
   }
 
