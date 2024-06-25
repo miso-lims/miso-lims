@@ -15,7 +15,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-public interface JpaCriteriaPaginatedBoxableSource<T extends Boxable> extends JpaCriteriaPaginatedDataSource<T, T> {
+public interface JpaCriteriaPaginatedBoxableSource<R extends Boxable, T extends R>
+    extends JpaCriteriaPaginatedDataSource<R, T> {
 
   @Override
   default void restrictPaginationByBox(QueryBuilder<?, T> builder, String query, Consumer<String> errorHandler) {

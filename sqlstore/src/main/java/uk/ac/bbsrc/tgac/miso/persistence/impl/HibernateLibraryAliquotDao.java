@@ -51,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotStore;
 @Repository
 @Transactional(rollbackFor = Exception.class)
 public class HibernateLibraryAliquotDao extends HibernateSaveDao<LibraryAliquot>
-    implements LibraryAliquotStore, JpaCriteriaPaginatedBoxableSource<LibraryAliquot> {
+    implements LibraryAliquotStore, JpaCriteriaPaginatedBoxableSource<LibraryAliquot, LibraryAliquot> {
 
   public HibernateLibraryAliquotDao() {
     super(LibraryAliquot.class);
