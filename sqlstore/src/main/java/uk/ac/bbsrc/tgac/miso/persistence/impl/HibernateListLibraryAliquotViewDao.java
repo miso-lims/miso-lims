@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.Join;
@@ -233,10 +233,12 @@ public class HibernateListLibraryAliquotViewDao extends HibernateProviderDao<Lis
     } else {
       Join<LibraryAliquotBoxPosition, BoxImpl> boxJoin =
           builder.getJoin(boxPositionJoin, LibraryAliquotBoxPosition_.box);
-      List<Path<String>> searchProperties = new ArrayList<>();
-      for (String property : HibernateBoxDao.SEARCH_PROPERTIES) {
-        searchProperties.add(boxJoin.get(property));
-      }
+      List<Path<String>> searchProperties = Arrays.asList(HibernateBoxDao.SEARCH_PROPERTIES).stream()
+          .map(property -> {
+            Path<String> path = boxJoin.get(property);
+            return path;
+          })
+          .collect(Collectors.toList());
       builder.addTextRestriction(searchProperties, query);
     }
   }
