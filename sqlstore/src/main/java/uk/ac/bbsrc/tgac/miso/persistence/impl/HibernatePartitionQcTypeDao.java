@@ -4,16 +4,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
+import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType_;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartition_;
 import uk.ac.bbsrc.tgac.miso.persistence.PartitionQcTypeDao;
 
 @Repository
@@ -26,21 +23,17 @@ public class HibernatePartitionQcTypeDao extends HibernateSaveDao<PartitionQCTyp
 
   @Override
   public PartitionQCType getByDescription(String description) throws IOException {
-    return (PartitionQCType) currentSession().createCriteria(PartitionQCType.class)
-        .add(Restrictions.eq("description", description))
-        .uniqueResult();
+    return getBy(PartitionQCType_.description, description);
   }
 
   @Override
   public List<PartitionQCType> listByIdList(Collection<Long> idList) throws IOException {
-    return listByIdList("partitionQcTypeId", idList);
+    return listByIdList(PartitionQCType_.PARTITION_QC_TYPE_ID, idList);
   }
 
   @Override
   public long getUsage(PartitionQCType type) throws IOException {
-    return (long) currentSession().createCriteria(RunPartition.class)
-        .add(Restrictions.eq("qcType", type))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    return getUsageBy(RunPartition.class, RunPartition_.qcType, type);
   }
 
 }
