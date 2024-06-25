@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl_;
 import uk.ac.bbsrc.tgac.miso.persistence.PipelineDao;
 
 @Transactional(rollbackFor = Exception.class)
@@ -22,12 +23,12 @@ public class HibernatePipelineDao extends HibernateSaveDao<Pipeline> implements 
 
   @Override
   public Pipeline getByAlias(String alias) throws IOException {
-    return getBy("alias", alias);
+    return getBy(Pipeline_.ALIAS, alias);
   }
 
   @Override
   public long getUsage(Pipeline pipeline) throws IOException {
-    return getUsageBy(ProjectImpl.class, "pipeline", pipeline);
+    return getUsageBy(ProjectImpl.class, ProjectImpl_.PIPELINE, pipeline);
   }
 
   @Override
