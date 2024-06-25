@@ -2,35 +2,34 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.persistence.TemporalType;
+import javax.persistence.criteria.Join;
+import javax.persistence.metamodel.SingularAttribute;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
-import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernateProjectDao extends HibernateSaveDao<Project>
-    implements ProjectStore, HibernatePaginatedDataSource<Project> {
+    implements ProjectStore, JpaCriteriaPaginatedDataSource<Project, ProjectImpl> {
 
-  private static final String[] SEARCH_PROPERTIES = new String[] {ProjectImpl_.NAME, ProjectImpl_.TITLE,
-      ProjectImpl_.DESCRIPTION, ProjectImpl_.CODE};
-  private final static List<AliasDescriptor> STANDARD_ALIASES = Collections.emptyList();
+  private static final List<SingularAttribute<ProjectImpl, String>> SEARCH_PROPERTIES =
+      Arrays.asList(ProjectImpl_.name, ProjectImpl_.title, ProjectImpl_.description, ProjectImpl_.code);
 
   public HibernateProjectDao() {
     super(Project.class, ProjectImpl.class);
@@ -48,9 +47,7 @@ public class HibernateProjectDao extends HibernateSaveDao<Project>
 
   @Override
   public long getUsage(Project project) throws IOException {
-    return (long) currentSession().createCriteria(SampleImpl.class)
-        .add(Restrictions.eq("project", project))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    return getUsageInCollection(SampleImpl.class, SampleImpl_.PROJECT, project);
   }
 
   @Override
@@ -59,73 +56,68 @@ public class HibernateProjectDao extends HibernateSaveDao<Project>
   }
 
   @Override
-  public String getProjectColumn() {
-    return null;
+  public SingularAttribute<ProjectImpl, ?> getIdProperty() {
+    return ProjectImpl_.id;
   }
 
   @Override
-  public Class<? extends Project> getRealClass() {
+  public Class<ProjectImpl> getEntityClass() {
     return ProjectImpl.class;
   }
 
   @Override
-  public String[] getSearchProperties() {
+  public Class<Project> getResultClass() {
+    return Project.class;
+  }
+
+  @Override
+  public List<SingularAttribute<ProjectImpl, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return STANDARD_ALIASES;
-  }
-
-  @Override
-  public String propertyForDate(Criteria criteria, DateType type) {
+  public SingularAttribute<ProjectImpl, ?> propertyForDate(DateType type) {
     switch (type) {
       case CREATE:
       case ENTERED:
-        return ProjectImpl_.CREATION_TIME;
+        return ProjectImpl_.creationTime;
       case UPDATE:
-        return ProjectImpl_.LAST_MODIFIED;
+        return ProjectImpl_.lastModified;
       case REB_EXPIRY:
-        return ProjectImpl_.REB_EXPIRY;
+        return ProjectImpl_.rebExpiry;
       default:
         return null;
     }
   }
 
-  public TemporalType temporalTypeForDate(DateType type) {
-    if (type == DateType.REB_EXPIRY) {
-      return TemporalType.DATE;
-    } else {
-      return TemporalType.TIMESTAMP;
-    }
+  @Override
+  public SingularAttribute<ProjectImpl, ? extends UserImpl> propertyForUser(boolean creator) {
+    return creator ? ProjectImpl_.creator : ProjectImpl_.lastModifier;
   }
 
   @Override
-  public String propertyForUser(boolean creator) {
-    return creator ? ProjectImpl_.CREATOR : ProjectImpl_.LAST_MODIFIER;
+  public void restrictPaginationByPipeline(QueryBuilder<?, ProjectImpl> builder, String query,
+      Consumer<String> errorHandler) {
+    Join<ProjectImpl, Pipeline> pipeline = builder.getJoin(builder.getRoot(), ProjectImpl_.pipeline);
+    builder.addTextRestriction(pipeline.get(Pipeline_.alias), query);
   }
 
   @Override
-  public void restrictPaginationByPipeline(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.createAlias("pipeline", "pipeline");
-    criteria.add(DbUtils.textRestriction(query, "pipeline.alias"));
+  public void restrictPaginationByRebNumber(QueryBuilder<?, ProjectImpl> builder, String query,
+      Consumer<String> errorHandler) {
+    builder.addTextRestriction(builder.getRoot().get(ProjectImpl_.rebNumber), query);
   }
 
   @Override
-  public void restrictPaginationByRebNumber(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(query, ProjectImpl_.REB_NUMBER));
-  }
-
-  @Override
-  public void restrictPaginationByStatus(Criteria criteria, String query, Consumer<String> errorHandler) {
+  public void restrictPaginationByStatus(QueryBuilder<?, ProjectImpl> builder, String query,
+      Consumer<String> errorHandler) {
     StatusType value = Arrays.stream(StatusType.values())
         .filter(status -> status.getKey().toLowerCase().equals(query.toLowerCase()))
         .findFirst().orElse(null);
     if (value == null) {
       errorHandler.accept("Invalid status: %s".formatted(query));
     } else {
-      criteria.add(Restrictions.eq(ProjectImpl_.STATUS, value));
+      builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(ProjectImpl_.status), value));
     }
   }
 
