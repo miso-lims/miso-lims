@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition_;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.RequisitionQC;
 import uk.ac.bbsrc.tgac.miso.persistence.RequisitionQcStore;
@@ -20,10 +21,16 @@ public class HibernateRequisitionQcDao extends HibernateQcStore<RequisitionQC> i
   }
 
   @Override
-  public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units) throws IOException {
+  public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units)
+      throws IOException {
     Requisition requisition = (Requisition) currentSession().get(Requisition.class, id);
     requisition.updateFromQc(correspondingField, value, units);
     currentSession().update(requisition);
+  }
+
+  @Override
+  public String getIdProperty() {
+    return Requisition_.REQUISITION_ID;
   }
 
 }

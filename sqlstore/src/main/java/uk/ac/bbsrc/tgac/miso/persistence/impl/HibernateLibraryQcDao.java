@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryQcStore;
@@ -21,10 +22,16 @@ public class HibernateLibraryQcDao extends HibernateQcStore<LibraryQC> implement
   }
 
   @Override
-  public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units) throws IOException {
+  public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units)
+      throws IOException {
     Library library = (Library) currentSession().get(LibraryImpl.class, id);
     correspondingField.updateField(library, value, units);
     currentSession().update(library);
+  }
+
+  @Override
+  public String getIdProperty() {
+    return LibraryImpl_.LIBRARY_ID;
   }
 
 }

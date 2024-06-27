@@ -1,9 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -89,11 +87,9 @@ public abstract class HibernateQcStore<T extends QC> implements QcTargetStore {
       return Collections.emptyList();
     }
 
-    QueryBuilder<?, ?> builder = new QueryBuilder<>(currentSession(), entityClass, entityClass);
-    List<Field> fields = Arrays.asList(entityClass.getDeclaredFields());
-    Field idField = fields.stream().filter(field -> field.getName().endsWith("Id")).findFirst().orElse(null);
-    String idName = idField != null ? idField.getName() : "id";
-    In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(idName));
+    QueryBuilder<? extends QualityControllable<T>, ? extends QualityControllable<T>> builder =
+        new QueryBuilder<>(currentSession(), entityClass, entityClass);
+    In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(getIdProperty()));
     for (Long id : ids) {
       inClause.value(id);
     }
@@ -103,5 +99,7 @@ public abstract class HibernateQcStore<T extends QC> implements QcTargetStore {
     builder.getResultList().forEach(result -> results.addAll(entityClass.cast(result).getQCs()));
     return results;
   }
+
+  public abstract String getIdProperty();
 
 }
