@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.persistence.ContainerQcStore;
@@ -21,10 +22,17 @@ public class HibernateContainerQcDao extends HibernateQcStore<ContainerQC> imple
   }
 
   @Override
-  public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units) throws IOException {
-    SequencerPartitionContainer container = (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, id);
+  public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units)
+      throws IOException {
+    SequencerPartitionContainer container =
+        (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, id);
     correspondingField.updateField(container, value, units);
     currentSession().update(container);
+  }
+
+  @Override
+  public String getIdProperty() {
+    return SequencerPartitionContainerImpl_.CONTAINER_ID;
   }
 
 }

@@ -1,14 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.Criteria;
+import javax.persistence.criteria.CriteriaBuilder.In;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
@@ -85,11 +86,20 @@ public abstract class HibernateQcStore<T extends QC> implements QcTargetStore {
     if (ids.isEmpty()) {
       return Collections.emptyList();
     }
-    Criteria criteria = currentSession().createCriteria(qcClass);
-    criteria.add(Restrictions.in("id", ids));
-    @SuppressWarnings("unchecked")
-    List<T> records = criteria.list();
-    return records;
+
+    QueryBuilder<? extends QualityControllable<T>, ? extends QualityControllable<T>> builder =
+        new QueryBuilder<>(currentSession(), entityClass, entityClass);
+    In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(getIdProperty()));
+    for (Long id : ids) {
+      inClause.value(id);
+    }
+    builder.addPredicate(inClause);
+
+    List<T> results = new ArrayList<>();
+    builder.getResultList().forEach(result -> results.addAll(entityClass.cast(result).getQCs()));
+    return results;
   }
+
+  public abstract String getIdProperty();
 
 }
