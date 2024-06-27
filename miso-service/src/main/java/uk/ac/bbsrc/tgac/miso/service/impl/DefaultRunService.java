@@ -195,7 +195,7 @@ public class DefaultRunService implements RunService {
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
     managed.setLastModifier(authorizationManager.getCurrentUser());
-    runDao.save(managed);
+    runDao.update(managed);
   }
 
   @Override
@@ -216,7 +216,7 @@ public class DefaultRunService implements RunService {
     }
     authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
     managed.getNotes().remove(deleteNote);
-    runDao.save(managed);
+    runDao.update(managed);
   }
 
   @Override
@@ -227,7 +227,7 @@ public class DefaultRunService implements RunService {
 
     run.setName(generateTemporaryName());
 
-    Run saved = save(run);
+    Run saved = save(run, true);
     makeContainerChangesChangeLog(saved, Collections.emptyList(), saved.getSequencerPartitionContainers());
     return saved.getId();
   }
@@ -238,13 +238,13 @@ public class DefaultRunService implements RunService {
     loadChildEntities(run);
     saveContainers(run);
     applyChanges(managed, run);
-    return save(managed).getId();
+    return save(managed, false).getId();
   }
 
-  private Run save(Run run) throws IOException {
+  private Run save(Run run, boolean create) throws IOException {
     try {
       run.setChangeDetails(authorizationManager.getCurrentUser());
-      Long id = runDao.save(run);
+      Long id = create ? runDao.create(run) : runDao.update(run);
       Run saved = runDao.get(id);
 
       // post-save field generation
@@ -256,7 +256,7 @@ public class DefaultRunService implements RunService {
         needsUpdate = true;
       }
       if (needsUpdate) {
-        runDao.save(saved);
+        runDao.update(saved);
         saved = runDao.get(saved.getId());
       }
       createRunPartitions(run);
