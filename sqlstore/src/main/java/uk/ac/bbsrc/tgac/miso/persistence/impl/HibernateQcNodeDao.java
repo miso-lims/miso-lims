@@ -3,12 +3,11 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.List;
 
+import javax.persistence.criteria.CriteriaBuilder.In;
+import javax.persistence.criteria.Join;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.Subqueries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,15 +15,35 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Run_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.LibraryAliquotQcNode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.LibraryAliquotQcNode_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.LibraryQcNode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.LibraryQcNode_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.PoolQcNode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.PoolQcNode_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.RunPartitionAliquotQcNode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.RunPartitionAliquotQcNode_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.RunPartitionQcNode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.RunPartitionQcNodePartition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.RunPartitionQcNodePartition_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.RunPartitionQcNode_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.RunQcNode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.RunQcNode_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.SampleQcNode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.SampleQcNode_;
 import uk.ac.bbsrc.tgac.miso.persistence.QcNodeDao;
 
 @Repository
@@ -83,17 +102,23 @@ public class HibernateQcNodeDao implements QcNodeDao {
   public SampleQcNode getForRunLibrary(long runId, long partitionId, long aliquotId) throws IOException {
     RunQcNode run = (RunQcNode) currentSession().get(RunQcNode.class, runId);
 
-    DetachedCriteria subquery = DetachedCriteria.forClass(Run.class)
-        .createAlias("runPositions", "position")
-        .createAlias("position.container", "container")
-        .createAlias("container.partitions", "partition")
-        .createAlias("partition.pool", "pool")
-        .add(Restrictions.eq("id", runId))
-        .add(Restrictions.eq("partition.id", partitionId))
-        .setProjection(Projections.property("pool.id"));
-    PoolQcNode pool = (PoolQcNode) currentSession().createCriteria(PoolQcNode.class)
-        .add(Subqueries.propertyEq("id", subquery))
-        .uniqueResult();
+    QueryBuilder<Long, Run> idBuilder = new QueryBuilder<>(currentSession(), Run.class, Long.class);
+    Join<Run, RunPosition> runPositionJoin = idBuilder.getJoin(idBuilder.getRoot(), Run_.runPositions);
+    Join<RunPosition, SequencerPartitionContainerImpl> container =
+        idBuilder.getJoin(runPositionJoin, RunPosition_.container);
+    Join<SequencerPartitionContainerImpl, PartitionImpl> parJoin =
+        idBuilder.getJoin(container, SequencerPartitionContainerImpl_.partitions);
+    Join<PartitionImpl, PoolImpl> poolJoin = idBuilder.getJoin(parJoin, PartitionImpl_.pool);
+    idBuilder.addPredicate(idBuilder.getCriteriaBuilder().equal(idBuilder.getRoot().get(Run_.runId), runId));
+    idBuilder.addPredicate(idBuilder.getCriteriaBuilder().equal(parJoin.get(PartitionImpl_.id), partitionId));
+    idBuilder.setColumns(poolJoin.get(PoolImpl_.poolId));
+    Long id = idBuilder.getSingleResultOrNull();
+
+    QueryBuilder<PoolQcNode, PoolQcNode> poolBuilder =
+        new QueryBuilder<>(currentSession(), PoolQcNode.class, PoolQcNode.class);
+    poolBuilder.addPredicate(poolBuilder.getCriteriaBuilder().equal(poolBuilder.getRoot().get(PoolQcNode_.id), id));
+    PoolQcNode pool = poolBuilder.getSingleResultOrNull();
+
     pool.setRuns(Lists.newArrayList(run));
 
     LibraryAliquotQcNode aliquot = (LibraryAliquotQcNode) currentSession().get(LibraryAliquotQcNode.class, aliquotId);
@@ -101,10 +126,18 @@ public class HibernateQcNodeDao implements QcNodeDao {
 
     SampleQcNode top = populateParents(aliquot);
 
-    RunPartitionQcNode partition = (RunPartitionQcNode) currentSession().createCriteria(RunPartitionQcNode.class)
-        .add(Restrictions.eq("run.id", runId))
-        .add(Restrictions.eq("partition.id", partitionId))
-        .uniqueResult();
+    QueryBuilder<RunPartitionQcNode, RunPartitionQcNode> partitionBuilder =
+        new QueryBuilder<>(currentSession(), RunPartitionQcNode.class, RunPartitionQcNode.class);
+    Join<RunPartitionQcNode, RunQcNode> runJoin =
+        partitionBuilder.getJoin(partitionBuilder.getRoot(), RunPartitionQcNode_.run);
+    partitionBuilder
+        .addPredicate(partitionBuilder.getCriteriaBuilder().equal(runJoin.get(RunQcNode_.id), runId));
+    Join<RunPartitionQcNode, RunPartitionQcNodePartition> partitionJoin =
+        partitionBuilder.getJoin(partitionBuilder.getRoot(), RunPartitionQcNode_.partition);
+    partitionBuilder.addPredicate(
+        partitionBuilder.getCriteriaBuilder().equal(partitionJoin.get(RunPartitionQcNodePartition_.id), partitionId));
+    RunPartitionQcNode partition = partitionBuilder.getSingleResultOrNull();
+
     run.setRunPartitions(Lists.newArrayList(partition));
 
     populateChildren(partition, run, aliquot);
@@ -130,7 +163,8 @@ public class HibernateQcNodeDao implements QcNodeDao {
 
   private SampleQcNode populateParents(LibraryAliquotQcNode item) {
     if (item.getParentAliquotId() != null) {
-      LibraryAliquotQcNode parent = (LibraryAliquotQcNode) currentSession().get(LibraryAliquotQcNode.class, item.getParentAliquotId());
+      LibraryAliquotQcNode parent =
+          (LibraryAliquotQcNode) currentSession().get(LibraryAliquotQcNode.class, item.getParentAliquotId());
       parent.setChildAliquots(Lists.newArrayList(item));
       return populateParents(parent);
     } else {
@@ -141,19 +175,23 @@ public class HibernateQcNodeDao implements QcNodeDao {
   }
 
   private void populateChildren(SampleQcNode item) {
-    @SuppressWarnings("unchecked")
-    List<SampleQcNode> childSamples = currentSession().createCriteria(SampleQcNode.class)
-        .add(Restrictions.eq("parentId", item.getId()))
-        .list();
+    QueryBuilder<SampleQcNode, SampleQcNode> childSampleBuilder =
+        new QueryBuilder<>(currentSession(), SampleQcNode.class, SampleQcNode.class);
+    childSampleBuilder.addPredicate(childSampleBuilder.getCriteriaBuilder()
+        .equal(childSampleBuilder.getRoot().get(SampleQcNode_.parentId), item.getId()));
+    List<SampleQcNode> childSamples = childSampleBuilder.getResultList();
+
     item.setChildSamples(childSamples);
     for (SampleQcNode child : childSamples) {
       populateChildren(child);
     }
 
-    @SuppressWarnings("unchecked")
-    List<LibraryQcNode> libraries = currentSession().createCriteria(LibraryQcNode.class)
-        .add(Restrictions.eq("sampleId", item.getId()))
-        .list();
+    QueryBuilder<LibraryQcNode, LibraryQcNode> libraryBuilder =
+        new QueryBuilder<>(currentSession(), LibraryQcNode.class, LibraryQcNode.class);
+    libraryBuilder.addPredicate(
+        libraryBuilder.getCriteriaBuilder().equal(libraryBuilder.getRoot().get(LibraryQcNode_.sampleId), item.getId()));
+    List<LibraryQcNode> libraries = libraryBuilder.getResultList();
+
     item.setLibraries(libraries);
     for (LibraryQcNode library : libraries) {
       populateChildren(library);
@@ -161,11 +199,14 @@ public class HibernateQcNodeDao implements QcNodeDao {
   }
 
   private void populateChildren(LibraryQcNode item) {
-    @SuppressWarnings("unchecked")
-    List<LibraryAliquotQcNode> aliquots = currentSession().createCriteria(LibraryAliquotQcNode.class)
-        .add(Restrictions.isNull("parentAliquotId"))
-        .add(Restrictions.eq("libraryId", item.getId()))
-        .list();
+    QueryBuilder<LibraryAliquotQcNode, LibraryAliquotQcNode> aliquotBuilder =
+        new QueryBuilder<>(currentSession(), LibraryAliquotQcNode.class, LibraryAliquotQcNode.class);
+    aliquotBuilder.addPredicate(aliquotBuilder.getCriteriaBuilder()
+        .isNull(aliquotBuilder.getRoot().get(LibraryAliquotQcNode_.parentAliquotId)));
+    aliquotBuilder.addPredicate(aliquotBuilder.getCriteriaBuilder()
+        .equal(aliquotBuilder.getRoot().get(LibraryAliquotQcNode_.libraryId), item.getId()));
+    List<LibraryAliquotQcNode> aliquots = aliquotBuilder.getResultList();
+
     item.setAliquots(aliquots);
     for (LibraryAliquotQcNode aliquot : aliquots) {
       populateChildren(aliquot);
@@ -173,25 +214,34 @@ public class HibernateQcNodeDao implements QcNodeDao {
   }
 
   private void populateChildren(LibraryAliquotQcNode item) {
-    @SuppressWarnings("unchecked")
-    List<LibraryAliquotQcNode> aliquots = currentSession().createCriteria(LibraryAliquotQcNode.class)
-        .add(Restrictions.eq("parentAliquotId", item.getId()))
-        .list();
+    QueryBuilder<LibraryAliquotQcNode, LibraryAliquotQcNode> aliquotBuilder =
+        new QueryBuilder<>(currentSession(), LibraryAliquotQcNode.class, LibraryAliquotQcNode.class);
+    aliquotBuilder.addPredicate(aliquotBuilder.getCriteriaBuilder()
+        .equal(aliquotBuilder.getRoot().get(LibraryAliquotQcNode_.parentAliquotId), item.getId()));
+    List<LibraryAliquotQcNode> aliquots = aliquotBuilder.getResultList();
+
     item.setChildAliquots(aliquots);
     for (LibraryAliquotQcNode aliquot : aliquots) {
       populateChildren(aliquot);
     }
 
-    DetachedCriteria subquery = DetachedCriteria.forClass(PoolImpl.class)
-        .createAlias("poolElements", "element")
-        .createAlias("element.aliquot", "aliquot")
-        .add(Restrictions.eq("aliquot.id", item.getId()))
-        .setProjection(Projections.id());
+    QueryBuilder<Long, PoolImpl> idBuilder = new QueryBuilder<>(currentSession(), PoolImpl.class, Long.class);
+    Join<PoolImpl, PoolElement> element = idBuilder.getJoin(idBuilder.getRoot(), PoolImpl_.poolElements);
+    Join<PoolElement, ListLibraryAliquotView> aliquot = idBuilder.getJoin(element, PoolElement_.aliquot);
+    idBuilder.addPredicate(
+        idBuilder.getCriteriaBuilder().equal(aliquot.get(ListLibraryAliquotView_.aliquotId), item.getId()));
+    idBuilder.setColumns(idBuilder.getRoot().get(PoolImpl_.poolId));
+    List<Long> ids = idBuilder.getResultList();
 
-    @SuppressWarnings("unchecked")
-    List<PoolQcNode> pools = currentSession().createCriteria(PoolQcNode.class)
-        .add(Subqueries.propertyIn("id", subquery))
-        .list();
+    QueryBuilder<PoolQcNode, PoolQcNode> poolBuilder =
+        new QueryBuilder<>(currentSession(), PoolQcNode.class, PoolQcNode.class);
+    In<Long> inClause = poolBuilder.getCriteriaBuilder().in(poolBuilder.getRoot().get(PoolQcNode_.id));
+    for (Long id : ids) {
+      inClause.value(id);
+    }
+    poolBuilder.addPredicate(inClause);
+    List<PoolQcNode> pools = poolBuilder.getResultList();
+
     item.setPools(pools);
     for (PoolQcNode pool : pools) {
       populateChildren(pool, item);
@@ -199,18 +249,26 @@ public class HibernateQcNodeDao implements QcNodeDao {
   }
 
   private void populateChildren(PoolQcNode item, LibraryAliquotQcNode aliquot) {
-    DetachedCriteria subquery = DetachedCriteria.forClass(Run.class)
-        .createAlias("runPositions", "runPosition")
-        .createAlias("runPosition.container", "container")
-        .createAlias("container.partitions", "partition")
-        .createAlias("partition.pool", "pool")
-        .add(Restrictions.eq("pool.id", item.getId()))
-        .setProjection(Projections.id());
+    QueryBuilder<Long, Run> idBuilder = new QueryBuilder<>(currentSession(), Run.class, Long.class);
+    Join<Run, RunPosition> runPositionJoin = idBuilder.getJoin(idBuilder.getRoot(), Run_.runPositions);
+    Join<RunPosition, SequencerPartitionContainerImpl> containerJoin =
+        idBuilder.getJoin(runPositionJoin, RunPosition_.container);
+    Join<SequencerPartitionContainerImpl, PartitionImpl> partitionJoin =
+        idBuilder.getJoin(containerJoin, SequencerPartitionContainerImpl_.partitions);
+    Join<PartitionImpl, PoolImpl> poolJoin = idBuilder.getJoin(partitionJoin, PartitionImpl_.pool);
+    idBuilder.addPredicate(idBuilder.getCriteriaBuilder().equal(poolJoin.get(PoolImpl_.poolId), item.getId()));
+    idBuilder.setColumns(idBuilder.getRoot().get(Run_.runId));
+    List<Long> ids = idBuilder.getResultList();
 
-    @SuppressWarnings("unchecked")
-    List<RunQcNode> runs = currentSession().createCriteria(RunQcNode.class)
-        .add(Subqueries.propertyIn("id", subquery))
-        .list();
+    QueryBuilder<RunQcNode, RunQcNode> runBuilder =
+        new QueryBuilder<>(currentSession(), RunQcNode.class, RunQcNode.class);
+    In<Long> inClause = runBuilder.getCriteriaBuilder().in(runBuilder.getRoot().get(RunQcNode_.id));
+    for (Long id : ids) {
+      inClause.value(id);
+    }
+    runBuilder.addPredicate(inClause);
+    List<RunQcNode> runs = runBuilder.getResultList();
+
     item.setRuns(runs);
     for (RunQcNode run : runs) {
       populateChildren(run, item, aliquot);
@@ -218,15 +276,28 @@ public class HibernateQcNodeDao implements QcNodeDao {
   }
 
   private void populateChildren(RunQcNode item, PoolQcNode pool, LibraryAliquotQcNode aliquot) {
-    DetachedCriteria subquery = DetachedCriteria.forClass(PartitionImpl.class)
-        .add(Restrictions.eq("pool.id", pool.getId()))
-        .setProjection(Projections.id());
+    QueryBuilder<Long, PartitionImpl> idBuilder = new QueryBuilder<>(currentSession(), PartitionImpl.class, Long.class);
+    Join<PartitionImpl, PoolImpl> poolJoin = idBuilder.getJoin(idBuilder.getRoot(), PartitionImpl_.pool);
+    idBuilder.addPredicate(idBuilder.getCriteriaBuilder().equal(poolJoin.get(PoolImpl_.poolId), pool.getId()));
+    idBuilder.setColumns(idBuilder.getRoot().get(PartitionImpl_.id));
+    List<Long> ids = idBuilder.getResultList();
 
-    @SuppressWarnings("unchecked")
-    List<RunPartitionQcNode> partitions = currentSession().createCriteria(RunPartitionQcNode.class)
-        .add(Restrictions.eq("run.id", item.getId()))
-        .add(Subqueries.propertyIn("partition.id", subquery))
-        .list();
+    QueryBuilder<RunPartitionQcNode, RunPartitionQcNode> partitionBuilder =
+        new QueryBuilder<>(currentSession(), RunPartitionQcNode.class, RunPartitionQcNode.class);
+    Join<RunPartitionQcNode, RunQcNode> runJoin =
+        partitionBuilder.getJoin(partitionBuilder.getRoot(), RunPartitionQcNode_.run);
+    partitionBuilder
+        .addPredicate(partitionBuilder.getCriteriaBuilder().equal(runJoin.get(RunQcNode_.id), item.getId()));
+    Join<RunPartitionQcNode, RunPartitionQcNodePartition> partitionJoin =
+        partitionBuilder.getJoin(partitionBuilder.getRoot(), RunPartitionQcNode_.partition);
+
+    In<Long> inClause = partitionBuilder.getCriteriaBuilder().in(partitionJoin.get(RunPartitionQcNodePartition_.id));
+    for (Long id : ids) {
+      inClause.value(id);
+    }
+    partitionBuilder.addPredicate(inClause);
+    List<RunPartitionQcNode> partitions = partitionBuilder.getResultList();
+
     item.setRunPartitions(partitions);
     for (RunPartitionQcNode partition : partitions) {
       populateChildren(partition, item, aliquot);
@@ -234,11 +305,22 @@ public class HibernateQcNodeDao implements QcNodeDao {
   }
 
   private void populateChildren(RunPartitionQcNode item, RunQcNode run, LibraryAliquotQcNode aliquot) {
-    RunPartitionAliquotQcNode runLib = (RunPartitionAliquotQcNode) currentSession().createCriteria(RunPartitionAliquotQcNode.class)
-        .add(Restrictions.eq("run.id", run.getId()))
-        .add(Restrictions.eq("partition.id", item.getPartition().getId()))
-        .add(Restrictions.eq("aliquot.id", aliquot.getId()))
-        .uniqueResult();
+    QueryBuilder<RunPartitionAliquotQcNode, RunPartitionAliquotQcNode> builder =
+        new QueryBuilder<>(currentSession(), RunPartitionAliquotQcNode.class, RunPartitionAliquotQcNode.class);
+    Join<RunPartitionAliquotQcNode, RunQcNode> runJoin =
+        builder.getJoin(builder.getRoot(), RunPartitionAliquotQcNode_.run);
+    Join<RunPartitionAliquotQcNode, RunPartitionQcNodePartition> partitionJoin =
+        builder.getJoin(builder.getRoot(), RunPartitionAliquotQcNode_.partition);
+    Join<RunPartitionAliquotQcNode, LibraryAliquotQcNode> aliquotJoin =
+        builder.getJoin(builder.getRoot(), RunPartitionAliquotQcNode_.aliquot);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(runJoin.get(RunQcNode_.id), run.getId()));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(partitionJoin.get(RunPartitionQcNodePartition_.id),
+        item.getPartition().getId()));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(aliquotJoin.get(LibraryAliquotQcNode_.id),
+        aliquot.getId()));
+
+    RunPartitionAliquotQcNode runLib = builder.getSingleResultOrNull();
+
     if (runLib == null) {
       runLib = new RunPartitionAliquotQcNode();
       runLib.setRun(run);
