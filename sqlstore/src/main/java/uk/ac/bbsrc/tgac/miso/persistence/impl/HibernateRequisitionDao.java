@@ -3,35 +3,41 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.Subqueries;
+import javax.persistence.criteria.CriteriaBuilder.In;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalLibrary_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.RequisitionDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
-    implements HibernatePaginatedDataSource<Requisition>, RequisitionDao {
+    implements JpaCriteriaPaginatedDataSource<Requisition, Requisition>, RequisitionDao {
 
-  private final static String[] SEARCH_PROPERTIES = new String[] {"alias"};
-  private static final List<AliasDescriptor> STANDARD_ALIASES = Collections.emptyList();
+  private final static List<SingularAttribute<Requisition, String>> SEARCH_PROPERTIES = Arrays
+      .asList(Requisition_.alias);
 
   public HibernateRequisitionDao() {
     super(Requisition.class);
@@ -39,7 +45,7 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
 
   @Override
   public Requisition getByAlias(String alias) throws IOException {
-    return getBy("alias", alias);
+    return getBy(Requisition_.ALIAS, alias);
   }
 
   @Override
@@ -50,10 +56,13 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   @Override
   public RequisitionSupplementalSample getSupplementalSample(Requisition requisition, Sample sample)
       throws IOException {
-    return (RequisitionSupplementalSample) currentSession().createCriteria(RequisitionSupplementalSample.class)
-        .add(Restrictions.eq("requisitionId", requisition.getId()))
-        .add(Restrictions.eq("sample", sample))
-        .uniqueResult();
+    QueryBuilder<RequisitionSupplementalSample, RequisitionSupplementalSample> builder = new QueryBuilder<>(
+        currentSession(), RequisitionSupplementalSample.class, RequisitionSupplementalSample.class);
+    builder.addPredicate(builder.getCriteriaBuilder()
+        .equal(builder.getRoot().get(RequisitionSupplementalSample_.requisitionId), requisition.getId()));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(RequisitionSupplementalSample_.sample), sample));
+    return builder.getSingleResultOrNull();
   }
 
   @Override
@@ -69,10 +78,13 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   @Override
   public RequisitionSupplementalLibrary getSupplementalLibrary(Requisition requisition, Library library)
       throws IOException {
-    return (RequisitionSupplementalLibrary) currentSession().createCriteria(RequisitionSupplementalLibrary.class)
-        .add(Restrictions.eq("requisitionId", requisition.getId()))
-        .add(Restrictions.eq("library", library))
-        .uniqueResult();
+    QueryBuilder<RequisitionSupplementalLibrary, RequisitionSupplementalLibrary> builder = new QueryBuilder<>(
+        currentSession(), RequisitionSupplementalLibrary.class, RequisitionSupplementalLibrary.class);
+    builder.addPredicate(builder.getCriteriaBuilder()
+        .equal(builder.getRoot().get(RequisitionSupplementalLibrary_.requisitionId), requisition.getId()));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(RequisitionSupplementalLibrary_.library), library));
+    return builder.getSingleResultOrNull();
   }
 
   @Override
@@ -91,68 +103,78 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   }
 
   @Override
-  public String getProjectColumn() {
-    return null;
+  public SingularAttribute<Requisition, ?> getIdProperty() {
+    return Requisition_.requisitionId;
   }
 
   @Override
-  public Class<? extends Requisition> getRealClass() {
+  public Class<Requisition> getEntityClass() {
     return Requisition.class;
   }
 
   @Override
-  public String[] getSearchProperties() {
+  public Class<Requisition> getResultClass() {
+    return Requisition.class;
+  }
+
+  @Override
+  public List<SingularAttribute<Requisition, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return STANDARD_ALIASES;
-  }
-
-  @Override
-  public String propertyForDate(Criteria criteria, DateType type) {
+  public SingularAttribute<Requisition, ?> propertyForDate(DateType type) {
     switch (type) {
       case ENTERED:
-        return "created";
+        return Requisition_.created;
       case UPDATE:
-        return "lastModified";
+        return Requisition_.lastModified;
       default:
         return null;
     }
   }
 
   @Override
-  public String propertyForSortColumn(String original) {
+  public Path<?> propertyForSortColumn(Root<Requisition> root, String original) {
     switch (original) {
+      case "id":
+        return root.get(Requisition_.requisitionId);
       case "creationTime":
-        return Requisition_.CREATED;
+        return root.get(Requisition_.created);
       default:
-        return original;
+        return root.get(original);
     }
   }
 
   @Override
-  public String propertyForUser(boolean creator) {
-    return creator ? "creator" : "lastModifier";
+  public SingularAttribute<Requisition, ? extends UserImpl> propertyForUser(boolean creator) {
+    return creator ? Requisition_.creator : Requisition_.lastModifier;
   }
 
   @Override
-  public void restrictPaginationByStatus(Criteria criteria, String status, Consumer<String> errorHandler) {
+  public void restrictPaginationByStatus(QueryBuilder<?, Requisition> builder, String status,
+      Consumer<String> errorHandler) {
     switch (status) {
       case "stopped":
-        criteria.add(Restrictions.eq(Requisition_.STOPPED, true));
+        builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(Requisition_.stopped), true));
         break;
       case "paused":
         LocalDate today = LocalDate.now(ZoneId.systemDefault());
-        criteria.createAlias(Requisition_.PAUSES, "pause")
-            .add(Restrictions.le("pause.startDate", today))
-            .add(Restrictions.or(Restrictions.isNull("pause.endDate"),
-                Restrictions.gt("pause.endDate", today)));
+        Join<Requisition, RequisitionPause> pause = builder.getJoin(builder.getRoot(), Requisition_.pauses);
+        builder.addPredicate(
+            builder.getCriteriaBuilder().lessThanOrEqualTo(pause.get(RequisitionPause_.startDate), today));
+        builder.addPredicate(
+            builder.getCriteriaBuilder().or(builder.getCriteriaBuilder().isNull(pause.get(RequisitionPause_.endDate)),
+                builder.getCriteriaBuilder().greaterThan(pause.get(RequisitionPause_.endDate), today)));
         break;
       case "ongoing":
-        criteria.add(Restrictions.eq(Requisition_.STOPPED, false))
-            .add(Subqueries.propertyNotIn(Requisition_.REQUISITION_ID, makePausedRequisitionIdsSubquery()));
+        builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(Requisition_.stopped), false));
+        List<Long> ids = makePausedRequisitionIdsSubquery();
+        In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(Requisition_.requisitionId));
+        for (Long id : ids) {
+          inClause.value(id);
+        }
+        builder.addPredicate(builder.getCriteriaBuilder().not(inClause));
         break;
       default:
         errorHandler.accept("Unknown requisition status: " + status);
@@ -160,14 +182,16 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
     }
   }
 
-  private DetachedCriteria makePausedRequisitionIdsSubquery() {
+  private List<Long> makePausedRequisitionIdsSubquery() {
     LocalDate today = LocalDate.now(ZoneId.systemDefault());
-    return DetachedCriteria.forClass(Requisition.class)
-        .createAlias(Requisition_.PAUSES, "pause")
-        .add(Restrictions.le("pause.startDate", today))
-        .add(Restrictions.or(Restrictions.isNull("pause.endDate"),
-            Restrictions.gt("pause.endDate", today)))
-        .setProjection(Projections.id());
+    QueryBuilder<Long, Requisition> builder = new QueryBuilder<>(currentSession(), Requisition.class, Long.class);
+    Join<Requisition, RequisitionPause> pause = builder.getJoin(builder.getRoot(), Requisition_.pauses);
+    builder.addPredicate(builder.getCriteriaBuilder().lessThanOrEqualTo(pause.get(RequisitionPause_.startDate), today));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().or(builder.getCriteriaBuilder().isNull(pause.get(RequisitionPause_.endDate)),
+            builder.getCriteriaBuilder().greaterThan(pause.get(RequisitionPause_.endDate), today)));
+    builder.setColumn(builder.getRoot().get(Requisition_.requisitionId));
+    return builder.getResultList();
   }
 
 }
