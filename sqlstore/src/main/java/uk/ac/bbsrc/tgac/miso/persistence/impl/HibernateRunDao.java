@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
@@ -147,11 +146,7 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
     Join<PoolElement, ListLibraryAliquotView> aliquot = idBuilder.getJoin(element, PoolElement_.aliquot);
     Join<ListLibraryAliquotView, ParentLibrary> library =
         idBuilder.getJoin(aliquot, ListLibraryAliquotView_.parentLibrary);
-    In<Long> idInClause = idBuilder.getCriteriaBuilder().in(library.get(ParentLibrary_.libraryId));
-    for (Long id : libraryIds) {
-      idInClause.value(id);
-    }
-    idBuilder.addPredicate(idInClause);
+    idBuilder.addInPredicate(library.get(ParentLibrary_.libraryId), libraryIds);
     Join<RunPosition, Run> run = idBuilder.getJoin(idBuilder.getRoot(), RunPosition_.run);
     idBuilder.setColumn(run.get(Run_.runId));
     List<Long> ids = idBuilder.getResultList();
@@ -161,11 +156,7 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
     }
 
     QueryBuilder<Run, Run> builder = getQueryBuilder();
-    In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(Run_.runId));
-    for (Long id : ids) {
-      inClause.value(id);
-    }
-    builder.addPredicate(inClause);
+    builder.addInPredicate(builder.getRoot().get(Run_.runId), ids);
     return builder.getResultList();
   }
 
@@ -206,11 +197,7 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
     }
 
     QueryBuilder<Run, Run> builder = getQueryBuilder();
-    In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(Run_.runId));
-    for (Long id : ids) {
-      inClause.value(id);
-    }
-    builder.addPredicate(inClause);
+    builder.addInPredicate(builder.getRoot().get(Run_.runId), ids);
     return builder.getResultList();
   }
 
@@ -310,11 +297,7 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
   @Override
   public void restrictPaginationByHealth(QueryBuilder<?, Run> builder, EnumSet<HealthType> healths,
       Consumer<String> errorHandler) {
-    In<HealthType> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(Run_.health));
-    for (HealthType health : healths) {
-      inClause.value(health);
-    }
-    builder.addPredicate(inClause);
+    builder.addInPredicate(builder.getRoot().get(Run_.health), healths);
   }
 
   @Override
@@ -376,12 +359,8 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
     Join<ParentLibrary, ParentSample> sample = builder.getJoin(library, ParentLibrary_.parentSample);
     Join<ParentSample, ParentProject> project = builder.getJoin(sample, ParentSample_.parentProject);
 
-    In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(Run_.runId));
     List<Long> ids = runs.stream().map(Run::getId).toList();
-    for (Long id : ids) {
-      inClause.value(id);
-    }
-    builder.addPredicate(inClause);
+    builder.addInPredicate(builder.getRoot().get(Run_.runId), ids);
     builder.setColumns(builder.getRoot().get(Run_.runId), project.get(ParentProject_.code),
         project.get(ParentProject_.name));
 

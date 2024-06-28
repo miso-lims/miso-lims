@@ -227,7 +227,7 @@ public class DefaultRunService implements RunService {
 
     run.setName(generateTemporaryName());
 
-    Run saved = save(run, true);
+    Run saved = save(run);
     makeContainerChangesChangeLog(saved, Collections.emptyList(), saved.getSequencerPartitionContainers());
     return saved.getId();
   }
@@ -238,13 +238,13 @@ public class DefaultRunService implements RunService {
     loadChildEntities(run);
     saveContainers(run);
     applyChanges(managed, run);
-    return save(managed, false).getId();
+    return save(managed).getId();
   }
 
-  private Run save(Run run, boolean create) throws IOException {
+  private Run save(Run run) throws IOException {
     try {
       run.setChangeDetails(authorizationManager.getCurrentUser());
-      Long id = create ? runDao.create(run) : runDao.update(run);
+      Long id = run.isSaved() ? runDao.update(run) : runDao.create(run);
       Run saved = runDao.get(id);
 
       // post-save field generation
