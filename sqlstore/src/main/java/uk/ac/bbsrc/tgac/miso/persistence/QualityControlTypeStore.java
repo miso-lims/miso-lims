@@ -8,17 +8,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
-public interface QualityControlTypeStore {
-
-  public List<QcType> list() throws IOException;
-
-  public QcType get(long id) throws IOException;
+public interface QualityControlTypeStore extends SaveDao<QcType> {
 
   public List<QcType> listByNameAndTarget(String name, QcTarget target) throws IOException;
-
-  public long create(QcType qcType) throws IOException;
-
-  public void update(QcType qcType) throws IOException;
 
   public long getUsage(QcType qcType) throws IOException;
 
