@@ -13,7 +13,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QC_;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun_;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
@@ -40,7 +42,7 @@ public class HibernateQcTypeDao extends HibernateSaveDao<QcType> implements Qual
   @Override
   public long getUsage(QcType qcType) throws IOException {
     LongQueryBuilder<?> builder = getBuilderForQcTarget(qcType);
-    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get("type"), qcType));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(QC_.TYPE), qcType));
     return builder.getCount();
   }
 
@@ -78,15 +80,15 @@ public class HibernateQcTypeDao extends HibernateSaveDao<QcType> implements Qual
   @Override
   public long getControlUsage(QcControl control) throws IOException {
     LongQueryBuilder<?> builder = getBuilderForTargetQcControlRun(control);
-    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get("control"), control));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(QcControlRun_.CONTROL), control));
     return builder.getCount();
   }
 
   @Override
   public long getKitUsage(QcType qcType, KitDescriptor kit) throws IOException {
     LongQueryBuilder<?> builder = getBuilderForQcTarget(qcType);
-    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get("type"), qcType));
-    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get("kit"), kit));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(QC_.TYPE), qcType));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(QC_.KIT), kit));
     return builder.getCount();
   }
 
