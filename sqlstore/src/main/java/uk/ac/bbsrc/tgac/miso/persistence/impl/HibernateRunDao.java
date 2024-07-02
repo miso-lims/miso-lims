@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
@@ -347,17 +348,18 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
     }
 
     QueryBuilder<Object[], Run> builder = new QueryBuilder<>(currentSession(), Run.class, Object[].class);
-    Join<Run, RunPosition> position = builder.getJoin(builder.getRoot(), Run_.runPositions);
-    Join<RunPosition, SequencerPartitionContainerImpl> container = builder.getJoin(position, RunPosition_.container);
+    Join<Run, RunPosition> position = builder.getJoin(builder.getRoot(), Run_.runPositions, JoinType.INNER);
+    Join<RunPosition, SequencerPartitionContainerImpl> container =
+        builder.getJoin(position, RunPosition_.container, JoinType.INNER);
     Join<SequencerPartitionContainerImpl, PartitionImpl> partition =
-        builder.getJoin(container, SequencerPartitionContainerImpl_.partitions);
-    Join<PartitionImpl, PoolImpl> pool = builder.getJoin(partition, PartitionImpl_.pool);
-    Join<PoolImpl, PoolElement> element = builder.getJoin(pool, PoolImpl_.poolElements);
-    Join<PoolElement, ListLibraryAliquotView> aliquot = builder.getJoin(element, PoolElement_.aliquot);
+        builder.getJoin(container, SequencerPartitionContainerImpl_.partitions, JoinType.INNER);
+    Join<PartitionImpl, PoolImpl> pool = builder.getJoin(partition, PartitionImpl_.pool, JoinType.INNER);
+    Join<PoolImpl, PoolElement> element = builder.getJoin(pool, PoolImpl_.poolElements, JoinType.INNER);
+    Join<PoolElement, ListLibraryAliquotView> aliquot = builder.getJoin(element, PoolElement_.aliquot, JoinType.INNER);
     Join<ListLibraryAliquotView, ParentLibrary> library =
-        builder.getJoin(aliquot, ListLibraryAliquotView_.parentLibrary);
-    Join<ParentLibrary, ParentSample> sample = builder.getJoin(library, ParentLibrary_.parentSample);
-    Join<ParentSample, ParentProject> project = builder.getJoin(sample, ParentSample_.parentProject);
+        builder.getJoin(aliquot, ListLibraryAliquotView_.parentLibrary, JoinType.INNER);
+    Join<ParentLibrary, ParentSample> sample = builder.getJoin(library, ParentLibrary_.parentSample, JoinType.INNER);
+    Join<ParentSample, ParentProject> project = builder.getJoin(sample, ParentSample_.parentProject, JoinType.INNER);
 
     List<Long> ids = runs.stream().map(Run::getId).toList();
     builder.addInPredicate(builder.getRoot().get(Run_.runId), ids);
