@@ -195,7 +195,7 @@ public class DefaultRunService implements RunService {
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
     managed.setLastModifier(authorizationManager.getCurrentUser());
-    runDao.save(managed);
+    runDao.update(managed);
   }
 
   @Override
@@ -216,7 +216,7 @@ public class DefaultRunService implements RunService {
     }
     authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
     managed.getNotes().remove(deleteNote);
-    runDao.save(managed);
+    runDao.update(managed);
   }
 
   @Override
@@ -244,7 +244,7 @@ public class DefaultRunService implements RunService {
   private Run save(Run run) throws IOException {
     try {
       run.setChangeDetails(authorizationManager.getCurrentUser());
-      Long id = runDao.save(run);
+      Long id = run.isSaved() ? runDao.update(run) : runDao.create(run);
       Run saved = runDao.get(id);
 
       // post-save field generation
@@ -256,7 +256,7 @@ public class DefaultRunService implements RunService {
         needsUpdate = true;
       }
       if (needsUpdate) {
-        runDao.save(saved);
+        runDao.update(saved);
         saved = runDao.get(saved.getId());
       }
       createRunPartitions(run);

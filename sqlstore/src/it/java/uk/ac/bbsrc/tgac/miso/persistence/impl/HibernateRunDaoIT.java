@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
@@ -256,7 +233,7 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
     run.setName("AwesomeRun");
     run.setLastModifier(user);
     run.setSequencingParameters(null);
-    assertEquals(1L, dao.save(run));
+    assertEquals(1L, dao.update(run));
 
     clearSession();
 
@@ -270,7 +247,7 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
   public void testSaveNew() throws IOException, MisoNamingException {
     Run newRun = makeRun("TestRun");
     newRun.setName("RUNX");
-    Long savedId = dao.save(newRun);
+    Long savedId = dao.create(newRun);
 
     clearSession();
 
@@ -279,9 +256,15 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testSaveNull() throws IOException {
-    exception.expect(NullPointerException.class);
-    dao.save(null);
+  public void testCreateNull() throws IOException {
+    exception.expect(IllegalArgumentException.class);
+    dao.create(null);
+  }
+
+  @Test
+  public void testUpdateNull() throws IOException {
+    exception.expect(IllegalArgumentException.class);
+    dao.update(null);
   }
 
   private Run makeRun(String alias) {

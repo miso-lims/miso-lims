@@ -119,7 +119,8 @@ public class DefaultRunServiceTest {
     assertFalse(sut.processNotification(notificationRun, 1, CONTAINER_MODEL_BARCODE, CONTAINER_SERIAL_NO,
         SEQUENCER_NAME, filterParameters,
         getLaneContents, null));
-    Mockito.verify(runStore, Mockito.times(0)).save(Mockito.any());
+    Mockito.verify(runStore, Mockito.times(0)).create(Mockito.any());
+    Mockito.verify(runStore, Mockito.times(0)).update(Mockito.any());
   }
 
   @Test
@@ -133,7 +134,8 @@ public class DefaultRunServiceTest {
     assertFalse(sut.processNotification(notificationRun, 1, CONTAINER_MODEL_BARCODE, CONTAINER_SERIAL_NO,
         SEQUENCER_NAME, filterParameters,
         getLaneContents, null));
-    Mockito.verify(runStore, Mockito.times(0)).save(Mockito.any());
+    Mockito.verify(runStore, Mockito.times(0)).create(Mockito.any());
+    Mockito.verify(runStore, Mockito.times(0)).update(Mockito.any());
   }
 
   private static Run makeSavedRun() {

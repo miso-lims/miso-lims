@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
@@ -36,11 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface RunStore extends PaginatedDataSource<Run> {
-
-  Run get(long id) throws IOException;
-
-  long save(Run run) throws IOException;
+public interface RunStore extends SaveDao<Run>, PaginatedDataSource<Run> {
 
   /**
    * Gets the latest Run, by start date, that is associated with the given container
@@ -65,7 +38,7 @@ public interface RunStore extends PaginatedDataSource<Run> {
    *
    * @param alias of type String
    * @return Run
-   * @throws IOException when
+   * @throws IOException
    */
   Run getByAlias(String alias) throws IOException;
 
@@ -74,7 +47,7 @@ public interface RunStore extends PaginatedDataSource<Run> {
    *
    * @param poolId of type long
    * @return List<Run>
-   * @throws IOException when
+   * @throws IOException
    */
   List<Run> listByPoolId(long poolId) throws IOException;
 
@@ -96,7 +69,7 @@ public interface RunStore extends PaginatedDataSource<Run> {
    *
    * @param projectId of type long
    * @return List<Run>
-   * @throws IOException when
+   * @throws IOException
    */
   List<Run> listByProjectId(long projectId) throws IOException;
 

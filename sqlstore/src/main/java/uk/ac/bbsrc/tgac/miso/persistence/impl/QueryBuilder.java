@@ -3,11 +3,13 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.From;
@@ -190,6 +192,12 @@ public class QueryBuilder<R, T> {
       predicates = new ArrayList<>();
     }
     this.predicates.add(predicate);
+  }
+
+  public <X> void addInPredicate(Path<X> path, Collection<X> items) {
+    In<X> inClause = criteriaBuilder.in(path);
+    items.forEach(item -> inClause.value(item));
+    addPredicate(inClause);
   }
 
   public void addTextRestriction(Path<String> path, String text) {
