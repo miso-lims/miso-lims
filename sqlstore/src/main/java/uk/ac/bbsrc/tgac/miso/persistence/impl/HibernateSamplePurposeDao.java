@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl_;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 
 @Repository
@@ -24,20 +24,17 @@ public class HibernateSamplePurposeDao extends HibernateSaveDao<SamplePurpose> i
 
   @Override
   public long getUsage(SamplePurpose samplePurpose) {
-    return (long) currentSession().createCriteria(SampleAliquotImpl.class)
-        .add(Restrictions.eq("samplePurpose", samplePurpose))
-        .setProjection(Projections.rowCount())
-        .uniqueResult();
+    return getUsageBy(SampleAliquotImpl.class, SampleAliquotImpl_.SAMPLE_PURPOSE, samplePurpose);
   }
 
   @Override
   public SamplePurpose getByAlias(String alias) throws IOException {
-    return getBy("alias", alias);
+    return getBy(SamplePurposeImpl_.ALIAS, alias);
   }
 
   @Override
   public List<SamplePurpose> listByIdList(Collection<Long> ids) throws IOException {
-    return listByIdList("samplePurposeId", ids);
+    return listByIdList(SamplePurposeImpl_.SAMPLE_PURPOSE_ID, ids);
   }
 
 }
