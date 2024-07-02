@@ -83,7 +83,7 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
   @Override
   public Set<SampleNumberPerProject> getAll() throws IOException {
     authorizationManager.throwIfUnauthenticated();
-    return Sets.newHashSet(sampleNumberPerProjectDao.getSampleNumberPerProject());
+    return Sets.newHashSet(sampleNumberPerProjectDao.list());
   }
 
   @Override

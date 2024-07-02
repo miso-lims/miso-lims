@@ -147,7 +147,7 @@ public class HibernateSampleNumberPerProjectDaoIT extends AbstractDAOTest {
     String s5 = sampleNumberPerProjectDao.nextNumber(project2, user, PRO2_PARTIAL_ALIAS);
     assertEquals("0002", s5);
 
-    assertTrue(sampleNumberPerProjectDao.getSampleNumberPerProject().size() == 3);
+    assertTrue(sampleNumberPerProjectDao.list().size() == 3);
 
   }
 
