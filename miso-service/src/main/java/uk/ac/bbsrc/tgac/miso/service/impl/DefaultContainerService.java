@@ -99,7 +99,7 @@ public class DefaultContainerService implements ContainerService {
     validateChange(container, null);
     container.setChangeDetails(authorizationManager.getCurrentUser());
 
-    return containerDao.save(container).getId();
+    return containerDao.create(container);
   }
 
   @Override
@@ -109,7 +109,7 @@ public class DefaultContainerService implements ContainerService {
     validateChange(container, managed);
     applyChanges(container, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    return containerDao.save(managed).getId();
+    return containerDao.update(managed);
   }
 
   @Override
@@ -288,7 +288,7 @@ public class DefaultContainerService implements ContainerService {
     validateChange(partition, original);
     applyChanges(original, partition);
     original.getSequencerPartitionContainer().setChangeDetails(authorizationManager.getCurrentUser());
-    containerDao.save(original.getSequencerPartitionContainer());
+    containerDao.update(original.getSequencerPartitionContainer());
   }
 
   private void validateChange(Partition partition, Partition beforeChange) {
