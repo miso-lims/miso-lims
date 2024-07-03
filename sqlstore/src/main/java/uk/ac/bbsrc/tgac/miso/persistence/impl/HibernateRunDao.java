@@ -9,126 +9,127 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import javax.persistence.TemporalType;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-import org.hibernate.type.LongType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.Index_;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel_;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Run_;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentProject;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentProject_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement_;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
-import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<Run> {
+public class HibernateRunDao extends HibernateSaveDao<Run>
+    implements RunStore, JpaCriteriaPaginatedDataSource<Run, Run> {
 
-  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("sequencer"),
-      new AliasDescriptor("sequencer.instrumentModel"));
-
-  private static final String[] SEARCH_PROPERTIES = new String[] {"name", "alias", "description"};
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  @Override
-  public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
+  public HibernateRunDao() {
+    super(Run.class);
   }
 
-  public static final String TABLE_NAME = "Run";
-
-  @Override
-  public long save(Run run) throws IOException {
-    long id;
-    if (run.getId() == Run.UNSAVED_ID) {
-      currentSession().save(run);
-    } else {
-      currentSession().update(run);
-    }
-    id = run.getId();
-    return id;
-  }
-
-  @Override
-  public Run get(long id) throws IOException {
-    Run run = (Run) currentSession().get(Run.class, id);
-    return run;
-  }
+  private static final List<SingularAttribute<Run, String>> SEARCH_PROPERTIES =
+      Arrays.asList(Run_.name, Run_.alias, Run_.description);
 
   @Override
   public Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException {
     // flush here because if Hibernate has not persisted recent changes to container-run relationships,
-    // unexpected associations may
-    // show up
+    // unexpected associations may show up
     currentSession().flush();
 
-    Criteria criteria = currentSession().createCriteria(Run.class, "r");
-    criteria.createAlias("runPositions", "runPos");
-    criteria.createAlias("runPos.container", "spc");
-    criteria.add(Restrictions.eq("spc.id", containerId));
-    criteria.addOrder(Order.desc("startDate"));
-    criteria.setMaxResults(1);
-    return (Run) criteria.uniqueResult();
+    QueryBuilder<Run, Run> builder = getQueryBuilder();
+    Join<Run, RunPosition> position = builder.getJoin(builder.getRoot(), Run_.runPositions);
+    Join<RunPosition, SequencerPartitionContainerImpl> container = builder.getJoin(position, RunPosition_.container);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(container.get(SequencerPartitionContainerImpl_.containerId), containerId));
+    builder.addSort(builder.getRoot().get(Run_.startDate), false);
+    List<Run> results = builder.getResultList(1, 0);
+    return results.isEmpty() ? null : results.get(0);
   }
 
   @Override
   public Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException {
     // flush here because if Hibernate has not persisted recent changes to container-run relationships,
-    // unexpected associations may
-    // show up
+    // unexpected associations may show up
     currentSession().flush();
 
-    Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.createAlias("runPositions", "runPos");
-    criteria.createAlias("runPos.container", "spc");
-    criteria.add(Restrictions.eq("spc.id", containerId));
-    criteria.addOrder(Order.desc("id"));
-    criteria.setMaxResults(1);
-    return (Run) criteria.uniqueResult();
+    QueryBuilder<Run, Run> builder = getQueryBuilder();
+    Join<Run, RunPosition> position = builder.getJoin(builder.getRoot(), Run_.runPositions);
+    Join<RunPosition, SequencerPartitionContainerImpl> container = builder.getJoin(position, RunPosition_.container);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(container.get(SequencerPartitionContainerImpl_.containerId), containerId));
+    builder.addSort(builder.getRoot().get(Run_.runId), false);
+    List<Run> results = builder.getResultList(1, 0);
+    return results.isEmpty() ? null : results.get(0);
   }
 
   @Override
   public Run getByAlias(String alias) throws IOException {
-    Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.add(Restrictions.eq("alias", alias));
-    return (Run) criteria.uniqueResult();
+    return getBy(Run_.ALIAS, alias);
   }
 
   @Override
   public List<Run> listByPoolId(long poolId) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<Long> ids = currentSession().createCriteria(Run.class)
-        .createAlias("runPositions", "runPos")
-        .createAlias("runPos.container", "spc")
-        .createAlias("spc.partitions", "partition")
-        .createAlias("partition.pool", "pool")
-        .add(Restrictions.eq("pool.id", poolId))
-        .setProjection(Projections.distinct(Projections.property("id")))
-        .list();
+    QueryBuilder<Long, Run> builder = new QueryBuilder<>(currentSession(), Run.class, Long.class);
+    Join<Run, RunPosition> position = builder.getJoin(builder.getRoot(), Run_.runPositions);
+    Join<RunPosition, SequencerPartitionContainerImpl> container = builder.getJoin(position, RunPosition_.container);
+    Join<SequencerPartitionContainerImpl, PartitionImpl> partition =
+        builder.getJoin(container, SequencerPartitionContainerImpl_.partitions);
+    Join<PartitionImpl, PoolImpl> pool = builder.getJoin(partition, PartitionImpl_.pool);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(pool.get(PoolImpl_.poolId), poolId));
+    builder.setColumn(builder.getRoot().get(Run_.runId));
+    List<Long> ids = builder.getResultList();
     return listByIdList(ids);
   }
 
   @Override
   public List<Run> listByLibraryAliquotId(long libraryAliquotId) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<Run> results = listByLibraryAliquotBaseCriteria()
-        .add(Restrictions.eq("aliquot.id", libraryAliquotId))
-        .list();
-    return results;
+    QueryBuilder<Run, Run> builder = getQueryBuilder();
+    Join<Run, RunPosition> position = builder.getJoin(builder.getRoot(), Run_.runPositions);
+    Join<RunPosition, SequencerPartitionContainerImpl> container = builder.getJoin(position, RunPosition_.container);
+    Join<SequencerPartitionContainerImpl, PartitionImpl> partition =
+        builder.getJoin(container, SequencerPartitionContainerImpl_.partitions);
+    Join<PartitionImpl, PoolImpl> pool = builder.getJoin(partition, PartitionImpl_.pool);
+    Join<PoolImpl, PoolElement> element = builder.getJoin(pool, PoolImpl_.poolElements);
+    Join<PoolElement, ListLibraryAliquotView> aliquot = builder.getJoin(element, PoolElement_.aliquot);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(aliquot.get(ListLibraryAliquotView_.aliquotId), libraryAliquotId));
+    return builder.getResultList();
   }
 
   @Override
@@ -136,230 +137,200 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
     if (libraryIds == null || libraryIds.isEmpty()) {
       return Collections.emptyList();
     }
-    @SuppressWarnings("unchecked")
-    List<Long> ids = currentSession().createSQLQuery("SELECT rspc.Run_runId AS runId"
-        + " FROM Run_SequencerPartitionContainer rspc"
-        + " JOIN _Partition part ON part.containerId = rspc.containers_containerId"
-        + " JOIN Pool_LibraryAliquot pla ON pla.poolId = part.pool_poolId"
-        + " JOIN LibraryAliquot la ON la.aliquotId = pla.aliquotId"
-        + " WHERE la.libraryId IN (:libraryIds)")
-        .addScalar("runId", new LongType())
-        .setParameterList("libraryIds", libraryIds)
-        .list();
+    QueryBuilder<Long, RunPosition> idBuilder = new QueryBuilder<>(currentSession(), RunPosition.class, Long.class);
+    Join<RunPosition, SequencerPartitionContainerImpl> container =
+        idBuilder.getJoin(idBuilder.getRoot(), RunPosition_.container);
+    Join<SequencerPartitionContainerImpl, PartitionImpl> part =
+        idBuilder.getJoin(container, SequencerPartitionContainerImpl_.partitions);
+    Join<PartitionImpl, PoolImpl> pool = idBuilder.getJoin(part, PartitionImpl_.pool);
+    Join<PoolImpl, PoolElement> element = idBuilder.getJoin(pool, PoolImpl_.poolElements);
+    Join<PoolElement, ListLibraryAliquotView> aliquot = idBuilder.getJoin(element, PoolElement_.aliquot);
+    Join<ListLibraryAliquotView, ParentLibrary> library =
+        idBuilder.getJoin(aliquot, ListLibraryAliquotView_.parentLibrary);
+    idBuilder.addInPredicate(library.get(ParentLibrary_.libraryId), libraryIds);
+    Join<RunPosition, Run> run = idBuilder.getJoin(idBuilder.getRoot(), RunPosition_.run);
+    idBuilder.setColumn(run.get(Run_.runId));
+    List<Long> ids = idBuilder.getResultList();
 
     if (ids == null || ids.isEmpty()) {
       return Collections.emptyList();
     }
 
-    @SuppressWarnings("unchecked")
-    List<Run> results = currentSession().createCriteria(Run.class)
-        .add(Property.forName("id").in(ids))
-        .list();
-
-    return results;
-  }
-
-  private Criteria listByLibraryAliquotBaseCriteria() {
-    return currentSession().createCriteria(Run.class)
-        .createAlias("runPositions", "runPos")
-        .createAlias("runPos.container", "spc")
-        .createAlias("spc.partitions", "partition")
-        .createAlias("partition.pool", "pool")
-        .createAlias("pool.poolElements", "element")
-        .createAlias("element.aliquot", "aliquot");
+    QueryBuilder<Run, Run> builder = getQueryBuilder();
+    builder.addInPredicate(builder.getRoot().get(Run_.runId), ids);
+    return builder.getResultList();
   }
 
   @Override
   public List<Run> listBySequencerPartitionContainerId(long containerId) throws IOException {
     // flush here because if Hibernate has not persisted recent changes to container-run relationships,
-    // unexpected associations may
-    // show up
+    // unexpected associations may show up
     currentSession().flush();
 
-    Criteria criteria = currentSession().createCriteria(Run.class);
-    criteria.createAlias("runPositions", "runPos");
-    criteria.createAlias("runPos.container", "spc");
-    criteria.add(Restrictions.eq("spc.id", containerId));
-    @SuppressWarnings("unchecked")
-    List<Run> records = criteria.list();
-    return records;
+    QueryBuilder<Run, Run> builder = new QueryBuilder<>(currentSession(), Run.class, Run.class);
+    Join<Run, RunPosition> position = builder.getJoin(builder.getRoot(), Run_.runPositions);
+    Join<RunPosition, SequencerPartitionContainerImpl> container = builder.getJoin(position, RunPosition_.container);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(container.get(SequencerPartitionContainerImpl_.containerId), containerId));
+    return builder.getResultList();
   }
 
   @Override
   public List<Run> listByProjectId(long projectId) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<Long> ids = currentSession().createCriteria(Run.class, "r")
-        .createAlias("runPositions", "runPos")
-        .createAlias("runPos.container", "spc")
-        .createAlias("spc.partitions", "partition")
-        .createAlias("partition.pool", "pool")
-        .createAlias("pool.poolElements", "poolElement")
-        .createAlias("poolElement.aliquot", "aliquot")
-        .createAlias("aliquot.parentLibrary", "library")
-        .createAlias("library.parentSample", "sample")
-        .createAlias("sample.parentProject", "project")
-        .add(Restrictions.eq("project.id", projectId))
-        .setProjection(Projections.distinct(Projections.property("r.id")))
-        .list();
+    QueryBuilder<Long, Run> idBuilder = new QueryBuilder<>(currentSession(), Run.class, Long.class);
+    Join<Run, RunPosition> position = idBuilder.getJoin(idBuilder.getRoot(), Run_.runPositions);
+    Join<RunPosition, SequencerPartitionContainerImpl> container = idBuilder.getJoin(position, RunPosition_.container);
+    Join<SequencerPartitionContainerImpl, PartitionImpl> partition =
+        idBuilder.getJoin(container, SequencerPartitionContainerImpl_.partitions);
+    Join<PartitionImpl, PoolImpl> pool = idBuilder.getJoin(partition, PartitionImpl_.pool);
+    Join<PoolImpl, PoolElement> element = idBuilder.getJoin(pool, PoolImpl_.poolElements);
+    Join<PoolElement, ListLibraryAliquotView> aliquot = idBuilder.getJoin(element, PoolElement_.aliquot);
+    Join<ListLibraryAliquotView, ParentLibrary> library =
+        idBuilder.getJoin(aliquot, ListLibraryAliquotView_.parentLibrary);
+    Join<ParentLibrary, ParentSample> sample = idBuilder.getJoin(library, ParentLibrary_.parentSample);
+    Join<ParentSample, ParentProject> project = idBuilder.getJoin(sample, ParentSample_.parentProject);
+    idBuilder.addPredicate(idBuilder.getCriteriaBuilder().equal(project.get(ParentProject_.projectId), projectId));
+    idBuilder.setColumn(idBuilder.getRoot().get(Run_.runId));
+    List<Long> ids = idBuilder.getResultList();
+
     if (ids.isEmpty()) {
       return Collections.emptyList();
     }
 
-    @SuppressWarnings("unchecked")
-    List<Run> records = currentSession().createCriteria(Run.class)
-        .add(Restrictions.in("id", ids))
-        .list();
-    return records;
+    QueryBuilder<Run, Run> builder = getQueryBuilder();
+    builder.addInPredicate(builder.getRoot().get(Run_.runId), ids);
+    return builder.getResultList();
   }
 
   @Override
   public List<Run> listByStatus(String health) throws IOException {
-    Criteria criteria = currentSession().createCriteria(Run.class, "r");
-    criteria.add(Restrictions.eq("health", HealthType.get(health)));
-    @SuppressWarnings("unchecked")
-    List<Run> records = criteria.list();
-    return records;
+    QueryBuilder<Run, Run> builder = getQueryBuilder();
+    builder
+        .addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(Run_.health), HealthType.get(health)));
+    return builder.getResultList();
   }
 
   @Override
   public List<Run> listByIdList(Collection<Long> ids) throws IOException {
-    if (ids == null || ids.isEmpty()) {
-      return Collections.emptyList();
-    }
-    @SuppressWarnings("unchecked")
-    List<Run> results = currentSession().createCriteria(Run.class)
-        .add(Restrictions.in("id", ids))
-        .list();
-    return results;
-  }
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+    return listByIdList(Run_.RUN_ID, ids);
   }
 
   @Override
-  public String getProjectColumn() {
-    return "project.id";
-  }
-
-  @Override
-  public String[] getSearchProperties() {
+  public List<SingularAttribute<Run, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return STANDARD_ALIASES;
-  }
-
-  @Override
-  public String propertyForSortColumn(String original) {
+  public Path<?> propertyForSortColumn(Root<Run> root, String original) {
+    if ("id".equals(original))
+      return root.get(Run_.runId);
     if ("platformType".equals(original))
-      return "instrumentModel.platformType";
+      return root.get(Run_.sequencer).get(InstrumentImpl_.instrumentModel).get(InstrumentModel_.platformType);
     if ("status".equals(original))
-      return "health";
+      return root.get(Run_.health);
     if ("endDate".equals(original))
-      return "completionDate";
-    return original;
-
+      return root.get(Run_.completionDate);
+    return root.get(original);
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, DateType type) {
+  public SingularAttribute<Run, ?> propertyForDate(DateType type) {
     switch (type) {
       case CREATE:
-        return "startDate";
+        return Run_.startDate;
       case ENTERED:
-        return "creationTime";
+        return Run_.creationTime;
       case UPDATE:
-        return "lastModified";
+        return Run_.lastModified;
       default:
         return null;
     }
   }
 
   @Override
-  public TemporalType temporalTypeForDate(DateType type) {
-    switch (type) {
-      case CREATE:
-        return TemporalType.DATE;
-      case ENTERED:
-      case UPDATE:
-        return TemporalType.TIMESTAMP;
-      default:
-        return null;
-    }
+  public SingularAttribute<Run, ? extends UserImpl> propertyForUser(boolean creator) {
+    return creator ? Run_.creator : Run_.lastModifier;
   }
 
   @Override
-  public String propertyForUser(boolean creator) {
-    return creator ? "creator" : "lastModifier";
+  public SingularAttribute<Run, ?> getIdProperty() {
+    return Run_.runId;
   }
 
   @Override
-  public Class<? extends Run> getRealClass() {
+  public Class<Run> getEntityClass() {
     return Run.class;
   }
 
   @Override
-  public void restrictPaginationByProjectId(Criteria criteria, long projectId, Consumer<String> errorHandler) {
-    criteria.createAlias("runPositions", "runPos")
-        .createAlias("runPos.container", "spc")
-        .createAlias("spc.partitions", "partition")
-        .createAlias("partition.pool", "pool")
-        .createAlias("pool.poolElements", "poolElement")
-        .createAlias("poolElement.aliquot", "aliquot")
-        .createAlias("aliquot.parentLibrary", "library")
-        .createAlias("library.parentSample", "sample")
-        .createAlias("sample.parentProject", "project");
-    HibernatePaginatedDataSource.super.restrictPaginationByProjectId(criteria, projectId, errorHandler);
+  public Class<Run> getResultClass() {
+    return Run.class;
   }
 
   @Override
-  public void restrictPaginationBySequencingParametersName(Criteria criteria, String query,
+  public void restrictPaginationByProjectId(QueryBuilder<?, Run> builder, long projectId,
+      Consumer<String> errorHandler) {
+    Join<Run, RunPosition> position = builder.getJoin(builder.getRoot(), Run_.runPositions);
+    Join<RunPosition, SequencerPartitionContainerImpl> container = builder.getJoin(position, RunPosition_.container);
+    Join<SequencerPartitionContainerImpl, PartitionImpl> partition =
+        builder.getJoin(container, SequencerPartitionContainerImpl_.partitions);
+    Join<PartitionImpl, PoolImpl> pool = builder.getJoin(partition, PartitionImpl_.pool);
+    Join<PoolImpl, PoolElement> element = builder.getJoin(pool, PoolImpl_.poolElements);
+    Join<PoolElement, ListLibraryAliquotView> aliquot = builder.getJoin(element, PoolElement_.aliquot);
+    Join<ListLibraryAliquotView, ParentLibrary> library =
+        builder.getJoin(aliquot, ListLibraryAliquotView_.parentLibrary);
+    Join<ParentLibrary, ParentSample> sample = builder.getJoin(library, ParentLibrary_.parentSample);
+    Join<ParentSample, ParentProject> project = builder.getJoin(sample, ParentSample_.parentProject);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(project.get(ParentProject_.projectId), projectId));
+  }
+
+  @Override
+  public void restrictPaginationBySequencingParametersName(QueryBuilder<?, Run> builder, String query,
       Consumer<String> errorHandler) {
     if (LimsUtils.isStringBlankOrNull(query)) {
-      criteria.add(Restrictions.isNull("sequencingParameters"));
+      builder.addPredicate(builder.getCriteriaBuilder().isNull(builder.getRoot().get(Run_.sequencingParameters)));
     } else {
-      criteria.createAlias("sequencingParameters", "params");
-      criteria.add(DbUtils.textRestriction(query, "params.name"));
+      Join<Run, SequencingParameters> params = builder.getJoin(builder.getRoot(), Run_.sequencingParameters);
+      builder.addTextRestriction(params.get(SequencingParameters_.name), query);
     }
   }
 
   @Override
-  public void restrictPaginationByHealth(Criteria criteria, EnumSet<HealthType> healths,
+  public void restrictPaginationByHealth(QueryBuilder<?, Run> builder, EnumSet<HealthType> healths,
       Consumer<String> errorHandler) {
-    criteria.add(Restrictions.in("health", healths.toArray()));
+    builder.addInPredicate(builder.getRoot().get(Run_.health), healths);
   }
 
   @Override
-  public void restrictPaginationByPlatformType(Criteria criteria, PlatformType platformType,
+  public void restrictPaginationByPlatformType(QueryBuilder<?, Run> builder, PlatformType platformType,
       Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("instrumentModel.platformType", platformType));
+    Join<Run, InstrumentImpl> sequencer = builder.getJoin(builder.getRoot(), Run_.sequencer);
+    Join<InstrumentImpl, InstrumentModel> instrumentModel = builder.getJoin(sequencer, InstrumentImpl_.instrumentModel);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(instrumentModel.get(InstrumentModel_.platformType), platformType));
   }
 
   @Override
-  public void restrictPaginationByIndex(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.createAlias("runPositions", "runPos")
-        .createAlias("runPos.container", "spc")
-        .createAlias("spc.partitions", "partition")
-        .createAlias("partition.pool", "pool")
-        .createAlias("pool.poolElements", "poolElement")
-        .createAlias("poolElement.aliquot", "aliquot")
-        .createAlias("aliquot.parentLibrary", "library")
-        .createAlias("library.index1", "index1")
-        .createAlias("library.index2", "index2", JoinType.LEFT_OUTER_JOIN)
-        .add(DbUtils.textRestriction(query, "index1.name", "index1.sequence", "index2.name", "index2.sequence"));
+  public void restrictPaginationByIndex(QueryBuilder<?, Run> builder, String query, Consumer<String> errorHandler) {
+    Join<Run, RunPosition> position = builder.getJoin(builder.getRoot(), Run_.runPositions);
+    Join<RunPosition, SequencerPartitionContainerImpl> container = builder.getJoin(position, RunPosition_.container);
+    Join<SequencerPartitionContainerImpl, PartitionImpl> partition =
+        builder.getJoin(container, SequencerPartitionContainerImpl_.partitions);
+    Join<PartitionImpl, PoolImpl> pool = builder.getJoin(partition, PartitionImpl_.pool);
+    Join<PoolImpl, PoolElement> element = builder.getJoin(pool, PoolImpl_.poolElements);
+    Join<PoolElement, ListLibraryAliquotView> aliquot = builder.getJoin(element, PoolElement_.aliquot);
+    Join<ListLibraryAliquotView, ParentLibrary> library =
+        builder.getJoin(aliquot, ListLibraryAliquotView_.parentLibrary);
+    Join<ParentLibrary, Index> index1 = builder.getJoin(library, ParentLibrary_.index1);
+    Join<ParentLibrary, Index> index2 = builder.getJoin(library, ParentLibrary_.index2);
+    builder.addTextRestriction(Arrays.asList(index1.get(Index_.name), index1.get(Index_.sequence),
+        index2.get(Index_.name), index2.get(Index_.sequence)), query);
   }
 
   @Override
-  public void restrictPaginationBySequencerId(Criteria criteria, long id, Consumer<String> errorHandler) {
-    criteria.createAlias("sequencer", "sequencer");
-    criteria.add(Restrictions.eq("sequencer.id", id));
+  public void restrictPaginationBySequencerId(QueryBuilder<?, Run> builder, long id, Consumer<String> errorHandler) {
+    Join<Run, InstrumentImpl> sequencer = builder.getJoin(builder.getRoot(), Run_.sequencer);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(sequencer.get(InstrumentImpl_.id), id));
   }
 
   @Override
@@ -371,29 +342,31 @@ public class HibernateRunDao implements RunStore, HibernatePaginatedDataSource<R
   public List<Run> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filter)
       throws IOException {
-    List<Run> runs = HibernatePaginatedDataSource.super.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+    List<Run> runs = JpaCriteriaPaginatedDataSource.super.list(errorHandler, offset, limit, sortDir, sortCol, filter);
     if (runs.isEmpty()) {
       return runs;
     }
 
-    @SuppressWarnings("unchecked")
-    List<Object[]> results = currentSession().createCriteria(Run.class)
-        .createAlias("runPositions", "position")
-        .createAlias("position.container", "container")
-        .createAlias("container.partitions", "partition")
-        .createAlias("partition.pool", "pool")
-        .createAlias("pool.poolElements", "element")
-        .createAlias("element.aliquot", "aliquot")
-        .createAlias("aliquot.parentLibrary", "library")
-        .createAlias("library.parentSample", "sample")
-        .createAlias("sample.parentProject", "project")
-        .setProjection(Projections.distinct(
-            Projections.projectionList()
-                .add(Projections.property("id"))
-                .add(Projections.property("project.code"))
-                .add(Projections.property("project.name"))))
-        .add(Restrictions.in("id", runs.stream().map(Run::getId).toArray()))
-        .list();
+    QueryBuilder<Object[], Run> builder = new QueryBuilder<>(currentSession(), Run.class, Object[].class);
+    Join<Run, RunPosition> position = builder.getJoin(builder.getRoot(), Run_.runPositions, JoinType.INNER);
+    Join<RunPosition, SequencerPartitionContainerImpl> container =
+        builder.getJoin(position, RunPosition_.container, JoinType.INNER);
+    Join<SequencerPartitionContainerImpl, PartitionImpl> partition =
+        builder.getJoin(container, SequencerPartitionContainerImpl_.partitions, JoinType.INNER);
+    Join<PartitionImpl, PoolImpl> pool = builder.getJoin(partition, PartitionImpl_.pool, JoinType.INNER);
+    Join<PoolImpl, PoolElement> element = builder.getJoin(pool, PoolImpl_.poolElements, JoinType.INNER);
+    Join<PoolElement, ListLibraryAliquotView> aliquot = builder.getJoin(element, PoolElement_.aliquot, JoinType.INNER);
+    Join<ListLibraryAliquotView, ParentLibrary> library =
+        builder.getJoin(aliquot, ListLibraryAliquotView_.parentLibrary, JoinType.INNER);
+    Join<ParentLibrary, ParentSample> sample = builder.getJoin(library, ParentLibrary_.parentSample, JoinType.INNER);
+    Join<ParentSample, ParentProject> project = builder.getJoin(sample, ParentSample_.parentProject, JoinType.INNER);
+
+    List<Long> ids = runs.stream().map(Run::getId).toList();
+    builder.addInPredicate(builder.getRoot().get(Run_.runId), ids);
+    builder.setColumns(builder.getRoot().get(Run_.runId), project.get(ParentProject_.code),
+        project.get(ParentProject_.name));
+
+    List<Object[]> results = builder.getResultList();
 
     for (Run run : runs) {
       run.setProjectsLabel(results.stream()

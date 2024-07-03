@@ -3,11 +3,13 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.From;
@@ -102,9 +104,13 @@ public class QueryBuilder<R, T> {
   }
 
   public <X, Y> Join<X, Y> getJoin(From<?, X> from, SingularAttribute<? super X, Y> attribute) {
+    return getJoin(from, attribute, JoinType.LEFT);
+  }
+
+  public <X, Y> Join<X, Y> getJoin(From<?, X> from, SingularAttribute<? super X, Y> attribute, JoinType joinType) {
     @SuppressWarnings("unchecked")
-    Join<X, Y> result = (Join<X, Y>) findJoin(from, attribute)
-        .orElseGet(() -> from.join(attribute, JoinType.LEFT));
+    Join<X, Y> result = (Join<X, Y>) findJoin(from, attribute, joinType)
+        .orElseGet(() -> from.join(attribute, joinType));
     return result;
   }
 
@@ -120,9 +126,14 @@ public class QueryBuilder<R, T> {
    * @return the join
    */
   public <X, Y> Join<X, Y> getSingularJoin(From<?, X> from, String attributeName, Class<Y> joinClass) {
+    return getSingularJoin(from, attributeName, joinClass, JoinType.LEFT);
+  }
+
+  public <X, Y> Join<X, Y> getSingularJoin(From<?, X> from, String attributeName, Class<Y> joinClass,
+      JoinType joinType) {
     @SuppressWarnings("unchecked")
-    Join<X, Y> result = (Join<X, Y>) findJoin(from, attributeName)
-        .orElseGet(() -> from.join(attributeName, JoinType.LEFT));
+    Join<X, Y> result = (Join<X, Y>) findJoin(from, attributeName, joinType)
+        .orElseGet(() -> from.join(attributeName, joinType));
     return result;
   }
 
@@ -138,42 +149,61 @@ public class QueryBuilder<R, T> {
    * @return the join
    */
   public <X, Y> SetJoin<X, Y> getSetJoin(From<?, X> from, String attributeName, Class<Y> joinClass) {
+    return getSetJoin(from, attributeName, joinClass, JoinType.LEFT);
+  }
+
+  public <X, Y> SetJoin<X, Y> getSetJoin(From<?, X> from, String attributeName, Class<Y> joinClass, JoinType joinType) {
     @SuppressWarnings("unchecked")
-    SetJoin<X, Y> result = (SetJoin<X, Y>) findJoin(from, attributeName)
-        .orElseGet(() -> from.join(attributeName, JoinType.LEFT));
+    SetJoin<X, Y> result = (SetJoin<X, Y>) findJoin(from, attributeName, joinType)
+        .orElseGet(() -> from.join(attributeName, joinType));
     return result;
   }
 
   public <X, Y> SetJoin<X, Y> getJoin(From<?, X> from, SetAttribute<? super X, Y> attribute) {
+    return getJoin(from, attribute, JoinType.LEFT);
+  }
+
+  public <X, Y> SetJoin<X, Y> getJoin(From<?, X> from, SetAttribute<? super X, Y> attribute, JoinType joinType) {
     @SuppressWarnings("unchecked")
-    SetJoin<X, Y> result = (SetJoin<X, Y>) findJoin(from, attribute)
-        .orElseGet(() -> from.join(attribute, JoinType.LEFT));
+    SetJoin<X, Y> result = (SetJoin<X, Y>) findJoin(from, attribute, joinType)
+        .orElseGet(() -> from.join(attribute, joinType));
     return result;
   }
 
   public <X, Y> ListJoin<X, Y> getJoin(From<?, X> from, ListAttribute<? super X, Y> attribute) {
+    return getJoin(from, attribute, JoinType.LEFT);
+  }
+
+  public <X, Y> ListJoin<X, Y> getJoin(From<?, X> from, ListAttribute<? super X, Y> attribute, JoinType joinType) {
     @SuppressWarnings("unchecked")
-    ListJoin<X, Y> result = (ListJoin<X, Y>) findJoin(from, attribute)
-        .orElseGet(() -> from.join(attribute, JoinType.LEFT));
+    ListJoin<X, Y> result = (ListJoin<X, Y>) findJoin(from, attribute, joinType)
+        .orElseGet(() -> from.join(attribute, joinType));
     return result;
   }
 
   public <X, K, Y> MapJoin<X, K, Y> getJoin(From<?, X> from, MapAttribute<? super X, K, Y> attribute) {
+    return getJoin(from, attribute, JoinType.LEFT);
+  }
+
+  public <X, K, Y> MapJoin<X, K, Y> getJoin(From<?, X> from, MapAttribute<? super X, K, Y> attribute,
+      JoinType joinType) {
     @SuppressWarnings("unchecked")
     MapJoin<X, K, Y> result =
-        (MapJoin<X, K, Y>) findJoin(from, attribute).orElseGet(() -> from.join(attribute, JoinType.LEFT));
+        (MapJoin<X, K, Y>) findJoin(from, attribute, joinType).orElseGet(() -> from.join(attribute, joinType));
     return result;
   }
 
-  private <X, Y> Optional<Join<X, ?>> findJoin(From<?, X> from, Attribute<? super X, Y> attribute) {
+  private <X, Y> Optional<Join<X, ?>> findJoin(From<?, X> from, Attribute<? super X, Y> attribute, JoinType joinType) {
     return from.getJoins().stream()
         .filter(join -> join.getAttribute().getName().equals(attribute.getName()))
+        .filter(join -> join.getJoinType().equals(joinType))
         .findFirst();
   }
 
-  private <X, Y> Optional<Join<X, ?>> findJoin(From<?, X> from, String attributeName) {
+  private <X, Y> Optional<Join<X, ?>> findJoin(From<?, X> from, String attributeName, JoinType joinType) {
     return from.getJoins().stream()
         .filter(join -> join.getAttribute().getName().equals(attributeName))
+        .filter(join -> join.getJoinType().equals(joinType))
         .findFirst();
   }
 
@@ -190,6 +220,12 @@ public class QueryBuilder<R, T> {
       predicates = new ArrayList<>();
     }
     this.predicates.add(predicate);
+  }
+
+  public <X> void addInPredicate(Path<X> path, Collection<X> items) {
+    In<X> inClause = criteriaBuilder.in(path);
+    items.forEach(item -> inClause.value(item));
+    addPredicate(inClause);
   }
 
   public void addTextRestriction(Path<String> path, String text) {
