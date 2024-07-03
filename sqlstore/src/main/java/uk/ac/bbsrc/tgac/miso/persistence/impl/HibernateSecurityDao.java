@@ -3,21 +3,20 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
+import com.eaglegenomics.simlims.core.Group_;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer_;
 import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 
 /**
@@ -48,9 +47,10 @@ public class HibernateSecurityDao implements SecurityStore {
   public Group getGroupByName(String groupName) throws IOException {
     if (groupName == null)
       throw new NullPointerException("Can not get by null group name");
-    Criteria criteria = currentSession().createCriteria(Group.class);
-    criteria.add(Restrictions.eq("name", groupName));
-    return (Group) criteria.uniqueResult();
+
+    QueryBuilder<Group, Group> builder = new QueryBuilder<>(currentSession(), Group.class, Group.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(Group_.name), groupName));
+    return builder.getSingleResultOrNull();
   }
 
   public SessionFactory getSessionFactory() {
@@ -64,35 +64,30 @@ public class HibernateSecurityDao implements SecurityStore {
 
   @Override
   public User getUserByLoginName(String loginName) throws IOException {
-    Criteria criteria = currentSession().createCriteria(UserImpl.class);
-    criteria.add(Restrictions.eq("loginName", loginName));
-    return (User) criteria.uniqueResult();
+    QueryBuilder<User, UserImpl> builder = new QueryBuilder<>(currentSession(), UserImpl.class, User.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(UserImpl_.loginName), loginName));
+    return builder.getSingleResultOrNull();
   }
 
   @Override
   public List<Group> listAllGroups() throws IOException {
-    Criteria criteria = currentSession().createCriteria(Group.class);
-    @SuppressWarnings("unchecked")
-    List<Group> results = criteria.list();
-    return results;
+    QueryBuilder<Group, Group> builder = new QueryBuilder<>(currentSession(), Group.class, Group.class);
+    return builder.getResultList();
   }
 
   @Override
   public List<User> listAllUsers() throws IOException {
-    Criteria criteria = currentSession().createCriteria(UserImpl.class);
-    @SuppressWarnings("unchecked")
-    List<User> results = criteria.list();
-    return results;
+    QueryBuilder<User, UserImpl> builder = new QueryBuilder<>(currentSession(), UserImpl.class, User.class);
+    return builder.getResultList();
   }
 
   @Override
   public List<User> listUsersBySearch(String search) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<User> results = currentSession().createCriteria(UserImpl.class)
-        .add(Restrictions.or(Restrictions.ilike("fullName", search, MatchMode.ANYWHERE),
-            Restrictions.ilike("loginName", search)))
-        .list();
-    return results;
+    QueryBuilder<User, UserImpl> builder = new QueryBuilder<>(currentSession(), UserImpl.class, User.class);
+    builder.addPredicate(builder.getCriteriaBuilder().or(
+        builder.getCriteriaBuilder().like(builder.getRoot().get(UserImpl_.fullName), '%' + search + '%'),
+        builder.getCriteriaBuilder().like(builder.getRoot().get(UserImpl_.loginName), search)));
+    return builder.getResultList();
   }
 
   @Override
@@ -125,11 +120,10 @@ public class HibernateSecurityDao implements SecurityStore {
 
   @Override
   public long getUsageByTransfers(Group group) throws IOException {
-    return (long) currentSession().createCriteria(Transfer.class)
-        .add(Restrictions.or(
-            Restrictions.eq("senderGroup", group), Restrictions.eq("recipientGroup", group)))
-        .setProjection(Projections.rowCount())
-        .uniqueResult();
-
+    LongQueryBuilder<Transfer> builder = new LongQueryBuilder<>(currentSession(), Transfer.class);
+    builder.addPredicate(builder.getCriteriaBuilder().or(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(Transfer_.senderGroup), group),
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(Transfer_.recipientGroup), group)));
+    return builder.getCount();
   }
 }
