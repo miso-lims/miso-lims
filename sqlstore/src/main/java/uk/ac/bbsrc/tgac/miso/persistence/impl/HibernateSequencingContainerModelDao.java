@@ -112,7 +112,7 @@ public class HibernateSequencingContainerModelDao extends HibernateSaveDao<Seque
 
   @Override
   public long getUsage(SequencingContainerModel model) throws IOException {
-    return getUsageBy(SequencerPartitionContainerImpl.class, SequencerPartitionContainerImpl_.MODEL, model);
+    return getUsageBy(SequencerPartitionContainerImpl.class, SequencerPartitionContainerImpl_.model, model);
   }
 
   @Override
