@@ -1,25 +1,3 @@
-/* Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * * *********************************************************************
- * *
- * * This file is part of MISO.
- * *
- * * MISO is free software: you can redistribute it and/or modify
- * * it under the terms of the GNU General Public License as published by
- * * the Free Software Foundation, either version 3 of the License, or
- * * (at your option) any later version.
- * *
- * * MISO is distributed in the hope that it will be useful,
- * * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * * GNU General Public License for more details.
- * *
- * * You should have received a copy of the GNU General Public License
- * * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- * *
- * * *********************************************************************
- * */
-
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
@@ -116,14 +94,15 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
   public void testSaveEdit() throws IOException {
     SequencerPartitionContainer spc = dao.get(4L);
 
-    SequencingContainerModel model = (SequencingContainerModel) sessionFactory.getCurrentSession().get(SequencingContainerModel.class, 1L);
+    SequencingContainerModel model =
+        (SequencingContainerModel) sessionFactory.getCurrentSession().get(SequencingContainerModel.class, 1L);
     spc.setModel(model);
     spc.setLastModifier(emptyUser);
     Run run = Mockito.mock(Run.class);
     Mockito.when(run.getId()).thenReturn(1L);
     spc.setIdentificationBarcode("ABCDEFXX");
 
-    dao.save(spc);
+    dao.update(spc);
     assertEquals(4L, spc.getId());
     SequencerPartitionContainer savedSPC = dao.get(4L);
     assertEquals(spc.getId(), savedSPC.getId());
@@ -131,9 +110,15 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testSaveNull() throws IOException {
-    exception.expect(NullPointerException.class);
-    dao.save(null);
+  public void testCreateNull() throws IOException {
+    exception.expect(IllegalArgumentException.class);
+    dao.create(null);
+  }
+
+  @Test
+  public void testUpdateNull() throws IOException {
+    exception.expect(IllegalArgumentException.class);
+    dao.update(null);
   }
 
   @Test
@@ -141,7 +126,7 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
     SequencerPartitionContainer newSPC = makeSPC("ABCDEFXX");
 
     assertEquals(SequencerPartitionContainerImpl.UNSAVED_ID, newSPC.getId());
-    dao.save(newSPC);
+    dao.create(newSPC);
     assertNotEquals(SequencerPartitionContainerImpl.UNSAVED_ID, newSPC.getId());
 
     SequencerPartitionContainer savedSPC = dao.get(newSPC.getId());
@@ -152,7 +137,8 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
     SequencerPartitionContainer pc = new SequencerPartitionContainerImpl();
     Date now = new Date();
     pc.setIdentificationBarcode(identificationBarcode);
-    SequencingContainerModel model = (SequencingContainerModel) sessionFactory.getCurrentSession().get(SequencingContainerModel.class, 1L);
+    SequencingContainerModel model =
+        (SequencingContainerModel) sessionFactory.getCurrentSession().get(SequencingContainerModel.class, 1L);
     pc.setModel(model);
     pc.setCreationTime(now);
     pc.setCreator(emptyUser);

@@ -3,96 +3,74 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.persistence.criteria.Join;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Run_;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl_;
 import uk.ac.bbsrc.tgac.miso.persistence.SequencerPartitionContainerStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSequencerPartitionContainerDao implements SequencerPartitionContainerStore {
+public class HibernateSequencerPartitionContainerDao extends HibernateSaveDao<SequencerPartitionContainer>
+    implements SequencerPartitionContainerStore {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  @Override
-  public SequencerPartitionContainer save(SequencerPartitionContainer spc) throws IOException {
-    if (spc.getId() == SequencerPartitionContainerImpl.UNSAVED_ID) {
-      currentSession().save(spc);
-    } else {
-      currentSession().update(spc);
-    }
-    return spc;
-  }
-
-  @Override
-  public SequencerPartitionContainer get(long id) throws IOException {
-    return (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, id);
+  public HibernateSequencerPartitionContainerDao() {
+    super(SequencerPartitionContainer.class, SequencerPartitionContainerImpl.class);
   }
 
   @Override
   public List<SequencerPartitionContainer> listAllSequencerPartitionContainersByRunId(long runId)
       throws IOException {
-    // flush here because if Hibernate has not persisted recent changes to container-run relationships, unexpected associations may
-    // show up
+    // flush here because if Hibernate has not persisted recent changes to container-run relationships,
+    // unexpected associations may show up
     currentSession().flush();
 
-    Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
-    criteria.createAlias("runPositions", "runPos");
-    criteria.createAlias("runPos.run", "run");
-    criteria.add(Restrictions.eq("run.id", runId));
-    @SuppressWarnings("unchecked")
-    List<SequencerPartitionContainer> records = criteria.list();
-    return records;
+    QueryBuilder<SequencerPartitionContainer, SequencerPartitionContainerImpl> builder =
+        new QueryBuilder<>(currentSession(), SequencerPartitionContainerImpl.class, SequencerPartitionContainer.class);
+    Join<SequencerPartitionContainerImpl, RunPosition> runPos =
+        builder.getJoin(builder.getRoot(), SequencerPartitionContainerImpl_.runPositions);
+    Join<RunPosition, Run> run = builder.getJoin(runPos, RunPosition_.run);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(run.get(Run_.runId), runId));
+    return builder.getResultList();
   }
 
   @Override
   public List<Partition> listAllPartitionsByPoolId(long poolId)
       throws IOException {
-    Criteria criteria = currentSession().createCriteria(PartitionImpl.class);
-    criteria.createAlias("pool", "pool");
-    criteria.add(Restrictions.eq("pool.id", poolId));
-    @SuppressWarnings("unchecked")
-    List<Partition> records = criteria.list();
-    return records;
+    QueryBuilder<Partition, PartitionImpl> builder =
+        new QueryBuilder<>(currentSession(), PartitionImpl.class, Partition.class);
+    Join<PartitionImpl, PoolImpl> pool = builder.getJoin(builder.getRoot(), PartitionImpl_.pool);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(pool.get(PoolImpl_.poolId), poolId));
+    return builder.getResultList();
   }
 
   @Override
   public List<SequencerPartitionContainer> listSequencerPartitionContainersByBarcode(String barcode)
       throws IOException {
-    Criteria criteria = currentSession().createCriteria(SequencerPartitionContainerImpl.class);
-    criteria.add(Restrictions.eq("identificationBarcode", barcode));
-    @SuppressWarnings("unchecked")
-    List<SequencerPartitionContainer> records = criteria.list();
-    return records;
+    QueryBuilder<SequencerPartitionContainer, SequencerPartitionContainerImpl> builder =
+        new QueryBuilder<>(currentSession(), SequencerPartitionContainerImpl.class, SequencerPartitionContainer.class);
+    builder.addPredicate(builder.getCriteriaBuilder()
+        .equal(builder.getRoot().get(SequencerPartitionContainerImpl_.identificationBarcode), barcode));
+    return builder.getResultList();
   }
 
   @Override
   public Partition getPartitionById(long partitionId) {
     return (Partition) currentSession().get(PartitionImpl.class, partitionId);
-  }
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
   }
 
   @Override
@@ -102,22 +80,24 @@ public class HibernateSequencerPartitionContainerDao implements SequencerPartiti
 
   @Override
   public List<PoreVersion> listPoreVersions() {
-    Criteria criteria = currentSession().createCriteria(PoreVersion.class);
-    @SuppressWarnings("unchecked")
-    List<PoreVersion> results = criteria.list();
-    return results;
+    QueryBuilder<PoreVersion, PoreVersion> builder =
+        new QueryBuilder<>(currentSession(), PoreVersion.class, PoreVersion.class);
+    return builder.getResultList();
   }
 
   @Override
   public Long getPartitionIdByRunIdAndPartitionNumber(long runId, int partitionNumber) throws IOException {
-    return (Long) currentSession().createCriteria(PartitionImpl.class)
-        .createAlias("sequencerPartitionContainer", "container")
-        .createAlias("container.runPositions", "runPosition")
-        .createAlias("runPosition.run", "run")
-        .add(Restrictions.eq("run.id", runId))
-        .add(Restrictions.eq("partitionNumber", partitionNumber))
-        .setProjection(Projections.id())
-        .uniqueResult();
+    QueryBuilder<Long, PartitionImpl> builder = new QueryBuilder<>(currentSession(), PartitionImpl.class, Long.class);
+    Join<PartitionImpl, SequencerPartitionContainerImpl> container =
+        builder.getJoin(builder.getRoot(), PartitionImpl_.sequencerPartitionContainer);
+    Join<SequencerPartitionContainerImpl, RunPosition> runPosition =
+        builder.getJoin(container, SequencerPartitionContainerImpl_.runPositions);
+    Join<RunPosition, Run> run = builder.getJoin(runPosition, RunPosition_.run);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(run.get(Run_.runId), runId));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(PartitionImpl_.partitionNumber), partitionNumber));
+    builder.setColumn(builder.getRoot().get(PartitionImpl_.id));
+    return builder.getSingleResultOrNull();
   }
 
 }
