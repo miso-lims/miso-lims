@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,26 +26,29 @@ public class HibernateSequencingOrderDao extends HibernateSaveDao<SequencingOrde
 
   @Override
   public List<SequencingOrder> listByPool(Pool pool) {
-    @SuppressWarnings("unchecked")
-    List<SequencingOrder> records = currentSession().createCriteria(SequencingOrderImpl.class)
-        .add(Restrictions.eq("pool", pool))
-        .list();
-    return records;
+    QueryBuilder<SequencingOrder, SequencingOrderImpl> builder =
+        new QueryBuilder<>(currentSession(), SequencingOrderImpl.class, SequencingOrder.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingOrderImpl_.pool), pool));
+    return builder.getResultList();
   }
 
   @Override
   public List<SequencingOrder> listByAttributes(Pool pool, RunPurpose purpose, SequencingContainerModel containerModel,
       SequencingParameters parameters, Integer partitions) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<SequencingOrder> records = currentSession().createCriteria(SequencingOrderImpl.class)
-        .add(Restrictions.eq("pool", pool))
-        .add(Restrictions.eq("purpose", purpose))
-        .add(containerModel == null ? Restrictions.isNull("containerModel")
-            : Restrictions.eq("containerModel", containerModel))
-        .add(Restrictions.eq("parameters", parameters))
-        .add(Restrictions.eq("partitions", partitions))
-        .list();
-    return records;
+    QueryBuilder<SequencingOrder, SequencingOrderImpl> builder =
+        new QueryBuilder<>(currentSession(), SequencingOrderImpl.class, SequencingOrder.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingOrderImpl_.pool), pool));
+    builder
+        .addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingOrderImpl_.purpose), purpose));
+    builder.addPredicate(containerModel == null
+        ? builder.getCriteriaBuilder().isNull(builder.getRoot().get(SequencingOrderImpl_.containerModel))
+        : builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingOrderImpl_.containerModel),
+            containerModel));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingOrderImpl_.parameters), parameters));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingOrderImpl_.partitions), partitions));
+    return builder.getResultList();
   }
 
   @Override
