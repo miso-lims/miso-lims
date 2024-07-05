@@ -87,6 +87,9 @@ public class HibernateLibraryDao extends HibernateSaveDao<Library>
     Predicate generateCriterion(QueryBuilder<EntityReference, LibraryImpl> builder,
         SingularAttribute<LibraryImpl, Long> associationPath, Long libraryId);
 
+    /**
+     * @return boolean true for ascending and false for descending
+     */
     boolean getOrder();
   }
 

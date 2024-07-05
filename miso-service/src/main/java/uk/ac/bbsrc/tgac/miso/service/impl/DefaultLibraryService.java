@@ -472,7 +472,7 @@ public class DefaultLibraryService implements LibraryService {
     }
     List<Long> potentialDupes = libraryDao.listByAlias(library.getAlias());
     for (Long potentialDupe : potentialDupes) {
-      if (!library.isSaved() || library.getId() != potentialDupe) {
+      if (!library.isSaved() || !potentialDupe.equals(library.getId())) {
         // an existing DIFFERENT library already has this alias
         return true;
       }
@@ -646,7 +646,7 @@ public class DefaultLibraryService implements LibraryService {
     }
     List<Long> potentialDupes = libraryDao.listByAlias(library.getAlias());
     for (Long potentialDupe : potentialDupes) {
-      if (!library.isSaved() || library.getId() != potentialDupe) {
+      if (!library.isSaved() || !potentialDupe.equals(library.getId())) {
         // an existing DIFFERENT library already has this alias
         throw new ValidationException(
             new ValidationError("alias", "A library with this alias already exists in the database"));
