@@ -103,6 +103,10 @@ public class QueryBuilder<R, T> {
     return criteriaBuilder.treat(root, subclass);
   }
 
+  public <X, Y, S extends Y> Join<X, S> treatJoin(Join<X, Y> join, Class<S> subclass) {
+    return criteriaBuilder.treat(join, subclass);
+  }
+
   public <X, Y> Join<X, Y> getJoin(From<?, X> from, SingularAttribute<? super X, Y> attribute) {
     return getJoin(from, attribute, JoinType.LEFT);
   }
@@ -343,6 +347,10 @@ public class QueryBuilder<R, T> {
     query.orderBy(order);
   }
 
+  public void addGroup(List<Expression<?>> expression) {
+    query.groupBy(expression);
+  }
+
   public List<R> getResultList() {
     return buildQuery().getResultList();
   }
@@ -364,7 +372,7 @@ public class QueryBuilder<R, T> {
 
   private Query<R> buildQuery() {
     applyPredicates();
-    if (!root.getJoins().isEmpty()) {
+    if (!root.getJoins().isEmpty() && query.getGroupList().isEmpty()) {
       query.distinct(true);
     }
     if (orders != null && !orders.isEmpty()) {
