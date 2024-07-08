@@ -110,7 +110,13 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     return null;
   }
 
-  List<SingularAttribute<? super T, String>> getSearchProperties();
+  public default List<SingularAttribute<? super T, String>> getSearchProperties() {
+    return Collections.emptyList();
+  }
+
+  public default List<Path<String>> getSearchProperties(Root<T> root) {
+    return pathsFromAttributes(root, getSearchProperties());
+  }
 
   SingularAttribute<? super T, ?> getIdProperty();
 
@@ -389,7 +395,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
 
   @Override
   default void restrictPaginationByQuery(QueryBuilder<?, T> builder, String query, Consumer<String> errorHandler) {
-    List<Path<String>> properties = pathsFromAttributes(builder, getSearchProperties());
+    List<Path<String>> properties = getSearchProperties(builder.getRoot());
     if (properties == null || properties.isEmpty()) {
       errorHandler
           .accept(String.format("%s does not have text fields that can be queried in this way.", getFriendlyName()));
@@ -397,10 +403,10 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     builder.addTextRestriction(properties, query);
   }
 
-  private List<Path<String>> pathsFromAttributes(QueryBuilder<?, T> builder,
+  private List<Path<String>> pathsFromAttributes(Root<T> root,
       Collection<SingularAttribute<? super T, String>> attributes) {
     return attributes.stream()
-        .map(x -> builder.getRoot().get(x))
+        .map(x -> root.get(x))
         .toList();
   }
 
@@ -554,7 +560,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
   @Override
   public default void restrictPaginationByIdentifiers(QueryBuilder<?, T> builder, Collection<String> identifiers,
       Consumer<String> errorHandler) {
-    List<Path<String>> fields = pathsFromAttributes(builder, getIdentifierProperties());
+    List<Path<String>> fields = pathsFromAttributes(builder.getRoot(), getIdentifierProperties());
     if (fields == null || fields.isEmpty()) {
       errorHandler.accept(String.format("%s cannot be filtered by identifiers", getFriendlyName()));
       return;
