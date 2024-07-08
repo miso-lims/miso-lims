@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.PaginationFilterSinkIT;
+import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 public class HibernateLibraryDaoSearchIT extends PaginationFilterSinkIT {
 
@@ -24,7 +25,7 @@ public class HibernateLibraryDaoSearchIT extends PaginationFilterSinkIT {
   }
 
   @Override
-  protected HibernatePaginatedDataSource<?> constructTestSubject() {
+  protected PaginatedDataSource<?> constructTestSubject() {
     HibernateLibraryDao sut = new HibernateLibraryDao();
     sut.setSessionFactory(getSessionFactory());
     return sut;

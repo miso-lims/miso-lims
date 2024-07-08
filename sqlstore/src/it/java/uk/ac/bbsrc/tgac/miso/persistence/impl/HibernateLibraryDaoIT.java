@@ -96,7 +96,7 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
     library.setLastModifier(mockUser);
     library.setLastModified(now);
 
-    long libraryId = dao.save(library);
+    long libraryId = dao.create(library);
     Library insertedLibrary = dao.get(libraryId);
     assertEquals(libraryName, insertedLibrary.getName());
     assertEquals("theAlias", insertedLibrary.getAlias());
@@ -114,7 +114,7 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
     Library before = (Library) currentSession().get(LibraryImpl.class, id);
     assertNotEquals(newDescription, before.getDescription());
     before.setDescription(newDescription);
-    dao.save(before);
+    dao.update(before);
 
     clearSession();
 
@@ -133,10 +133,9 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   @Test
   public void testListByAlias() throws Exception {
     String alias = "TEST_0006_Bn_R_PE_300_WG";
-    Collection<EntityReference> byAlias = dao.listByAlias(alias);
+    Collection<Long> byAlias = dao.listByAlias(alias);
     assertNotNull(byAlias);
     assertEquals(1, byAlias.size());
-    assertEquals("alias does not match", alias, byAlias.iterator().next().getLabel());
   }
 
   @Test
@@ -241,8 +240,8 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAll() throws Exception {
-    List<Library> libraries = dao.listAll();
+  public void testList() throws Exception {
+    List<Library> libraries = dao.list();
     List<Long> libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l, 15l);
     assertEquals(15, libraries.size());
     for (Library library : libraries) {

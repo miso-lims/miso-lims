@@ -142,7 +142,7 @@ public class DefaultLibraryService implements LibraryService {
   private Library save(Library library, boolean validateAliasUniqueness) throws IOException {
     NamingScheme namingScheme = getNamingScheme(library);
     try {
-      long newId = libraryDao.save(library);
+      long newId = library.isSaved() ? libraryDao.update(library) : libraryDao.create(library);
 
       Library managed = libraryDao.get(newId);
 
@@ -178,7 +178,7 @@ public class DefaultLibraryService implements LibraryService {
         needsUpdate = true;
       }
       if (needsUpdate) {
-        libraryDao.save(managed);
+        libraryDao.update(managed);
       }
       if (validateAliasUniqueness) {
         validateAliasUniqueness(managed, namingScheme);
@@ -271,7 +271,7 @@ public class DefaultLibraryService implements LibraryService {
 
   @Override
   public List<Library> list() throws IOException {
-    return libraryDao.listAll();
+    return libraryDao.list();
   }
 
   @Override
@@ -321,7 +321,7 @@ public class DefaultLibraryService implements LibraryService {
     }
     authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
     managed.getNotes().remove(deleteNote);
-    libraryDao.save(managed);
+    libraryDao.update(managed);
   }
 
   /**
@@ -470,9 +470,9 @@ public class DefaultLibraryService implements LibraryService {
         || (LimsUtils.isDetailedLibrary(library) && ((DetailedLibrary) library).hasNonStandardAlias())) {
       return false;
     }
-    List<EntityReference> potentialDupes = libraryDao.listByAlias(library.getAlias());
-    for (EntityReference potentialDupe : potentialDupes) {
-      if (!library.isSaved() || library.getId() != potentialDupe.getId()) {
+    List<Long> potentialDupes = libraryDao.listByAlias(library.getAlias());
+    for (Long potentialDupe : potentialDupes) {
+      if (!library.isSaved() || !potentialDupe.equals(library.getId())) {
         // an existing DIFFERENT library already has this alias
         return true;
       }
@@ -644,9 +644,9 @@ public class DefaultLibraryService implements LibraryService {
         || (LimsUtils.isDetailedLibrary(library) && ((DetailedLibrary) library).hasNonStandardAlias())) {
       return;
     }
-    List<EntityReference> potentialDupes = libraryDao.listByAlias(library.getAlias());
-    for (EntityReference potentialDupe : potentialDupes) {
-      if (!library.isSaved() || library.getId() != potentialDupe.getId()) {
+    List<Long> potentialDupes = libraryDao.listByAlias(library.getAlias());
+    for (Long potentialDupe : potentialDupes) {
+      if (!library.isSaved() || !potentialDupe.equals(library.getId())) {
         // an existing DIFFERENT library already has this alias
         throw new ValidationException(
             new ValidationError("alias", "A library with this alias already exists in the database"));

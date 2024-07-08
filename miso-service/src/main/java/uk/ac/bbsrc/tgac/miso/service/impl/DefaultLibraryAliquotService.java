@@ -194,7 +194,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
       if (parent instanceof LibraryAliquot) {
         libraryAliquotDao.update((LibraryAliquot) parent);
       } else {
-        libraryStore.save((Library) parent);
+        libraryStore.update((Library) parent);
       }
     } catch (ValidationException e) {
       throw ValidationUtils.rewriteParentErrors(e);
