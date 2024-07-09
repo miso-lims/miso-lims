@@ -43,7 +43,7 @@ public class HibernateSubprojectDao extends HibernateSaveDao<Subproject> impleme
 
   @Override
   public List<Subproject> listByIdList(Collection<Long> ids) throws IOException {
-    return listByIdList("subprojectId", ids);
+    return listByIdList(SubprojectImpl_.SUBPROJECT_ID, ids);
   }
 
   @Override
