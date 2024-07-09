@@ -1,47 +1,28 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment_;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.StudyType_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.StudyStore;
 
@@ -55,73 +36,34 @@ import uk.ac.bbsrc.tgac.miso.persistence.StudyStore;
  */
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSource<Study> {
-  private static final String[] SEARCH_PROPERTIES = new String[] { "name", "alias", "description" };
-  private static final Iterable<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("project"));
+public class HibernateStudyDao extends HibernateSaveDao<Study>
+    implements StudyStore, JpaCriteriaPaginatedDataSource<Study, StudyImpl> {
 
-  protected static final Logger log = LoggerFactory.getLogger(HibernateStudyDao.class);
-
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
+  public HibernateStudyDao() {
+    super(Study.class, StudyImpl.class);
   }
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
+  private static final List<SingularAttribute<StudyImpl, String>> SEARCH_PROPERTIES =
+      Arrays.asList(StudyImpl_.name, StudyImpl_.alias, StudyImpl_.description);
 
-  @Override
-  public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  @Override
-  public long save(Study study) throws IOException {
-    long id;
-    if (!study.isSaved()) {
-      id = (Long) currentSession().save(study);
-    } else {
-      currentSession().update(study);
-      id = study.getId();
-    }
-    return id;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public List<Study> listAll() {
-    return currentSession().createCriteria(StudyImpl.class).list();
-  }
-
-  @SuppressWarnings("unchecked")
   @Override
   public List<Study> listAllWithLimit(long limit) throws IOException {
-    if (limit == 0) return Collections.emptyList();
-    return currentSession().createCriteria(StudyImpl.class).setMaxResults((int) limit).list();
-  }
-
-  @Override
-  public Study get(long studyId) throws IOException {
-    return (Study) currentSession().get(StudyImpl.class, studyId);
+    if (limit == 0)
+      return Collections.emptyList();
+    return getQueryBuilder().getResultList((int) limit, 0);
   }
 
   @Override
   public Study getByAlias(String alias) throws IOException {
-    return (Study) currentSession().createCriteria(StudyImpl.class)
-        .add(Restrictions.eq("alias", alias))
-        .uniqueResult();
+    return getBy(StudyImpl_.ALIAS, alias);
   }
 
   @Override
   public List<Study> listByProjectId(long projectId) throws IOException {
-    Criteria criteria = currentSession().createCriteria(StudyImpl.class);
-    criteria.createAlias("project", "project");
-    criteria.add(Restrictions.eq("project.id", projectId));
-    @SuppressWarnings("unchecked")
-    List<Study> results = criteria.list();
-    return results;
+    QueryBuilder<Study, StudyImpl> builder = getQueryBuilder();
+    Join<StudyImpl, ProjectImpl> project = builder.getJoin(builder.getRoot(), StudyImpl_.project);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(project.get(ProjectImpl_.id), projectId));
+    return builder.getResultList();
   }
 
   @Override
@@ -130,50 +72,57 @@ public class HibernateStudyDao implements StudyStore, HibernatePaginatedDataSour
   }
 
   @Override
-  public String getProjectColumn() {
-    return "project.id";
+  public SingularAttribute<StudyImpl, ?> getIdProperty() {
+    return StudyImpl_.studyId;
   }
 
   @Override
-  public Class<? extends Study> getRealClass() {
+  public Class<StudyImpl> getEntityClass() {
     return StudyImpl.class;
   }
 
   @Override
-  public String[] getSearchProperties() {
+  public Class<Study> getResultClass() {
+    return Study.class;
+  }
+
+  @Override
+  public List<SingularAttribute<StudyImpl, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return STANDARD_ALIASES;
-  }
-
-  @Override
-  public String propertyForDate(Criteria criteria, DateType type) {
+  public SingularAttribute<StudyImpl, ?> propertyForDate(DateType type) {
     return null;
   }
 
   @Override
-  public String propertyForSortColumn(String original) {
+  public Path<?> propertyForSortColumn(Root<StudyImpl> root, String original) {
     switch (original) {
-    case "studyTypeId":
-      return "studyType.id";
-    default:
-    return original;
+      case "id":
+        return root.get(StudyImpl_.studyId);
+      case "studyTypeId":
+        return root.get(StudyImpl_.studyType).get(StudyType_.typeId);
+      default:
+        return root.get(original);
     }
   }
 
   @Override
-  public String propertyForUser(boolean creator) {
-    return creator ? "creator" : "lastModifier";
+  public SingularAttribute<StudyImpl, ? extends UserImpl> propertyForUser(boolean creator) {
+    return creator ? StudyImpl_.creator : StudyImpl_.lastModifier;
   }
 
   @Override
   public long getUsage(Study study) throws IOException {
-    return (long) currentSession().createCriteria(Experiment.class)
-        .add(Restrictions.eq("study", study))
-        .setProjection(Projections.rowCount()).uniqueResult();
+    return getUsageBy(Experiment.class, Experiment_.STUDY, study);
+  }
+
+  @Override
+  public void restrictPaginationByProjectId(QueryBuilder<?, StudyImpl> builder, long projectId,
+      Consumer<String> errorHandler) {
+    Join<StudyImpl, ProjectImpl> project = builder.getJoin(builder.getRoot(), StudyImpl_.project);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(project.get(ProjectImpl_.id), projectId));
   }
 
 }
