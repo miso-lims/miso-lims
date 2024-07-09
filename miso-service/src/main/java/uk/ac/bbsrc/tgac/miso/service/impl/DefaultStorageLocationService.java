@@ -63,7 +63,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
   }
 
   @Override
-  public StorageLocation get(long id) {
+  public StorageLocation get(long id) throws IOException {
     return storageLocationStore.get(id);
   }
 
@@ -99,7 +99,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     }
     room.setChangeDetails(authorizationManager.getCurrentUser());
     if (!room.isSaved()) {
-      return storageLocationStore.save(room);
+      return storageLocationStore.create(room);
     } else {
       throw new IllegalArgumentException("Can not yet update rooms");
     }
@@ -131,7 +131,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     validateChange(location, null);
     createParentIfNecessary(location);
     location.setChangeDetails(authorizationManager.getCurrentUser());
-    return storageLocationStore.save(location);
+    return storageLocationStore.create(location);
   }
 
   private long update(StorageLocation location) throws IOException {
@@ -141,7 +141,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     createParentIfNecessary(location);
     applyChanges(location, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    return storageLocationStore.save(managed);
+    return storageLocationStore.update(managed);
   }
 
   public long addServiceRecord(ServiceRecord record, StorageLocation location) throws ValidationException, IOException {
@@ -154,7 +154,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     long recordId = serviceRecordService.create(record);
     ServiceRecord managedRecord = serviceRecordService.get(recordId);
     managedLocation.getServiceRecords().add(managedRecord);
-    storageLocationStore.save(managedLocation);
+    storageLocationStore.update(managedLocation);
 
     return managedRecord.getId();
   }
@@ -207,7 +207,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
   private void createParentIfNecessary(StorageLocation freezer) throws IOException {
     if (freezer.getParentLocation() != null && !freezer.getParentLocation().isSaved()) {
       freezer.getParentLocation().setChangeDetails(authorizationManager.getCurrentUser());
-      long parentId = storageLocationStore.save(freezer.getParentLocation());
+      long parentId = storageLocationStore.update(freezer.getParentLocation());
       freezer.setParentLocation(storageLocationStore.get(parentId));
     }
   }
@@ -228,7 +228,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     validateChange(storage, null);
     loadChildEntities(storage);
     storage.setChangeDetails(authorizationManager.getCurrentUser());
-    long savedId = storageLocationStore.save(storage);
+    long savedId = storageLocationStore.update(storage);
     StorageLocation[] childLocations =
         storage.getChildLocations().toArray(new StorageLocation[storage.getChildLocations().size()]);
     for (StorageLocation child : childLocations) {

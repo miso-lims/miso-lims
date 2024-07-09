@@ -7,9 +7,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 
 
-public interface StorageLocationStore {
-
-  StorageLocation get(long id);
+public interface StorageLocationStore extends SaveDao<StorageLocation> {
 
   StorageLocation getByBarcode(String barcode);
 
@@ -18,8 +16,6 @@ public interface StorageLocationStore {
   List<StorageLocation> listRooms();
 
   List<StorageLocation> listFreezers();
-
-  long save(StorageLocation location);
 
   StorageLocation getByServiceRecord(ServiceRecord record) throws IOException;
 
