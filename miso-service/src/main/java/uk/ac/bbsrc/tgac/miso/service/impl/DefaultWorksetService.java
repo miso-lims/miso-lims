@@ -145,7 +145,7 @@ public class DefaultWorksetService implements WorksetService {
     workset.setChangeDetails(authorizationManager.getCurrentUser());
     loadMembers(workset, workset.getLastModified());
     validateChange(workset, null);
-    return worksetStore.save(workset);
+    return worksetStore.create(workset);
   }
 
   @Override
@@ -154,7 +154,7 @@ public class DefaultWorksetService implements WorksetService {
     validateChange(workset, managed);
     applyChanges(workset, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    return worksetStore.save(managed);
+    return worksetStore.update(managed);
   }
 
   private void loadMembers(Workset newWorkset, Date timestamp) throws IOException {
@@ -221,7 +221,7 @@ public class DefaultWorksetService implements WorksetService {
     }
     authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
     managed.getNotes().remove(deleteNote);
-    worksetStore.save(managed);
+    worksetStore.update(managed);
   }
 
   @Override
@@ -231,7 +231,7 @@ public class DefaultWorksetService implements WorksetService {
     note.setOwner(authorizationManager.getCurrentUser());
     managed.addNote(note);
     managed.setLastModifier(authorizationManager.getCurrentUser());
-    worksetStore.save(managed);
+    worksetStore.update(managed);
   }
 
   @Override
@@ -322,7 +322,7 @@ public class DefaultWorksetService implements WorksetService {
     }
     if (!itemsAdded.isEmpty()) {
       toWorkset.setChangeDetails(authorizationManager.getCurrentUser());
-      worksetStore.save(toWorkset);
+      worksetStore.update(toWorkset);
       String actionMessage = fromWorkset == null ? String.format("Added %s", typeLabel)
           : String.format("Added %s from workset '%s'", typeLabel, fromWorkset.getAlias());
       addChangeLogForItems(toWorkset, itemsAdded, actionMessage, typeLabel);
@@ -340,7 +340,7 @@ public class DefaultWorksetService implements WorksetService {
       }
     }
     fromWorkset.setChangeDetails(authorizationManager.getCurrentUser());
-    worksetStore.save(fromWorkset);
+    worksetStore.update(fromWorkset);
     String actionMessage = toWorkset == null ? String.format("Removed %s", typeLabel)
         : String.format("Removed %s to workset '%s'", typeLabel, toWorkset.getAlias());
     addChangeLogForItems(fromWorkset, items, actionMessage, typeLabel);

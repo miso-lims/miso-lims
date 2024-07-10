@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGet() {
+  public void testGet() throws IOException {
     Workset workset = sut.get(1L);
     assertNotNull(workset);
     assertEquals(1L, workset.getId());
@@ -46,7 +47,7 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testCreate() {
+  public void testCreate() throws IOException {
     String alias = "New workset";
     long sampleId = 3L;
     Workset workset = new Workset();
@@ -56,7 +57,7 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
     sample.setItem((Sample) currentSession().get(SampleImpl.class, sampleId));
     workset.getWorksetSamples().add(sample);
     workset.setChangeDetails((User) currentSession().get(UserImpl.class, 1L));
-    long savedId = sut.save(workset);
+    long savedId = sut.create(workset);
 
     clearSession();
 
@@ -68,13 +69,13 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testSaveAttributes() {
+  public void testSaveAttributes() throws IOException {
     Workset workset = sut.get(1L);
     String alias = "changed";
     String desc = "new desc";
     workset.setAlias(alias);
     workset.setDescription(desc);
-    sut.save(workset);
+    sut.update(workset);
 
     sessionFactory.getCurrentSession().flush();
     sessionFactory.getCurrentSession().clear();
@@ -85,7 +86,7 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testSaveSampleAddition() {
+  public void testSaveSampleAddition() throws IOException {
     Workset workset = sut.get(1L);
     assertEquals(3, workset.getWorksetSamples().size());
 
@@ -95,7 +96,7 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
     addition.setWorkset(workset);
     addition.setAddedTime(new Date());
     workset.getWorksetSamples().add(addition);
-    sut.save(workset);
+    sut.update(workset);
 
     sessionFactory.getCurrentSession().flush();
     sessionFactory.getCurrentSession().clear();
@@ -105,11 +106,11 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testSaveSampleRemoval() {
+  public void testSaveSampleRemoval() throws IOException {
     Workset workset = sut.get(1L);
     WorksetSample removal = workset.getWorksetSamples().iterator().next();
     workset.getWorksetSamples().remove(removal);
-    sut.save(workset);
+    sut.update(workset);
 
     sessionFactory.getCurrentSession().flush();
     sessionFactory.getCurrentSession().clear();
@@ -119,25 +120,25 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListBySample() throws Exception {
+  public void testListBySample() throws IOException {
     List<Workset> results = sut.listBySample(1L);
     assertEquals(2, results.size());
   }
 
   @Test
-  public void testListByLibrary() throws Exception {
+  public void testListByLibrary() throws IOException {
     List<Workset> results = sut.listByLibrary(1L);
     assertEquals(1, results.size());
   }
 
   @Test
-  public void testListByLibraryAliquot() throws Exception {
+  public void testListByLibraryAliquot() throws IOException {
     List<Workset> results = sut.listByLibraryAliquot(1L);
     assertEquals(1, results.size());
   }
 
   @Test
-  public void testGetByAlias() throws Exception {
+  public void testGetByAlias() throws IOException {
     String alias = "test";
     Workset workset = sut.getByAlias(alias);
     assertNotNull(workset);
@@ -145,7 +146,7 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetSampleAddedTimes() throws Exception {
+  public void testGetSampleAddedTimes() throws IOException {
     Map<Long, Date> times = sut.getSampleAddedTimes(1L);
     assertEquals(2, times.size());
     Date expected = LimsUtils.parseDateTime("2021-03-08 13:57:00");
@@ -154,7 +155,7 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetLibraryAddedTimes() throws Exception {
+  public void testGetLibraryAddedTimes() throws IOException {
     Map<Long, Date> times = sut.getLibraryAddedTimes(2L);
     assertEquals(1, times.size());
     Date expected = LimsUtils.parseDateTime("2021-03-08 13:58:00");
@@ -162,7 +163,7 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testGetLibraryAliquotAddedTimes() throws Exception {
+  public void testGetLibraryAliquotAddedTimes() throws IOException {
     Map<Long, Date> times = sut.getLibraryAliquotAddedTimes(2L);
     assertEquals(1, times.size());
     Date expected = LimsUtils.parseDateTime("2021-03-08 13:59:00");

@@ -7,9 +7,7 @@ import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 
-public interface WorksetStore {
-
-  public Workset get(long id) throws IOException;
+public interface WorksetStore extends SaveDao<Workset> {
 
   public Workset getByAlias(String alias) throws IOException;
 
@@ -18,8 +16,6 @@ public interface WorksetStore {
   public List<Workset> listByLibrary(long libraryId) throws IOException;
 
   public List<Workset> listByLibraryAliquot(long aliquotId) throws IOException;
-
-  public long save(Workset workset) throws IOException;
 
   public Map<Long, Date> getSampleAddedTimes(long worksetId) throws IOException;
 
