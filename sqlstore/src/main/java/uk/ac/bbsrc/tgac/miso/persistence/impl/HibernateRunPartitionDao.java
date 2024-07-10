@@ -5,44 +5,32 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartition_;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionStore;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateRunPartitionDao implements RunPartitionStore {
+public class HibernateRunPartitionDao extends HibernateProviderDao<RunPartition> implements RunPartitionStore {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public HibernateRunPartitionDao() {
+    super(RunPartition.class);
   }
 
   @Override
   public RunPartition get(long runId, long partitionId) throws IOException {
-    return (RunPartition) currentSession().createCriteria(RunPartition.class)
-        .add(Restrictions.eq("runId", runId))
-        .add(Restrictions.eq("partitionId", partitionId))
-        .uniqueResult();
+    QueryBuilder<RunPartition, RunPartition> builder =
+        new QueryBuilder<>(currentSession(), RunPartition.class, RunPartition.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(RunPartition_.runId), runId));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(RunPartition_.partitionId), partitionId));
+    return builder.getSingleResultOrNull();
   }
 
   @Override
@@ -57,10 +45,11 @@ public class HibernateRunPartitionDao implements RunPartitionStore {
 
   @Override
   public void deleteForRun(Run run) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<RunPartition> runPartitions = currentSession().createCriteria(RunPartition.class)
-        .add(Restrictions.eq("runId", run.getId()))
-        .list();
+    QueryBuilder<RunPartition, RunPartition> builder =
+        new QueryBuilder<>(currentSession(), RunPartition.class, RunPartition.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(RunPartition_.runId), run.getId()));
+    List<RunPartition> runPartitions = builder.getResultList();
+
     for (RunPartition runPartition : runPartitions) {
       currentSession().delete(runPartition);
     }
@@ -72,11 +61,11 @@ public class HibernateRunPartitionDao implements RunPartitionStore {
         .map(Partition::getId)
         .collect(Collectors.toSet());
 
-    @SuppressWarnings("unchecked")
-    List<RunPartition> items = currentSession().createCriteria(RunPartition.class)
-        .add(Restrictions.eq("runId", run.getId()))
-        .add(Restrictions.in("partitionId", partitionIds))
-        .list();
+    QueryBuilder<RunPartition, RunPartition> builder =
+        new QueryBuilder<>(currentSession(), RunPartition.class, RunPartition.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(RunPartition_.runId), run.getId()));
+    builder.addInPredicate(builder.getRoot().get(RunPartition_.partitionId), partitionIds);
+    List<RunPartition> items = builder.getResultList();
 
     for (RunPartition item : items) {
       currentSession().delete(item);
