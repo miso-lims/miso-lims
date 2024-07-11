@@ -6,14 +6,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.hibernate.SQLQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.type.LongType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +22,23 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot.RunPartitionAliquotId;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot_;
+import uk.ac.bbsrc.tgac.miso.core.data.Run_;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement_;
 import uk.ac.bbsrc.tgac.miso.persistence.ListLibraryAliquotViewDao;
 import uk.ac.bbsrc.tgac.miso.persistence.RunPartitionAliquotDao;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
@@ -66,8 +79,24 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
     RunPartitionAliquot result = (RunPartitionAliquot) currentSession().get(RunPartitionAliquot.class, id);
     if (result == null) {
       // ensure the relationship exists before constructing the entity
-      List<Object[]> ids = queryIds("WHERE r.runId = ? AND part.partitionId = ? AND pla.aliquotId = ?",
-          new long[] {run.getId(), partition.getId(), aliquot.getId()});
+      QueryBuilder<Object[], Run> idBuilder = new QueryBuilder<>(currentSession(), Run.class, Object[].class);
+      Join<Run, RunPosition> position = idBuilder.getJoin(idBuilder.getRoot(), Run_.runPositions, JoinType.INNER);
+      Join<RunPosition, SequencerPartitionContainerImpl> container =
+          idBuilder.getJoin(position, RunPosition_.container, JoinType.INNER);
+      Join<SequencerPartitionContainerImpl, PartitionImpl> part =
+          idBuilder.getJoin(container, SequencerPartitionContainerImpl_.partitions, JoinType.INNER);
+      Join<PartitionImpl, PoolImpl> pool = idBuilder.getJoin(part, PartitionImpl_.pool, JoinType.INNER);
+      Join<PoolImpl, PoolElement> element = idBuilder.getJoin(pool, PoolImpl_.poolElements, JoinType.INNER);
+      Join<PoolElement, ListLibraryAliquotView> plAliquot =
+          idBuilder.getJoin(element, PoolElement_.aliquot, JoinType.INNER);
+      idBuilder.addPredicate(idBuilder.getCriteriaBuilder().equal(idBuilder.getRoot().get(Run_.runId), run.getId()));
+      idBuilder.addPredicate(idBuilder.getCriteriaBuilder().equal(part.get(PartitionImpl_.id), partition.getId()));
+      idBuilder.addPredicate(
+          idBuilder.getCriteriaBuilder().equal(plAliquot.get(ListLibraryAliquotView_.aliquotId), aliquot.getId()));
+      idBuilder.setColumns(idBuilder.getRoot().get(Run_.runId), part.get(PartitionImpl_.id),
+          plAliquot.get(ListLibraryAliquotView_.aliquotId));
+      List<Object[]> ids = idBuilder.getResultList();
+
       if (ids.isEmpty()) {
         return null;
       }
@@ -78,12 +107,26 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
   @Override
   public List<RunPartitionAliquot> listByRunId(long runId) throws IOException {
-    List<Object[]> ids = queryIds("WHERE r.runId = ?", new long[] {runId});
+    QueryBuilder<Object[], Run> idBuilder = new QueryBuilder<>(currentSession(), Run.class, Object[].class);
+    Join<Run, RunPosition> position = idBuilder.getJoin(idBuilder.getRoot(), Run_.runPositions, JoinType.INNER);
+    Join<RunPosition, SequencerPartitionContainerImpl> container =
+        idBuilder.getJoin(position, RunPosition_.container, JoinType.INNER);
+    Join<SequencerPartitionContainerImpl, PartitionImpl> partition =
+        idBuilder.getJoin(container, SequencerPartitionContainerImpl_.partitions, JoinType.INNER);
+    Join<PartitionImpl, PoolImpl> pool = idBuilder.getJoin(partition, PartitionImpl_.pool, JoinType.INNER);
+    Join<PoolImpl, PoolElement> element = idBuilder.getJoin(pool, PoolImpl_.poolElements, JoinType.INNER);
+    Join<PoolElement, ListLibraryAliquotView> plAliquot =
+        idBuilder.getJoin(element, PoolElement_.aliquot, JoinType.INNER);
+    idBuilder.addPredicate(idBuilder.getCriteriaBuilder().equal(idBuilder.getRoot().get(Run_.runId), runId));
+    idBuilder.setColumns(idBuilder.getRoot().get(Run_.runId), partition.get(PartitionImpl_.id),
+        plAliquot.get(ListLibraryAliquotView_.aliquotId));
+    List<Object[]> ids = idBuilder.getResultList();
 
-    @SuppressWarnings("unchecked")
-    List<RunPartitionAliquot> results = currentSession().createCriteria(RunPartitionAliquot.class)
-        .add(Restrictions.eq("run.id", runId))
-        .list();
+    QueryBuilder<RunPartitionAliquot, RunPartitionAliquot> builder =
+        new QueryBuilder<>(currentSession(), RunPartitionAliquot.class, RunPartitionAliquot.class);
+    Join<RunPartitionAliquot, Run> run = builder.getJoin(builder.getRoot(), RunPartitionAliquot_.run);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(run.get(Run_.runId), runId));
+    List<RunPartitionAliquot> results = builder.getResultList();
 
     constructMissing(ids, results);
     return results;
@@ -91,12 +134,28 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
   @Override
   public List<RunPartitionAliquot> listByAliquotId(long aliquotId) throws IOException {
-    List<Object[]> ids = queryIds("WHERE pla.aliquotId = ?", new long[] {aliquotId});
+    QueryBuilder<Object[], Run> idBuilder = new QueryBuilder<>(currentSession(), Run.class, Object[].class);
+    Join<Run, RunPosition> position = idBuilder.getJoin(idBuilder.getRoot(), Run_.runPositions, JoinType.INNER);
+    Join<RunPosition, SequencerPartitionContainerImpl> container =
+        idBuilder.getJoin(position, RunPosition_.container, JoinType.INNER);
+    Join<SequencerPartitionContainerImpl, PartitionImpl> partition =
+        idBuilder.getJoin(container, SequencerPartitionContainerImpl_.partitions, JoinType.INNER);
+    Join<PartitionImpl, PoolImpl> pool = idBuilder.getJoin(partition, PartitionImpl_.pool, JoinType.INNER);
+    Join<PoolImpl, PoolElement> element = idBuilder.getJoin(pool, PoolImpl_.poolElements, JoinType.INNER);
+    Join<PoolElement, ListLibraryAliquotView> plAliquot =
+        idBuilder.getJoin(element, PoolElement_.aliquot, JoinType.INNER);
+    idBuilder.addPredicate(
+        idBuilder.getCriteriaBuilder().equal(plAliquot.get(ListLibraryAliquotView_.aliquotId), aliquotId));
+    idBuilder.setColumns(idBuilder.getRoot().get(Run_.runId), partition.get(PartitionImpl_.id),
+        plAliquot.get(ListLibraryAliquotView_.aliquotId));
+    List<Object[]> ids = idBuilder.getResultList();
 
-    @SuppressWarnings("unchecked")
-    List<RunPartitionAliquot> results = currentSession().createCriteria(RunPartitionAliquot.class)
-        .add(Restrictions.eq("aliquot.aliquotId", aliquotId))
-        .list();
+    QueryBuilder<RunPartitionAliquot, RunPartitionAliquot> builder =
+        new QueryBuilder<>(currentSession(), RunPartitionAliquot.class, RunPartitionAliquot.class);
+    Join<RunPartitionAliquot, ListLibraryAliquotView> aliquot =
+        builder.getJoin(builder.getRoot(), RunPartitionAliquot_.aliquot);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(aliquot.get(ListLibraryAliquotView_.aliquotId), aliquotId));
+    List<RunPartitionAliquot> results = builder.getResultList();
 
     constructMissing(ids, results);
     return results;
@@ -107,41 +166,37 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
     if (libraryIds == null || libraryIds.isEmpty()) {
       return Collections.emptyList();
     }
-    List<Object[]> ids = queryIds("JOIN LibraryAliquot la ON la.aliquotId = pla.aliquotId"
-        + " JOIN Library l ON l.libraryId = la.libraryId"
-        + " WHERE l.libraryId IN (:ids)", query -> query.setParameterList("ids", libraryIds));
 
-    @SuppressWarnings("unchecked")
-    List<RunPartitionAliquot> results = currentSession().createCriteria(RunPartitionAliquot.class)
-        .createAlias("aliquot.parentLibrary", "library")
-        .add(Restrictions.in("library.libraryId", libraryIds))
-        .list();
+    QueryBuilder<Object[], Run> idBuilder = new QueryBuilder<>(currentSession(), Run.class, Object[].class);
+    Join<Run, RunPosition> position = idBuilder.getJoin(idBuilder.getRoot(), Run_.runPositions, JoinType.INNER);
+    Join<RunPosition, SequencerPartitionContainerImpl> container =
+        idBuilder.getJoin(position, RunPosition_.container, JoinType.INNER);
+    Join<SequencerPartitionContainerImpl, PartitionImpl> partition =
+        idBuilder.getJoin(container, SequencerPartitionContainerImpl_.partitions, JoinType.INNER);
+    Join<PartitionImpl, PoolImpl> pool = idBuilder.getJoin(partition, PartitionImpl_.pool, JoinType.INNER);
+    Join<PoolImpl, PoolElement> element = idBuilder.getJoin(pool, PoolImpl_.poolElements, JoinType.INNER);
+    Join<PoolElement, ListLibraryAliquotView> plAliquot =
+        idBuilder.getJoin(element, PoolElement_.aliquot, JoinType.INNER);
+    Join<PoolElement, ListLibraryAliquotView> libraryAliquot =
+        idBuilder.getJoin(element, PoolElement_.aliquot, JoinType.INNER);
+    Join<ListLibraryAliquotView, ParentLibrary> parentLibrary =
+        idBuilder.getJoin(libraryAliquot, ListLibraryAliquotView_.parentLibrary, JoinType.INNER);
+    idBuilder.addInPredicate(parentLibrary.get(ParentLibrary_.libraryId), libraryIds);
+    idBuilder.setColumns(idBuilder.getRoot().get(Run_.runId), partition.get(PartitionImpl_.id),
+        plAliquot.get(ListLibraryAliquotView_.aliquotId));
+    List<Object[]> ids = idBuilder.getResultList();
+
+    QueryBuilder<RunPartitionAliquot, RunPartitionAliquot> builder =
+        new QueryBuilder<>(currentSession(), RunPartitionAliquot.class, RunPartitionAliquot.class);
+    Join<RunPartitionAliquot, ListLibraryAliquotView> aliquot =
+        builder.getJoin(builder.getRoot(), RunPartitionAliquot_.aliquot);
+    Join<ListLibraryAliquotView, ParentLibrary> library =
+        builder.getJoin(aliquot, ListLibraryAliquotView_.parentLibrary);
+    builder.addInPredicate(library.get(ParentLibrary_.libraryId), libraryIds);
+    List<RunPartitionAliquot> results = builder.getResultList();
 
     constructMissing(ids, results);
     return results;
-  }
-
-  private List<Object[]> queryIds(String additionalQuery, Consumer<SQLQuery> addParameters) {
-    SQLQuery query = currentSession().createSQLQuery(
-        "SELECT r.runId, part.partitionId, pla.aliquotId"
-            + " FROM Run r"
-            + " JOIN Run_SequencerPartitionContainer rspc ON rspc.Run_runId = r.runId"
-            + " JOIN _Partition part ON part.containerId = rspc.containers_containerId"
-            + " JOIN Pool_LibraryAliquot pla ON pla.poolId = part.pool_poolId" + " " + additionalQuery)
-        .addScalar("runId", new LongType())
-        .addScalar("partitionId", new LongType())
-        .addScalar("aliquotId", new LongType());
-    addParameters.accept(query);
-    return query.list();
-  }
-
-  private List<Object[]> queryIds(String additionalQuery, long[] parameters) {
-    return queryIds(additionalQuery, query -> {
-      for (int i = 0; i < parameters.length; i++) {
-        // parameters indices start at 1, but parameters array starts at 0
-        query.setLong(i + 1, parameters[i]);
-      }
-    });
   }
 
   private void constructMissing(List<Object[]> ids, List<RunPartitionAliquot> results) throws IOException {
@@ -158,9 +213,10 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
     if (!missingIds.isEmpty()) {
       List<Run> runs = runStore.listByIdList(getIdComponent(missingIds, 0));
-      List<Partition> partitions = currentSession().createCriteria(PartitionImpl.class)
-          .add(Restrictions.in("id", getIdComponent(missingIds, 1)))
-          .list();
+      QueryBuilder<Partition, PartitionImpl> builder =
+          new QueryBuilder<>(currentSession(), PartitionImpl.class, Partition.class);
+      builder.addInPredicate(builder.getRoot().get(PartitionImpl_.id), getIdComponent(missingIds, 1));
+      List<Partition> partitions = builder.getResultList();
       List<ListLibraryAliquotView> aliquots = listLibraryAliquotViewDao.listByIdList(getIdComponent(missingIds, 2));
 
       for (Long[] id : missingIds) {
@@ -194,12 +250,12 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
   @Override
   public void deleteForRunContainer(Run run, SequencerPartitionContainer container) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<RunPartitionAliquot> items = currentSession().createCriteria(RunPartitionAliquot.class)
-        .createAlias("partition", "partition")
-        .add(Restrictions.eq("run", run))
-        .add(Restrictions.eq("partition.sequencerPartitionContainer", container))
-        .list();
+    QueryBuilder<RunPartitionAliquot, RunPartitionAliquot> builder =
+        new QueryBuilder<>(currentSession(), RunPartitionAliquot.class, RunPartitionAliquot.class);
+    Join<RunPartitionAliquot, Partition> partition = builder.getJoin(builder.getRoot(), RunPartitionAliquot_.partition);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(RunPartitionAliquot_.run), run));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(partition.get("sequencerPartitionContainer"), container));
+    List<RunPartitionAliquot> items = builder.getResultList();
 
     for (RunPartitionAliquot item : items) {
       currentSession().delete(item);
@@ -208,11 +264,11 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
   @Override
   public void deleteForPartition(Partition partition) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<RunPartitionAliquot> items = currentSession().createCriteria(RunPartitionAliquot.class)
-        .createAlias("partition", "partition")
-        .add(Restrictions.eq("partition", partition))
-        .list();
+    QueryBuilder<RunPartitionAliquot, RunPartitionAliquot> builder =
+        new QueryBuilder<>(currentSession(), RunPartitionAliquot.class, RunPartitionAliquot.class);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(RunPartitionAliquot_.partition), partition));
+    List<RunPartitionAliquot> items = builder.getResultList();
 
     for (RunPartitionAliquot item : items) {
       currentSession().delete(item);
@@ -221,21 +277,24 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
   @Override
   public void deleteForPoolAliquot(Pool pool, long aliquotId) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<Run> runs = currentSession().createCriteria(Run.class)
-        .createAlias("runPositions", "runPosition")
-        .createAlias("runPosition.container", "container")
-        .createAlias("container.partitions", "partition")
-        .add(Restrictions.eq("partition.pool", pool))
-        .list();
+    QueryBuilder<Run, Run> runBuilder = new QueryBuilder<>(currentSession(), Run.class, Run.class);
+    Join<Run, RunPosition> runPosition = runBuilder.getJoin(runBuilder.getRoot(), Run_.runPositions);
+    Join<RunPosition, SequencerPartitionContainerImpl> container =
+        runBuilder.getJoin(runPosition, RunPosition_.container);
+    Join<SequencerPartitionContainerImpl, PartitionImpl> partition =
+        runBuilder.getJoin(container, SequencerPartitionContainerImpl_.partitions);
+    runBuilder.addPredicate(runBuilder.getCriteriaBuilder().equal(partition.get(PartitionImpl_.pool), pool));
+    List<Run> runs = runBuilder.getResultList();
 
     if (!runs.isEmpty()) {
-      @SuppressWarnings("unchecked")
-      List<RunPartitionAliquot> items = currentSession().createCriteria(RunPartitionAliquot.class)
-          .createAlias("partition", "partition")
-          .add(Restrictions.in("run", runs))
-          .add(Restrictions.eq("aliquot.aliquotId", aliquotId))
-          .list();
+      QueryBuilder<RunPartitionAliquot, RunPartitionAliquot> builder =
+          new QueryBuilder<>(currentSession(), RunPartitionAliquot.class, RunPartitionAliquot.class);
+      Join<RunPartitionAliquot, ListLibraryAliquotView> aliquot =
+          builder.getJoin(builder.getRoot(), RunPartitionAliquot_.aliquot);
+      builder.addInPredicate(builder.getRoot().get(RunPartitionAliquot_.run), runs);
+      builder
+          .addPredicate(builder.getCriteriaBuilder().equal(aliquot.get(ListLibraryAliquotView_.aliquotId), aliquotId));
+      List<RunPartitionAliquot> items = builder.getResultList();
 
       for (RunPartitionAliquot item : items) {
         currentSession().delete(item);
