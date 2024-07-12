@@ -7,9 +7,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.persistence.criteria.Join;
+
 import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +18,17 @@ import com.eaglegenomics.simlims.core.Group;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer_;
 import uk.ac.bbsrc.tgac.miso.persistence.TransferStore;
 
 @Repository
@@ -36,7 +45,7 @@ public class HibernateTransferDao extends HibernateSaveDao<Transfer> implements 
       return 0L;
     }
     BigDecimal pendingGroups = (BigDecimal) currentSession()
-        .createSQLQuery("SELECT COALESCE(SUM(transfers), 0) FROM PendingTransferGroupView WHERE groupId IN (:ids)")
+        .createNativeQuery("SELECT COALESCE(SUM(transfers), 0) FROM PendingTransferGroupView WHERE groupId IN (:ids)")
         .setParameterList("ids", groups.stream().map(Group::getId).collect(Collectors.toSet()))
         .uniqueResult();
     return pendingGroups.longValueExact();
@@ -48,21 +57,24 @@ public class HibernateTransferDao extends HibernateSaveDao<Transfer> implements 
   }
 
   @Override
-  public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferTime) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<Transfer> results = currentSession().createCriteria(Transfer.class)
-        .createAlias("sampleTransfers", "sampleTransfer", JoinType.LEFT_OUTER_JOIN)
-        .createAlias("sampleTransfer.item", "sample", JoinType.LEFT_OUTER_JOIN)
-        .createAlias("libraryTransfers", "libraryTransfer", JoinType.LEFT_OUTER_JOIN)
-        .createAlias("libraryTransfer.item", "library", JoinType.LEFT_OUTER_JOIN)
-        .createAlias("library.sample", "librarySample", JoinType.LEFT_OUTER_JOIN)
-        .add(Restrictions.eq("senderLab", sender))
-        .add(Restrictions.eq("recipientGroup", recipient))
-        .add(Restrictions.eq("transferTime", transferTime))
-        .add(Restrictions.or(Restrictions.eq("sample.project", project), Restrictions.eq("librarySample.project", project)))
-        .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
-        .list();
-    return results;
+  public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferTime)
+      throws IOException {
+    QueryBuilder<Transfer, Transfer> builder =
+        new QueryBuilder<>(currentSession(), Transfer.class, Transfer.class, Criteria.DISTINCT_ROOT_ENTITY);
+    Join<Transfer, TransferSample> sampleTransfer = builder.getJoin(builder.getRoot(), Transfer_.sampleTransfers);
+    Join<TransferSample, SampleImpl> sample = builder.getJoin(sampleTransfer, TransferSample_.item);
+    Join<Transfer, TransferLibrary> libraryTransfer = builder.getJoin(builder.getRoot(), Transfer_.libraryTransfers);
+    Join<TransferLibrary, LibraryImpl> library = builder.getJoin(libraryTransfer, TransferLibrary_.item);
+    Join<LibraryImpl, SampleImpl> librarySample = builder.getJoin(library, LibraryImpl_.sample);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(Transfer_.senderLab), sender));
+    builder
+        .addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(Transfer_.recipientGroup), recipient));
+    builder
+        .addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(Transfer_.transferTime), transferTime));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().or(builder.getCriteriaBuilder().equal(sample.get(SampleImpl_.project), project),
+            builder.getCriteriaBuilder().equal(librarySample.get(SampleImpl_.project), project)));
+    return builder.getResultList();
   }
 
   @Override
