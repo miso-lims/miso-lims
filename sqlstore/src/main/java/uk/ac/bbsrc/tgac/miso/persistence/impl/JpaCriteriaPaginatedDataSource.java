@@ -106,13 +106,13 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
    *         alias, and/or identificationBarcode. Required for bulk lookup by identifiers (search by
    *         names feature)
    */
-  default List<SingularAttribute<T, String>> getIdentifierProperties() {
+  default List<SingularAttribute<? super T, String>> getIdentifierProperties() {
     return null;
   }
 
-  List<SingularAttribute<T, String>> getSearchProperties();
+  List<SingularAttribute<? super T, String>> getSearchProperties();
 
-  SingularAttribute<T, ?> getIdProperty();
+  SingularAttribute<? super T, ?> getIdProperty();
 
   @Override
   public default List<R> list(Consumer<String> errorHandler, int offset, int limit, boolean ascending, String sortCol,
@@ -165,7 +165,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
    * @return the name of the property or null if the search criterion should be ignored.
    */
 
-  public abstract SingularAttribute<T, ?> propertyForDate(DateType type);
+  public abstract SingularAttribute<? super T, ?> propertyForDate(DateType type);
 
   /**
    * Determine the correct Hibernate property given the user-supplied sort column. Default
@@ -181,7 +181,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
    * @param creator if true, the user that created this object; otherwise the last modifier
    * @return the name of the property or null if the search criterion should be ignored
    */
-  public abstract SingularAttribute<T, ? extends UserImpl> propertyForUser(boolean creator);
+  public abstract SingularAttribute<? super T, ? extends UserImpl> propertyForUser(boolean creator);
 
   @Override
   public default void restrictPaginationByArchived(QueryBuilder<?, T> builder, boolean isArchived,
@@ -226,7 +226,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
   @Override
   public default void restrictPaginationByDate(QueryBuilder<?, T> builder, Date start, Date end, DateType type,
       Consumer<String> errorHandler) {
-    SingularAttribute<T, ?> property = propertyForDate(type);
+    SingularAttribute<? super T, ?> property = propertyForDate(type);
     if (property != null) {
       Path<?> propertyPath = builder.getRoot().get(property);
       if (propertyPath.getJavaType() == Date.class) {
@@ -251,7 +251,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
       Consumer<String> errorHandler) {
     LocalDate startDate = LocalDate.ofInstant(start.toInstant(), ZoneId.systemDefault());
     LocalDate endDate = LocalDate.ofInstant(end.toInstant(), ZoneId.systemDefault());
-    SingularAttribute<T, ?> property = propertyForDate(type);
+    SingularAttribute<? super T, ?> property = propertyForDate(type);
     @SuppressWarnings("unchecked")
     Path<LocalDate> dateProperty = (Path<LocalDate>) builder.getRoot().get(property);
     if (property != null) {
@@ -400,7 +400,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
   }
 
   private List<Path<String>> pathsFromAttributes(QueryBuilder<?, T> builder,
-      Collection<SingularAttribute<T, String>> attributes) {
+      Collection<SingularAttribute<? super T, String>> attributes) {
     return attributes.stream()
         .map(x -> builder.getRoot().get(x))
         .toList();
@@ -441,7 +441,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
   @Override
   public default void restrictPaginationByUser(QueryBuilder<?, T> builder, String query, boolean creator,
       Consumer<String> errorHandler) {
-    SingularAttribute<T, ? extends UserImpl> userAttribute = propertyForUser(creator);
+    SingularAttribute<? super T, ? extends UserImpl> userAttribute = propertyForUser(creator);
     if (userAttribute == null) {
       errorHandler.accept(String.format("%s has no %s.", getFriendlyName(), (creator ? "creator" : "modifier")));
     } else {

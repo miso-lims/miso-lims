@@ -71,8 +71,9 @@ public class HibernateListLibraryAliquotViewDao extends HibernateProviderDao<Lis
   }
 
   // Make sure these match the HiberateLibraryAliquotDao
-  private static final List<SingularAttribute<ListLibraryAliquotView, String>> SEARCH_PROPERTIES = Arrays.asList(
-      ListLibraryAliquotView_.name, ListLibraryAliquotView_.alias, ListLibraryAliquotView_.identificationBarcode);
+  private static final List<SingularAttribute<? super ListLibraryAliquotView, String>> SEARCH_PROPERTIES =
+      Arrays.asList(
+          ListLibraryAliquotView_.name, ListLibraryAliquotView_.alias, ListLibraryAliquotView_.identificationBarcode);
 
   @Override
   public ListLibraryAliquotView get(Long aliquotId) throws IOException {
@@ -139,12 +140,12 @@ public class HibernateListLibraryAliquotViewDao extends HibernateProviderDao<Lis
   }
 
   @Override
-  public List<SingularAttribute<ListLibraryAliquotView, String>> getIdentifierProperties() {
+  public List<SingularAttribute<? super ListLibraryAliquotView, String>> getIdentifierProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public List<SingularAttribute<ListLibraryAliquotView, String>> getSearchProperties() {
+  public List<SingularAttribute<? super ListLibraryAliquotView, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
@@ -234,7 +235,7 @@ public class HibernateListLibraryAliquotViewDao extends HibernateProviderDao<Lis
       Join<LibraryAliquotBoxPosition, BoxImpl> boxJoin =
           builder.getJoin(boxPositionJoin, LibraryAliquotBoxPosition_.box);
       List<Path<String>> searchProperties = new ArrayList<>();
-      for (String property : HibernateBoxDao.SEARCH_PROPERTIES) {
+      for (SingularAttribute<? super BoxImpl, String> property : HibernateBoxDao.SEARCH_PROPERTIES) {
         searchProperties.add(boxJoin.get(property));
       }
       builder.addTextRestriction(searchProperties, query);

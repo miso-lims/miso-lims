@@ -46,7 +46,7 @@ public class HibernatePrinterDao extends HibernateSaveDao<Printer>
   }
 
   @Override
-  public List<SingularAttribute<Printer, String>> getSearchProperties() {
+  public List<SingularAttribute<? super Printer, String>> getSearchProperties() {
     return Arrays.asList(Printer_.name);
   }
 

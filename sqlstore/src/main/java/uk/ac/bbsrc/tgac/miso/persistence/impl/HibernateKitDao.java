@@ -160,11 +160,11 @@ public class HibernateKitDao implements KitStore, JpaCriteriaPaginatedDataSource
     return KitDescriptor_.kitDescriptorId;
   }
 
-  private static final List<SingularAttribute<KitDescriptor, String>> SEARCH_PROPERTIES = Arrays
+  private static final List<SingularAttribute<? super KitDescriptor, String>> SEARCH_PROPERTIES = Arrays
       .asList(KitDescriptor_.name, KitDescriptor_.manufacturer, KitDescriptor_.partNumber, KitDescriptor_.description);
 
   @Override
-  public List<SingularAttribute<KitDescriptor, String>> getSearchProperties() {
+  public List<SingularAttribute<? super KitDescriptor, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 

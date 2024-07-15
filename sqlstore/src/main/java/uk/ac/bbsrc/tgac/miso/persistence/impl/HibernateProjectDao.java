@@ -28,7 +28,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 public class HibernateProjectDao extends HibernateSaveDao<Project>
     implements ProjectStore, JpaCriteriaPaginatedDataSource<Project, ProjectImpl> {
 
-  private static final List<SingularAttribute<ProjectImpl, String>> SEARCH_PROPERTIES =
+  private static final List<SingularAttribute<? super ProjectImpl, String>> SEARCH_PROPERTIES =
       Arrays.asList(ProjectImpl_.name, ProjectImpl_.title, ProjectImpl_.description, ProjectImpl_.code);
 
   public HibernateProjectDao() {
@@ -71,7 +71,7 @@ public class HibernateProjectDao extends HibernateSaveDao<Project>
   }
 
   @Override
-  public List<SingularAttribute<ProjectImpl, String>> getSearchProperties() {
+  public List<SingularAttribute<? super ProjectImpl, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 

@@ -58,7 +58,7 @@ public class HibernateLibraryAliquotDao extends HibernateSaveDao<LibraryAliquot>
   }
 
   // Make sure these match the HiberateListLibraryAliquotViewDao
-  private final static List<SingularAttribute<LibraryAliquot, String>> SEARCH_PROPERTIES =
+  private final static List<SingularAttribute<? super LibraryAliquot, String>> SEARCH_PROPERTIES =
       Arrays.asList(LibraryAliquot_.name, LibraryAliquot_.alias, LibraryAliquot_.identificationBarcode);
 
   @Override
@@ -102,7 +102,7 @@ public class HibernateLibraryAliquotDao extends HibernateSaveDao<LibraryAliquot>
   }
 
   @Override
-  public List<SingularAttribute<LibraryAliquot, String>> getSearchProperties() {
+  public List<SingularAttribute<? super LibraryAliquot, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 

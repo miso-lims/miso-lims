@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.LibraryTemplateStore;
 public class HibernateLibraryTemplateDao extends HibernateSaveDao<LibraryTemplate>
     implements LibraryTemplateStore, JpaCriteriaPaginatedDataSource<LibraryTemplate, LibraryTemplate> {
 
-  private static final List<SingularAttribute<LibraryTemplate, String>> SEARCH_PROPERTIES =
+  private static final List<SingularAttribute<? super LibraryTemplate, String>> SEARCH_PROPERTIES =
       Arrays.asList(LibraryTemplate_.alias);
 
   public HibernateLibraryTemplateDao() {
@@ -53,7 +53,7 @@ public class HibernateLibraryTemplateDao extends HibernateSaveDao<LibraryTemplat
   }
 
   @Override
-  public List<SingularAttribute<LibraryTemplate, String>> getSearchProperties() {
+  public List<SingularAttribute<? super LibraryTemplate, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 

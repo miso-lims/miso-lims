@@ -43,7 +43,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.ListContainerViewDao;
 public class HibernateListContainerViewDao
     implements ListContainerViewDao, JpaCriteriaPaginatedDataSource<ListContainerView, ListContainerView> {
 
-  private static final List<SingularAttribute<ListContainerView, String>> SEARCH_PROPERTIES =
+  private static final List<SingularAttribute<? super ListContainerView, String>> SEARCH_PROPERTIES =
       Arrays.asList(ListContainerView_.identificationBarcode);
 
   @Autowired
@@ -79,7 +79,7 @@ public class HibernateListContainerViewDao
   }
 
   @Override
-  public List<SingularAttribute<ListContainerView, String>> getSearchProperties() {
+  public List<SingularAttribute<? super ListContainerView, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 

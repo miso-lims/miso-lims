@@ -36,7 +36,7 @@ public class HibernateArrayDao extends HibernateSaveDao<Array>
     super(Array.class);
   }
 
-  private static final List<SingularAttribute<Array, String>> SEARCH_PROPERTIES =
+  private static final List<SingularAttribute<? super Array, String>> SEARCH_PROPERTIES =
       Arrays.asList(Array_.alias, Array_.serialNumber, Array_.description);
 
   @Value("${miso.detailed.sample.enabled}")
@@ -110,7 +110,7 @@ public class HibernateArrayDao extends HibernateSaveDao<Array>
   }
 
   @Override
-  public List<SingularAttribute<Array, String>> getSearchProperties() {
+  public List<SingularAttribute<? super Array, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 

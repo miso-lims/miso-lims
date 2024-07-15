@@ -84,7 +84,7 @@ public class HibernateListTransferViewDao
   }
 
   @Override
-  public List<SingularAttribute<ListTransferView, String>> getSearchProperties() {
+  public List<SingularAttribute<? super ListTransferView, String>> getSearchProperties() {
     return Collections.emptyList();
   }
 

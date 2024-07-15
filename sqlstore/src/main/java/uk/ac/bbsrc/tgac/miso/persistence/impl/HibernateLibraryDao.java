@@ -133,11 +133,12 @@ public class HibernateLibraryDao extends HibernateSaveDao<Library>
     this.detailedSample = detailedSample;
   }
 
-  private final static List<SingularAttribute<LibraryImpl, String>> IDENTIFIER_FIELDS =
+  private final static List<SingularAttribute<? super LibraryImpl, String>> IDENTIFIER_FIELDS =
       Arrays.asList(LibraryImpl_.name, LibraryImpl_.alias, LibraryImpl_.identificationBarcode);
 
-  private final static List<SingularAttribute<LibraryImpl, String>> SEARCH_FIELDS = Arrays.asList(LibraryImpl_.name,
-      LibraryImpl_.alias, LibraryImpl_.description, LibraryImpl_.identificationBarcode);
+  private final static List<SingularAttribute<? super LibraryImpl, String>> SEARCH_FIELDS =
+      Arrays.asList(LibraryImpl_.name,
+          LibraryImpl_.alias, LibraryImpl_.description, LibraryImpl_.identificationBarcode);
 
   @Override
   public List<Long> listByAlias(String alias) throws IOException {
@@ -271,12 +272,12 @@ public class HibernateLibraryDao extends HibernateSaveDao<Library>
   }
 
   @Override
-  public List<SingularAttribute<LibraryImpl, String>> getIdentifierProperties() {
+  public List<SingularAttribute<? super LibraryImpl, String>> getIdentifierProperties() {
     return IDENTIFIER_FIELDS;
   }
 
   @Override
-  public List<SingularAttribute<LibraryImpl, String>> getSearchProperties() {
+  public List<SingularAttribute<? super LibraryImpl, String>> getSearchProperties() {
     return SEARCH_FIELDS;
   }
 
