@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -169,7 +170,7 @@ public class HibernateKitDao implements KitStore, JpaCriteriaPaginatedDataSource
   }
 
   @Override
-  public SingularAttribute<KitDescriptor, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<KitDescriptor> root, DateType type) {
     return null;
   }
 

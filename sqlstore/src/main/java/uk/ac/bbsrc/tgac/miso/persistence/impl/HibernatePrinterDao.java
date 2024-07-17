@@ -51,7 +51,7 @@ public class HibernatePrinterDao extends HibernateSaveDao<Printer>
   }
 
   @Override
-  public SingularAttribute<Printer, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<Printer> root, DateType type) {
     return null;
   }
 

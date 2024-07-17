@@ -134,14 +134,14 @@ public class HibernatePoolDao extends HibernateSaveDao<Pool>
   }
 
   @Override
-  public SingularAttribute<PoolImpl, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<PoolImpl> root, DateType type) {
     switch (type) {
       case CREATE:
-        return PoolImpl_.creationDate;
+        return root.get(PoolImpl_.creationDate);
       case ENTERED:
-        return PoolImpl_.creationTime;
+        return root.get(PoolImpl_.creationTime);
       case UPDATE:
-        return PoolImpl_.lastModified;
+        return root.get(PoolImpl_.lastModified);
       default:
         return null;
     }

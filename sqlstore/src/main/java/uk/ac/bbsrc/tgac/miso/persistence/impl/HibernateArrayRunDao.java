@@ -72,14 +72,14 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
   }
 
   @Override
-  public SingularAttribute<ArrayRun, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<ArrayRun> root, DateType type) {
     switch (type) {
       case CREATE:
-        return ArrayRun_.startDate;
+        return root.get(ArrayRun_.startDate);
       case ENTERED:
-        return ArrayRun_.creationTime;
+        return root.get(ArrayRun_.creationTime);
       case UPDATE:
-        return ArrayRun_.lastModified;
+        return root.get(ArrayRun_.lastModified);
       default:
         return null;
     }

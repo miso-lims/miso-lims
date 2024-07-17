@@ -63,7 +63,7 @@ public class HibernateIndexDao extends HibernateSaveDao<Index>
   }
 
   @Override
-  public SingularAttribute<Index, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<Index> root, DateType type) {
     return null;
   }
 

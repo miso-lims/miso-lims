@@ -150,12 +150,12 @@ public class HibernateListLibraryAliquotViewDao extends HibernateProviderDao<Lis
   }
 
   @Override
-  public SingularAttribute<ListLibraryAliquotView, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<ListLibraryAliquotView> root, DateType type) {
     switch (type) {
       case CREATE:
-        return ListLibraryAliquotView_.created;
+        return root.get(ListLibraryAliquotView_.created);
       case UPDATE:
-        return ListLibraryAliquotView_.lastUpdated;
+        return root.get(ListLibraryAliquotView_.lastUpdated);
       default:
         return null;
     }

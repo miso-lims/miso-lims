@@ -123,12 +123,12 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   }
 
   @Override
-  public SingularAttribute<Requisition, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<Requisition> root, DateType type) {
     switch (type) {
       case ENTERED:
-        return Requisition_.created;
+        return root.get(Requisition_.created);
       case UPDATE:
-        return Requisition_.lastModified;
+        return root.get(Requisition_.lastModified);
       default:
         return null;
     }

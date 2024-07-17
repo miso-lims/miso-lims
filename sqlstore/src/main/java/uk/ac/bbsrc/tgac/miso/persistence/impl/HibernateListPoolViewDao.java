@@ -87,14 +87,14 @@ public class HibernateListPoolViewDao
   }
 
   @Override
-  public SingularAttribute<ListPoolView, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<ListPoolView> root, DateType type) {
     switch (type) {
       case CREATE:
-        return ListPoolView_.creationDate;
+        return root.get(ListPoolView_.creationDate);
       case ENTERED:
-        return ListPoolView_.creationTime;
+        return root.get(ListPoolView_.creationTime);
       case UPDATE:
-        return ListPoolView_.lastModified;
+        return root.get(ListPoolView_.lastModified);
       default:
         return null;
     }

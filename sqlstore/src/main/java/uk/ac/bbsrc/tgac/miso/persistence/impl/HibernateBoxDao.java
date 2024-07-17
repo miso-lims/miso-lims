@@ -271,12 +271,12 @@ public class HibernateBoxDao extends HibernateProviderDao<Box>
   }
 
   @Override
-  public SingularAttribute<? super BoxImpl, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<BoxImpl> root, DateType type) {
     switch (type) {
       case ENTERED:
-        return BoxImpl_.creationTime;
+        return root.get(BoxImpl_.creationTime);
       case UPDATE:
-        return BoxImpl_.lastModified;
+        return root.get(BoxImpl_.lastModified);
       default:
         return null;
     }

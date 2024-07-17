@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,7 +141,7 @@ public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentMode
   }
 
   @Override
-  public SingularAttribute<InstrumentModel, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<InstrumentModel> root, DateType type) {
     return null;
   }
 

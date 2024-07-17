@@ -130,12 +130,12 @@ public class HibernateArrayDao extends HibernateSaveDao<Array>
   }
 
   @Override
-  public SingularAttribute<Array, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<Array> root, DateType type) {
     switch (type) {
       case ENTERED:
-        return Array_.creationTime;
+        return root.get(Array_.creationTime);
       case UPDATE:
-        return Array_.lastModified;
+        return root.get(Array_.lastModified);
       default:
         return null;
     }

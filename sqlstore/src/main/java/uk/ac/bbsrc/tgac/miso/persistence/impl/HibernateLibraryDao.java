@@ -308,14 +308,14 @@ public class HibernateLibraryDao extends HibernateSaveDao<Library>
   }
 
   @Override
-  public SingularAttribute<LibraryImpl, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<LibraryImpl> root, DateType type) {
     switch (type) {
       case CREATE:
-        return LibraryImpl_.creationDate;
+        return root.get(LibraryImpl_.creationDate);
       case ENTERED:
-        return LibraryImpl_.creationTime;
+        return root.get(LibraryImpl_.creationTime);
       case UPDATE:
-        return LibraryImpl_.lastModified;
+        return root.get(LibraryImpl_.lastModified);
       default:
         return null;
     }

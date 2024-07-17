@@ -234,14 +234,14 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
   }
 
   @Override
-  public SingularAttribute<Run, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<Run> root, DateType type) {
     switch (type) {
       case CREATE:
-        return Run_.startDate;
+        return root.get(Run_.startDate);
       case ENTERED:
-        return Run_.creationTime;
+        return root.get(Run_.creationTime);
       case UPDATE:
-        return Run_.lastModified;
+        return root.get(Run_.lastModified);
       default:
         return null;
     }

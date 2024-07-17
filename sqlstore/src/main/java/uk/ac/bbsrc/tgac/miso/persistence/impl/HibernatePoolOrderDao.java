@@ -59,12 +59,12 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder>
   }
 
   @Override
-  public SingularAttribute<PoolOrder, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<PoolOrder> root, DateType type) {
     switch (type) {
       case ENTERED:
-        return PoolOrder_.creationDate;
+        return root.get(PoolOrder_.creationDate);
       case UPDATE:
-        return PoolOrder_.lastUpdated;
+        return root.get(PoolOrder_.lastUpdated);
       default:
         return null;
     }
