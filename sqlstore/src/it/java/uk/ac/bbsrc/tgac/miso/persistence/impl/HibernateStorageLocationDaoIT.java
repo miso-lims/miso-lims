@@ -82,7 +82,7 @@ public class HibernateStorageLocationDaoIT extends AbstractDAOTest {
     room.setAlias(alias);
     room.setLocationUnit(LocationUnit.ROOM);
     room.setChangeDetails((User) currentSession().get(UserImpl.class, 1L));
-    long savedId = sut.save(room);
+    long savedId = sut.create(room);
 
     clearSession();
 
@@ -98,7 +98,7 @@ public class HibernateStorageLocationDaoIT extends AbstractDAOTest {
     StorageLocation original = (StorageLocation) currentSession().get(StorageLocation.class, locationId);
     assertNotEquals(newAlias, original.getAlias());
     original.setAlias(newAlias);
-    sut.save(original);
+    sut.update(original);
 
     clearSession();
 
