@@ -107,12 +107,12 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
     validateChange(study, null);
     study.setChangeDetails(authorizationManager.getCurrentUser());
     study.setName(LimsUtils.generateTemporaryName());
-    long id = studyStore.save(study);
+    long id = studyStore.create(study);
     try {
       NamingScheme namingScheme = namingSchemeHolder.getPrimary();
       study.setName(namingScheme.generateNameFor(study));
       validateNameOrThrow(study, namingScheme);
-      studyStore.save(study);
+      studyStore.update(study);
     } catch (MisoNamingException e) {
       throw new IOException(e);
     }
@@ -130,13 +130,14 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
 
     // project is immutable
     original.setStudyType(studyTypeDao.get(study.getStudyType().getId()));
-    return studyStore.save(original);
+    return studyStore.update(original);
   }
 
   private void validateChange(Study study, Study beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
-    if (ValidationUtils.isSetAndChanged(Study::getAlias, study, beforeChange) && studyStore.getByAlias(study.getAlias()) != null) {
+    if (ValidationUtils.isSetAndChanged(Study::getAlias, study, beforeChange)
+        && studyStore.getByAlias(study.getAlias()) != null) {
       errors.add(new ValidationError("alias", "There is already a study with this alias"));
     }
 
@@ -151,7 +152,8 @@ public class DefaultStudyService implements StudyService, PaginatedDataSource<St
   }
 
   @Override
-  public List<Study> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+  public List<Study> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter)
       throws IOException {
     return studyStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }

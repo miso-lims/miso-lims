@@ -70,7 +70,7 @@ public class DefaultStudyServiceTest {
     db.setDescription("mt");
     s.setStudyType(st);
     when(studyStore.get(1L)).thenReturn(db);
-    when(studyStore.save(db)).thenReturn(1L);
+    when(studyStore.update(db)).thenReturn(1L);
 
     assertEquals(1L, sut.update(s));
     assertEquals(s.getDescription(), db.getDescription());

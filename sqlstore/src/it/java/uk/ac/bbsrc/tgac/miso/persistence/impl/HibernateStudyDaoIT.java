@@ -44,23 +44,29 @@ public class HibernateStudyDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testSaveNull() throws IOException, MisoNamingException {
-    exception.expect(NullPointerException.class);
-    dao.save(null);
+  public void testCreateNull() throws IOException, MisoNamingException {
+    exception.expect(IllegalArgumentException.class);
+    dao.create(null);
+  }
+
+  @Test
+  public void testUpdateNull() throws IOException, MisoNamingException {
+    exception.expect(IllegalArgumentException.class);
+    dao.update(null);
   }
 
   @Test
   public void testSaveNew() throws IOException, MisoNamingException {
     Study newStudy = makeStudy();
-    long id = dao.save(newStudy);
+    long id = dao.create(newStudy);
 
     Study savedRun = dao.get(id);
     assertEquals(newStudy.getAlias(), savedRun.getAlias());
   }
 
   @Test
-  public void testListAll() {
-    List<Study> studies = dao.listAll();
+  public void testList() throws IOException {
+    List<Study> studies = dao.list();
     assertEquals(6, studies.size());
   }
 
