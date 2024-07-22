@@ -21,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Index_;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
@@ -97,20 +98,29 @@ public class HibernateSequencingOrderSummaryViewDao
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<SequencingOrderSummaryView> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, SequencingOrderSummaryView> builder, String original,
+      boolean ascending) {
     switch (original) {
       case "id":
-        return root.get(SequencingOrderSummaryView_.orderSummaryId);
+        return builder.getRoot().get(SequencingOrderSummaryView_.orderSummaryId);
       case "containerModelAlias":
-        return root.get(SequencingOrderSummaryView_.containerModel).get(SequencingContainerModel_.alias);
+        Join<SequencingOrderSummaryView, SequencingContainerModel> containerModel =
+            builder.getJoin(builder.getRoot(), SequencingOrderSummaryView_.containerModel);
+        return containerModel.get(SequencingContainerModel_.alias);
       case "pool.id":
-        return root.get(SequencingOrderSummaryView_.pool).get(ListPoolView_.poolId);
+        Join<SequencingOrderSummaryView, ListPoolView> poolId =
+            builder.getJoin(builder.getRoot(), SequencingOrderSummaryView_.pool);
+        return poolId.get(ListPoolView_.poolId);
       case "pool.alias":
-        return root.get(SequencingOrderSummaryView_.pool).get(ListPoolView_.alias);
+        Join<SequencingOrderSummaryView, ListPoolView> poolAlias =
+            builder.getJoin(builder.getRoot(), SequencingOrderSummaryView_.pool);
+        return poolAlias.get(ListPoolView_.alias);
       case "parameters.name":
-        return root.get(SequencingOrderSummaryView_.parameters).get(SequencingParameters_.name);
+        Join<SequencingOrderSummaryView, SequencingParameters> parameters =
+            builder.getJoin(builder.getRoot(), SequencingOrderSummaryView_.parameters);
+        return parameters.get(SequencingParameters_.name);
       default:
-        return root.get(original);
+        return builder.getRoot().get(original);
     }
   }
 

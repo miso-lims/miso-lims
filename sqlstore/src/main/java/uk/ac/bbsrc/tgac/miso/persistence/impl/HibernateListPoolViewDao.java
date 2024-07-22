@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.Session;
@@ -101,13 +100,14 @@ public class HibernateListPoolViewDao
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<ListPoolView> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, ListPoolView> builder, String original, boolean ascending) {
     if ("creationDate".equals(original)) {
-      return root.get(ListPoolView_.creationTime);
+      return builder.getRoot().get(ListPoolView_.creationTime);
     } else if ("id".equals(original)) {
-      return root.get(ListPoolView_.poolId);
+      return builder.getRoot().get(ListPoolView_.poolId);
+    } else {
+      return builder.getRoot().get(original);
     }
-    return root.get(original);
   }
 
   @Override

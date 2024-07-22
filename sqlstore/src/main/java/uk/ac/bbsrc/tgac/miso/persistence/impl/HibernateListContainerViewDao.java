@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.Session;
@@ -84,11 +83,11 @@ public class HibernateListContainerViewDao
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<ListContainerView> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, ListContainerView> builder, String original, boolean ascending) {
     if ("id".equals(original)) {
-      return root.get(ListContainerView_.CONTAINER_ID);
+      return builder.getRoot().get(ListContainerView_.containerId);
     } else {
-      return root.get(original);
+      return builder.getRoot().get(original);
     }
   }
 

@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.springframework.stereotype.Repository;
@@ -16,6 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
@@ -71,14 +71,15 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<PoolOrder> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, PoolOrder> builder, String original, boolean ascending) {
     switch (original) {
       case "id":
-        return root.get(PoolOrder_.poolOrderId);
+        return builder.getRoot().get(PoolOrder_.poolOrderId);
       case "purposeAlias":
-        return root.get(PoolOrder_.purpose).get(RunPurpose_.alias);
+        Join<PoolOrder, RunPurpose> purpose = builder.getJoin(builder.getRoot(), PoolOrder_.purpose);
+        return purpose.get(RunPurpose_.alias);
       default:
-        return root.get(original);
+        return builder.getRoot().get(original);
     }
   }
 

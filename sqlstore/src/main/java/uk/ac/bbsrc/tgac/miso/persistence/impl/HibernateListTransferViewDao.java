@@ -10,7 +10,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.Session;
@@ -104,11 +103,11 @@ public class HibernateListTransferViewDao
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<ListTransferView> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, ListTransferView> builder, String original, boolean ascending) {
     if ("id".equals(original)) {
-      return root.get(ListTransferView_.transferId);
+      return builder.getRoot().get(ListTransferView_.transferId);
     } else {
-      return root.get(original);
+      return builder.getRoot().get(original);
     }
   }
 

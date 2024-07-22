@@ -93,11 +93,11 @@ public class HibernateLibraryAliquotDao extends HibernateSaveDao<LibraryAliquot>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<LibraryAliquot> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, LibraryAliquot> builder, String original, boolean ascending) {
     if ("id".equals(original)) {
-      return root.get(LibraryAliquot_.ALIQUOT_ID);
+      return builder.getRoot().get(LibraryAliquot_.aliquotId);
     } else {
-      return root.get(original);
+      return builder.getRoot().get(original);
     }
   }
 

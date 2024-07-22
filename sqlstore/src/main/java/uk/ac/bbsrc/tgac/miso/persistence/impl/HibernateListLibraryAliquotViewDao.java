@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.springframework.stereotype.Repository;
@@ -104,38 +103,47 @@ public class HibernateListLibraryAliquotViewDao extends HibernateProviderDao<Lis
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<ListLibraryAliquotView> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, ListLibraryAliquotView> builder, String original,
+      boolean ascending) {
+    Join<ListLibraryAliquotView, ParentLibrary> parentLibrary =
+        builder.getJoin(builder.getRoot(), ListLibraryAliquotView_.parentLibrary);
+    Join<ParentLibrary, ParentSample> parentSample = builder.getJoin(parentLibrary, ParentLibrary_.parentSample);
+    Join<ParentSample, ParentAttributes> parentAttributes =
+        builder.getJoin(parentSample, ParentSample_.parentAttributes);
+    Join<ParentAttributes, ParentTissueAttributes> tissueAttributes =
+        builder.getJoin(parentAttributes, ParentAttributes_.tissueAttributes);
+
     switch (original) {
       case "id":
-        return root.get(ListLibraryAliquotView_.aliquotId);
+        return builder.getRoot().get(ListLibraryAliquotView_.aliquotId);
       case "lastModified":
-        return root.get(ListLibraryAliquotView_.lastUpdated);
+        return builder.getRoot().get(ListLibraryAliquotView_.lastUpdated);
       case "library.parentSampleId":
-        return root.get(ListLibraryAliquotView_.parentLibrary).get(ParentLibrary_.parentSample)
-            .get(ParentSample_.sampleId);
+        return parentSample.get(ParentSample_.sampleId);
       case "library.parentSampleAlias":
-        return root.get(ListLibraryAliquotView_.parentLibrary).get(ParentLibrary_.parentSample)
-            .get(ParentSample_.alias);
+        return parentSample.get(ParentSample_.alias);
       case "libraryPlatformType":
       case "library.platformType":
-        return root.get(ListLibraryAliquotView_.parentLibrary).get(ParentLibrary_.platformType);
+        return parentLibrary.get(ParentLibrary_.platformType);
       case "creatorName":
-        return root.get(ListLibraryAliquotView_.creator).get(UserImpl_.fullName);
+        Join<ListLibraryAliquotView, UserImpl> creator =
+            builder.getJoin(builder.getRoot(), ListLibraryAliquotView_.creator);
+        return creator.get(UserImpl_.fullName);
       case "creationDate":
-        return root.get(ListLibraryAliquotView_.created);
+        return builder.getRoot().get(ListLibraryAliquotView_.created);
       case "effectiveTissueOriginAlias":
-        return root.get(ListLibraryAliquotView_.parentLibrary).get(ParentLibrary_.parentSample)
-            .get(ParentSample_.parentAttributes).get(ParentAttributes_.tissueAttributes)
-            .get(ParentTissueAttributes_.tissueOrigin).get(TissueOriginImpl_.alias);
+        Join<ParentTissueAttributes, TissueOriginImpl> tissueOrigin =
+            builder.getJoin(tissueAttributes, ParentTissueAttributes_.tissueOrigin);
+        return tissueOrigin.get(TissueOriginImpl_.alias);
       case "effectiveTissueTypeAlias":
-        return root.get(ListLibraryAliquotView_.parentLibrary).get(ParentLibrary_.parentSample)
-            .get(ParentSample_.parentAttributes).get(ParentAttributes_.tissueAttributes)
-            .get(ParentTissueAttributes_.tissueType).get(TissueTypeImpl_.alias);
+        Join<ParentTissueAttributes, TissueTypeImpl> tissueType =
+            builder.getJoin(tissueAttributes, ParentTissueAttributes_.tissueType);
+        return tissueType.get(TissueTypeImpl_.alias);
       case "projectCode":
-        return root.get(ListLibraryAliquotView_.parentLibrary).get(ParentLibrary_.parentSample)
-            .get(ParentSample_.parentProject).get(ParentProject_.projectId);
+        Join<ParentSample, ParentProject> parentProject = builder.getJoin(parentSample, ParentSample_.parentProject);
+        return parentProject.get(ParentProject_.projectId);
       default:
-        return root.get(original);
+        return builder.getRoot().get(original);
     }
   }
 

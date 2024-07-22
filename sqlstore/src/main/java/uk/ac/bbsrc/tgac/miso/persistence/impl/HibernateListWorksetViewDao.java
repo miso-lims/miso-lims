@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.Session;
@@ -79,11 +78,11 @@ public class HibernateListWorksetViewDao
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<ListWorksetView> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, ListWorksetView> builder, String original, boolean ascending) {
     if ("id".equals(original)) {
-      return root.get(ListWorksetView_.worksetId);
+      return builder.getRoot().get(ListWorksetView_.worksetId);
     } else {
-      return root.get(original);
+      return builder.getRoot().get(original);
     }
   }
 

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel_;
 import uk.ac.bbsrc.tgac.miso.core.data.Array_;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -142,11 +144,12 @@ public class HibernateArrayDao extends HibernateSaveDao<Array>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<Array> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, Array> builder, String original, boolean ascending) {
     if ("arrayModelId".equals(original)) {
-      return root.get("arrayModel.id");
+      Join<Array, ArrayModel> arrayModel = builder.getJoin(builder.getRoot(), Array_.arrayModel);
+      return arrayModel.get(ArrayModel_.id);
     } else {
-      return root.get(original);
+      return builder.getRoot().get(original);
     }
   }
 

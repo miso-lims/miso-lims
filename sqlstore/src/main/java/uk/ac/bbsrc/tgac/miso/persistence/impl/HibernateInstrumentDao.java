@@ -9,7 +9,6 @@ import java.util.function.Consumer;
 
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.springframework.stereotype.Repository;
@@ -103,16 +102,21 @@ public class HibernateInstrumentDao extends HibernateSaveDao<Instrument>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<InstrumentImpl> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, InstrumentImpl> builder, String original, boolean ascending) {
     switch (original) {
       case "platformType":
-        return root.get(InstrumentImpl_.instrumentModel).get(InstrumentModel_.platformType);
+        Join<InstrumentImpl, InstrumentModel> modelPT =
+            builder.getJoin(builder.getRoot(), InstrumentImpl_.instrumentModel);
+        return modelPT.get(InstrumentModel_.platformType);
       case "instrumentModelAlias":
-        return root.get(InstrumentImpl_.instrumentModel).get(InstrumentModel_.alias);
+        Join<InstrumentImpl, InstrumentModel> modelAlias =
+            builder.getJoin(builder.getRoot(), InstrumentImpl_.instrumentModel);
+        return modelAlias.get(InstrumentModel_.alias);
       case "workstationAlias":
-        return root.get(InstrumentImpl_.workstation).get(Workstation_.alias);
+        Join<InstrumentImpl, Workstation> workstation = builder.getJoin(builder.getRoot(), InstrumentImpl_.workstation);
+        return workstation.get(Workstation_.alias);
       default:
-        return root.get(original);
+        return builder.getRoot().get(original);
     }
   }
 

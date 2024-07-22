@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.springframework.stereotype.Repository;
@@ -221,16 +220,21 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<Run> root, String original) {
-    if ("id".equals(original))
-      return root.get(Run_.runId);
-    if ("platformType".equals(original))
-      return root.get(Run_.sequencer).get(InstrumentImpl_.instrumentModel).get(InstrumentModel_.platformType);
-    if ("status".equals(original))
-      return root.get(Run_.health);
-    if ("endDate".equals(original))
-      return root.get(Run_.completionDate);
-    return root.get(original);
+  public Path<?> propertyForSortColumn(QueryBuilder<?, Run> builder, String original, boolean ascending) {
+    switch (original) {
+      case "id":
+        return builder.getRoot().get(Run_.runId);
+      case "platformType":
+        Join<Run, InstrumentImpl> sequencer = builder.getJoin(builder.getRoot(), Run_.sequencer);
+        Join<InstrumentImpl, InstrumentModel> model = builder.getJoin(sequencer, InstrumentImpl_.instrumentModel);
+        return model.get(InstrumentModel_.platformType);
+      case "status":
+        return builder.getRoot().get(Run_.health);
+      case "endDate":
+        return builder.getRoot().get(Run_.completionDate);
+      default:
+        return builder.getRoot().get(original);
+    }
   }
 
   @Override

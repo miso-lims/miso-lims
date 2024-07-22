@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.springframework.stereotype.Repository;
@@ -56,14 +55,14 @@ public class HibernatePrinterDao extends HibernateSaveDao<Printer>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<Printer> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, Printer> builder, String original, boolean ascending) {
     switch (original) {
       case "id":
-        return root.get(Printer_.printerId);
+        return builder.getRoot().get(Printer_.printerId);
       case "available":
-        return root.get(Printer_.enabled);
+        return builder.getRoot().get(Printer_.enabled);
       default:
-        return root.get(original);
+        return builder.getRoot().get(original);
     }
   }
 

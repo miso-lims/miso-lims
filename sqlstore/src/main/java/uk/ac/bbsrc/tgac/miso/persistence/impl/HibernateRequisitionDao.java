@@ -11,7 +11,6 @@ import java.util.function.Consumer;
 import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.springframework.stereotype.Repository;
@@ -135,14 +134,14 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<Requisition> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, Requisition> builder, String original, boolean ascending) {
     switch (original) {
       case "id":
-        return root.get(Requisition_.requisitionId);
+        return builder.getRoot().get(Requisition_.requisitionId);
       case "creationTime":
-        return root.get(Requisition_.created);
+        return builder.getRoot().get(Requisition_.created);
       default:
-        return root.get(original);
+        return builder.getRoot().get(original);
     }
   }
 
