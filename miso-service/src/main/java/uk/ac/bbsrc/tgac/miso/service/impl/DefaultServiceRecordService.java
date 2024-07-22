@@ -50,7 +50,7 @@ public class DefaultServiceRecordService implements ServiceRecordService {
 
   @Override
   public long create(ServiceRecord record) throws IOException {
-    return serviceRecordDao.save(record);
+    return serviceRecordDao.create(record);
   }
 
   @Override
@@ -58,7 +58,7 @@ public class DefaultServiceRecordService implements ServiceRecordService {
     ServiceRecord managed = get(record.getId());
     validateChange(record, managed);
     applyRecordChanges(managed, record);
-    return serviceRecordDao.save(managed);
+    return serviceRecordDao.update(managed);
   }
 
   private void applyRecordChanges(ServiceRecord target, ServiceRecord source) throws IOException {

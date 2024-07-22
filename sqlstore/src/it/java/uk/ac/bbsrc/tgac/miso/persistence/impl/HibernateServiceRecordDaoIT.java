@@ -56,7 +56,7 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
   public void testSaveNew() throws IOException {
 
     String title = "New Record 1";
-    Long newId = dao.save(makeServiceRecord(title));
+    Long newId = dao.create(makeServiceRecord(title));
 
     ServiceRecord savedRec = dao.get(newId);
     assertEquals(title, savedRec.getTitle());
@@ -78,7 +78,7 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
     Instrument sr = Mockito.mock(Instrument.class);
     Mockito.when(sr.getId()).thenReturn(1L);
 
-    assertEquals(1L, dao.save(rec));
+    assertEquals(1L, dao.update(rec));
 
     ServiceRecord saved = dao.get(1L);
     assertEquals(newTitle, saved.getTitle());
@@ -98,8 +98,8 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAll() throws IOException {
-    List<ServiceRecord> list = dao.listAll();
+  public void testList() throws IOException {
+    List<ServiceRecord> list = dao.list();
     assertEquals(4, list.size());
   }
 
