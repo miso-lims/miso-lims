@@ -10,9 +10,6 @@ import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +40,8 @@ public class HibernateSiblingNumberGenerator implements SiblingNumberGenerator {
   }
 
   @Override
-  public <T extends Aliasable> int getFirstAvailableSiblingNumber(Class<T> clazz, String partialAlias) throws IOException {
+  public <T extends Aliasable> int getFirstAvailableSiblingNumber(Class<T> clazz, String partialAlias)
+      throws IOException {
     Set<Integer> siblingNumbers = getExistingSiblingNumbers(clazz, partialAlias);
     int next = 1;
     while (siblingNumbers.contains(next)) {
@@ -52,12 +50,12 @@ public class HibernateSiblingNumberGenerator implements SiblingNumberGenerator {
     return next;
   }
 
-  private <T extends Aliasable> Set<Integer> getExistingSiblingNumbers(Class<T> clazz, String partialAlias) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<String> results = currentSession().createCriteria(clazz)
-        .add(Restrictions.like("alias", partialAlias, MatchMode.START))
-        .setProjection(Projections.property("alias"))
-        .list();
+  private <T extends Aliasable> Set<Integer> getExistingSiblingNumbers(Class<T> clazz, String partialAlias)
+      throws IOException {
+    QueryBuilder<String, T> builder = new QueryBuilder<>(currentSession(), clazz, String.class);
+    builder.addPredicate(builder.getCriteriaBuilder().like(builder.getRoot().get("alias"), partialAlias + '%'));
+    builder.setColumn(builder.getRoot().get("alias"));
+    List<String> results = builder.getResultList();
 
     String regex = "^.{" + partialAlias.length() + "}(\\d+)$";
     Pattern pattern = Pattern.compile(regex);
