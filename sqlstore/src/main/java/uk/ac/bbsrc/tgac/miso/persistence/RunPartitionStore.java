@@ -6,7 +6,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 
-public interface RunPartitionStore {
+public interface RunPartitionStore extends ProviderDao<RunPartition> {
 
   public RunPartition get(long runId, long partitionId) throws IOException;
 
