@@ -78,7 +78,7 @@ public class HibernateListWorksetViewDao
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, ListWorksetView> builder, String original, boolean ascending) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, ListWorksetView> builder, String original) {
     if ("id".equals(original)) {
       return builder.getRoot().get(ListWorksetView_.worksetId);
     } else {

@@ -103,44 +103,63 @@ public class HibernateListLibraryAliquotViewDao extends HibernateProviderDao<Lis
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, ListLibraryAliquotView> builder, String original,
-      boolean ascending) {
-    Join<ListLibraryAliquotView, ParentLibrary> parentLibrary =
-        builder.getJoin(builder.getRoot(), ListLibraryAliquotView_.parentLibrary);
-    Join<ParentLibrary, ParentSample> parentSample = builder.getJoin(parentLibrary, ParentLibrary_.parentSample);
-    Join<ParentSample, ParentAttributes> parentAttributes =
-        builder.getJoin(parentSample, ParentSample_.parentAttributes);
-    Join<ParentAttributes, ParentTissueAttributes> tissueAttributes =
-        builder.getJoin(parentAttributes, ParentAttributes_.tissueAttributes);
-
+  public Path<?> propertyForSortColumn(QueryBuilder<?, ListLibraryAliquotView> builder, String original) {
     switch (original) {
       case "id":
         return builder.getRoot().get(ListLibraryAliquotView_.aliquotId);
       case "lastModified":
         return builder.getRoot().get(ListLibraryAliquotView_.lastUpdated);
       case "library.parentSampleId":
-        return parentSample.get(ParentSample_.sampleId);
+        Join<ListLibraryAliquotView, ParentLibrary> sampleIdParentLibrary =
+            builder.getJoin(builder.getRoot(), ListLibraryAliquotView_.parentLibrary);
+        Join<ParentLibrary, ParentSample> sampleIdParentSample =
+            builder.getJoin(sampleIdParentLibrary, ParentLibrary_.parentSample);
+        return sampleIdParentSample.get(ParentSample_.sampleId);
       case "library.parentSampleAlias":
-        return parentSample.get(ParentSample_.alias);
+        Join<ListLibraryAliquotView, ParentLibrary> sampleAliasParentLibrary =
+            builder.getJoin(builder.getRoot(), ListLibraryAliquotView_.parentLibrary);
+        Join<ParentLibrary, ParentSample> sampleAliasParentSample =
+            builder.getJoin(sampleAliasParentLibrary, ParentLibrary_.parentSample);
+        return sampleAliasParentSample.get(ParentSample_.alias);
       case "libraryPlatformType":
       case "library.platformType":
-        return parentLibrary.get(ParentLibrary_.platformType);
+        return builder.getJoin(builder.getRoot(), ListLibraryAliquotView_.parentLibrary)
+            .get(ParentLibrary_.platformType);
       case "creatorName":
-        Join<ListLibraryAliquotView, UserImpl> creator =
-            builder.getJoin(builder.getRoot(), ListLibraryAliquotView_.creator);
-        return creator.get(UserImpl_.fullName);
+        return builder.getJoin(builder.getRoot(), ListLibraryAliquotView_.creator).get(UserImpl_.fullName);
       case "creationDate":
         return builder.getRoot().get(ListLibraryAliquotView_.created);
       case "effectiveTissueOriginAlias":
+        Join<ListLibraryAliquotView, ParentLibrary> tissueOriginParentLibrary =
+            builder.getJoin(builder.getRoot(), ListLibraryAliquotView_.parentLibrary);
+        Join<ParentLibrary, ParentSample> tissueOriginParentSample =
+            builder.getJoin(tissueOriginParentLibrary, ParentLibrary_.parentSample);
+        Join<ParentSample, ParentAttributes> tissueOriginParentAttributes =
+            builder.getJoin(tissueOriginParentSample, ParentSample_.parentAttributes);
+        Join<ParentAttributes, ParentTissueAttributes> tissueOriginTissueAttributes =
+            builder.getJoin(tissueOriginParentAttributes, ParentAttributes_.tissueAttributes);
         Join<ParentTissueAttributes, TissueOriginImpl> tissueOrigin =
-            builder.getJoin(tissueAttributes, ParentTissueAttributes_.tissueOrigin);
+            builder.getJoin(tissueOriginTissueAttributes, ParentTissueAttributes_.tissueOrigin);
         return tissueOrigin.get(TissueOriginImpl_.alias);
       case "effectiveTissueTypeAlias":
+        Join<ListLibraryAliquotView, ParentLibrary> tissueTypeParentLibrary =
+            builder.getJoin(builder.getRoot(), ListLibraryAliquotView_.parentLibrary);
+        Join<ParentLibrary, ParentSample> tissueTypeParentSample =
+            builder.getJoin(tissueTypeParentLibrary, ParentLibrary_.parentSample);
+        Join<ParentSample, ParentAttributes> tissueTypeParentAttributes =
+            builder.getJoin(tissueTypeParentSample, ParentSample_.parentAttributes);
+        Join<ParentAttributes, ParentTissueAttributes> tissueTypeTissueAttributes =
+            builder.getJoin(tissueTypeParentAttributes, ParentAttributes_.tissueAttributes);
         Join<ParentTissueAttributes, TissueTypeImpl> tissueType =
-            builder.getJoin(tissueAttributes, ParentTissueAttributes_.tissueType);
+            builder.getJoin(tissueTypeTissueAttributes, ParentTissueAttributes_.tissueType);
         return tissueType.get(TissueTypeImpl_.alias);
       case "projectCode":
-        Join<ParentSample, ParentProject> parentProject = builder.getJoin(parentSample, ParentSample_.parentProject);
+        Join<ListLibraryAliquotView, ParentLibrary> parentProjectParentLibrary =
+            builder.getJoin(builder.getRoot(), ListLibraryAliquotView_.parentLibrary);
+        Join<ParentLibrary, ParentSample> parentProjectParentSample =
+            builder.getJoin(parentProjectParentLibrary, ParentLibrary_.parentSample);
+        Join<ParentSample, ParentProject> parentProject =
+            builder.getJoin(parentProjectParentSample, ParentSample_.parentProject);
         return parentProject.get(ParentProject_.projectId);
       default:
         return builder.getRoot().get(original);

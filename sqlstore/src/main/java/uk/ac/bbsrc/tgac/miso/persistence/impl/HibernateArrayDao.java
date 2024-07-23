@@ -144,7 +144,7 @@ public class HibernateArrayDao extends HibernateSaveDao<Array>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, Array> builder, String original, boolean ascending) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, Array> builder, String original) {
     if ("arrayModelId".equals(original)) {
       Join<Array, ArrayModel> arrayModel = builder.getJoin(builder.getRoot(), Array_.arrayModel);
       return arrayModel.get(ArrayModel_.id);

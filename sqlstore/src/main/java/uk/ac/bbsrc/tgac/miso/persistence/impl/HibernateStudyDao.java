@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.springframework.stereotype.Repository;
@@ -97,14 +96,14 @@ public class HibernateStudyDao extends HibernateSaveDao<Study>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<StudyImpl> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, StudyImpl> builder, String original) {
     switch (original) {
       case "id":
-        return root.get(StudyImpl_.studyId);
+        return builder.getRoot().get(StudyImpl_.studyId);
       case "studyTypeId":
-        return root.get(StudyImpl_.studyType).get(StudyType_.typeId);
+        return builder.getJoin(builder.getRoot(), StudyImpl_.studyType).get(StudyType_.typeId);
       default:
-        return root.get(original);
+        return builder.getRoot().get(original);
     }
   }
 

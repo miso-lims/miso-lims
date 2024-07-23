@@ -220,7 +220,7 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, Run> builder, String original, boolean ascending) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, Run> builder, String original) {
     switch (original) {
       case "id":
         return builder.getRoot().get(Run_.runId);

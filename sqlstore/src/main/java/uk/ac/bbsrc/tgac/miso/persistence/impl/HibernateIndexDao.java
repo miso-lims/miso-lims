@@ -67,7 +67,7 @@ public class HibernateIndexDao extends HibernateSaveDao<Index>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, Index> builder, String original, boolean ascending) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, Index> builder, String original) {
     Join<Index, IndexFamily> family = builder.getJoin(builder.getRoot(), Index_.family);
     switch (original) {
       case "family.platformType":

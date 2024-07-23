@@ -134,7 +134,7 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, Requisition> builder, String original, boolean ascending) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, Requisition> builder, String original) {
     switch (original) {
       case "id":
         return builder.getRoot().get(Requisition_.requisitionId);

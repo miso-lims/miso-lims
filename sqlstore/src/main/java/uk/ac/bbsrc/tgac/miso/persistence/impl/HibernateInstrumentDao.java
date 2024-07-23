@@ -102,7 +102,7 @@ public class HibernateInstrumentDao extends HibernateSaveDao<Instrument>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, InstrumentImpl> builder, String original, boolean ascending) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, InstrumentImpl> builder, String original) {
     switch (original) {
       case "platformType":
         Join<InstrumentImpl, InstrumentModel> modelPT =

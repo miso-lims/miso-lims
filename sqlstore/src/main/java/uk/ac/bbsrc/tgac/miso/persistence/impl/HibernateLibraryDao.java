@@ -280,29 +280,36 @@ public class HibernateLibraryDao extends HibernateSaveDao<Library>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, LibraryImpl> builder, String original, boolean ascending) {
-    Join<LibraryImpl, SampleImpl> sample = builder.getJoin(builder.getRoot(), LibraryImpl_.sample);
-    Join<DetailedSampleImpl, ParentAttributes> parentAttributes = builder.getJoin(
-        builder.getCriteriaBuilder().treat(sample, DetailedSampleImpl.class), DetailedSampleImpl_.parentAttributes);
-    Join<ParentAttributes, ParentTissueAttributes> tissueAttributes =
-        builder.getJoin(parentAttributes, ParentAttributes_.tissueAttributes);
-
+  public Path<?> propertyForSortColumn(QueryBuilder<?, LibraryImpl> builder, String original) {
     switch (original) {
       case "id":
         return builder.getRoot().get(LibraryImpl_.libraryId);
       case "parentSampleId":
-        return sample.get(SampleImpl_.sampleId);
+        return builder.getJoin(builder.getRoot(), LibraryImpl_.sample).get(SampleImpl_.sampleId);
       case "parentSampleAlias":
-        return sample.get(SampleImpl_.alias);
+        return builder.getJoin(builder.getRoot(), LibraryImpl_.sample).get(SampleImpl_.alias);
       case "effectiveTissueOriginAlias":
+        Join<LibraryImpl, SampleImpl> tissueOriginSample = builder.getJoin(builder.getRoot(), LibraryImpl_.sample);
+        Join<DetailedSampleImpl, ParentAttributes> tissueOriginParentAttributes = builder.getJoin(
+            builder.getCriteriaBuilder().treat(tissueOriginSample, DetailedSampleImpl.class),
+            DetailedSampleImpl_.parentAttributes);
+        Join<ParentAttributes, ParentTissueAttributes> tissueOriginTissueAttributes =
+            builder.getJoin(tissueOriginParentAttributes, ParentAttributes_.tissueAttributes);
         Join<ParentTissueAttributes, TissueOriginImpl> tissueOrigin =
-            builder.getJoin(tissueAttributes, ParentTissueAttributes_.tissueOrigin);
+            builder.getJoin(tissueOriginTissueAttributes, ParentTissueAttributes_.tissueOrigin);
         return tissueOrigin.get(TissueOriginImpl_.alias);
       case "effectiveTissueTypeAlias":
+        Join<LibraryImpl, SampleImpl> tissueTypeSample = builder.getJoin(builder.getRoot(), LibraryImpl_.sample);
+        Join<DetailedSampleImpl, ParentAttributes> tissueTypeParentAttributes = builder.getJoin(
+            builder.getCriteriaBuilder().treat(tissueTypeSample, DetailedSampleImpl.class),
+            DetailedSampleImpl_.parentAttributes);
+        Join<ParentAttributes, ParentTissueAttributes> tissueTypeTissueAttributes =
+            builder.getJoin(tissueTypeParentAttributes, ParentAttributes_.tissueAttributes);
         Join<ParentTissueAttributes, TissueTypeImpl> tissueType =
-            builder.getJoin(tissueAttributes, ParentTissueAttributes_.tissueType);
+            builder.getJoin(tissueTypeTissueAttributes, ParentTissueAttributes_.tissueType);
         return tissueType.get(TissueTypeImpl_.alias);
       case "projectCode":
+        Join<LibraryImpl, SampleImpl> sample = builder.getJoin(builder.getRoot(), LibraryImpl_.sample);
         Join<SampleImpl, ProjectImpl> project = builder.getJoin(sample, SampleImpl_.project);
         return project.get(ProjectImpl_.id);
       default:

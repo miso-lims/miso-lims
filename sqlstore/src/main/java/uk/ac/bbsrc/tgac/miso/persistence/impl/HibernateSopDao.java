@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.springframework.stereotype.Repository;
@@ -103,12 +102,12 @@ public class HibernateSopDao extends HibernateSaveDao<Sop> implements JpaCriteri
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<Sop> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, Sop> builder, String original) {
     switch (original) {
       case "id":
-        return root.get(Sop_.sopId);
+        return builder.getRoot().get(Sop_.sopId);
       default:
-        return root.get(original);
+        return builder.getRoot().get(original);
     }
   }
 

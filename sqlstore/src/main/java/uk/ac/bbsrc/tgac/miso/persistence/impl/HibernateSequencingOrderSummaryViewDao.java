@@ -98,8 +98,7 @@ public class HibernateSequencingOrderSummaryViewDao
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, SequencingOrderSummaryView> builder, String original,
-      boolean ascending) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, SequencingOrderSummaryView> builder, String original) {
     switch (original) {
       case "id":
         return builder.getRoot().get(SequencingOrderSummaryView_.orderSummaryId);

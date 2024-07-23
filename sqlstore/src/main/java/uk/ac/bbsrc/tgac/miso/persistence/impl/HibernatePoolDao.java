@@ -104,7 +104,7 @@ public class HibernatePoolDao extends HibernateSaveDao<Pool>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, PoolImpl> builder, String original, boolean ascending) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, PoolImpl> builder, String original) {
     original = original.replaceAll("[^\\w]", "");
     if ("id".equals(original)) {
       return builder.getRoot().get(PoolImpl_.poolId);

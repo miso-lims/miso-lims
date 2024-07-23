@@ -90,7 +90,7 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, ArrayRun> builder, String original, boolean ascending) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, ArrayRun> builder, String original) {
     if ("platformType".equals(original)) {
       Join<ArrayRun, InstrumentImpl> instrument = builder.getJoin(builder.getRoot(), ArrayRun_.instrument);
       Join<InstrumentImpl, InstrumentModel> model = builder.getJoin(instrument, InstrumentImpl_.instrumentModel);

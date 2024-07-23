@@ -130,8 +130,8 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     QueryBuilder<Tuple, T> resultQueryBuilder = new QueryBuilder<>(currentSession(), getEntityClass(), Tuple.class);
 
     Path<?> idProperty = idQueryBuilder.getRoot().get(getIdProperty());
-    Path<?> sortProperty = sortCol == null ? null : propertyForSortColumn(idQueryBuilder, sortCol, ascending);
-    Path<?> resultSortProperty = sortCol == null ? null : propertyForSortColumn(resultQueryBuilder, sortCol, ascending);
+    Path<?> sortProperty = sortCol == null ? null : propertyForSortColumn(idQueryBuilder, sortCol);
+    Path<?> resultSortProperty = sortCol == null ? null : propertyForSortColumn(resultQueryBuilder, sortCol);
     if (sortProperty != null && !idProperty.equals(sortProperty)) {
       idQueryBuilder.addSort(sortProperty, ascending);
       resultQueryBuilder.addSort(resultSortProperty, ascending);
@@ -179,10 +179,8 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
    * Determine the correct Hibernate property given the user-supplied sort column. Default
    * implementation always returns the original value unmodified
    */
-  public default Path<?> propertyForSortColumn(QueryBuilder<?, T> builder, String original, boolean ascending) {
-    Path<?> path = builder.getRoot().get(original);
-    builder.addSort(path, ascending);
-    return path;
+  public default Path<?> propertyForSortColumn(QueryBuilder<?, T> builder, String original) {
+    return builder.getRoot().get(original);
   }
 
   /**

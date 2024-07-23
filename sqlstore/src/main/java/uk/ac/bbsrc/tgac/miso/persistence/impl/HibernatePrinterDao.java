@@ -55,7 +55,7 @@ public class HibernatePrinterDao extends HibernateSaveDao<Printer>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, Printer> builder, String original, boolean ascending) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, Printer> builder, String original) {
     switch (original) {
       case "id":
         return builder.getRoot().get(Printer_.printerId);

@@ -100,7 +100,7 @@ public class HibernateListPoolViewDao
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, ListPoolView> builder, String original, boolean ascending) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, ListPoolView> builder, String original) {
     if ("creationDate".equals(original)) {
       return builder.getRoot().get(ListPoolView_.creationTime);
     } else if ("id".equals(original)) {

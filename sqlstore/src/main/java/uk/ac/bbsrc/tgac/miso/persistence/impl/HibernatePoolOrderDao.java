@@ -71,7 +71,7 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(QueryBuilder<?, PoolOrder> builder, String original, boolean ascending) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, PoolOrder> builder, String original) {
     switch (original) {
       case "id":
         return builder.getRoot().get(PoolOrder_.poolOrderId);
