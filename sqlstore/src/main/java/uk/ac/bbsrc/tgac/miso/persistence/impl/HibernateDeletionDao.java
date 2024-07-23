@@ -20,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl_;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 
@@ -78,7 +79,7 @@ public class HibernateDeletionDao implements DeletionStore, JpaCriteriaPaginated
   public Path<?> propertyForSortColumn(Root<Deletion> root, String original) {
     switch (original) {
       case "userName":
-        return root.get(Deletion_.user);
+        return root.get(Deletion_.user).get(UserImpl_.fullName);
       default:
         return root.get(original);
     }
