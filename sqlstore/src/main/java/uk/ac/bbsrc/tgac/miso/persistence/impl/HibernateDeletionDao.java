@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.Session;
@@ -76,12 +75,12 @@ public class HibernateDeletionDao implements DeletionStore, JpaCriteriaPaginated
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<Deletion> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, Deletion> builder, String original) {
     switch (original) {
       case "userName":
-        return root.get(Deletion_.user).get(UserImpl_.fullName);
+        return builder.getJoin(builder.getRoot(), Deletion_.user).get(UserImpl_.fullName);
       default:
-        return root.get(original);
+        return builder.getRoot().get(original);
     }
   }
 
