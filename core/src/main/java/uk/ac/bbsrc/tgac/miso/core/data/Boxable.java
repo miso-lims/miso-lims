@@ -11,9 +11,13 @@ import java.util.function.Supplier;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
@@ -32,11 +36,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 public interface Boxable extends Aliasable, Barcodable, Nameable, Serializable {
 
   public enum EntityType {
-    SAMPLE("Sample", SampleImpl.class, SampleBoxableView.class, SampleBoxPosition::new, "sampleId"), //
-    LIBRARY("Library", LibraryImpl.class, LibraryBoxableView.class, LibraryBoxPosition::new, "libraryId"), //
+    SAMPLE("Sample", SampleImpl.class, SampleBoxableView.class, SampleBoxPosition::new, SampleImpl_.SAMPLE_ID), //
+    LIBRARY("Library", LibraryImpl.class, LibraryBoxableView.class, LibraryBoxPosition::new, LibraryImpl_.LIBRARY_ID), //
     LIBRARY_ALIQUOT("Library Aliquot", LibraryAliquot.class, LibraryAliquotBoxableView.class,
-        LibraryAliquotBoxPosition::new, "aliquotId"), //
-    POOL("Pool", PoolImpl.class, PoolBoxableView.class, PoolBoxPosition::new, "poolId"); //
+        LibraryAliquotBoxPosition::new, LibraryAliquot_.ALIQUOT_ID), //
+    POOL("Pool", PoolImpl.class, PoolBoxableView.class, PoolBoxPosition::new, PoolImpl_.POOL_ID); //
 
     private static final Map<String, EntityType> lookup;
 

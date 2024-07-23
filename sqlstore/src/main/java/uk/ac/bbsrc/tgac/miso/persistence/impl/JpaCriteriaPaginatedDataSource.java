@@ -165,7 +165,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
    * @return the name of the property or null if the search criterion should be ignored.
    */
 
-  public abstract Path<?> propertyForDate(Root<T> builder, DateType type);
+  public abstract Path<?> propertyForDate(Root<T> root, DateType type);
 
   /**
    * Determine the correct Hibernate property given the user-supplied sort column. Default
