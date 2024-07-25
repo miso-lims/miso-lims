@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.springframework.stereotype.Repository;
@@ -28,7 +30,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 public class HibernateProjectDao extends HibernateSaveDao<Project>
     implements ProjectStore, JpaCriteriaPaginatedDataSource<Project, ProjectImpl> {
 
-  private static final List<SingularAttribute<ProjectImpl, String>> SEARCH_PROPERTIES =
+  private static final List<SingularAttribute<? super ProjectImpl, String>> SEARCH_PROPERTIES =
       Arrays.asList(ProjectImpl_.name, ProjectImpl_.title, ProjectImpl_.description, ProjectImpl_.code);
 
   public HibernateProjectDao() {
@@ -71,20 +73,20 @@ public class HibernateProjectDao extends HibernateSaveDao<Project>
   }
 
   @Override
-  public List<SingularAttribute<ProjectImpl, String>> getSearchProperties() {
+  public List<SingularAttribute<? super ProjectImpl, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public SingularAttribute<ProjectImpl, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<ProjectImpl> root, DateType type) {
     switch (type) {
       case CREATE:
       case ENTERED:
-        return ProjectImpl_.creationTime;
+        return root.get(ProjectImpl_.creationTime);
       case UPDATE:
-        return ProjectImpl_.lastModified;
+        return root.get(ProjectImpl_.lastModified);
       case REB_EXPIRY:
-        return ProjectImpl_.rebExpiry;
+        return root.get(ProjectImpl_.rebExpiry);
       default:
         return null;
     }

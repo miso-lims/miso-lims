@@ -34,7 +34,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.ListPoolViewDao;
 public class HibernateListPoolViewDao
     implements ListPoolViewDao, JpaCriteriaPaginatedDataSource<ListPoolView, ListPoolView> {
 
-  private final static List<SingularAttribute<ListPoolView, String>> SEARCH_PROPERTIES = Arrays
+  private final static List<SingularAttribute<? super ListPoolView, String>> SEARCH_PROPERTIES = Arrays
       .asList(ListPoolView_.name, ListPoolView_.alias, ListPoolView_.identificationBarcode, ListPoolView_.description);
 
   @Autowired
@@ -82,19 +82,19 @@ public class HibernateListPoolViewDao
   }
 
   @Override
-  public List<SingularAttribute<ListPoolView, String>> getSearchProperties() {
+  public List<SingularAttribute<? super ListPoolView, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public SingularAttribute<ListPoolView, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<ListPoolView> root, DateType type) {
     switch (type) {
       case CREATE:
-        return ListPoolView_.creationDate;
+        return root.get(ListPoolView_.creationDate);
       case ENTERED:
-        return ListPoolView_.creationTime;
+        return root.get(ListPoolView_.creationTime);
       case UPDATE:
-        return ListPoolView_.lastModified;
+        return root.get(ListPoolView_.lastModified);
       default:
         return null;
     }

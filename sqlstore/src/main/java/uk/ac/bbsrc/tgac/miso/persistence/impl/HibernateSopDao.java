@@ -30,7 +30,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SopDao;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateSopDao extends HibernateSaveDao<Sop> implements JpaCriteriaPaginatedDataSource<Sop, Sop>, SopDao {
 
-  private final static List<SingularAttribute<Sop, String>> SEARCH_PROPERTIES = Arrays.asList(Sop_.alias);
+  private final static List<SingularAttribute<? super Sop, String>> SEARCH_PROPERTIES = Arrays.asList(Sop_.alias);
 
   public HibernateSopDao() {
     super(Sop.class);
@@ -93,12 +93,12 @@ public class HibernateSopDao extends HibernateSaveDao<Sop> implements JpaCriteri
   }
 
   @Override
-  public List<SingularAttribute<Sop, String>> getSearchProperties() {
+  public List<SingularAttribute<? super Sop, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public SingularAttribute<Sop, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<Sop> root, DateType type) {
     return null;
   }
 

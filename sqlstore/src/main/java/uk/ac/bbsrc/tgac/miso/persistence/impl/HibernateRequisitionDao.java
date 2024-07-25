@@ -36,7 +36,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.RequisitionDao;
 public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
     implements JpaCriteriaPaginatedDataSource<Requisition, Requisition>, RequisitionDao {
 
-  private final static List<SingularAttribute<Requisition, String>> SEARCH_PROPERTIES = Arrays
+  private final static List<SingularAttribute<? super Requisition, String>> SEARCH_PROPERTIES = Arrays
       .asList(Requisition_.alias);
 
   public HibernateRequisitionDao() {
@@ -118,17 +118,17 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   }
 
   @Override
-  public List<SingularAttribute<Requisition, String>> getSearchProperties() {
+  public List<SingularAttribute<? super Requisition, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public SingularAttribute<Requisition, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<Requisition> root, DateType type) {
     switch (type) {
       case ENTERED:
-        return Requisition_.created;
+        return root.get(Requisition_.created);
       case UPDATE:
-        return Requisition_.lastModified;
+        return root.get(Requisition_.lastModified);
       default:
         return null;
     }

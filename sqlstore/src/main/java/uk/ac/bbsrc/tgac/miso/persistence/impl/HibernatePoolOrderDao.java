@@ -26,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
 public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder>
     implements PoolOrderDao, JpaCriteriaPaginatedDataSource<PoolOrder, PoolOrder> {
 
-  private static final List<SingularAttribute<PoolOrder, String>> SEARCH_PROPERTIES =
+  private static final List<SingularAttribute<? super PoolOrder, String>> SEARCH_PROPERTIES =
       Arrays.asList(PoolOrder_.alias, PoolOrder_.description);
 
   public HibernatePoolOrderDao() {
@@ -49,7 +49,7 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder>
   }
 
   @Override
-  public List<SingularAttribute<PoolOrder, String>> getSearchProperties() {
+  public List<SingularAttribute<? super PoolOrder, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
@@ -59,12 +59,12 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder>
   }
 
   @Override
-  public SingularAttribute<PoolOrder, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<PoolOrder> root, DateType type) {
     switch (type) {
       case ENTERED:
-        return PoolOrder_.creationDate;
+        return root.get(PoolOrder_.creationDate);
       case UPDATE:
-        return PoolOrder_.lastUpdated;
+        return root.get(PoolOrder_.lastUpdated);
       default:
         return null;
     }

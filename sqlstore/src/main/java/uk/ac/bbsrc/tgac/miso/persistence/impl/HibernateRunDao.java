@@ -63,7 +63,7 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
     super(Run.class);
   }
 
-  private static final List<SingularAttribute<Run, String>> SEARCH_PROPERTIES =
+  private static final List<SingularAttribute<? super Run, String>> SEARCH_PROPERTIES =
       Arrays.asList(Run_.name, Run_.alias, Run_.description);
 
   @Override
@@ -216,7 +216,7 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
   }
 
   @Override
-  public List<SingularAttribute<Run, String>> getSearchProperties() {
+  public List<SingularAttribute<? super Run, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
@@ -234,14 +234,14 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
   }
 
   @Override
-  public SingularAttribute<Run, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<Run> root, DateType type) {
     switch (type) {
       case CREATE:
-        return Run_.startDate;
+        return root.get(Run_.startDate);
       case ENTERED:
-        return Run_.creationTime;
+        return root.get(Run_.creationTime);
       case UPDATE:
-        return Run_.lastModified;
+        return root.get(Run_.lastModified);
       default:
         return null;
     }

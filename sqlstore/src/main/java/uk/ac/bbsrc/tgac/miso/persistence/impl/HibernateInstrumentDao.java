@@ -46,7 +46,7 @@ public class HibernateInstrumentDao extends HibernateSaveDao<Instrument>
     super(Instrument.class, InstrumentImpl.class);
   }
 
-  private static final List<SingularAttribute<InstrumentImpl, String>> SEARCH_PROPERTIES =
+  private static final List<SingularAttribute<? super InstrumentImpl, String>> SEARCH_PROPERTIES =
       Arrays.asList(InstrumentImpl_.name, InstrumentImpl_.serialNumber, InstrumentImpl_.identificationBarcode);
 
   @Override
@@ -93,13 +93,13 @@ public class HibernateInstrumentDao extends HibernateSaveDao<Instrument>
   }
 
   @Override
-  public List<SingularAttribute<InstrumentImpl, String>> getSearchProperties() {
+  public List<SingularAttribute<? super InstrumentImpl, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public SingularAttribute<InstrumentImpl, ?> propertyForDate(DateType type) {
-    return type == DateType.CREATE ? InstrumentImpl_.dateCommissioned : null;
+  public Path<?> propertyForDate(Root<InstrumentImpl> root, DateType type) {
+    return type == DateType.CREATE ? root.get(InstrumentImpl_.dateCommissioned) : null;
   }
 
   @Override

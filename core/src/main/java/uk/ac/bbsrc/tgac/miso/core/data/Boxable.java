@@ -11,9 +11,13 @@ import java.util.function.Supplier;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
@@ -32,10 +36,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 public interface Boxable extends Aliasable, Barcodable, Nameable, Serializable {
 
   public enum EntityType {
-    SAMPLE("Sample", SampleImpl.class, SampleBoxableView.class, SampleBoxPosition::new), //
-    LIBRARY("Library", LibraryImpl.class, LibraryBoxableView.class, LibraryBoxPosition::new), //
-    LIBRARY_ALIQUOT("Library Aliquot", LibraryAliquot.class, LibraryAliquotBoxableView.class, LibraryAliquotBoxPosition::new), //
-    POOL("Pool", PoolImpl.class, PoolBoxableView.class, PoolBoxPosition::new); //
+    SAMPLE("Sample", SampleImpl.class, SampleBoxableView.class, SampleBoxPosition::new, SampleImpl_.SAMPLE_ID), //
+    LIBRARY("Library", LibraryImpl.class, LibraryBoxableView.class, LibraryBoxPosition::new, LibraryImpl_.LIBRARY_ID), //
+    LIBRARY_ALIQUOT("Library Aliquot", LibraryAliquot.class, LibraryAliquotBoxableView.class,
+        LibraryAliquotBoxPosition::new, LibraryAliquot_.ALIQUOT_ID), //
+    POOL("Pool", PoolImpl.class, PoolBoxableView.class, PoolBoxPosition::new, PoolImpl_.POOL_ID); //
 
     private static final Map<String, EntityType> lookup;
 
@@ -51,13 +56,15 @@ public interface Boxable extends Aliasable, Barcodable, Nameable, Serializable {
     private final Class<? extends Boxable> persistClass;
     private final Class<? extends BoxableView> viewClass;
     private final Supplier<? extends AbstractBoxPosition> positionConstructor;
+    private final String idProperty;
 
     private EntityType(String label, Class<? extends Boxable> persistClass, Class<? extends BoxableView> viewClass,
-        Supplier<? extends AbstractBoxPosition> positionConstructor) {
+        Supplier<? extends AbstractBoxPosition> positionConstructor, String idProperty) {
       this.label = label;
       this.persistClass = persistClass;
       this.viewClass = viewClass;
       this.positionConstructor = positionConstructor;
+      this.idProperty = idProperty;
     }
 
     public static EntityType get(String label) {
@@ -78,6 +85,10 @@ public interface Boxable extends Aliasable, Barcodable, Nameable, Serializable {
 
     public AbstractBoxPosition makeBoxPosition() {
       return positionConstructor.get();
+    }
+
+    public String getIdProperty() {
+      return idProperty;
     }
   }
 
@@ -116,16 +127,14 @@ public interface Boxable extends Aliasable, Barcodable, Nameable, Serializable {
   /**
    * Sets the alias of this Sample object.
    *
-   * @param alias
-   *          alias.
+   * @param alias alias.
    */
   public void setAlias(String alias);
 
   /**
    * Sets the 'emptied' attribute for the Implementor
    * 
-   * @param boolean
-   *          emptied
+   * @param boolean emptied
    */
   public void setDiscarded(boolean emptied);
 

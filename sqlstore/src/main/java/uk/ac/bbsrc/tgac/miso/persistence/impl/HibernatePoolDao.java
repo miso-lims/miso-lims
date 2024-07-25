@@ -47,10 +47,10 @@ public class HibernatePoolDao extends HibernateSaveDao<Pool>
     super(Pool.class, PoolImpl.class);
   }
 
-  private final static List<SingularAttribute<PoolImpl, String>> IDENTIFIER_PROPERTIES =
+  private final static List<SingularAttribute<? super PoolImpl, String>> IDENTIFIER_PROPERTIES =
       Arrays.asList(PoolImpl_.name, PoolImpl_.alias, PoolImpl_.identificationBarcode);
 
-  private final static List<SingularAttribute<PoolImpl, String>> SEARCH_PROPERTIES =
+  private final static List<SingularAttribute<? super PoolImpl, String>> SEARCH_PROPERTIES =
       Arrays.asList(PoolImpl_.name, PoolImpl_.alias, PoolImpl_.identificationBarcode, PoolImpl_.description);
 
   @Override
@@ -89,12 +89,12 @@ public class HibernatePoolDao extends HibernateSaveDao<Pool>
   }
 
   @Override
-  public List<SingularAttribute<PoolImpl, String>> getIdentifierProperties() {
+  public List<SingularAttribute<? super PoolImpl, String>> getIdentifierProperties() {
     return IDENTIFIER_PROPERTIES;
   }
 
   @Override
-  public List<SingularAttribute<PoolImpl, String>> getSearchProperties() {
+  public List<SingularAttribute<? super PoolImpl, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
@@ -134,14 +134,14 @@ public class HibernatePoolDao extends HibernateSaveDao<Pool>
   }
 
   @Override
-  public SingularAttribute<PoolImpl, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<PoolImpl> root, DateType type) {
     switch (type) {
       case CREATE:
-        return PoolImpl_.creationDate;
+        return root.get(PoolImpl_.creationDate);
       case ENTERED:
-        return PoolImpl_.creationTime;
+        return root.get(PoolImpl_.creationTime);
       case UPDATE:
-        return PoolImpl_.lastModified;
+        return root.get(PoolImpl_.lastModified);
       default:
         return null;
     }

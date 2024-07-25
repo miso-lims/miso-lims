@@ -10,48 +10,47 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition_;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize_;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxUse_;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView_;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.BoxStore;
-import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
-public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<Box> {
+public class HibernateBoxDao extends HibernateProviderDao<Box>
+    implements BoxStore, JpaCriteriaPaginatedDataSource<Box, BoxImpl> {
 
-  private static final String FIELD_NAME = "name";
-  private static final String FIELD_ALIAS = "alias";
-  private static final String FIELD_BARCODE = "identificationBarcode";
-
-  protected static final String[] IDENTIFIER_PROPERTIES = { FIELD_NAME, FIELD_ALIAS, FIELD_BARCODE };
-  protected static final String[] SEARCH_PROPERTIES = { FIELD_NAME, FIELD_ALIAS, FIELD_BARCODE, "locationBarcode" };
-
-  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(new AliasDescriptor("size"), new AliasDescriptor("use"));
-
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  @Override
-  public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
+  public HibernateBoxDao() {
+    super(Box.class, BoxImpl.class);
   }
+
+  protected static final List<SingularAttribute<? super BoxImpl, String>> IDENTIFIER_PROPERTIES =
+      Arrays.asList(BoxImpl_.name, BoxImpl_.alias, BoxImpl_.identificationBarcode);
+
+  protected static final List<SingularAttribute<? super BoxImpl, String>> SEARCH_PROPERTIES =
+      Arrays.asList(BoxImpl_.name, BoxImpl_.alias, BoxImpl_.identificationBarcode, BoxImpl_.locationBarcode);
 
   @Override
   public Boxable getBoxable(BoxableId id) {
@@ -65,39 +64,13 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public Box get(long boxId) throws IOException {
-    return (Box) currentSession().get(BoxImpl.class, boxId);
-  }
-
-  @Override
   public Box getBoxByAlias(String alias) throws IOException {
-    Criteria criteria = currentSession().createCriteria(BoxImpl.class);
-    criteria.add(Restrictions.eq(FIELD_ALIAS, alias));
-    return (Box) criteria.uniqueResult();
+    return getBy(BoxImpl_.ALIAS, alias);
   }
 
   @Override
   public List<Box> listByIdList(List<Long> idList) throws IOException {
-    if (idList == null || idList.isEmpty()) {
-      return Collections.emptyList();
-    }
-    Criteria criteria = currentSession().createCriteria(BoxImpl.class);
-    criteria.add(Restrictions.in("boxId", idList));
-    @SuppressWarnings("unchecked")
-    List<Box> records = criteria.list();
-    return records;
-  }
-
-  protected SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  @Override
-  public List<Box> listAll() throws IOException {
-    Criteria criteria = currentSession().createCriteria(BoxImpl.class);
-    @SuppressWarnings("unchecked")
-    List<Box> results = criteria.list();
-    return results;
+    return listByIdList(BoxImpl_.BOX_ID, idList);
   }
 
   @Override
@@ -105,14 +78,13 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     if (search == null) {
       throw new NullPointerException("No search String provided");
     }
-    Criteria criteria = currentSession().createCriteria(BoxImpl.class);
-    criteria.add(Restrictions.or(
-        Restrictions.eq("identificationBarcode", search),
-        Restrictions.eq("name", search),
-        Restrictions.eq(FIELD_ALIAS, search)));
-    @SuppressWarnings("unchecked")
-    List<Box> results = criteria.list();
-    return results;
+
+    QueryBuilder<Box, BoxImpl> builder = getQueryBuilder();
+    builder.addPredicate(builder.getCriteriaBuilder()
+        .or(builder.getCriteriaBuilder().equal(builder.getRoot().get(BoxImpl_.identificationBarcode), search),
+            builder.getCriteriaBuilder().equal(builder.getRoot().get(BoxImpl_.name), search),
+            builder.getCriteriaBuilder().equal(builder.getRoot().get(BoxImpl_.alias), search)));
+    return builder.getResultList();
   }
 
   private static String getMostSimilarProperty(Box box, String search) {
@@ -129,13 +101,15 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     if (search == null) {
       throw new NullPointerException("No search String provided");
     }
-    Criteria criteria = currentSession().createCriteria(BoxImpl.class);
-    criteria.add(Restrictions.or(
-        Restrictions.like("identificationBarcode", search, onlyMatchBeginning ? MatchMode.START : MatchMode.ANYWHERE),
-        Restrictions.like("name", search, onlyMatchBeginning ? MatchMode.START : MatchMode.ANYWHERE),
-        Restrictions.like(FIELD_ALIAS, search, onlyMatchBeginning ? MatchMode.START : MatchMode.ANYWHERE)));
-    @SuppressWarnings("unchecked")
-    List<Box> results = criteria.list();
+
+    String pattern = onlyMatchBeginning ? search + '%' : '%' + search + '%';
+    QueryBuilder<Box, BoxImpl> builder = getQueryBuilder();
+    builder.addPredicate(builder.getCriteriaBuilder().or(
+        builder.getCriteriaBuilder().like(builder.getRoot().get(BoxImpl_.identificationBarcode), pattern),
+        builder.getCriteriaBuilder().like(builder.getRoot().get(BoxImpl_.name), pattern),
+        builder.getCriteriaBuilder().like(builder.getRoot().get(BoxImpl_.alias), pattern)));
+    List<Box> results = builder.getResultList();
+
     results.sort((Box b1, Box b2) -> {
       String p1 = getMostSimilarProperty(b1, search.toLowerCase());
       String p2 = getMostSimilarProperty(b2, search.toLowerCase());
@@ -158,8 +132,10 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     Box box = get(boxable.getBoxId());
     box.getBoxPositions().remove(boxable.getBoxPosition());
     currentSession().update(box);
-    // flush required to avoid constraint violation incase item is immediately added to another box or the same one
-    // NOTE: this flush will cause ALL Hibernate-managed items to be saved to the db in their current state, even if their `save` method
+    // flush required to avoid constraint violation incase item is immediately added to another box or
+    // the same one
+    // NOTE: this flush will cause ALL Hibernate-managed items to be saved to the db in their current
+    // state, even if their `save` method
     // hasn't explicitly been called yet
     currentSession().flush();
   }
@@ -170,8 +146,10 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
       return (long) currentSession().save(box);
     } else {
       currentSession().update(box);
-      // flush required to avoid constraint violation incase removed items are immediately added to another box or the same one
-      // NOTE: this flush will cause ALL Hibernate-managed items to be saved to the db in their current state, even if their `save` method
+      // flush required to avoid constraint violation incase removed items are immediately added to
+      // another box or the same one
+      // NOTE: this flush will cause ALL Hibernate-managed items to be saved to the db in their current
+      // state, even if their `save` method
       // hasn't explicitly been called yet
       currentSession().flush();
       return box.getId();
@@ -188,7 +166,16 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     if (barcodes == null || barcodes.isEmpty()) {
       return Collections.emptyList();
     }
-    return queryBoxables(Restrictions.in(FIELD_BARCODE, barcodes));
+
+    List<BoxableView> results = new ArrayList<>();
+    for (EntityType entityType : EntityType.values()) {
+      QueryBuilder<BoxableView, ? extends BoxableView> builder =
+          new QueryBuilder<>(currentSession(), entityType.getViewClass(), BoxableView.class);
+      builder.addInPredicate(builder.getRoot().get(BoxableView_.identificationBarcode), barcodes);
+      List<BoxableView> partialResults = builder.getResultList();
+      results.addAll(partialResults);
+    }
+    return results;
   }
 
   @Override
@@ -204,10 +191,11 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
           .map(BoxableId::getTargetId)
           .collect(Collectors.toList());
       if (!filteredIds.isEmpty()) {
-        @SuppressWarnings("unchecked")
-        List<BoxableView> partialResults = currentSession().createCriteria(entityType.getViewClass())
-            .add(Restrictions.in("id", filteredIds))
-            .list();
+        QueryBuilder<BoxableView, ? extends BoxableView> builder =
+            new QueryBuilder<>(currentSession(), entityType.getViewClass(), BoxableView.class);
+        builder.addInPredicate(builder.getRoot().get(entityType.getIdProperty()), filteredIds);
+        List<BoxableView> partialResults = builder.getResultList();
+
         results.addAll(partialResults);
       }
     }
@@ -216,18 +204,15 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
 
   @Override
   public List<BoxableView> getBoxContents(long boxId) throws IOException {
-    return queryBoxables(Restrictions.eq("box.id", boxId));
-  }
-
-  private List<BoxableView> queryBoxables(Criterion criterion) {
     List<BoxableView> results = new ArrayList<>();
     for (EntityType entityType : EntityType.values()) {
-      @SuppressWarnings("unchecked")
-      List<BoxableView> partialResults = currentSession().createCriteria(entityType.getViewClass())
-          .createAlias("boxPosition", "boxPosition", JoinType.LEFT_OUTER_JOIN)
-          .createAlias("boxPosition.box", "box", JoinType.LEFT_OUTER_JOIN)
-          .add(criterion)
-          .list();
+      QueryBuilder<BoxableView, ? extends BoxableView> builder =
+          new QueryBuilder<>(currentSession(), entityType.getViewClass(), BoxableView.class);
+      Join<? extends BoxableView, BoxPosition> boxPosition =
+          builder.getSingularJoin(builder.getRoot(), "boxPosition", BoxPosition.class);
+      Join<BoxPosition, BoxImpl> box = builder.getJoin(boxPosition, BoxPosition_.box);
+      builder.addPredicate(builder.getCriteriaBuilder().equal(box.get(BoxImpl_.boxId), boxId));
+      List<BoxableView> partialResults = builder.getResultList();
       results.addAll(partialResults);
     }
     return results;
@@ -238,14 +223,21 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
     if (search == null) {
       throw new NullPointerException("No search String provided");
     }
-    return queryBoxables(Restrictions.and(Restrictions.or(
-        Restrictions.eq(FIELD_BARCODE, search),
-        Restrictions.eq(FIELD_NAME, search),
-        Restrictions.eq(FIELD_ALIAS, search)), Restrictions.eq("discarded", false)));
-  }
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+    List<BoxableView> results = new ArrayList<>();
+    for (EntityType entityType : EntityType.values()) {
+      QueryBuilder<BoxableView, ? extends BoxableView> builder =
+          new QueryBuilder<>(currentSession(), entityType.getViewClass(), BoxableView.class);
+      builder.addPredicate(builder.getCriteriaBuilder().and(
+          builder.getCriteriaBuilder().or(
+              builder.getCriteriaBuilder().equal(builder.getRoot().get(BoxableView_.identificationBarcode), search),
+              builder.getCriteriaBuilder().equal(builder.getRoot().get(BoxableView_.name), search),
+              builder.getCriteriaBuilder().equal(builder.getRoot().get(BoxableView_.alias), search)),
+          builder.getCriteriaBuilder().equal(builder.getRoot().get(BoxableView_.discarded), false)));
+      List<BoxableView> partialResults = builder.getResultList();
+      results.addAll(partialResults);
+    }
+    return results;
   }
 
   @Override
@@ -254,77 +246,85 @@ public class HibernateBoxDao implements BoxStore, HibernatePaginatedDataSource<B
   }
 
   @Override
-  public String getProjectColumn() {
-    return null;
+  public SingularAttribute<? super BoxImpl, ?> getIdProperty() {
+    return BoxImpl_.boxId;
   }
 
   @Override
-  public Class<? extends Box> getRealClass() {
+  public Class<BoxImpl> getEntityClass() {
     return BoxImpl.class;
   }
 
   @Override
-  public String[] getIdentifierProperties() {
+  public Class<Box> getResultClass() {
+    return Box.class;
+  }
+
+  @Override
+  public List<SingularAttribute<? super BoxImpl, String>> getIdentifierProperties() {
     return IDENTIFIER_PROPERTIES;
   }
 
   @Override
-  public String[] getSearchProperties() {
+  public List<SingularAttribute<? super BoxImpl, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return STANDARD_ALIASES;
-  }
-
-  @Override
-  public String propertyForDate(Criteria criteria, DateType type) {
+  public Path<?> propertyForDate(Root<BoxImpl> root, DateType type) {
     switch (type) {
-    case ENTERED:
-      return "creationTime";
-    case UPDATE:
-      return "lastModified";
-    default:
-      return null;
+      case ENTERED:
+        return root.get(BoxImpl_.creationTime);
+      case UPDATE:
+        return root.get(BoxImpl_.lastModified);
+      default:
+        return null;
     }
   }
 
   @Override
-  public String propertyForSortColumn(String original) {
+  public Path<?> propertyForSortColumn(Root<BoxImpl> root, String original) {
     switch (original) {
-    case "sizeId":
-      return "size.id";
-    case "useId":
-      return "use.id";
-    default:
-      return original;
+      case "id":
+        return root.get(BoxImpl_.boxId);
+      case "sizeId":
+        return root.get(BoxImpl_.size).get(BoxSize_.id);
+      case "useId":
+        return root.get(BoxImpl_.use).get(BoxUse_.id);
+      default:
+        return root.get(original);
     }
   }
 
   @Override
-  public String propertyForUser(boolean creator) {
-    return creator ? "creator" : "lastModifier";
+  public SingularAttribute<? super BoxImpl, ? extends UserImpl> propertyForUser(boolean creator) {
+    return creator ? BoxImpl_.creator : BoxImpl_.lastModifier;
   }
 
   @Override
-  public void restrictPaginationByBoxUse(Criteria criteria, long id, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("use.id", id));
+  public void restrictPaginationByBoxUse(QueryBuilder<?, BoxImpl> builder, long id, Consumer<String> errorHandler) {
+    Join<BoxImpl, BoxUse> use = builder.getJoin(builder.getRoot(), BoxImpl_.use);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(use.get(BoxUse_.id), id));
   }
 
   @Override
-  public void restrictPaginationByFreezer(Criteria criteria, String query, Consumer<String> errorHandler) {
-    DbUtils.restrictPaginationByFreezer(criteria, query, "storageLocation");
+  public void restrictPaginationByFreezer(QueryBuilder<?, BoxImpl> builder, String query,
+      Consumer<String> errorHandler) {
+    Join<BoxImpl, BoxPosition> boxPositionJoin = builder.getJoin(builder.getRoot(), BoxImpl_.boxPositions);
+    builder.addFreezerPredicate(boxPositionJoin, query);
   }
 
   @Override
-  public void restrictPaginationByBoxType(Criteria criteria, BoxType boxType, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("size.boxType", boxType));
+  public void restrictPaginationByBoxType(QueryBuilder<?, BoxImpl> builder, BoxType boxType,
+      Consumer<String> errorHandler) {
+    Join<BoxImpl, BoxSize> size = builder.getJoin(builder.getRoot(), BoxImpl_.size);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(size.get(BoxSize_.boxType), boxType));
   }
 
   @Override
-  public void restrictPaginationByBarcode(Criteria criteria, String barcode, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(barcode, FIELD_BARCODE));
+  public void restrictPaginationByBarcode(QueryBuilder<?, BoxImpl> builder, String barcode,
+      Consumer<String> errorHandler) {
+    builder.addTextRestriction(builder.getRoot().get(BoxImpl_.identificationBarcode), barcode);;
   }
 
 }

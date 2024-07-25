@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.springframework.stereotype.Repository;
@@ -25,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.LibraryTemplateStore;
 public class HibernateLibraryTemplateDao extends HibernateSaveDao<LibraryTemplate>
     implements LibraryTemplateStore, JpaCriteriaPaginatedDataSource<LibraryTemplate, LibraryTemplate> {
 
-  private static final List<SingularAttribute<LibraryTemplate, String>> SEARCH_PROPERTIES =
+  private static final List<SingularAttribute<? super LibraryTemplate, String>> SEARCH_PROPERTIES =
       Arrays.asList(LibraryTemplate_.alias);
 
   public HibernateLibraryTemplateDao() {
@@ -53,12 +55,12 @@ public class HibernateLibraryTemplateDao extends HibernateSaveDao<LibraryTemplat
   }
 
   @Override
-  public List<SingularAttribute<LibraryTemplate, String>> getSearchProperties() {
+  public List<SingularAttribute<? super LibraryTemplate, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public SingularAttribute<LibraryTemplate, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<LibraryTemplate> root, DateType type) {
     return null;
   }
 

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -160,16 +161,16 @@ public class HibernateKitDao implements KitStore, JpaCriteriaPaginatedDataSource
     return KitDescriptor_.kitDescriptorId;
   }
 
-  private static final List<SingularAttribute<KitDescriptor, String>> SEARCH_PROPERTIES = Arrays
+  private static final List<SingularAttribute<? super KitDescriptor, String>> SEARCH_PROPERTIES = Arrays
       .asList(KitDescriptor_.name, KitDescriptor_.manufacturer, KitDescriptor_.partNumber, KitDescriptor_.description);
 
   @Override
-  public List<SingularAttribute<KitDescriptor, String>> getSearchProperties() {
+  public List<SingularAttribute<? super KitDescriptor, String>> getSearchProperties() {
     return SEARCH_PROPERTIES;
   }
 
   @Override
-  public SingularAttribute<KitDescriptor, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<KitDescriptor> root, DateType type) {
     return null;
   }
 

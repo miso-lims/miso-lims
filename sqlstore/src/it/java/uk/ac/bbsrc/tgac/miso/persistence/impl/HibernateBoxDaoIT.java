@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
@@ -132,8 +109,8 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListAll() throws Exception {
-    Collection<Box> boxes = dao.listAll();
+  public void testList() throws Exception {
+    Collection<Box> boxes = dao.list();
     assertEquals(4, boxes.size());
   }
 
@@ -357,7 +334,8 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     assertNotNull(empty);
     assertTrue(empty.isEmpty());
 
-    List<BoxableId> ids = Arrays.asList(new BoxableId(EntityType.LIBRARY_ALIQUOT, 1L), new BoxableId(EntityType.POOL, 1L));
+    List<BoxableId> ids =
+        Arrays.asList(new BoxableId(EntityType.LIBRARY_ALIQUOT, 1L), new BoxableId(EntityType.POOL, 1L));
     List<BoxableView> list = dao.getBoxableViewsByIdList(ids);
     assertNotNull(list);
     assertEquals(2, list.size());
@@ -465,18 +443,21 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSearchByEntered() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-02-24"), LimsUtils.parseDate("2021-02-24"), DateType.ENTERED));
+    testSearch(
+        PaginationFilter.date(LimsUtils.parseDate("2021-02-24"), LimsUtils.parseDate("2021-02-24"), DateType.ENTERED));
   }
 
   @Test
   public void testSearchByLastModified() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-02-24"), LimsUtils.parseDate("2021-02-24"), DateType.UPDATE));
+    testSearch(
+        PaginationFilter.date(LimsUtils.parseDate("2021-02-24"), LimsUtils.parseDate("2021-02-24"), DateType.UPDATE));
   }
 
   @Test
   public void testSearchByDistributedInvalid() throws IOException {
     exception.expect(RuntimeException.class);
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-02-24"), LimsUtils.parseDate("2021-02-24"), DateType.DISTRIBUTED));
+    testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-02-24"), LimsUtils.parseDate("2021-02-24"),
+        DateType.DISTRIBUTED));
   }
 
   @Test
@@ -565,7 +546,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSorts() throws Exception {
-    String[] sorts = { "sizeId", "useId" };
+    String[] sorts = {"sizeId", "useId"};
     for (String sort : sorts) {
       assertNotNull(dao.list(0, 0, true, sort));
     }

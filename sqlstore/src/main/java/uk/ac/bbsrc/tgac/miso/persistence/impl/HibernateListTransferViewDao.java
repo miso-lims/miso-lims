@@ -84,20 +84,20 @@ public class HibernateListTransferViewDao
   }
 
   @Override
-  public List<SingularAttribute<ListTransferView, String>> getSearchProperties() {
+  public List<SingularAttribute<? super ListTransferView, String>> getSearchProperties() {
     return Collections.emptyList();
   }
 
   @Override
-  public SingularAttribute<ListTransferView, ?> propertyForDate(DateType type) {
+  public Path<?> propertyForDate(Root<ListTransferView> root, DateType type) {
     switch (type) {
       case ENTERED:
-        return ListTransferView_.created;
+        return root.get(ListTransferView_.created);
       case CREATE:
       case RECEIVE:
-        return ListTransferView_.transferTime;
+        return root.get(ListTransferView_.transferTime);
       case UPDATE:
-        return ListTransferView_.lastModified;
+        return root.get(ListTransferView_.lastModified);
       default:
         return null;
     }

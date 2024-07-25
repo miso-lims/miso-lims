@@ -14,7 +14,10 @@ import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 public interface HibernatePaginatedBoxableSource<T extends Boxable> extends HibernatePaginatedDataSource<T> {
 
-  public final static String[] BOX_SEARCH_PROPERTIES = LimsUtils.prefix("box.", HibernateBoxDao.SEARCH_PROPERTIES);
+  public final static String[] SEARCH_PROPS =
+      new String[] {"name", "alias", "identificationBarcode", "locationBarcode"};
+
+  public final static String[] BOX_SEARCH_PROPERTIES = LimsUtils.prefix("box.", SEARCH_PROPS);
 
   @Override
   default void restrictPaginationByBox(Criteria criteria, String query, Consumer<String> errorHandler) {
@@ -36,7 +39,8 @@ public interface HibernatePaginatedBoxableSource<T extends Boxable> extends Hibe
   }
 
   @Override
-  public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type, Consumer<String> errorHandler) {
+  public default void restrictPaginationByDate(Criteria criteria, Date start, Date end, DateType type,
+      Consumer<String> errorHandler) {
     if (type == DateType.RECEIVE) {
       DbUtils.restrictPaginationByReceiptTransferDate(criteria, start, end);
     } else if (type == DateType.DISTRIBUTED) {

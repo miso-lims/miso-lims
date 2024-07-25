@@ -14,13 +14,14 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
  * This interface defines a DAO for storing Boxes
  * 
  */
-public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
+public interface BoxStore extends ProviderDao<Box>, PaginatedDataSource<Box> {
+
+  public long save(Box box) throws IOException;
 
   /**
    * Retrieve a Box from data store given a Box alias.
    * 
-   * @param String
-   *          alias
+   * @param String alias
    * @return Box
    * @throws IOException
    */
@@ -30,8 +31,7 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
    * List all Boxes associated with ids from the given id list
    * 
    * @return List<Box>
-   * @throws IOException
-   *           when the objects cannot be retrieved
+   * @throws IOException when the objects cannot be retrieved
    */
   List<Box> listByIdList(List<Long> idList) throws IOException;
 
@@ -50,8 +50,8 @@ public interface BoxStore extends Store<Box>, PaginatedDataSource<Box> {
   public List<BoxableView> getBoxContents(long boxId) throws IOException;
 
   /**
-   * Finds BoxableViews with identificationBarcode, name, or alias matching the provided search string. Returns exact matches only,
-   * and excludes any discarded items
+   * Finds BoxableViews with identificationBarcode, name, or alias matching the provided search
+   * string. Returns exact matches only, and excludes any discarded items
    * 
    * @param search string to search for
    * @return all matches

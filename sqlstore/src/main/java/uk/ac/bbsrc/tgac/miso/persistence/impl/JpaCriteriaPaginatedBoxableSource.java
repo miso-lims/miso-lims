@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
+import javax.persistence.metamodel.SingularAttribute;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition_;
@@ -26,7 +27,7 @@ public interface JpaCriteriaPaginatedBoxableSource<R extends Boxable, T extends 
     } else {
       Join<? extends AbstractBoxPosition, BoxImpl> boxJoin = builder.getJoin(join, AbstractBoxPosition_.box);
       List<Path<String>> searchProperties = new ArrayList<>();
-      for (String property : HibernateBoxDao.SEARCH_PROPERTIES) {
+      for (SingularAttribute<? super BoxImpl, String> property : HibernateBoxDao.SEARCH_PROPERTIES) {
         searchProperties.add(boxJoin.get(property));
       }
       builder.addTextRestriction(searchProperties, query);
