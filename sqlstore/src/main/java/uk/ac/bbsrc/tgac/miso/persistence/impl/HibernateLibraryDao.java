@@ -312,7 +312,7 @@ public class HibernateLibraryDao extends HibernateSaveDao<Library>
       case "projectCode":
         Join<LibraryImpl, SampleImpl> sample = builder.getJoin(builder.getRoot(), LibraryImpl_.sample);
         Join<SampleImpl, ProjectImpl> project = builder.getJoin(sample, SampleImpl_.project);
-        return project.get(ProjectImpl_.id);
+        return project.get(ProjectImpl_.code);
       default:
         return builder.getRoot().get(original);
     }

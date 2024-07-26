@@ -161,7 +161,7 @@ public class HibernateListLibraryAliquotViewDao extends HibernateProviderDao<Lis
             builder.getJoin(parentProjectParentLibrary, ParentLibrary_.parentSample);
         Join<ParentSample, ParentProject> parentProject =
             builder.getJoin(parentProjectParentSample, ParentSample_.parentProject);
-        return parentProject.get(ParentProject_.projectId);
+        return parentProject.get(ParentProject_.code);
       default:
         return builder.getRoot().get(original);
     }
