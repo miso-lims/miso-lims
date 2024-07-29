@@ -78,12 +78,12 @@ public class HibernateTargetedSequencingDao extends HibernateSaveDao<TargetedSeq
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<TargetedSequencing> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, TargetedSequencing> builder, String original) {
     switch (original) {
       case "id":
-        return root.get(TargetedSequencing_.targetedSequencingId);
+        return builder.getRoot().get(TargetedSequencing_.targetedSequencingId);
       default:
-        return root.get(original);
+        return builder.getRoot().get(original);
     }
   }
 

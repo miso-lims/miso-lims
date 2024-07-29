@@ -17,6 +17,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun_;
 import uk.ac.bbsrc.tgac.miso.core.data.Array_;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -86,12 +90,16 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<ArrayRun> root, String original) {
-    if ("platformType".equals(original))
-      return root.get("instrumentModel.platformType");
-    if ("status".equals(original))
-      return root.get(ArrayRun_.HEALTH);
-    return root.get(original);
+  public Path<?> propertyForSortColumn(QueryBuilder<?, ArrayRun> builder, String original) {
+    if ("platformType".equals(original)) {
+      Join<ArrayRun, InstrumentImpl> instrument = builder.getJoin(builder.getRoot(), ArrayRun_.instrument);
+      Join<InstrumentImpl, InstrumentModel> model = builder.getJoin(instrument, InstrumentImpl_.instrumentModel);
+      return model.get(InstrumentModel_.platformType);
+    } else if ("status".equals(original)) {
+      return builder.getRoot().get(ArrayRun_.health);
+    } else {
+      return builder.getRoot().get(original);
+    }
   }
 
   @Override

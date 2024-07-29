@@ -110,7 +110,13 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     return null;
   }
 
-  List<SingularAttribute<? super T, String>> getSearchProperties();
+  public default List<SingularAttribute<? super T, String>> getSearchProperties() {
+    return Collections.emptyList();
+  }
+
+  public default List<Path<String>> getSearchProperties(Root<T> root) {
+    return pathsFromAttributes(root, getSearchProperties());
+  }
 
   SingularAttribute<? super T, ?> getIdProperty();
 
@@ -121,13 +127,14 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
       throw new IOException("Limit and Offset must not be less than zero");
     }
     QueryBuilder<Tuple, T> idQueryBuilder = new QueryBuilder<>(currentSession(), getEntityClass(), Tuple.class);
-    QueryBuilder<R, T> resultQueryBuilder = new QueryBuilder<>(currentSession(), getEntityClass(), getResultClass());
+    QueryBuilder<Tuple, T> resultQueryBuilder = new QueryBuilder<>(currentSession(), getEntityClass(), Tuple.class);
 
     Path<?> idProperty = idQueryBuilder.getRoot().get(getIdProperty());
-    Path<?> sortProperty = sortCol == null ? null : propertyForSortColumn(idQueryBuilder.getRoot(), sortCol);
+    Path<?> sortProperty = sortCol == null ? null : propertyForSortColumn(idQueryBuilder, sortCol);
+    Path<?> resultSortProperty = sortCol == null ? null : propertyForSortColumn(resultQueryBuilder, sortCol);
     if (sortProperty != null && !idProperty.equals(sortProperty)) {
       idQueryBuilder.addSort(sortProperty, ascending);
-      resultQueryBuilder.addSort(sortProperty, ascending);
+      resultQueryBuilder.addSort(resultSortProperty, ascending);
       idQueryBuilder.setColumns(idProperty, sortProperty);
     } else {
       idQueryBuilder.setColumns(idProperty);
@@ -142,7 +149,6 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
       resultQueryBuilder.addSort(idProperty, ascending);
     }
 
-
     for (PaginationFilter filter : filters) {
       filter.apply(this, idQueryBuilder, errorHandler);
     }
@@ -155,7 +161,11 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     }
     // We do this in two steps to make a smaller query that that the database can optimise
     resultQueryBuilder.addPredicate(idProperty.in(ids));
-    List<R> records = resultQueryBuilder.getResultList();
+    // We additionally need to select the sort column in the result set for the database to provide us
+    // with duplicate-free results sorted by the column specified.
+    resultQueryBuilder.setColumns(resultQueryBuilder.getRoot(), resultSortProperty);
+    @SuppressWarnings("unchecked")
+    List<R> records = (List<R>) resultQueryBuilder.getResultList().stream().map(x -> x.get(0)).toList();
     return records;
   }
 
@@ -171,8 +181,8 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
    * Determine the correct Hibernate property given the user-supplied sort column. Default
    * implementation always returns the original value unmodified
    */
-  public default Path<?> propertyForSortColumn(Root<T> root, String original) {
-    return root.get(original);
+  public default Path<?> propertyForSortColumn(QueryBuilder<?, T> builder, String original) {
+    return builder.getRoot().get(original);
   }
 
   /**
@@ -389,7 +399,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
 
   @Override
   default void restrictPaginationByQuery(QueryBuilder<?, T> builder, String query, Consumer<String> errorHandler) {
-    List<Path<String>> properties = pathsFromAttributes(builder, getSearchProperties());
+    List<Path<String>> properties = getSearchProperties(builder.getRoot());
     if (properties == null || properties.isEmpty()) {
       errorHandler
           .accept(String.format("%s does not have text fields that can be queried in this way.", getFriendlyName()));
@@ -397,10 +407,10 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     builder.addTextRestriction(properties, query);
   }
 
-  private List<Path<String>> pathsFromAttributes(QueryBuilder<?, T> builder,
+  private List<Path<String>> pathsFromAttributes(Root<T> root,
       Collection<SingularAttribute<? super T, String>> attributes) {
     return attributes.stream()
-        .map(x -> builder.getRoot().get(x))
+        .map(x -> root.get(x))
         .toList();
   }
 
@@ -554,7 +564,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
   @Override
   public default void restrictPaginationByIdentifiers(QueryBuilder<?, T> builder, Collection<String> identifiers,
       Consumer<String> errorHandler) {
-    List<Path<String>> fields = pathsFromAttributes(builder, getIdentifierProperties());
+    List<Path<String>> fields = pathsFromAttributes(builder.getRoot(), getIdentifierProperties());
     if (fields == null || fields.isEmpty()) {
       errorHandler.accept(String.format("%s cannot be filtered by identifiers", getFriendlyName()));
       return;

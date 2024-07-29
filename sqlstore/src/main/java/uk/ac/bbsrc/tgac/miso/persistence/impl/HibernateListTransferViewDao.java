@@ -104,11 +104,11 @@ public class HibernateListTransferViewDao
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<ListTransferView> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, ListTransferView> builder, String original) {
     if ("id".equals(original)) {
-      return root.get(ListTransferView_.transferId);
+      return builder.getRoot().get(ListTransferView_.transferId);
     } else {
-      return root.get(original);
+      return builder.getRoot().get(original);
     }
   }
 

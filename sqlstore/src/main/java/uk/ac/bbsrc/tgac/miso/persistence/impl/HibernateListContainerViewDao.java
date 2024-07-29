@@ -84,11 +84,11 @@ public class HibernateListContainerViewDao
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<ListContainerView> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, ListContainerView> builder, String original) {
     if ("id".equals(original)) {
-      return root.get(ListContainerView_.CONTAINER_ID);
+      return builder.getRoot().get(ListContainerView_.containerId);
     } else {
-      return root.get(original);
+      return builder.getRoot().get(original);
     }
   }
 

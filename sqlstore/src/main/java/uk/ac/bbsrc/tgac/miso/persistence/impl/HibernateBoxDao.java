@@ -283,16 +283,16 @@ public class HibernateBoxDao extends HibernateProviderDao<Box>
   }
 
   @Override
-  public Path<?> propertyForSortColumn(Root<BoxImpl> root, String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, BoxImpl> builder, String original) {
     switch (original) {
       case "id":
-        return root.get(BoxImpl_.boxId);
+        return builder.getRoot().get(BoxImpl_.boxId);
       case "sizeId":
-        return root.get(BoxImpl_.size).get(BoxSize_.id);
+        return builder.getJoin(builder.getRoot(), BoxImpl_.size).get(BoxSize_.id);
       case "useId":
-        return root.get(BoxImpl_.use).get(BoxUse_.id);
+        return builder.getJoin(builder.getRoot(), BoxImpl_.use).get(BoxUse_.id);
       default:
-        return root.get(original);
+        return builder.getRoot().get(original);
     }
   }
 
