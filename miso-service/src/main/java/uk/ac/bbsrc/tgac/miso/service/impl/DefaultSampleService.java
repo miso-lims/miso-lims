@@ -381,7 +381,7 @@ public class DefaultSampleService implements SampleService {
   private Sample save(Sample sample, boolean validateAliasUniqueness) throws IOException {
     NamingScheme namingScheme = getNamingScheme(sample);
     try {
-      Long newId = sample.getId();
+      long newId = sample.getId();
       if (!hasTemporaryAlias(sample)) {
         validateAlias(sample, namingScheme);
       }

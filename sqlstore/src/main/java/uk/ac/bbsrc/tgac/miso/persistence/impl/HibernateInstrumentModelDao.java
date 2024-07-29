@@ -138,6 +138,16 @@ public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentMode
   }
 
   @Override
+  public Path<?> propertyForSortColumn(QueryBuilder<?, InstrumentModel> builder, String original) {
+    switch (original) {
+      case "id":
+        return builder.getRoot().get(InstrumentModel_.instrumentModelId);
+      default:
+        return builder.getRoot().get(original);
+    }
+  }
+
+  @Override
   public Path<?> propertyForDate(Root<InstrumentModel> root, DateType type) {
     return null;
   }

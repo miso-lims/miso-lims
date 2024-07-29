@@ -82,8 +82,6 @@ public class HibernateIndexDao extends HibernateSaveDao<Index>
     return null;
   }
 
-
-
   @Override
   public void restrictPaginationByArchived(QueryBuilder<?, Index> builder, boolean isArchived,
       Consumer<String> errorHandler) {
