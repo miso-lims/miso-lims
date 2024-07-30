@@ -25,9 +25,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.TargetedSequencingStore;
 public class HibernateTargetedSequencingDao extends HibernateSaveDao<TargetedSequencing>
     implements TargetedSequencingStore, JpaCriteriaPaginatedDataSource<TargetedSequencing, TargetedSequencing> {
 
-  private static final List<SingularAttribute<? super TargetedSequencing, String>> SEARCH_PROPERTIES =
-      Arrays.asList(TargetedSequencing_.alias);
-
   public HibernateTargetedSequencingDao() {
     super(TargetedSequencing.class);
   }
@@ -68,8 +65,8 @@ public class HibernateTargetedSequencingDao extends HibernateSaveDao<TargetedSeq
   }
 
   @Override
-  public List<SingularAttribute<? super TargetedSequencing, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<TargetedSequencing> root) {
+    return Arrays.asList(root.get(TargetedSequencing_.alias));
   }
 
   @Override

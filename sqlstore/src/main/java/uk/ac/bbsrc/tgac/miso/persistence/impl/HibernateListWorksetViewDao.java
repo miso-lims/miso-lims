@@ -26,9 +26,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.ListWorksetViewStore;
 public class HibernateListWorksetViewDao
     implements ListWorksetViewStore, JpaCriteriaPaginatedDataSource<ListWorksetView, ListWorksetView> {
 
-  private static final List<SingularAttribute<? super ListWorksetView, String>> SEARCH_PROPERTIES =
-      Arrays.asList(ListWorksetView_.alias, ListWorksetView_.description);
-
   @Autowired
   private SessionFactory sessionFactory;
 
@@ -62,8 +59,8 @@ public class HibernateListWorksetViewDao
   }
 
   @Override
-  public List<SingularAttribute<? super ListWorksetView, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<ListWorksetView> root) {
+    return Arrays.asList(root.get(ListWorksetView_.alias), root.get(ListWorksetView_.description));
   }
 
   @Override

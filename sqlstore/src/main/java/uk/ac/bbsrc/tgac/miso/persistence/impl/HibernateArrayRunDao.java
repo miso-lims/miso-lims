@@ -38,9 +38,6 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
     super(ArrayRun.class);
   }
 
-  private static final List<SingularAttribute<? super ArrayRun, String>> SEARCH_PROPERTIES =
-      Arrays.asList(ArrayRun_.alias, ArrayRun_.description);
-
   @Override
   public ArrayRun getByAlias(String alias) throws IOException {
     return getBy(ArrayRun_.ALIAS, alias);
@@ -71,8 +68,8 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
   }
 
   @Override
-  public List<SingularAttribute<? super ArrayRun, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<ArrayRun> root) {
+    return Arrays.asList(root.get(ArrayRun_.alias), root.get(ArrayRun_.description));
   }
 
   @Override

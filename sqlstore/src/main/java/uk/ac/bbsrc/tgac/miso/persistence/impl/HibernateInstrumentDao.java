@@ -46,9 +46,6 @@ public class HibernateInstrumentDao extends HibernateSaveDao<Instrument>
     super(Instrument.class, InstrumentImpl.class);
   }
 
-  private static final List<SingularAttribute<? super InstrumentImpl, String>> SEARCH_PROPERTIES =
-      Arrays.asList(InstrumentImpl_.name, InstrumentImpl_.serialNumber, InstrumentImpl_.identificationBarcode);
-
   @Override
   public List<Instrument> listByType(InstrumentType type) throws IOException {
     QueryBuilder<Instrument, InstrumentImpl> builder = getQueryBuilder();
@@ -93,8 +90,9 @@ public class HibernateInstrumentDao extends HibernateSaveDao<Instrument>
   }
 
   @Override
-  public List<SingularAttribute<? super InstrumentImpl, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<InstrumentImpl> root) {
+    return Arrays.asList(root.get(InstrumentImpl_.name), root.get(InstrumentImpl_.serialNumber),
+        root.get(InstrumentImpl_.identificationBarcode));
   }
 
   @Override

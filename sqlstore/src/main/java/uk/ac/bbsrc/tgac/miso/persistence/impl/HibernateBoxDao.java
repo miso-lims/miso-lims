@@ -49,8 +49,9 @@ public class HibernateBoxDao extends HibernateProviderDao<Box>
   protected static final List<SingularAttribute<? super BoxImpl, String>> IDENTIFIER_PROPERTIES =
       Arrays.asList(BoxImpl_.name, BoxImpl_.alias, BoxImpl_.identificationBarcode);
 
-  protected static final List<SingularAttribute<? super BoxImpl, String>> SEARCH_PROPERTIES =
-      Arrays.asList(BoxImpl_.name, BoxImpl_.alias, BoxImpl_.identificationBarcode, BoxImpl_.locationBarcode);
+  // protected static final List<SingularAttribute<? super BoxImpl, String>> SEARCH_PROPERTIES =
+  // Arrays.asList(BoxImpl_.name, BoxImpl_.alias, BoxImpl_.identificationBarcode,
+  // BoxImpl_.locationBarcode);
 
   @Override
   public Boxable getBoxable(BoxableId id) {
@@ -266,8 +267,9 @@ public class HibernateBoxDao extends HibernateProviderDao<Box>
   }
 
   @Override
-  public List<SingularAttribute<? super BoxImpl, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<BoxImpl> root) {
+    return Arrays.asList(root.get(BoxImpl_.name), root.get(BoxImpl_.alias),
+        root.get(BoxImpl_.identificationBarcode), root.get(BoxImpl_.locationBarcode));
   }
 
   @Override

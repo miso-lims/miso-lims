@@ -63,9 +63,6 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
     super(Run.class);
   }
 
-  private static final List<SingularAttribute<? super Run, String>> SEARCH_PROPERTIES =
-      Arrays.asList(Run_.name, Run_.alias, Run_.description);
-
   @Override
   public Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException {
     // flush here because if Hibernate has not persisted recent changes to container-run relationships,
@@ -216,8 +213,8 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
   }
 
   @Override
-  public List<SingularAttribute<? super Run, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<Run> root) {
+    return Arrays.asList(root.get(Run_.name), root.get(Run_.alias), root.get(Run_.description));
   }
 
   @Override

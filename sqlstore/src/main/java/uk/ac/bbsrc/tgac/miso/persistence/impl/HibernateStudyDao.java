@@ -43,9 +43,6 @@ public class HibernateStudyDao extends HibernateSaveDao<Study>
     super(Study.class, StudyImpl.class);
   }
 
-  private static final List<SingularAttribute<? super StudyImpl, String>> SEARCH_PROPERTIES =
-      Arrays.asList(StudyImpl_.name, StudyImpl_.alias, StudyImpl_.description);
-
   @Override
   public List<Study> listAllWithLimit(long limit) throws IOException {
     if (limit == 0)
@@ -87,8 +84,8 @@ public class HibernateStudyDao extends HibernateSaveDao<Study>
   }
 
   @Override
-  public List<SingularAttribute<? super StudyImpl, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<StudyImpl> root) {
+    return Arrays.asList(root.get(StudyImpl_.name), root.get(StudyImpl_.alias), root.get(StudyImpl_.description));
   }
 
   @Override

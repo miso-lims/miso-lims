@@ -110,12 +110,8 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     return null;
   }
 
-  public default List<SingularAttribute<? super T, String>> getSearchProperties() {
-    return Collections.emptyList();
-  }
-
   public default List<Path<String>> getSearchProperties(Root<T> root) {
-    return pathsFromAttributes(root, getSearchProperties());
+    return Collections.emptyList();
   }
 
   SingularAttribute<? super T, ?> getIdProperty();

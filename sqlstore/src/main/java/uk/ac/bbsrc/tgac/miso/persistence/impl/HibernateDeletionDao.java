@@ -28,9 +28,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 @Repository
 public class HibernateDeletionDao implements DeletionStore, JpaCriteriaPaginatedDataSource<Deletion, Deletion> {
 
-  private static final List<SingularAttribute<? super Deletion, String>> SEARCH_PROPERTIES =
-      Arrays.asList(Deletion_.description);
-
   @Autowired
   private SessionFactory sessionFactory;
 
@@ -71,8 +68,8 @@ public class HibernateDeletionDao implements DeletionStore, JpaCriteriaPaginated
   }
 
   @Override
-  public List<SingularAttribute<? super Deletion, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<Deletion> root) {
+    return Arrays.asList(root.get(Deletion_.description));
   }
 
   @Override

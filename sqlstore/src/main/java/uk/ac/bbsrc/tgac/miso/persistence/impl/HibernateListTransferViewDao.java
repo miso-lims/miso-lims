@@ -2,8 +2,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Consumer;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -81,11 +79,6 @@ public class HibernateListTransferViewDao
   @Override
   public Class<ListTransferView> getResultClass() {
     return ListTransferView.class;
-  }
-
-  @Override
-  public List<SingularAttribute<? super ListTransferView, String>> getSearchProperties() {
-    return Collections.emptyList();
   }
 
   @Override
