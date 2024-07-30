@@ -89,7 +89,7 @@ public class HibernateSampleDao extends HibernateSaveDao<Sample>
     super(Sample.class, SampleImpl.class);
   }
 
-  private static final List<SingularAttribute<? super SampleImpl, String>> SEARCH_PROPERTIES =
+  private static final List<SingularAttribute<? super SampleImpl, String>> IDENTIFIER_PROPERTIES =
       Arrays.asList(SampleImpl_.alias, SampleImpl_.identificationBarcode, SampleImpl_.name);
 
   private static final List<String> SAMPLE_CATEGORIES =
@@ -375,12 +375,13 @@ public class HibernateSampleDao extends HibernateSaveDao<Sample>
 
   @Override
   public List<SingularAttribute<? super SampleImpl, String>> getIdentifierProperties() {
-    return SEARCH_PROPERTIES;
+    return IDENTIFIER_PROPERTIES;
   }
 
   @Override
-  public List<SingularAttribute<? super SampleImpl, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<SampleImpl> root) {
+    return Arrays.asList(root.get(SampleImpl_.alias), root.get(SampleImpl_.identificationBarcode),
+        root.get(SampleImpl_.name));
   }
 
   @Override
