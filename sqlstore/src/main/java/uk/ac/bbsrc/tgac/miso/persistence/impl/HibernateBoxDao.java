@@ -49,10 +49,6 @@ public class HibernateBoxDao extends HibernateProviderDao<Box>
   protected static final List<SingularAttribute<? super BoxImpl, String>> IDENTIFIER_PROPERTIES =
       Arrays.asList(BoxImpl_.name, BoxImpl_.alias, BoxImpl_.identificationBarcode);
 
-  // protected static final List<SingularAttribute<? super BoxImpl, String>> SEARCH_PROPERTIES =
-  // Arrays.asList(BoxImpl_.name, BoxImpl_.alias, BoxImpl_.identificationBarcode,
-  // BoxImpl_.locationBarcode);
-
   @Override
   public Boxable getBoxable(BoxableId id) {
     Class<?> clazz = id.getTargetType().getPersistClass();
