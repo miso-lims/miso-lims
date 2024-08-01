@@ -50,9 +50,6 @@ public class HibernatePoolDao extends HibernateSaveDao<Pool>
   private final static List<SingularAttribute<? super PoolImpl, String>> IDENTIFIER_PROPERTIES =
       Arrays.asList(PoolImpl_.name, PoolImpl_.alias, PoolImpl_.identificationBarcode);
 
-  private final static List<SingularAttribute<? super PoolImpl, String>> SEARCH_PROPERTIES =
-      Arrays.asList(PoolImpl_.name, PoolImpl_.alias, PoolImpl_.identificationBarcode, PoolImpl_.description);
-
   @Override
   public Pool getByBarcode(String barcode) throws IOException {
     if (barcode == null)
@@ -94,8 +91,9 @@ public class HibernatePoolDao extends HibernateSaveDao<Pool>
   }
 
   @Override
-  public List<SingularAttribute<? super PoolImpl, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<PoolImpl> root) {
+    return Arrays.asList(root.get(PoolImpl_.name), root.get(PoolImpl_.alias),
+        root.get(PoolImpl_.identificationBarcode), root.get(PoolImpl_.description));
   }
 
 

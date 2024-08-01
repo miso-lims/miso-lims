@@ -46,9 +46,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.InstrumentModelStore;
 public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentModel>
     implements JpaCriteriaPaginatedDataSource<InstrumentModel, InstrumentModel>, InstrumentModelStore {
 
-  private static final List<SingularAttribute<? super InstrumentModel, String>> SEARCH_PROPERTIES =
-      Arrays.asList(InstrumentModel_.alias);
-
   @Autowired
   private JdbcTemplate template;
 
@@ -136,8 +133,8 @@ public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentMode
   }
 
   @Override
-  public List<SingularAttribute<? super InstrumentModel, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<InstrumentModel> root) {
+    return Arrays.asList(root.get(InstrumentModel_.alias));
   }
 
   @Override

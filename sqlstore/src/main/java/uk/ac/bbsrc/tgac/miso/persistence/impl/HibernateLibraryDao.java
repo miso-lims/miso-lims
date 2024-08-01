@@ -135,10 +135,6 @@ public class HibernateLibraryDao extends HibernateSaveDao<Library>
   private final static List<SingularAttribute<? super LibraryImpl, String>> IDENTIFIER_FIELDS =
       Arrays.asList(LibraryImpl_.name, LibraryImpl_.alias, LibraryImpl_.identificationBarcode);
 
-  private final static List<SingularAttribute<? super LibraryImpl, String>> SEARCH_FIELDS =
-      Arrays.asList(LibraryImpl_.name,
-          LibraryImpl_.alias, LibraryImpl_.description, LibraryImpl_.identificationBarcode);
-
   @Override
   public List<Long> listByAlias(String alias) throws IOException {
     QueryBuilder<Long, LibraryImpl> builder = new QueryBuilder<>(currentSession(), LibraryImpl.class, Long.class);
@@ -276,8 +272,9 @@ public class HibernateLibraryDao extends HibernateSaveDao<Library>
   }
 
   @Override
-  public List<SingularAttribute<? super LibraryImpl, String>> getSearchProperties() {
-    return SEARCH_FIELDS;
+  public List<Path<String>> getSearchProperties(Root<LibraryImpl> root) {
+    return Arrays.asList(root.get(LibraryImpl_.name), root.get(LibraryImpl_.alias),
+        root.get(LibraryImpl_.description), root.get(LibraryImpl_.identificationBarcode));
   }
 
   @Override

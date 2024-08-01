@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
@@ -13,11 +14,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition_;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl_;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public interface JpaCriteriaPaginatedBoxableSource<R extends Boxable, T extends R>
     extends JpaCriteriaPaginatedDataSource<R, T> {
+
+  public static final List<SingularAttribute<? super BoxImpl, String>> SEARCH_PROPERTIES =
+      Arrays.asList(BoxImpl_.name, BoxImpl_.alias, BoxImpl_.identificationBarcode, BoxImpl_.locationBarcode);
 
   @Override
   default void restrictPaginationByBox(QueryBuilder<?, T> builder, String query, Consumer<String> errorHandler) {
@@ -27,7 +32,7 @@ public interface JpaCriteriaPaginatedBoxableSource<R extends Boxable, T extends 
     } else {
       Join<? extends AbstractBoxPosition, BoxImpl> boxJoin = builder.getJoin(join, AbstractBoxPosition_.box);
       List<Path<String>> searchProperties = new ArrayList<>();
-      for (SingularAttribute<? super BoxImpl, String> property : HibernateBoxDao.SEARCH_PROPERTIES) {
+      for (SingularAttribute<? super BoxImpl, String> property : SEARCH_PROPERTIES) {
         searchProperties.add(boxJoin.get(property));
       }
       builder.addTextRestriction(searchProperties, query);

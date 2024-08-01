@@ -36,9 +36,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.RequisitionDao;
 public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
     implements JpaCriteriaPaginatedDataSource<Requisition, Requisition>, RequisitionDao {
 
-  private final static List<SingularAttribute<? super Requisition, String>> SEARCH_PROPERTIES = Arrays
-      .asList(Requisition_.alias);
-
   public HibernateRequisitionDao() {
     super(Requisition.class);
   }
@@ -118,8 +115,8 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   }
 
   @Override
-  public List<SingularAttribute<? super Requisition, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<Requisition> root) {
+    return Arrays.asList(root.get(Requisition_.alias));
   }
 
   @Override

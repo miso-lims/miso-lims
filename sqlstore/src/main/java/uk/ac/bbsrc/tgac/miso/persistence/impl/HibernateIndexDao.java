@@ -30,9 +30,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.IndexStore;
 public class HibernateIndexDao extends HibernateSaveDao<Index>
     implements IndexStore, JpaCriteriaPaginatedDataSource<Index, Index> {
 
-  private static final List<SingularAttribute<? super Index, String>> SEARCH_PROPERTIES =
-      Arrays.asList(Index_.name, Index_.sequence);
-
   public HibernateIndexDao() {
     super(Index.class);
   }
@@ -58,8 +55,8 @@ public class HibernateIndexDao extends HibernateSaveDao<Index>
   }
 
   @Override
-  public List<SingularAttribute<? super Index, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<Index> root) {
+    return Arrays.asList(root.get(Index_.name), root.get(Index_.sequence));
   }
 
   @Override

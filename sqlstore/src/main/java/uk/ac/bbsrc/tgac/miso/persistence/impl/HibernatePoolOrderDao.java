@@ -27,9 +27,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
 public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder>
     implements PoolOrderDao, JpaCriteriaPaginatedDataSource<PoolOrder, PoolOrder> {
 
-  private static final List<SingularAttribute<? super PoolOrder, String>> SEARCH_PROPERTIES =
-      Arrays.asList(PoolOrder_.alias, PoolOrder_.description);
-
   public HibernatePoolOrderDao() {
     super(PoolOrder.class);
   }
@@ -50,8 +47,8 @@ public class HibernatePoolOrderDao extends HibernateSaveDao<PoolOrder>
   }
 
   @Override
-  public List<SingularAttribute<? super PoolOrder, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<PoolOrder> root) {
+    return Arrays.asList(root.get(PoolOrder_.alias), root.get(PoolOrder_.description));
   }
 
   @Override

@@ -34,9 +34,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.ListPoolViewDao;
 public class HibernateListPoolViewDao
     implements ListPoolViewDao, JpaCriteriaPaginatedDataSource<ListPoolView, ListPoolView> {
 
-  private final static List<SingularAttribute<? super ListPoolView, String>> SEARCH_PROPERTIES = Arrays
-      .asList(ListPoolView_.name, ListPoolView_.alias, ListPoolView_.identificationBarcode, ListPoolView_.description);
-
   @Autowired
   private SessionFactory sessionFactory;
 
@@ -82,8 +79,9 @@ public class HibernateListPoolViewDao
   }
 
   @Override
-  public List<SingularAttribute<? super ListPoolView, String>> getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<ListPoolView> root) {
+    return Arrays.asList(root.get(ListPoolView_.name), root.get(ListPoolView_.alias),
+        root.get(ListPoolView_.identificationBarcode), root.get(ListPoolView_.description));
   }
 
   @Override
