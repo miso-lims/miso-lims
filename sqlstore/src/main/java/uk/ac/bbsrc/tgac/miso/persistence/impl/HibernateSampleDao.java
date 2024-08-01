@@ -141,11 +141,6 @@ public class HibernateSampleDao extends HibernateSaveDao<Sample>
   }
 
   @Override
-  public Sample getSample(long id) throws IOException {
-    return (Sample) currentSession().get(SampleImpl.class, id);
-  }
-
-  @Override
   public List<EntityReference> listByAlias(String alias) throws IOException {
     QueryBuilder<EntityReference, SampleImpl> builder =
         new QueryBuilder<>(currentSession(), SampleImpl.class, EntityReference.class);

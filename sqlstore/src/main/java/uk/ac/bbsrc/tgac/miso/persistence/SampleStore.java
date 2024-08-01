@@ -45,8 +45,6 @@ public interface SampleStore extends SaveDao<Sample>, PaginatedDataSource<Sample
 
         Sample getByLibraryAliquotId(long aliquotId) throws IOException;
 
-        Sample getSample(long id) throws IOException;
-
         /**
          * List all the identities associated with a given project which have at least one external name
          * which exactly or partially matches the input String or a comma-separated portion of the input

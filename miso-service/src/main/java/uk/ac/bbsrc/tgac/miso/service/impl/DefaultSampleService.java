@@ -246,7 +246,7 @@ public class DefaultSampleService implements SampleService {
 
   @Override
   public Sample get(long sampleId) throws IOException {
-    return sampleStore.getSample(sampleId);
+    return sampleStore.get(sampleId);
   }
 
   @Override
@@ -390,7 +390,7 @@ public class DefaultSampleService implements SampleService {
       } else {
         sampleStore.update(sample);
       }
-      Sample created = sampleStore.getSample(newId);
+      Sample created = sampleStore.get(newId);
 
       // post-save field generation
       boolean needsUpdate = false;
@@ -555,7 +555,7 @@ public class DefaultSampleService implements SampleService {
     }
     DetailedSample tempParent = sample.getParent();
     if (tempParent.isSaved()) {
-      Sample parent = sampleStore.getSample(tempParent.getId());
+      Sample parent = sampleStore.get(tempParent.getId());
       if (parent == null)
         throw new IllegalArgumentException("Parent sample does not exist");
       else
@@ -632,7 +632,7 @@ public class DefaultSampleService implements SampleService {
   private SampleIdentity findOrCreateIdentity(DetailedSample descendant, SampleIdentity identity)
       throws IOException, MisoNamingException {
     if (identity.isSaved()) {
-      Sample managedIdentity = sampleStore.getSample(identity.getId());
+      Sample managedIdentity = sampleStore.get(identity.getId());
       return (SampleIdentity) LimsUtils.deproxify(managedIdentity);
     } else {
       // If samples are being bulk received for the same new donor, they will all have a null parentId.
