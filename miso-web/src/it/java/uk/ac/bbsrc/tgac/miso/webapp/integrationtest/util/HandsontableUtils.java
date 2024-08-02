@@ -87,7 +87,7 @@ public class HandsontableUtils {
   }
 
   public static String emptyIfNull(Integer value) {
-    return value == null ? "" : StringUtils.strip(value.toString(), "0");
+    return value == null ? "" : StringUtils.stripStart(value.toString(), "0");
   }
 
   public static String emptyIfNull(String value) {
