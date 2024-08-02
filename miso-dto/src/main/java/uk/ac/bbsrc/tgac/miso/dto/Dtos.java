@@ -870,7 +870,7 @@ public class Dtos {
     if (from instanceof SampleStockSingleCellRelative) {
       SampleStockSingleCellRelative scFrom = (SampleStockSingleCellRelative) from;
       SampleStockSingleCell sc = new SampleStockSingleCellImpl();
-      setBigDecimal(sc::setTargetCellRecovery, scFrom.getTargetCellRecovery());
+      setInteger(sc::setTargetCellRecovery, scFrom.getTargetCellRecovery());
       setBigDecimal(sc::setCellViability, scFrom.getCellViability());
       setBigDecimal(sc::setLoadingCellConcentration, scFrom.getLoadingCellConcentration());
       to = sc;
@@ -4600,12 +4600,20 @@ public class Dtos {
     }
   }
 
+  public static void setInteger(@Nonnull Consumer<Integer> setter, String value) {
+    setter.accept(isStringEmptyOrNull(value) ? null : Integer.valueOf(value));
+  }
+
   public static void setInteger(@Nonnull Consumer<Integer> setter, Integer value, boolean nullOk) {
     if (value != null || nullOk) {
       setter.accept(value);
     } else {
       setter.accept(0);
     }
+  }
+
+  public static void setString(@Nonnull Consumer<String> setter, Integer value) {
+    setter.accept(value == null ? null : value.toString());
   }
 
   public static void setString(@Nonnull Consumer<String> setter, BigDecimal value) {

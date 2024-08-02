@@ -13,17 +13,17 @@ public class SampleStockSingleCellImpl extends SampleStockImpl implements Sample
 
   private static final long serialVersionUID = 1L;
 
-  private BigDecimal targetCellRecovery;
+  private Integer targetCellRecovery;
   private BigDecimal cellViability;
   private BigDecimal loadingCellConcentration;
 
   @Override
-  public BigDecimal getTargetCellRecovery() {
+  public Integer getTargetCellRecovery() {
     return targetCellRecovery;
   }
 
   @Override
-  public void setTargetCellRecovery(BigDecimal targetCellRecovery) {
+  public void setTargetCellRecovery(Integer targetCellRecovery) {
     this.targetCellRecovery = targetCellRecovery;
   }
 
@@ -59,19 +59,28 @@ public class SampleStockSingleCellImpl extends SampleStockImpl implements Sample
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     SampleStockSingleCellImpl other = (SampleStockSingleCellImpl) obj;
     if (cellViability == null) {
-      if (other.cellViability != null) return false;
-    } else if (!cellViability.equals(other.cellViability)) return false;
+      if (other.cellViability != null)
+        return false;
+    } else if (!cellViability.equals(other.cellViability))
+      return false;
     if (loadingCellConcentration == null) {
-      if (other.loadingCellConcentration != null) return false;
-    } else if (!loadingCellConcentration.equals(other.loadingCellConcentration)) return false;
+      if (other.loadingCellConcentration != null)
+        return false;
+    } else if (!loadingCellConcentration.equals(other.loadingCellConcentration))
+      return false;
     if (targetCellRecovery == null) {
-      if (other.targetCellRecovery != null) return false;
-    } else if (!targetCellRecovery.equals(other.targetCellRecovery)) return false;
+      if (other.targetCellRecovery != null)
+        return false;
+    } else if (!targetCellRecovery.equals(other.targetCellRecovery))
+      return false;
     return true;
   }
 

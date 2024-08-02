@@ -35,11 +35,13 @@ public class HandsontableUtils {
     assertEquals("Row count", expectedRows, table.getRowCount());
   }
 
-  public static void assertColumnValues(HandsOnTable table, int rowNum, Map<String, String> attributes, String hintMessage) {
+  public static void assertColumnValues(HandsOnTable table, int rowNum, Map<String, String> attributes,
+      String hintMessage) {
     String formatString = hintMessage + " row %d column '%s' value";
     attributes.forEach((key, val) -> {
       if (isStringEmptyOrNull(val)) {
-        assertTrue(String.format(formatString, rowNum, key) + " expected empty", isStringEmptyOrNull(table.getText(key, rowNum)));
+        assertTrue(String.format(formatString, rowNum, key) + " expected empty",
+            isStringEmptyOrNull(table.getText(key, rowNum)));
       } else {
         assertEquals(String.format(formatString, rowNum, key), val, table.getText(key, rowNum));
       }
@@ -66,12 +68,14 @@ public class HandsontableUtils {
     assertTrue("Save error messages", result.getSaveErrors().isEmpty());
   }
 
-  public static <T> void assertEntityAttribute(String column, Map<String, String> attributes, T object, Function<T, String> getter) {
+  public static <T> void assertEntityAttribute(String column, Map<String, String> attributes, T object,
+      Function<T, String> getter) {
     if (attributes.containsKey(column)) {
       String objectAttribute = getter.apply(object);
       String tableAttribute = attributes.get(column);
       if (tableAttribute == null) {
-        assertTrue(String.format("persisted attribute expected empty '%s'", column), isStringEmptyOrNull(objectAttribute));
+        assertTrue(String.format("persisted attribute expected empty '%s'", column),
+            isStringEmptyOrNull(objectAttribute));
       } else {
         assertEquals(String.format("persisted attribute '%s'", column), tableAttribute, objectAttribute);
       }
@@ -80,6 +84,10 @@ public class HandsontableUtils {
 
   public static String emptyIfNull(BigDecimal value) {
     return value == null ? "" : StringUtils.strip(value.toPlainString(), "0");
+  }
+
+  public static String emptyIfNull(Integer value) {
+    return value == null ? "" : StringUtils.strip(value.toString(), "0");
   }
 
   public static String emptyIfNull(String value) {

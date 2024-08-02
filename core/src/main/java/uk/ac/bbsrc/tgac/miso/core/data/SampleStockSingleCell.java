@@ -6,9 +6,9 @@ public interface SampleStockSingleCell extends SampleStock {
 
   public static final String SUBCATEGORY_NAME = "Single Cell (stock)";
 
-  public BigDecimal getTargetCellRecovery();
+  public Integer getTargetCellRecovery();
 
-  public void setTargetCellRecovery(BigDecimal targetCellRecovery);
+  public void setTargetCellRecovery(Integer targetCellRecovery);
 
   public BigDecimal getCellViability();
 
