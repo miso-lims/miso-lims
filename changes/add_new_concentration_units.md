@@ -1,4 +1,4 @@
 New concentration units
-* cells/µl
-* nuclei/µl
+* cells/µL
+* nuclei/µL
 * cells/mL
