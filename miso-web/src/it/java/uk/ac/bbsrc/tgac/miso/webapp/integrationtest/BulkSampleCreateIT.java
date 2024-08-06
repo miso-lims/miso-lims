@@ -77,7 +77,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   private static final Set<String> rnaStockColumns = Sets.newHashSet(SamColumns.DNASE_TREATED);
 
   private static final Set<String> singleCellStockColumns =
-      Sets.newHashSet(SamColumns.TARGET_CELL_RECOVERERY, SamColumns.CELL_VIABILITY,
+      Sets.newHashSet(SamColumns.TARGET_CELL_RECOVERY, SamColumns.CELL_VIABILITY,
           SamColumns.LOADING_CELL_CONC, SamColumns.PARENT_NG_USED, SamColumns.PARENT_VOLUME_USED);
 
   // columns specific to creating aliquots
@@ -804,7 +804,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     stock.put(SamColumns.QC_STATUS, "Ready");
     stock.put(SamColumns.INITIAL_CELL_CONC, "12.34");
     stock.put(SamColumns.DIGESTION, "abcde");
-    stock.put(SamColumns.TARGET_CELL_RECOVERERY, "23");
+    stock.put(SamColumns.TARGET_CELL_RECOVERY, "23");
     stock.put(SamColumns.CELL_VIABILITY, "34.56");
     stock.put(SamColumns.LOADING_CELL_CONC, "45.67");
 
@@ -1094,7 +1094,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     aliquot.put(SamColumns.PURPOSE, "Library");
     aliquot.put(SamColumns.INITIAL_CELL_CONC, "12.34");
     aliquot.put(SamColumns.DIGESTION, "abcde");
-    aliquot.put(SamColumns.TARGET_CELL_RECOVERERY, "23");
+    aliquot.put(SamColumns.TARGET_CELL_RECOVERY, "23");
     aliquot.put(SamColumns.CELL_VIABILITY, "34.56");
     aliquot.put(SamColumns.LOADING_CELL_CONC, "45.67");
 

@@ -87,7 +87,7 @@ public class BulkSamplePage extends BulkPage {
     public static final String PARENT_SAMPLE_CLASS = "Parent Sample Class";
     public static final String INITIAL_CELL_CONC = "Initial Cell Conc.";
     public static final String DIGESTION = "Digestion";
-    public static final String TARGET_CELL_RECOVERERY = "Target Cell Recovery";
+    public static final String TARGET_CELL_RECOVERY = "Target Cell Recovery";
     public static final String CELL_VIABILITY = "Cell Viability";
     public static final String LOADING_CELL_CONC = "Loading Cell Conc.";
     public static final String INPUT_INTO_LIBRARY = "Input into Library";
@@ -111,7 +111,8 @@ public class BulkSamplePage extends BulkPage {
     table = new HandsOnTable(getDriver());
   }
 
-  public static BulkSamplePage getForCreate(WebDriver driver, String baseUrl, Integer quantity, Long projectId, String sampleCategory) {
+  public static BulkSamplePage getForCreate(WebDriver driver, String baseUrl, Integer quantity, Long projectId,
+      String sampleCategory) {
     String url = baseUrl + "miso/sample/bulk/new";
     MapBuilder<String, String> params = new MapBuilder<String, String>()
         .put("quantity", quantity.toString());
@@ -132,7 +133,8 @@ public class BulkSamplePage extends BulkPage {
     return new BulkSamplePage(driver);
   }
 
-  public static BulkSamplePage getForPropagate(WebDriver driver, String baseUrl, List<Long> parentIds, List<Integer> replicates,
+  public static BulkSamplePage getForPropagate(WebDriver driver, String baseUrl, List<Long> parentIds,
+      List<Integer> replicates,
       String sampleCategory) {
     String ids = Joiner.on(',').join(parentIds);
     String replicatesString = Joiner.on(',').join(replicates);
