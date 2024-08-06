@@ -36,7 +36,7 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
 
   private static final long serialVersionUID = 1L;
 
-  @ManyToOne(optional = true, targetEntity = DetailedSampleImpl.class, fetch = FetchType.LAZY)
+  @ManyToOne(optional = true, targetEntity = DetailedSampleImpl.class, fetch = FetchType.EAGER)
   @JoinColumn(name = "parentId", nullable = true)
   private DetailedSample parent;
 

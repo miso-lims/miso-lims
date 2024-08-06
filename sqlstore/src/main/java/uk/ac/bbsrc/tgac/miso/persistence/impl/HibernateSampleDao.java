@@ -13,26 +13,19 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import javax.persistence.TemporalType;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Disjunction;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
+import uk.ac.bbsrc.tgac.miso.core.data.Array_;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -41,32 +34,63 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentAttributes;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentAttributes_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferViewSample_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset_;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
-import uk.ac.bbsrc.tgac.miso.persistence.util.DbUtils;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxableSource<Sample> {
+public class HibernateSampleDao extends HibernateSaveDao<Sample>
+    implements SampleStore, JpaCriteriaPaginatedBoxableSource<Sample, SampleImpl> {
 
-  private static final String[] SEARCH_PROPERTIES = new String[] {"alias", "identificationBarcode", "name"};
-  private static final List<AliasDescriptor> STANDARD_ALIASES = Arrays.asList(
-      new AliasDescriptor("parentAttributes", JoinType.LEFT_OUTER_JOIN),
-      new AliasDescriptor("parentAttributes.identityAttributes", JoinType.LEFT_OUTER_JOIN),
-      new AliasDescriptor("parentAttributes.tissueAttributes", JoinType.LEFT_OUTER_JOIN),
-      new AliasDescriptor("tissueAttributes.tissueOrigin", JoinType.LEFT_OUTER_JOIN),
-      new AliasDescriptor("tissueAttributes.tissueType", JoinType.LEFT_OUTER_JOIN),
-      new AliasDescriptor("sampleClass", JoinType.LEFT_OUTER_JOIN));
+  public HibernateSampleDao() {
+    super(Sample.class, SampleImpl.class);
+  }
+
+  private static final List<SingularAttribute<? super SampleImpl, String>> IDENTIFIER_PROPERTIES =
+      Arrays.asList(SampleImpl_.alias, SampleImpl_.identificationBarcode, SampleImpl_.name);
 
   private static final List<String> SAMPLE_CATEGORIES =
       Arrays.asList(SampleIdentity.CATEGORY_NAME, SampleTissue.CATEGORY_NAME,
@@ -75,33 +99,13 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
   public void setDetailedSample(boolean detailedSample) {
     this.detailedSample = detailedSample;
   }
 
   @Override
-  public Long create(final Sample sample) throws IOException {
-    return (Long) currentSession().save(sample);
-  }
-
-  @Override
-  public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
-  }
-
-  @Override
-  public Sample get(long id) throws IOException {
-    return getSample(id);
-  }
-
-  @Override
   public Sample getByBarcode(String barcode) throws IOException {
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.add(Restrictions.eq("identificationBarcode", barcode));
-    return (Sample) criteria.uniqueResult();
+    return getBy(SampleImpl_.IDENTIFICATION_BARCODE, barcode);
   }
 
   @Override
@@ -109,74 +113,40 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     if (barcodeList.isEmpty()) {
       return Collections.emptyList();
     }
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.add(Restrictions.in("identificationBarcode", barcodeList));
-    @SuppressWarnings("unchecked")
-    List<Sample> records = criteria.list();
-    return records;
+    QueryBuilder<Sample, SampleImpl> builder = getQueryBuilder();
+    builder.addInPredicate(builder.getRoot().get(SampleImpl_.identificationBarcode), barcodeList);
+    return builder.getResultList();
   }
 
   @Override
   public List<Sample> listByIdList(Collection<Long> idList) throws IOException {
-    if (idList.isEmpty()) {
-      return Collections.emptyList();
-    }
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    criteria.add(Restrictions.in("sampleId", idList));
-    @SuppressWarnings("unchecked")
-    List<Sample> records = criteria.list();
-    return records;
+    return listByIdList(SampleImpl_.SAMPLE_ID, idList);
   }
 
   @Override
   public Sample getByLibraryAliquotId(long aliquotId) {
-    DetachedCriteria subquery = DetachedCriteria.forClass(LibraryAliquot.class)
-        .createAlias("library", "library")
-        .createAlias("library.sample", "sample")
-        .add(Restrictions.eq("id", aliquotId))
-        .setProjection(Projections.property("sample.sampleId"));
+    QueryBuilder<Long, LibraryAliquot> idBuilder =
+        new QueryBuilder<>(currentSession(), LibraryAliquot.class, Long.class);
+    Join<LibraryAliquot, LibraryImpl> library =
+        idBuilder.getJoin(idBuilder.getRoot(), LibraryAliquot_.library, JoinType.INNER);
+    Join<LibraryImpl, SampleImpl> sample = idBuilder.getJoin(library, LibraryImpl_.sample, JoinType.INNER);
+    idBuilder.addPredicate(
+        idBuilder.getCriteriaBuilder().equal(idBuilder.getRoot().get(LibraryAliquot_.aliquotId), aliquotId));
+    idBuilder.setColumn(sample.get(SampleImpl_.sampleId));
+    Long sampleId = idBuilder.getSingleResultOrNull();
 
-    return (Sample) currentSession().createCriteria(SampleImpl.class)
-        .add(Property.forName("id").eq(subquery))
-        .uniqueResult();
-  }
-
-  @Override
-  public List<Sample> list() throws IOException {
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class);
-    @SuppressWarnings("unchecked")
-    List<Sample> records = criteria.list();
-    return records;
-  }
-
-  @Override
-  public Sample getSample(long id) throws IOException {
-    return (Sample) currentSession().get(SampleImpl.class, id);
+    QueryBuilder<Sample, SampleImpl> builder = getQueryBuilder();
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(SampleImpl_.sampleId), sampleId));
+    return builder.getSingleResultOrNull();
   }
 
   @Override
   public List<EntityReference> listByAlias(String alias) throws IOException {
-    @SuppressWarnings("unchecked")
-    List<EntityReference> results = currentSession().createCriteria(SampleImpl.class)
-        .add(Restrictions.eq("alias", alias))
-        .setProjection(EntityReference.makeProjectionList("id", "alias"))
-        .setResultTransformer(EntityReference.RESULT_TRANSFORMER)
-        .list();
-    return results;
-  }
-
-  @Override
-  public long update(Sample sample) throws IOException {
-    currentSession().update(sample);
-    return sample.getId();
-  }
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+    QueryBuilder<EntityReference, SampleImpl> builder =
+        new QueryBuilder<>(currentSession(), SampleImpl.class, EntityReference.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(SampleImpl_.alias), alias));
+    builder.setColumns(builder.getRoot().get(SampleImpl_.sampleId), builder.getRoot().get(SampleImpl_.alias));
+    return builder.getResultList();
   }
 
   @Override
@@ -186,16 +156,20 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     if (isStringEmptyOrNull(query)) {
       return Collections.emptyList();
     }
-    @SuppressWarnings("unchecked")
+
     List<IdentityView> records = (List<IdentityView>) SampleIdentityImpl.getSetFromString(query)
         .stream().map(extNameOrAlias -> {
-          Criteria criteria = currentSession().createCriteria(IdentityView.class)
-              .add(Restrictions.eq("discriminator", SampleIdentity.CATEGORY_NAME));
+          QueryBuilder<IdentityView, IdentityView> builder =
+              new QueryBuilder<>(currentSession(), IdentityView.class, IdentityView.class);
+          builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(IdentityView_.discriminator),
+              SampleIdentity.CATEGORY_NAME));
           if (projectId != null) {
-            criteria.add(Restrictions.eq("projectId", projectId));
+            builder.addPredicate(
+                builder.getCriteriaBuilder().equal(builder.getRoot().get(IdentityView_.projectId), projectId));
           }
-          criteria.add(DbUtils.textRestriction(extNameOrAlias, "externalName", "alias"));
-          return criteria.list();
+          builder.addTextRestriction(Arrays.asList(builder.getRoot().get(IdentityView_.externalName),
+              builder.getRoot().get(IdentityView_.alias)), extNameOrAlias);
+          return builder.getResultList();
         }).flatMap(list -> list.stream())
         .distinct()
         .collect(Collectors.toList());
@@ -226,17 +200,21 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
     if (externalNames == null || externalNames.isEmpty()) {
       return Collections.emptyList();
     }
-    Criteria criteria = currentSession().createCriteria(IdentityView.class);
+    QueryBuilder<IdentityView, IdentityView> builder =
+        new QueryBuilder<>(currentSession(), IdentityView.class, IdentityView.class);
     if (project != null) {
-      criteria.add(Restrictions.eq("projectId", project.getId()));
+      builder.addPredicate(
+          builder.getCriteriaBuilder().equal(builder.getRoot().get(IdentityView_.projectId), project.getId()));
     }
-    Disjunction disjunction = Restrictions.disjunction();
+
+    Predicate disjunction = builder.getCriteriaBuilder().disjunction();
     for (String externalName : externalNames) {
-      disjunction.add(Restrictions.ilike("externalName", externalName, MatchMode.ANYWHERE));
+      disjunction = builder.getCriteriaBuilder().or(disjunction, builder.getCriteriaBuilder()
+          .like(builder.getRoot().get(IdentityView_.externalName), '%' + externalName + '%'));
     }
-    criteria.add(disjunction);
-    @SuppressWarnings("unchecked")
-    List<IdentityView> results = criteria.list();
+    builder.addPredicate(disjunction);
+
+    List<IdentityView> results = builder.getResultList();
     if (exactMatch) {
       return filterOnlyExactExternalNameMatches(results, externalNames);
     } else {
@@ -257,20 +235,42 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   @Override
   public SampleTissue getMatchingGhostTissue(SampleTissue tissue) {
     validateGhostTissueLookup(tissue);
-    Criteria criteria = currentSession().createCriteria(SampleTissueImpl.class);
-    criteria.add(Restrictions.eq("isSynthetic", true));
-    criteria.add(Restrictions.eq("parent.id", tissue.getParent().getId()));
-    criteria.add(Restrictions.eq("tissueOrigin.id", tissue.getTissueOrigin().getId()));
-    criteria.add(Restrictions.eq("tissueType.id", tissue.getTissueType().getId()));
-    criteria.add(eqNullable("timesReceived", tissue.getTimesReceived()));
-    criteria.add(eqNullable("tubeNumber", tissue.getTubeNumber()));
-    criteria.add(eqNullable("passageNumber", tissue.getPassageNumber()));
-    criteria.add(eqNullable("timepoint", tissue.getTimepoint()));
-    return (SampleTissue) criteria.uniqueResult();
+
+    QueryBuilder<SampleTissue, SampleTissueImpl> builder =
+        new QueryBuilder<>(currentSession(), SampleTissueImpl.class, SampleTissue.class);
+    Join<SampleTissueImpl, DetailedSampleImpl> parent =
+        builder.getJoin(builder.getRoot(), SampleTissueImpl_.parent);
+    Join<SampleTissueImpl, ParentAttributes> parentAttributes =
+        builder.getJoin(builder.getRoot(), SampleTissueImpl_.parentAttributes);
+    Join<ParentAttributes, ParentTissueAttributes> tissueAttributes =
+        builder.getJoin(parentAttributes, ParentAttributes_.tissueAttributes);
+    Join<ParentTissueAttributes, TissueOriginImpl> tissueOrigin =
+        builder.getJoin(tissueAttributes, ParentTissueAttributes_.tissueOrigin);
+    Join<ParentTissueAttributes, TissueTypeImpl> tissueType =
+        builder.getJoin(tissueAttributes, ParentTissueAttributes_.tissueType);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(SampleTissueImpl_.isSynthetic), true));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(parent.get(DetailedSampleImpl_.sampleId), tissue.getParent().getId()));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(tissueOrigin.get(TissueOriginImpl_.tissueOriginId),
+        tissue.getTissueOrigin().getId()));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(tissueType.get(TissueTypeImpl_.tissueTypeId),
+        tissue.getTissueType().getId()));
+    builder.addPredicate(
+        eqNullable(builder, builder.getRoot().get(SampleTissueImpl_.timesReceived), tissue.getTimesReceived()));
+    builder.addPredicate(
+        eqNullable(builder, builder.getRoot().get(SampleTissueImpl_.tubeNumber), tissue.getTubeNumber()));
+    builder.addPredicate(
+        eqNullable(builder, builder.getRoot().get(SampleTissueImpl_.passageNumber), tissue.getPassageNumber()));
+    builder.addPredicate(
+        eqNullable(builder, builder.getRoot().get(SampleTissueImpl_.timepoint), tissue.getTimepoint()));
+    return builder.getSingleResultOrNull();
   }
 
-  private Criterion eqNullable(String propertyName, Object value) {
-    return value == null ? Restrictions.isNull(propertyName) : Restrictions.eq(propertyName, value);
+  private Predicate eqNullable(QueryBuilder<SampleTissue, SampleTissueImpl> builder, Path<?> property,
+      Object value) {
+    return value == null ? builder.getCriteriaBuilder().isNull(property)
+        : builder.getCriteriaBuilder().equal(property, value);
   }
 
   private void validateGhostTissueLookup(SampleTissue tissue) {
@@ -285,68 +285,82 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public String getProjectColumn() {
-    return "project.id";
-  }
-
-  @Override
-  public Iterable<AliasDescriptor> listAliases() {
-    return STANDARD_ALIASES;
-  }
-
-  @Override
-  public String propertyForSortColumn(String original) {
+  public Path<?> propertyForSortColumn(QueryBuilder<?, SampleImpl> builder, String original) {
     switch (original) {
+      case "id":
+        return builder.getRoot().get(SampleImpl_.sampleId);
       case "effectiveExternalNames":
-        return "identityAttributes.externalName";
+        Join<DetailedSampleImpl, ParentAttributes> parentAttributes =
+            builder.getJoin(builder.getRoot(DetailedSampleImpl.class), DetailedSampleImpl_.parentAttributes);
+        Join<ParentAttributes, ParentIdentityAttributes> identityAttributes =
+            builder.getJoin(parentAttributes, ParentAttributes_.identityAttributes);
+        return identityAttributes.get(ParentIdentityAttributes_.externalName);
       case "effectiveTissueOriginAlias":
-        return "tissueOrigin.alias";
+        Join<DetailedSampleImpl, ParentAttributes> tissueOriginParentAttributes =
+            builder.getJoin(builder.getRoot(DetailedSampleImpl.class), DetailedSampleImpl_.parentAttributes);
+        Join<ParentAttributes, ParentTissueAttributes> tissueOriginTissueAttributes =
+            builder.getJoin(tissueOriginParentAttributes, ParentAttributes_.tissueAttributes);
+        Join<ParentTissueAttributes, TissueOriginImpl> tissueOrigin =
+            builder.getJoin(tissueOriginTissueAttributes, ParentTissueAttributes_.tissueOrigin);
+        return tissueOrigin.get(TissueOriginImpl_.alias);
       case "effectiveTissueTypeAlias":
-        return "tissueType.alias";
+        Join<DetailedSampleImpl, ParentAttributes> tissueTypeParentAttributes =
+            builder.getJoin(builder.getRoot(DetailedSampleImpl.class), DetailedSampleImpl_.parentAttributes);
+        Join<ParentAttributes, ParentTissueAttributes> tissueTypeTissueAttributes =
+            builder.getJoin(tissueTypeParentAttributes, ParentAttributes_.tissueAttributes);
+        Join<ParentTissueAttributes, TissueTypeImpl> tissueType =
+            builder.getJoin(tissueTypeTissueAttributes, ParentTissueAttributes_.tissueType);
+        return tissueType.get(TissueTypeImpl_.alias);
       case "sampleClassId":
-        return "sampleClass.alias";
+        return builder.getJoin(builder.getRoot(DetailedSampleImpl.class), DetailedSampleImpl_.sampleClass)
+            .get(SampleClassImpl_.alias);
       case "projectCode":
-        return "project.id";
+        return builder.getJoin(builder.getRoot(), SampleImpl_.project).get(ProjectImpl_.code);
+      case "creationDate":
+        // Using an unchecked cast here since CriteriaBuilder.treat() does not work here
+        @SuppressWarnings("unchecked")
+        Root<DetailedSampleImpl> detailedSampleRoot = ((Root<DetailedSampleImpl>) (Object) builder.getRoot());
+        return detailedSampleRoot.get(DetailedSampleImpl_.creationDate);
       default:
-        return original;
+        return builder.getRoot().get(original);
     }
   }
 
   @Override
-  public Class<? extends Sample> getRealClass() {
+  public SingularAttribute<SampleImpl, ?> getIdProperty() {
+    return SampleImpl_.sampleId;
+  }
+
+  @Override
+  public Class<SampleImpl> getEntityClass() {
     return SampleImpl.class;
   }
 
   @Override
-  public String propertyForDate(Criteria criteria, DateType type) {
+  public Class<Sample> getResultClass() {
+    return Sample.class;
+  }
+
+  @Override
+  public Path<?> propertyForDate(Root<SampleImpl> root, DateType type) {
     switch (type) {
       case CREATE:
-        return detailedSample ? "creationDate" : null;
+        return detailedSample
+            ? currentSession().getCriteriaBuilder().treat(root, DetailedSampleImpl.class)
+                .get(DetailedSampleImpl_.creationDate)
+            : null;
       case ENTERED:
-        return "creationTime";
+        return root.get(SampleImpl_.creationTime);
       case UPDATE:
-        return "lastModified";
+        return root.get(SampleImpl_.lastModified);
       default:
         return null;
     }
   }
 
   @Override
-  public TemporalType temporalTypeForDate(DateType type) {
-    switch (type) {
-      case CREATE:
-        return TemporalType.DATE;
-      case ENTERED:
-      case UPDATE:
-        return TemporalType.TIMESTAMP;
-      default:
-        return null;
-    }
-  }
-
-  @Override
-  public String propertyForUser(boolean creator) {
-    return creator ? "creator" : "lastModifier";
+  public SingularAttribute<SampleImpl, ? extends UserImpl> propertyForUser(boolean creator) {
+    return creator ? SampleImpl_.creator : SampleImpl_.lastModifier;
   }
 
   @Override
@@ -355,45 +369,51 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public String[] getIdentifierProperties() {
-    return SEARCH_PROPERTIES;
+  public List<SingularAttribute<? super SampleImpl, String>> getIdentifierProperties() {
+    return IDENTIFIER_PROPERTIES;
   }
 
   @Override
-  public String[] getSearchProperties() {
-    return SEARCH_PROPERTIES;
+  public List<Path<String>> getSearchProperties(Root<SampleImpl> root) {
+    return Arrays.asList(root.get(SampleImpl_.alias), root.get(SampleImpl_.identificationBarcode),
+        root.get(SampleImpl_.name));
   }
 
   @Override
   public long getChildSampleCount(Sample sample) {
-    return (long) currentSession().createCriteria(DetailedSampleImpl.class)
-        .add(Restrictions.eqOrIsNull("parent", sample))
-        .setProjection(Projections.rowCount())
-        .uniqueResult();
+    LongQueryBuilder<DetailedSampleImpl> builder = new LongQueryBuilder<>(currentSession(), DetailedSampleImpl.class);
+    builder.addPredicate(
+        sample == null ? builder.getCriteriaBuilder().isNull(builder.getRoot().get(DetailedSampleImpl_.parent))
+            : builder.getCriteriaBuilder().equal(builder.getRoot().get(DetailedSampleImpl_.parent), sample));
+    return builder.getCount();
   }
 
   @Override
   public EntityReference getNextInProject(Sample sample) {
-    return (EntityReference) currentSession().createCriteria(SampleImpl.class)
-        .add(Restrictions.eq("project", sample.getProject()))
-        .add(Restrictions.gt("sampleId", sample.getId()))
-        .addOrder(Order.asc("sampleId"))
-        .setMaxResults(1)
-        .setProjection(EntityReference.makeProjectionList("id", "name"))
-        .setResultTransformer(EntityReference.RESULT_TRANSFORMER)
-        .uniqueResult();
+    QueryBuilder<EntityReference, SampleImpl> builder =
+        new QueryBuilder<>(currentSession(), SampleImpl.class, EntityReference.class);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(SampleImpl_.project), sample.getProject()));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().greaterThan(builder.getRoot().get(SampleImpl_.sampleId), sample.getId()));
+    builder.addSort(builder.getRoot().get(SampleImpl_.sampleId), true);
+    builder.setColumns(builder.getRoot().get(SampleImpl_.sampleId), builder.getRoot().get(SampleImpl_.name));
+    List<EntityReference> result = builder.getResultList(1, 0);
+    return result.isEmpty() ? null : result.get(0);
   }
 
   @Override
   public EntityReference getPreviousInProject(Sample sample) {
-    return (EntityReference) currentSession().createCriteria(SampleImpl.class)
-        .add(Restrictions.eq("project", sample.getProject()))
-        .add(Restrictions.lt("sampleId", sample.getId()))
-        .addOrder(Order.desc("sampleId"))
-        .setMaxResults(1)
-        .setProjection(EntityReference.makeProjectionList("id", "name"))
-        .setResultTransformer(EntityReference.RESULT_TRANSFORMER)
-        .uniqueResult();
+    QueryBuilder<EntityReference, SampleImpl> builder =
+        new QueryBuilder<>(currentSession(), SampleImpl.class, EntityReference.class);
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(SampleImpl_.project), sample.getProject()));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().lessThan(builder.getRoot().get(SampleImpl_.sampleId), sample.getId()));
+    builder.addSort(builder.getRoot().get(SampleImpl_.sampleId), false);
+    builder.setColumns(builder.getRoot().get(SampleImpl_.sampleId), builder.getRoot().get(SampleImpl_.name));
+    List<EntityReference> result = builder.getResultList(1, 0);
+    return result.isEmpty() ? null : result.get(0);
   }
 
   @Override
@@ -410,21 +430,23 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
       return Collections.emptySet();
     }
     Set<Long> output = new HashSet<>();
-    Criteria criteria = currentSession().createCriteria(SampleImpl.class)
-        .createAlias("parent", "parent")
-        .createAlias("sampleClass", "sampleClass")
-        .add(Restrictions.in("parent.sampleId", parentIds))
-        .setProjection(
-            Projections.projectionList()
-                .add(Projections.property("sampleId"))
-                .add(Projections.property("sampleClass.sampleCategory")));
+
+    QueryBuilder<Object[], SampleImpl> builder = new QueryBuilder<>(currentSession(), SampleImpl.class, Object[].class);
+    Join<DetailedSampleImpl, DetailedSampleImpl> parent =
+        builder.getJoin(builder.getRoot(DetailedSampleImpl.class), DetailedSampleImpl_.parent, JoinType.INNER);
+    Join<DetailedSampleImpl, SampleClassImpl> sampleClass =
+        builder.getJoin(builder.getRoot(DetailedSampleImpl.class), DetailedSampleImpl_.sampleClass, JoinType.INNER);
+    Join<SampleImpl, Requisition> requisition =
+        builder.getJoin(builder.getRoot(), SampleImpl_.requisition);
+    builder.addInPredicate(parent.get(DetailedSampleImpl_.sampleId), parentIds);
+    builder.setColumns(builder.getRoot().get(SampleImpl_.sampleId), sampleClass.get(SampleClassImpl_.sampleCategory));
+
     if (effectiveRequisitionId != null) {
-      criteria = criteria.createAlias(SampleImpl_.REQUISITION, "requisition", JoinType.LEFT_OUTER_JOIN)
-          .add(Restrictions.or(Restrictions.eq("requisition.id", effectiveRequisitionId),
-              Restrictions.isNull("requisition")));
+      builder.addPredicate(builder.getCriteriaBuilder().or(
+          builder.getCriteriaBuilder().equal(requisition.get(Requisition_.requisitionId), effectiveRequisitionId),
+          builder.getCriteriaBuilder().isNull(builder.getRoot().get(SampleImpl_.requisition))));
     }
-    @SuppressWarnings("unchecked")
-    List<Object[]> results = criteria.list();
+    List<Object[]> results = builder.getResultList();
 
     int targetIndex = SAMPLE_CATEGORIES.indexOf(targetSampleCategory);
     Set<Long> nextParents = new HashSet<>();
@@ -445,111 +467,170 @@ public class HibernateSampleDao implements SampleStore, HibernatePaginatedBoxabl
   }
 
   @Override
-  public void restrictPaginationByExternalName(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(query, "externalName", "secondaryIdentifier"));
+  public void restrictPaginationByProjectId(QueryBuilder<?, SampleImpl> builder, long projectId,
+      Consumer<String> errorHandler) {
+    Join<SampleImpl, ProjectImpl> project = builder.getJoin(builder.getRoot(), SampleImpl_.project);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(project.get(ProjectImpl_.id), projectId));
   }
 
   @Override
-  public void restrictPaginationByLab(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.createAlias("lab", "lab", JoinType.LEFT_OUTER_JOIN);
-    criteria.add(DbUtils.textRestriction(query, "lab.alias"));
+  public void restrictPaginationByExternalName(QueryBuilder<?, SampleImpl> builder, String query,
+      Consumer<String> errorHandler) {
+    Join<DetailedSampleImpl, ParentAttributes> parentAttributes =
+        builder.getJoin(builder.getRoot(DetailedSampleImpl.class), DetailedSampleImpl_.parentAttributes);
+    Join<ParentAttributes, ParentIdentityAttributes> identityAttributes =
+        builder.getJoin(parentAttributes, ParentAttributes_.identityAttributes);
+    builder.addTextRestriction(Arrays.asList(identityAttributes.get(ParentIdentityAttributes_.externalName),
+        builder.getRoot(SampleTissueImpl.class).get(SampleTissueImpl_.secondaryIdentifier)), query);
   }
 
   @Override
-  public void restrictPaginationByGroupId(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(query, "groupId"));
+  public void restrictPaginationByLab(QueryBuilder<?, SampleImpl> builder, String query,
+      Consumer<String> errorHandler) {
+    Join<SampleTissueImpl, LabImpl> lab =
+        builder.getJoin(builder.getRoot(SampleTissueImpl.class), SampleTissueImpl_.lab);
+    builder.addTextRestriction(lab.get(LabImpl_.alias), query);
   }
 
   @Override
-  public void restrictPaginationByGhost(Criteria criteria, boolean isGhost, Consumer<String> errorHandler) {
-    criteria.add(Restrictions.eq("isSynthetic", isGhost));
+  public void restrictPaginationByGroupId(QueryBuilder<?, SampleImpl> builder, String query,
+      Consumer<String> errorHandler) {
+    builder.addTextRestriction(builder.getRoot(DetailedSampleImpl.class).get(DetailedSampleImpl_.groupId), query);
   }
 
   @Override
-  public void restrictPaginationByClass(Criteria criteria, String name, Consumer<String> errorHandler) {
-    criteria.createAlias("sampleClass", "sampleClass");
-    criteria.add(DbUtils.textRestriction(name, "sampleClass.alias"));
+  public void restrictPaginationByGhost(QueryBuilder<?, SampleImpl> builder, boolean isGhost,
+      Consumer<String> errorHandler) {
+    builder.addPredicate(builder.getCriteriaBuilder()
+        .equal(builder.getRoot(DetailedSampleImpl.class).get(DetailedSampleImpl_.isSynthetic), isGhost));
   }
 
   @Override
-  public void restrictPaginationByArrayed(Criteria criteria, boolean isArrayed, Consumer<String> errorHandler) {
-    DetachedCriteria subquery = DetachedCriteria.forClass(Array.class)
-        .createAlias("samples", "sample")
-        .setProjection(Projections.property("sample.id"));
+  public void restrictPaginationByClass(QueryBuilder<?, SampleImpl> builder, String name,
+      Consumer<String> errorHandler) {
+    Join<DetailedSampleImpl, SampleClassImpl> sampleClass =
+        builder.getJoin(builder.getRoot(DetailedSampleImpl.class), DetailedSampleImpl_.sampleClass, JoinType.INNER);
+    builder.addTextRestriction(sampleClass.get(SampleClassImpl_.alias), name);
+  }
+
+  @Override
+  public void restrictPaginationByArrayed(QueryBuilder<?, SampleImpl> builder, boolean isArrayed,
+      Consumer<String> errorHandler) {
+    QueryBuilder<Long, Array> idBuilder = new QueryBuilder<>(currentSession(), Array.class, Long.class);
+    Join<Array, SampleImpl> sample = idBuilder.getJoin(idBuilder.getRoot(), Array_.samples, JoinType.INNER);
+    idBuilder.setColumn(sample.get(SampleImpl_.sampleId));
+    List<Long> ids = idBuilder.getResultList();
     if (isArrayed) {
-      criteria.add(Property.forName("id").in(subquery));
+      builder.addInPredicate(builder.getRoot().get(SampleImpl_.sampleId), ids);
     } else {
-      criteria.add(Property.forName("id").notIn(subquery));
+      builder.addNotInPredicate(builder.getRoot().get(SampleImpl_.sampleId), ids);
     }
   }
 
   @Override
-  public void restrictPaginationByRequisitionId(Criteria criteria, long requisitionId, Consumer<String> errorHandler) {
-    criteria.createAlias("requisition", "requisition")
-        .add(Restrictions.eq("requisition.requisitionId", requisitionId));
-  }
-
-  @Override
-  public void restrictPaginationByRequisition(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.createAlias("requisition", "requisition")
-        .add(DbUtils.textRestriction(query, "requisition.alias"));
-  }
-
-  @Override
-  public void restrictPaginationBySupplementalToRequisitionId(Criteria criteria, long requisitionId,
+  public void restrictPaginationByRequisitionId(QueryBuilder<?, SampleImpl> builder, long requisitionId,
       Consumer<String> errorHandler) {
-    DetachedCriteria subquery = DetachedCriteria.forClass(RequisitionSupplementalSample.class)
-        .createAlias("sample", "sample")
-        .add(Restrictions.eq("requisitionId", requisitionId))
-        .setProjection(Projections.property("sample.id"));
-    criteria.add(Property.forName("id").in(subquery));
+    Join<SampleImpl, Requisition> requisition =
+        builder.getJoin(builder.getRoot(), SampleImpl_.requisition, JoinType.INNER);
+    builder
+        .addPredicate(builder.getCriteriaBuilder().equal(requisition.get(Requisition_.requisitionId), requisitionId));
   }
 
   @Override
-  public void restrictPaginationBySubproject(Criteria criteria, String query, Consumer<String> errorHandler) {
+  public void restrictPaginationByRequisition(QueryBuilder<?, SampleImpl> builder, String query,
+      Consumer<String> errorHandler) {
+    Join<SampleImpl, Requisition> requisition =
+        builder.getJoin(builder.getRoot(), SampleImpl_.requisition, JoinType.INNER);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(requisition.get(Requisition_.alias), query));
+  }
+
+  @Override
+  public void restrictPaginationBySupplementalToRequisitionId(QueryBuilder<?, SampleImpl> builder, long requisitionId,
+      Consumer<String> errorHandler) {
+    QueryBuilder<Long, RequisitionSupplementalSample> idBuilder =
+        new QueryBuilder<>(currentSession(), RequisitionSupplementalSample.class, Long.class);
+    Join<RequisitionSupplementalSample, SampleImpl> sample =
+        idBuilder.getJoin(idBuilder.getRoot(), RequisitionSupplementalSample_.sample, JoinType.INNER);
+    idBuilder.addPredicate(idBuilder.getCriteriaBuilder()
+        .equal(idBuilder.getRoot().get(RequisitionSupplementalSample_.requisitionId), requisitionId));
+    idBuilder.setColumn(sample.get(SampleImpl_.sampleId));
+    List<Long> ids = idBuilder.getResultList();
+
+    builder.addInPredicate(builder.getRoot().get(SampleImpl_.sampleId), ids);
+  }
+
+  @Override
+  public void restrictPaginationBySubproject(QueryBuilder<?, SampleImpl> builder, String query,
+      Consumer<String> errorHandler) {
     if (LimsUtils.isStringBlankOrNull(query)) {
-      criteria.add(Restrictions.isNull("subproject"));
+      builder.addPredicate(builder.getCriteriaBuilder()
+          .isNull(builder.getRoot(DetailedSampleImpl.class).get(DetailedSampleImpl_.subproject)));
     } else {
-      criteria.createAlias("subproject", "subproject");
-      criteria.add(DbUtils.textRestriction(query, "subproject.alias"));
+      Join<DetailedSampleImpl, SubprojectImpl> subproject =
+          builder.getJoin(builder.getRoot(DetailedSampleImpl.class), DetailedSampleImpl_.subproject, JoinType.INNER);
+      builder.addTextRestriction(subproject.get(SubprojectImpl_.alias), query);
     }
   }
 
   @Override
-  public void restrictPaginationByTissueOrigin(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(query, "tissueOrigin.alias"));
-  }
-
-  @Override
-  public void restrictPaginationByTissueType(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(query, "tissueType.alias"));
-  }
-
-  @Override
-  public void restrictPaginationByWorksetId(Criteria criteria, long worksetId, Consumer<String> errorHandler) {
-    DetachedCriteria subquery = DetachedCriteria.forClass(Workset.class)
-        .createAlias("worksetSamples", "worksetSample")
-        .createAlias("worksetSample.item", "sample")
-        .add(Restrictions.eq("id", worksetId))
-        .setProjection(Projections.property("sample.id"));
-    criteria.add(Property.forName("id").in(subquery));
-  }
-
-  @Override
-  public void restrictPaginationByTimepoint(Criteria criteria, String query, Consumer<String> errorHandler) {
-    criteria.add(DbUtils.textRestriction(query, "timepoint"));
-  }
-
-  @Override
-  public void restrictPaginationByDistributionRecipient(Criteria criteria, String query,
+  public void restrictPaginationByTissueOrigin(QueryBuilder<?, SampleImpl> builder, String query,
       Consumer<String> errorHandler) {
-    DbUtils.restrictPaginationByDistributionRecipient(criteria, query, "samples", "sampleId");
+    Join<DetailedSampleImpl, ParentAttributes> parentAttributes =
+        builder.getJoin(builder.getRoot(DetailedSampleImpl.class), DetailedSampleImpl_.parentAttributes);
+    Join<ParentAttributes, ParentTissueAttributes> tissueAttributes =
+        builder.getJoin(parentAttributes, ParentAttributes_.tissueAttributes);
+    Join<ParentTissueAttributes, TissueOriginImpl> tissueOrigin =
+        builder.getJoin(tissueAttributes, ParentTissueAttributes_.tissueOrigin);
+    builder.addTextRestriction(tissueOrigin.get(TissueOriginImpl_.alias), query);
   }
 
   @Override
-  public void restrictPaginationByIdentityIds(Criteria criteria, List<Long> identityIds,
+  public void restrictPaginationByTissueType(QueryBuilder<?, SampleImpl> builder, String query,
       Consumer<String> errorHandler) {
-    criteria.add(Restrictions.in("identityAttributes.id", identityIds));
+    Join<DetailedSampleImpl, ParentAttributes> parentAttributes =
+        builder.getJoin(builder.getRoot(DetailedSampleImpl.class), DetailedSampleImpl_.parentAttributes);
+    Join<ParentAttributes, ParentTissueAttributes> tissueAttributes =
+        builder.getJoin(parentAttributes, ParentAttributes_.tissueAttributes);
+    Join<ParentTissueAttributes, TissueTypeImpl> tissueType =
+        builder.getJoin(tissueAttributes, ParentTissueAttributes_.tissueType);
+    builder.addTextRestriction(tissueType.get(TissueTypeImpl_.alias), query);
+  }
+
+  @Override
+  public void restrictPaginationByWorksetId(QueryBuilder<?, SampleImpl> builder, long worksetId,
+      Consumer<String> errorHandler) {
+    QueryBuilder<Long, Workset> idBuilder = new QueryBuilder<>(currentSession(), Workset.class, Long.class);
+    Join<Workset, WorksetSample> worksetSample =
+        idBuilder.getJoin(idBuilder.getRoot(), Workset_.worksetSamples, JoinType.INNER);
+    Join<WorksetSample, SampleImpl> sample = idBuilder.getJoin(worksetSample, WorksetSample_.item, JoinType.INNER);
+    idBuilder.addPredicate(idBuilder.getCriteriaBuilder().equal(idBuilder.getRoot().get(Workset_.id), worksetId));
+    idBuilder.setColumn(sample.get(SampleImpl_.sampleId));
+    List<Long> ids = idBuilder.getResultList();
+
+    builder.addInPredicate(builder.getRoot().get(SampleImpl_.sampleId), ids);
+  }
+
+  @Override
+  public void restrictPaginationByTimepoint(QueryBuilder<?, SampleImpl> builder, String query,
+      Consumer<String> errorHandler) {
+    builder.addTextRestriction(builder.getRoot(SampleTissueImpl.class).get(SampleTissueImpl_.timepoint), query);
+  }
+
+  @Override
+  public void restrictPaginationByDistributionRecipient(QueryBuilder<?, SampleImpl> builder, String query,
+      Consumer<String> errorHandler) {
+    builder.addDistributionRecipientPredicate(query, ListTransferView_.SAMPLES, ListTransferViewSample_.SAMPLE_ID,
+        SampleImpl_.SAMPLE_ID);
+  }
+
+  @Override
+  public void restrictPaginationByIdentityIds(QueryBuilder<?, SampleImpl> builder, List<Long> identityIds,
+      Consumer<String> errorHandler) {
+    Join<DetailedSampleImpl, ParentAttributes> parentAttributes =
+        builder.getJoin(builder.getRoot(DetailedSampleImpl.class), DetailedSampleImpl_.parentAttributes);
+    Join<ParentAttributes, ParentIdentityAttributes> identityAttributes =
+        builder.getJoin(parentAttributes, ParentAttributes_.identityAttributes);
+    builder.addInPredicate(identityAttributes.get(ParentIdentityAttributes_.sampleId), identityIds);
   }
 
 }

@@ -232,6 +232,12 @@ public class QueryBuilder<R, T> {
     addPredicate(inClause);
   }
 
+  public <X> void addNotInPredicate(Path<X> path, Collection<X> items) {
+    In<X> inClause = criteriaBuilder.in(path);
+    items.forEach(item -> inClause.value(item));
+    addPredicate(criteriaBuilder.not(inClause));
+  }
+
   public void addTextRestriction(Path<String> path, String text) {
     addPredicate(makeTextRestriction(path, text));
   }

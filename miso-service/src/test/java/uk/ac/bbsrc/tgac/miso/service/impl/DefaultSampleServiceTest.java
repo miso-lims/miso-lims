@@ -170,7 +170,7 @@ public class DefaultSampleServiceTest {
     String expectedName = "generated_name";
     Mockito.when(namingScheme.generateNameFor((Sample) Mockito.any())).thenReturn(expectedName);
     Mockito.when(namingScheme.generateSampleAlias((Sample) Mockito.any())).thenReturn("bad");
-    Mockito.when(sampleStore.getSample(Mockito.anyLong())).thenReturn(sample);
+    Mockito.when(sampleStore.get(Mockito.anyLong())).thenReturn(sample);
     sut.create(sample);
 
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
@@ -200,7 +200,7 @@ public class DefaultSampleServiceTest {
     String expectedAlias = "generated_alias";
     Mockito.when(namingScheme.hasSampleAliasGenerator()).thenReturn(true);
     Mockito.when(namingScheme.generateSampleAlias((Sample) Mockito.any())).thenReturn(expectedAlias);
-    Mockito.when(sampleStore.getSample(Mockito.anyLong())).thenReturn(sample);
+    Mockito.when(sampleStore.get(Mockito.anyLong())).thenReturn(sample);
     sut.create(sample);
 
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
@@ -216,7 +216,7 @@ public class DefaultSampleServiceTest {
     mockShellProjectWithRealLookup(sample);
     assertNull("identificationBarcode should be null before save for test", sample.getIdentificationBarcode());
     sut.setAutoGenerateIdBarcodes(true);
-    Mockito.when(sampleStore.getSample(Mockito.anyLong())).thenReturn(sample);
+    Mockito.when(sampleStore.get(Mockito.anyLong())).thenReturn(sample);
     sut.create(sample);
 
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
@@ -238,7 +238,7 @@ public class DefaultSampleServiceTest {
     postSave.setParent(parent);
 
     Mockito.when(sampleStore.create(Mockito.any(Sample.class))).thenReturn(newId);
-    Mockito.when(sampleStore.getSample(newId)).thenReturn(postSave);
+    Mockito.when(sampleStore.get(newId)).thenReturn(postSave);
     mockValidRelationship(parent.getSampleClass(), child.getSampleClass());
 
     sut.create(child);
@@ -268,8 +268,8 @@ public class DefaultSampleServiceTest {
     postSave.setParent(parent);
 
     Mockito.when(sampleStore.create(Mockito.any(Sample.class))).thenReturn(newId);
-    Mockito.when(sampleStore.getSample(newId)).thenReturn(postSave);
-    Mockito.when(sampleStore.getSample(shellParentId)).thenReturn(parent);
+    Mockito.when(sampleStore.get(newId)).thenReturn(postSave);
+    Mockito.when(sampleStore.get(shellParentId)).thenReturn(parent);
     mockValidRelationship(parent.getSampleClass(), child.getSampleClass());
 
     sut.create(child);
@@ -311,7 +311,7 @@ public class DefaultSampleServiceTest {
 
     Long newId = 31L;
     Mockito.when(sampleStore.create(sample)).thenReturn(newId);
-    Mockito.when(sampleStore.getSample(newId)).thenReturn(sample);
+    Mockito.when(sampleStore.get(newId)).thenReturn(sample);
 
     sut.create(sample);
 
@@ -348,9 +348,9 @@ public class DefaultSampleServiceTest {
     analyte.setParent(tissue);
 
     Mockito.when(sampleStore.create(tissue)).thenReturn(94L);
-    Mockito.when(sampleStore.getSample(94L)).thenReturn(tissue);
+    Mockito.when(sampleStore.get(94L)).thenReturn(tissue);
     Mockito.when(sampleStore.create(analyte)).thenReturn(12L);
-    Mockito.when(sampleStore.getSample(12L)).thenReturn(analyte);
+    Mockito.when(sampleStore.get(12L)).thenReturn(analyte);
 
     mockValidRelationship(identity.getSampleClass(), tissue.getSampleClass());
     mockValidRelationship(tissue.getSampleClass(), analyte.getSampleClass());
@@ -380,11 +380,11 @@ public class DefaultSampleServiceTest {
     SampleIdentity identityPostCreate = makeUnsavedParentIdentity();
     identityPostCreate.setId(39L);
     Mockito.when(sampleStore.create(Mockito.any(Sample.class))).thenReturn(identityPostCreate.getId());
-    Mockito.when(sampleStore.getSample(39L)).thenReturn(identityPostCreate);
+    Mockito.when(sampleStore.get(39L)).thenReturn(identityPostCreate);
     Mockito.when(sampleStore.create(tissue)).thenReturn(94L);
-    Mockito.when(sampleStore.getSample(94L)).thenReturn(tissue);
+    Mockito.when(sampleStore.get(94L)).thenReturn(tissue);
     Mockito.when(sampleStore.create(analyte)).thenReturn(12L);
-    Mockito.when(sampleStore.getSample(12L)).thenReturn(analyte);
+    Mockito.when(sampleStore.get(12L)).thenReturn(analyte);
 
     mockValidRelationship(identity.getSampleClass(), tissue.getSampleClass());
     mockValidRelationship(tissue.getSampleClass(), analyte.getSampleClass());
@@ -402,7 +402,7 @@ public class DefaultSampleServiceTest {
   @Test
   public void testUpdatePlainSample() throws Exception {
     Sample old = makePlainSample();
-    Mockito.when(sampleStore.getSample(old.getId())).thenReturn(old);
+    Mockito.when(sampleStore.get(old.getId())).thenReturn(old);
 
     Sample updated = makePlainSample();
     // modifiable attributes
@@ -572,7 +572,7 @@ public class DefaultSampleServiceTest {
 
   private SampleIdentity makeParentIdentityWithLookup() throws IOException {
     SampleIdentity sample = makeUnsavedParentIdentity();
-    Mockito.when(sampleStore.getSample(sample.getId())).thenReturn(sample);
+    Mockito.when(sampleStore.get(sample.getId())).thenReturn(sample);
     Mockito.when(sampleClassService.listByCategory(Mockito.eq(SampleIdentity.CATEGORY_NAME)))
         .thenReturn(Lists.newArrayList(sample.getSampleClass()));
     return sample;

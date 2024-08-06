@@ -168,6 +168,16 @@ public class HibernateKitDao implements KitStore, JpaCriteriaPaginatedDataSource
   }
 
   @Override
+  public Path<?> propertyForSortColumn(QueryBuilder<?, KitDescriptor> builder, String original) {
+    switch (original) {
+      case "id":
+        return builder.getRoot().get(KitDescriptor_.kitDescriptorId);
+      default:
+        return builder.getRoot().get(original);
+    }
+  }
+
+  @Override
   public Path<?> propertyForDate(Root<KitDescriptor> root, DateType type) {
     return null;
   }

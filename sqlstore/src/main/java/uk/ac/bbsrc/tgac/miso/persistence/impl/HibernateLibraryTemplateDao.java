@@ -57,6 +57,16 @@ public class HibernateLibraryTemplateDao extends HibernateSaveDao<LibraryTemplat
   }
 
   @Override
+  public Path<?> propertyForSortColumn(QueryBuilder<?, LibraryTemplate> builder, String original) {
+    switch (original) {
+      case "id":
+        return builder.getRoot().get(LibraryTemplate_.libraryTemplateId);
+      default:
+        return builder.getRoot().get(original);
+    }
+  }
+
+  @Override
   public Path<?> propertyForDate(Root<LibraryTemplate> root, DateType type) {
     return null;
   }

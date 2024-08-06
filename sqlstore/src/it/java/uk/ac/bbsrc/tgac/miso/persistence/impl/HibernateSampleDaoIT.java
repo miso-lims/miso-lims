@@ -416,10 +416,10 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testPropertyForDateNull() throws Exception {
-    // receive and distributed dates are handled by HibernatePaginatedBoxableSource
-    Criteria criteria = Mockito.mock(Criteria.class);
-    assertNull(dao.propertyForDate(criteria, DateType.RECEIVE));
-    assertNull(dao.propertyForDate(criteria, DateType.DISTRIBUTED));
+    // receive and distributed dates are handled by JpaCriteriaPaginatedBoxableSource
+    QueryBuilder<?, SampleImpl> builder = Mockito.mock(QueryBuilder.class);
+    assertNull(dao.propertyForDate(builder.getRoot(), DateType.RECEIVE));
+    assertNull(dao.propertyForDate(builder.getRoot(), DateType.DISTRIBUTED));
   }
 
   @Test
