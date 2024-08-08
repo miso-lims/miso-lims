@@ -1154,13 +1154,12 @@ BulkTarget.sample = (function ($) {
       columns.push(
         {
           title: "Target Cell Recovery",
-          type: "decimal",
+          type: "int",
           data: "targetCellRecovery",
+          min: 0,
           include: show["Stock"],
           sampleSubcategory: ["Single Cell (stock)", "Single Cell (aliquot)"],
           includeSaved: targetCategory === "Stock",
-          precision: 14,
-          scale: 10,
         },
         {
           title: "Cell Viability",

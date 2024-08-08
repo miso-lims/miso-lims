@@ -11,7 +11,7 @@ public class SampleStockSingleCellDto extends SampleStockDto implements SampleSt
   private String initialCellConcentration;
   private String digestion;
 
-  private String targetCellRecovery;
+  private Integer targetCellRecovery;
   private String cellViability;
   private String loadingCellConcentration;
 
@@ -46,12 +46,12 @@ public class SampleStockSingleCellDto extends SampleStockDto implements SampleSt
   }
 
   @Override
-  public String getTargetCellRecovery() {
+  public Integer getTargetCellRecovery() {
     return targetCellRecovery;
   }
 
   @Override
-  public void setTargetCellRecovery(String targetCellRecovery) {
+  public void setTargetCellRecovery(Integer targetCellRecovery) {
     this.targetCellRecovery = targetCellRecovery;
   }
 

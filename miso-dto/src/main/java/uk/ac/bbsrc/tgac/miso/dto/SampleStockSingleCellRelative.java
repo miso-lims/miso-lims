@@ -2,9 +2,9 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 public interface SampleStockSingleCellRelative extends SampleSingleCellRelative {
 
-  public String getTargetCellRecovery();
+  public Integer getTargetCellRecovery();
 
-  public void setTargetCellRecovery(String targetCellRecovery);
+  public void setTargetCellRecovery(Integer targetCellRecovery);
 
   public String getCellViability();
 

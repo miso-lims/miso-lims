@@ -629,9 +629,8 @@ FormTarget.sample = (function ($) {
             {
               title: "Target Cell Recovery",
               data: "targetCellRecovery",
-              type: "decimal",
-              precision: 14,
-              scale: 10,
+              type: "int",
+              min: 0,
               include: object.sampleSubcategory === "Single Cell (stock)",
             },
             {

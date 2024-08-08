@@ -847,7 +847,7 @@ public class Dtos {
     if (isStockSingleCellSample(from)) {
       SampleStockSingleCell scFrom = (SampleStockSingleCell) from;
       SampleStockSingleCellDto sc = new SampleStockSingleCellDto();
-      setString(sc::setTargetCellRecovery, scFrom.getTargetCellRecovery());
+      sc.setTargetCellRecovery(scFrom.getTargetCellRecovery());
       setString(sc::setCellViability, scFrom.getCellViability());
       setString(sc::setLoadingCellConcentration, scFrom.getLoadingCellConcentration());
       dto = sc;
@@ -870,7 +870,7 @@ public class Dtos {
     if (from instanceof SampleStockSingleCellRelative) {
       SampleStockSingleCellRelative scFrom = (SampleStockSingleCellRelative) from;
       SampleStockSingleCell sc = new SampleStockSingleCellImpl();
-      setBigDecimal(sc::setTargetCellRecovery, scFrom.getTargetCellRecovery());
+      setInteger(sc::setTargetCellRecovery, scFrom.getTargetCellRecovery(), true);
       setBigDecimal(sc::setCellViability, scFrom.getCellViability());
       setBigDecimal(sc::setLoadingCellConcentration, scFrom.getLoadingCellConcentration());
       to = sc;
