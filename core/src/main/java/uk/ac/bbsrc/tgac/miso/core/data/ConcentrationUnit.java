@@ -6,7 +6,10 @@ public enum ConcentrationUnit {
 
   NANOGRAMS_PER_MICROLITRE("ng/&#181;L", "ng/µL", "ng/uL"), //
   NANOMOLAR("nM"), //
-  PICOMOLAR("pM");
+  PICOMOLAR("pM"), //
+  CELLS_PER_MICROLITRE("cells/&#181;L", "cells/µL", "cells/uL"), //
+  NUCLEI_PER_MICROLITRE("nuclei/&#181;L", "nuclei/µL", "nuclei/uL"), //
+  CELLS_PER_MILLILITRE("cells/mL");
 
   private final String units;
   private final String rawLabel;
@@ -37,10 +40,12 @@ public enum ConcentrationUnit {
   }
 
   /**
-   * Finds the ConcentrationUnit corresponding to a unit String, or null if no ConcentrationUnit is found.
+   * Finds the ConcentrationUnit corresponding to a unit String, or null if no ConcentrationUnit is
+   * found.
    * 
    * @param units The units of the ConcentrationUnit as a String
-   * @return ConcentrationUnit The ConcentrationUnit with the specified units, or null if no ConcentrationUnits have the specified units
+   * @return ConcentrationUnit The ConcentrationUnit with the specified units, or null if no
+   *         ConcentrationUnits have the specified units
    */
   public static ConcentrationUnit getFromString(String units) {
     if (units == null) {
