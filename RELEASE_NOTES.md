@@ -7,6 +7,22 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.21.0] - 2024-08-15
+
+### Added
+
+* New volume units
+  * mg
+* New concentration units
+  * cells/µL
+  * nuclei/µL
+  * cells/mL
+
+### Changed
+
+* “Target Cell Recovery” in “Single Cell (stock)” now takes an integer instead of a decimal.
+
+
 ## [2.20.0] - 2024-06-20
 
 ### Added
