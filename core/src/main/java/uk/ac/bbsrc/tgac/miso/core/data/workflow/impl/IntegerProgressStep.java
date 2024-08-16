@@ -1,8 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 
@@ -31,11 +30,15 @@ public class IntegerProgressStep extends AbstractProgressStep {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     IntegerProgressStep other = (IntegerProgressStep) obj;
-    if (input != other.input) return false;
+    if (input != other.input)
+      return false;
     return true;
   }
 

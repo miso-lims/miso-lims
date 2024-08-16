@@ -7,16 +7,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -25,6 +15,15 @@ import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Charsets;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelCanvas;
@@ -34,8 +33,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelElement;
 @Table(name = "Printer")
 public class Printer implements Deletable, Serializable {
 
-  private static final CollectionLikeType LAYOUT_TYPE = TypeFactory.defaultInstance().constructCollectionLikeType(List.class,
-      LabelElement.class);
+  private static final CollectionLikeType LAYOUT_TYPE =
+      TypeFactory.defaultInstance().constructCollectionLikeType(List.class,
+          LabelElement.class);
   private static final ObjectMapper MAPPER = new ObjectMapper();
   private static final long serialVersionUID = 1L;
 

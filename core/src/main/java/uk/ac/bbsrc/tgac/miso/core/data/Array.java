@@ -9,25 +9,24 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ArrayChangeLog;
@@ -74,8 +73,8 @@ public class Array implements Serializable, Aliasable, ChangeLoggable, Deletable
   @OneToMany(targetEntity = SampleImpl.class)
   @MapKeyColumn(name = "position", unique = true)
   @JoinTable(name = "ArrayPosition",
-      joinColumns = { @JoinColumn(name = "arrayId", referencedColumnName = "arrayId") },
-      inverseJoinColumns = { @JoinColumn(name = "sampleId", referencedColumnName = "sampleId") })
+      joinColumns = {@JoinColumn(name = "arrayId", referencedColumnName = "arrayId")},
+      inverseJoinColumns = {@JoinColumn(name = "sampleId", referencedColumnName = "sampleId")})
   @Fetch(FetchMode.SUBSELECT)
   private Map<String, Sample> samples = new HashMap<>();
 

@@ -7,10 +7,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response.Status;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +25,8 @@ import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
@@ -183,19 +181,20 @@ public class PrinterRestController extends RestController {
   @Autowired
   private ContainerService containerService;
 
-  private final JQueryDataTableBackend<Printer, PrinterDto> jQueryBackend = new JQueryDataTableBackend<Printer, PrinterDto>() {
+  private final JQueryDataTableBackend<Printer, PrinterDto> jQueryBackend =
+      new JQueryDataTableBackend<Printer, PrinterDto>() {
 
-    @Override
-    protected PrinterDto asDto(Printer model) {
-      return Dtos.asDto(model, getObjectMapper());
-    }
+        @Override
+        protected PrinterDto asDto(Printer model) {
+          return Dtos.asDto(model, getObjectMapper());
+        }
 
-    @Override
-    protected PaginatedDataSource<Printer> getSource() throws IOException {
-      return printerService;
-    }
+        @Override
+        protected PaginatedDataSource<Printer> getSource() throws IOException {
+          return printerService;
+        }
 
-  };
+      };
 
   @Autowired
   private LibraryAliquotService libraryAliquotService;
@@ -212,7 +211,7 @@ public class PrinterRestController extends RestController {
   @Autowired
   private SampleService sampleService;
 
-  @PostMapping(value = "{printerId}/boxcontents", headers = { "Content-type=application/json" })
+  @PostMapping(value = "{printerId}/boxcontents", headers = {"Content-type=application/json"})
   @ResponseBody
   public long boxContents(@PathVariable("printerId") Long printerId, @RequestBody BoxPrintRequest request)
       throws IOException {
@@ -230,7 +229,7 @@ public class PrinterRestController extends RestController {
                 .map(WhineyFunction.rethrow(this::loadBarcodable))));
   }
 
-  @PostMapping(value = "{printerId}/boxpositions", headers = { "Content-type=application/json" })
+  @PostMapping(value = "{printerId}/boxpositions", headers = {"Content-type=application/json"})
   @ResponseBody
   public long boxPositions(@PathVariable("printerId") Long printerId, @RequestBody BoxPositionPrintRequest request)
       throws IOException {
@@ -247,7 +246,7 @@ public class PrinterRestController extends RestController {
             .map(WhineyFunction.rethrow(this::loadBarcodable)));
   }
 
-  @PostMapping(headers = { "Content-type=application/json" })
+  @PostMapping(headers = {"Content-type=application/json"})
   @ResponseBody
   @ResponseStatus(code = HttpStatus.CREATED)
   public PrinterDto create(@RequestBody PrinterDto dto) throws IOException {
@@ -261,19 +260,19 @@ public class PrinterRestController extends RestController {
     return jQueryBackend.get(request, advancedSearchParser);
   }
 
-  @PostMapping(value = "/bulk-delete", headers = { "Content-type=application/json" })
+  @PostMapping(value = "/bulk-delete", headers = {"Content-type=application/json"})
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@RequestBody List<Long> printerIds) throws IOException {
     RestUtils.bulkDelete("Printer", printerIds, printerService);
   }
 
-  @PutMapping(value = "/disable", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/disable", headers = {"Content-type=application/json"})
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void disable(@RequestBody List<Long> printerIds) throws IOException {
     setState(printerIds, false);
   }
 
-  @PostMapping(value = "{printerId}/duplicate", headers = { "Content-type=application/json" })
+  @PostMapping(value = "{printerId}/duplicate", headers = {"Content-type=application/json"})
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ResponseBody
   public void duplicate(@PathVariable("printerId") Long printerId, @RequestBody DuplicateRequest request)
@@ -289,7 +288,7 @@ public class PrinterRestController extends RestController {
     printerService.create(printer);
   }
 
-  @PutMapping(value = "/enable", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/enable", headers = {"Content-type=application/json"})
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void enable(@RequestBody List<Long> printerIds) throws IOException {
     setState(printerIds, true);
@@ -304,7 +303,7 @@ public class PrinterRestController extends RestController {
     return Dtos.asDto(printer, getObjectMapper());
   }
 
-  @GetMapping(value = "{printerId}/layout", headers = { "Content-type=application/json" })
+  @GetMapping(value = "{printerId}/layout", headers = {"Content-type=application/json"})
   @ResponseBody
   public List<LabelElement> getLayout(@PathVariable("printerId") Long printerId)
       throws JsonParseException, JsonMappingException, IOException {
@@ -315,7 +314,7 @@ public class PrinterRestController extends RestController {
     return printer.parseLayout();
   }
 
-  @GetMapping(headers = { "Content-type=application/json" })
+  @GetMapping(headers = {"Content-type=application/json"})
   @ResponseBody
   public List<PrinterDto> list() throws IOException {
     return printerService.list(0, 0, true, "id").stream()
@@ -326,20 +325,20 @@ public class PrinterRestController extends RestController {
   private Barcodable loadBarcodable(Entry<String, BoxPosition> e) throws IOException {
     long id = e.getValue().getBoxableId().getTargetId();
     switch (e.getValue().getBoxableId().getTargetType()) {
-    case LIBRARY_ALIQUOT:
-      return libraryAliquotService.get(id);
-    case LIBRARY:
-      return libraryService.get(id);
-    case SAMPLE:
-      return sampleService.get(id);
-    case POOL:
-      return poolService.get(id);
-    default:
-      throw new IllegalArgumentException("Unknown barcodeable type: " + e.getValue().getBoxableId().getTargetType());
+      case LIBRARY_ALIQUOT:
+        return libraryAliquotService.get(id);
+      case LIBRARY:
+        return libraryService.get(id);
+      case SAMPLE:
+        return sampleService.get(id);
+      case POOL:
+        return poolService.get(id);
+      default:
+        throw new IllegalArgumentException("Unknown barcodeable type: " + e.getValue().getBoxableId().getTargetType());
     }
   }
 
-  @PutMapping(value = "{printerId}/layout", headers = { "Content-type=application/json" })
+  @PutMapping(value = "{printerId}/layout", headers = {"Content-type=application/json"})
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ResponseBody
   public void setLayout(@PathVariable("printerId") Long printerId, @RequestBody List<LabelElement> layout)
@@ -371,7 +370,7 @@ public class PrinterRestController extends RestController {
     }
   }
 
-  @PostMapping(value = "{printerId}", headers = { "Content-type=application/json" })
+  @PostMapping(value = "{printerId}", headers = {"Content-type=application/json"})
   @ResponseBody
   public long submit(@PathVariable("printerId") Long printerId, @RequestBody PrintRequest request)
       throws IOException {
@@ -383,26 +382,26 @@ public class PrinterRestController extends RestController {
     WhineyFunction<Long, Barcodable> fetcher;
 
     switch (request.getType()) {
-    case "box":
-      fetcher = boxService::get;
-      break;
-    case "container":
-      fetcher = containerService::get;
-      break;
-    case "libraryaliquot":
-      fetcher = libraryAliquotService::get;
-      break;
-    case "library":
-      fetcher = libraryService::get;
-      break;
-    case "sample":
-      fetcher = sampleService::get;
-      break;
-    case "pool":
-      fetcher = poolService::get;
-      break;
-    default:
-      throw new IllegalArgumentException("Unknown barcodeable type: " + request.getType());
+      case "box":
+        fetcher = boxService::get;
+        break;
+      case "container":
+        fetcher = containerService::get;
+        break;
+      case "libraryaliquot":
+        fetcher = libraryAliquotService::get;
+        break;
+      case "library":
+        fetcher = libraryService::get;
+        break;
+      case "sample":
+        fetcher = sampleService::get;
+        break;
+      case "pool":
+        fetcher = poolService::get;
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown barcodeable type: " + request.getType());
     }
 
     return printer.printBarcode(user, request.getCopies(), request.getIds().stream()//

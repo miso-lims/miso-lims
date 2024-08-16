@@ -94,10 +94,10 @@ public class HibernateSecurityDao implements SecurityStore {
   public long saveGroup(Group group) throws IOException {
     long id;
     if (!group.isSaved()) {
-      id = (Long) currentSession().save(group);
-    } else {
+      currentSession().persist(group);
       id = group.getId();
-      currentSession().update(group);
+    } else {
+      id = currentSession().merge(group).getId();
     }
     return id;
   }
@@ -106,10 +106,10 @@ public class HibernateSecurityDao implements SecurityStore {
   public long saveUser(User user) throws IOException {
     long id;
     if (!user.isSaved()) {
-      id = (Long) currentSession().save(user);
-    } else {
+      currentSession().persist(user);
       id = user.getId();
-      currentSession().update(user);
+    } else {
+      id = currentSession().merge(user).getId();
     }
     return id;
   }

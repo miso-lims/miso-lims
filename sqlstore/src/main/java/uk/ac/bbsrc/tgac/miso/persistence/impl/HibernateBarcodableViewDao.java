@@ -8,8 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import javax.persistence.criteria.Root;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
 
+import jakarta.persistence.criteria.Root;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl_;
@@ -174,8 +173,10 @@ public class HibernateBarcodableViewDao implements BarcodableViewDao {
       String entityTypeLabel, String idField,
       String primaryLabelField, String secondaryLabelField) throws IOException {
 
-    QueryBuilder<?, ?> builder = new QueryBuilder<>(currentSession(), implementationClass, Object[].class,
-        new BarcodableReference.ResultTransformer(entityTypeLabel));
+    @SuppressWarnings("unchecked")
+    QueryBuilder<BarcodableReference, ?> builder =
+        new QueryBuilder<>(currentSession(), implementationClass, Object[].class,
+            new BarcodableReference.TupleTransformer(entityTypeLabel));
     Root<?> root = builder.getRoot();
     builder.addPredicate(
         builder.getCriteriaBuilder().equal(root.get("identificationBarcode"), identificationBarcode));

@@ -22,7 +22,8 @@ public interface QcTargetStore {
 
   public long save(QC qc) throws IOException;
 
-  public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units) throws IOException;
+  public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units)
+      throws IOException;
 
   public void deleteControlRun(QcControlRun controlRun) throws IOException;
 

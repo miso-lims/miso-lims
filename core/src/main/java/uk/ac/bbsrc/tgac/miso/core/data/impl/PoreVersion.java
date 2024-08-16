@@ -2,11 +2,10 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 
 @Entity
@@ -52,14 +51,20 @@ public class PoreVersion implements Serializable, Aliasable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     PoreVersion other = (PoreVersion) obj;
     if (alias == null) {
-      if (other.alias != null) return false;
-    } else if (!alias.equals(other.alias)) return false;
-    if (poreVersionId != other.poreVersionId) return false;
+      if (other.alias != null)
+        return false;
+    } else if (!alias.equals(other.alias))
+      return false;
+    if (poreVersionId != other.poreVersionId)
+      return false;
     return true;
   }
 

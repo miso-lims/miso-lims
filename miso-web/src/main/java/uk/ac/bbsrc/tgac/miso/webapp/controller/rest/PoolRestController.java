@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -36,10 +33,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -58,6 +51,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
@@ -288,7 +284,8 @@ public class PoolRestController extends RestController {
   }
 
   @PutMapping(value = "/{poolId}/contents", produces = "application/json")
-  public @ResponseBody PoolDto changePoolContents(@PathVariable Long poolId, @RequestBody PoolChangeRequest request) throws IOException {
+  public @ResponseBody PoolDto changePoolContents(@PathVariable Long poolId, @RequestBody PoolChangeRequest request)
+      throws IOException {
     Pool pool = poolService.get(poolId);
     Stream<PoolElement> originalMinusRemoved = pool.getPoolContents().stream()
         .filter(element -> !request.remove.contains(element.getAliquot().getId()));
@@ -300,7 +297,8 @@ public class PoolRestController extends RestController {
   }
 
   @PutMapping(value = "/{poolId}/proportions")
-  public @ResponseBody PoolDto changeProportions(@PathVariable long poolId, @RequestBody Map<String, Integer> proportions)
+  public @ResponseBody PoolDto changeProportions(@PathVariable long poolId,
+      @RequestBody Map<String, Integer> proportions)
       throws IOException {
     if (proportions == null || proportions.isEmpty()) {
       throw new RestException("Proportions missing", Status.BAD_REQUEST);
@@ -358,7 +356,8 @@ public class PoolRestController extends RestController {
   public void assignPool(@PathVariable Long poolId, @RequestBody AssignPoolDto request) throws IOException {
     Pool pool = poolId == 0 ? null : poolService.get(poolId);
 
-    // Determine if this pool transition is allowed for this experiment. If removing a pool, it strictly isn't. If the new pool contains the
+    // Determine if this pool transition is allowed for this experiment. If removing a pool, it strictly
+    // isn't. If the new pool contains the
     // same library as the experiment, it's fine.
     Predicate<Experiment> isTransitionValid = pool == null ? experiment -> false
         : experiment -> pool.getPoolContents().stream().map(pd -> pd.getAliquot().getLibraryId())
@@ -383,11 +382,13 @@ public class PoolRestController extends RestController {
                   Status.BAD_REQUEST);
             }
           }
-          if (pool != null && partition.getSequencerPartitionContainer().getModel().getPlatformType() != pool.getPlatformType()) {
+          if (pool != null
+              && partition.getSequencerPartitionContainer().getModel().getPlatformType() != pool.getPlatformType()) {
             throw new RestException(
                 String.format("%s %d in %s is not compatible with pool %s.",
                     partition.getSequencerPartitionContainer().getModel().getPlatformType().getPartitionName(),
-                    partition.getPartitionNumber(), partition.getSequencerPartitionContainer().getIdentificationBarcode(), pool.getName()),
+                    partition.getPartitionNumber(),
+                    partition.getSequencerPartitionContainer().getIdentificationBarcode(), pool.getName()),
                 Status.BAD_REQUEST);
           }
           partition.setPool(pool);
@@ -421,7 +422,8 @@ public class PoolRestController extends RestController {
 
   @GetMapping(value = "dt/platform/{platform}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<PoolDto> getDTPoolsByPlatform(@PathVariable("platform") String platform, HttpServletRequest request)
+  public DataTablesResponseDto<PoolDto> getDTPoolsByPlatform(@PathVariable("platform") String platform,
+      HttpServletRequest request)
       throws IOException {
     PlatformType platformType = PlatformType.valueOf(platform);
     if (platformType == null) {
@@ -432,7 +434,8 @@ public class PoolRestController extends RestController {
 
   @GetMapping(value = "dt/project/{id}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<PoolDto> getDTPoolsByProject(@PathVariable("id") Long id, HttpServletRequest request) throws IOException {
+  public DataTablesResponseDto<PoolDto> getDTPoolsByProject(@PathVariable("id") Long id, HttpServletRequest request)
+      throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
 
@@ -445,7 +448,8 @@ public class PoolRestController extends RestController {
 
   @GetMapping(value = "/picker/search")
   @ResponseBody
-  public PoolPickerResponse getPickersBySearch(@RequestParam("platform") String platform, @RequestParam("query") String query)
+  public PoolPickerResponse getPickersBySearch(@RequestParam("platform") String platform,
+      @RequestParam("query") String query)
       throws IOException {
     return getPoolPickerWithFilters(100,
         PaginationFilter.platformType(PlatformType.valueOf(platform)),
@@ -467,14 +471,16 @@ public class PoolRestController extends RestController {
   }
 
   private PoolPickerEntry poolTransform(Pool pool) throws IOException {
-    List<SequencingOrderCompletionDto> completions = sequencingOrderCompletionService.listByPoolId(pool.getId()).stream()
-        .map(oc -> Dtos.asDto(oc, indexChecker)).collect(Collectors.toList());
+    List<SequencingOrderCompletionDto> completions =
+        sequencingOrderCompletionService.listByPoolId(pool.getId()).stream()
+            .map(oc -> Dtos.asDto(oc, indexChecker)).collect(Collectors.toList());
     return new PoolPickerEntry(makePoolDto(pool), completions);
   }
 
-  @PostMapping(value = "/query", produces = { "application/json" })
+  @PostMapping(value = "/query", produces = {"application/json"})
   @ResponseBody
-  public List<PoolDto> getPoolsInBulk(@RequestBody List<String> names, HttpServletRequest request, HttpServletResponse response,
+  public List<PoolDto> getPoolsInBulk(@RequestBody List<String> names, HttpServletRequest request,
+      HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     return poolService.list(0, 0, true, "id", PaginationFilter.bulkLookup(names))
         .stream()
@@ -494,16 +500,19 @@ public class PoolRestController extends RestController {
   @ResponseBody
   public HttpEntity<byte[]> getSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
-    return MisoWebUtils.generateSpreadsheet(request, poolService::listByIdList, detailedSample, PoolSpreadSheets::valueOf, response);
+    return MisoWebUtils.generateSpreadsheet(request, poolService::listByIdList, detailedSample,
+        PoolSpreadSheets::valueOf, response);
   }
 
   @PostMapping(value = "/contents/spreadsheet", produces = "application/octet-stream")
   @ResponseBody
-  public HttpEntity<byte[]> getContentsSpreadsheet(@RequestBody SpreadsheetRequest request, HttpServletResponse response,
+  public HttpEntity<byte[]> getContentsSpreadsheet(@RequestBody SpreadsheetRequest request,
+      HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     List<LibraryAliquot> aliquots = libraryAliquotService.listByPoolIds(request.getIds());
 
-    return MisoWebUtils.generateSpreadsheet(request, aliquots.stream(), detailedSample, LibraryAliquotSpreadSheets::valueOf, response);
+    return MisoWebUtils.generateSpreadsheet(request, aliquots.stream(), detailedSample,
+        LibraryAliquotSpreadSheets::valueOf, response);
   }
 
   @PostMapping(value = "/bulk-delete")
@@ -539,7 +548,8 @@ public class PoolRestController extends RestController {
       return poolService.listByIdList(ids);
     }
   })
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, this::getSamples))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class,
+          this::getSamples))//
       .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, this::getSamples))//
       .add(new RelationFinder.ParentSampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
           this::getSamples))//
@@ -587,7 +597,8 @@ public class PoolRestController extends RestController {
 
   @PostMapping(value = "/parents/{category}")
   @ResponseBody
-  public List<?> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+  public List<?> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids,
+      HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return parentFinder.list(ids, category);
   }
@@ -616,7 +627,8 @@ public class PoolRestController extends RestController {
 
   @PostMapping(value = "/children/{category}")
   @ResponseBody
-  public List<?> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+  public List<?> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids,
+      HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return childFinder.list(ids, category);
   }
@@ -628,11 +640,13 @@ public class PoolRestController extends RestController {
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     IlluminaExperiment experiment = IlluminaExperiment.valueOf(request.getExperimentType());
     SequencingParameters parameters = sequencingParametersService.get(request.getSequencingParametersId());
-    List<Pool> pools = request.getPoolIds().stream().map(WhineyFunction.rethrow(poolService::get)).collect(Collectors.toList());
+    List<Pool> pools =
+        request.getPoolIds().stream().map(WhineyFunction.rethrow(poolService::get)).collect(Collectors.toList());
     response.setHeader("Content-Disposition", String.format("attachment; filename=%s-%s.csv", experiment.name(),
         pools.stream().map(Pool::getAlias).collect(Collectors.joining("-"))));
     return new HttpEntity<>(experiment
-        .makeSampleSheet(request.getGenomeFolder(), parameters, request.getCustomRead1Primer(), request.getCustomIndexPrimer(),
+        .makeSampleSheet(request.getGenomeFolder(), parameters, request.getCustomRead1Primer(),
+            request.getCustomIndexPrimer(),
             request.getCustomRead2Primer(),
             pools)
         .getBytes(StandardCharsets.UTF_8));

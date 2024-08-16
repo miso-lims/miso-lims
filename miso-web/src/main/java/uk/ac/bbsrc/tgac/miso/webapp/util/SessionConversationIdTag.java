@@ -1,38 +1,15 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
 
-import javax.servlet.jsp.JspException;
-
 import org.springframework.web.servlet.tags.form.AbstractHtmlElementTag;
 import org.springframework.web.servlet.tags.form.TagWriter;
 
+import jakarta.servlet.jsp.JspException;
+
 /**
- * This class handles setting a variable as a request attribute and creating
- * a hidden input field.
+ * This class handles setting a variable as a request attribute and creating a hidden input field.
+ * 
  * @author MJones
  * @version Aug 31, 2010
  *
@@ -59,7 +36,9 @@ public class SessionConversationIdTag extends AbstractHtmlElementTag {
   /*
    * (non-Javadoc)
    * 
-   * @see org.springframework.web.servlet.tags.form.AbstractFormTag#writeTagContent(org.springframework.web.servlet.tags.form.TagWriter)
+   * @see
+   * org.springframework.web.servlet.tags.form.AbstractFormTag#writeTagContent(org.springframework.web
+   * .servlet.tags.form.TagWriter)
    */
   @Override
   protected int writeTagContent(TagWriter tagWriter) throws JspException {
@@ -99,8 +78,7 @@ public class SessionConversationIdTag extends AbstractHtmlElementTag {
   }
 
   /**
-   * @param attributeName
-   *          the attributeName to set
+   * @param attributeName the attributeName to set
    */
   public void setAttributeName(String attributeName) {
     this.attributeName = attributeName;
@@ -114,8 +92,7 @@ public class SessionConversationIdTag extends AbstractHtmlElementTag {
   }
 
   /**
-   * @param createHiddenInput
-   *          the createHiddenInput to set
+   * @param createHiddenInput the createHiddenInput to set
    */
   public void setCreateHiddenInput(boolean createHiddenInput) {
     this.createHiddenInput = createHiddenInput;

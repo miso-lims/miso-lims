@@ -8,15 +8,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -245,7 +244,7 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
   @Override
   public void save(RunPartitionAliquot runPartitionAliquot) throws IOException {
-    currentSession().save(runPartitionAliquot);
+    currentSession().persist(runPartitionAliquot);
   }
 
   @Override
@@ -258,7 +257,7 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
     List<RunPartitionAliquot> items = builder.getResultList();
 
     for (RunPartitionAliquot item : items) {
-      currentSession().delete(item);
+      currentSession().remove(item);
     }
   }
 
@@ -271,7 +270,7 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
     List<RunPartitionAliquot> items = builder.getResultList();
 
     for (RunPartitionAliquot item : items) {
-      currentSession().delete(item);
+      currentSession().remove(item);
     }
   }
 
@@ -297,7 +296,7 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
       List<RunPartitionAliquot> items = builder.getResultList();
 
       for (RunPartitionAliquot item : items) {
-        currentSession().delete(item);
+        currentSession().remove(item);
       }
     }
   }

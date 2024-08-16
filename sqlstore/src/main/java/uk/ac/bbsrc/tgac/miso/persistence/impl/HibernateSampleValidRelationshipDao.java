@@ -33,7 +33,7 @@ public class HibernateSampleValidRelationshipDao extends HibernateProviderDao<Sa
 
   @Override
   public void delete(SampleValidRelationship sampleValidRelationship) throws IOException {
-    currentSession().delete(sampleValidRelationship);
+    currentSession().remove(sampleValidRelationship);
   }
 
 }

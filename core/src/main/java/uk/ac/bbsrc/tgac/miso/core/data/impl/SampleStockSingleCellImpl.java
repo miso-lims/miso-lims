@@ -2,9 +2,8 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.math.BigDecimal;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 
 @Entity

@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.Response.Status;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -20,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
@@ -43,20 +43,22 @@ public class SequencingContainerModelRestController extends RestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<SequencingContainerModelDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<SequencingContainerModelDto> dtos)
+      throws IOException {
     return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, containerModelService, true);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<SequencingContainerModelDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<SequencingContainerModelDto> dtos)
+      throws IOException {
     return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, Dtos::to, containerModelService, true);
   }
 
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
-    return asyncOperationManager.getAsyncProgress(uuid, SequencingContainerModel.class, containerModelService, Dtos::asDto);
+    return asyncOperationManager.getAsyncProgress(uuid, SequencingContainerModel.class, containerModelService,
+        Dtos::asDto);
   }
 
   @PostMapping(value = "/bulk-delete")

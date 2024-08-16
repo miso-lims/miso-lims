@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 import java.io.Serializable;
@@ -28,20 +5,19 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
@@ -52,8 +28,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
- * Provides model access to the underlying MISO QcType lookup table. These types should hold manufacturer platform information for QC
- * analysis.
+ * Provides model access to the underlying MISO QcType lookup table. These types should hold
+ * manufacturer platform information for QC analysis.
  * <p/>
  * See:
  * 
@@ -87,8 +63,8 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
   private InstrumentModel instrumentModel;
 
   @ManyToMany
-  @JoinTable(name = "QCType_KitDescriptor", joinColumns = { @JoinColumn(name = "qcTypeId") }, inverseJoinColumns = {
-      @JoinColumn(name = "kitDescriptorId") })
+  @JoinTable(name = "QCType_KitDescriptor", joinColumns = {@JoinColumn(name = "qcTypeId")}, inverseJoinColumns = {
+      @JoinColumn(name = "kitDescriptorId")})
   private Set<KitDescriptor> kitDescriptors;
 
   @OneToMany(mappedBy = "qcType", cascade = CascadeType.REMOVE)
@@ -107,8 +83,7 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
   /**
    * Sets the qcTypeId of this QcType object.
    * 
-   * @param qcTypeId
-   *          qcTypeId.
+   * @param qcTypeId qcTypeId.
    */
   @Override
   public void setId(long qcTypeId) {
@@ -127,8 +102,7 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
   /**
    * Sets the name of this QcType object.
    * 
-   * @param name
-   *          name.
+   * @param name name.
    */
   public void setName(String name) {
     this.name = name;
@@ -146,8 +120,7 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
   /**
    * Sets the description of this LibraryType object.
    * 
-   * @param description
-   *          description.
+   * @param description description.
    */
   public void setDescription(String description) {
     this.description = description;
@@ -165,8 +138,7 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
   /**
    * Sets the qcTarget of this QcType object.
    * 
-   * @param qcTarget
-   *          qcTarget.
+   * @param qcTarget qcTarget.
    */
   public void setQcTarget(QcTarget qcTarget) {
     this.qcTarget = qcTarget;
@@ -184,17 +156,16 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
   /**
    * Sets the units of this QcType object.
    * 
-   * @param units
-   *          units.
+   * @param units units.
    */
   public void setUnits(String units) {
     this.units = units;
   }
 
   /**
-   * Represents the number of digits after a decimal that this QcType is capable of offering.
-   * A precision of zero represents an Integer.
-   * A precision of -1 represents a boolean. A QC performed with a boolean precision QcType should have a result of either 1 or 0.
+   * Represents the number of digits after a decimal that this QcType is capable of offering. A
+   * precision of zero represents an Integer. A precision of -1 represents a boolean. A QC performed
+   * with a boolean precision QcType should have a result of either 1 or 0.
    * 
    * @return Integer precisionAfterDecimal
    */
@@ -272,9 +243,12 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
     if (isSaved()) {
-      if (obj == null) return false;
-      if (obj == this) return true;
-      if (!(obj instanceof QcType)) return false;
+      if (obj == null)
+        return false;
+      if (obj == this)
+        return true;
+      if (!(obj instanceof QcType))
+        return false;
       QcType them = (QcType) obj;
       if (them.isSaved()) {
         return qcTypeId == them.qcTypeId;
@@ -318,11 +292,14 @@ public class QcType implements Comparable<QcType>, Serializable, Aliasable, Dele
   public int compareTo(QcType t) {
     if (getName() != null && t.getName() != null) {
       int name = getName().compareTo(t.getName());
-      if (name != 0) return name;
+      if (name != 0)
+        return name;
     }
 
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
+    if (getId() < t.getId())
+      return -1;
+    if (getId() > t.getId())
+      return 1;
     return 0;
   }
 

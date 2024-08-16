@@ -2,31 +2,31 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 
 @Entity
 @Table(name = "LibraryDesign")
-public class LibraryDesign implements Deletable, Identifiable, Serializable {
+public class LibraryDesign implements Deletable, Serializable {
 
   public static boolean validate(Library library, Iterable<LibraryDesign> rules) {
     // Return true if the ruleset is empty.
     boolean first = true;
     for (LibraryDesign rule : rules) {
-      if (rule.validate(library)) return true;
+      if (rule.validate(library))
+        return true;
       first = false;
     }
     return first;
@@ -110,10 +110,14 @@ public class LibraryDesign implements Deletable, Identifiable, Serializable {
   }
 
   public boolean validate(Library library) {
-    if (!(library.getSample() instanceof DetailedSample)) return true;
-    if (((DetailedSample) library.getSample()).getSampleClass().getId() != sampleClass.getId()) return false;
-    if (library.getLibrarySelectionType().getId() != librarySelectionType.getId()) return false;
-    if (library.getLibraryStrategyType().getId() != libraryStrategyType.getId()) return false;
+    if (!(library.getSample() instanceof DetailedSample))
+      return true;
+    if (((DetailedSample) library.getSample()).getSampleClass().getId() != sampleClass.getId())
+      return false;
+    if (library.getLibrarySelectionType().getId() != librarySelectionType.getId())
+      return false;
+    if (library.getLibraryStrategyType().getId() != libraryStrategyType.getId())
+      return false;
     return true;
   }
 
@@ -130,9 +134,12 @@ public class LibraryDesign implements Deletable, Identifiable, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     LibraryDesign other = (LibraryDesign) obj;
     return new EqualsBuilder()
         .append(librarySelectionType, other.librarySelectionType)

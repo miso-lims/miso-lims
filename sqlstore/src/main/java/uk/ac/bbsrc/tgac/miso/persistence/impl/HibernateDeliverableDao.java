@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.criteria.SetJoin;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.SetJoin;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl_;

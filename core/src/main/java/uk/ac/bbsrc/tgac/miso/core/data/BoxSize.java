@@ -5,21 +5,20 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 @Table(name = "BoxSize")
-public class BoxSize implements Deletable, Identifiable, Serializable {
+public class BoxSize implements Deletable, Serializable {
 
   public enum BoxType {
     STORAGE("Storage"), PLATE("Plate");
@@ -105,7 +104,8 @@ public class BoxSize implements Deletable, Identifiable, Serializable {
   }
 
   public Stream<String> positionStream() {
-    return IntStream.range(0, boxSizeRows * boxSizeColumns).mapToObj(x -> BoxUtils.getPositionString(x / boxSizeColumns, x % boxSizeColumns));
+    return IntStream.range(0, boxSizeRows * boxSizeColumns)
+        .mapToObj(x -> BoxUtils.getPositionString(x / boxSizeColumns, x % boxSizeColumns));
   }
 
   @Override

@@ -3,10 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -19,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.servlet.http.HttpServletRequest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.service.TargetedSequencingService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -45,28 +44,29 @@ public class TargetedSequencingRestController extends RestController {
   @Autowired
   private AsyncOperationManager asyncOperationManager;
 
-  private final JQueryDataTableBackend<TargetedSequencing, TargetedSequencingDto> jQueryBackend = new JQueryDataTableBackend<TargetedSequencing, TargetedSequencingDto>() {
-    @Override
-    protected TargetedSequencingDto asDto(TargetedSequencing model) {
-      return Dtos.asDto(model);
-    }
+  private final JQueryDataTableBackend<TargetedSequencing, TargetedSequencingDto> jQueryBackend =
+      new JQueryDataTableBackend<TargetedSequencing, TargetedSequencingDto>() {
+        @Override
+        protected TargetedSequencingDto asDto(TargetedSequencing model) {
+          return Dtos.asDto(model);
+        }
 
-    @Override
-    protected PaginatedDataSource<TargetedSequencing> getSource() throws IOException {
-      return targetedSequencingService;
-    }
-  };
+        @Override
+        protected PaginatedDataSource<TargetedSequencing> getSource() throws IOException {
+          return targetedSequencingService;
+        }
+      };
 
   @GetMapping(value = "/dt/kit/{id}/available", produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<TargetedSequencingDto> availableTargetedSequencings(@PathVariable("id") Long kitDescriptorId,
+  public @ResponseBody DataTablesResponseDto<TargetedSequencingDto> availableTargetedSequencings(
+      @PathVariable("id") Long kitDescriptorId,
       HttpServletRequest request) throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, new PaginationFilter[0]);
   }
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<TargetedSequencingDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<TargetedSequencingDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, targetedSequencingService, true);
   }
 
@@ -78,7 +78,8 @@ public class TargetedSequencingRestController extends RestController {
 
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
-    return asyncOperationManager.getAsyncProgress(uuid, TargetedSequencing.class, targetedSequencingService, Dtos::asDto);
+    return asyncOperationManager.getAsyncProgress(uuid, TargetedSequencing.class, targetedSequencingService,
+        Dtos::asDto);
   }
 
   @PostMapping(value = "/bulk-delete")

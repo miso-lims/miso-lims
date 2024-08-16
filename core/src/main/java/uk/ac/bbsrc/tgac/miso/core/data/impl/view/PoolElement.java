@@ -2,13 +2,12 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement.PoolElementId;
@@ -52,16 +51,23 @@ public class PoolElement implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
       PoolElementId other = (PoolElementId) obj;
       if (pool == null) {
-        if (other.pool != null) return false;
-      } else if (!pool.equals(other.pool)) return false;
+        if (other.pool != null)
+          return false;
+      } else if (!pool.equals(other.pool))
+        return false;
       if (aliquot == null) {
-        if (other.aliquot != null) return false;
-      } else if (!aliquot.equals(other.aliquot)) return false;
+        if (other.aliquot != null)
+          return false;
+      } else if (!aliquot.equals(other.aliquot))
+        return false;
       return true;
     }
 

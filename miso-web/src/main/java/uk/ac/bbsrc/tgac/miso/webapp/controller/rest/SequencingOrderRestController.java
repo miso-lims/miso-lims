@@ -5,10 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -26,6 +22,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
@@ -79,29 +78,32 @@ public class SequencingOrderRestController extends RestController {
   @Autowired
   private AsyncOperationManager asyncOperationManager;
 
-  private final JQueryDataTableBackend<SequencingOrderSummaryView, SequencingOrderCompletionDto> jQueryBackend = new JQueryDataTableBackend<>() {
+  private final JQueryDataTableBackend<SequencingOrderSummaryView, SequencingOrderCompletionDto> jQueryBackend =
+      new JQueryDataTableBackend<>() {
 
-    @Override
-    protected PaginatedDataSource<SequencingOrderSummaryView> getSource() throws IOException {
-      return sequencingOrderSummaryViewService;
-    }
+        @Override
+        protected PaginatedDataSource<SequencingOrderSummaryView> getSource() throws IOException {
+          return sequencingOrderSummaryViewService;
+        }
 
-    @Override
-    protected SequencingOrderCompletionDto asDto(SequencingOrderSummaryView model) {
-      return Dtos.asDto(model, indexChecker);
-    }
-  };
+        @Override
+        protected SequencingOrderCompletionDto asDto(SequencingOrderSummaryView model) {
+          return Dtos.asDto(model, indexChecker);
+        }
+      };
 
-  @GetMapping(value = "/pools/{id}/dt/completions", produces = { "application/json" })
+  @GetMapping(value = "/pools/{id}/dt/completions", produces = {"application/json"})
   @ResponseBody
-  public DataTablesResponseDto<SequencingOrderCompletionDto> getCompletionsByPool(@PathVariable("id") Long id, HttpServletRequest request)
+  public DataTablesResponseDto<SequencingOrderCompletionDto> getCompletionsByPool(@PathVariable("id") Long id,
+      HttpServletRequest request)
       throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.pool(id));
   }
 
-  @GetMapping(value = "/sequencingorders/{id}", produces = { "application/json" })
+  @GetMapping(value = "/sequencingorders/{id}", produces = {"application/json"})
   @ResponseBody
-  public SequencingOrderDto get(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response)
+  public SequencingOrderDto get(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response)
       throws IOException {
     SequencingOrder result = sequencingOrderService.get(id);
     if (result == null) {
@@ -111,26 +113,28 @@ public class SequencingOrderRestController extends RestController {
     }
   }
 
-  @PostMapping(value = "/sequencingorders", headers = { "Content-type=application/json" })
+  @PostMapping(value = "/sequencingorders", headers = {"Content-type=application/json"})
   @ResponseBody
   @ResponseStatus(code = HttpStatus.CREATED)
-  public SequencingOrderDto create(@RequestBody SequencingOrderDto orderDto, UriComponentsBuilder b, HttpServletResponse response)
+  public SequencingOrderDto create(@RequestBody SequencingOrderDto orderDto, UriComponentsBuilder b,
+      HttpServletResponse response)
       throws IOException {
     SequencingOrder seqOrder = Dtos.to(orderDto);
     Long id = sequencingOrderService.create(seqOrder);
     SequencingOrder saved = sequencingOrderService.get(id);
     return Dtos.asDto(saved, indexChecker);
   }
-  
-  @GetMapping(value = "/sequencingorders/dt/completions/all/{platform}", produces = { "application/json" })
+
+  @GetMapping(value = "/sequencingorders/dt/completions/all/{platform}", produces = {"application/json"})
   @ResponseBody
-  public DataTablesResponseDto<SequencingOrderCompletionDto> getDtCompletions(@PathVariable String platform, HttpServletRequest request)
+  public DataTablesResponseDto<SequencingOrderCompletionDto> getDtCompletions(@PathVariable String platform,
+      HttpServletRequest request)
       throws IOException {
     return jQueryBackend.get(request, advancedSearchParser,
         PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
-  @GetMapping(value = "/sequencingorders/dt/completions/outstanding/{platform}", produces = { "application/json" })
+  @GetMapping(value = "/sequencingorders/dt/completions/outstanding/{platform}", produces = {"application/json"})
   @ResponseBody
   public DataTablesResponseDto<SequencingOrderCompletionDto> getDtCompletionsOutstanding(@PathVariable String platform,
       HttpServletRequest request) throws IOException {
@@ -138,7 +142,7 @@ public class SequencingOrderRestController extends RestController {
         PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
-  @GetMapping(value = "/sequencingorders/dt/completions/in-progress/{platform}", produces = { "application/json" })
+  @GetMapping(value = "/sequencingorders/dt/completions/in-progress/{platform}", produces = {"application/json"})
   @ResponseBody
   public DataTablesResponseDto<SequencingOrderCompletionDto> getDtCompletionsInProgress(@PathVariable String platform,
       HttpServletRequest request) throws IOException {
@@ -146,7 +150,7 @@ public class SequencingOrderRestController extends RestController {
         PaginationFilter.platformType(PlatformType.valueOf(platform)));
   }
 
-  @PutMapping(value = "/sequencingorders/{id}", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/sequencingorders/{id}", headers = {"Content-type=application/json"})
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void update(@PathVariable("id") Long id, @RequestBody SequencingOrderDto dto,
@@ -167,7 +171,8 @@ public class SequencingOrderRestController extends RestController {
   @DeleteMapping(value = "/sequencingorders/{id}")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void delete(@PathVariable(name = "id", required = true) long id, HttpServletResponse response) throws IOException {
+  public void delete(@PathVariable(name = "id", required = true) long id, HttpServletResponse response)
+      throws IOException {
     RestUtils.delete("Sequencing order", id, sequencingOrderService);
   }
 
@@ -178,7 +183,7 @@ public class SequencingOrderRestController extends RestController {
     RestUtils.bulkDelete("Sequencing order", ids, sequencingOrderService);
   }
 
-  @GetMapping(value = "/sequencingorders/picker/active", produces = { "application/json" })
+  @GetMapping(value = "/sequencingorders/picker/active", produces = {"application/json"})
   @ResponseBody
   public PoolPickerResponse getPickersByUnfulfilled(@RequestParam("platform") String platform) throws IOException {
     return getPoolPickerWithFilters(100,
@@ -186,7 +191,7 @@ public class SequencingOrderRestController extends RestController {
         PaginationFilter.fulfilled(false));
   }
 
-  @GetMapping(value = "/sequencingorders/picker/chemistry", produces = { "application/json" })
+  @GetMapping(value = "/sequencingorders/picker/chemistry", produces = {"application/json"})
   @ResponseBody
   public PoolPickerResponse getPickersByChemistry(@RequestParam("platform") String platform,
       @RequestParam("seqParamsId") Long paramsId,
@@ -215,14 +220,16 @@ public class SequencingOrderRestController extends RestController {
   @GetMapping(value = "/sequencingorders/search")
   @ResponseBody
   public List<SequencingOrderDto> search(@RequestParam long poolId, @RequestParam long purposeId,
-      @RequestParam(required = false) Long containerModelId, @RequestParam long parametersId, @RequestParam int partitions)
+      @RequestParam(required = false) Long containerModelId, @RequestParam long parametersId,
+      @RequestParam int partitions)
       throws IOException {
     Pool pool = getOrThrow(poolService, poolId, "Pool");
     RunPurpose purpose = getOrThrow(runPurposeService, purposeId, "Run purpose");
     SequencingContainerModel containerModel = containerModelId == null ? null
         : getOrThrow(containerModelService, containerModelId, "Container model");
     SequencingParameters parameters = getOrThrow(sequencingParametersService, parametersId, "Sequencing parameters");
-    List<SequencingOrder> results = sequencingOrderService.listByAttributes(pool, purpose, containerModel, parameters, partitions);
+    List<SequencingOrder> results =
+        sequencingOrderService.listByAttributes(pool, purpose, containerModel, parameters, partitions);
     return results.stream().map(so -> Dtos.asDto(so, indexChecker)).collect(Collectors.toList());
   }
 

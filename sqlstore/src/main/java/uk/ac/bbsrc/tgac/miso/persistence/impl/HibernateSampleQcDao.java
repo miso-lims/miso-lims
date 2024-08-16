@@ -25,7 +25,7 @@ public class HibernateSampleQcDao extends HibernateQcStore<SampleQC> implements 
       throws IOException {
     SampleImpl sample = (SampleImpl) currentSession().get(SampleImpl.class, id);
     sample.updateFromQc(correspondingField, value, units);
-    currentSession().update(sample);
+    currentSession().merge(sample);
   }
 
   @Override

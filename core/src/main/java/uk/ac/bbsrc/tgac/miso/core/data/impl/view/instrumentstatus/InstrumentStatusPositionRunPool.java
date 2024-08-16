@@ -3,13 +3,12 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus;
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
-
 import org.hibernate.annotations.Immutable;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPositionRunPool.InstrumentStatusPositionRunPoolId;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 

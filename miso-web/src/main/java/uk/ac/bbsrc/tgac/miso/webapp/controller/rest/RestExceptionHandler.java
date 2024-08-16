@@ -4,16 +4,11 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.http.HttpMessage;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.NestedServletException;
@@ -21,6 +16,9 @@ import org.springframework.web.util.NestedServletException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 
@@ -28,16 +26,16 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
  * Class for handling exceptions occurring in REST Controller classes
  */
 public class RestExceptionHandler {
-  
+
   private static final Logger log = LoggerFactory.getLogger(RestExceptionHandler.class);
-  
+
   private RestExceptionHandler() {
     throw new AssertionError("Instantiability not intended");
   }
-  
+
   /**
-   * Collects information from an exception, sets an appropriate HTTP Status for the response, and forms a representation of the
-   * error that may be returned to the client. e.g.
+   * Collects information from an exception, sets an appropriate HTTP Status for the response, and
+   * forms a representation of the error that may be returned to the client. e.g.
    * 
    * <pre>
    * {
@@ -55,7 +53,8 @@ public class RestExceptionHandler {
    * @param exception The exception that was thrown while handling a REST request
    * @return a representation of the error to return to the client
    */
-  public static ObjectNode handleException(HttpServletRequest request, HttpServletResponse response, Exception exception, ObjectMapper mapper) {
+  public static ObjectNode handleException(HttpServletRequest request, HttpServletResponse response,
+      Exception exception, ObjectMapper mapper) {
     ObjectNode error = mapper.createObjectNode();
     error.put("requestUrl", request.getRequestURL().toString());
     String detailMessage = exception.getLocalizedMessage();
@@ -94,13 +93,13 @@ public class RestExceptionHandler {
     } else if (ExceptionUtils.getRootCause(exception) instanceof IOException
         && StringUtils.containsIgnoreCase(ExceptionUtils.getRootCauseMessage(exception), "Broken pipe")) {
       response.setStatus(Status.SERVICE_UNAVAILABLE.getStatusCode());
-          return null;
+      return null;
     } else {
-          // Unknown/unexpected exception
-          detailMessage = "An unexpected error has occurred";
-          status = Status.INTERNAL_SERVER_ERROR;
+      // Unknown/unexpected exception
+      detailMessage = "An unexpected error has occurred";
+      status = Status.INTERNAL_SERVER_ERROR;
     }
-    
+
     error.put("detail", detailMessage);
     error.put("code", status.getStatusCode());
     error.put("message", status.getReasonPhrase());
@@ -110,12 +109,12 @@ public class RestExceptionHandler {
     } else {
       log.debug(status.getStatusCode() + " error handling REST request", exception);
     }
-    
+
     if (!error.has("dataFormat")) {
       error.put("dataFormat", "custom");
     }
     response.setStatus(status.getStatusCode());
-    
+
     return error;
   }
 
@@ -128,5 +127,5 @@ public class RestExceptionHandler {
       mapNode.put(entry.getKey(), entry.getValue());
     }
   }
-  
+
 }

@@ -8,9 +8,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.acls.model.NotFoundException;
@@ -26,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -70,33 +69,37 @@ public class WorksetRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<ListWorksetView, ListWorksetViewDto> jQueryBackend = new JQueryDataTableBackend<ListWorksetView, ListWorksetViewDto>() {
+  private final JQueryDataTableBackend<ListWorksetView, ListWorksetViewDto> jQueryBackend =
+      new JQueryDataTableBackend<ListWorksetView, ListWorksetViewDto>() {
 
-    @Override
-    protected ListWorksetViewDto asDto(ListWorksetView model) {
-      return Dtos.asDto(model);
-    }
+        @Override
+        protected ListWorksetViewDto asDto(ListWorksetView model) {
+          return Dtos.asDto(model);
+        }
 
-    @Override
-    protected PaginatedDataSource<ListWorksetView> getSource() throws IOException {
-      return worksetService;
-    }
+        @Override
+        protected PaginatedDataSource<ListWorksetView> getSource() throws IOException {
+          return worksetService;
+        }
 
-  };
+      };
 
   @GetMapping(value = "/dt/all", produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<ListWorksetViewDto> dataTable(HttpServletRequest request) throws IOException {
+  public @ResponseBody DataTablesResponseDto<ListWorksetViewDto> dataTable(HttpServletRequest request)
+      throws IOException {
     return jQueryBackend.get(request, advancedSearchParser);
   }
 
   @GetMapping(value = "/dt/mine", produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<ListWorksetViewDto> dataTableForUser(HttpServletRequest request) throws IOException {
+  public @ResponseBody DataTablesResponseDto<ListWorksetViewDto> dataTableForUser(HttpServletRequest request)
+      throws IOException {
     String username = authorizationManager.getCurrentUser().getLoginName();
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.user(username, true));
   }
 
   @GetMapping(value = "/dt/uncategorized", produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<ListWorksetViewDto> dataTableForUncategorized(HttpServletRequest request) throws IOException {
+  public @ResponseBody DataTablesResponseDto<ListWorksetViewDto> dataTableForUncategorized(HttpServletRequest request)
+      throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.category(""));
   }
 
@@ -124,7 +127,8 @@ public class WorksetRestController extends RestController {
 
   @PostMapping(value = "/{worksetId}/samples")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void addSamples(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> sampleIds)
+  public void addSamples(@PathVariable(value = "worksetId", required = true) long worksetId,
+      @RequestBody List<Long> sampleIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
     List<Sample> items = loadItems("Sample", sampleIds, sampleService);
@@ -133,7 +137,8 @@ public class WorksetRestController extends RestController {
 
   @PostMapping(value = "/{worksetId}/libraries")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void addLibraries(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> libraryIds)
+  public void addLibraries(@PathVariable(value = "worksetId", required = true) long worksetId,
+      @RequestBody List<Long> libraryIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
     List<Library> items = loadItems("Library", libraryIds, libraryService);
@@ -142,7 +147,8 @@ public class WorksetRestController extends RestController {
 
   @PostMapping(value = "/{worksetId}/libraryaliquots")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void addLibraryAliquots(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> aliquotIds)
+  public void addLibraryAliquots(@PathVariable(value = "worksetId", required = true) long worksetId,
+      @RequestBody List<Long> aliquotIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
     List<LibraryAliquot> items = loadItems("Library aliquot", aliquotIds, libraryAliquotService);
@@ -151,7 +157,8 @@ public class WorksetRestController extends RestController {
 
   @DeleteMapping("/{worksetId}/samples")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void removeSamples(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> sampleIds)
+  public void removeSamples(@PathVariable(value = "worksetId", required = true) long worksetId,
+      @RequestBody List<Long> sampleIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
     List<Sample> items = loadItems("Sample", sampleIds, sampleService);
@@ -160,7 +167,8 @@ public class WorksetRestController extends RestController {
 
   @DeleteMapping("/{worksetId}/libraries")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void removeLibraries(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> libraryIds)
+  public void removeLibraries(@PathVariable(value = "worksetId", required = true) long worksetId,
+      @RequestBody List<Long> libraryIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
     List<Library> items = loadItems("Library", libraryIds, libraryService);
@@ -169,7 +177,8 @@ public class WorksetRestController extends RestController {
 
   @DeleteMapping("/{worksetId}/libraryaliquots")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void removeLibraryAliquots(@PathVariable(value = "worksetId", required = true) long worksetId, @RequestBody List<Long> aliquotIds)
+  public void removeLibraryAliquots(@PathVariable(value = "worksetId", required = true) long worksetId,
+      @RequestBody List<Long> aliquotIds)
       throws IOException {
     Workset workset = getWorkset(worksetId);
     List<LibraryAliquot> items = loadItems("Library aliquot", aliquotIds, libraryAliquotService);
@@ -184,7 +193,8 @@ public class WorksetRestController extends RestController {
     return workset;
   }
 
-  private <T extends Boxable, J extends WorksetItem<T>> List<T> loadItems(String typeName, List<Long> ids, ProviderService<T> service)
+  private <T extends Boxable, J extends WorksetItem<T>> List<T> loadItems(String typeName, List<Long> ids,
+      ProviderService<T> service)
       throws IOException {
     List<T> items = new ArrayList<>();
     for (Long id : ids) {
@@ -236,7 +246,8 @@ public class WorksetRestController extends RestController {
 
   @PostMapping("/merge")
   @ResponseStatus(HttpStatus.CREATED)
-  public @ResponseBody WorksetDto mergeWorksets(@RequestBody(required = true) MergeWorksetsRequestData data) throws IOException {
+  public @ResponseBody WorksetDto mergeWorksets(@RequestBody(required = true) MergeWorksetsRequestData data)
+      throws IOException {
     Workset workset = new Workset();
     if (LimsUtils.isStringEmptyOrNull(data.getAlias())) {
       throw new RestException("No alias provided for new workset", Status.BAD_REQUEST);
@@ -252,7 +263,8 @@ public class WorksetRestController extends RestController {
       }
       copyWorksetItems(child.getWorksetSamples(), workset.getWorksetSamples(), WorksetSample::new);
       copyWorksetItems(child.getWorksetLibraries(), workset.getWorksetLibraries(), WorksetLibrary::new);
-      copyWorksetItems(child.getWorksetLibraryAliquots(), workset.getWorksetLibraryAliquots(), WorksetLibraryAliquot::new);
+      copyWorksetItems(child.getWorksetLibraryAliquots(), workset.getWorksetLibraryAliquots(),
+          WorksetLibraryAliquot::new);
     }
     worksetService.create(workset);
     return Dtos.asDto(workset);
@@ -292,23 +304,27 @@ public class WorksetRestController extends RestController {
 
   @PostMapping("/{worksetId}/samples/move")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public @ResponseBody void moveSamples(@PathVariable long worksetId, @RequestBody MoveItemsDto dto) throws IOException {
+  public @ResponseBody void moveSamples(@PathVariable long worksetId, @RequestBody MoveItemsDto dto)
+      throws IOException {
     moveItems(worksetId, dto, "Sample", sampleService, worksetService::moveSamples);
   }
 
   @PostMapping("/{worksetId}/libraries/move")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public @ResponseBody void moveLibraries(@PathVariable long worksetId, @RequestBody MoveItemsDto dto) throws IOException {
+  public @ResponseBody void moveLibraries(@PathVariable long worksetId, @RequestBody MoveItemsDto dto)
+      throws IOException {
     moveItems(worksetId, dto, "Library", libraryService, worksetService::moveLibraries);
   }
 
   @PostMapping("/{worksetId}/libraryaliquots/move")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public @ResponseBody void moveLibraryAliquots(@PathVariable long worksetId, @RequestBody MoveItemsDto dto) throws IOException {
+  public @ResponseBody void moveLibraryAliquots(@PathVariable long worksetId, @RequestBody MoveItemsDto dto)
+      throws IOException {
     moveItems(worksetId, dto, "Library aliquot", libraryAliquotService, worksetService::moveLibraryAliquots);
   }
 
-  private <T extends Boxable> void moveItems(long sourceWorksetId, MoveItemsDto dto, String itemTypeName, ProviderService<T> service,
+  private <T extends Boxable> void moveItems(long sourceWorksetId, MoveItemsDto dto, String itemTypeName,
+      ProviderService<T> service,
       TriConsumer<Workset, Workset, Collection<T>> moveFunction) throws IOException {
     Workset sourceWorkset = worksetService.get(sourceWorksetId);
     if (sourceWorkset == null) {

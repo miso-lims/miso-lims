@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 
-public interface DetailedQcStatus extends Deletable, Identifiable, Serializable, Timestamped {
+public interface DetailedQcStatus extends Deletable, Serializable, Timestamped {
 
   Boolean getStatus();
 

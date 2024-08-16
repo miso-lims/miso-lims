@@ -6,29 +6,28 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 @Entity
 @Table(name = "SequencingParameters")
 
-public class SequencingParameters implements Deletable, Serializable, Identifiable, Comparable<SequencingParameters>, Timestamped
-{
+public class SequencingParameters
+    implements Deletable, Serializable, Comparable<SequencingParameters>, Timestamped {
 
   private static final long serialVersionUID = 1L;
 
@@ -153,6 +152,7 @@ public class SequencingParameters implements Deletable, Serializable, Identifiab
   }
 
   private static final List<String> sortOrder = getSortOrder();
+
   private static List<String> getSortOrder() {
     List<String> order = new ArrayList<>();
     order.add("v4 2×126");
@@ -181,7 +181,8 @@ public class SequencingParameters implements Deletable, Serializable, Identifiab
         break;
       }
     }
-    if (thisSortKey == null) thisSortKey = 100;
+    if (thisSortKey == null)
+      thisSortKey = 100;
 
     Integer otherSortKey = null;
     for (int i = 0; i < sortOrder.size(); i++) {
@@ -190,7 +191,8 @@ public class SequencingParameters implements Deletable, Serializable, Identifiab
         break;
       }
     }
-    if (otherSortKey == null) otherSortKey = 100;
+    if (otherSortKey == null)
+      otherSortKey = 100;
 
     if (thisSortKey == otherSortKey) {
       return name.compareTo(other.name);
@@ -227,22 +229,34 @@ public class SequencingParameters implements Deletable, Serializable, Identifiab
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     SequencingParameters other = (SequencingParameters) obj;
-    if (chemistry != other.chemistry) return false;
+    if (chemistry != other.chemistry)
+      return false;
     if (instrumentModel == null) {
-      if (other.instrumentModel != null) return false;
-    } else if (!instrumentModel.equals(other.instrumentModel)) return false;
+      if (other.instrumentModel != null)
+        return false;
+    } else if (!instrumentModel.equals(other.instrumentModel))
+      return false;
     if (name == null) {
-      if (other.name != null) return false;
-    } else if (!name.equals(other.name)) return false;
-    if (readLength != other.readLength) return false;
-    if (readLength2 != other.readLength2) return false;
+      if (other.name != null)
+        return false;
+    } else if (!name.equals(other.name))
+      return false;
+    if (readLength != other.readLength)
+      return false;
+    if (readLength2 != other.readLength2)
+      return false;
     if (runType == null) {
-      if (other.runType != null) return false;
-    } else if (!runType.equals(other.runType)) return false;
+      if (other.runType != null)
+        return false;
+    } else if (!runType.equals(other.runType))
+      return false;
     return true;
   }
 

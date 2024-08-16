@@ -5,15 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
-
-import org.hibernate.Criteria;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Index_;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -65,7 +63,7 @@ public class HibernatePoolDao extends HibernateSaveDao<Pool>
   @Override
   public List<Pool> listByLibraryId(long libraryId) throws IOException {
     QueryBuilder<Pool, PoolImpl> builder =
-        new QueryBuilder<>(currentSession(), PoolImpl.class, Pool.class, Criteria.DISTINCT_ROOT_ENTITY);
+        new QueryBuilder<>(currentSession(), PoolImpl.class, Pool.class);
     Join<PoolImpl, PoolElement> elementJoin = builder.getJoin(builder.getRoot(), PoolImpl_.poolElements);
     Join<PoolElement, ListLibraryAliquotView> aliquotJoin = builder.getJoin(elementJoin, PoolElement_.aliquot);
     Join<ListLibraryAliquotView, ParentLibrary> libraryJoin =

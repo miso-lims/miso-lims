@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -22,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -50,18 +49,19 @@ public class KitDescriptorRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<KitDescriptor, KitDescriptorDto> jQueryBackend = new JQueryDataTableBackend<KitDescriptor, KitDescriptorDto>() {
+  private final JQueryDataTableBackend<KitDescriptor, KitDescriptorDto> jQueryBackend =
+      new JQueryDataTableBackend<KitDescriptor, KitDescriptorDto>() {
 
-    @Override
-    protected KitDescriptorDto asDto(KitDescriptor model) {
-      return Dtos.asDto(model);
-    }
+        @Override
+        protected KitDescriptorDto asDto(KitDescriptor model) {
+          return Dtos.asDto(model);
+        }
 
-    @Override
-    protected PaginatedDataSource<KitDescriptor> getSource() throws IOException {
-      return kitDescriptorService;
-    }
-  };
+        @Override
+        protected PaginatedDataSource<KitDescriptor> getSource() throws IOException {
+          return kitDescriptorService;
+        }
+      };
 
   public static class KitChangeTargetedSequencingRequest {
     private List<Long> add;
@@ -88,13 +88,13 @@ public class KitDescriptorRestController extends RestController {
     this.kitDescriptorService = kitService;
   }
 
-  @GetMapping(value = "/{id}", produces = { "application/json" })
+  @GetMapping(value = "/{id}", produces = {"application/json"})
   @ResponseBody
   public KitDescriptorDto getKitDescriptor(@PathVariable long id) throws IOException {
     return RestUtils.getObject("Kit descriptor", id, kitDescriptorService, Dtos::asDto);
   }
 
-  @GetMapping(produces = { "application/json" })
+  @GetMapping(produces = {"application/json"})
   @ResponseBody
   public Set<KitDescriptorDto> getKitDescriptors() throws IOException {
     Collection<KitDescriptor> kitDescriptors = kitDescriptorService.list();
@@ -102,18 +102,20 @@ public class KitDescriptorRestController extends RestController {
     return dtos;
   }
 
-  @PostMapping(headers = { "Content-type=application/json" })
+  @PostMapping(headers = {"Content-type=application/json"})
   @ResponseStatus(HttpStatus.CREATED)
-  public @ResponseBody KitDescriptorDto createKitDescriptor(@RequestBody KitDescriptorDto kitDescriptorDto) throws IOException {
+  public @ResponseBody KitDescriptorDto createKitDescriptor(@RequestBody KitDescriptorDto kitDescriptorDto)
+      throws IOException {
     return RestUtils.createObject("Kit descriptor", kitDescriptorDto, Dtos::to, kitDescriptorService, kd -> {
       constantsController.refreshConstants();
       return Dtos.asDto(kd);
     });
   }
 
-  @PutMapping(value = "/{id}", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/{id}", headers = {"Content-type=application/json"})
   @ResponseStatus(HttpStatus.OK)
-  public @ResponseBody KitDescriptorDto updateKitDescriptor(@PathVariable long id, @RequestBody KitDescriptorDto kitDescriptorDto)
+  public @ResponseBody KitDescriptorDto updateKitDescriptor(@PathVariable long id,
+      @RequestBody KitDescriptorDto kitDescriptorDto)
       throws IOException {
     return RestUtils.updateObject("Kit descriptor", id, kitDescriptorDto, Dtos::to, kitDescriptorService, kd -> {
       constantsController.refreshConstants();
@@ -129,7 +131,8 @@ public class KitDescriptorRestController extends RestController {
 
   @GetMapping(value = "/dt/type/{type}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<KitDescriptorDto> dataTableByType(@PathVariable("type") String type, HttpServletRequest request)
+  public DataTablesResponseDto<KitDescriptorDto> dataTableByType(@PathVariable("type") String type,
+      HttpServletRequest request)
       throws IOException {
     KitType kitType = KitType.valueOf(type);
     if (kitType == null) {
@@ -157,7 +160,8 @@ public class KitDescriptorRestController extends RestController {
   }
 
   @GetMapping("/search")
-  public @ResponseBody List<KitDescriptorDto> search(@RequestParam("q") String search, @RequestParam("kitType") String kitTypeString)
+  public @ResponseBody List<KitDescriptorDto> search(@RequestParam("q") String search,
+      @RequestParam("kitType") String kitTypeString)
       throws IOException {
     KitType kitType = KitType.get(kitTypeString);
     if (kitType == null) {

@@ -16,6 +16,7 @@ public class Pair<K, V> implements Entry<K, V> {
     };
 
   }
+
   private final K key;
 
   private final V value;
@@ -42,16 +43,19 @@ public class Pair<K, V> implements Entry<K, V> {
   }
 
   @Override
-  public boolean equals(Object o){
-    if(o == this) return true;
-    if(!(o instanceof Pair)) return false;
-    Pair<K, V> po = (Pair<K, V>)o;
+  public boolean equals(Object o) {
+    if (o == this)
+      return true;
+    if (!(o instanceof Pair))
+      return false;
+    @SuppressWarnings("unchecked")
+    Pair<K, V> po = (Pair<K, V>) o;
     return Objects.equals(this.key, po.key)
-            && Objects.equals(this.value, po.value);
+        && Objects.equals(this.value, po.value);
   }
 
   @Override
-  public int hashCode(){
+  public int hashCode() {
     return Objects.hash(this.key, this.value);
   }
 }

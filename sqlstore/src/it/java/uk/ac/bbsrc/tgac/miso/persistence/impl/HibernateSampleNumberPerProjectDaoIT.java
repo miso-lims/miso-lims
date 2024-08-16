@@ -175,7 +175,7 @@ public class HibernateSampleNumberPerProjectDaoIT extends AbstractDAOTest {
 
     Sample sam = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 1L);
     sam.setAlias(PRO1_PARTIAL_ALIAS + "0003");
-    sessionFactory.getCurrentSession().save(sam);
+    sessionFactory.getCurrentSession().persist(sam);
 
     String s2 = sampleNumberPerProjectDao.nextNumber(project, user, PRO1_PARTIAL_ALIAS);
     assertEquals("0004", s2);

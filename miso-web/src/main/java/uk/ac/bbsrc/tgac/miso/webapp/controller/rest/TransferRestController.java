@@ -8,9 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -26,6 +23,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.eaglegenomics.simlims.core.Group;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
@@ -70,24 +69,27 @@ public class TransferRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<ListTransferView, ListTransferViewDto> jQueryBackend = new JQueryDataTableBackend<ListTransferView, ListTransferViewDto>() {
+  private final JQueryDataTableBackend<ListTransferView, ListTransferViewDto> jQueryBackend =
+      new JQueryDataTableBackend<ListTransferView, ListTransferViewDto>() {
 
-    @Override
-    protected ListTransferViewDto asDto(ListTransferView model) {
-      return Dtos.asDto(model);
-    }
+        @Override
+        protected ListTransferViewDto asDto(ListTransferView model) {
+          return Dtos.asDto(model);
+        }
 
-    @Override
-    protected PaginatedDataSource<ListTransferView> getSource() throws IOException {
-      return listTransferViewService;
-    }
+        @Override
+        protected PaginatedDataSource<ListTransferView> getSource() throws IOException {
+          return listTransferViewService;
+        }
 
-  };
+      };
 
   @GetMapping("/dt/pending")
-  public @ResponseBody DataTablesResponseDto<ListTransferViewDto> listPendingDatatable(HttpServletRequest request) throws IOException {
+  public @ResponseBody DataTablesResponseDto<ListTransferViewDto> listPendingDatatable(HttpServletRequest request)
+      throws IOException {
     Set<Group> groups = authorizationManager.getCurrentUser().getGroups();
-    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.pending(), PaginationFilter.recipientGroups(groups));
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.pending(),
+        PaginationFilter.recipientGroups(groups));
   }
 
   @GetMapping("/dt/{transferType}")
@@ -109,7 +111,8 @@ public class TransferRestController extends RestController {
     Map<Long, Long> boxMoves = new HashMap<>();
     dto.getItems().forEach(item -> {
       if (item.getNewBoxLocationId() != null) {
-        if (boxMoves.containsKey(item.getBoxId()) && !item.getNewBoxLocationId().equals(boxMoves.get(item.getBoxId()))) {
+        if (boxMoves.containsKey(item.getBoxId())
+            && !item.getNewBoxLocationId().equals(boxMoves.get(item.getBoxId()))) {
           throw new RestException("Multiple locations specified for the same box", Status.BAD_REQUEST);
         }
         boxMoves.put(item.getBoxId(), item.getNewBoxLocationId());
@@ -139,7 +142,8 @@ public class TransferRestController extends RestController {
   }
 
   @PostMapping("/{transferId}/notifications")
-  public @ResponseBody TransferNotificationDto addNotification(@PathVariable long transferId, @RequestBody TransferNotificationDto dto,
+  public @ResponseBody TransferNotificationDto addNotification(@PathVariable long transferId,
+      @RequestBody TransferNotificationDto dto,
       @RequestParam(defaultValue = "false") boolean saveContact) throws IOException {
     Transfer transfer = RestUtils.retrieve("Transfer", transferId, transferService);
     TransferNotificationDto result = RestUtils.createObject("Notification", dto, from -> {
@@ -157,7 +161,8 @@ public class TransferRestController extends RestController {
   }
 
   @PostMapping("/{transferId}/notifications/{notificationId}/resend")
-  public @ResponseBody TransferNotificationDto resendNotification(@PathVariable long transferId, @PathVariable long notificationId)
+  public @ResponseBody TransferNotificationDto resendNotification(@PathVariable long transferId,
+      @PathVariable long notificationId)
       throws IOException {
     TransferNotification notification = RestUtils.retrieve("Notification", notificationId, transferNotificationService);
     if (notification.getTransfer().getId() != transferId) {
@@ -176,7 +181,8 @@ public class TransferRestController extends RestController {
   @PostMapping("/{transferId}/notifications/bulk-delete")
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void bulkDeleteNotifications(@PathVariable long transferId, @RequestBody(required = true) List<Long> ids) throws IOException {
+  public void bulkDeleteNotifications(@PathVariable long transferId, @RequestBody(required = true) List<Long> ids)
+      throws IOException {
     List<TransferNotification> notifications = new ArrayList<>();
     for (Long id : ids) {
       notifications.add(RestUtils.retrieve("Notification", id, transferNotificationService, Status.BAD_REQUEST));

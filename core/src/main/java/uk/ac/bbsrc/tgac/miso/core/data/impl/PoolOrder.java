@@ -9,34 +9,31 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
-import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolOrderChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
-public class PoolOrder implements Deletable, Identifiable, Serializable, Timestamped, ChangeLoggable {
+public class PoolOrder implements Deletable, Serializable, ChangeLoggable {
 
   public enum Status {
     OUTSTANDING("Outstanding"), DRAFT("Draft"), FULFILLED("Fulfilled");
@@ -299,7 +296,8 @@ public class PoolOrder implements Deletable, Identifiable, Serializable, Timesta
 
   @Override
   public int hashCode() {
-    return Objects.hash(alias, description, draft, orderLibraryAliquots, parameters, partitions, containerModel, pool, purpose,
+    return Objects.hash(alias, description, draft, orderLibraryAliquots, parameters, partitions, containerModel, pool,
+        purpose,
         sequencingOrder);
   }
 

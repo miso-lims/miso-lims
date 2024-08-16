@@ -2,18 +2,13 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
 import java.util.List;
 
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
-
 public class BarcodableReference {
 
-  public static class ResultTransformer implements org.hibernate.transform.ResultTransformer {
-
-    private static final long serialVersionUID = 1L;
-
+  @SuppressWarnings("rawtypes")
+  public static class TupleTransformer implements org.hibernate.query.TupleTransformer {
     private final String entityType;
 
-    public ResultTransformer(String entityType) {
+    public TupleTransformer(String entityType) {
       this.entityType = entityType;
     }
 
@@ -23,22 +18,14 @@ public class BarcodableReference {
       return new BarcodableReference(entityType, (long) tuple[0], (String) tuple[1], secondaryLabel);
     }
 
-    @SuppressWarnings("rawtypes")
+  };
+
+  @SuppressWarnings("rawtypes")
+  public static class ResultListTransformer implements org.hibernate.query.ResultListTransformer {
     @Override
     public List transformList(List collection) {
       return collection;
     }
-
-  };
-
-  public static ProjectionList makeProjectionList(String primaryLabelProperty, String secondaryLabelProperty) {
-    ProjectionList projections = Projections.projectionList()
-        .add(Projections.property("id"))
-        .add(Projections.property(primaryLabelProperty));
-    if (secondaryLabelProperty != null) {
-      projections.add(Projections.property(secondaryLabelProperty));
-    }
-    return projections;
   }
 
   private final String entityType;

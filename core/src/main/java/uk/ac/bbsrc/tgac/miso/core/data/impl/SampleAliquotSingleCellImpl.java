@@ -2,9 +2,8 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.math.BigDecimal;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 
 @Entity
@@ -35,13 +34,18 @@ public class SampleAliquotSingleCellImpl extends SampleAliquotImpl implements Sa
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     SampleAliquotSingleCellImpl other = (SampleAliquotSingleCellImpl) obj;
     if (inputIntoLibrary == null) {
-      if (other.inputIntoLibrary != null) return false;
-    } else if (!inputIntoLibrary.equals(other.inputIntoLibrary)) return false;
+      if (other.inputIntoLibrary != null)
+        return false;
+    } else if (!inputIntoLibrary.equals(other.inputIntoLibrary))
+      return false;
     return true;
   }
 

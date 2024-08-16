@@ -1,8 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -50,16 +49,23 @@ public class OxfordNanoporeRun extends Run {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     OxfordNanoporeRun other = (OxfordNanoporeRun) obj;
     if (minKnowVersion == null) {
-      if (other.minKnowVersion != null) return false;
-    } else if (!minKnowVersion.equals(other.minKnowVersion)) return false;
+      if (other.minKnowVersion != null)
+        return false;
+    } else if (!minKnowVersion.equals(other.minKnowVersion))
+      return false;
     if (protocolVersion == null) {
-      if (other.protocolVersion != null) return false;
-    } else if (!protocolVersion.equals(other.protocolVersion)) return false;
+      if (other.protocolVersion != null)
+        return false;
+    } else if (!protocolVersion.equals(other.protocolVersion))
+      return false;
     return true;
   }
 

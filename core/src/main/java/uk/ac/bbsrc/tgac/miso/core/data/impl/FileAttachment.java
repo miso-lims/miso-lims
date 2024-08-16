@@ -3,17 +3,16 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 
 @Entity(name = "Attachment")
@@ -104,23 +103,35 @@ public class FileAttachment implements Identifiable, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     FileAttachment other = (FileAttachment) obj;
-    if (attachmentId != other.attachmentId) return false;
+    if (attachmentId != other.attachmentId)
+      return false;
     if (created == null) {
-      if (other.created != null) return false;
-    } else if (!created.equals(other.created)) return false;
+      if (other.created != null)
+        return false;
+    } else if (!created.equals(other.created))
+      return false;
     if (creator == null) {
-      if (other.creator != null) return false;
-    } else if (!creator.equals(other.creator)) return false;
+      if (other.creator != null)
+        return false;
+    } else if (!creator.equals(other.creator))
+      return false;
     if (filename == null) {
-      if (other.filename != null) return false;
-    } else if (!filename.equals(other.filename)) return false;
+      if (other.filename != null)
+        return false;
+    } else if (!filename.equals(other.filename))
+      return false;
     if (path == null) {
-      if (other.path != null) return false;
-    } else if (!path.equals(other.path)) return false;
+      if (other.path != null)
+        return false;
+    } else if (!path.equals(other.path))
+      return false;
     return true;
   }
 

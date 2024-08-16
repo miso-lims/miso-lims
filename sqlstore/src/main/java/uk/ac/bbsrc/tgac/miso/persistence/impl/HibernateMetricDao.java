@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.criteria.Join;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayMetric;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayMetric_;

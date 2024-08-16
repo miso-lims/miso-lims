@@ -12,22 +12,21 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.persistence.Query;
-import javax.persistence.Table;
-import javax.persistence.Tuple;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.SetJoin;
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Group_;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.Table;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.SetJoin;
+import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -74,7 +73,8 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
       // try a quicker approach
       Table tableAnnotation = getEntityClass().getAnnotation(Table.class);
       if (tableAnnotation != null) {
-        Query query = currentSession().createNativeQuery("SELECT COUNT(*) FROM " + tableAnnotation.name());
+        Query query =
+            currentSession().createNativeQuery("SELECT COUNT(*) FROM " + tableAnnotation.name(), BigInteger.class);
         return ((BigInteger) query.getSingleResult()).longValueExact();
       }
     }

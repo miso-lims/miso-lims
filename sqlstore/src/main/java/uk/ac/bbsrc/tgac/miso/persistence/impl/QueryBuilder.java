@@ -8,32 +8,31 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaBuilder.In;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.From;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.ListJoin;
-import javax.persistence.criteria.MapJoin;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Selection;
-import javax.persistence.criteria.SetJoin;
-import javax.persistence.criteria.Subquery;
-import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.ListAttribute;
-import javax.persistence.metamodel.MapAttribute;
-import javax.persistence.metamodel.SetAttribute;
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.hibernate.transform.ResultTransformer;
+import org.hibernate.query.TupleTransformer;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.From;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.ListJoin;
+import jakarta.persistence.criteria.MapJoin;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Selection;
+import jakarta.persistence.criteria.SetJoin;
+import jakarta.persistence.criteria.Subquery;
+import jakarta.persistence.metamodel.Attribute;
+import jakarta.persistence.metamodel.ListAttribute;
+import jakarta.persistence.metamodel.MapAttribute;
+import jakarta.persistence.metamodel.SetAttribute;
+import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
@@ -56,7 +55,7 @@ public class QueryBuilder<R, T> {
   private final Root<T> root;
   private List<Predicate> predicates;
   private List<Order> orders;
-  private ResultTransformer resultTransformer = null;
+  private TupleTransformer<R> resultTransformer = null;
 
   public QueryBuilder(Session session, Class<T> entityClass, Class<R> resultClass) {
     this.session = session;
@@ -71,7 +70,7 @@ public class QueryBuilder<R, T> {
   }
 
   public QueryBuilder(Session session, Class<T> entityClass, Class<R> resultClass,
-      ResultTransformer resultTransformer) {
+      TupleTransformer<R> resultTransformer) {
     this(session, entityClass, resultClass);
     this.resultTransformer = resultTransformer;
   }
@@ -389,7 +388,7 @@ public class QueryBuilder<R, T> {
       query.orderBy(orders);
     }
 
-    return resultTransformer != null ? session.createQuery(query).setResultTransformer(resultTransformer)
+    return resultTransformer != null ? session.createQuery(query).setTupleTransformer(resultTransformer)
         : session.createQuery(query);
   }
 

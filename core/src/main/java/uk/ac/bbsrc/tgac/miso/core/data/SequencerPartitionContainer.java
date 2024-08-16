@@ -19,8 +19,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
  * @since 0.1.6
  */
 public interface SequencerPartitionContainer
-    extends Comparable<SequencerPartitionContainer>, Barcodable, ChangeLoggable, Serializable,
-    QualityControllable<ContainerQC>, Deletable {
+    extends Comparable<SequencerPartitionContainer>, Barcodable, Serializable, QualityControllable<ContainerQC>,
+    Deletable {
 
   public String getDescription();
 

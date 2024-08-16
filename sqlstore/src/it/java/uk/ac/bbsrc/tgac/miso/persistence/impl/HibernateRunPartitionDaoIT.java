@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartition_;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
@@ -107,17 +107,17 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
   }
 
   private List<RunPartition> getByRunId(long runId) {
-    @SuppressWarnings("unchecked")
-    List<RunPartition> results = currentSession().createCriteria(RunPartition.class)
-        .add(Restrictions.eq("runId", runId))
-        .list();
-    return results;
+    QueryBuilder<RunPartition, RunPartition> builder =
+        new QueryBuilder<>(currentSession(), RunPartition.class, RunPartition.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(RunPartition_.runId), runId));
+    return builder.getResultList();
   }
 
   @Test
   public void testDeleteForRunContainer() throws Exception {
     Run run = (Run) currentSession().get(Run.class, 2L);
-    SequencerPartitionContainer container = (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, 2L);
+    SequencerPartitionContainer container =
+        (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, 2L);
     List<RunPartition> before = getByRunAndContainer(run, container);
     assertEquals(8, before.size());
     dao.deleteForRunContainer(run, container);
@@ -130,12 +130,11 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
 
   private List<RunPartition> getByRunAndContainer(Run run, SequencerPartitionContainer container) {
     Set<Long> partitionIds = container.getPartitions().stream().map(Partition::getId).collect(Collectors.toSet());
-    @SuppressWarnings("unchecked")
-    List<RunPartition> results = currentSession().createCriteria(RunPartition.class)
-        .add(Restrictions.eq("runId", run.getId()))
-        .add(Restrictions.in("partitionId", partitionIds))
-        .list();
-    return results;
+    QueryBuilder<RunPartition, RunPartition> builder =
+        new QueryBuilder<>(currentSession(), RunPartition.class, RunPartition.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(RunPartition_.runId), run.getId()));
+    builder.addInPredicate(builder.getRoot().get(RunPartition_.partitionId), partitionIds);
+    return builder.getResultList();
   }
 
 }

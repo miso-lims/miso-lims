@@ -9,10 +9,11 @@ import java.util.Set;
 
 import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
 
-public interface SampleClass extends Deletable, Identifiable, Serializable, Timestamped {
+public interface SampleClass extends Deletable, Serializable, Timestamped {
 
   public static final List<String> CATEGORIES = Collections.unmodifiableList(Arrays.asList(SampleIdentity.CATEGORY_NAME,
-      SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME));
+      SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME,
+      SampleAliquot.CATEGORY_NAME));
 
   public static final Map<String, List<String>> SUBCATEGORIES = new MapBuilder<String, List<String>>()
       .put(SampleIdentity.CATEGORY_NAME, SampleIdentity.SUBCATEGORIES)

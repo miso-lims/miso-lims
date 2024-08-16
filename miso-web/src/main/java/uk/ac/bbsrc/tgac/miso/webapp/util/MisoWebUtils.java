@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
 import java.io.File;
@@ -35,8 +12,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -50,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import jakarta.servlet.http.HttpServletResponse;
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.SampleQcNode;
@@ -120,6 +96,7 @@ public class MisoWebUtils {
     }
     return storageOk;
   }
+
   public static Map<String, String> checkCorePropertiesFiles(String baseStoragePath) {
     Map<String, String> checks = new HashMap<>();
     if (baseStoragePath.endsWith("/")) {
@@ -137,7 +114,8 @@ public class MisoWebUtils {
 
   public static <T> HttpEntity<byte[]> generateSpreadsheet(SpreadsheetRequest request,
       ThrowingFunction<List<Long>, List<T>, IOException> fetcher,
-      boolean detailedSample, Function<String, Spreadsheet<T>> formatLibrary, HttpServletResponse response) throws IOException {
+      boolean detailedSample, Function<String, Spreadsheet<T>> formatLibrary, HttpServletResponse response)
+      throws IOException {
     List<T> input = fetcher.apply(request.getIds());
     return generateSpreadsheet(request, input.stream(), detailedSample, formatLibrary, response);
   }
@@ -157,12 +135,14 @@ public class MisoWebUtils {
     return new HttpEntity<>(formatter.generate(data.stream(), detailedSample, spreadsheet), httpHeaders);
   }
 
-  private static <T> HttpHeaders makeHttpHeaders(Spreadsheet<T> spreadsheet, SpreadSheetFormat formatter, HttpServletResponse response) {
+  private static <T> HttpHeaders makeHttpHeaders(Spreadsheet<T> spreadsheet, SpreadSheetFormat formatter,
+      HttpServletResponse response) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(formatter.mediaType());
     response.setHeader("Content-Disposition",
-        "attachment; filename=" + String.format("%s-%s.%s", spreadsheet.name(), DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(
-            ZonedDateTime.now()), formatter.extension()));
+        "attachment; filename="
+            + String.format("%s-%s.%s", spreadsheet.name(), DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(
+                ZonedDateTime.now()), formatter.extension()));
     return headers;
   }
 
@@ -201,8 +181,8 @@ public class MisoWebUtils {
    * @param formData
    * @param required
    * @return the value mapped to the provided key if it is set and not empty; otherwise null
-   * @throws ClientErrorException if the value is required and missing or empty, or if the value is set and non-empty, but is not a valid
-   *           Long
+   * @throws ClientErrorException if the value is required and missing or empty, or if the value is
+   *         set and non-empty, but is not a valid Long
    */
   public static Long getLongInput(String key, Map<String, String> formData, boolean required) {
     String stringValue = getStringInput(key, formData, required);
@@ -220,8 +200,8 @@ public class MisoWebUtils {
    * @param formData
    * @param required
    * @return the value mapped to the provided key if it is set and not empty; otherwise null
-   * @throws ClientErrorException if the value is required and missing or empty, or if the value is set and non-empty, but is not a valid
-   *           Integer
+   * @throws ClientErrorException if the value is required and missing or empty, or if the value is
+   *         set and non-empty, but is not a valid Integer
    */
   public static Integer getIntegerInput(String key, Map<String, String> formData, boolean required) {
     String stringValue = getStringInput(key, formData, required);
@@ -231,8 +211,9 @@ public class MisoWebUtils {
       throw new ClientErrorException(String.format("Invalid value for parameter '%s'", key), e);
     }
   }
-  
-  public static ModelAndView getQcHierarchy(String entityType, long id, ThrowingFunction<Long, SampleQcNode, IOException> getter,
+
+  public static ModelAndView getQcHierarchy(String entityType, long id,
+      ThrowingFunction<Long, SampleQcNode, IOException> getter,
       ModelMap model, ObjectMapper mapper) throws IOException {
     SampleQcNode hierarchy = getter.apply(id);
     if (hierarchy == null) {
@@ -247,7 +228,8 @@ public class MisoWebUtils {
     return new ModelAndView("/WEB-INF/pages/qcHierarchy.jsp", model);
   }
 
-  public static void addIssues(IssueTrackerManager issueTrackerManager, ThrowingSupplier<List<Issue>, IOException> getIssues,
+  public static void addIssues(IssueTrackerManager issueTrackerManager,
+      ThrowingSupplier<List<Issue>, IOException> getIssues,
       ModelMap model) {
     model.put("issueTrackerEnabled", issueTrackerManager != null);
     if (issueTrackerManager != null) {

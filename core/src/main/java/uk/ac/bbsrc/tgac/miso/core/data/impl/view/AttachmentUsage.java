@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
 import org.hibernate.annotations.Immutable;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @Entity
 @Immutable

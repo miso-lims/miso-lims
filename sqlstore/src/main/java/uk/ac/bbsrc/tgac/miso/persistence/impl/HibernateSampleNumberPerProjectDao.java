@@ -38,19 +38,20 @@ public class HibernateSampleNumberPerProjectDao extends HibernateProviderDao<Sam
     Date now = new Date();
     sampleNumberPerProject.setCreationDate(now);
     sampleNumberPerProject.setLastUpdated(now);
-    return (Long) currentSession().save(sampleNumberPerProject);
+    currentSession().persist(sampleNumberPerProject);
+    return sampleNumberPerProject.getId();
   }
 
   @Override
   public void update(SampleNumberPerProject sampleNumberPerProject) {
     Date now = new Date();
     sampleNumberPerProject.setLastUpdated(now);
-    currentSession().update(sampleNumberPerProject);
+    currentSession().merge(sampleNumberPerProject);
   }
 
   @Override
   public void delete(SampleNumberPerProject sampleNumberPerProject) {
-    currentSession().delete(sampleNumberPerProject);
+    currentSession().remove(sampleNumberPerProject);
   }
 
   @Override

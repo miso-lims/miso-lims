@@ -1,16 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.changelog;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
-import org.hibernate.annotations.Index;
-import org.hibernate.annotations.Table;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -18,8 +16,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.LibraryBoxableView;
 
 @Entity
-@Table(appliesTo = "LibraryChangeLog", indexes = {
-    @Index(name = "LibraryChangeLog_libraryId_changeTime", columnNames = {"libraryId", "changeTime"})})
+@Table(name = "LibraryChangeLog", indexes = {
+    @Index(name = "LibraryChangeLog_libraryId_changeTime", columnList = "libraryId, changeTime")})
 public class LibraryChangeLog extends AbstractChangeLog {
 
   private static final long serialVersionUID = 1L;
