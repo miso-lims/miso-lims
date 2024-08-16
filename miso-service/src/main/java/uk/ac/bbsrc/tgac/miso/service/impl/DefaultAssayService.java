@@ -91,10 +91,26 @@ public class DefaultAssayService extends AbstractSaveService<Assay> implements A
         && assayDao.getByAliasAndVersion(object.getAlias(), object.getVersion()) != null) {
       errors.add(ValidationError.forDuplicate("assay", "alias", "alias and version"));
     }
+
     long distinctTests = object.getAssayTests().stream().mapToLong(AssayTest::getId).distinct().count();
     if (object.getAssayTests().size() != distinctTests) {
       errors.add(new ValidationError("tests", "Duplicate tests not allowed"));
     }
+    long distinctOrigins = object.getAssayTests().stream().filter(test -> test.isRepeatPerTimepoint()).map(test -> {
+      long id = test.getTissueOrigin() == null ? 0 : test.getTissueOrigin().getId();
+      return test.isNegateTissueOrigin() ? id * -1 : id;
+    }).distinct().count();
+    if (distinctOrigins > 1) {
+      errors.add(new ValidationError("tests", "All repeatable tests must have the same tissue origin"));
+    }
+    long distinctTypes = object.getAssayTests().stream().filter(test -> test.isRepeatPerTimepoint()).map(test -> {
+      long id = test.getTissueType() == null ? 0 : test.getTissueType().getId();
+      return test.isNegateTissueType() ? id * -1 : id;
+    }).distinct().count();
+    if (distinctTypes > 1) {
+      errors.add(new ValidationError("tests", "All repeatable tests must have the same tissue type"));
+    }
+
     long distinctMetrics = object.getAssayMetrics().stream().mapToLong(x -> x.getMetric().getId()).distinct().count();
     if (object.getAssayMetrics().size() != distinctMetrics) {
       errors.add(new ValidationError("metrics", "Duplicate metrics not allowed"));

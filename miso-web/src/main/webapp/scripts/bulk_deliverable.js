@@ -29,7 +29,12 @@ BulkTarget.deliverable = (function () {
           required: true,
           maxLength: 255,
         },
-        BulkUtils.columns.makeBoolean("Analysis Review Required", "analysisReviewRequired", true),
+        BulkUtils.columns.makeBoolean(
+          "Analysis Review Required",
+          "analysisReviewRequired",
+          true,
+          true
+        ),
       ];
     },
   };

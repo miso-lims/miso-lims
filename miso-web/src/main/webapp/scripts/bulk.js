@@ -1006,7 +1006,7 @@ BulkUtils = (function ($) {
         };
       },
 
-      makeBoolean: function (title, data, required) {
+      makeBoolean: function (title, data, required, include) {
         source = [
           {
             label: "True",
@@ -1031,6 +1031,7 @@ BulkUtils = (function ($) {
           getItemLabel: Utils.array.get("label"),
           getItemValue: Utils.array.get("value"),
           required: !!required,
+          include: !!include,
         };
       },
     },

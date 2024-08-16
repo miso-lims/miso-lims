@@ -7,12 +7,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest.LibraryQualificationMethod;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest.PermittedSamples;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 
 public class AssayTestDto {
 
   private Long id;
   private String alias;
+  private Long tissueOriginId;
+  private boolean negateTissueOrigin;
   private Long tissueTypeId;
   private boolean negateTissueType;
   private Long extractionClassId;
@@ -26,6 +29,8 @@ public class AssayTestDto {
     AssayTestDto to = new AssayTestDto();
     setLong(to::setId, from.getId(), true);
     setString(to::setAlias, from.getAlias());
+    Dtos.setId(to::setTissueOriginId, from.getTissueOrigin());
+    setBoolean(to::setNegateTissueOrigin, from.isNegateTissueOrigin(), false);
     Dtos.setId(to::setTissueTypeId, from.getTissueType());
     setBoolean(to::setNegateTissueType, from.isNegateTissueType(), false);
     Dtos.setId(to::setExtractionClassId, from.getExtractionClass());
@@ -52,6 +57,22 @@ public class AssayTestDto {
 
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+
+  public Long getTissueOriginId() {
+    return tissueOriginId;
+  }
+
+  public void setTissueOriginId(Long tissueOriginId) {
+    this.tissueOriginId = tissueOriginId;
+  }
+
+  public boolean isNegateTissueOrigin() {
+    return negateTissueOrigin;
+  }
+
+  public void setNegateTissueOrigin(boolean negateTissueOrigin) {
+    this.negateTissueOrigin = negateTissueOrigin;
   }
 
   public Long getTissueTypeId() {
@@ -122,7 +143,10 @@ public class AssayTestDto {
     AssayTest to = new AssayTest();
     setLong(to::setId, getId(), false);
     setString(to::setAlias, getAlias());
+    setObject(to::setTissueOrigin, TissueOriginImpl::new, getTissueOriginId());
+    setBoolean(to::setNegateTissueOrigin, isNegateTissueOrigin(), false);
     setObject(to::setTissueType, TissueTypeImpl::new, getTissueTypeId());
+    setBoolean(to::setNegateTissueType, isNegateTissueType(), false);
     setObject(to::setExtractionClass, SampleClassImpl::new, getExtractionClassId());
     setBoolean(to::setNegateTissueType, isNegateTissueType(), false);
     setObject(to::setLibraryDesignCode, LibraryDesignCode::new, getLibraryDesignCodeId());

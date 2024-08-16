@@ -16,6 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -58,6 +59,12 @@ public class AssayTest implements Aliasable, Deletable, Serializable {
   private long testId = UNSAVED_ID;
 
   private String alias;
+
+  @ManyToOne(targetEntity = TissueOriginImpl.class)
+  @JoinColumn(name = "tissueOriginId")
+  private TissueOrigin tissueOrigin;
+
+  private boolean negateTissueOrigin;
 
   @ManyToOne(targetEntity = TissueTypeImpl.class)
   @JoinColumn(name = "tissueTypeId")
@@ -117,6 +124,22 @@ public class AssayTest implements Aliasable, Deletable, Serializable {
   @Override
   public boolean isSaved() {
     return getId() != UNSAVED_ID;
+  }
+
+  public TissueOrigin getTissueOrigin() {
+    return tissueOrigin;
+  }
+
+  public void setTissueOrigin(TissueOrigin tissueOrigin) {
+    this.tissueOrigin = tissueOrigin;
+  }
+
+  public boolean isNegateTissueOrigin() {
+    return negateTissueOrigin;
+  }
+
+  public void setNegateTissueOrigin(boolean negateTissueOrigin) {
+    this.negateTissueOrigin = negateTissueOrigin;
   }
 
   public TissueType getTissueType() {
@@ -186,8 +209,10 @@ public class AssayTest implements Aliasable, Deletable, Serializable {
   @Override
   public boolean equals(Object o) {
     return LimsUtils.equals(this, o,
+        AssayTest::isNegateTissueOrigin,
         AssayTest::isNegateTissueType,
         AssayTest::getAlias,
+        AssayTest::getTissueOrigin,
         AssayTest::getTissueType,
         AssayTest::getExtractionClass,
         AssayTest::getLibraryDesignCode,
@@ -199,7 +224,8 @@ public class AssayTest implements Aliasable, Deletable, Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(alias, tissueType, negateTissueType, extractionClass, libraryDesignCode,
-        libraryQualificationMethod, libraryQualificationDesignCode, repeatPerTimepoint, permittedSamples);
+    return Objects.hash(alias, tissueOrigin, negateTissueOrigin, tissueType, negateTissueType, extractionClass,
+        libraryDesignCode, libraryQualificationMethod, libraryQualificationDesignCode, repeatPerTimepoint,
+        permittedSamples);
   }
 }

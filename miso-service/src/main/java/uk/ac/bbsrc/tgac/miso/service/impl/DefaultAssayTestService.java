@@ -14,6 +14,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayTestService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
+import uk.ac.bbsrc.tgac.miso.core.service.TissueOriginService;
 import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -35,6 +36,8 @@ public class DefaultAssayTestService extends AbstractSaveService<AssayTest> impl
   private TransactionTemplate transactionTemplate;
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private TissueOriginService tissueOriginService;
   @Autowired
   private TissueTypeService tissueTypeService;
   @Autowired
@@ -82,6 +85,7 @@ public class DefaultAssayTestService extends AbstractSaveService<AssayTest> impl
   @Override
   protected void loadChildEntities(AssayTest object) throws IOException {
     loadChildEntity(object.getTissueType(), object::setTissueType, tissueTypeService);
+    loadChildEntity(object.getTissueOrigin(), object::setTissueOrigin, tissueOriginService);
     loadChildEntity(object.getExtractionClass(), object::setExtractionClass, sampleClassService);
     loadChildEntity(object.getLibraryDesignCode(), object::setLibraryDesignCode, libraryDesignCodeService);
     loadChildEntity(object.getLibraryQualificationDesignCode(), object::setLibraryQualificationDesignCode,
@@ -113,6 +117,8 @@ public class DefaultAssayTestService extends AbstractSaveService<AssayTest> impl
   @Override
   protected void applyChanges(AssayTest to, AssayTest from) throws IOException {
     to.setAlias(from.getAlias());
+    to.setTissueOrigin(from.getTissueOrigin());
+    to.setNegateTissueOrigin(from.isNegateTissueOrigin());
     to.setTissueType(from.getTissueType());
     to.setNegateTissueType(from.isNegateTissueType());
     to.setExtractionClass(from.getExtractionClass());

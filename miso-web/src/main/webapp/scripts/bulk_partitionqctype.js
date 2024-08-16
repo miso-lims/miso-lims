@@ -29,9 +29,9 @@ BulkTarget.partitionqctype = (function () {
           required: true,
           maxLength: 255,
         },
-        BulkUtils.columns.makeBoolean("Note Required", "noteRequired", true),
-        BulkUtils.columns.makeBoolean("Order Fulfilled", "orderFulfilled", true),
-        BulkUtils.columns.makeBoolean("Disable Pipeline", "analysisSkipped", true),
+        BulkUtils.columns.makeBoolean("Note Required", "noteRequired", true, true),
+        BulkUtils.columns.makeBoolean("Order Fulfilled", "orderFulfilled", true, true),
+        BulkUtils.columns.makeBoolean("Disable Pipeline", "analysisSkipped", true, true),
       ];
     },
   };
