@@ -22,6 +22,10 @@ Starting with version 1.29.0, the format of this file is based on
 
 * “Target Cell Recovery” in “Single Cell (stock)” now takes an integer instead of a decimal.
 
+### Known Issues
+
+* Pinery showing the wrong value for "Target Cell Revovery" sample attribute 
+
 
 ## [2.20.0] - 2024-06-20
 
