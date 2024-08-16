@@ -27,7 +27,7 @@ public class HibernateContainerQcDao extends HibernateQcStore<ContainerQC> imple
     SequencerPartitionContainer container =
         (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, id);
     correspondingField.updateField(container, value, units);
-    currentSession().update(container);
+    currentSession().merge(container);
   }
 
   @Override

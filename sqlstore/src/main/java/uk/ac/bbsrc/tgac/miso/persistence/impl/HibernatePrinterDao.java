@@ -3,13 +3,12 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;

@@ -9,8 +9,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -20,22 +18,27 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import com.eaglegenomics.simlims.core.User;
+import com.google.protobuf.BytesValue.Builder;
 
+import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot_;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot.RunPartitionAliquotId;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView_;
 import uk.ac.bbsrc.tgac.miso.persistence.ListLibraryAliquotViewDao;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
 
@@ -203,28 +206,35 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
   }
 
   private long countForRunAndContainer(Run run, SequencerPartitionContainer container) {
-    return (long) currentSession().createCriteria(RunPartitionAliquot.class)
-        .createAlias("partition", "partition")
-        .add(Restrictions.eq("run", run))
-        .add(Restrictions.eq("partition.sequencerPartitionContainer", container))
-        .setProjection(Projections.rowCount())
-        .uniqueResult();
+    LongQueryBuilder<RunPartitionAliquot> builder = new LongQueryBuilder<>(currentSession(), RunPartitionAliquot.class);
+    Join<RunPartitionAliquot, Partition> join = builder.getJoin(builder.getRoot(), RunPartitionAliquot_.partition);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(RunPartitionAliquot_.run), run));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(join.get(PartitionImpl_.SEQUENCER_PARTITION_CONTAINER), container));
+    return builder.getCount();
   }
 
   @Test
   public void testDeleteForPartition() throws Exception {
     Partition partition = (Partition) currentSession().get(PartitionImpl.class, 1L);
-    List<RunPartitionAliquot> before = currentSession().createCriteria(RunPartitionAliquot.class)
-        .add(Restrictions.eq("partition", partition))
-        .list();
+
+    QueryBuilder<RunPartitionAliquot, RunPartitionAliquot> beforeBuilder =
+        new QueryBuilder<>(currentSession(), RunPartitionAliquot.class, RunPartitionAliquot.class);
+    beforeBuilder.addPredicate(beforeBuilder.getCriteriaBuilder()
+        .equal(beforeBuilder.getRoot().get(RunPartitionAliquot_.partition), partition));
+    List<RunPartitionAliquot> before = beforeBuilder.getResultList();
+
     assertEquals(2, before.size());
 
     sut.deleteForPartition(partition);
     clearSession();
 
-    List<RunPartitionAliquot> after = currentSession().createCriteria(RunPartitionAliquot.class)
-        .add(Restrictions.eq("partition", partition))
-        .list();
+    QueryBuilder<RunPartitionAliquot, RunPartitionAliquot> afterBuilder =
+        new QueryBuilder<>(currentSession(), RunPartitionAliquot.class, RunPartitionAliquot.class);
+    afterBuilder.addPredicate(
+        afterBuilder.getCriteriaBuilder().equal(afterBuilder.getRoot().get(RunPartitionAliquot_.partition), partition));
+    List<RunPartitionAliquot> after = afterBuilder.getResultList();
+
     assertTrue(after.isEmpty());
   }
 
@@ -242,13 +252,15 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
   }
 
   private long countForPoolAliquot(Pool pool, LibraryAliquot aliquot) {
-    return (long) currentSession().createCriteria(RunPartitionAliquot.class)
-        .createAlias("partition", "partition")
-        .createAlias("aliquot", "aliquot")
-        .add(Restrictions.eq("partition.pool", pool))
-        .add(Restrictions.eq("aliquot.id", aliquot.getId()))
-        .setProjection(Projections.rowCount())
-        .uniqueResult();
+    LongQueryBuilder<RunPartitionAliquot> builder = new LongQueryBuilder<>(currentSession(), RunPartitionAliquot.class);
+    Join<RunPartitionAliquot, Partition> partitionJoin =
+        builder.getJoin(builder.getRoot(), RunPartitionAliquot_.partition);
+    Join<RunPartitionAliquot, ListLibraryAliquotView> aliquotJoin =
+        builder.getJoin(builder.getRoot(), RunPartitionAliquot_.aliquot);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(partitionJoin.get(PartitionImpl_.POOL), pool));
+    builder.addPredicate(
+        builder.getCriteriaBuilder().equal(aliquotJoin.get(ListLibraryAliquotView_.aliquotId), aliquot.getId()));
+    return builder.getCount();
   }
 
 }

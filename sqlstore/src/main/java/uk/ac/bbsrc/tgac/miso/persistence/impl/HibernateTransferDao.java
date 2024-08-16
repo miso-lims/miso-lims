@@ -7,14 +7,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.persistence.criteria.Join;
-
-import org.hibernate.Criteria;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
 
+import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -44,8 +42,9 @@ public class HibernateTransferDao extends HibernateSaveDao<Transfer> implements 
     if (groups == null || groups.isEmpty()) {
       return 0L;
     }
-    BigDecimal pendingGroups = (BigDecimal) currentSession()
-        .createNativeQuery("SELECT COALESCE(SUM(transfers), 0) FROM PendingTransferGroupView WHERE groupId IN (:ids)")
+    BigDecimal pendingGroups = currentSession()
+        .createNativeQuery("SELECT COALESCE(SUM(transfers), 0) FROM PendingTransferGroupView WHERE groupId IN (:ids)",
+            BigDecimal.class)
         .setParameterList("ids", groups.stream().map(Group::getId).collect(Collectors.toSet()))
         .uniqueResult();
     return pendingGroups.longValueExact();
@@ -53,14 +52,14 @@ public class HibernateTransferDao extends HibernateSaveDao<Transfer> implements 
 
   @Override
   public <T extends TransferItem<?>> void deleteTransferItem(T item) throws IOException {
-    currentSession().delete(item);
+    currentSession().remove(item);
   }
 
   @Override
   public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferTime)
       throws IOException {
     QueryBuilder<Transfer, Transfer> builder =
-        new QueryBuilder<>(currentSession(), Transfer.class, Transfer.class, Criteria.DISTINCT_ROOT_ENTITY);
+        new QueryBuilder<>(currentSession(), Transfer.class, Transfer.class);
     Join<Transfer, TransferSample> sampleTransfer = builder.getJoin(builder.getRoot(), Transfer_.sampleTransfers);
     Join<TransferSample, SampleImpl> sample = builder.getJoin(sampleTransfer, TransferSample_.item);
     Join<Transfer, TransferLibrary> libraryTransfer = builder.getJoin(builder.getRoot(), Transfer_.libraryTransfers);

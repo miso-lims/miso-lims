@@ -7,20 +7,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyColumn;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
@@ -48,8 +47,9 @@ public class LibraryTemplate implements Serializable, Deletable {
 
   @ManyToMany(targetEntity = ProjectImpl.class)
   @JoinTable(name = "LibraryTemplate_Project", joinColumns = {
-      @JoinColumn(name = "libraryTemplateId", nullable = false) }, inverseJoinColumns = {
-          @JoinColumn(name = "projectId", nullable = false) })
+      @JoinColumn(name = "libraryTemplateId", nullable = false)},
+      inverseJoinColumns = {
+          @JoinColumn(name = "projectId", nullable = false)})
   private List<Project> projects = new ArrayList<>();
 
   private BigDecimal defaultVolume;
@@ -82,14 +82,16 @@ public class LibraryTemplate implements Serializable, Deletable {
 
   @ManyToMany(targetEntity = Index.class)
   @MapKeyColumn(name = "position", unique = true)
-  @JoinTable(name = "LibraryTemplate_Index1", joinColumns = { @JoinColumn(name = "libraryTemplateId") }, inverseJoinColumns = {
-      @JoinColumn(name = "indexId") })
+  @JoinTable(name = "LibraryTemplate_Index1", joinColumns = {@JoinColumn(name = "libraryTemplateId")},
+      inverseJoinColumns = {
+          @JoinColumn(name = "indexId")})
   private Map<String, Index> indexOnes;
 
   @ManyToMany(targetEntity = Index.class)
   @MapKeyColumn(name = "position", unique = true)
-  @JoinTable(name = "LibraryTemplate_Index2", joinColumns = { @JoinColumn(name = "libraryTemplateId") }, inverseJoinColumns = {
-      @JoinColumn(name = "indexId") })
+  @JoinTable(name = "LibraryTemplate_Index2", joinColumns = {@JoinColumn(name = "libraryTemplateId")},
+      inverseJoinColumns = {
+          @JoinColumn(name = "indexId")})
   private Map<String, Index> indexTwos;
 
   @Override

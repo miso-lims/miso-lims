@@ -2,13 +2,13 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Transient;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 
 @Entity
 public class InstrumentPosition implements Serializable, Aliasable {
@@ -58,7 +58,8 @@ public class InstrumentPosition implements Serializable, Aliasable {
   }
 
   /**
-   * This value is not loaded from the database, and is only intended to be set when included in an InstrumentStatus
+   * This value is not loaded from the database, and is only intended to be set when included in an
+   * InstrumentStatus
    * 
    * @return whether or not the instrument position is out of service
    */
@@ -82,17 +83,25 @@ public class InstrumentPosition implements Serializable, Aliasable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     InstrumentPosition other = (InstrumentPosition) obj;
     if (alias == null) {
-      if (other.alias != null) return false;
-    } else if (!alias.equals(other.alias)) return false;
+      if (other.alias != null)
+        return false;
+    } else if (!alias.equals(other.alias))
+      return false;
     if (instrumentModel == null) {
-      if (other.instrumentModel != null) return false;
-    } else if (!instrumentModel.equals(other.instrumentModel)) return false;
-    if (positionId != other.positionId) return false;
+      if (other.instrumentModel != null)
+        return false;
+    } else if (!instrumentModel.equals(other.instrumentModel))
+      return false;
+    if (positionId != other.positionId)
+      return false;
     return true;
   }
 

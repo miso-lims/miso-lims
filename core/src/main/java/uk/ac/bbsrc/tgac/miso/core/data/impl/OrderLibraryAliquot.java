@@ -2,13 +2,12 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot.OrderLibraryId;
 
 @Entity
@@ -50,16 +49,23 @@ public class OrderLibraryAliquot implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
       OrderLibraryId other = (OrderLibraryId) obj;
       if (aliquot == null) {
-        if (other.aliquot != null) return false;
-      } else if (!aliquot.equals(other.aliquot)) return false;
+        if (other.aliquot != null)
+          return false;
+      } else if (!aliquot.equals(other.aliquot))
+        return false;
       if (poolOrder == null) {
-        if (other.poolOrder != null) return false;
-      } else if (!poolOrder.equals(other.poolOrder)) return false;
+        if (other.poolOrder != null)
+          return false;
+      } else if (!poolOrder.equals(other.poolOrder))
+        return false;
       return true;
     }
 

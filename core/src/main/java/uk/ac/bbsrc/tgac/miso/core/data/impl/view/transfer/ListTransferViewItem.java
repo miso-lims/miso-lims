@@ -3,8 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer;
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.persistence.MappedSuperclass;
-
+import jakarta.persistence.MappedSuperclass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 

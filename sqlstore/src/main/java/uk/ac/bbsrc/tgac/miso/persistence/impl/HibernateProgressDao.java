@@ -1,16 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.util.List;
+import java.util.Objects;
 
-import javax.persistence.criteria.Join;
-
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
@@ -57,7 +56,7 @@ public class HibernateProgressDao implements ProgressStore {
   @Override
   public List<Progress> listByUserId(long id) {
     QueryBuilder<Progress, ProgressImpl> builder =
-        new QueryBuilder<>(currentSession(), ProgressImpl.class, Progress.class, Criteria.DISTINCT_ROOT_ENTITY);
+        new QueryBuilder<>(currentSession(), ProgressImpl.class, Progress.class);
     Join<ProgressImpl, UserImpl> userJoin = builder.getJoin(builder.getRoot(), ProgressImpl_.user);
     builder.addPredicate(builder.getCriteriaBuilder().equal(userJoin.get(UserImpl_.userId), id));
 
@@ -68,14 +67,18 @@ public class HibernateProgressDao implements ProgressStore {
   @Override
   public Progress save(Progress progress) {
     if (!progress.isSaved()) {
-      currentSession().save(progress);
+      currentSession().persist(progress);
     } else {
-      currentSession().update(progress);
+      currentSession().merge(progress);
     }
 
     if (progress.getSteps() != null) {
       for (ProgressStep step : progress.getSteps()) {
-        currentSession().saveOrUpdate(step);
+        if (Objects.isNull(currentSession().find(ProgressStep.class, step.getId()))) {
+          currentSession().persist(step);
+        } else {
+          currentSession().merge(step);
+        }
       }
     }
 
@@ -85,12 +88,12 @@ public class HibernateProgressDao implements ProgressStore {
   @Override
   public void delete(Progress progress) {
     progress.getSteps().forEach(this::delete);
-    currentSession().delete(progress);
+    currentSession().remove(progress);
   }
 
   @Override
   public void delete(ProgressStep step) {
-    currentSession().delete(step);
+    currentSession().remove(step);
     currentSession().flush();
   }
 

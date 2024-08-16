@@ -30,8 +30,9 @@ public class HibernateChangeLoggableDao implements ChangeLoggableStore {
 
   @Override
   public void update(ChangeLoggable changeLoggable) {
-    currentSession().update(changeLoggable);
-    // flush required because we need this change persisted immediately to be consumed by trigger-generated change log entries
+    currentSession().merge(changeLoggable);
+    // flush required because we need this change persisted immediately to be consumed by
+    // trigger-generated change log entries
     currentSession().flush();
   }
 

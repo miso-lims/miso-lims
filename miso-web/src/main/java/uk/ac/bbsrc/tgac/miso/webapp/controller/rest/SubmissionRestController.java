@@ -5,10 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,6 +21,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -54,7 +53,8 @@ public class SubmissionRestController extends RestController {
     headers.setContentType(new MediaType("application", "zip"));
     response.setHeader("Content-Disposition",
         "attachment; filename="
-            + String.format("SUBMISSON%d-%s.zip", submission.getId(), new SimpleDateFormat("yyyy-MM-dd").format(new Date())));
+            + String.format("SUBMISSON%d-%s.zip", submission.getId(),
+                new SimpleDateFormat("yyyy-MM-dd").format(new Date())));
     return new EnaSubmissionPreparation(submission, user, centreName, SubmissionActionType.valueOf(action)).toBytes();
   }
 
@@ -64,7 +64,8 @@ public class SubmissionRestController extends RestController {
   }
 
   @PutMapping("/{submissionId}")
-  public @ResponseBody SubmissionDto update(@PathVariable long submissionId, @RequestBody SubmissionDto dto) throws IOException {
+  public @ResponseBody SubmissionDto update(@PathVariable long submissionId, @RequestBody SubmissionDto dto)
+      throws IOException {
     return RestUtils.updateObject("Submission", submissionId, dto, Dtos::to, submissionService, Dtos::asDto);
   }
 

@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;

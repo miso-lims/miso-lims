@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data.impl.kit;
 
 import java.io.Serializable;
@@ -30,33 +7,31 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.KitDescriptorChangeLog;
@@ -64,19 +39,21 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
- * A KitDescriptor handles information about a consumable element that is generally typed by a name, manufacturer and part number. Kits use
- * KitDescriptors, coupled with a lot number, to represent a real-world manifestation of a consumable kit.
+ * A KitDescriptor handles information about a consumable element that is generally typed by a name,
+ * manufacturer and part number. Kits use KitDescriptors, coupled with a lot number, to represent a
+ * real-world manifestation of a consumable kit.
  * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @Entity
 @Table(name = "KitDescriptor")
-public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, Identifiable {
+public class KitDescriptor implements Serializable, ChangeLoggable, Deletable {
 
   public static int sortByName(KitDescriptor a, KitDescriptor b) {
     return a.getName().compareTo(b.getName());
   }
+
   private static final long serialVersionUID = 1L;
 
   /** Field UNSAVED_ID */
@@ -98,8 +75,9 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
 
   @ManyToMany(targetEntity = TargetedSequencing.class)
   @JoinTable(name = "TargetedSequencing_KitDescriptor", inverseJoinColumns = {
-      @JoinColumn(name = "targetedSequencingId") }, joinColumns = {
-          @JoinColumn(name = "kitDescriptorId") })
+      @JoinColumn(name = "targetedSequencingId")},
+      joinColumns = {
+          @JoinColumn(name = "kitDescriptorId")})
   private final Set<TargetedSequencing> targetedSequencing = new HashSet<>();
 
   @ManyToOne(targetEntity = UserImpl.class, fetch = FetchType.LAZY)
@@ -137,8 +115,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
   /**
    * Sets the kitDescriptorId of this KitDescriptor object.
    * 
-   * @param kitDescriptorId
-   *          kitDescriptorId.
+   * @param kitDescriptorId kitDescriptorId.
    */
   @Override
   public void setId(long kitDescriptorId) {
@@ -157,8 +134,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
   /**
    * Sets the name of this KitDescriptor object.
    * 
-   * @param name
-   *          name.
+   * @param name name.
    */
   public void setName(String name) {
     this.name = name;
@@ -176,8 +152,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
   /**
    * Sets the version of this KitDescriptor object.
    * 
-   * @param version
-   *          version.
+   * @param version version.
    */
   public void setVersion(Integer version) {
     this.version = version;
@@ -195,8 +170,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
   /**
    * Sets the manufacturer of this KitDescriptor object.
    * 
-   * @param manufacturer
-   *          manufacturer.
+   * @param manufacturer manufacturer.
    */
   public void setManufacturer(String manufacturer) {
     this.manufacturer = manufacturer;
@@ -214,8 +188,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
   /**
    * Sets the partNumber of this KitDescriptor object.
    * 
-   * @param partNumber
-   *          partNumber.
+   * @param partNumber partNumber.
    */
   public void setPartNumber(String partNumber) {
     this.partNumber = partNumber;
@@ -233,8 +206,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
   /**
    * Sets the stockLevel of this KitDescriptor object.
    * 
-   * @param stockLevel
-   *          stockLevel.
+   * @param stockLevel stockLevel.
    */
   public void setStockLevel(Integer stockLevel) {
     this.stockLevel = stockLevel;
@@ -243,8 +215,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
   /**
    * Sets the description of this KitDescriptor object.
    *
-   * @param description
-   *          description.
+   * @param description description.
    */
   public void setDescription(String description) {
     this.description = description;
@@ -279,8 +250,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
   /**
    * Sets the kitType of this KitDescriptor object.
    * 
-   * @param kitType
-   *          kitType.
+   * @param kitType kitType.
    * 
    */
   public void setKitType(KitType kitType) {
@@ -299,8 +269,7 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
   /**
    * Sets the platformType of this KitDescriptor object.
    * 
-   * @param platformType
-   *          platformType.
+   * @param platformType platformType.
    */
   public void setPlatformType(PlatformType platformType) {
     this.platformType = platformType;
@@ -415,9 +384,12 @@ public class KitDescriptor implements Serializable, ChangeLoggable, Deletable, I
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     KitDescriptor other = (KitDescriptor) obj;
     return new EqualsBuilder()
         .append(description, other.description)

@@ -129,10 +129,10 @@ public class AdminRestController extends DefaultRestController {
     if (cache == null) {
       return false;
     }
-    cache.evictCollectionRegions();
+    cache.evictCollectionData();
     cache.evictDefaultQueryRegion();
-    cache.evictEntityRegions();
-    cache.evictNaturalIdRegions();
+    cache.evictEntityData();
+    cache.evictNaturalIdData();
     cache.evictQueryRegions();
     return true;
   }
@@ -150,7 +150,8 @@ public class AdminRestController extends DefaultRestController {
     List<RegenerationResponse> response = new ArrayList<>();
     response.add(RegenerationResponse.regenerate("samples", sampleService, sampleService::update));
     response.add(RegenerationResponse.regenerate("libraries", libraryService, libraryService::update));
-    response.add(RegenerationResponse.regenerate("libraryaliquots", libraryAliquotService, libraryAliquotService::update));
+    response
+        .add(RegenerationResponse.regenerate("libraryaliquots", libraryAliquotService, libraryAliquotService::update));
     response.add(RegenerationResponse.regenerate("pools", poolService, poolService::update));
     response.add(RegenerationResponse.regenerate("boxes", boxService, boxService::save));
     return response;

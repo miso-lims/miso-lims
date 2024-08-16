@@ -7,11 +7,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
-import javax.ws.rs.core.Response.Status;
-
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.service.DeleterService;
@@ -25,13 +24,15 @@ public class RestUtils {
     throw new IllegalStateException("Util class not intended for instantiation");
   }
 
-  public static <T, R extends Identifiable> T getObject(String type, long id, ProviderService<R> service, Function<R, T> toDto)
+  public static <T, R extends Identifiable> T getObject(String type, long id, ProviderService<R> service,
+      Function<R, T> toDto)
       throws IOException {
     R object = retrieve(type, id, service);
     return toDto.apply(object);
   }
 
-  public static <T, R extends Identifiable, S> T createObject(String type, T dto, Function<T, R> toObject, SaveService<R> service,
+  public static <T, R extends Identifiable, S> T createObject(String type, T dto, Function<T, R> toObject,
+      SaveService<R> service,
       Function<R, T> toDto) throws IOException {
     validateDtoProvided(type, dto);
     R object = toObject.apply(dto);
@@ -52,7 +53,8 @@ public class RestUtils {
     }
   }
 
-  public static <T, R extends Identifiable, S> T updateObject(String type, long targetId, T dto, Function<T, R> toObject,
+  public static <T, R extends Identifiable, S> T updateObject(String type, long targetId, T dto,
+      Function<T, R> toObject,
       SaveService<R> service, Function<R, T> toDto) throws IOException {
     validateDtoProvided(type, dto);
     R object = toObject.apply(dto);
@@ -65,7 +67,8 @@ public class RestUtils {
     return toDto.apply(service.get(savedId));
   }
 
-  public static <T extends Deletable> void bulkDelete(String type, List<Long> ids, DeleterService<T> service) throws IOException {
+  public static <T extends Deletable> void bulkDelete(String type, List<Long> ids, DeleterService<T> service)
+      throws IOException {
     List<T> items = new ArrayList<>();
     for (Long id : ids) {
       if (id == null) {
@@ -77,7 +80,8 @@ public class RestUtils {
     service.bulkDelete(items);
   }
 
-  public static <T extends Deletable> void delete(String type, long targetId, DeleterService<T> service) throws IOException {
+  public static <T extends Deletable> void delete(String type, long targetId, DeleterService<T> service)
+      throws IOException {
     T item = service.get(targetId);
     if (item == null) {
       throw new RestException(type + " not found", Status.NOT_FOUND);
@@ -85,11 +89,13 @@ public class RestUtils {
     service.delete(item);
   }
 
-  public static <T extends Identifiable> T retrieve(String type, long id, ProviderService<T> service) throws IOException {
+  public static <T extends Identifiable> T retrieve(String type, long id, ProviderService<T> service)
+      throws IOException {
     return retrieve(type, id, service, Status.NOT_FOUND);
   }
 
-  public static <T extends Identifiable> T retrieve(String type, long id, ProviderService<T> service, Status notFoundStatus)
+  public static <T extends Identifiable> T retrieve(String type, long id, ProviderService<T> service,
+      Status notFoundStatus)
       throws IOException {
     if (id <= 0) {
       throw new RestException("Invalid id: " + id, Status.BAD_REQUEST);

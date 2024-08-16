@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
@@ -30,19 +7,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
- * Indices represent adapter sequences that can be prepended to sequencable material in order to facilitate multiplexing.
+ * Indices represent adapter sequences that can be prepended to sequencable material in order to
+ * facilitate multiplexing.
  * 
  * @author Rob Davey
  * @date 10-May-2011
@@ -60,13 +37,14 @@ public class Index implements Deletable, Nameable, Serializable {
   }
 
   /**
-   * Compares two sequences to check for duplicates or near matches. For sequences of different lengths, the additional characters
-   * on the longer sequence are ignored - "AAAA" and "AAAACC" are considered duplicates. For every non-matching character, edit
-   * distance increases by 1
+   * Compares two sequences to check for duplicates or near matches. For sequences of different
+   * lengths, the additional characters on the longer sequence are ignored - "AAAA" and "AAAACC" are
+   * considered duplicates. For every non-matching character, edit distance increases by 1
    * 
    * @param sequence1
    * @param sequence2
-   * @return mismatches between the two sequences with 0 meaning they are duplicates, 1 meaning they differ by one character, etc.
+   * @return mismatches between the two sequences with 0 meaning they are duplicates, 1 meaning they
+   *         differ by one character, etc.
    */
   public static int checkMismatches(String sequence1, String sequence2) {
     int minLength = Math.min(sequence1.length(), sequence2.length());
@@ -143,7 +121,8 @@ public class Index implements Deletable, Nameable, Serializable {
   }
 
   public String getLabel() {
-    if (getSequence() == null || getFamily().hasFakeSequence()) return getName();
+    if (getSequence() == null || getFamily().hasFakeSequence())
+      return getName();
     return getName() + " (" + getSequence() + ")";
   }
 

@@ -26,7 +26,8 @@ public class HibernateChangeLogDao implements ChangeLogStore {
 
   @Override
   public Long create(ChangeLog changeLog) {
-    return (Long) currentSession().save(changeLog);
+    currentSession().persist(changeLog);
+    return changeLog.getId();
   }
 
 }

@@ -2,9 +2,9 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.view.box;
 
 import java.io.Serializable;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public abstract class BoxablePositionView implements Serializable {

@@ -5,17 +5,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl_;
@@ -80,10 +79,10 @@ public class HibernateKitDao implements KitStore, JpaCriteriaPaginatedDataSource
   public long save(Kit kit) throws IOException {
     long id;
     if (!kit.isSaved()) {
-      id = (Long) currentSession().save(kit);
-    } else {
-      currentSession().update(kit);
+      currentSession().persist(kit);
       id = kit.getId();
+    } else {
+      id = currentSession().merge(kit).getId();
     }
     return id;
   }
@@ -121,10 +120,10 @@ public class HibernateKitDao implements KitStore, JpaCriteriaPaginatedDataSource
   public long saveKitDescriptor(KitDescriptor kd) throws IOException {
     long id;
     if (!kd.isSaved()) {
-      id = (Long) currentSession().save(kd);
-    } else {
-      currentSession().update(kd);
+      currentSession().persist(kd);
       id = kd.getId();
+    } else {
+      id = currentSession().merge(kd).getId();
     }
     return id;
   }

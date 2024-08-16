@@ -1,10 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractProgressStep;
@@ -37,13 +36,18 @@ public class SampleProgressStep extends AbstractProgressStep {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     SampleProgressStep other = (SampleProgressStep) obj;
     if (input == null) {
-      if (other.input != null) return false;
-    } else if (!input.equals(other.input)) return false;
+      if (other.input != null)
+        return false;
+    } else if (!input.equals(other.input))
+      return false;
     return true;
   }
 

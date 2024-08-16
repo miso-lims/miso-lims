@@ -10,14 +10,13 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition_;
@@ -57,7 +56,7 @@ public class HibernateBoxDao extends HibernateProviderDao<Box>
 
   @Override
   public void saveBoxable(Boxable boxable) {
-    currentSession().update(boxable);
+    currentSession().merge(boxable);
   }
 
   @Override
@@ -128,7 +127,7 @@ public class HibernateBoxDao extends HibernateProviderDao<Box>
     }
     Box box = get(boxable.getBoxId());
     box.getBoxPositions().remove(boxable.getBoxPosition());
-    currentSession().update(box);
+    currentSession().merge(box);
     // flush required to avoid constraint violation incase item is immediately added to another box or
     // the same one
     // NOTE: this flush will cause ALL Hibernate-managed items to be saved to the db in their current
@@ -139,18 +138,20 @@ public class HibernateBoxDao extends HibernateProviderDao<Box>
 
   @Override
   public long save(Box box) throws IOException {
+    long id;
     if (!box.isSaved()) {
-      return (long) currentSession().save(box);
+      currentSession().persist(box);
+      id = box.getId();
     } else {
-      currentSession().update(box);
+      id = currentSession().merge(box).getId();
       // flush required to avoid constraint violation incase removed items are immediately added to
       // another box or the same one
       // NOTE: this flush will cause ALL Hibernate-managed items to be saved to the db in their current
       // state, even if their `save` method
       // hasn't explicitly been called yet
       currentSession().flush();
-      return box.getId();
     }
+    return id;
   }
 
   @Override

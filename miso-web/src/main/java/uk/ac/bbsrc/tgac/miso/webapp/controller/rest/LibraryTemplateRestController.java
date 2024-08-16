@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
@@ -29,10 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -47,14 +20,20 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
-import uk.ac.bbsrc.tgac.miso.dto.*;
+import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateIndexDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
@@ -73,24 +52,24 @@ public class LibraryTemplateRestController extends RestController {
   @Autowired
   private AsyncOperationManager asyncOperationManager;
 
-  private final JQueryDataTableBackend<LibraryTemplate, LibraryTemplateDto> jQueryBackend = new JQueryDataTableBackend<LibraryTemplate, LibraryTemplateDto>() {
+  private final JQueryDataTableBackend<LibraryTemplate, LibraryTemplateDto> jQueryBackend =
+      new JQueryDataTableBackend<LibraryTemplate, LibraryTemplateDto>() {
 
-    @Override
-    protected LibraryTemplateDto asDto(LibraryTemplate model) {
-      return Dtos.asDto(model);
-    }
+        @Override
+        protected LibraryTemplateDto asDto(LibraryTemplate model) {
+          return Dtos.asDto(model);
+        }
 
-    @Override
-    protected PaginatedDataSource<LibraryTemplate> getSource() throws IOException {
-      return libraryTemplateService;
-    }
+        @Override
+        protected PaginatedDataSource<LibraryTemplate> getSource() throws IOException {
+          return libraryTemplateService;
+        }
 
-  };
+      };
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<LibraryTemplateDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<LibraryTemplateDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, libraryTemplateService);
   }
 
@@ -119,7 +98,7 @@ public class LibraryTemplateRestController extends RestController {
       throws IOException {
     return RestUtils.updateObject(TYPE_LABEL, id, libraryTemplateDto, Dtos::to, libraryTemplateService, Dtos::asDto);
   }
-  
+
   @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<LibraryTemplateDto> getLibraryTemplates(HttpServletRequest request) throws IOException {
@@ -128,7 +107,8 @@ public class LibraryTemplateRestController extends RestController {
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<LibraryTemplateDto> getDTLibraryTemplatesByProject(@PathVariable("id") Long id, HttpServletRequest request)
+  public DataTablesResponseDto<LibraryTemplateDto> getDTLibraryTemplatesByProject(@PathVariable("id") Long id,
+      HttpServletRequest request)
       throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
@@ -144,8 +124,9 @@ public class LibraryTemplateRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkAddProject(@RequestParam("projectId") Long projectId, @RequestBody List<Long> templateIds)
       throws IOException {
-    List<LibraryTemplate> templates = templateIds.stream().map(WhineyFunction.rethrow(id -> libraryTemplateService.get(id)))
-        .collect(Collectors.toList());
+    List<LibraryTemplate> templates =
+        templateIds.stream().map(WhineyFunction.rethrow(id -> libraryTemplateService.get(id)))
+            .collect(Collectors.toList());
     templates.forEach(template -> {
       try {
         addProject(template, projectId);
@@ -164,8 +145,9 @@ public class LibraryTemplateRestController extends RestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkRemoveProject(@RequestParam("projectId") Long projectId, @RequestBody List<Long> templateIds)
       throws IOException {
-    List<LibraryTemplate> templates = templateIds.stream().map(WhineyFunction.rethrow(id -> libraryTemplateService.get(id)))
-        .collect(Collectors.toList());
+    List<LibraryTemplate> templates =
+        templateIds.stream().map(WhineyFunction.rethrow(id -> libraryTemplateService.get(id)))
+            .collect(Collectors.toList());
     templates.forEach(template -> {
       try {
         removeProject(template, projectId);
@@ -191,7 +173,7 @@ public class LibraryTemplateRestController extends RestController {
   @PutMapping("/{templateId}/indices")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode updateIndices(@PathVariable long templateId,
-                                                @RequestBody List<LibraryTemplateIndexDto> dtos) throws IOException {
+      @RequestBody List<LibraryTemplateIndexDto> dtos) throws IOException {
     List<LibraryTemplateDto> templateDtos = makeTemplateDtosForIndexUpdate(templateId, dtos);
     return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, templateDtos, Dtos::to, libraryTemplateService);
   }

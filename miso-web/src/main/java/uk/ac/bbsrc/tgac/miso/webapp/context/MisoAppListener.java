@@ -33,9 +33,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.management.MalformedObjectNameException;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 
 import org.apache.logging.log4j.core.config.Configurator;
 import org.hibernate.SessionFactory;
@@ -48,6 +45,9 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 import io.prometheus.client.hibernate.HibernateStatisticsCollector;
 import io.prometheus.client.hotspot.DefaultExports;
 import io.prometheus.jmx.JmxCollector;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
