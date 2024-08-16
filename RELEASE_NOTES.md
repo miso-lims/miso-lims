@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.21.1] - 2024-08-16
+
+### Fixed
+
+* Pinery showing the wrong value for "Target Cell Revovery" sample attribute
+
+
 ## [2.21.0] - 2024-08-15
 
 ### Added
