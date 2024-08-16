@@ -1195,12 +1195,7 @@ public class MisoClient implements Lims {
         }
       }, //
       REFERENCE_SLIDE_ID("reference_slide_id", "Reference Slide"), //
-      TARGET_CELL_RECOVERY("target_cell_recovery", "Target Cell Recovery") {
-        @Override
-        public String extractStringValueFrom(ResultSet rs) throws SQLException {
-          return extractBigDecimalString(rs, getSqlKey());
-        }
-      }, //
+      TARGET_CELL_RECOVERY("target_cell_recovery", "Target Cell Recovery"), //
       CELL_VIABILITY("cell_viability", "Cell Viability") {
         @Override
         public String extractStringValueFrom(ResultSet rs) throws SQLException {
