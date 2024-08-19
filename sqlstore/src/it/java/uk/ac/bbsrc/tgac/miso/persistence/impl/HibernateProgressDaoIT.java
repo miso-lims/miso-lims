@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.SortedSet;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -20,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Streams;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -54,13 +55,13 @@ public class HibernateProgressDaoIT extends AbstractDAOTest {
   @InjectMocks
   private HibernateProgressDao dao;
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    dao.setSessionFactory(sessionFactory);
+    dao.setEntityManager(entityManager);
     progress1 = createProgress1();
     progress2 = createProgress2();
   }
@@ -106,7 +107,7 @@ public class HibernateProgressDaoIT extends AbstractDAOTest {
    */
   public long save(Progress progress) {
     long id = dao.save(progress).getId();
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap(Session.class);
     session.flush();
     session.evict(progress);
     return id;
@@ -221,6 +222,6 @@ public class HibernateProgressDaoIT extends AbstractDAOTest {
   }
 
   private User getDefaultUser() {
-    return (User) sessionFactory.getCurrentSession().get(UserImpl.class, USER_ID);
+    return (User) entityManager.unwrap(Session.class).get(UserImpl.class, USER_ID);
   }
 }

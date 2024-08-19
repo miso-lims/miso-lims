@@ -13,7 +13,7 @@
   default-autowire="byName">
 
 
-  <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+  <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
     <property name="dataSource" ref="dataSource" />
     <property name="packagesToScan">
       <list>
@@ -22,19 +22,25 @@
         <value>uk.ac.bbsrc.tgac.miso.core.event</value>
       </list>
     </property>
-    <property name="hibernateProperties">
+    <property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
+    <property name="jpaProperties">
       <props>
         <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
       </props>
     </property>
   </bean>
 
+  <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+    <property name="showSql" value="false" />
+    <property name="generateDdl" value="true" />
+  </bean>
+
   <tx:annotation-driven />
   <bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
   <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
 
-  <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
-    <property name="sessionFactory" ref="sessionFactory" />
+  <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory" ref="entityManagerFactory" />
     <property name="dataSource" ref="dataSource" />
   </bean>
   

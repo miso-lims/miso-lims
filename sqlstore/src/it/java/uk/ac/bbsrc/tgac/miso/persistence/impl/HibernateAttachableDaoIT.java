@@ -28,7 +28,7 @@ public class HibernateAttachableDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateAttachableDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test

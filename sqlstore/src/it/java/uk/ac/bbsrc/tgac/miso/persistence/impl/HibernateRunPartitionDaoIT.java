@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
@@ -37,12 +38,12 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
   private HibernateRunPartitionDao dao;
 
   @Autowired
-  SessionFactory sessionFactory;
+  EntityManager entityManager;
 
   @Before
   public void setup() throws IOException, MisoNamingException {
     dao = new HibernateRunPartitionDao();
-    dao.setSessionFactory(sessionFactory);
+    dao.setEntityManager(entityManager);
   }
 
   @Test
@@ -68,7 +69,7 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGet() throws Exception {
-    Run run = (Run) sessionFactory.getCurrentSession().get(Run.class, 1L);
+    Run run = (Run) entityManager.unwrap(Session.class).get(Run.class, 1L);
     assertNotNull(run);
     Partition partition = (Partition) currentSession().get(PartitionImpl.class, 1L);
     assertNotNull(partition);
@@ -80,7 +81,7 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
 
   @Test
   public void testUpdate() throws Exception {
-    Run run = (Run) sessionFactory.getCurrentSession().get(Run.class, 1L);
+    Run run = (Run) entityManager.unwrap(Session.class).get(Run.class, 1L);
     Partition partition = (Partition) currentSession().get(PartitionImpl.class, 1L);
     RunPartition qc = dao.get(run.getId(), partition.getId());
     assertNotNull(qc);

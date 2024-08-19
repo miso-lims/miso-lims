@@ -7,13 +7,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
@@ -23,21 +24,21 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateArrayDaoIT extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   private HibernateArrayDao sut;
 
   @Before
   public void setup() {
     sut = new HibernateArrayDao();
-    sut.setSessionFactory(sessionFactory);
+    sut.setEntityManager(entityManager);
     sut.setDetailedSample(true);
   }
 
   @Test
   public void testSaveNew() throws Exception {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap(Session.class);
     ArrayModel model = (ArrayModel) session.get(ArrayModel.class, 1L);
     User user = (User) session.get(UserImpl.class, 1L);
     Date now = new Date();

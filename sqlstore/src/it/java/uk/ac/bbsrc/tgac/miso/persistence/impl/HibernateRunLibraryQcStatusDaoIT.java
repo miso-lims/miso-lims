@@ -3,7 +3,8 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
 
-public class HibernateRunLibraryQcStatusDaoIT extends AbstractHibernateSaveDaoTest<RunLibraryQcStatus, HibernateRunLibraryQcStatusDao> {
+public class HibernateRunLibraryQcStatusDaoIT
+    extends AbstractHibernateSaveDaoTest<RunLibraryQcStatus, HibernateRunLibraryQcStatusDao> {
 
   public HibernateRunLibraryQcStatusDaoIT() {
     super(RunLibraryQcStatus.class, 3L, 3);
@@ -12,7 +13,7 @@ public class HibernateRunLibraryQcStatusDaoIT extends AbstractHibernateSaveDaoTe
   @Override
   public HibernateRunLibraryQcStatusDao constructTestSubject() {
     HibernateRunLibraryQcStatusDao sut = new HibernateRunLibraryQcStatusDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 
@@ -27,7 +28,8 @@ public class HibernateRunLibraryQcStatusDaoIT extends AbstractHibernateSaveDaoTe
   @SuppressWarnings("unchecked")
   @Override
   public UpdateParameters<RunLibraryQcStatus, String> getUpdateParams() {
-    return new UpdateParameters<>(3L, RunLibraryQcStatus::getDescription, RunLibraryQcStatus::setDescription, "Changed");
+    return new UpdateParameters<>(3L, RunLibraryQcStatus::getDescription, RunLibraryQcStatus::setDescription,
+        "Changed");
   }
 
 }

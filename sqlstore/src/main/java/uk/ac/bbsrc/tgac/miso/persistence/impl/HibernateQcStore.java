@@ -7,9 +7,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder.In;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun;
@@ -19,9 +19,6 @@ import uk.ac.bbsrc.tgac.miso.persistence.QcTargetStore;
 
 public abstract class HibernateQcStore<T extends QC> implements QcTargetStore {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
   private final Class<? extends QualityControllable<T>> entityClass;
   private final Class<T> qcClass;
 
@@ -30,12 +27,15 @@ public abstract class HibernateQcStore<T extends QC> implements QcTargetStore {
     this.qcClass = qcClass;
   }
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
+
+  public Session currentSession() {
+    return entityManager.unwrap(Session.class);
   }
 
-  protected Session currentSession() {
-    return sessionFactory.getCurrentSession();
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override

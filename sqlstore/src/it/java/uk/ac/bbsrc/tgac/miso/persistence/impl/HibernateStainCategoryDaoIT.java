@@ -19,7 +19,7 @@ public class HibernateStainCategoryDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateStainCategoryDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -54,7 +54,7 @@ public class HibernateStainCategoryDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    StainCategory saved = (StainCategory) getSessionFactory().getCurrentSession().get(StainCategory.class, savedId);
+    StainCategory saved = (StainCategory) currentSession().get(StainCategory.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -62,20 +62,20 @@ public class HibernateStainCategoryDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String name = "New Name";
-    StainCategory cat = (StainCategory) getSessionFactory().getCurrentSession().get(StainCategory.class, id);
+    StainCategory cat = (StainCategory) currentSession().get(StainCategory.class, id);
     assertNotEquals(name, cat.getName());
     cat.setName(name);
     sut.update(cat);
 
     clearSession();
 
-    StainCategory saved = (StainCategory) getSessionFactory().getCurrentSession().get(StainCategory.class, id);
+    StainCategory saved = (StainCategory) currentSession().get(StainCategory.class, id);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    StainCategory cat = (StainCategory) getSessionFactory().getCurrentSession().get(StainCategory.class, 1L);
+    StainCategory cat = (StainCategory) currentSession().get(StainCategory.class, 1L);
     assertEquals("Category One", cat.getName());
     assertEquals(2L, sut.getUsage(cat));
   }

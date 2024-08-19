@@ -7,7 +7,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 
 import java.util.Arrays;
 
-public class HibernateScientificNameDaoIT extends AbstractHibernateSaveDaoTest<ScientificName, HibernateScientificNameDao> {
+public class HibernateScientificNameDaoIT
+    extends AbstractHibernateSaveDaoTest<ScientificName, HibernateScientificNameDao> {
 
   public HibernateScientificNameDaoIT() {
     super(ScientificName.class, 1L, 3);
@@ -16,7 +17,7 @@ public class HibernateScientificNameDaoIT extends AbstractHibernateSaveDaoTest<S
   @Override
   public HibernateScientificNameDao constructTestSubject() {
     HibernateScientificNameDao sut = new HibernateScientificNameDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

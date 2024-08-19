@@ -55,7 +55,7 @@ public class HibernateRunPartitionAliquotDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test

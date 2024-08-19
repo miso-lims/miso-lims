@@ -16,7 +16,7 @@ public class HibernatePipelineDaoIT extends AbstractHibernateSaveDaoTest<Pipelin
   @Override
   public HibernatePipelineDao constructTestSubject() {
     HibernatePipelineDao sut = new HibernatePipelineDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

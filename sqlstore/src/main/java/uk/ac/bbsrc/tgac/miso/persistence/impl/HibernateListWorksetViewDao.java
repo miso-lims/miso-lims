@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.metamodel.SingularAttribute;
@@ -25,16 +25,15 @@ import uk.ac.bbsrc.tgac.miso.persistence.ListWorksetViewStore;
 public class HibernateListWorksetViewDao
     implements ListWorksetViewStore, JpaCriteriaPaginatedDataSource<ListWorksetView, ListWorksetView> {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public Session currentSession() {
+    return entityManager.unwrap(Session.class);
   }
 
-  @Override
-  public Session currentSession() {
-    return sessionFactory.getCurrentSession();
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override

@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
@@ -38,8 +39,8 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
   @Rule
   public final ExpectedException expectedException = ExpectedException.none();
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @InjectMocks
   private HibernateLibraryAliquotDao dao;
@@ -49,7 +50,7 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
   @Before
   public void setUp() throws MisoNamingException {
     MockitoAnnotations.initMocks(this);
-    dao.setSessionFactory(sessionFactory);
+    dao.setEntityManager(entityManager);
     emptyUser.setId(1L);
   }
 

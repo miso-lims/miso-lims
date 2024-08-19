@@ -6,11 +6,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
@@ -20,15 +21,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 public class HibernateQcTypeDaoIT extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   private HibernateQcTypeDao dao;
 
   @Before
   public void setup() throws IOException {
     dao = new HibernateQcTypeDao();
-    dao.setSessionFactory(sessionFactory);
+    dao.setEntityManager(entityManager);
   }
 
   @Test

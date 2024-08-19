@@ -12,7 +12,6 @@ import com.eaglegenomics.simlims.core.User;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -41,7 +40,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 @Table(name = "Experiment")
 public class Experiment implements Comparable<Experiment>, Nameable, ChangeLoggable, Deletable, Serializable {
   @Entity
-  @Embeddable
   @Table(name = "Experiment_Run_Partition")
   public static class RunPartition implements Serializable {
     private static final long serialVersionUID = 1L;

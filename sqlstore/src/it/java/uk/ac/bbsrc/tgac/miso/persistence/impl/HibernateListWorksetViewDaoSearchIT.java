@@ -21,7 +21,7 @@ public class HibernateListWorksetViewDaoSearchIT extends PaginationFilterSinkIT 
   @Override
   protected PaginatedDataSource<?> constructTestSubject() {
     HibernateListWorksetViewDao sut = new HibernateListWorksetViewDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

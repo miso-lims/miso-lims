@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,6 +24,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
@@ -48,8 +49,8 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
   @Spy
   private JdbcTemplate jdbcTemplate;
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Mock
   private SecurityStore securityDAO;
@@ -69,7 +70,7 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
   @Before
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
-    dao.setSessionFactory(sessionFactory);
+    dao.setEntityManager(entityManager);
     emptyUser.setId(1L);
     when(securityDAO.getUserById(ArgumentMatchers.anyLong())).thenReturn(emptyUser);
     emptySR.setId(1L);

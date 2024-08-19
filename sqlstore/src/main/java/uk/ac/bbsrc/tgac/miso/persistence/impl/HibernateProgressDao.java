@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Objects;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl_;
@@ -21,19 +21,19 @@ import uk.ac.bbsrc.tgac.miso.persistence.ProgressStore;
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernateProgressDao implements ProgressStore {
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
+  @PersistenceContext
+  private EntityManager entityManager;
 
   public Session currentSession() {
-    return sessionFactory.getCurrentSession();
+    return getEntityManager().unwrap(Session.class);
+  }
+
+  public EntityManager getEntityManager() {
+    return entityManager;
+  }
+
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override

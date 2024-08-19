@@ -20,7 +20,7 @@ public class HibernateSampleValidRelationshipDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateSampleValidRelationshipDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -50,13 +50,15 @@ public class HibernateSampleValidRelationshipDaoIT extends AbstractDAOTest {
 
   @Test
   public void testDelete() throws Exception {
-    SampleValidRelationship before = (SampleValidRelationship) currentSession().get(SampleValidRelationshipImpl.class, 4L);
+    SampleValidRelationship before =
+        (SampleValidRelationship) currentSession().get(SampleValidRelationshipImpl.class, 4L);
     assertNotNull(before);
     sut.delete(before);
 
     clearSession();
 
-    SampleValidRelationship after = (SampleValidRelationship) currentSession().get(SampleValidRelationshipImpl.class, 4L);
+    SampleValidRelationship after =
+        (SampleValidRelationship) currentSession().get(SampleValidRelationshipImpl.class, 4L);
     assertNull(after);
   }
 

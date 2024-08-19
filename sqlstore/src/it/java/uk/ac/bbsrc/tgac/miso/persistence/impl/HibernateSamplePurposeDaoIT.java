@@ -13,7 +13,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 import java.util.Arrays;
 
-public class HibernateSamplePurposeDaoIT extends AbstractHibernateSaveDaoTest<SamplePurpose, HibernateSamplePurposeDao> {
+public class HibernateSamplePurposeDaoIT
+    extends AbstractHibernateSaveDaoTest<SamplePurpose, HibernateSamplePurposeDao> {
 
   public HibernateSamplePurposeDaoIT() {
     super(SamplePurposeImpl.class, 1L, 2);
@@ -22,7 +23,7 @@ public class HibernateSamplePurposeDaoIT extends AbstractHibernateSaveDaoTest<Sa
   @Override
   public HibernateSamplePurposeDao constructTestSubject() {
     HibernateSamplePurposeDao sut = new HibernateSamplePurposeDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

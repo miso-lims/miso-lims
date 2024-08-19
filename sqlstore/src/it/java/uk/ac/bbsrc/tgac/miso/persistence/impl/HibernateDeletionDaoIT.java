@@ -3,13 +3,14 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
@@ -22,15 +23,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 public class HibernateDeletionDaoIT extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   private HibernateDeletionDao sut;
 
   @Before
   public void setup() {
     sut = new HibernateDeletionDao();
-    sut.setSessionFactory(sessionFactory);
+    sut.setEntityManager(entityManager);
   }
 
   @Test
@@ -54,7 +55,7 @@ public class HibernateDeletionDaoIT extends AbstractDAOTest {
   }
 
   private <T extends Deletable> void testDelete(Class<T> targetClass, long targetId) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap(Session.class);
     @SuppressWarnings("unchecked")
     T deletable = (T) session.get(targetClass, targetId);
     assertNotNull(deletable);
