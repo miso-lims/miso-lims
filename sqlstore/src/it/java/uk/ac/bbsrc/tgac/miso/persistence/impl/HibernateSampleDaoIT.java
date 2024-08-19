@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -47,15 +48,15 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   @Rule
   public final ExpectedException exception = ExpectedException.none();
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   private HibernateSampleDao dao;
 
   @Before
   public void setup() {
     dao = new HibernateSampleDao();
-    dao.setSessionFactory(sessionFactory);
+    dao.setEntityManager(entityManager);
     dao.setDetailedSample(true);
   }
 

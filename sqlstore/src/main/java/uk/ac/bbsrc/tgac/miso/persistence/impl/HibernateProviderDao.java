@@ -6,11 +6,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.ProviderDao;
 public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
 
   @Autowired
-  private SessionFactory sessionFactory;
+  EntityManager entityManager;
 
   private final Class<T> resultClass;
   private final Class<? extends T> entityClass;
@@ -38,12 +38,12 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
     this.entityClass = resultClass;
   }
 
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
+  public EntityManager getEntityManager() {
+    return entityManager;
   }
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   protected Class<T> getResultClass() {
@@ -55,7 +55,7 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
   }
 
   public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
+    return getEntityManager().unwrap(Session.class);
   }
 
   @Override

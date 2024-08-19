@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +11,8 @@ import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Group_;
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
@@ -31,11 +31,19 @@ import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 @Repository
 public class HibernateSecurityDao implements SecurityStore {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
-  private Session currentSession() {
-    return getSessionFactory().getCurrentSession();
+  public Session currentSession() {
+    return getEntityManager().unwrap(Session.class);
+  }
+
+  public EntityManager getEntityManager() {
+    return entityManager;
+  }
+
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override
@@ -51,10 +59,6 @@ public class HibernateSecurityDao implements SecurityStore {
     QueryBuilder<Group, Group> builder = new QueryBuilder<>(currentSession(), Group.class, Group.class);
     builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(Group_.name), groupName));
     return builder.getSingleResultOrNull();
-  }
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
   }
 
   @Override
@@ -112,10 +116,6 @@ public class HibernateSecurityDao implements SecurityStore {
       id = currentSession().merge(user).getId();
     }
     return id;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
   }
 
   @Override

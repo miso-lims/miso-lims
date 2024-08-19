@@ -8,7 +8,6 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Date;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -18,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
@@ -37,8 +38,8 @@ public class HibernateChangeLogDaoIT extends AbstractDAOTest {
 
   @Mock
   private HibernateSecurityDao securityDAO;
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @InjectMocks
   private HibernateChangeLogDao sut;
@@ -53,8 +54,8 @@ public class HibernateChangeLogDaoIT extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     user.setId(1L);
     when(securityDAO.getUserById(anyLong())).thenReturn(user);
-    sut.setSessionFactory(sessionFactory);
-    libraryDao.setSessionFactory(sessionFactory);
+    sut.setEntityManager(entityManager);
+    libraryDao.setEntityManager(entityManager);
   }
 
   private Collection<ChangeLog> listSampleChangelogs(long libraryId) {

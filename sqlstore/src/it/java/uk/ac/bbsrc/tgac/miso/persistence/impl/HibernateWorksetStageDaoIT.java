@@ -16,7 +16,7 @@ public class HibernateWorksetStageDaoIT extends AbstractHibernateSaveDaoTest<Wor
   @Override
   public HibernateWorksetStageDao constructTestSubject() {
     HibernateWorksetStageDao sut = new HibernateWorksetStageDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

@@ -20,19 +20,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 public class HibernateLibraryDesignDaoIT extends AbstractDAOTest {
 
   private HibernateLibraryDesignDao dao;
-  
+
   @Before
   public void setup() throws IOException {
     dao = new HibernateLibraryDesignDao();
-    dao.setSessionFactory(getSessionFactory());
+    dao.setEntityManager(getEntityManager());
   }
-  
+
   @Test
   public void testList() throws IOException {
     List<LibraryDesign> list = dao.list();
     assertEquals(2, list.size());
   }
-  
+
   @Test
   public void testListByClass() throws IOException {
     SampleClass sc = new SampleClassImpl();
@@ -40,7 +40,7 @@ public class HibernateLibraryDesignDaoIT extends AbstractDAOTest {
     List<LibraryDesign> list = dao.listByClass(sc);
     assertEquals(1L, list.size());
   }
-  
+
   @Test
   public void testListByClassNull() throws IOException {
     List<LibraryDesign> list = dao.listByClass(null);
@@ -57,7 +57,7 @@ public class HibernateLibraryDesignDaoIT extends AbstractDAOTest {
   public void testListByIdListNone() throws Exception {
     testListByIdListNone(dao::listByIdList);
   }
-  
+
   @Test
   public void testGet() throws IOException {
     LibraryDesign ld = dao.get(1L);
@@ -78,7 +78,7 @@ public class HibernateLibraryDesignDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetUsage() throws IOException {
-    LibraryDesign design = (LibraryDesign) getSessionFactory().getCurrentSession().get(LibraryDesign.class, 1L);
+    LibraryDesign design = (LibraryDesign) currentSession().get(LibraryDesign.class, 1L);
     assertEquals("DESIGN1", design.getName());
     assertEquals(0L, dao.getUsage(design));
   }
@@ -96,7 +96,7 @@ public class HibernateLibraryDesignDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    LibraryDesign saved = (LibraryDesign) getSessionFactory().getCurrentSession().get(LibraryDesign.class, savedId);
+    LibraryDesign saved = (LibraryDesign) currentSession().get(LibraryDesign.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -104,14 +104,14 @@ public class HibernateLibraryDesignDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String name = "NU";
-    LibraryDesign design = (LibraryDesign) getSessionFactory().getCurrentSession().get(LibraryDesign.class, id);
+    LibraryDesign design = (LibraryDesign) currentSession().get(LibraryDesign.class, id);
     assertNotEquals(name, design.getName());
     design.setName(name);
     dao.update(design);
 
     clearSession();
 
-    LibraryDesign saved = (LibraryDesign) getSessionFactory().getCurrentSession().get(LibraryDesign.class, id);
+    LibraryDesign saved = (LibraryDesign) currentSession().get(LibraryDesign.class, id);
     assertEquals(name, saved.getName());
   }
 

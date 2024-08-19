@@ -9,11 +9,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -47,22 +48,23 @@ import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
 public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
 
   @Autowired
-  private SessionFactory sessionFactory;
-  @Autowired
   private RunStore runStore;
   @Autowired
   private ListLibraryAliquotViewDao listLibraryAliquotViewDao;
 
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
+  @PersistenceContext
+  private EntityManager entityManager;
 
   public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
+    return entityManager.unwrap(Session.class);
+  }
+
+  public EntityManager getEntityManager() {
+    return entityManager;
+  }
+
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   public void setListLibraryAliquotViewDao(ListLibraryAliquotViewDao listLibraryAliquotViewDao) {

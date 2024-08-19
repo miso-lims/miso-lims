@@ -31,7 +31,7 @@ public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requ
   @Override
   public HibernateRequisitionDao constructTestSubject() {
     HibernateRequisitionDao sut = new HibernateRequisitionDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

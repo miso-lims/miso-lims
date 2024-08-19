@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.Root;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
@@ -47,15 +47,15 @@ public class HibernateBarcodableViewDao implements BarcodableViewDao {
           this::getPoolWithBarcode,
           this::getBoxWithBarcode, this::getContainerWithBarcode, this::getContainerModelWithBarcode);
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
+  @PersistenceContext
+  private EntityManager entityManager;
 
   public Session currentSession() {
-    return sessionFactory.getCurrentSession();
+    return entityManager.unwrap(Session.class);
+  }
+
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override

@@ -18,7 +18,7 @@ public class HibernateSequencingControlTypeDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateSequencingControlTypeDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test

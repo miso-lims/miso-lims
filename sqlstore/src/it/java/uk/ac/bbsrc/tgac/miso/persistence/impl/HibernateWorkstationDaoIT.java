@@ -19,7 +19,7 @@ public class HibernateWorkstationDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateWorkstationDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -46,7 +46,7 @@ public class HibernateWorkstationDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    Workstation saved = (Workstation) getSessionFactory().getCurrentSession().get(Workstation.class, savedId);
+    Workstation saved = (Workstation) currentSession().get(Workstation.class, savedId);
     assertNotNull(saved);
     assertEquals(alias, saved.getAlias());
   }
@@ -55,20 +55,20 @@ public class HibernateWorkstationDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Alias";
-    Workstation workstation = (Workstation) getSessionFactory().getCurrentSession().get(Workstation.class, id);
+    Workstation workstation = (Workstation) currentSession().get(Workstation.class, id);
     assertNotEquals(alias, workstation.getAlias());
     workstation.setAlias(alias);
     sut.update(workstation);
 
     clearSession();
 
-    Workstation saved = (Workstation) getSessionFactory().getCurrentSession().get(Workstation.class, id);
+    Workstation saved = (Workstation) currentSession().get(Workstation.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    Workstation workstation = (Workstation) getSessionFactory().getCurrentSession().get(Workstation.class, 1L);
+    Workstation workstation = (Workstation) currentSession().get(Workstation.class, 1L);
     assertEquals(4L, sut.getUsage(workstation));
   }
 

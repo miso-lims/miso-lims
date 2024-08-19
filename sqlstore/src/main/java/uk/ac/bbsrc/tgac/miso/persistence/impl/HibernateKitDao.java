@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
@@ -42,20 +42,19 @@ import uk.ac.bbsrc.tgac.miso.persistence.KitStore;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateKitDao implements KitStore, JpaCriteriaPaginatedDataSource<KitDescriptor, KitDescriptor> {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
-  @Override
   public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
+    return entityManager.unwrap(Session.class);
   }
 
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
+  public EntityManager getEntityManager() {
+    return entityManager;
   }
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override

@@ -13,7 +13,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 import java.util.Arrays;
 
-public class HibernateTissueMaterialDaoIT extends AbstractHibernateSaveDaoTest<TissueMaterial, HibernateTissueMaterialDao> {
+public class HibernateTissueMaterialDaoIT
+    extends AbstractHibernateSaveDaoTest<TissueMaterial, HibernateTissueMaterialDao> {
 
   public HibernateTissueMaterialDaoIT() {
     super(TissueMaterialImpl.class, 3L, 3);
@@ -22,7 +23,7 @@ public class HibernateTissueMaterialDaoIT extends AbstractHibernateSaveDaoTest<T
   @Override
   public HibernateTissueMaterialDao constructTestSubject() {
     HibernateTissueMaterialDao sut = new HibernateTissueMaterialDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

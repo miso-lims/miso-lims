@@ -18,7 +18,7 @@ public class HibernateQcNodeDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateQcNodeDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test

@@ -19,7 +19,7 @@ public class HibernateAssayDaoIT extends AbstractHibernateSaveDaoTest<Assay, Hib
   @Override
   public HibernateAssayDao constructTestSubject() {
     HibernateAssayDao sut = new HibernateAssayDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 
@@ -65,7 +65,8 @@ public class HibernateAssayDaoIT extends AbstractHibernateSaveDaoTest<Assay, Hib
 
     Assay before = (Assay) currentSession().get(Assay.class, assayId);
     assertEquals(2, before.getAssayMetrics().size());
-    AssayMetric beforeMetric = before.getAssayMetrics().stream().filter(x -> x.getMetric().getId() == metricId).findAny().orElse(null);
+    AssayMetric beforeMetric =
+        before.getAssayMetrics().stream().filter(x -> x.getMetric().getId() == metricId).findAny().orElse(null);
     before.getAssayMetrics().remove(beforeMetric);
     assertNotNull(beforeMetric);
     getTestSubject().deleteAssayMetric(beforeMetric);

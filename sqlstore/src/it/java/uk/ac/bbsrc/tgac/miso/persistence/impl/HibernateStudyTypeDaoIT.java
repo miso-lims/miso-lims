@@ -18,7 +18,7 @@ public class HibernateStudyTypeDaoIT extends AbstractHibernateSaveDaoTest<StudyT
   @Override
   public HibernateStudyTypeDao constructTestSubject() {
     HibernateStudyTypeDao sut = new HibernateStudyTypeDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

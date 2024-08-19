@@ -23,7 +23,7 @@ public class HibernateIndexDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     dao = new HibernateIndexDao();
-    dao.setSessionFactory(getSessionFactory());
+    dao.setEntityManager(getEntityManager());
   }
 
   @Test

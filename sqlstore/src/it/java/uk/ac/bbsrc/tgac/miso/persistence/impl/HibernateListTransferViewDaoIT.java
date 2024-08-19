@@ -21,7 +21,7 @@ public class HibernateListTransferViewDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateListTransferViewDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test

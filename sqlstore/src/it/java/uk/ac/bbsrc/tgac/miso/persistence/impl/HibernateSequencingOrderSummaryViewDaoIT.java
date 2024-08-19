@@ -5,11 +5,12 @@ import static org.junit.Assert.assertNotNull;
 import java.io.IOException;
 import java.util.EnumSet;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -17,15 +18,15 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateSequencingOrderSummaryViewDaoIT extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-  
+  @PersistenceContext
+  private EntityManager entityManager;
+
   private HibernateSequencingOrderSummaryViewDao sut;
-  
+
   @Before
   public void setup() {
     sut = new HibernateSequencingOrderSummaryViewDao();
-    sut.setSessionFactory(sessionFactory);
+    sut.setEntityManager(entityManager);
   }
 
   @Test

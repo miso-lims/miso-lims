@@ -2,13 +2,15 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -22,15 +24,15 @@ public class HibernateSampleNumberPerProjectDaoIT extends AbstractDAOTest {
   private static final String PRO2_PARTIAL_ALIAS = "PRO2_";
   private static final String PRO3_PARTIAL_ALIAS = "PRO3_";
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   private HibernateSampleNumberPerProjectDao sampleNumberPerProjectDao;
 
   @Before
   public void setup() {
     sampleNumberPerProjectDao = new HibernateSampleNumberPerProjectDao();
-    sampleNumberPerProjectDao.setSessionFactory(sessionFactory);
+    sampleNumberPerProjectDao.setEntityManager(entityManager);
   }
 
   @Test
@@ -173,9 +175,9 @@ public class HibernateSampleNumberPerProjectDaoIT extends AbstractDAOTest {
     String s = sampleNumberPerProjectDao.nextNumber(project, user, PRO1_PARTIAL_ALIAS);
     assertEquals("0002", s);
 
-    Sample sam = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 1L);
+    Sample sam = (Sample) entityManager.unwrap(Session.class).get(SampleImpl.class, 1L);
     sam.setAlias(PRO1_PARTIAL_ALIAS + "0003");
-    sessionFactory.getCurrentSession().persist(sam);
+    entityManager.unwrap(Session.class).persist(sam);
 
     String s2 = sampleNumberPerProjectDao.nextNumber(project, user, PRO1_PARTIAL_ALIAS);
     assertEquals("0004", s2);

@@ -20,7 +20,7 @@ public class HibernateInstrumentStatusDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateInstrumentStatusDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test

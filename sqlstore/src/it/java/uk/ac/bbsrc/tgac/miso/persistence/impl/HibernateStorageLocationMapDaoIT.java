@@ -18,7 +18,7 @@ public class HibernateStorageLocationMapDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateStorageLocationMapDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -53,7 +53,8 @@ public class HibernateStorageLocationMapDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    StorageLocationMap saved = (StorageLocationMap) getSessionFactory().getCurrentSession().get(StorageLocationMap.class, savedId);
+    StorageLocationMap saved =
+        (StorageLocationMap) currentSession().get(StorageLocationMap.class, savedId);
     assertEquals(filename, saved.getFilename());
   }
 
@@ -61,20 +62,23 @@ public class HibernateStorageLocationMapDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String filename = "renamed.html";
-    StorageLocationMap map = (StorageLocationMap) getSessionFactory().getCurrentSession().get(StorageLocationMap.class, id);
+    StorageLocationMap map =
+        (StorageLocationMap) currentSession().get(StorageLocationMap.class, id);
     assertNotEquals(filename, map.getFilename());
     map.setFilename(filename);
     sut.update(map);
 
     clearSession();
 
-    StorageLocationMap saved = (StorageLocationMap) getSessionFactory().getCurrentSession().get(StorageLocationMap.class, id);
+    StorageLocationMap saved =
+        (StorageLocationMap) currentSession().get(StorageLocationMap.class, id);
     assertEquals(filename, saved.getFilename());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    StorageLocationMap map = (StorageLocationMap) getSessionFactory().getCurrentSession().get(StorageLocationMap.class, 1L);
+    StorageLocationMap map =
+        (StorageLocationMap) currentSession().get(StorageLocationMap.class, 1L);
     assertEquals("floor_one.html", map.getFilename());
     assertEquals(2L, sut.getUsage(map));
   }

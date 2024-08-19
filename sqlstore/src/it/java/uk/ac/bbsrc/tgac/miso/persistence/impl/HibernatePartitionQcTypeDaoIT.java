@@ -19,7 +19,7 @@ public class HibernatePartitionQcTypeDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernatePartitionQcTypeDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -64,7 +64,8 @@ public class HibernatePartitionQcTypeDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    PartitionQCType saved = (PartitionQCType) getSessionFactory().getCurrentSession().get(PartitionQCType.class, savedId);
+    PartitionQCType saved =
+        (PartitionQCType) currentSession().get(PartitionQCType.class, savedId);
     assertEquals(desc, saved.getDescription());
   }
 
@@ -72,20 +73,21 @@ public class HibernatePartitionQcTypeDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long typeId = 1L;
     String newDesc = "New Desc";
-    PartitionQCType st = (PartitionQCType) getSessionFactory().getCurrentSession().get(PartitionQCType.class, typeId);
+    PartitionQCType st = (PartitionQCType) currentSession().get(PartitionQCType.class, typeId);
     assertNotEquals(newDesc, st.getDescription());
     st.setDescription(newDesc);
     assertEquals(typeId, sut.update(st));
 
     clearSession();
 
-    PartitionQCType saved = (PartitionQCType) getSessionFactory().getCurrentSession().get(PartitionQCType.class, typeId);
+    PartitionQCType saved =
+        (PartitionQCType) currentSession().get(PartitionQCType.class, typeId);
     assertEquals(newDesc, saved.getDescription());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    PartitionQCType ok = (PartitionQCType) getSessionFactory().getCurrentSession().get(PartitionQCType.class, 1L);
+    PartitionQCType ok = (PartitionQCType) currentSession().get(PartitionQCType.class, 1L);
     assertEquals("OK", ok.getDescription());
     assertEquals(1L, sut.getUsage(ok));
   }
