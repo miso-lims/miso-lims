@@ -206,8 +206,9 @@ public class DefaultStorageLocationService implements StorageLocationService {
 
   private void createParentIfNecessary(StorageLocation freezer) throws IOException {
     if (freezer.getParentLocation() != null && !freezer.getParentLocation().isSaved()) {
-      freezer.getParentLocation().setChangeDetails(authorizationManager.getCurrentUser());
-      long parentId = storageLocationStore.update(freezer.getParentLocation());
+      StorageLocation parent = freezer.getParentLocation();
+      parent.setChangeDetails(authorizationManager.getCurrentUser());
+      long parentId = parent.isSaved() ? storageLocationStore.update(parent) : storageLocationStore.create(parent);
       freezer.setParentLocation(storageLocationStore.get(parentId));
     }
   }
@@ -228,7 +229,7 @@ public class DefaultStorageLocationService implements StorageLocationService {
     validateChange(storage, null);
     loadChildEntities(storage);
     storage.setChangeDetails(authorizationManager.getCurrentUser());
-    long savedId = storageLocationStore.update(storage);
+    long savedId = storageLocationStore.create(storage);
     StorageLocation[] childLocations =
         storage.getChildLocations().toArray(new StorageLocation[storage.getChildLocations().size()]);
     for (StorageLocation child : childLocations) {

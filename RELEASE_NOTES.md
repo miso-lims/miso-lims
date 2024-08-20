@@ -13,6 +13,10 @@ Starting with version 1.29.0, the format of this file is based on
 
 * Pinery showing the wrong value for "Target Cell Revovery" sample attribute
 
+### Known Issues
+
+* Error adding storage to freezers
+
 
 ## [2.21.0] - 2024-08-15
 
@@ -32,6 +36,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * Pinery showing the wrong value for "Target Cell Revovery" sample attribute 
+* Error adding storage to freezers
 
 
 ## [2.20.0] - 2024-06-20
