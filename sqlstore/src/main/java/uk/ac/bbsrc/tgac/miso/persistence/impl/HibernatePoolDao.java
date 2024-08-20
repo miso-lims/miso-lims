@@ -132,14 +132,14 @@ public class HibernatePoolDao extends HibernateSaveDao<Pool>
   }
 
   @Override
-  public Path<?> propertyForDate(Root<PoolImpl> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, PoolImpl> builder, DateType type) {
     switch (type) {
       case CREATE:
-        return root.get(PoolImpl_.creationDate);
+        return builder.getRoot().get(PoolImpl_.creationDate);
       case ENTERED:
-        return root.get(PoolImpl_.creationTime);
+        return builder.getRoot().get(PoolImpl_.creationTime);
       case UPDATE:
-        return root.get(PoolImpl_.lastModified);
+        return builder.getRoot().get(PoolImpl_.lastModified);
       default:
         return null;
     }

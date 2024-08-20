@@ -180,12 +180,14 @@ public class HibernateListLibraryAliquotViewDao extends HibernateProviderDao<Lis
   }
 
   @Override
-  public Path<?> propertyForDate(Root<ListLibraryAliquotView> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, ListLibraryAliquotView> builder, DateType type) {
     switch (type) {
+      case ENTERED:
+        return builder.getRoot().get(ListLibraryAliquotView_.created);
       case CREATE:
-        return root.get(ListLibraryAliquotView_.created);
+        return builder.getRoot().get(ListLibraryAliquotView_.created);
       case UPDATE:
-        return root.get(ListLibraryAliquotView_.lastUpdated);
+        return builder.getRoot().get(ListLibraryAliquotView_.lastUpdated);
       default:
         return null;
     }

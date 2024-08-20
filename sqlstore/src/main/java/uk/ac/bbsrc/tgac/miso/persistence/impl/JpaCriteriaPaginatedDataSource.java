@@ -171,7 +171,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
    * @return the name of the property or null if the search criterion should be ignored.
    */
 
-  public abstract Path<?> propertyForDate(Root<T> root, DateType type);
+  public abstract Path<?> propertyForDate(QueryBuilder<?, T> builder, DateType type);
 
   /**
    * Determine the correct Hibernate property given the user-supplied sort column. Default
@@ -232,7 +232,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
   @Override
   public default void restrictPaginationByDate(QueryBuilder<?, T> builder, Date start, Date end, DateType type,
       Consumer<String> errorHandler) {
-    Path<?> propertyPath = propertyForDate(builder.getRoot(), type);
+    Path<?> propertyPath = propertyForDate(builder, type);
     if (propertyPath != null) {
       if (propertyPath.getJavaType() == Date.class) {
         @SuppressWarnings("unchecked")
@@ -257,7 +257,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     LocalDate startDate = LocalDate.ofInstant(start.toInstant(), ZoneId.systemDefault());
     LocalDate endDate = LocalDate.ofInstant(end.toInstant(), ZoneId.systemDefault());
     @SuppressWarnings("unchecked")
-    Path<LocalDate> dateProperty = (Path<LocalDate>) propertyForDate(builder.getRoot(), type);
+    Path<LocalDate> dateProperty = (Path<LocalDate>) propertyForDate(builder, type);
     if (dateProperty != null) {
       builder.addPredicate(builder.getCriteriaBuilder().between(dateProperty, startDate, endDate));
     } else {

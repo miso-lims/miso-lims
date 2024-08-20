@@ -8,7 +8,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.Session;
@@ -82,15 +81,15 @@ public class HibernateListTransferViewDao
   }
 
   @Override
-  public Path<?> propertyForDate(Root<ListTransferView> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, ListTransferView> builder, DateType type) {
     switch (type) {
       case ENTERED:
-        return root.get(ListTransferView_.created);
+        return builder.getRoot().get(ListTransferView_.created);
       case CREATE:
       case RECEIVE:
-        return root.get(ListTransferView_.transferTime);
+        return builder.getRoot().get(ListTransferView_.transferTime);
       case UPDATE:
-        return root.get(ListTransferView_.lastModified);
+        return builder.getRoot().get(ListTransferView_.lastModified);
       default:
         return null;
     }

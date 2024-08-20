@@ -342,17 +342,19 @@ public class HibernateSampleDao extends HibernateSaveDao<Sample>
   }
 
   @Override
-  public Path<?> propertyForDate(Root<SampleImpl> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, SampleImpl> builder, DateType type) {
     switch (type) {
       case CREATE:
+        // Using an unchecked cast here since CriteriaBuilder.treat() does not work here
+        @SuppressWarnings("unchecked")
+        Root<DetailedSampleImpl> detailedSampleRoot = ((Root<DetailedSampleImpl>) (Object) builder.getRoot());
         return detailedSample
-            ? currentSession().getCriteriaBuilder().treat(root, DetailedSampleImpl.class)
-                .get(DetailedSampleImpl_.creationDate)
+            ? detailedSampleRoot.get(DetailedSampleImpl_.creationDate)
             : null;
       case ENTERED:
-        return root.get(SampleImpl_.creationTime);
+        return builder.getRoot().get(SampleImpl_.creationTime);
       case UPDATE:
-        return root.get(SampleImpl_.lastModified);
+        return builder.getRoot().get(SampleImpl_.lastModified);
       default:
         return null;
     }

@@ -96,8 +96,8 @@ public class HibernateInstrumentDao extends HibernateSaveDao<Instrument>
   }
 
   @Override
-  public Path<?> propertyForDate(Root<InstrumentImpl> root, DateType type) {
-    return type == DateType.CREATE ? root.get(InstrumentImpl_.dateCommissioned) : null;
+  public Path<?> propertyForDate(QueryBuilder<?, InstrumentImpl> builder, DateType type) {
+    return type == DateType.CREATE ? builder.getRoot().get(InstrumentImpl_.dateCommissioned) : null;
   }
 
   @Override

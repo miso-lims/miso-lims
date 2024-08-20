@@ -88,10 +88,10 @@ public class HibernateSequencingOrderSummaryViewDao
   }
 
   @Override
-  public Path<?> propertyForDate(Root<SequencingOrderSummaryView> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, SequencingOrderSummaryView> builder, DateType type) {
     switch (type) {
       case UPDATE:
-        return root.get(SequencingOrderSummaryView_.lastUpdated);
+        return builder.getRoot().get(SequencingOrderSummaryView_.lastUpdated);
       default:
         return null;
     }

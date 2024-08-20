@@ -60,7 +60,7 @@ public class HibernateIndexDao extends HibernateSaveDao<Index>
   }
 
   @Override
-  public Path<?> propertyForDate(Root<Index> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, Index> builder, DateType type) {
     return null;
   }
 

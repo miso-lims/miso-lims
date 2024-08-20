@@ -96,7 +96,7 @@ public class HibernateSopDao extends HibernateSaveDao<Sop> implements JpaCriteri
   }
 
   @Override
-  public Path<?> propertyForDate(Root<Sop> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, Sop> builder, DateType type) {
     return null;
   }
 

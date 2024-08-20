@@ -236,14 +236,14 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
   }
 
   @Override
-  public Path<?> propertyForDate(Root<Run> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, Run> builder, DateType type) {
     switch (type) {
       case CREATE:
-        return root.get(Run_.startDate);
+        return builder.getRoot().get(Run_.startDate);
       case ENTERED:
-        return root.get(Run_.creationTime);
+        return builder.getRoot().get(Run_.creationTime);
       case UPDATE:
-        return root.get(Run_.lastModified);
+        return builder.getRoot().get(Run_.lastModified);
       default:
         return null;
     }

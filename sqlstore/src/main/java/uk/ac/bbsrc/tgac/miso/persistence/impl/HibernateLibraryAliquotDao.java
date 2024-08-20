@@ -140,14 +140,14 @@ public class HibernateLibraryAliquotDao extends HibernateSaveDao<LibraryAliquot>
   }
 
   @Override
-  public Path<?> propertyForDate(Root<LibraryAliquot> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, LibraryAliquot> builder, DateType type) {
     switch (type) {
       case CREATE:
-        return root.get(LibraryAliquot_.creationDate);
+        return builder.getRoot().get(LibraryAliquot_.creationDate);
       case ENTERED:
-        return root.get(LibraryAliquot_.creationTime);
+        return builder.getRoot().get(LibraryAliquot_.creationTime);
       case UPDATE:
-        return root.get(LibraryAliquot_.lastUpdated);
+        return builder.getRoot().get(LibraryAliquot_.lastUpdated);
       default:
         return null;
     }
