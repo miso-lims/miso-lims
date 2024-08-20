@@ -269,12 +269,12 @@ public class HibernateBoxDao extends HibernateProviderDao<Box>
   }
 
   @Override
-  public Path<?> propertyForDate(Root<BoxImpl> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, BoxImpl> builder, DateType type) {
     switch (type) {
       case ENTERED:
-        return root.get(BoxImpl_.creationTime);
+        return builder.getRoot().get(BoxImpl_.creationTime);
       case UPDATE:
-        return root.get(BoxImpl_.lastModified);
+        return builder.getRoot().get(BoxImpl_.lastModified);
       default:
         return null;
     }

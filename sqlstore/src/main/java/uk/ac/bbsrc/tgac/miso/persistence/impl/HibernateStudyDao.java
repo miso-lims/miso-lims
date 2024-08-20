@@ -89,7 +89,7 @@ public class HibernateStudyDao extends HibernateSaveDao<Study>
   }
 
   @Override
-  public Path<?> propertyForDate(Root<StudyImpl> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, StudyImpl> builder, DateType type) {
     return null;
   }
 

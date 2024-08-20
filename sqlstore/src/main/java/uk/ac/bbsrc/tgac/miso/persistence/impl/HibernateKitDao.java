@@ -178,7 +178,7 @@ public class HibernateKitDao implements KitStore, JpaCriteriaPaginatedDataSource
   }
 
   @Override
-  public Path<?> propertyForDate(Root<KitDescriptor> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, KitDescriptor> builder, DateType type) {
     return null;
   }
 

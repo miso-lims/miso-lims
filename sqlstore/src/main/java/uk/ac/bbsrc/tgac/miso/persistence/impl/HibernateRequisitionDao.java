@@ -120,12 +120,12 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
   }
 
   @Override
-  public Path<?> propertyForDate(Root<Requisition> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, Requisition> builder, DateType type) {
     switch (type) {
       case ENTERED:
-        return root.get(Requisition_.created);
+        return builder.getRoot().get(Requisition_.created);
       case UPDATE:
-        return root.get(Requisition_.lastModified);
+        return builder.getRoot().get(Requisition_.lastModified);
       default:
         return null;
     }

@@ -70,7 +70,7 @@ public class HibernateTargetedSequencingDao extends HibernateSaveDao<TargetedSeq
   }
 
   @Override
-  public Path<?> propertyForDate(Root<TargetedSequencing> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, TargetedSequencing> builder, DateType type) {
     return null;
   }
 

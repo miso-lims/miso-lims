@@ -63,8 +63,8 @@ public class HibernateDeletionDao implements DeletionStore, JpaCriteriaPaginated
   }
 
   @Override
-  public Path<?> propertyForDate(Root<Deletion> root, DateType type) {
-    return root.get(Deletion_.changeTime);
+  public Path<?> propertyForDate(QueryBuilder<?, Deletion> builder, DateType type) {
+    return builder.getRoot().get(Deletion_.changeTime);
   }
 
   @Override

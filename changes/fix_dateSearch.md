@@ -1,0 +1,1 @@
+Error searching by date for some pages

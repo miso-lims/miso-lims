@@ -129,12 +129,12 @@ public class HibernateArrayDao extends HibernateSaveDao<Array>
   }
 
   @Override
-  public Path<?> propertyForDate(Root<Array> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, Array> builder, DateType type) {
     switch (type) {
       case ENTERED:
-        return root.get(Array_.creationTime);
+        return builder.getRoot().get(Array_.creationTime);
       case UPDATE:
-        return root.get(Array_.lastModified);
+        return builder.getRoot().get(Array_.lastModified);
       default:
         return null;
     }

@@ -76,15 +76,15 @@ public class HibernateProjectDao extends HibernateSaveDao<Project>
   }
 
   @Override
-  public Path<?> propertyForDate(Root<ProjectImpl> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, ProjectImpl> builder, DateType type) {
     switch (type) {
       case CREATE:
       case ENTERED:
-        return root.get(ProjectImpl_.creationTime);
+        return builder.getRoot().get(ProjectImpl_.creationTime);
       case UPDATE:
-        return root.get(ProjectImpl_.lastModified);
+        return builder.getRoot().get(ProjectImpl_.lastModified);
       case REB_EXPIRY:
-        return root.get(ProjectImpl_.rebExpiry);
+        return builder.getRoot().get(ProjectImpl_.rebExpiry);
       default:
         return null;
     }

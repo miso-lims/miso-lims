@@ -148,7 +148,7 @@ public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentMode
   }
 
   @Override
-  public Path<?> propertyForDate(Root<InstrumentModel> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, InstrumentModel> builder, DateType type) {
     return null;
   }
 

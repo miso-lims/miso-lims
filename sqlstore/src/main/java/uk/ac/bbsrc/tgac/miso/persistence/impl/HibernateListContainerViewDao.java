@@ -90,12 +90,12 @@ public class HibernateListContainerViewDao
   }
 
   @Override
-  public Path<?> propertyForDate(Root<ListContainerView> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, ListContainerView> builder, DateType type) {
     switch (type) {
       case ENTERED:
-        return root.get(ListContainerView_.created);
+        return builder.getRoot().get(ListContainerView_.created);
       case UPDATE:
-        return root.get(ListContainerView_.lastModified);
+        return builder.getRoot().get(ListContainerView_.lastModified);
       default:
         return null;
     }

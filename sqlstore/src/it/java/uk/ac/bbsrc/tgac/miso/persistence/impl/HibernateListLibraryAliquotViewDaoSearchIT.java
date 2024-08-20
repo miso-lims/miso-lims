@@ -13,8 +13,8 @@ public class HibernateListLibraryAliquotViewDaoSearchIT extends PaginationFilter
       EnumSet.of(SearchType.QUERY, SearchType.ID, SearchType.IDS, SearchType.DESIGN,
           SearchType.FREEZER, SearchType.DISTRIBUTED, SearchType.DISTRIBUTION_RECIPIENT, SearchType.TISSUE_ORIGIN,
           SearchType.TISSUE_TYPE, SearchType.PROJECT, SearchType.PLATFORM_TYPE, SearchType.BOX, SearchType.INDEX,
-          SearchType.POOL, SearchType.CREATED, SearchType.UPDATED, SearchType.RECEIVED, SearchType.WORKSET,
-          SearchType.CREATOR, SearchType.MODIFIER, SearchType.BULK_LOOKUP, SearchType.BARCODE);
+          SearchType.POOL, SearchType.ENTERED, SearchType.CREATED, SearchType.UPDATED, SearchType.RECEIVED,
+          SearchType.WORKSET, SearchType.CREATOR, SearchType.MODIFIER, SearchType.BULK_LOOKUP, SearchType.BARCODE);
   private static final List<String> SORT_FIELDS = Arrays.asList("alias", "lastModified", "library.parentSampleId",
       "library.parentSampleAlias", "libraryPlatformType", "library.platformType", "creatorName", "creationDate",
       "effectiveTissueOriginAlias", "effectiveTissueTypeAlias", "projectCode");

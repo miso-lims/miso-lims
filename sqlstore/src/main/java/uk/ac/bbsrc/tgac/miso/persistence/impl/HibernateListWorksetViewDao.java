@@ -64,12 +64,12 @@ public class HibernateListWorksetViewDao
   }
 
   @Override
-  public Path<?> propertyForDate(Root<ListWorksetView> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, ListWorksetView> builder, DateType type) {
     switch (type) {
       case ENTERED:
-        return root.get(ListWorksetView_.created);
+        return builder.getRoot().get(ListWorksetView_.created);
       case UPDATE:
-        return root.get(ListWorksetView_.lastModified);
+        return builder.getRoot().get(ListWorksetView_.lastModified);
       default:
         return null;
     }

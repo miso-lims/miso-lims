@@ -67,7 +67,7 @@ public class HibernateLibraryTemplateDao extends HibernateSaveDao<LibraryTemplat
   }
 
   @Override
-  public Path<?> propertyForDate(Root<LibraryTemplate> root, DateType type) {
+  public Path<?> propertyForDate(QueryBuilder<?, LibraryTemplate> builder, DateType type) {
     return null;
   }
 
