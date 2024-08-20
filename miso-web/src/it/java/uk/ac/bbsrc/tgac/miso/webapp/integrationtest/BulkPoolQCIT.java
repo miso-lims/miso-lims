@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.hibernate.criterion.Order;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,7 +19,9 @@ import com.google.common.collect.Sets;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC_;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.QueryBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkQCPage.QcColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
@@ -127,14 +128,14 @@ public class BulkPoolQCIT extends AbstractIT {
     // Goal: ensure that volume and volume units are updated by the QC
     BulkQCPage page = getAddPage(Arrays.asList(2201L), 1);
     HandsOnTable table = page.getTable();
-    
+
     Map<String, String> attrs = Maps.newLinkedHashMap();
     attrs.put(QcColumns.DATE, "2018-07-10");
     attrs.put(QcColumns.TYPE, "update volume qc");
     attrs.put(QcColumns.RESULT, "10.43");
-    
+
     fillRow(table, 0, attrs);
-    
+
     assertFalse(table.isWritable(QcColumns.POOL_ALIAS, 0));
     assertFalse(table.isWritable(QcColumns.UNITS, 0));
 
@@ -143,11 +144,14 @@ public class BulkPoolQCIT extends AbstractIT {
 
     PoolQC saved = getLatestQc();
     assertQCAttributes(attrs, saved);
-    
-    assertEquals(String.format("Expected volume to be updated to %s, instead got %f", "10.43", saved.getPool().getVolume()), 0,
+
+    assertEquals(
+        String.format("Expected volume to be updated to %s, instead got %f", "10.43", saved.getPool().getVolume()), 0,
         saved.getPool().getVolume().compareTo(new BigDecimal("10.43")));
-    assertEquals(String.format("Expected volume units to be updated to %s, instead got %s", VolumeUnit.MICROLITRES.getUnits(),
-        saved.getPool().getVolumeUnits().getUnits()), VolumeUnit.MICROLITRES, saved.getPool().getVolumeUnits());
+    assertEquals(
+        String.format("Expected volume units to be updated to %s, instead got %s", VolumeUnit.MICROLITRES.getUnits(),
+            saved.getPool().getVolumeUnits().getUnits()),
+        VolumeUnit.MICROLITRES, saved.getPool().getVolumeUnits());
   }
 
   @Test
@@ -155,14 +159,14 @@ public class BulkPoolQCIT extends AbstractIT {
     // Goal: ensure that volume and volume units are updated by the QC
     BulkQCPage page = getAddPage(Arrays.asList(2201L), 1);
     HandsOnTable table = page.getTable();
-    
+
     Map<String, String> attrs = Maps.newLinkedHashMap();
     attrs.put(QcColumns.DATE, "2018-07-10");
     attrs.put(QcColumns.TYPE, "update concentration qc");
     attrs.put(QcColumns.RESULT, "24.78");
-    
+
     fillRow(table, 0, attrs);
-    
+
     assertFalse(table.isWritable(QcColumns.POOL_ALIAS, 0));
     assertFalse(table.isWritable(QcColumns.UNITS, 0));
 
@@ -171,11 +175,16 @@ public class BulkPoolQCIT extends AbstractIT {
 
     PoolQC saved = getLatestQc();
     assertQCAttributes(attrs, saved);
-    
-    assertEquals(String.format("Expected concentration to be updated to %s, instead got %f", "24.78", saved.getPool().getConcentration()),
+
+    assertEquals(
+        String.format("Expected concentration to be updated to %s, instead got %f", "24.78",
+            saved.getPool().getConcentration()),
         0, saved.getPool().getConcentration().compareTo(new BigDecimal("24.78")));
-    assertEquals(String.format("Expected concentration units to be updated to %s, instead got %s", ConcentrationUnit.NANOMOLAR.getUnits(),
-        saved.getPool().getConcentrationUnits().getUnits()), ConcentrationUnit.NANOMOLAR, saved.getPool().getConcentrationUnits());
+    assertEquals(
+        String.format("Expected concentration units to be updated to %s, instead got %s",
+            ConcentrationUnit.NANOMOLAR.getUnits(),
+            saved.getPool().getConcentrationUnits().getUnits()),
+        ConcentrationUnit.NANOMOLAR, saved.getPool().getConcentrationUnits());
   }
 
   private void fillRow(HandsOnTable table, int rowNum, Map<String, String> attributes) {
@@ -186,7 +195,8 @@ public class BulkPoolQCIT extends AbstractIT {
     String formatString = hintMessage + " row %d column '%s' value";
     attributes.forEach((key, val) -> {
       if (isStringEmptyOrNull(val)) {
-        assertTrue(String.format(formatString, rowNum, key) + " expected empty", isStringEmptyOrNull(table.getText(key, rowNum)));
+        assertTrue(String.format(formatString, rowNum, key) + " expected empty",
+            isStringEmptyOrNull(table.getText(key, rowNum)));
       } else {
         assertEquals(String.format(formatString, rowNum, key), val, table.getText(key, rowNum));
       }
@@ -200,12 +210,14 @@ public class BulkPoolQCIT extends AbstractIT {
     testQCAttribute(QcColumns.UNITS, attributes, PoolQc, qc -> qc.getType().getUnits());
   }
 
-  private <T> void testQCAttribute(String column, Map<String, String> attributes, T object, Function<T, String> getter) {
+  private <T> void testQCAttribute(String column, Map<String, String> attributes, T object,
+      Function<T, String> getter) {
     if (attributes.containsKey(column)) {
       String objectAttribute = getter.apply(object);
       String tableAttribute = cleanNullValues(column, attributes.get(column));
       if (tableAttribute == null) {
-        assertTrue(String.format("persisted attribute expected empty '%s'", column), isStringEmptyOrNull(objectAttribute));
+        assertTrue(String.format("persisted attribute expected empty '%s'", column),
+            isStringEmptyOrNull(objectAttribute));
       } else {
         assertEquals(String.format("persisted attribute '%s'", column), tableAttribute, objectAttribute);
       }
@@ -217,10 +229,10 @@ public class BulkPoolQCIT extends AbstractIT {
   }
 
   private PoolQC getLatestQc() {
-    return (PoolQC) getSession().createCriteria(PoolQC.class)
-        .addOrder(Order.desc("qcId"))
-        .setMaxResults(1)
-        .uniqueResult();
+    QueryBuilder<PoolQC, PoolQC> builder = new QueryBuilder<>(getSession(), PoolQC.class, PoolQC.class);
+    builder.addSort(builder.getRoot().get(PoolQC_.qcId), false);
+    List<PoolQC> qc = builder.getResultList(1, 0);
+    return qc.size() == 0 ? null : qc.get(0);
   }
 
 }
