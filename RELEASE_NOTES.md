@@ -7,6 +7,14 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.21.2] - 2024-08-20
+
+### Fixed
+
+* Error adding storage to freezers
+* Error searching by date for some pages
+
+
 ## [2.21.1] - 2024-08-16
 
 ### Fixed
@@ -16,6 +24,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * Error adding storage to freezers
+* Error searching by date for some pages
 
 
 ## [2.21.0] - 2024-08-15
@@ -37,7 +46,7 @@ Starting with version 1.29.0, the format of this file is based on
 
 * Pinery showing the wrong value for "Target Cell Revovery" sample attribute 
 * Error adding storage to freezers
-
+* Error searching by date for some pages
 
 ## [2.20.0] - 2024-06-20
 
