@@ -6,11 +6,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
@@ -22,7 +22,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.ProviderDao;
 @Repository
 public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
 
-  @Autowired
+  @PersistenceContext
   EntityManager entityManager;
 
   private final Class<T> resultClass;
