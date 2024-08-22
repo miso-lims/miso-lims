@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
@@ -20,7 +21,7 @@ public class SampleTissuePieceImpl extends SampleTissueProcessingImpl implements
   @JoinColumn(name = "tissuePieceType")
   private TissuePieceType tissuePieceType;
 
-  @ManyToOne(targetEntity = SampleSlideImpl.class)
+  @ManyToOne(targetEntity = SampleSlideImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "referenceSlideId")
   private SampleSlide referenceSlide;
 

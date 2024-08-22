@@ -4,6 +4,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
@@ -25,7 +26,7 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
 
   private Integer slidesConsumed;
 
-  @ManyToOne(targetEntity = SampleSlideImpl.class)
+  @ManyToOne(targetEntity = SampleSlideImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "referenceSlideId")
   private SampleSlide referenceSlide;
 

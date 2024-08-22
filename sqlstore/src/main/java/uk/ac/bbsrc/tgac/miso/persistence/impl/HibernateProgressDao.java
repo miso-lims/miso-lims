@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
@@ -12,6 +11,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.ProgressImpl;
@@ -25,7 +25,7 @@ public class HibernateProgressDao implements ProgressStore {
   private EntityManager entityManager;
 
   public Session currentSession() {
-    return getEntityManager().unwrap(Session.class);
+    return entityManager.unwrap(Session.class);
   }
 
   public EntityManager getEntityManager() {
@@ -69,12 +69,13 @@ public class HibernateProgressDao implements ProgressStore {
     if (!progress.isSaved()) {
       currentSession().persist(progress);
     } else {
-      currentSession().merge(progress);
+      // TODO figure out why merge() doesn't work
+      currentSession().update(progress);
     }
 
     if (progress.getSteps() != null) {
       for (ProgressStep step : progress.getSteps()) {
-        if (Objects.isNull(currentSession().find(ProgressStep.class, step.getId()))) {
+        if (currentSession().get(AbstractProgressStep.class, step.getId()) == null) {
           currentSession().persist(step);
         } else {
           currentSession().merge(step);

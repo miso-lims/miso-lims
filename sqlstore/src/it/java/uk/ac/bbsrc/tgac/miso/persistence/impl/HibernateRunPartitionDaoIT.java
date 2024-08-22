@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.eaglegenomics.simlims.core.User;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
@@ -37,7 +38,7 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
 
   private HibernateRunPartitionDao dao;
 
-  @Autowired
+  @PersistenceContext
   EntityManager entityManager;
 
   @Before

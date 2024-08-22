@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Arrays;
@@ -126,6 +127,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     QueryBuilder<Tuple, T> resultQueryBuilder = new QueryBuilder<>(currentSession(), getEntityClass(), Tuple.class);
 
     Path<?> idProperty = idQueryBuilder.getRoot().get(getIdProperty());
+    Path<?> resultIdProperty = resultQueryBuilder.getRoot().get(getIdProperty());
     Path<?> sortProperty = sortCol == null ? null : propertyForSortColumn(idQueryBuilder, sortCol);
     Path<?> resultSortProperty = sortCol == null ? null : propertyForSortColumn(resultQueryBuilder, sortCol);
     if (sortProperty != null && !idProperty.equals(sortProperty)) {
@@ -139,10 +141,10 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     // deterministic)
     if (sortProperty != null && !idProperty.equals(sortProperty)) {
       idQueryBuilder.addSort(idProperty, true);
-      resultQueryBuilder.addSort(idProperty, true);
+      resultQueryBuilder.addSort(resultIdProperty, true);
     } else {
       idQueryBuilder.addSort(idProperty, ascending);
-      resultQueryBuilder.addSort(idProperty, ascending);
+      resultQueryBuilder.addSort(resultIdProperty, ascending);
     }
 
     for (PaginationFilter filter : filters) {
@@ -156,7 +158,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
       return Collections.emptyList();
     }
     // We do this in two steps to make a smaller query that that the database can optimise
-    resultQueryBuilder.addPredicate(idProperty.in(ids));
+    resultQueryBuilder.addPredicate(resultIdProperty.in(ids));
     // We additionally need to select the sort column in the result set for the database to provide us
     // with duplicate-free results sorted by the column specified.
     resultQueryBuilder.setColumns(resultQueryBuilder.getRoot(), resultSortProperty);
@@ -244,6 +246,12 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
         LocalDate startDate = LocalDate.ofInstant(start.toInstant(), ZoneId.systemDefault());
         LocalDate endDate = LocalDate.ofInstant(end.toInstant(), ZoneId.systemDefault());
         builder.addPredicate(builder.getCriteriaBuilder().between(localDateProperty, startDate, endDate));
+      } else if (propertyPath.getJavaType() == Timestamp.class) {
+        @SuppressWarnings("unchecked")
+        Path<Timestamp> timestampProperty = (Path<Timestamp>) propertyPath;
+        Timestamp startDate = new java.sql.Timestamp(start.getTime());
+        Timestamp endDate = new java.sql.Timestamp(end.getTime());
+        builder.addPredicate(builder.getCriteriaBuilder().between(timestampProperty, startDate, endDate));
       } else {
         throw new IllegalArgumentException("Unhandled date class: %s".formatted(propertyPath.getJavaType().getName()));
       }
