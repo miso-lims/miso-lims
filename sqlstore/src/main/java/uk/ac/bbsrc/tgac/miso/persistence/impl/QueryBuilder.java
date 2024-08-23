@@ -275,7 +275,7 @@ public class QueryBuilder<R, T> {
     } else if (containsWildcards(text)) {
       String sanitized = sanitizeQueryString(text);
       String finalText = replaceWildcards(sanitized);
-      return criteriaBuilder.like(path, finalText);
+      return criteriaBuilder.like(path, finalText, '\\');
     } else {
       String sanitized = sanitizeQueryString(text);
       String finalText = "%" + sanitized + "%";

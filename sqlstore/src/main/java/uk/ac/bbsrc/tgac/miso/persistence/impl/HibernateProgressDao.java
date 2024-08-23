@@ -68,9 +68,6 @@ public class HibernateProgressDao implements ProgressStore {
   public Progress save(Progress progress) {
     if (!progress.isSaved()) {
       currentSession().persist(progress);
-    } else {
-      // TODO figure out why merge() doesn't work
-      currentSession().update(progress);
     }
 
     if (progress.getSteps() != null) {
@@ -82,6 +79,7 @@ public class HibernateProgressDao implements ProgressStore {
         }
       }
     }
+    currentSession().merge(progress);
 
     return progress;
   }
