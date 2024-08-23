@@ -41,17 +41,17 @@ public class ExcelSpreadsheetWrapper implements SpreadsheetWrapper {
     XSSFRow row = sheet.getRow(rowNum);
     XSSFCell cell = row.getCell(colNum, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
     switch (cell.getCellTypeEnum()) {
-    case BLANK:
-    case STRING:
-      return cell.getStringCellValue();
-    case NUMERIC:
-      if (DateUtil.isCellDateFormatted(cell)) {
-        return LimsUtils.formatDate(cell.getDateCellValue());
-      } else {
-        return Double.toString(cell.getNumericCellValue()).replaceFirst("\\.0+$", "");
-      }
-    default:
-      throw new IllegalArgumentException("Unhandled cell type");
+      case BLANK:
+      case STRING:
+        return cell.getStringCellValue();
+      case NUMERIC:
+        if (DateUtil.isCellDateFormatted(cell)) {
+          return LimsUtils.formatDate(cell.getDateCellValue());
+        } else {
+          return cell.getRawValue();
+        }
+      default:
+        throw new IllegalArgumentException("Unhandled cell type");
     }
   }
 
