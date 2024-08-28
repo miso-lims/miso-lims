@@ -48,7 +48,7 @@ BulkTarget.containermodel = (function () {
           min: 1,
         },
         (function () {
-          var column = BulkUtils.columns.makeBoolean("Fallback", "fallback", true);
+          var column = BulkUtils.columns.makeBoolean("Fallback", "fallback", true, true);
           column.description =
             "Fallback containers do not represent actual products, and are only intended for use" +
             " when the real container model cannot be determined.";

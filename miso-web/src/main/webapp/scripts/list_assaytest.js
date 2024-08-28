@@ -54,6 +54,27 @@ ListTarget.assaytest = (function () {
           iSortPriority: 1,
         },
         {
+          sTitle: "Tissue Origin",
+          mData: "tissueOriginId",
+          mRender: function (data, type, full) {
+            if (!data) {
+              return null;
+            } else {
+              var tissueOrigin = Utils.array.findUniqueOrThrow(
+                Utils.array.idPredicate(data),
+                Constants.tissueOrigins
+              );
+              var text = (full.negateTissueOrigin ? "NOT " : "") + tissueOrigin.alias;
+              if (type === "display") {
+                return '<span title="' + tissueOrigin.description + '">' + text + "</span>";
+              } else {
+                return text;
+              }
+            }
+          },
+          include: Constants.isDetailedSample,
+        },
+        {
           sTitle: "Tissue Type",
           mData: "tissueTypeId",
           mRender: function (data, type, full) {

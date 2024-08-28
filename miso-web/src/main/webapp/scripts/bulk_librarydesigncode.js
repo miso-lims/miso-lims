@@ -35,6 +35,7 @@ BulkTarget.librarydesigncode = (function ($) {
         BulkUtils.columns.makeBoolean(
           "Targeted Sequencing Req'd",
           "targetedSequencingRequired",
+          true,
           true
         ),
       ];

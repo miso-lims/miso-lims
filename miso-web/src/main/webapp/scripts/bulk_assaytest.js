@@ -27,6 +27,24 @@ BulkTarget.assaytest = (function ($) {
       return [
         BulkUtils.columns.simpleAlias(50),
         {
+          title: "Tissue Origin",
+          data: "tissueOriginId",
+          type: "dropdown",
+          source: Constants.tissueOrigins,
+          getItemLabel: function (item) {
+            return item.alias + " (" + item.description + ")";
+          },
+          getItemValue: Utils.array.getId,
+          sortSource: true,
+          include: Constants.isDetailedSample,
+        },
+        BulkUtils.columns.makeBoolean(
+          "Negate Tissue Origin",
+          "negateTissueOrigin",
+          true,
+          Constants.isDetailedSample
+        ),
+        {
           title: "Tissue Type",
           data: "tissueTypeId",
           type: "dropdown",
@@ -38,7 +56,12 @@ BulkTarget.assaytest = (function ($) {
           sortSource: true,
           include: Constants.isDetailedSample,
         },
-        BulkUtils.columns.makeBoolean("Negate Tissue Type", "negateTissueType", true),
+        BulkUtils.columns.makeBoolean(
+          "Negate Tissue Type",
+          "negateTissueType",
+          true,
+          Constants.isDetailedSample
+        ),
         {
           title: "Extraction Class",
           data: "extractionClassId",
@@ -104,9 +127,9 @@ BulkTarget.assaytest = (function ($) {
           var col = BulkUtils.columns.makeBoolean(
             "Repeat Per Timepoint",
             "repeatPerTimepoint",
-            true
+            true,
+            Constants.isDetailedSample
           );
-          col.include = Constants.isDetailedSample;
           col.description =
             "If true, the test must be repeated for each timepoint received; if false, the test must " +
             "only be completed once per identity";

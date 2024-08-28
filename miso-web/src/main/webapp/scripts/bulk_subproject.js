@@ -35,7 +35,7 @@ BulkTarget.subproject = (function ($) {
         },
         BulkUtils.columns.simpleAlias(255),
         BulkUtils.columns.description,
-        BulkUtils.columns.makeBoolean("Priority", "priority", true),
+        BulkUtils.columns.makeBoolean("Priority", "priority", true, true),
         {
           title: "Reference Genome",
           data: "referenceGenomeId",

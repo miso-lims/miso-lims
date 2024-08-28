@@ -1565,6 +1565,10 @@ public class MisoClient implements Lims {
   private static final RowMapper<AssayTest> assayTestRowMapper = (rs, rowNum) -> {
     AssayTest test = new DefaultAssayTest();
     test.setName(rs.getString("name"));
+    test.setTissueOrigin(rs.getString("tissueOrigin"));
+    if (test.getTissueOrigin() != null) {
+      test.setNegateTissueOrigin(rs.getBoolean("negateTissueOrigin"));
+    }
     test.setTissueType(rs.getString("tissueType"));
     if (test.getTissueType() != null) {
       test.setNegateTissueType(rs.getBoolean("negateTissueType"));
