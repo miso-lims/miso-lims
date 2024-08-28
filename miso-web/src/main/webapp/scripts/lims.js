@@ -1280,7 +1280,8 @@ Utils.validation = {
   dateTimeRegex:
     "^(19|20)[0-9]{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01]) ([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$",
   sanitizeRegex: "^[^<>&\\t\\n\\r]*$",
-  uriComponentRegex: "^[^<>&%;/\\\\]*$", // problem characters even when encoded in URI components: %;\/
+  uriComponentRegex: "^[^<>&%;/\\t\\n\\r\\\\]*$", // problem characters even when encoded in URI components: <>&%;\/
+  uriRegex: "^[^<>\\t\\n\\r\\\\]*$", // problem characters in full URIs: <>\
   alphanumRegex: "^[-_\\w]*$",
   unicodeWordRegex: "^[\\p{L}0-9_\\^\\-\\.\\s]+$",
   emailRegex: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,

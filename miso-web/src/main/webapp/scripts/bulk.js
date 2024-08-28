@@ -3363,23 +3363,24 @@ BulkUtils = (function ($) {
 
   function textValidator(column) {
     var sanitize = new RegExp(Utils.validation.sanitizeRegex);
-    var regex = column.regex ? new RegExp(column.regex) : null;
     return function (value, callback) {
       if (Utils.validation.isEmpty(value)) {
         return validateEmpty(this, callback);
       } else if (column.maxLength && value.length > column.maxLength) {
         callback(false);
         return "Max length is " + column.maxLength + " characters";
+      } else if (column.regex) {
+        var regex = new RegExp(column.regex);
+        if (!regex.test(value)) {
+          callback(false);
+          return "Does not match expected pattern";
+        }
       } else if (!sanitize.test(value)) {
         callback(false);
         return "Cannot contain tabs, line breaks, or the following characters: <>&";
-      } else if (regex && !regex.test(value)) {
-        callback(false);
-        return "Does not match expected pattern";
-      } else {
-        callback(true);
-        return null;
       }
+      callback(true);
+      return null;
     };
   }
 
