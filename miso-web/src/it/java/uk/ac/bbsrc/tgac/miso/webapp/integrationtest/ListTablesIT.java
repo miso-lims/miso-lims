@@ -1017,9 +1017,10 @@ public class ListTablesIT extends AbstractIT {
 
   @Test
   public void testListAssayTestsSetup() throws Exception {
-    testPageSetup(ListTarget.ASSAY_TESTS, Sets.newHashSet(Columns.ALIAS, Columns.TISSUE_TYPE, Columns.EXTRACTION_CLASS,
-        Columns.LIBRARY_DESIGN_CODE_FULL, Columns.LIBRARY_QUALIFICATION_METHOD, Columns.PERMITTED_SAMPLES,
-        Columns.REPEAT));
+    testPageSetup(ListTarget.ASSAY_TESTS,
+        Sets.newHashSet(Columns.ALIAS, Columns.TISSUE_ORIGIN, Columns.TISSUE_TYPE, Columns.EXTRACTION_CLASS,
+            Columns.LIBRARY_DESIGN_CODE_FULL, Columns.LIBRARY_QUALIFICATION_METHOD, Columns.PERMITTED_SAMPLES,
+            Columns.REPEAT));
   }
 
   @Test
