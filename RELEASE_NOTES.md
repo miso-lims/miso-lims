@@ -7,6 +7,22 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.22.0] - 2024-08-29
+
+### Added
+
+* Ability to specify a tissue origin for assay tests (detailed sample)
+
+### Fixed
+
+* The ampersand ("&") character was not allowed in SOP URLs
+* When importing Excel files, numbers were being converted to scientific notation
+
+### Upgrade Notes
+
+* Updated Pinery to 2.36.0
+
+
 ## [2.21.2] - 2024-08-20
 
 ### Fixed
