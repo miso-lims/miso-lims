@@ -4,8 +4,7 @@ import java.util.List;
 
 public class BarcodableReference {
 
-  @SuppressWarnings("rawtypes")
-  public static class TupleTransformer implements org.hibernate.query.TupleTransformer {
+  public static class TupleTransformer implements org.hibernate.query.TupleTransformer<BarcodableReference> {
     private final String entityType;
 
     public TupleTransformer(String entityType) {
@@ -13,17 +12,16 @@ public class BarcodableReference {
     }
 
     @Override
-    public Object transformTuple(Object[] tuple, String[] aliases) {
+    public BarcodableReference transformTuple(Object[] tuple, String[] aliases) {
       String secondaryLabel = tuple.length < 3 ? null : (String) tuple[2];
       return new BarcodableReference(entityType, (long) tuple[0], (String) tuple[1], secondaryLabel);
     }
 
   };
 
-  @SuppressWarnings("rawtypes")
-  public static class ResultListTransformer implements org.hibernate.query.ResultListTransformer {
+  public static class ResultListTransformer implements org.hibernate.query.ResultListTransformer<BarcodableReference> {
     @Override
-    public List transformList(List collection) {
+    public List<BarcodableReference> transformList(List<BarcodableReference> collection) {
       return collection;
     }
   }

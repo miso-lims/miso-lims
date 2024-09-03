@@ -233,7 +233,6 @@ public class BulkLibraryQCIT extends AbstractIT {
   private LibraryQC getLatestQc() {
     QueryBuilder<LibraryQC, LibraryQC> builder = new QueryBuilder<>(getSession(), LibraryQC.class, LibraryQC.class);
     builder.addSort(builder.getRoot().get(LibraryQC_.qcId), false);
-    List<LibraryQC> qc = builder.getResultList(1, 0);
-    return qc.size() == 0 ? null : qc.get(0);
+    return builder.getSingleResultOrNull();
   }
 }

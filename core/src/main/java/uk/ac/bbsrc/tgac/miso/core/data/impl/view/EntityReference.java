@@ -7,21 +7,20 @@ import org.hibernate.query.TupleTransformer;
 
 public class EntityReference {
 
-  @SuppressWarnings("rawtypes")
-  public static final TupleTransformer TUPLE_TRANSFORMER = new TupleTransformer() {
+  public static final TupleTransformer<EntityReference> TUPLE_TRANSFORMER = new TupleTransformer<EntityReference>() {
     @Override
-    public Object transformTuple(Object[] tuple, String[] aliases) {
+    public EntityReference transformTuple(Object[] tuple, String[] aliases) {
       return new EntityReference((long) tuple[0], (String) tuple[1]);
     }
   };
 
-  @SuppressWarnings("rawtypes")
-  public static final ResultListTransformer RESULT_LIST_TRANSFORMER = new ResultListTransformer() {
-    @Override
-    public List transformList(List collection) {
-      return collection;
-    }
-  };
+  public static final ResultListTransformer<EntityReference> RESULT_LIST_TRANSFORMER =
+      new ResultListTransformer<EntityReference>() {
+        @Override
+        public List<EntityReference> transformList(List<EntityReference> collection) {
+          return collection;
+        }
+      };
 
   private final long id;
   private final String label;
