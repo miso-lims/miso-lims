@@ -169,13 +169,12 @@ public class HibernateBarcodableViewDao implements BarcodableViewDao {
         SequencingContainerModel_.ALIAS, null);
   }
 
-  private BarcodableReference getItemWithBarcode(String identificationBarcode, Class<?> implementationClass,
+  private <T> BarcodableReference getItemWithBarcode(String identificationBarcode, Class<T> implementationClass,
       String entityTypeLabel, String idField,
       String primaryLabelField, String secondaryLabelField) throws IOException {
 
-    @SuppressWarnings("unchecked")
-    QueryBuilder<BarcodableReference, ?> builder =
-        new QueryBuilder<>(currentSession(), implementationClass, Object[].class,
+    QueryBuilder<BarcodableReference, T> builder =
+        new QueryBuilder<BarcodableReference, T>(currentSession(), implementationClass, BarcodableReference.class,
             new BarcodableReference.TupleTransformer(entityTypeLabel));
     Root<?> root = builder.getRoot();
     builder.addPredicate(

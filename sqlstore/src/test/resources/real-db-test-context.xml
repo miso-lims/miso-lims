@@ -26,7 +26,7 @@
 
   <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
     <property name="showSql" value="false" />
-    <property name="generateDdl" value="true" />
+    <property name="generateDdl" value="false" />
   </bean>
 
   <tx:annotation-driven />

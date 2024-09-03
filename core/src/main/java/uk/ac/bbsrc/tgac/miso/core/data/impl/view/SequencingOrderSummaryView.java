@@ -62,7 +62,7 @@ public class SequencingOrderSummaryView implements Serializable {
   @PrimaryKeyJoinColumn
   private SequencingOrderFulfillmentView fulfillmentView;
 
-  @OneToOne(targetEntity = SequencingOrderNoContainerModelFulfillmentView.class)
+  @OneToOne
   @PrimaryKeyJoinColumn
   private SequencingOrderNoContainerModelFulfillmentView noContainerModelFulfillmentView;
 

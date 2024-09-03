@@ -71,13 +71,6 @@ public class BulkSaveOperation<T extends Identifiable> {
     awaitingItemResult = false;
   }
 
-  public synchronized void addSuccess(T saved) {
-    assertAwaitingResult();
-    savedIds.add(saved.getId());
-    progress++;
-    awaitingItemResult = false;
-  }
-
   public synchronized void addFailure(ValidationException e) {
     assertAwaitingResult();
     errorsByRow.put(progress, e.getErrors());

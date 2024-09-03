@@ -249,8 +249,8 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
       } else if (propertyPath.getJavaType() == Timestamp.class) {
         @SuppressWarnings("unchecked")
         Path<Timestamp> timestampProperty = (Path<Timestamp>) propertyPath;
-        Timestamp startDate = new java.sql.Timestamp(start.getTime());
-        Timestamp endDate = new java.sql.Timestamp(end.getTime());
+        Timestamp startDate = new Timestamp(start.getTime());
+        Timestamp endDate = new Timestamp(end.getTime());
         builder.addPredicate(builder.getCriteriaBuilder().between(timestampProperty, startDate, endDate));
       } else {
         throw new IllegalArgumentException("Unhandled date class: %s".formatted(propertyPath.getJavaType().getName()));
