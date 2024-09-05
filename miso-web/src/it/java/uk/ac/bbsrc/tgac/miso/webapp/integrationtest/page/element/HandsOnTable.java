@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -26,13 +27,16 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class HandsOnTable extends AbstractElement {
 
-  private static final By columnHeadingsSelector = By.cssSelector("div.ht_master table.htCore span.colHeader:not(.cornerHeader)");
+  private static final By columnHeadingsSelector =
+      By.cssSelector("div.ht_master table.htCore span.colHeader:not(.cornerHeader)");
   private static final By inputRowsSelector = By.cssSelector("div.ht_master table.htCore tbody tr");
   private static final By lockedRowsSelector = By.cssSelector("div.ht_clone_left table.htCore tbody tr");
   private static final By inputCellSelector = By.tagName("td");
   private static final By dropdownArrowSelector = By.className("htAutocompleteArrow");
-  private static final By activeDropdownSelector = By.cssSelector("div.handsontableInputHolder:not([style*='z-index: -1'])");
-  private static final By activeCellEditorSelector = By.cssSelector("div.handsontableInputHolder:not([style*='z-index: -1']) > textarea");
+  private static final By activeDropdownSelector =
+      By.cssSelector("div.handsontableInputHolder:not([style*='z-index: -1'])");
+  private static final By activeCellEditorSelector =
+      By.cssSelector("div.handsontableInputHolder:not([style*='z-index: -1']) > textarea");
   private static final By dropdownOptionRowsSelector = By.cssSelector("div.ht_master table.htCore > tbody > tr");
   private final List<String> columnHeadings;
   private final List<WebElement> inputRows;
@@ -72,7 +76,8 @@ public class HandsOnTable extends AbstractElement {
   }
 
   /**
-   * Enters text into a writable cell. Will fail if the cell is read-only. See {@link #isWritable(String, int)}
+   * Enters text into a writable cell. Will fail if the cell is read-only. See
+   * {@link #isWritable(String, int)}
    * 
    * @param columnHeading
    * @param rowNum data row number. 0 is the first data row
@@ -90,7 +95,11 @@ public class HandsOnTable extends AbstractElement {
     WebElement cell = getCell(columnHeading, rowNum);
     cancelEditing();
     if (!cell.getAttribute("class").contains("current")) {
-      cell.click();
+      try {
+        cell.click();
+      } catch (ElementClickInterceptedException e) {
+        throw new RuntimeException("Error setting row %d %s to '%s'".formatted(rowNum, columnHeading, text), e);
+      }
       waitUntil((driver) -> getCell(columnHeading, rowNum).getAttribute("class").contains("current"));
     }
     WebElement cellEditor = findElementIfExists(activeCellEditorSelector);
@@ -184,8 +193,8 @@ public class HandsOnTable extends AbstractElement {
   }
 
   /**
-   * Use with old HOT interface (HotTargets) only. Those using the new bulk interface (BulkTargets) should
-   * implement BulkPage and use its save method instead
+   * Use with old HOT interface (HotTargets) only. Those using the new bulk interface (BulkTargets)
+   * should implement BulkPage and use its save method instead
    * 
    * @param confirmRequired
    * @return
@@ -196,8 +205,8 @@ public class HandsOnTable extends AbstractElement {
   }
 
   /**
-   * Use with old HOT interface (HotTargets) only. Those using the new bulk interface (BulkTargets) should
-   * implement BulkPage and use its save method instead
+   * Use with old HOT interface (HotTargets) only. Those using the new bulk interface (BulkTargets)
+   * should implement BulkPage and use its save method instead
    * 
    * @param confirmRequired
    * @return
@@ -215,7 +224,8 @@ public class HandsOnTable extends AbstractElement {
   }
 
   /**
-   * Remove non-ASCII characters from a String. This is mainly to get rid of the dropdown arrow that becomes part of the text
+   * Remove non-ASCII characters from a String. This is mainly to get rid of the dropdown arrow that
+   * becomes part of the text
    * 
    * @param option String to clean
    * @return cleaned String

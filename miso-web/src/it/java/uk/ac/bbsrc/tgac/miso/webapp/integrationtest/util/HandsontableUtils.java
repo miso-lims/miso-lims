@@ -10,16 +10,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTableSaveResult;
 
 public class HandsontableUtils {
-
-  private static final Logger log = LoggerFactory.getLogger(HandsontableUtils.class);
 
   private HandsontableUtils() {
     throw new IllegalStateException("Util class not intended for instantiation");
@@ -50,22 +45,6 @@ public class HandsontableUtils {
 
   public static void fillRow(HandsOnTable table, int rowNum, Map<String, String> attributes) {
     attributes.forEach((key, val) -> table.enterText(key, rowNum, val));
-  }
-
-  public static void saveAndAssertSuccess(HandsOnTable table) {
-    saveAndAssertSuccess(table, false);
-  }
-
-  public static void saveAndAssertSuccess(HandsOnTable table, boolean confirmRequired) {
-    HandsOnTableSaveResult result = table.save(confirmRequired);
-
-    if (result.getItemsSaved() != table.getRowCount()) {
-      log.error(result.printSummary());
-    }
-
-    assertEquals("Save count", table.getRowCount(), result.getItemsSaved());
-    assertTrue("Server error messages", result.getServerErrors().isEmpty());
-    assertTrue("Save error messages", result.getSaveErrors().isEmpty());
   }
 
   public static <T> void assertEntityAttribute(String column, Map<String, String> attributes, T object,
