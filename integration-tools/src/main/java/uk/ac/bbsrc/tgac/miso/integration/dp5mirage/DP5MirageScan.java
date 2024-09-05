@@ -15,8 +15,6 @@ import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 public class DP5MirageScan implements BoxScan {
 
   private final JsonNode scan;
-  private final String[][] barcodes;
-  private final DP5MirageScanPosition[] formattedScan;
 
   /**
    * Constructs a new DP5MirageScan to wrap scan data from a DP5MirageScanner
@@ -25,46 +23,6 @@ public class DP5MirageScan implements BoxScan {
    */
   public DP5MirageScan(JsonNode scan) {
     this.scan = scan;
-
-    barcodes = new String[scan.get("tubeBarcode").get(scan.get("tubeBarcode").size()-1).get(
-        "row").asInt()][scan.get("tubeBarcode").get(scan.get("tubeBarcode").size()-1).get("column").asInt()];
-
-    // Populate barcodes array
-    for(int i = 0; i < scan.get("tubeBarcode").size(); i++) {
-      barcodes[scan.get("tubeBarcode").get(i).get("row").asInt()-1][scan.get("tubeBarcode").get(i).get("column").asInt()-1] = String.valueOf(
-          scan.get("tubeBarcode").get(i).get("barcode"));
-    }
-
-    // Create list of DP5MirageScanPosition objects
-    ObjectMapper objectMapper = new ObjectMapper();
-    List<DP5MirageScanPosition> positions = objectMapper.convertValue(scan.get("tubeBarcode"),
-        new TypeReference<>() {
-        });
-
-    // Convert to array
-    formattedScan = positions.toArray(new DP5MirageScanPosition[scan.get("tubeBarcode").size()]);
-    for(DP5MirageScanPosition pos: formattedScan) {
-      System.out.println(pos.toString()); // TODO testing only
-    }
-
-    // TODO testing only
-    System.out.println(scan.get("tubeBarcode").toString());
-    System.out.println("\n");
-    System.out.println("Get barcode at A01: " + getBarcode("A01"));
-    System.out.println("Get barcode at D 5: " + getBarcode('D', 05));
-    System.out.println("Get barcode at [1, 1]: " + getBarcode(1, 1));
-    System.out.println("Get barcode array: " + Arrays.deepToString(getBarcodesArray()));
-    System.out.println("Get barcodes map: " + getBarcodesMap());
-    System.out.println("Is box full of tubes? " + isFull());
-    System.out.println("No tubes?: " + isEmpty());
-    System.out.println("Number of tubes in the box: " + getTubeCount());
-    System.out.println("Maximum number of tubes in the box: " + getMaximumTubeCount());
-    System.out.println("Failed to read barcode from any tube? " + hasReadErrors());
-    System.out.println("List of read error positions; " + getReadErrorPositions().toString());
-    System.out.println("Row count: " + getRowCount());
-    System.out.println("Column count: " + getColumnCount());
-    System.out.println("NoReadLabel: " + getNoReadLabel());
-    System.out.println("NoTubeLabel: " + getNoTubeLabel());
   }
 
   /**
@@ -92,7 +50,9 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public String getBarcode(char row, int column) {
-    return barcodes[BoxUtils.fromRowChar(row)][column -1];
+    // We need to subtract 1 from column because of zero-based index
+    String[][] barcodes = getBarcodesArray();
+    return barcodes[BoxUtils.fromRowChar(row)][column-1];
   }
 
   /**
@@ -106,6 +66,7 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public String getBarcode(int row, int column) {
+    String[][] barcodes = getBarcodesArray();
     return barcodes[row -1][column -1];
   }
 
@@ -119,6 +80,15 @@ public class DP5MirageScan implements BoxScan {
   public String[][] getBarcodesArray() {
     // scan is immutable and already returns a defensive copy, so returning this does not break
     // immutability
+    String[][] barcodes =
+        new String[scan.get("tubeBarcode").get(scan.get("tubeBarcode").size()-1).get(
+        "row").asInt()][scan.get("tubeBarcode").get(scan.get("tubeBarcode").size()-1).get("column").asInt()];
+
+    // Populate barcodes array
+    for(int i = 0; i < scan.get("tubeBarcode").size(); i++) {
+      barcodes[scan.get("tubeBarcode").get(i).get("row").asInt()-1][scan.get("tubeBarcode").get(i).get("column").asInt()-1] = String.valueOf(
+          scan.get("tubeBarcode").get(i).get("barcode"));
+    }
     return barcodes;
   }
 
@@ -132,7 +102,7 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public Map<String, String> getBarcodesMap() {
-    String[][] array = barcodes.clone();
+    String[][] array = getBarcodesArray();
     Map<String, String> map = new HashMap<>();
     for (int row = 0; row < array.length; row++) {
       for (int col = 0; col < array[row].length; col++) {
@@ -148,9 +118,8 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public boolean isFull() {
-    // TODO review the conditions
-    for(DP5MirageScanPosition position: formattedScan) {
-      if(position.getDecodeStatus().equals("EMPTY") || position.getDecodeStatus().equals("ERROR")) {
+    for(DP5MirageScanPosition position: getFormattedScan()) {
+      if(position.getDecodeStatus().equals("EMPTY")) {
         return false;
       }
     }
@@ -162,7 +131,12 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public boolean isEmpty() {
-    return scan.get("tubeBarcode").isEmpty();
+    for(DP5MirageScanPosition position: getFormattedScan()) {
+      if(position.getDecodeStatus().equals("SUCCESS")) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -179,9 +153,8 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public int getTubeCount() {
-    //TODO review the conditions
     int tubeCounter = 0;
-    for(DP5MirageScanPosition position: formattedScan) {
+    for(DP5MirageScanPosition position: getFormattedScan()) {
       if(!position.getDecodeStatus().equals("EMPTY")) {
         tubeCounter++;
       }
@@ -195,10 +168,8 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public boolean hasReadErrors() {
-    //TODO ERROR unable to tell between empty tube that exists but no barcode or no test tube at
-    // all
-    for(DP5MirageScanPosition position: formattedScan) {
-      if(position.getDecodeStatus().equals("EMPTY") && position.getBarcode().equals("null")) {
+    for(DP5MirageScanPosition position: getFormattedScan()) {
+      if(position.getDecodeStatus().equals("ERROR") && position.getBarcode().equals("null")) {
         return true;
       }
     }
@@ -211,7 +182,6 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public List<String> getReadErrorPositions() {
-    // TODO evaluate conditions
     final String[][] barcodes = getBarcodesArray();
     final String noRead = getNoReadLabel();
     List<String> positions = new ArrayList<>();
@@ -245,7 +215,7 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public String getNoReadLabel() {
-    return "No Read";
+    return "\"null\"";
   }
 
   /**
@@ -253,6 +223,18 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public String getNoTubeLabel() {
-    return "No Tube";
+    return "EMPTY";
+  }
+
+  /**
+   * @return array of DP5MirageScanPosition objects
+   */
+  public DP5MirageScanPosition[] getFormattedScan() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    List<DP5MirageScanPosition> positions = objectMapper.convertValue(scan.get("tubeBarcode"),
+        new TypeReference<>() {
+        });
+
+    return positions.toArray(new DP5MirageScanPosition[scan.get("tubeBarcode").size()]);
   }
 }
