@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.integration.test;
 
 import static org.junit.Assert.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public abstract class BoxScanTests<T extends BoxScan> {
    *  <LI>B02: 44444</LI>
    * </OL>
    */
-  protected abstract T getFullScan();
+  protected abstract T getFullScan() throws JsonProcessingException;
   
   /**
    * Returns a new BoxScan, representing a scan of an empty box of tubes. Implementations must return a BoxScan implementation object 
@@ -42,7 +43,7 @@ public abstract class BoxScanTests<T extends BoxScan> {
   protected abstract T getErredScan();
   
   @Test
-  public void testReferenceConversions() {
+  public void testReferenceConversions() throws JsonProcessingException {
     BoxScan fullScan = getFullScan();
     assertEquals("33333",fullScan.getBarcode("A02"));
     assertEquals("33333",fullScan.getBarcode(1,2));
@@ -50,7 +51,7 @@ public abstract class BoxScanTests<T extends BoxScan> {
   }
   
   @Test
-  public void testCollectionComparison() {
+  public void testCollectionComparison() throws JsonProcessingException {
     BoxScan fullScan = getFullScan();
     String[][] array = fullScan.getBarcodesArray();
     assertEquals(array[0][0], "11111");
@@ -66,7 +67,7 @@ public abstract class BoxScanTests<T extends BoxScan> {
   }
   
   @Test
-  public void testImmutability() {
+  public void testImmutability() throws JsonProcessingException {
     BoxScan fullScan = getFullScan();
     
     String[][] array = fullScan.getBarcodesArray();
@@ -86,7 +87,7 @@ public abstract class BoxScanTests<T extends BoxScan> {
   }
   
   @Test
-  public void testFullScan() {
+  public void testFullScan() throws JsonProcessingException {
     BoxScan fullScan = getFullScan();
     assertTrue(fullScan.isFull());
     assertFalse(fullScan.isEmpty());
