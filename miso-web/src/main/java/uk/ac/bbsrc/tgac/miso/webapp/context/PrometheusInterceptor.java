@@ -8,17 +8,19 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import io.prometheus.client.Histogram;
+import io.prometheus.metrics.core.metrics.Histogram;
 
 public class PrometheusInterceptor implements MethodInterceptor {
 
-  private static final Histogram controller_times = Histogram.build().name("miso_controller_method_time")
+  private static final Histogram controller_times = Histogram.builder().name("miso_controller_method_time")
       .labelNames("javaclass", "method", "success")
-      .help("The time, in milliseconds, this method takes to run.").buckets(100, 500, 1000, 2000, 3000, 5000, 8000, 15000, 30000)
+      .help("The time, in milliseconds, this method takes to run.")
+      .classicUpperBounds(100, 500, 1000, 2000, 3000, 5000, 8000, 15000, 30000)
       .register();
-  private static final Histogram service_times = Histogram.build().name("miso_service_method_time")
+  private static final Histogram service_times = Histogram.builder().name("miso_service_method_time")
       .labelNames("javaclass", "method", "success")
-      .help("The time, in milliseconds, this method takes to run.").buckets(100, 500, 1000, 2000, 3000, 5000, 8000, 15000, 30000)
+      .help("The time, in milliseconds, this method takes to run.")
+      .classicUpperBounds(100, 500, 1000, 2000, 3000, 5000, 8000, 15000, 30000)
       .register();
 
   @Override
@@ -41,7 +43,8 @@ public class PrometheusInterceptor implements MethodInterceptor {
     return AnnotationUtils.findAnnotation(method, RequestMapping.class) != null;
   }
 
-  private static Object monitor(MethodInvocation invocation, Histogram histogram, String className, String methodName) throws Throwable {
+  private static Object monitor(MethodInvocation invocation, Histogram histogram, String className, String methodName)
+      throws Throwable {
     long startTime = System.currentTimeMillis();
     boolean success = true;
     try {
@@ -51,7 +54,7 @@ public class PrometheusInterceptor implements MethodInterceptor {
       throw e;
     } finally {
       long duration = System.currentTimeMillis() - startTime;
-      histogram.labels(className, methodName, Boolean.toString(success)).observe(duration);
+      histogram.labelValues(className, methodName, Boolean.toString(success)).observe(duration);
     }
   }
 
