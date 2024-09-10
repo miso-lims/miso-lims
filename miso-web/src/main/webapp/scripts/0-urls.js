@@ -11,16 +11,24 @@ Urls = (function () {
     };
   }
 
-  var baseUrl = "/miso";
-  var restBase = baseUrl + "/rest";
+  var restBase = "/rest";
 
   var ui = {};
   var rest = {};
   var download = {};
+  var upload = {};
   var external = {};
 
+  // Admin
+  var adminRestBase = restBase + "/admin";
+  rest.admin = {
+    clearHibernateCache: adminRestBase + "/cache/clear",
+    refreshConstants: adminRestBase + "/constants/refresh",
+    regenerateBarcodes: adminRestBase + "/barcode/regen",
+  };
+
   // Arrays
-  var arrayUiBase = baseUrl + "/array";
+  var arrayUiBase = "/array";
   ui.arrays = {
     create: arrayUiBase + "/new",
     edit: idUrlFunction(arrayUiBase),
@@ -28,13 +36,18 @@ Urls = (function () {
 
   var arrayRestBase = restBase + "/arrays";
   rest.arrays = {
+    changelog: middleIdUrlFunction(arrayRestBase, "/changelog"),
     create: arrayRestBase,
     update: idUrlFunction(arrayRestBase),
     datatable: arrayRestBase + "/dt",
+    position: function (arrayId, position) {
+      return arrayRestBase + "/" + arrayId + "/positions/" + position;
+    },
+    sampleSearch: arrayRestBase + "/sample-search",
   };
 
   // Array Models
-  var arrayModelUiBase = baseUrl + "/arraymodel";
+  var arrayModelUiBase = "/arraymodel";
   ui.arrayModels = {
     bulkCreate: arrayModelUiBase + "/bulk/new",
     bulkEdit: arrayModelUiBase + "/bulk/edit",
@@ -47,7 +60,7 @@ Urls = (function () {
   };
 
   // Array Runs
-  var arrayRunUiBase = baseUrl + "/arrayrun";
+  var arrayRunUiBase = "/arrayrun";
   ui.arrayRuns = {
     create: arrayRunUiBase + "/new",
     edit: idUrlFunction(arrayRunUiBase),
@@ -63,7 +76,7 @@ Urls = (function () {
   };
 
   // Assays
-  var assayUiBase = baseUrl + "/assay";
+  var assayUiBase = "/assay";
   ui.assays = {
     create: assayUiBase + "/new",
     edit: idUrlFunction(assayUiBase),
@@ -76,7 +89,7 @@ Urls = (function () {
   };
 
   // Assay Tests
-  var assayTestUiBase = baseUrl + "/assaytest";
+  var assayTestUiBase = "/assaytest";
   ui.assayTests = {
     bulkCreate: assayTestUiBase + "/bulk/new",
     bulkEdit: assayTestUiBase + "/bulk/edit",
@@ -88,8 +101,19 @@ Urls = (function () {
     bulkSaveProgress: idUrlFunction(assayTestRestBase + "/bulk"),
   };
 
+  // Attachments
+  var attachmentRestBase = restBase + "/attachments";
+  rest.attachments = {
+    delete: function (entityType, entityId, attachmentId) {
+      return "/attachments/" + entityType + "/" + entityId + "/" + attachmentId;
+    },
+    link: function (entityType, entityId) {
+      return "/attachments/" + entityType + "/" + entityId;
+    },
+  };
+
   // Attachment Categories
-  var attachmentCategoryUiBase = baseUrl + "/attachmentcategories";
+  var attachmentCategoryUiBase = "/attachmentcategories";
   ui.attachmentCategories = {
     bulkCreate: attachmentCategoryUiBase + "/bulk/new",
     bulkEdit: attachmentCategoryUiBase + "/bulk/edit",
@@ -101,8 +125,14 @@ Urls = (function () {
     bulkSaveProgress: idUrlFunction(attachmentCategoryRestBase + "/bulk"),
   };
 
+  // Barcodables
+  var barcodableRestBase = restBase + "/barcodables";
+  rest.barcodables = {
+    search: barcodableRestBase + "/search",
+  };
+
   // Boxes
-  var boxUiBase = baseUrl + "/box";
+  var boxUiBase = "/box";
   ui.boxes = {
     create: boxUiBase + "/new",
     edit: idUrlFunction(boxUiBase),
@@ -150,7 +180,7 @@ Urls = (function () {
   };
 
   // Box Sizes
-  var boxSizeUiBase = baseUrl + "/boxsize";
+  var boxSizeUiBase = "/boxsize";
   ui.boxSizes = {
     bulkCreate: boxSizeUiBase + "/bulk/new",
     bulkEdit: boxSizeUiBase + "/bulk/edit",
@@ -163,7 +193,7 @@ Urls = (function () {
   };
 
   // Box Uses
-  var boxUseUiBase = baseUrl + "/boxuse";
+  var boxUseUiBase = "/boxuse";
   ui.boxUses = {
     bulkCreate: boxUseUiBase + "/bulk/new",
     bulkEdit: boxUseUiBase + "/bulk/edit",
@@ -176,7 +206,7 @@ Urls = (function () {
   };
 
   // Contacts
-  var contactUiBase = baseUrl + "/contact";
+  var contactUiBase = "/contact";
   ui.contacts = {
     bulkCreate: contactUiBase + "/bulk/new",
     bulkEdit: contactUiBase + "/bulk/edit",
@@ -190,7 +220,7 @@ Urls = (function () {
   };
 
   // Containers
-  var containerUiBase = baseUrl + "/container";
+  var containerUiBase = "/container";
   ui.containers = {
     create: idUrlFunction(containerUiBase + "/new"),
     edit: idUrlFunction(containerUiBase),
@@ -208,7 +238,7 @@ Urls = (function () {
   };
 
   // Container Models
-  var containerModelUiBase = baseUrl + "/containermodel";
+  var containerModelUiBase = "/containermodel";
   ui.containerModels = {
     bulkCreate: containerModelUiBase + "/bulk/new",
     bulkEdit: containerModelUiBase + "/bulk/edit",
@@ -228,7 +258,7 @@ Urls = (function () {
   };
 
   // Detailed QC Statuses
-  var detailedQcStatusUiBase = baseUrl + "/detailedqcstatus";
+  var detailedQcStatusUiBase = "/detailedqcstatus";
   ui.detailedQcStatuses = {
     bulkCreate: detailedQcStatusUiBase + "/bulk/new",
     bulkEdit: detailedQcStatusUiBase + "/bulk/edit",
@@ -241,7 +271,7 @@ Urls = (function () {
   };
 
   // Experiments
-  var experimentUiBase = baseUrl + "/experiment";
+  var experimentUiBase = "/experiment";
   ui.experiments = {
     edit: idUrlFunction(experimentUiBase),
   };
@@ -250,11 +280,12 @@ Urls = (function () {
   rest.experiments = {
     create: experimentRestBase,
     update: idUrlFunction(experimentRestBase),
+    addKit: middleIdUrlFunction(experimentRestBase, "/addkit"),
     addRunPartition: middleIdUrlFunction(experimentRestBase, "/add"),
   };
 
   // Freezers - REST components are under Storage Locations
-  var freezerUiBase = baseUrl + "/freezer";
+  var freezerUiBase = "/freezer";
   ui.freezers = {
     create: freezerUiBase + "/new",
     edit: idUrlFunction(freezerUiBase),
@@ -275,7 +306,7 @@ Urls = (function () {
   };
 
   // Groups
-  var groupUiBase = baseUrl + "/admin/group";
+  var groupUiBase = "/admin/group";
   ui.groups = {
     create: groupUiBase + "/new",
     edit: idUrlFunction(groupUiBase),
@@ -303,7 +334,7 @@ Urls = (function () {
   };
 
   // Index Families
-  var indexFamilyUiBase = baseUrl + "/indexfamily";
+  var indexFamilyUiBase = "/indexfamily";
   ui.indexFamilies = {
     create: indexFamilyUiBase + "/new",
     edit: idUrlFunction(indexFamilyUiBase),
@@ -316,7 +347,7 @@ Urls = (function () {
   };
 
   // Indices
-  var indexUiBase = baseUrl + "/index";
+  var indexUiBase = "/index";
   ui.indices = {
     bulkCreate: indexUiBase + "/bulk/new",
     bulkEdit: indexUiBase + "/bulk/edit",
@@ -328,10 +359,11 @@ Urls = (function () {
     bulkSaveProgress: idUrlFunction(indexRestBase + "/bulk"),
     datatable: indexRestBase + "/dt",
     platformDatatable: idUrlFunction(indexRestBase + "/dt/platform"),
+    search: indexRestBase + "/search",
   };
 
   // Instruments
-  var instrumentUiBase = baseUrl + "/instrument";
+  var instrumentUiBase = "/instrument";
   ui.instruments = {
     create: instrumentUiBase + "/new",
     edit: idUrlFunction(instrumentUiBase),
@@ -357,7 +389,7 @@ Urls = (function () {
   };
 
   // Instrument Models
-  var instrumentModelUiBase = baseUrl + "/instrumentmodel";
+  var instrumentModelUiBase = "/instrumentmodel";
   ui.instrumentModels = {
     create: instrumentModelUiBase + "/new",
     edit: idUrlFunction(instrumentModelUiBase),
@@ -370,8 +402,11 @@ Urls = (function () {
     update: idUrlFunction(instrumentModelRestBase),
   };
 
+  // Instrument Status
+  rest.instrumentStatus = restBase + "/instrumentstatus";
+
   // Kit Descriptors
-  var kitDescriptorUiBase = baseUrl + "/kitdescriptor";
+  var kitDescriptorUiBase = "/kitdescriptor";
   ui.kitDescriptors = {
     create: kitDescriptorUiBase + "/new",
     edit: idUrlFunction(kitDescriptorUiBase),
@@ -389,7 +424,7 @@ Urls = (function () {
   };
 
   // Labs
-  var labUiBase = baseUrl + "/lab";
+  var labUiBase = "/lab";
   ui.labs = {
     bulkCreate: labUiBase + "/bulk/new",
     bulkEdit: labUiBase + "/bulk/edit",
@@ -402,7 +437,7 @@ Urls = (function () {
   };
 
   // Libraries
-  var libraryUiBase = baseUrl + "/library";
+  var libraryUiBase = "/library";
   ui.libraries = {
     edit: idUrlFunction(libraryUiBase),
     bulkReceive: libraryUiBase + "/bulk/receive",
@@ -439,7 +474,7 @@ Urls = (function () {
   };
 
   // Library Aliquots
-  var libraryAliquotUiBase = baseUrl + "/libraryaliquot";
+  var libraryAliquotUiBase = "/libraryaliquot";
   ui.libraryAliquots = {
     edit: idUrlFunction(libraryAliquotUiBase),
     bulkEdit: libraryAliquotUiBase + "/bulk/edit",
@@ -476,7 +511,7 @@ Urls = (function () {
   };
 
   // Library Designs
-  var libraryDesignUiBase = baseUrl + "/librarydesign";
+  var libraryDesignUiBase = "/librarydesign";
   ui.libraryDesigns = {
     bulkCreate: libraryDesignUiBase + "/bulk/new",
     bulkEdit: libraryDesignUiBase + "/bulk/edit",
@@ -490,7 +525,7 @@ Urls = (function () {
   };
 
   // Library Design Codes
-  var libraryDesignCodeUiBase = baseUrl + "/librarydesigncode";
+  var libraryDesignCodeUiBase = "/librarydesigncode";
   ui.libraryDesignCodes = {
     bulkCreate: libraryDesignCodeUiBase + "/bulk/new",
     bulkEdit: libraryDesignCodeUiBase + "/bulk/edit",
@@ -502,7 +537,7 @@ Urls = (function () {
   };
 
   // Library Selections
-  var librarySelectionUiBase = baseUrl + "/libraryselection";
+  var librarySelectionUiBase = "/libraryselection";
   ui.librarySelections = {
     bulkCreate: librarySelectionUiBase + "/bulk/new",
     bulkEdit: librarySelectionUiBase + "/bulk/edit",
@@ -515,7 +550,7 @@ Urls = (function () {
   };
 
   // Library Spike-Ins
-  var librarySpikeInUiBase = baseUrl + "/libraryspikein";
+  var librarySpikeInUiBase = "/libraryspikein";
   ui.librarySpikeIns = {
     bulkCreate: librarySpikeInUiBase + "/bulk/new",
     bulkEdit: librarySpikeInUiBase + "/bulk/edit",
@@ -528,7 +563,7 @@ Urls = (function () {
   };
 
   // Library Strategies
-  var libraryStrategyUiBase = baseUrl + "/librarystrategy";
+  var libraryStrategyUiBase = "/librarystrategy";
   ui.libraryStrategies = {
     bulkCreate: libraryStrategyUiBase + "/bulk/new",
     bulkEdit: libraryStrategyUiBase + "/bulk/edit",
@@ -541,7 +576,7 @@ Urls = (function () {
   };
 
   // Library Templates
-  var libraryTemplateUiBase = baseUrl + "/librarytemplate";
+  var libraryTemplateUiBase = "/librarytemplate";
   ui.libraryTemplates = {
     create: libraryTemplateUiBase + "/new",
     edit: idUrlFunction(libraryTemplateUiBase),
@@ -567,7 +602,7 @@ Urls = (function () {
   };
 
   // Library Types
-  var libraryTypeUiBase = baseUrl + "/librarytype";
+  var libraryTypeUiBase = "/librarytype";
   ui.libraryTypes = {
     bulkCreate: libraryTypeUiBase + "/bulk/new",
     bulkEdit: libraryTypeUiBase + "/bulk/edit",
@@ -586,7 +621,7 @@ Urls = (function () {
   };
 
   // Metrics
-  var metricUiBase = baseUrl + "/metric";
+  var metricUiBase = "/metric";
   ui.metrics = {
     bulkCreate: metricUiBase + "/bulk/new",
     bulkEdit: metricUiBase + "/bulk/edit",
@@ -599,7 +634,7 @@ Urls = (function () {
   };
 
   // Metric Subcategories
-  var metricSubcategoryUiBase = baseUrl + "/metricsubcategory";
+  var metricSubcategoryUiBase = "/metricsubcategory";
   ui.metricSubcategories = {
     bulkCreate: metricSubcategoryUiBase + "/bulk/new",
     bulkEdit: metricSubcategoryUiBase + "/bulk/edit",
@@ -623,7 +658,7 @@ Urls = (function () {
   };
 
   // Partition QC Types
-  var partitionQcTypeUiBase = baseUrl + "/partitionqctype";
+  var partitionQcTypeUiBase = "/partitionqctype";
   ui.partitionQcTypes = {
     bulkCreate: partitionQcTypeUiBase + "/bulk/new",
     bulkEdit: partitionQcTypeUiBase + "/bulk/edit",
@@ -636,7 +671,7 @@ Urls = (function () {
   };
 
   // Pipelines
-  var pipelineUiBase = baseUrl + "/pipeline";
+  var pipelineUiBase = "/pipeline";
   ui.pipelines = {
     bulkCreate: pipelineUiBase + "/bulk/new",
     bulkEdit: pipelineUiBase + "/bulk/edit",
@@ -649,7 +684,7 @@ Urls = (function () {
   };
 
   // Pools
-  var poolUiBase = baseUrl + "/pool";
+  var poolUiBase = "/pool";
   ui.pools = {
     create: poolUiBase + "/new",
     edit: idUrlFunction(poolUiBase),
@@ -682,7 +717,7 @@ Urls = (function () {
   };
 
   // Pool Orders
-  var poolOrderUiBase = baseUrl + "/poolorder";
+  var poolOrderUiBase = "/poolorder";
   ui.poolOrders = {
     create: poolOrderUiBase + "/new",
     edit: idUrlFunction(poolOrderUiBase),
@@ -704,13 +739,15 @@ Urls = (function () {
     enable: printerRestBase + "/enable",
     disable: printerRestBase + "/disable",
     layout: middleIdUrlFunction(printerRestBase, "/layout"),
+    list: printerRestBase,
     duplicate: middleIdUrlFunction(printerRestBase, "/duplicate"),
+    print: idUrlFunction(printerRestBase),
     printBoxContents: middleIdUrlFunction(printerRestBase, "/boxcontents"),
     printBoxPositions: middleIdUrlFunction(printerRestBase, "/boxpositions"),
   };
 
   // Projects
-  var projectUiBase = baseUrl + "/project";
+  var projectUiBase = "/project";
   ui.projects = {
     create: projectUiBase + "/new",
     edit: idUrlFunction(projectUiBase),
@@ -727,7 +764,7 @@ Urls = (function () {
   };
 
   // QCs
-  var qcUiBase = baseUrl + "/qc";
+  var qcUiBase = "/qc";
   ui.qcs = {
     bulkAddFrom: idUrlFunction(qcUiBase + "/bulk/addFrom"),
     bulkEdit: idUrlFunction(qcUiBase + "/bulk/edit"),
@@ -749,7 +786,7 @@ Urls = (function () {
   };
 
   // QC Types
-  var qcTypeUiBase = baseUrl + "/qctype";
+  var qcTypeUiBase = "/qctype";
   ui.qcTypes = {
     create: qcTypeUiBase + "/new",
     edit: idUrlFunction(qcTypeUiBase),
@@ -762,7 +799,7 @@ Urls = (function () {
   };
 
   // Reference Genomes
-  var referenceGenomeUiBase = baseUrl + "/referencegenome";
+  var referenceGenomeUiBase = "/referencegenome";
   ui.referenceGenomes = {
     bulkCreate: referenceGenomeUiBase + "/bulk/new",
     bulkEdit: referenceGenomeUiBase + "/bulk/edit",
@@ -775,7 +812,7 @@ Urls = (function () {
   };
 
   // Requisitions
-  var requisitionUiBase = baseUrl + "/requisition";
+  var requisitionUiBase = "/requisition";
   ui.requisitions = {
     create: requisitionUiBase + "/new",
     edit: idUrlFunction(requisitionUiBase),
@@ -812,7 +849,7 @@ Urls = (function () {
   };
 
   // Runs
-  var runUiBase = baseUrl + "/run";
+  var runUiBase = "/run";
   ui.runs = {
     create: idUrlFunction(runUiBase + "/new"),
     edit: idUrlFunction(runUiBase),
@@ -834,16 +871,18 @@ Urls = (function () {
     potentialExperiments: middleIdUrlFunction(runRestBase, "/potentialExperiments"),
     spreadsheet: runRestBase + "/spreadsheet",
     parents: idUrlFunction(runRestBase + "/parents"),
+    search: runRestBase + "/search",
+    recent: runRestBase + "/recent",
   };
 
   // Run-Libraries
-  var runLibraryUiBase = baseUrl + "/runlibraries";
+  var runLibraryUiBase = "/runlibraries";
   ui.runLibraries = {
     qcHierarchy: middleIdUrlFunction(runLibraryUiBase, "/qc-hierarchy"),
   };
 
   // Run-Library QC Statuses
-  var runLibraryQcStatusUiBase = baseUrl + "/runlibraryqcstatus";
+  var runLibraryQcStatusUiBase = "/runlibraryqcstatus";
   ui.runLibraryQcStatuses = {
     bulkCreate: runLibraryQcStatusUiBase + "/bulk/new",
     bulkEdit: runLibraryQcStatusUiBase + "/bulk/edit",
@@ -856,7 +895,7 @@ Urls = (function () {
   };
 
   // Run Purposes
-  var runPurposeUiBase = baseUrl + "/runpurpose";
+  var runPurposeUiBase = "/runpurpose";
   ui.runPurposes = {
     bulkCreate: runPurposeUiBase + "/bulk/new",
     bulkEdit: runPurposeUiBase + "/bulk/edit",
@@ -869,7 +908,7 @@ Urls = (function () {
   };
 
   // Samples
-  var sampleUiBase = baseUrl + "/sample";
+  var sampleUiBase = "/sample";
   ui.samples = {
     edit: idUrlFunction(sampleUiBase),
     bulkCreate: sampleUiBase + "/bulk/new",
@@ -902,7 +941,7 @@ Urls = (function () {
   };
 
   // Sample Classes
-  var sampleClassUiBase = baseUrl + "/sampleclass";
+  var sampleClassUiBase = "/sampleclass";
   ui.sampleClasses = {
     create: sampleClassUiBase + "/new",
     edit: idUrlFunction(sampleClassUiBase),
@@ -915,7 +954,7 @@ Urls = (function () {
   };
 
   // Sample Purposes
-  var samplePurposeUiBase = baseUrl + "/samplepurpose";
+  var samplePurposeUiBase = "/samplepurpose";
   ui.samplePurposes = {
     bulkCreate: samplePurposeUiBase + "/bulk/new",
     bulkEdit: samplePurposeUiBase + "/bulk/edit",
@@ -928,7 +967,7 @@ Urls = (function () {
   };
 
   // Sample Types
-  var sampleTypeUiBase = baseUrl + "/sampletype";
+  var sampleTypeUiBase = "/sampletype";
   ui.sampleTypes = {
     bulkCreate: sampleTypeUiBase + "/bulk/new",
     bulkEdit: sampleTypeUiBase + "/bulk/edit",
@@ -941,7 +980,7 @@ Urls = (function () {
   };
 
   // Scientific Names
-  var scientificNameUiBase = baseUrl + "/scientificname";
+  var scientificNameUiBase = "/scientificname";
   ui.scientificNames = {
     bulkCreate: scientificNameUiBase + "/bulk/new",
     bulkEdit: scientificNameUiBase + "/bulk/edit",
@@ -954,7 +993,7 @@ Urls = (function () {
   };
 
   // Sequencing Control Types
-  var sequencingControlTypeUiBase = baseUrl + "/sequencingcontroltype";
+  var sequencingControlTypeUiBase = "/sequencingcontroltype";
   ui.sequencingControlTypes = {
     bulkCreate: sequencingControlTypeUiBase + "/bulk/new",
     bulkEdit: sequencingControlTypeUiBase + "/bulk/edit",
@@ -967,7 +1006,7 @@ Urls = (function () {
   };
 
   // Sequencing Orders
-  var sequencingOrderUiBase = baseUrl + "/sequencingorder";
+  var sequencingOrderUiBase = "/sequencingorder";
   ui.sequencingOrders = {
     bulkCreate: sequencingOrderUiBase + "/bulk/new",
   };
@@ -989,7 +1028,7 @@ Urls = (function () {
   };
 
   // Sequencing Parameters
-  var sequencingParametersUiBase = baseUrl + "/sequencingparameters";
+  var sequencingParametersUiBase = "/sequencingparameters";
   ui.sequencingParameters = {
     bulkCreate: sequencingParametersUiBase + "/bulk/new",
     bulkEdit: sequencingParametersUiBase + "/bulk/edit",
@@ -1009,7 +1048,7 @@ Urls = (function () {
   };
 
   // attachment
-  var attachmentUiBase = baseUrl + "/attachments";
+  var attachmentUiBase = "/attachments";
   ui.attachments = {
     serviceRecord: function (recordId, fileId) {
       return attachmentUiBase + "/servicerecord/" + recordId + "/" + fileId;
@@ -1017,7 +1056,7 @@ Urls = (function () {
   };
 
   // SOPs
-  var sopUiBase = baseUrl + "/sop";
+  var sopUiBase = "/sop";
   ui.sops = {
     bulkCreate: sopUiBase + "/bulk/new",
     bulkEdit: sopUiBase + "/bulk/edit",
@@ -1031,7 +1070,7 @@ Urls = (function () {
   };
 
   // Stains
-  var stainUiBase = baseUrl + "/stain";
+  var stainUiBase = "/stain";
   ui.stains = {
     bulkCreate: stainUiBase + "/bulk/new",
     bulkEdit: stainUiBase + "/bulk/edit",
@@ -1044,7 +1083,7 @@ Urls = (function () {
   };
 
   // Stain Categories
-  var stainCategoryUiBase = baseUrl + "/staincategory";
+  var stainCategoryUiBase = "/staincategory";
   ui.stainCategories = {
     bulkCreate: stainCategoryUiBase + "/bulk/new",
     bulkEdit: stainCategoryUiBase + "/bulk/edit",
@@ -1057,7 +1096,7 @@ Urls = (function () {
   };
 
   // Storage Labels
-  var storageLabelUiBase = baseUrl + "/storagelabel";
+  var storageLabelUiBase = "/storagelabel";
   ui.storageLabels = {
     bulkCreate: storageLabelUiBase + "/bulk/new",
     bulkEdit: storageLabelUiBase + "/bulk/edit",
@@ -1102,7 +1141,7 @@ Urls = (function () {
   };
 
   // Studies
-  var studyUiBase = baseUrl + "/study";
+  var studyUiBase = "/study";
   ui.studies = {
     create: studyUiBase + "/new",
     createInProject: idUrlFunction(studyUiBase + "/new"),
@@ -1118,7 +1157,7 @@ Urls = (function () {
   };
 
   // Study Types
-  var studyTypeUiBase = baseUrl + "/studytype";
+  var studyTypeUiBase = "/studytype";
   ui.studyTypes = {
     bulkCreate: studyTypeUiBase + "/bulk/new",
     bulkEdit: studyTypeUiBase + "/bulk/edit",
@@ -1131,7 +1170,7 @@ Urls = (function () {
   };
 
   // Submissions
-  var submissionUiBase = baseUrl + "/submission";
+  var submissionUiBase = "/submission";
   ui.submissions = {
     create: submissionUiBase + "/new",
     edit: idUrlFunction(submissionUiBase),
@@ -1141,10 +1180,11 @@ Urls = (function () {
   rest.submissions = {
     create: submissionRestBase,
     update: idUrlFunction(submissionRestBase),
+    download: middleIdUrlFunction(submissionRestBase, "/download"),
   };
 
   // Subprojects
-  var subprojectUiBase = baseUrl + "/subproject";
+  var subprojectUiBase = "/subproject";
   ui.subprojects = {
     bulkCreate: subprojectUiBase + "/bulk/new",
     bulkEdit: subprojectUiBase + "/bulk/edit",
@@ -1157,7 +1197,7 @@ Urls = (function () {
   };
 
   // Targeted Sequencings
-  var targetedSequencingUiBase = baseUrl + "/targetedsequencing";
+  var targetedSequencingUiBase = "/targetedsequencing";
   ui.targetedSequencings = {
     bulkCreate: targetedSequencingUiBase + "/bulk/new",
     bulkEdit: targetedSequencingUiBase + "/bulk/edit",
@@ -1174,7 +1214,7 @@ Urls = (function () {
   };
 
   // Tissue Materials
-  var tissueMaterialUiBase = baseUrl + "/tissuematerial";
+  var tissueMaterialUiBase = "/tissuematerial";
   ui.tissueMaterials = {
     bulkCreate: tissueMaterialUiBase + "/bulk/new",
     bulkEdit: tissueMaterialUiBase + "/bulk/edit",
@@ -1187,7 +1227,7 @@ Urls = (function () {
   };
 
   // Tissue Origins
-  var tissueOriginUiBase = baseUrl + "/tissueorigin";
+  var tissueOriginUiBase = "/tissueorigin";
   ui.tissueOrigins = {
     bulkCreate: tissueOriginUiBase + "/bulk/new",
     bulkEdit: tissueOriginUiBase + "/bulk/edit",
@@ -1200,7 +1240,7 @@ Urls = (function () {
   };
 
   // Tissue Piece Types
-  var tissuePieceTypesUiBase = baseUrl + "/tissuepiecetype";
+  var tissuePieceTypesUiBase = "/tissuepiecetype";
   ui.tissuePieceTypes = {
     bulkCreate: tissuePieceTypesUiBase + "/bulk/new",
     bulkEdit: tissuePieceTypesUiBase + "/bulk/edit",
@@ -1213,7 +1253,7 @@ Urls = (function () {
   };
 
   // Tissue Types
-  var tissueTypeUiBase = baseUrl + "/tissuetype";
+  var tissueTypeUiBase = "/tissuetype";
   ui.tissueTypes = {
     bulkCreate: tissueTypeUiBase + "/bulk/new",
     bulkEdit: tissueTypeUiBase + "/bulk/edit",
@@ -1226,7 +1266,7 @@ Urls = (function () {
   };
 
   // Transfers
-  var transferUiBase = baseUrl + "/transfer";
+  var transferUiBase = "/transfer";
   ui.transfers = {
     create: transferUiBase + "/new",
     edit: idUrlFunction(transferUiBase),
@@ -1245,11 +1285,11 @@ Urls = (function () {
   };
 
   // Users
-  var userUiBase = baseUrl + "/admin/user";
+  var userUiBase = "/admin/user";
   ui.users = {
     create: userUiBase + "/new",
     edit: idUrlFunction(userUiBase),
-    editSelf: idUrlFunction(baseUrl + "/user"),
+    editSelf: idUrlFunction("/user"),
   };
 
   var userRestBase = restBase + "/users";
@@ -1261,7 +1301,7 @@ Urls = (function () {
   };
 
   // Deliverables
-  var deliverableUiBase = baseUrl + "/deliverable";
+  var deliverableUiBase = "/deliverable";
   ui.deliverables = {
     bulkCreate: deliverableUiBase + "/bulk/new",
     bulkEdit: deliverableUiBase + "/bulk/edit",
@@ -1274,7 +1314,7 @@ Urls = (function () {
   };
 
   // Contact Roles
-  var contactRoleUiBase = baseUrl + "/contactrole";
+  var contactRoleUiBase = "/contactrole";
   ui.contactRoles = {
     bulkCreate: contactRoleUiBase + "/bulk/new",
     bulkEdit: contactRoleUiBase + "/bulk/edit",
@@ -1286,8 +1326,30 @@ Urls = (function () {
     bulkSaveProgress: idUrlFunction(contactRoleRestBase + "/bulk"),
   };
 
+  // Workflows
+  var workflowUiBase = "/workflow";
+  ui.workflows = {
+    create: idUrlFunction(workflowUiBase + "/new"),
+    edit: idUrlFunction(workflowUiBase),
+  };
+
+  var workflowRestBase = restBase + "/workflows";
+  rest.workflows = {
+    list: workflowRestBase,
+    addFavourite: idUrlFunction(workflowRestBase + "/favourites/add"),
+    removeFavourite: idUrlFunction(workflowRestBase + "/favourites/remove"),
+    getStep: function (workflowId, stepNumber) {
+      return workflowRestBase + "/" + workflowId + "/step/" + stepNumber;
+    },
+    processInput: function (workflowId, stepNumber) {
+      return workflowRestBase + "/" + workflowId + "/step/" + stepNumber + "/";
+    },
+    latestStep: middleIdUrlFunction(workflowRestBase, "/step/latest"),
+    execute: middleIdUrlFunction(workflowRestBase, "/execute"),
+  };
+
   // Worksets
-  var worksetUiBase = baseUrl + "/workset";
+  var worksetUiBase = "/workset";
   ui.worksets = {
     create: worksetUiBase + "/new",
     edit: idUrlFunction(worksetUiBase),
@@ -1313,7 +1375,7 @@ Urls = (function () {
   };
 
   // Workset Categories
-  var worksetCategoryUiBase = baseUrl + "/worksetcategory";
+  var worksetCategoryUiBase = "/worksetcategory";
   ui.worksetCategories = {
     bulkCreate: worksetCategoryUiBase + "/bulk/new",
     bulkEdit: worksetCategoryUiBase + "/bulk/edit",
@@ -1326,7 +1388,7 @@ Urls = (function () {
   };
 
   // Workset Stages
-  var worksetStageUiBase = baseUrl + "/worksetstage";
+  var worksetStageUiBase = "/worksetstage";
   ui.worksetStages = {
     bulkCreate: worksetStageUiBase + "/bulk/new",
     bulkEdit: worksetStageUiBase + "/bulk/edit",
@@ -1339,7 +1401,7 @@ Urls = (function () {
   };
 
   // Workstations
-  var workstationUiBase = baseUrl + "/workstation";
+  var workstationUiBase = "/workstation";
   ui.workstations = {
     bulkCreate: workstationUiBase + "/bulk/new",
     bulkEdit: workstationUiBase + "/bulk/edit",
@@ -1354,7 +1416,15 @@ Urls = (function () {
   };
 
   // Downloads
-  download.boxSpreadsheet = idUrlFunction(baseUrl + "/download/box/forms");
+  download.attachment = function (entityType, entityId, attachmentId) {
+    return "/attachments/" + entityType + "/" + entityId + "/" + attachmentId;
+  };
+  download.boxSpreadsheet = idUrlFunction("/download/box/forms");
+
+  // Uploads
+  upload.attachment = function (entityType, entityId) {
+    return "/attachments/" + entityType + "/" + entityId;
+  };
 
   // External sites
   external.userManual = function (section, subsection) {
@@ -1377,6 +1447,7 @@ Urls = (function () {
     ui: ui,
     rest: rest,
     download: download,
+    upload: upload,
     external: external,
   };
 })();

@@ -59,7 +59,7 @@ public class TransferPage extends FormPage<TransferPage.Field> {
   public static TransferPage getForCreateWithSamples(WebDriver driver, String baseUrl, Collection<Long> sampleIds) {
     MapBuilder<String, String> params = new MapBuilder<String, String>()
         .put("sampleIds", Joiner.on(',').join(sampleIds));
-    postData(driver, baseUrl + "miso/transfer/new", params.build());
+    postData(driver, baseUrl + "transfer/new", params.build());
     return new TransferPage(driver);
   }
 

@@ -15,7 +15,7 @@ public class ListPoolsPage extends ListPage {
   }
 
   public static ListPoolsPage getListPage(WebDriver driver, String baseUrl) {
-    String url = String.format("%smiso/pools", baseUrl);
+    String url = String.format("%spools", baseUrl);
     driver.get(url);
     return new ListPoolsPage(driver);
   }

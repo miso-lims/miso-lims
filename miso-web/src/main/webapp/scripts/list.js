@@ -1248,7 +1248,7 @@ ListUtils = (function ($) {
             Utils.ajaxWithDialog(
               "Deleting " + pluralType,
               "POST",
-              "/miso/rest/" + urlFragment + "/bulk-delete",
+              "/rest/" + urlFragment + "/bulk-delete",
               ids,
               function () {
                 Utils.page.pageReload();

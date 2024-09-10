@@ -1,4 +1,3 @@
-<%@ page import="uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider" %>
 <!DOCTYPE html>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -52,7 +51,7 @@
   
   <script type="text/javascript">Constants = {};</script>
   <sec:authorize access="isAuthenticated()">
-    <script type="text/javascript" src="<c:url value='/miso/constants.js'/>?ts=<fmt:formatNumber value="${timestamp.time / 60000}" maxFractionDigits="0" groupingUsed="false" />"></script>
+    <script type="text/javascript" src="<c:url value='/constants.js'/>?ts=<fmt:formatNumber value="${timestamp.time / 60000}" maxFractionDigits="0" groupingUsed="false" />"></script>
   </sec:authorize>
   <script type="text/javascript" src="<c:url value='/scripts/header_script.js'/>?version=${miso:version()}"></script>
 
@@ -77,7 +76,7 @@
           <a href="${misoBugUrl}" target="_blank" rel="noopener noreferrer">Report a problem</a> |
         </c:if>
         Logged in as:
-        <a href="/miso/myAccount"><b id="currentUser"><sec:authentication property="principal.username"/></b></a>
+        <a href="/myAccount"><b id="currentUser"><sec:authentication property="principal.username"/></b></a>
         | <a href="<c:url value="/logout"/>">Logout</a>
       </div>
     </sec:authorize>

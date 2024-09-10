@@ -45,8 +45,9 @@ public class StudyPage extends HeaderFooterPage {
   }
 
   public static StudyPage get(WebDriver driver, String baseUrl, Long studyId, Long projectId) {
-    if (studyId == null && projectId == null) throw new IllegalArgumentException("Project ID cannot be null when creating a new study");
-    driver.get(baseUrl + "miso/study/" + (studyId == null ? "new" : studyId) + (projectId == null ? "" : "/" + projectId));
+    if (studyId == null && projectId == null)
+      throw new IllegalArgumentException("Project ID cannot be null when creating a new study");
+    driver.get(baseUrl + "study/" + (studyId == null ? "new" : studyId) + (projectId == null ? "" : "/" + projectId));
     return new StudyPage(driver);
   }
 

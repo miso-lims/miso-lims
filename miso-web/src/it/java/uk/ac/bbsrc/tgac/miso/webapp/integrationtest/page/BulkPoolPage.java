@@ -46,9 +46,9 @@ public class BulkPoolPage extends BulkPage {
   };
 
   private static final By EDIT_BUTTON_TEXT = By.linkText("Edit");
-  private static final String POOL_SEPARATELY_URL_FRAGMENT = "miso/libraryaliquot/bulk/pool-separate";
-  private static final String POOL_TOGETHER_URL_FRAGMENT = "miso/libraryaliquot/bulk/merge";
-  private static final String MERGE_URL_FRAGMENT = "miso/pool/bulk/merge";
+  private static final String POOL_SEPARATELY_URL_FRAGMENT = "libraryaliquot/bulk/pool-separate";
+  private static final String POOL_TOGETHER_URL_FRAGMENT = "libraryaliquot/bulk/merge";
+  private static final String MERGE_URL_FRAGMENT = "pool/bulk/merge";
 
   @FindBy(id = "bulkactions")
   private WebElement toolbar;
@@ -73,7 +73,7 @@ public class BulkPoolPage extends BulkPage {
 
   public static BulkPoolPage getForEdit(WebDriver driver, String baseUrl, Collection<Long> poolIds) {
     String ids = Joiner.on(',').join(poolIds);
-    String url = baseUrl + "miso/pool/bulk/edit";
+    String url = baseUrl + "pool/bulk/edit";
     MapBuilder<String, String> params = new MapBuilder<String, String>()
         .put("ids", ids);
     postData(driver, url, params.build());

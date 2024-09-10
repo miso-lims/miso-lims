@@ -47,12 +47,12 @@ public class KitDescriptorPage extends FormPage<KitDescriptorPage.Field> {
   }
 
   public static KitDescriptorPage getForCreate(WebDriver driver, String baseUrl) {
-    driver.get(baseUrl + "miso/kitdescriptor/new");
+    driver.get(baseUrl + "kitdescriptor/new");
     return new KitDescriptorPage(driver);
   }
 
   public static KitDescriptorPage getForEdit(WebDriver driver, String baseUrl, long kitDescriptorId) {
-    driver.get(baseUrl + "miso/kitdescriptor/" + kitDescriptorId);
+    driver.get(baseUrl + "kitdescriptor/" + kitDescriptorId);
     return new KitDescriptorPage(driver);
   }
 

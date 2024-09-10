@@ -41,7 +41,7 @@ ListTarget.kit_consumable = {
                   Utils.ajaxWithDialog(
                     "Adding Kit",
                     "POST",
-                    "/miso/rest/experiments/" + config.experimentId + "/addkit",
+                    Urls.rest.experiments.addKit(config.experimentId),
                     result,
                     Utils.page.pageReload
                   );

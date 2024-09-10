@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.beans.PropertyEditorSupport;
@@ -53,9 +30,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -78,7 +55,8 @@ public class EditSequencerPartitionContainerController {
   private ObjectMapper mapper;
 
   /**
-   * Translates foreign keys to entity objects with only the ID set, to be used in service layer to reload persisted child objects
+   * Translates foreign keys to entity objects with only the ID set, to be used in service layer to
+   * reload persisted child objects
    *
    * @param binder
    */
@@ -109,7 +87,7 @@ public class EditSequencerPartitionContainerController {
       SequencerPartitionContainer saved = containerService.save(container);
       session.setComplete();
       model.clear();
-      return new ModelAndView("redirect:/miso/container/" + saved.getId(), model);
+      return new ModelAndView("redirect:/container/" + saved.getId(), model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save container", ex);
@@ -130,14 +108,16 @@ public class EditSequencerPartitionContainerController {
   public ModelAndView setupNewForm(@PathVariable("modelId") Long modelId, ModelMap model)
       throws IOException {
     SequencingContainerModel containerModel = containerModelService.get(modelId);
-    if (containerModel == null) throw new NotFoundException("No container model found for ID " + modelId.toString());
+    if (containerModel == null)
+      throw new NotFoundException("No container model found for ID " + modelId.toString());
     SequencerPartitionContainer container = containerModel.getPlatformType().createContainer();
     container.setModel(containerModel);
 
     model.put("title", "New " + containerModel.getPlatformType().getContainerName());
 
     container.setPartitions(
-        IntStream.range(0, containerModel.getPartitionCount()).mapToObj(number -> new PartitionImpl(container, number + 1))
+        IntStream.range(0, containerModel.getPartitionCount())
+            .mapToObj(number -> new PartitionImpl(container, number + 1))
             .collect(Collectors.toList()));
     return setupForm(container, model);
   }
@@ -145,7 +125,8 @@ public class EditSequencerPartitionContainerController {
   @GetMapping(value = "/{containerId}")
   public ModelAndView setupEditForm(@PathVariable Long containerId, ModelMap model) throws IOException {
     SequencerPartitionContainer container = containerService.get(containerId);
-    if (container == null) throw new NotFoundException("No container found with ID " + containerId);
+    if (container == null)
+      throw new NotFoundException("No container found with ID " + containerId);
     model.put("title", container.getModel().getPlatformType().getContainerName() + " " + containerId);
     return setupForm(container, model);
   }
@@ -155,7 +136,8 @@ public class EditSequencerPartitionContainerController {
     model.put("containerPartitions",
         container.getPartitions().stream().map(partition -> Dtos.asDto(partition, false, indexChecker))
             .collect(Collectors.toList()));
-    model.put("containerRuns", runService.listByContainerId(container.getId()).stream().map(Dtos::asDto).collect(Collectors.toList()));
+    model.put("containerRuns",
+        runService.listByContainerId(container.getId()).stream().map(Dtos::asDto).collect(Collectors.toList()));
     model.put("containerJSON", mapper.writer().writeValueAsString(Dtos.asDto(container, indexChecker)));
     model.put("poreVersions", containerService.listPoreVersions());
     return new ModelAndView("/WEB-INF/pages/editSequencerPartitionContainer.jsp", model);

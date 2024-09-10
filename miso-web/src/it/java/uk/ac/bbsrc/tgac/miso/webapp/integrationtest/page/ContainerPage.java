@@ -51,12 +51,12 @@ public class ContainerPage extends FormPage<ContainerPage.Field> {
   }
 
   public static ContainerPage getForCreate(WebDriver driver, String baseUrl, long containerModelId) {
-    driver.get(baseUrl + "miso/container/new/" + containerModelId);
+    driver.get(baseUrl + "container/new/" + containerModelId);
     return new ContainerPage(driver);
   }
 
   public static ContainerPage getForEdit(WebDriver driver, String baseUrl, long containerId) {
-    driver.get(baseUrl + "miso/container/" + containerId);
+    driver.get(baseUrl + "container/" + containerId);
     return new ContainerPage(driver);
   }
 

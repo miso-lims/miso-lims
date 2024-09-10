@@ -23,9 +23,10 @@ public class BulkPoolCustomPage extends BulkPoolPage {
     waitWithTimeout().until(titleContains("Create Pools from Library Aliquots "));
   }
 
-  public static BulkPoolCustomPage get(WebDriver driver, String baseUrl, Collection<Long> aliquotIds, int poolQuantity) {
+  public static BulkPoolCustomPage get(WebDriver driver, String baseUrl, Collection<Long> aliquotIds,
+      int poolQuantity) {
     String ids = Joiner.on(',').join(aliquotIds);
-    String url = baseUrl + "miso/libraryaliquot/bulk/pool";
+    String url = baseUrl + "libraryaliquot/bulk/pool";
     MapBuilder<String, String> params = new MapBuilder<String, String>()
         .put("ids", ids)
         .put("quantity", Integer.toString(poolQuantity));

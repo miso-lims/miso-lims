@@ -17,7 +17,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class WorksetPage extends FormPage<WorksetPage.Field> {
-  
+
   public static enum Field implements FormPage.FieldElement {
     ID(By.id("worksetForm_id")), //
     ALIAS(By.id("worksetForm_alias")), //
@@ -67,20 +67,21 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
   }
 
   public static WorksetPage get(WebDriver driver, String baseUrl, long worksetId) {
-    driver.get(baseUrl + "miso/workset/" + worksetId);
+    driver.get(baseUrl + "workset/" + worksetId);
     return new WorksetPage(driver);
   }
 
   public static WorksetPage getForNew(WebDriver driver, String baseUrl) {
-    driver.get(baseUrl + "miso/workset/new");
+    driver.get(baseUrl + "workset/new");
     return new WorksetPage(driver);
   }
 
   /**
    * Attempts to save the Workset
    * 
-   * @return the refreshed WorksetPage if the save was successful; otherwise, null. A null return means that the save has
-   *         failed, and validation/error messages should be displayed on the page
+   * @return the refreshed WorksetPage if the save was successful; otherwise, null. A null return
+   *         means that the save has failed, and validation/error messages should be displayed on the
+   *         page
    */
   public WorksetPage clickSave() {
     WebElement html = getHtmlElement();
@@ -91,7 +92,8 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
     } else {
       saveButton.click();
       try {
-        waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(html), ExpectedConditions.visibilityOf(errorBox)));
+        waitUntil(
+            ExpectedConditions.or(ExpectedConditions.stalenessOf(html), ExpectedConditions.visibilityOf(errorBox)));
       } catch (StaleElementReferenceException e) {
         waitUntil(ExpectedConditions.stalenessOf(html));
       }

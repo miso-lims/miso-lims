@@ -1,6 +1,6 @@
 PaneTarget.workflow = (function () {
   var title = "Workflows";
-  var url = "/miso/rest/workflows";
+  var url = Urls.rest.workflows.list;
 
   var transform = function (data) {
     return Tile.make(
@@ -13,7 +13,7 @@ PaneTarget.workflow = (function () {
         ]),
       ],
       function () {
-        window.location = window.location.origin + "/miso/workflow/edit/" + data.workflowId;
+        window.location = Urls.ui.workflows.edit(data.workflowId);
       }
     );
   };
@@ -24,7 +24,7 @@ PaneTarget.workflow = (function () {
 
       var createWorkflowTiles = favouriteWorkflows.map(function (data) {
         return Tile.make([Tile.title("Begin New " + data.description)], function () {
-          window.location = window.location.origin + "/miso/workflow/new/" + data.workflowName;
+          window.location = Urls.ui.workflows.create(data.workflowName);
         });
       });
 
@@ -36,8 +36,7 @@ PaneTarget.workflow = (function () {
               return {
                 name: workflow.description,
                 handler: function () {
-                  window.location =
-                    window.location.origin + "/miso/workflow/new/" + workflow.workflowName;
+                  window.location = Urls.ui.workflows.create(workflow.workflowName);
                 },
               };
             })
@@ -63,7 +62,7 @@ PaneTarget.workflow = (function () {
                     Utils.ajaxWithDialog(
                       "Adding Workflow to Favourites",
                       "POST",
-                      "/miso/rest/workflows/favourites/add/" + workflow.workflowName,
+                      Urls.rest.workflows.addFavourite(workflow.workflowName),
                       null,
                       Utils.page.pageReload
                     );
@@ -76,7 +75,7 @@ PaneTarget.workflow = (function () {
                     Utils.ajaxWithDialog(
                       "Removing Workflow from Favourites",
                       "POST",
-                      "/miso/rest/workflows/favourites/remove/" + workflow.workflowName,
+                      Urls.rest.workflows.removeFavourite(workflow.workflowName),
                       null,
                       Utils.page.pageReload
                     );

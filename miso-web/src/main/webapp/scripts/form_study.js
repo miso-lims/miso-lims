@@ -61,7 +61,7 @@ FormTarget.study = (function ($) {
                 return config.detailedSample ? project.code : project.title;
               },
               getLink: function (study) {
-                return "/miso/project/" + study.projectId;
+                return Urls.ui.projects.edit(study.projectId);
               },
             },
             {

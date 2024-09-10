@@ -401,7 +401,7 @@ ListTarget.partition = {
         include: config.showPool,
         iSortPriority: 0,
         mRender: Warning.tableWarningRenderer(WarningTarget.partition, function (full) {
-          return full.pool ? "/miso/pool/" + full.pool.id : null;
+          return full.pool ? Urls.ui.pools.edit(full.pool.id) : null;
         }),
       },
       {

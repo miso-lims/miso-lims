@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: davey
-  Date: 15-Feb-2010
-  Time: 15:08:42
-
---%>
 <%@ include file="../header.jsp" %>
 
 <div id="maincontent">
@@ -21,7 +14,7 @@
         <li>
           <div class="breadcrumbsbubbleInfo">
             <div class="trigger">
-              <a href='<c:url value="/miso/project/${study.project.id}"/>'>${study.project.title}</a>
+              <a href='<c:url value="/project/${study.project.id}"/>'>${study.project.title}</a>
             </div>
             <div class="breadcrumbspopup">
                 ${study.project.name}

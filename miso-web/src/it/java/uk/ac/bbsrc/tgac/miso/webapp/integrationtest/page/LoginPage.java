@@ -10,7 +10,7 @@ import org.openqa.selenium.support.PageFactory;
 
 public class LoginPage extends HeaderFooterPage {
 
-  private static final String RELATIVE_URL = "miso/login";
+  private static final String RELATIVE_URL = "login";
 
   private static final By LOGIN_FORM = By.id("login-form");
   private static final By ERROR_DIV = By.className("flasherror");

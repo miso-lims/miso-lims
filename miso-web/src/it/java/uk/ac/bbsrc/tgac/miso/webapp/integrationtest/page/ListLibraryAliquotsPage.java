@@ -10,7 +10,7 @@ public class ListLibraryAliquotsPage extends ListPage {
   }
 
   public static ListLibraryAliquotsPage getListPage(WebDriver driver, String baseUrl) {
-    String url = String.format("%smiso/libraryaliquots", baseUrl);
+    String url = String.format("%slibraryaliquots", baseUrl);
     driver.get(url);
     return new ListLibraryAliquotsPage(driver);
   }

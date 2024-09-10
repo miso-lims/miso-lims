@@ -22,7 +22,7 @@
       <li>
         <div class="breadcrumbsbubbleInfo">
           <div class="trigger">
-            <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${detailedSample ? sample.project.code : sample.project.title}</a>
+            <a href='<c:url value="/project/${sample.project.id}"/>'>${detailedSample ? sample.project.code : sample.project.title}</a>
           </div>
           <div class="breadcrumbspopup">
               ${sample.project.name}
@@ -32,12 +32,12 @@
     </ul>
     <c:if test="${not empty nextSample}">
       <span style="float:right; padding-top: 5px; padding-left: 6px">
-        <a class='arrowright' href='<c:url value="/miso/sample/${nextSample.id}"/>'>Next Sample <b>${nextSample.label}</b></a>
+        <a class='arrowright' href='<c:url value="/sample/${nextSample.id}"/>'>Next Sample <b>${nextSample.label}</b></a>
       </span>
     </c:if>
     <c:if test="${not empty previousSample}">
       <span style="float:right; padding-top: 5px">
-        <a class='arrowleft' href='<c:url value="/miso/sample/${previousSample.id}"/>'>Previous Sample <b>${previousSample.label}</b></a>
+        <a class='arrowleft' href='<c:url value="/sample/${previousSample.id}"/>'>Previous Sample <b>${previousSample.label}</b></a>
       </span>
     </c:if>
   </div>

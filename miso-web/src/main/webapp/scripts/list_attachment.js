@@ -53,12 +53,8 @@ ListTarget.attachment = (function () {
           mRender: function (data, type, full) {
             if (type === "display") {
               return (
-                '<a href="/miso/attachments/' +
-                config.entityType +
-                "/" +
-                config.entityId +
-                "/" +
-                full.id +
+                '<a href="' +
+                Urls.download.attachment(config.entityType, config.entityId, full.id) +
                 '">' +
                 data +
                 "</a>"
@@ -123,7 +119,7 @@ ListTarget.attachment = (function () {
         "Delete",
         ["Are you sure you wish to delete " + filename + "? This cannot be undone."],
         function () {
-          var url = "/miso/rest/attachments/" + entityType + "/" + entityId + "/" + attachmentId;
+          var url = Urls.rest.attachments.delete(entityType, entityId, attachmentId);
           Utils.ajaxWithDialog("Deleting file", "DELETE", url, null, function () {
             Utils.page.pageReload();
           });
@@ -179,7 +175,7 @@ ListTarget.attachment = (function () {
                 params.entityIds = sharedIds;
               }
               var url =
-                "/miso/attachments/" + entityType + "/" + entityId + "?" + Utils.page.param(params);
+                Urls.upload.attachment(entityType, entityId) + "?" + Utils.page.param(params);
               var formData = new FormData(jQuery("#uploadForm")[0]);
               dialog.dialog("close");
               dialogArea.empty();
@@ -265,12 +261,7 @@ ListTarget.attachment = (function () {
               params.entityIds = sharedIds;
             }
             var url =
-              "/miso/rest/attachments/" +
-              entityType +
-              "/" +
-              entityId +
-              "?" +
-              Utils.page.param(params);
+              Urls.rest.attachments.link(entityType, entityId) + "?" + Utils.page.param(params);
             Utils.ajaxWithDialog("Linking File", "POST", url, null, function () {
               Utils.showOkDialog(
                 "Link Project File",

@@ -7,9 +7,9 @@
   xmlns:tx="http://www.springframework.org/schema/tx"
   xmlns:mvc="http://www.springframework.org/schema/mvc"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd 
+  xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
                       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-                      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd 
+                      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
                       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
                       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
                       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd"
@@ -23,23 +23,21 @@
     <property name="location" value="${miso.propertiesFile}" />
   </bean>
 
-  <bean id="applicationContextProvider" name="applicationContextProvider" class="uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider" />
-  <bean id="iApplicationContextProvider" name="iApplicationContextProvider" class="uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider" />
+  <aop:config />
 
-  <aop:config/>
-
-  <bean name="prometheusInterceptor" class="uk.ac.bbsrc.tgac.miso.webapp.context.PrometheusInterceptor" />
+  <bean name="prometheusInterceptor"
+    class="uk.ac.bbsrc.tgac.miso.webapp.context.PrometheusInterceptor" />
   <bean id="prometheusAdvisor"
-     class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
-     <property name="advice">
-        <ref bean="prometheusInterceptor"/>
-     </property>
-     <property name="patterns">
-     <array>
-       <value>uk\.ac\.bbsrc\.tgac\.miso\.service\.impl\..*</value>
-       <value>uk\.ac\.bbsrc\.tgac\.miso\.webapp\.controller\..*</value>
-     </array>
-     </property>
+    class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+    <property name="advice">
+      <ref bean="prometheusInterceptor" />
+    </property>
+    <property name="patterns">
+      <array>
+        <value>uk\.ac\.bbsrc\.tgac\.miso\.service\.impl\..*</value>
+        <value>uk\.ac\.bbsrc\.tgac\.miso\.webapp\.controller\..*</value>
+      </array>
+    </property>
   </bean>
 
   <import resource="db-config.xml" />
@@ -48,17 +46,14 @@
 
   <import resource="miso-config.xml" />
 
-  <import resource="standard-security-config.xml" />
-  <import resource="${security.method}-security-config.xml" />
-
   <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-     <property name="corePoolSize" value="5" />
-     <property name="maxPoolSize" value="10" />
-     <property name="queueCapacity" value="25" />
+    <property name="corePoolSize" value="5" />
+    <property name="maxPoolSize" value="10" />
+    <property name="queueCapacity" value="25" />
   </bean>
-  <task:annotation-driven executor="taskExecutor" scheduler="taskScheduler"/>
-  <task:executor id="taskExecutor" pool-size="2"/>
-  <task:scheduler id="taskScheduler" pool-size="10"/>
+  <task:annotation-driven executor="taskExecutor" scheduler="taskScheduler" />
+  <task:executor id="taskExecutor" pool-size="2" />
+  <task:scheduler id="taskScheduler" pool-size="10" />
 
   <mvc:annotation-driven>
     <mvc:message-converters>
@@ -67,5 +62,9 @@
       </bean>
     </mvc:message-converters>
   </mvc:annotation-driven>
+  <mvc:resources mapping="/scripts/**" location="/scripts/"></mvc:resources>
+  <mvc:resources mapping="/styles/**" location="/styles/"></mvc:resources>
+  <mvc:resources mapping="/favicon.ico" location="/favicon.ico"></mvc:resources>
+  <mvc:resources mapping="/index.html" location="/index.html"></mvc:resources>
 
 </beans>

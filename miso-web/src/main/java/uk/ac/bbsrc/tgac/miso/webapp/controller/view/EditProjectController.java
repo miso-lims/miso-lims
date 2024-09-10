@@ -62,7 +62,7 @@ public class EditProjectController {
   @GetMapping("/shortname/{shortName}")
   public ModelAndView byProjectShortName(@PathVariable String shortName, ModelMap model) throws IOException {
     model.clear();
-    return new ModelAndView("redirect:/miso/project/code/%s".formatted(shortName), model);
+    return new ModelAndView("redirect:/project/code/%s".formatted(shortName), model);
   }
 
   @GetMapping("/code/{code}")

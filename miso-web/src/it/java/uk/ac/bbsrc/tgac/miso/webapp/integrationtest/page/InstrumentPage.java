@@ -51,7 +51,7 @@ public class InstrumentPage extends FormPage<InstrumentPage.Field> {
   }
 
   public static InstrumentPage get(WebDriver driver, String baseUrl, long instrumentId) {
-    driver.get(baseUrl + "miso/instrument/" + instrumentId);
+    driver.get(baseUrl + "instrument/" + instrumentId);
     return new InstrumentPage(driver);
   }
 

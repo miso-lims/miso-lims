@@ -68,7 +68,7 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
   }
 
   public static LibraryPage get(WebDriver driver, String baseUrl, long libraryId) {
-    driver.get(baseUrl + "miso/library/" + libraryId);
+    driver.get(baseUrl + "library/" + libraryId);
     return new LibraryPage(driver);
   }
 

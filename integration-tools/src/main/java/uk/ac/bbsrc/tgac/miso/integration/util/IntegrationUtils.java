@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.integration.util;
 
 import java.io.BufferedReader;
@@ -57,8 +34,8 @@ import org.slf4j.LoggerFactory;
  */
 public class IntegrationUtils {
   private static final Logger log = LoggerFactory.getLogger(IntegrationUtils.class);
-  
-    public static String makePostRequest(String host, int port, String query) throws IntegrationException {
+
+  public static String makePostRequest(String host, int port, String query) throws IntegrationException {
     if (query == null || query.isEmpty()) {
       throw new IntegrationException("Query must be populated when calling makePostRequest.");
     }
@@ -89,17 +66,14 @@ public class IntegrationUtils {
     return rtn;
 
   }
-  
+
   /**
    * Sets up the socket connection to a given host
    * 
-   * @param host
-   *          of type String
-   * @param port
-   *          of type int
+   * @param host of type String
+   * @param port of type int
    * @return Socket
-   * @throws IntegrationException
-   *           when the socket couldn't be created
+   * @throws IntegrationException when the socket couldn't be created
    */
   public static Socket prepareSocket(String host, int port) throws IntegrationException {
     try {
@@ -113,13 +87,10 @@ public class IntegrationUtils {
   /**
    * Sends a String message to a given host socket
    * 
-   * @param socket
-   *          of type Socket
-   * @param query
-   *          of type String
+   * @param socket of type Socket
+   * @param query of type String
    * @return String
-   * @throws IntegrationException
-   *           when the socket couldn't be created
+   * @throws IntegrationException when the socket couldn't be created
    */
   public static String sendMessage(Socket socket, String query) throws IntegrationException {
     BufferedWriter wr = null;
@@ -147,8 +118,10 @@ public class IntegrationUtils {
       int i = 0;
       while (i < dirty.length()) {
         codePoint = dirty.codePointAt(i);
-        if ((codePoint == 0x9) || (codePoint == 0xA) || (codePoint == 0xD) || ((codePoint >= 0x20) && (codePoint <= 0xD7FF))
-            || ((codePoint >= 0xE000) && (codePoint <= 0xFFFD)) || ((codePoint >= 0x10000) && (codePoint <= 0x10FFFF))) {
+        if ((codePoint == 0x9) || (codePoint == 0xA) || (codePoint == 0xD)
+            || ((codePoint >= 0x20) && (codePoint <= 0xD7FF))
+            || ((codePoint >= 0xE000) && (codePoint <= 0xFFFD))
+            || ((codePoint >= 0x10000) && (codePoint <= 0x10FFFF))) {
           response.append(Character.toChars(codePoint));
         }
         i += Character.charCount(codePoint);
