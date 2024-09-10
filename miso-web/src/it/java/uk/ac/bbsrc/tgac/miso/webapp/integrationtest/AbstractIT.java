@@ -139,7 +139,7 @@ public abstract class AbstractIT {
     if (!constantsComplete()) {
       log.warn("Missing data in constants.js - refreshing");
       ((JavascriptExecutor) getDriver())
-          .executeScript("jQuery.ajax({type: 'POST', url: '/miso/rest/admin/constants/refresh'})");
+          .executeScript("jQuery.ajax({type: 'POST', url: '/rest/admin/constants/refresh'})");
       for (int attempt = 0; attempt < 5; attempt++) {
         try {
           Thread.sleep(30000);

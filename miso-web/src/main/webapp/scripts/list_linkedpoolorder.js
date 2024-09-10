@@ -1,7 +1,7 @@
 ListTarget.linkedpoolorder = {
   name: "Pool Orders",
   createUrl: function (config, projectId) {
-    return "/miso/rest/poolorders/dt/" + config.status;
+    return Urls.rest.poolOrders.statusDatatable(config.status);
   },
   queryUrl: null,
   createBulkActions: function (config, projectId) {

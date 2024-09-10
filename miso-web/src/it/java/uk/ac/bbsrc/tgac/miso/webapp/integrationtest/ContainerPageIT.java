@@ -48,9 +48,10 @@ public class ContainerPageIT extends AbstractIT {
     InstrumentModel miseq = (InstrumentModel) getSession().get(InstrumentModel.class, 2L);
     SequencingContainerModel model = (SequencingContainerModel) getSession().get(SequencingContainerModel.class, 3L);
     String newUrl = listContainers
-        .clickButtonAndGetUrl(ButtonText.ADD + " " + containerName, Lists.newArrayList(miseq.getAlias(), model.getAlias()));
+        .clickButtonAndGetUrl(ButtonText.ADD + " " + containerName,
+            Lists.newArrayList(miseq.getAlias(), model.getAlias()));
 
-    assertTrue(newUrl.matches(".*/miso/container/new/" + model.getId()));
+    assertTrue(newUrl.matches(".*/container/new/" + model.getId()));
   }
 
   @Test
@@ -82,8 +83,9 @@ public class ContainerPageIT extends AbstractIT {
     fields.remove(Field.ID);
     assertFieldValues("post-save", fields, page2);
     long savedId = Long.parseLong(page2.getField(Field.ID));
-    SequencerPartitionContainer savedContainer = (SequencerPartitionContainer) getSession().get(SequencerPartitionContainerImpl.class,
-        savedId);
+    SequencerPartitionContainer savedContainer =
+        (SequencerPartitionContainer) getSession().get(SequencerPartitionContainerImpl.class,
+            savedId);
     assertContainerAttributes(fields, savedContainer);
   }
 
@@ -112,16 +114,20 @@ public class ContainerPageIT extends AbstractIT {
 
     ContainerPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
-    SequencerPartitionContainer savedContainer = (SequencerPartitionContainer) getSession().get(SequencerPartitionContainerImpl.class,
-        6001L);
+    SequencerPartitionContainer savedContainer =
+        (SequencerPartitionContainer) getSession().get(SequencerPartitionContainerImpl.class,
+            6001L);
     assertContainerAttributes(fields, savedContainer);
   }
 
-  private void assertContainerAttributes(Map<ContainerPage.Field, String> expectedValues, SequencerPartitionContainer container) {
+  private void assertContainerAttributes(Map<ContainerPage.Field, String> expectedValues,
+      SequencerPartitionContainer container) {
     assertAttribute(Field.ID, expectedValues, Long.toString(container.getId()));
     assertAttribute(Field.SERIAL_NUMBER, expectedValues, container.getIdentificationBarcode());
     assertAttribute(Field.MODEL, expectedValues, container.getModel().getAlias());
-    assertAttribute(Field.CLUSTERING_KIT, expectedValues, nullOrGet(container.getClusteringKit(), KitDescriptor::getName));
-    assertAttribute(Field.MULTIPLEXING_KIT, expectedValues, nullOrGet(container.getMultiplexingKit(), KitDescriptor::getName));
+    assertAttribute(Field.CLUSTERING_KIT, expectedValues,
+        nullOrGet(container.getClusteringKit(), KitDescriptor::getName));
+    assertAttribute(Field.MULTIPLEXING_KIT, expectedValues,
+        nullOrGet(container.getMultiplexingKit(), KitDescriptor::getName));
   }
 }

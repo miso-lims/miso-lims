@@ -1,6 +1,6 @@
 PaneTarget.instrument_status = (function () {
   var title = "Instrument Status";
-  var url = "/miso/rest/instrumentstatus";
+  var url = Urls.rest.instrumentStatus;
 
   var transform = function (data) {
     var positionCount = data.positions.length;
@@ -118,7 +118,7 @@ PaneTarget.instrument_status = (function () {
           {
             name: "View Instrument (" + data.instrument.name + ")",
             handler: function () {
-              window.location = window.location.origin + "/miso/instrument/" + data.instrument.id;
+              window.location = Urls.ui.instruments.edit(data.instrument.id);
             },
           },
         ];
@@ -133,7 +133,7 @@ PaneTarget.instrument_status = (function () {
                 position.run.alias +
                 ")",
               handler: function () {
-                window.location = window.location.origin + "/miso/run/" + position.run.id;
+                window.location = Urls.ui.runs.edit(position.run.id);
               },
             });
             if (position.pools) {
@@ -141,7 +141,7 @@ PaneTarget.instrument_status = (function () {
                 links.push({
                   name: "View " + pool.name + " (" + pool.alias + ")",
                   handler: function () {
-                    window.location = window.location.origin + "/miso/pool/" + pool.id;
+                    window.location = Urls.ui.pools.edit(pool.id);
                   },
                 });
               });

@@ -281,7 +281,7 @@ public class NotificationManager {
 
     if (baseUrl != null && internalDomain != null && notification.getRecipientEmail().endsWith("@" + internalDomain)) {
       bodyElements
-          .add(p(a("View transfer in MISO").withHref(String.format("%s/miso/transfer/%d", baseUrl, transfer.getId()))));
+          .add(p(a("View transfer in MISO").withHref(String.format("%s/transfer/%d", baseUrl, transfer.getId()))));
     }
     bodyElements.add(p("Please do not reply to this email. This address is not monitored."));
 

@@ -12,7 +12,7 @@ var Admin = Admin || {
       Utils.ajaxWithDialog(
         "Clearing Cache",
         "POST",
-        "/miso/rest/admin/cache/clear",
+        Urls.rest.admin.clearHibernateCache,
         null,
         function (success) {
           Utils.showOkDialog("Cache", [success ? "Cache cleared." : "Failed to clear cache."]);
@@ -25,7 +25,7 @@ var Admin = Admin || {
       Utils.ajaxWithDialog(
         "Generating Barcodes",
         "POST",
-        "/miso/rest/admin/barcode/regen",
+        Urls.rest.admin.regenerateBarcodes,
         null,
         function (results) {
           Utils.showOkDialog(
@@ -59,7 +59,7 @@ var Admin = Admin || {
       Utils.ajaxWithDialog(
         "Refreshing Constants",
         "POST",
-        "/miso/rest/admin/constants/refresh",
+        Urls.rest.admin.refreshConstants,
         null,
         function (success) {
           Utils.showOkDialog("Constants", ["Constants refreshed."]);

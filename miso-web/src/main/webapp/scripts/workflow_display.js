@@ -23,7 +23,7 @@ var WorkflowDisplay = (function () {
   }
 
   function executeWorkflow(workflowId) {
-    ajax("POST", "/miso/rest/workflows/" + workflowId + "/execute", showSuccess, showError);
+    ajax("POST", Urls.rest.workflows.execute(workflowId), showSuccess, showError);
   }
 
   function showError(xhr) {
@@ -50,11 +50,8 @@ var WorkflowDisplay = (function () {
     ajax(
       "POST",
       encodeURI(
-        "/miso/rest/workflows/" +
-          workflowId +
-          "/step/" +
-          stepNumber +
-          "/?" +
+        Urls.rest.workflows.processInput(workflowId, stepNumber) +
+          "?" +
           Utils.page.param({
             input: input,
           })
@@ -94,16 +91,11 @@ var WorkflowDisplay = (function () {
   }
 
   function changeStep(workflowId, stepNumber) {
-    ajax(
-      "GET",
-      "/miso/rest/workflows/" + workflowId + "/step/" + stepNumber,
-      updateDisplay,
-      showError
-    );
+    ajax("GET", Urls.rest.workflows.getStep(workflowId, stepNumber), updateDisplay, showError);
   }
 
   function cancelInput(workflowId) {
-    ajax("DELETE", "/miso/rest/workflows/" + workflowId + "/step/latest", updateDisplay, showError);
+    ajax("DELETE", Urls.rest.workflows.latestStep(workflowId), updateDisplay, showError);
   }
 
   function makeLogIconCell(file, label) {
@@ -181,7 +173,7 @@ var WorkflowDisplay = (function () {
   }
 
   function continueWorkflow(workflowId) {
-    ajax("GET", "/miso/rest/workflows/" + workflowId + "/step/latest", updateDisplay, showError);
+    ajax("GET", Urls.rest.workflows.latestStep(workflowId), updateDisplay, showError);
   }
 
   function makeSkipButton(workflowId, stepNumber) {

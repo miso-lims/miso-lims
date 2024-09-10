@@ -68,7 +68,7 @@ ListTarget.experiment_run_partition = {
         mRender: Warning.tableWarningRenderer(
           WarningTarget.experiment_run_partition,
           function (data) {
-            return "/miso/pool/" + data.partition.pool.id;
+            return Urls.ui.pools.edit(data.partition.pool.id);
           }
         ),
       },

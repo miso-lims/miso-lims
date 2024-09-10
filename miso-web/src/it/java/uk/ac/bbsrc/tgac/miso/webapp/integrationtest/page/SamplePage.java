@@ -69,7 +69,7 @@ public class SamplePage extends FormPage<SamplePage.Field> {
   }
 
   public static SamplePage get(WebDriver driver, String baseUrl, long sampleId) {
-    driver.get(baseUrl + "miso/sample/" + sampleId);
+    driver.get(baseUrl + "sample/" + sampleId);
     return new SamplePage(driver);
   }
 

@@ -27,7 +27,8 @@ public class BulkSequencingOrderPage extends BulkPage {
     public static final String DESCRIPTION = "Description";
 
     public static List<String> all() {
-      return Lists.newArrayList(NAME, ALIAS, PURPOSE, INSTRUMENT_MODEL, CONTAINER_MODEL, PARAMETERS, PARTITIONS, DESCRIPTION);
+      return Lists.newArrayList(NAME, ALIAS, PURPOSE, INSTRUMENT_MODEL, CONTAINER_MODEL, PARAMETERS, PARTITIONS,
+          DESCRIPTION);
     }
 
     private Columns() {
@@ -35,7 +36,7 @@ public class BulkSequencingOrderPage extends BulkPage {
     }
   };
 
-  public static final String CREATE_URL_FRAGMENT = "miso/sequencingorder/bulk/new";
+  public static final String CREATE_URL_FRAGMENT = "sequencingorder/bulk/new";
 
   private HandsOnTable table;
 
@@ -48,7 +49,8 @@ public class BulkSequencingOrderPage extends BulkPage {
 
   public static BulkSequencingOrderPage getForCreate(WebDriver driver, String baseUrl, Collection<Long> poolIds) {
     String poolIdString = Joiner.on(",").join(poolIds);
-    postData(driver, baseUrl + CREATE_URL_FRAGMENT, new MapBuilder<String, String>().put("poolIds", poolIdString).build());
+    postData(driver, baseUrl + CREATE_URL_FRAGMENT,
+        new MapBuilder<String, String>().put("poolIds", poolIdString).build());
     return new BulkSequencingOrderPage(driver);
   }
 

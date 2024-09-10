@@ -14,7 +14,7 @@
       Utils.ajaxWithDialog(
         "Index Search",
         "POST",
-        "/miso/rest/indices/search",
+        Urls.rest.indices.search,
         searchData,
         function (data) {
           var results = "";

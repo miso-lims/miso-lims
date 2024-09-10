@@ -14,7 +14,7 @@
   <c:if test="${run.id != 0}">
     <c:forEach items="<%=uk.ac.bbsrc.tgac.miso.core.util.SampleSheet.values()%>" var="sheet">
       <c:if test="${sheet.allowedFor(run)}">
-        <a href="<c:url value='/miso/rest/runs/${run.id}/samplesheet/${sheet.name()}'/>" class="ui-button ui-state-default">Download Sample Sheet (${sheet.alias()})</a>
+        <a href="<c:url value='/rest/runs/${run.id}/samplesheet/${sheet.name()}'/>" class="ui-button ui-state-default">Download Sample Sheet (${sheet.alias()})</a>
       </c:if>
     </c:forEach>
     <span></span>

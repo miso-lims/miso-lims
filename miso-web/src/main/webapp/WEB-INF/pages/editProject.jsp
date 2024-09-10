@@ -33,7 +33,7 @@
           <button class="ui-state-default ui-state-hover small-gap-right clickable-non-link"
             onclick="Subproject.filterSamples('samples_section_arrowclick', 'project_samples', '${subproject.alias}'); return false;">${subproject.alias}</button>
         </c:forEach>
-        <br/><a href="<c:url value='/miso/subproject/bulk/new?quantity=1'/>">Add new subproject</a>
+        <br/><a href="<c:url value='/subproject/bulk/new?quantity=1'/>">Add new subproject</a>
         </td>
       </tr>
     </c:if>

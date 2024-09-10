@@ -39,7 +39,7 @@ public class PoolPage extends FormPage<PoolPage.Field> {
     DISTRIBUTION_DATE(By.id("poolForm_distributionDate")), //
     DISTRIBUTION_RECIPIENT(By.id("poolForm_distributionRecipient")), //
     LOCATION(By.id("poolForm_boxPosition")), //
-    
+
     WARNINGS(By.id("warnings")); //
 
     private final By selector;
@@ -100,12 +100,12 @@ public class PoolPage extends FormPage<PoolPage.Field> {
   }
 
   public static PoolPage getForCreate(WebDriver driver, String baseUrl) {
-    driver.get(baseUrl + "miso/pool/new");
+    driver.get(baseUrl + "pool/new");
     return new PoolPage(driver, true);
   }
 
   public static PoolPage getForEdit(WebDriver driver, String baseUrl, long poolId) {
-    driver.get(baseUrl + "miso/pool/" + poolId);
+    driver.get(baseUrl + "pool/" + poolId);
     return new PoolPage(driver, false);
   }
 
@@ -155,7 +155,8 @@ public class PoolPage extends FormPage<PoolPage.Field> {
       Integer proportion = searchTermsAndProportions.entrySet().stream()
           .filter(entry -> entry.getKey().equals(m.group(1)) || entry.getKey().equals(m.group(2)))
           .findFirst()
-          .orElseThrow(() -> new IllegalStateException("Failed to match search term to proportion field with text: " + element.getText()))
+          .orElseThrow(() -> new IllegalStateException(
+              "Failed to match search term to proportion field with text: " + element.getText()))
           .getValue();
       element.findElement(By.tagName("input")).sendKeys(proportion.toString());
     }
@@ -176,7 +177,8 @@ public class PoolPage extends FormPage<PoolPage.Field> {
       }
     }
     if (selected != namesToRemove.size()) {
-      throw new IllegalArgumentException(String.format("Found only %d/%d of the specified aliquots", selected, namesToRemove.size()));
+      throw new IllegalArgumentException(
+          String.format("Found only %d/%d of the specified aliquots", selected, namesToRemove.size()));
     }
     aliquotsTable.clickButton("Remove");
     waitUntil(invisibilityOf(dialogContainer));

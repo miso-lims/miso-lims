@@ -744,7 +744,7 @@ var Utils = Utils || {
     Utils.ajaxWithDialog(
       "Getting Printers",
       "GET",
-      window.location.origin + "/miso/rest/printers",
+      Urls.rest.printers.list,
       null,
       function (printers) {
         Utils.showDialog(
@@ -784,7 +784,7 @@ var Utils = Utils || {
       Utils.ajaxWithDialog(
         "Printing",
         "POST",
-        window.location.origin + "/miso/rest/printers/" + printer,
+        Urls.rest.printers.print,
         {
           type: type,
           ids: ids,
@@ -1115,7 +1115,7 @@ var Utils = Utils || {
         ]);
         return;
       }
-      Utils.ajaxWithDialog("Creating Box", "POST", "/miso/rest/boxes", box, callback);
+      Utils.ajaxWithDialog("Creating Box", "POST", Urls.rest.boxes.create, box, callback);
     });
   },
   getEmptyBoxPositions: function (box) {

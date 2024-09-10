@@ -41,12 +41,12 @@ public class FreezerPage extends FormPage<FreezerPage.Field> {
   }
 
   public static FreezerPage get(WebDriver driver, String baseUrl, long freezerId) {
-    driver.get(baseUrl + "miso/freezer/" + freezerId);
+    driver.get(baseUrl + "freezer/" + freezerId);
     return new FreezerPage(driver);
   }
 
   public static FreezerPage getForCreate(WebDriver driver, String baseUrl) {
-    driver.get(baseUrl + "miso/freezer/new");
+    driver.get(baseUrl + "freezer/new");
     return new FreezerPage(driver);
   }
 

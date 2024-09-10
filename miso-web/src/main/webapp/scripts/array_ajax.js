@@ -113,7 +113,7 @@
     var selectedPosition = visual.selectedItems[0].position;
 
     $.ajax({
-      url: "/miso/rest/arrays/" + arrayJson.id + "/positions/" + selectedPosition,
+      url: Urls.rest.arrays.position(arrayJson.id, selectedPosition),
       type: "DELETE",
       dataType: "json",
     })
@@ -135,7 +135,8 @@
     }
     showSamplesLoading(true);
     var url =
-      "/miso/rest/arrays/sample-search?" +
+      Urls.rest.arrays.sampleSearch +
+      "?" +
       Utils.page.param({
         q: searchString,
       });
@@ -172,10 +173,7 @@
 
       $.ajax({
         url:
-          "/miso/rest/arrays/" +
-          arrayJson.id +
-          "/positions/" +
-          selectedPosition +
+          Urls.rest.arrays.position(arrayJson.id, selectedPosition) +
           "?" +
           Utils.page.param({
             sampleId: jQuery("#resultSelect").val(),
@@ -360,7 +358,7 @@
 
   function updateChangelogs() {
     $.ajax({
-      url: "/miso/rest/arrays/" + arrayJson.id + "/changelog",
+      url: Urls.rest.arrays.changelog(arrayJson.id),
       type: "GET",
       dataType: "json",
     })

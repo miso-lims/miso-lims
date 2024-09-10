@@ -19,7 +19,7 @@
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/project/${library.sample.project.id}"/>'>${library.sample.project.title}</a>
+          <a href='<c:url value="/project/${library.sample.project.id}"/>'>${library.sample.project.title}</a>
         </div>
         <div class="breadcrumbspopup">
             ${library.sample.project.name}
@@ -29,7 +29,7 @@
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.alias}</a>
+          <a href='<c:url value="/sample/${library.sample.id}"/>'>${library.sample.alias}</a>
         </div>
         <div class="breadcrumbspopup">
             ${library.sample.name}
@@ -39,12 +39,12 @@
   </ul>
   <c:if test="${not empty nextLibrary}">
     <span style="float:right; padding-top: 5px; padding-left: 6px">
-      <a class='arrowright' href='<c:url value="/miso/library/${nextLibrary.id}"/>'>Next Library <b>${nextLibrary.label}</b></a>
+      <a class='arrowright' href='<c:url value="/library/${nextLibrary.id}"/>'>Next Library <b>${nextLibrary.label}</b></a>
     </span>
   </c:if>
   <c:if test="${not empty previousLibrary}">
     <span style="float:right; padding-top: 5px">
-      <a class='arrowleft' href='<c:url value="/miso/library/${previousLibrary.id}"/>'>Previous Library <b>${previousLibrary.label}</b></a>
+      <a class='arrowleft' href='<c:url value="/library/${previousLibrary.id}"/>'>Previous Library <b>${previousLibrary.label}</b></a>
     </span>
   </c:if>
 </div>

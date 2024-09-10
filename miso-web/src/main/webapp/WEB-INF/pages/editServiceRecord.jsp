@@ -13,22 +13,22 @@
     <div class="breadcrumbs">
       <ul>
         <li>
-          <a href="<c:url value='/miso/'/>">Home</a>
+          <a href="<c:url value='/'/>">Home</a>
         </li>
         <c:if test="${instrument.id != null}">
           <li>
-            <a href='<c:url value="/miso/instruments"/>'>Instruments</a>
+            <a href='<c:url value="/instruments"/>'>Instruments</a>
           </li>
           <li>
-            <a href='<c:url value="/miso/instrument/${instrument.id}"/>'>${instrument.name}</a>
+            <a href='<c:url value="/instrument/${instrument.id}"/>'>${instrument.name}</a>
           </li>
         </c:if>
         <c:if test="${freezer.id != null}">
           <li>
-            <a href='<c:url value="/miso/storagelocations"/>'>Storage Locations</a>
+            <a href='<c:url value="/storagelocations"/>'>Storage Locations</a>
           </li>
           <li>
-            <a href='<c:url value="/miso/freezer/${freezer.id}"/>'>${freezer.alias}</a>
+            <a href='<c:url value="/freezer/${freezer.id}"/>'>${freezer.alias}</a>
           </li>
         </c:if>
 

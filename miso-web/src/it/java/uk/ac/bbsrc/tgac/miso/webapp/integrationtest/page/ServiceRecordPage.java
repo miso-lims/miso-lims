@@ -50,9 +50,9 @@ public class ServiceRecordPage extends FormPage<ServiceRecordPage.Field> {
     if (sequencerId == null && serviceRecordId == null) {
       throw new IllegalArgumentException("Must specify either instrument ID or service record ID");
     } else if (serviceRecordId == null) {
-      driver.get(baseUrl + "miso/instrument/" + instrumentId + "/servicerecord/new/" + sequencerId);
+      driver.get(baseUrl + "instrument/" + instrumentId + "/servicerecord/new/" + sequencerId);
     } else {
-      driver.get(baseUrl + "miso/instrument/" + instrumentId + "/servicerecord/" + serviceRecordId);
+      driver.get(baseUrl + "instrument/" + instrumentId + "/servicerecord/" + serviceRecordId);
     }
     return new ServiceRecordPage(driver);
   }

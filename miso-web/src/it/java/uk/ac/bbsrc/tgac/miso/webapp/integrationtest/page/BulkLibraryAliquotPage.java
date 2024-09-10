@@ -65,7 +65,8 @@ public class BulkLibraryAliquotPage extends BulkPage {
 
   public BulkLibraryAliquotPage(WebDriver driver) {
     super(driver);
-    waitWithTimeout().until(or(titleContains("Create Library Aliquots from "), titleContains("Edit Library Aliquots ")));
+    waitWithTimeout()
+        .until(or(titleContains("Create Library Aliquots from "), titleContains("Edit Library Aliquots ")));
     refreshElements();
   }
 
@@ -77,21 +78,22 @@ public class BulkLibraryAliquotPage extends BulkPage {
 
   public static BulkLibraryAliquotPage getForEdit(WebDriver driver, String baseUrl, Collection<Long> aliquotIds) {
     String ids = Joiner.on(',').join(aliquotIds);
-    String url = baseUrl + "miso/libraryaliquot/bulk/edit";
+    String url = baseUrl + "libraryaliquot/bulk/edit";
     postData(driver, url, new MapBuilder<String, String>().put("ids", ids).build());
     return new BulkLibraryAliquotPage(driver);
   }
 
   public static BulkLibraryAliquotPage getForPropagate(WebDriver driver, String baseUrl, Collection<Long> libraryIds) {
     String ids = Joiner.on(',').join(libraryIds);
-    String url = baseUrl + "miso/libraryaliquot/bulk/propagate";
+    String url = baseUrl + "libraryaliquot/bulk/propagate";
     postData(driver, url, new MapBuilder<String, String>().put("ids", ids).build());
     return new BulkLibraryAliquotPage(driver);
   }
 
-  public static BulkLibraryAliquotPage getForRepropagate(WebDriver driver, String baseUrl, Collection<Long> aliquotIds) {
+  public static BulkLibraryAliquotPage getForRepropagate(WebDriver driver, String baseUrl,
+      Collection<Long> aliquotIds) {
     String ids = Joiner.on(',').join(aliquotIds);
-    String url = baseUrl + "miso/libraryaliquot/bulk/repropagate";
+    String url = baseUrl + "libraryaliquot/bulk/repropagate";
     postData(driver, url, new MapBuilder<String, String>().put("ids", ids).build());
     return new BulkLibraryAliquotPage(driver);
   }

@@ -5,7 +5,7 @@ import org.openqa.selenium.WebDriver;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class IdentitySearchPage extends HeaderFooterPage {
-  
+
   private final DataTable samplesTable;
 
   public IdentitySearchPage(WebDriver driver) {
@@ -14,10 +14,10 @@ public class IdentitySearchPage extends HeaderFooterPage {
   }
 
   public static IdentitySearchPage get(WebDriver driver, String baseUrl) {
-    driver.get(baseUrl + "miso/tools/identitysearch");
+    driver.get(baseUrl + "tools/identitysearch");
     return new IdentitySearchPage(driver);
   }
-  
+
   public DataTable getSamplesTable() {
     return samplesTable;
   }

@@ -102,7 +102,7 @@ public class BulkLibraryPage extends BulkPage {
 
   public static BulkLibraryPage getForEdit(WebDriver driver, String baseUrl, Collection<Long> libraryIds) {
     String ids = Joiner.on(',').join(libraryIds);
-    String url = baseUrl + "miso/library/bulk/edit";
+    String url = baseUrl + "library/bulk/edit";
     postData(driver, url, new MapBuilder<String, String>().put("ids", ids).build());
     return new BulkLibraryPage(driver);
   }
@@ -111,7 +111,7 @@ public class BulkLibraryPage extends BulkPage {
       List<Integer> replicates) {
     String ids = Joiner.on(',').join(sampleIds);
     String replicatesString = Joiner.on(',').join(replicates);
-    String url = baseUrl + "miso/library/bulk/propagate";
+    String url = baseUrl + "library/bulk/propagate";
     postData(driver, url, new MapBuilder<String, String>()
         .put("ids", ids)
         .put("replicates", replicatesString)
@@ -121,7 +121,7 @@ public class BulkLibraryPage extends BulkPage {
 
   public static BulkLibraryPage getForReceive(WebDriver driver, String baseUrl, int quantity, Long projectId,
       Long aliquotClassId) {
-    String url = baseUrl + "miso/library/bulk/receive";
+    String url = baseUrl + "library/bulk/receive";
     MapBuilder<String, String> params = new MapBuilder<String, String>()
         .put("quantity", String.valueOf(quantity));
     if (projectId != null) {

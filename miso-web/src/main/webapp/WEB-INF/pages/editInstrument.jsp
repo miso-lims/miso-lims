@@ -16,10 +16,10 @@
     <div class="breadcrumbs">
       <ul>
         <li>
-          <a href="<c:url value='/miso/'/>">Home</a>
+          <a href="<c:url value='/'/>">Home</a>
         </li>
         <li>
-          <a href='<c:url value="/miso/instruments"/>'>Instruments</a>
+          <a href='<c:url value="/instruments"/>'>Instruments</a>
         </li>
       </ul>
     </div>

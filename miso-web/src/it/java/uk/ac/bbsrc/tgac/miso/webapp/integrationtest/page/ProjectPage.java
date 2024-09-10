@@ -75,7 +75,7 @@ public class ProjectPage extends HeaderFooterPage {
   }
 
   public static ProjectPage get(WebDriver driver, String baseUrl, Long projectId) {
-    driver.get(baseUrl + "miso/project/" + (projectId == null ? "new" : projectId));
+    driver.get(baseUrl + "project/" + (projectId == null ? "new" : projectId));
     return new ProjectPage(driver);
   }
 

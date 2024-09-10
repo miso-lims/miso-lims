@@ -171,7 +171,7 @@ var Pane = (function () {
           return wkflow.barcode == query;
         });
         if (workflow) {
-          window.location = window.location.origin + "/miso/workflow/new/" + workflow.workflowName;
+          window.location = Urls.ui.workflows.create(workflow.workflowName);
           return;
         }
       }

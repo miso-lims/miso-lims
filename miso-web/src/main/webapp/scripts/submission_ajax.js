@@ -19,12 +19,7 @@ var Submission = {
         },
       ],
       function (results) {
-        window.location =
-          window.location.origin +
-          "/miso/rest/submissions/" +
-          id +
-          "/download?" +
-          Utils.page.param(results);
+        window.location = Urls.rest.submissions.download(id) + "?" + Utils.page.param(results);
       }
     );
   },

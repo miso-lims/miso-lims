@@ -36,17 +36,18 @@ public class TestUtils {
    * @return true if an error occurs; false otherwise
    */
   public static boolean checkForErrors(WebDriver driver, String baseUrl, String urlSlug) {
-    String url = String.format("%smiso/%s", baseUrl, urlSlug);
+    String url = String.format("%s%s", baseUrl, urlSlug);
     try {
       driver.get(url);
       return doChecks(driver, urlSlug);
     } catch (Exception e) {
-      log.error("/miso/{}: Exception thrown while checking for errors", urlSlug, e);
+      log.error("/{}: Exception thrown while checking for errors", urlSlug, e);
       return true;
     }
   }
 
-  public static boolean checkForErrors(WebDriver driver, String baseUrl, String urlSlug, BiConsumer<WebDriver, String> factoryMethod) {
+  public static boolean checkForErrors(WebDriver driver, String baseUrl, String urlSlug,
+      BiConsumer<WebDriver, String> factoryMethod) {
     try {
       factoryMethod.accept(driver, baseUrl);
       return doChecks(driver, urlSlug);
@@ -57,12 +58,12 @@ public class TestUtils {
   }
 
   public static boolean checkForErrors(WebDriver driver, String baseUrl, String urlSlug, Map<String, String> formData) {
-    String url = String.format("%smiso/%s", baseUrl, urlSlug);
+    String url = String.format("%s%s", baseUrl, urlSlug);
     try {
       postData(driver, url, formData);
       return doChecks(driver, urlSlug);
     } catch (Exception e) {
-      log.error("/miso/{}: Exception thrown while checking for errors", urlSlug, e);
+      log.error("/{}: Exception thrown while checking for errors", urlSlug, e);
       return true;
     }
   }
@@ -76,7 +77,7 @@ public class TestUtils {
     if (urlSlug == null) {
       url = driver.getCurrentUrl();
     } else {
-      url = "/miso/" + urlSlug;
+      url = urlSlug;
       if (!driver.getCurrentUrl().contains(url)) {
         log.error("{}: Navigation failed", url);
         return true;

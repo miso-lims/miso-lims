@@ -26,7 +26,7 @@ public class ListPage extends AbstractListPage {
   }
 
   public static ListPage getListPage(WebDriver driver, String baseUrl, String listTarget) {
-    String url = String.format("%smiso/%s", baseUrl, listTarget);
+    String url = String.format("%s%s", baseUrl, listTarget);
     driver.get(url);
     return new ListPage(driver);
   }

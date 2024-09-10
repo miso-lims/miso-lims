@@ -20,7 +20,7 @@
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/project/${aliquot.library.sample.project.id}"/>'>${aliquot.library.sample.project.title}</a>
+          <a href='<c:url value="/project/${aliquot.library.sample.project.id}"/>'>${aliquot.library.sample.project.title}</a>
         </div>
         <div class="breadcrumbspopup">
             ${aliquot.library.sample.project.name}
@@ -30,7 +30,7 @@
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/sample/${aliquot.library.sample.id}"/>'>${aliquot.library.sample.alias}</a>
+          <a href='<c:url value="/sample/${aliquot.library.sample.id}"/>'>${aliquot.library.sample.alias}</a>
         </div>
         <div class="breadcrumbspopup">
             ${aliquot.library.sample.name}
@@ -40,7 +40,7 @@
     <li>
       <div class="breadcrumbsbubbleInfo">
         <div class="trigger">
-          <a href='<c:url value="/miso/library/${aliquot.library.id}"/>'>${aliquot.library.alias}</a>
+          <a href='<c:url value="/library/${aliquot.library.id}"/>'>${aliquot.library.alias}</a>
         </div>
         <div class="breadcrumbspopup">
             ${aliquot.library.name}

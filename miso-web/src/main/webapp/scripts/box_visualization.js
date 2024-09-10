@@ -770,7 +770,7 @@
     },
 
     hyperlinkifyBoxable: function (name, id, text) {
-      var path = "/miso/";
+      var path = "/";
       var prefix = name.substring(0, 3);
       if (["SAM", "LIB", "LDI", "IPO"].includes(prefix)) {
         if (prefix == "SAM") {

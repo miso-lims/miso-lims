@@ -66,7 +66,7 @@ public class BoxPage extends FormPage<BoxPage.Field> {
   }
 
   public static BoxPage get(WebDriver driver, String baseUrl, Long boxId) {
-    driver.get(baseUrl + "miso/box/" + (boxId == null ? "new" : boxId));
+    driver.get(baseUrl + "box/" + (boxId == null ? "new" : boxId));
 
     return new BoxPage(driver);
   }

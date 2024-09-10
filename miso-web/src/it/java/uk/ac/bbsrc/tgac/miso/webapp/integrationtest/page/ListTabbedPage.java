@@ -54,7 +54,7 @@ public class ListTabbedPage extends AbstractListPage {
   private List<WebElement> tableWrapperElements;
   @FindBy(className = "parsley-error")
   private WebElement errors;
-  
+
   private final List<WebElement> tabs;
 
   private final List<DataTable> tables = new ArrayList<>();
@@ -77,7 +77,7 @@ public class ListTabbedPage extends AbstractListPage {
   }
 
   public static ListTabbedPage getTabbedListPage(WebDriver driver, String baseUrl, String listTarget) {
-    String url = String.format("%smiso/%s", baseUrl, listTarget);
+    String url = String.format("%s%s", baseUrl, listTarget);
     driver.get(url);
     return new ListTabbedPage(driver);
   }
@@ -95,7 +95,8 @@ public class ListTabbedPage extends AbstractListPage {
     String tableId = "list" + tabNumber;
     selectedTable = tables.stream()
         .filter(table -> tableId.equals(table.getId())).findAny().orElse(null);
-    if (selectedTable == null) throw new IllegalArgumentException("Cannot find table with id " + tableId);
+    if (selectedTable == null)
+      throw new IllegalArgumentException("Cannot find table with id " + tableId);
   }
 
   @Override
@@ -107,7 +108,8 @@ public class ListTabbedPage extends AbstractListPage {
     selectedTab = tabs.stream()
         .filter(tab -> tab.getText().trim().equals(tabHeading))
         .findAny().orElse(null);
-    if (selectedTab == null) throw new IllegalArgumentException("Cannot find tab " + tabHeading);
+    if (selectedTab == null)
+      throw new IllegalArgumentException("Cannot find tab " + tabHeading);
 
     setSelectedTable(getTabNumber());
     selectedTab.click();

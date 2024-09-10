@@ -55,12 +55,12 @@ public class PoolOrderPage extends FormPage<PoolOrderPage.Field> {
   }
 
   public static PoolOrderPage getForCreate(WebDriver driver, String baseUrl) {
-    driver.get(baseUrl + "miso/poolorder/new");
+    driver.get(baseUrl + "poolorder/new");
     return new PoolOrderPage(driver);
   }
 
   public static PoolOrderPage getForEdit(WebDriver driver, String baseUrl, long orderId) {
-    driver.get(baseUrl + "miso/poolorder/" + orderId);
+    driver.get(baseUrl + "poolorder/" + orderId);
     return new PoolOrderPage(driver);
   }
 
@@ -73,7 +73,8 @@ public class PoolOrderPage extends FormPage<PoolOrderPage.Field> {
     } else {
       saveButton.click();
       try {
-        waitUntil(ExpectedConditions.or(ExpectedConditions.stalenessOf(html), ExpectedConditions.visibilityOf(errorBox)));
+        waitUntil(
+            ExpectedConditions.or(ExpectedConditions.stalenessOf(html), ExpectedConditions.visibilityOf(errorBox)));
       } catch (StaleElementReferenceException e) {
         waitUntil(ExpectedConditions.stalenessOf(html));
       }

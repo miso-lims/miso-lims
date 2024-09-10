@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
@@ -75,7 +52,8 @@ public class MenuController {
   }
 
   @RequestMapping("/login")
-  public ModelAndView loginPage(ModelMap model, @RequestParam(name = "login_error", required = false) Integer loginError) {
+  public ModelAndView loginPage(ModelMap model,
+      @RequestParam(name = "login_error", required = false) Integer loginError) {
     return new ModelAndView("/WEB-INF/login.jsp", model);
   }
 
@@ -105,7 +83,8 @@ public class MenuController {
     User user = authorizationManager.getCurrentUser();
     model.put("title", "Home");
     model.put("favouriteWorkflows",
-        user.getFavouriteWorkflows().stream().map(Dtos::asDto).map(dto -> mapper.valueToTree(dto)).collect(Collectors.toList()));
+        user.getFavouriteWorkflows().stream().map(Dtos::asDto).map(dto -> mapper.valueToTree(dto))
+            .collect(Collectors.toList()));
     return new ModelAndView("/WEB-INF/pages/mainMenu.jsp", model);
   }
 

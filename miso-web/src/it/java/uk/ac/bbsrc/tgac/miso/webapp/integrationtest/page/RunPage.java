@@ -91,12 +91,12 @@ public class RunPage extends FormPage<RunPage.Field> {
   }
 
   public static RunPage getForCreate(WebDriver driver, String baseUrl, long sequencerId) {
-    driver.get(baseUrl + "miso/run/new/" + sequencerId);
+    driver.get(baseUrl + "run/new/" + sequencerId);
     return new RunPage(driver);
   }
 
   public static RunPage getForEdit(WebDriver driver, String baseUrl, long runId) {
-    driver.get(baseUrl + "miso/run/" + runId);
+    driver.get(baseUrl + "run/" + runId);
     return new RunPage(driver);
   }
 
@@ -145,25 +145,28 @@ public class RunPage extends FormPage<RunPage.Field> {
       BigDecimal loadingConcentration, ConcentrationUnit units) {
     checkLaneBoxesAndSelectOption(partitions, "Assign Pool", option);
     switch (option) {
-    case PoolSearch.NO_POOL:
-      return;
-    case PoolSearch.SEARCH:
-      waitUntil(textToBe(By.className("ui-dialog-title"), "Search for Pool to Assign"));
-      dialog.findElement(By.tagName("input")).sendKeys(searchText);
-      getDriver().findElement(By.id("ok")).click();
-      waitUntil(textToBe(By.className("ui-dialog-title"), "Select Pool"));
-      if (assignFirstPool) clickFirstPoolTile(true, searchText);
-      break;
-    case PoolSearch.OUTSTANDING_MATCH:
-    case PoolSearch.OUTSTANDING_ALL:
-    case PoolSearch.RECENT:
-      waitUntil(textToBe(By.className("ui-dialog-title"), "Select Pool"));
-      if (assignFirstPool) clickFirstPoolTile(false, searchText);
-      break;
-    case PoolSearch.RTR:
-      waitUntil(textToBe(By.className("ui-dialog-title"), "Select Pool"));
-      if (assignFirstPool) clickFirstPoolTile(true, searchText);
-      break;
+      case PoolSearch.NO_POOL:
+        return;
+      case PoolSearch.SEARCH:
+        waitUntil(textToBe(By.className("ui-dialog-title"), "Search for Pool to Assign"));
+        dialog.findElement(By.tagName("input")).sendKeys(searchText);
+        getDriver().findElement(By.id("ok")).click();
+        waitUntil(textToBe(By.className("ui-dialog-title"), "Select Pool"));
+        if (assignFirstPool)
+          clickFirstPoolTile(true, searchText);
+        break;
+      case PoolSearch.OUTSTANDING_MATCH:
+      case PoolSearch.OUTSTANDING_ALL:
+      case PoolSearch.RECENT:
+        waitUntil(textToBe(By.className("ui-dialog-title"), "Select Pool"));
+        if (assignFirstPool)
+          clickFirstPoolTile(false, searchText);
+        break;
+      case PoolSearch.RTR:
+        waitUntil(textToBe(By.className("ui-dialog-title"), "Select Pool"));
+        if (assignFirstPool)
+          clickFirstPoolTile(true, searchText);
+        break;
     }
     if (assignFirstPool) {
       setLoadingConcentration(loadingConcentration, units);
@@ -184,7 +187,8 @@ public class RunPage extends FormPage<RunPage.Field> {
     clickOk();
   }
 
-  public RunPage assignPools(List<Integer> partitions, String option, String searchText, BigDecimal loadingConcentration,
+  public RunPage assignPools(List<Integer> partitions, String option, String searchText,
+      BigDecimal loadingConcentration,
       ConcentrationUnit units) {
     WebElement html = getHtmlElement();
     searchForPools(true, partitions, option, searchText, loadingConcentration, units);
