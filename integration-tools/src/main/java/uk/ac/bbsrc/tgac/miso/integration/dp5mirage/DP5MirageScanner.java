@@ -151,6 +151,7 @@ public class DP5MirageScanner implements BoxScanner {
   public DP5MirageScanner() throws IntegrationException {
     this.host = "localhost";
     this.port = 8777;
+    this.httpClient = HttpClient.newBuilder().version(Version.HTTP_2).build();
   }
 
   /**
@@ -164,9 +165,22 @@ public class DP5MirageScanner implements BoxScanner {
   public DP5MirageScanner(String host, int port) throws IntegrationException {
     this.host = host;
     this.port = port;
+    this.httpClient = HttpClient.newBuilder().version(Version.HTTP_2).build();
+  }
 
-    // TODO create private http client here
-    setHttpClient(HttpClient.newBuilder().version(Version.HTTP_2).build());  // this is the default
+  /**
+   * Constructs a new DP5MirageScanner to communicate with a DP5-headless server and retrieve scan
+   * data
+   *
+   * @param host DP5Mirage server hostname or ip
+   * @param port DP5Mirage server port
+   * @param httpClient DP5Mirage httpClient used for testing
+   * @throws IntegrationException if the server hostname or ip could not be resolved
+   */
+  public DP5MirageScanner(String host, int port, HttpClient httpClient) throws IntegrationException {
+    this.host = host;
+    this.port = port;
+    this.httpClient = httpClient;
   }
 
   // Helper Methods
@@ -232,7 +246,6 @@ public class DP5MirageScanner implements BoxScanner {
   @Override
   public void prepareScan(int expectedRows, int expectedColumns) throws IntegrationException {
     // No preparation needed before scanning
-    // Maybe check status of scanner?
   }
 
   /**
@@ -248,6 +261,7 @@ public class DP5MirageScanner implements BoxScanner {
     // Scan a rack in DP5 for a given container uid
     Map<String, String> params = new HashMap<>();
     params.put("container_uid", "mirage96sbs"); //TODO ADD THIS TO DOCUMENTATION
+    params.put("annotated_image", "false");
     params.put("raw_image", "false");
     JsonNode scan = scanRackUsingDP5(params);
 

@@ -132,7 +132,7 @@ public class DP5MirageScan implements BoxScan {
   @Override
   public boolean isEmpty() {
     for(DP5MirageScanPosition position: getFormattedScan()) {
-      if(position.getDecodeStatus().equals("SUCCESS")) {
+      if(position.getDecodeStatus().equals("SUCCESS") || position.getDecodeStatus().equals("ERROR")) {
         return false;
       }
     }
@@ -169,7 +169,7 @@ public class DP5MirageScan implements BoxScan {
   @Override
   public boolean hasReadErrors() {
     for(DP5MirageScanPosition position: getFormattedScan()) {
-      if(position.getDecodeStatus().equals("ERROR") && position.getBarcode().equals("null")) {
+      if(position.getDecodeStatus().equals("ERROR")) {
         return true;
       }
     }

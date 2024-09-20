@@ -38,7 +38,7 @@ public class BoxScannerConfigurer {
       if (configParts.length != 4
           || !Pattern.compile("^ *[a-zA-Z0-9][a-zA-Z0-9 ]{0,100} *$").matcher(configParts[0]).matches()
           || !(configParts[1].equals("visionmate") || configParts[1].equals("dp5mirage"))
-          || !Pattern.compile("^ *[a-zA-Z0-9\\.]+ *$").matcher(configParts[2]).matches()
+          || !Pattern.compile("^ *[a-zA-Z0-9\\.-]+ *$").matcher(configParts[2]).matches()
           || !Pattern.compile("^ *\\d{1,5} *$").matcher(configParts[3]).matches()) {
         throw new IllegalArgumentException("Invalid box scanner configuration: " + configStrings[i]);
       }
