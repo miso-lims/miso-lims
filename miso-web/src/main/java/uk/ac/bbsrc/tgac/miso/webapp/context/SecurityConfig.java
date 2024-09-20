@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
+import javax.servlet.DispatcherType;
 import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
@@ -22,6 +23,9 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -83,6 +87,11 @@ public class SecurityConfig {
       RememberMeServices rememberMeServices) throws Exception {
     return http
         .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+            // opting into Spring Security 6.0 defaults
+            .shouldFilterAllDispatcherTypes(true)
+            // above can be removed after update to Spring Security 6
+            .dispatcherTypeMatchers(DispatcherType.FORWARD)
+            .permitAll()
             .requestMatchers(
                 "/favicon.ico",
                 "/styles/**",
@@ -103,6 +112,15 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .logout(logout -> logout.logoutSuccessUrl("/login"))
         .exceptionHandling().accessDeniedPage("/accessDenied").and()
+        // Opting into Spring Security 6.0 defaults
+        .securityContext(securityContext -> securityContext
+            .requireExplicitSave(true)
+            .securityContextRepository(new DelegatingSecurityContextRepository(
+                new RequestAttributeSecurityContextRepository(),
+                new HttpSessionSecurityContextRepository())))
+        .sessionManagement(sessions -> sessions
+            .requireExplicitAuthenticationStrategy(true))
+        // above can be removed after update to Spring Security 6
         .build();
   }
 
