@@ -13,6 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -20,7 +23,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 
 public class MisoLoginFilter extends UsernamePasswordAuthenticationFilter {
-  
+
   @Autowired
   private UserService userService;
 
@@ -30,8 +33,17 @@ public class MisoLoginFilter extends UsernamePasswordAuthenticationFilter {
   @Value("${security.ad.emailDomain:#{null}}")
   private String emailDomain;
 
+  public MisoLoginFilter() {
+    // Save security context in HTTP session and request attribute (match Spring Security 6 default)
+    super.setSecurityContextRepository(
+        new DelegatingSecurityContextRepository(
+            new HttpSessionSecurityContextRepository(),
+            new RequestAttributeSecurityContextRepository()));
+  }
+
   @Override
-  public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+  public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+      throws AuthenticationException {
     Authentication authentication = super.attemptAuthentication(request, response);
     if (authentication == null) {
       return null;
