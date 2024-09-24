@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -95,11 +94,7 @@ public class HandsOnTable extends AbstractElement {
     WebElement cell = getCell(columnHeading, rowNum);
     cancelEditing();
     if (!cell.getAttribute("class").contains("current")) {
-      try {
-        cell.click();
-      } catch (ElementClickInterceptedException e) {
-        throw new RuntimeException("Error setting row %d %s to '%s'".formatted(rowNum, columnHeading, text), e);
-      }
+      cell.click();
       waitUntil((driver) -> getCell(columnHeading, rowNum).getAttribute("class").contains("current"));
     }
     WebElement cellEditor = findElementIfExists(activeCellEditorSelector);

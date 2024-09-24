@@ -15,6 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -30,11 +31,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ContextConfiguration;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.HomePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LoginPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestRunner;
-
-import io.github.bonigarcia.wdm.WebDriverManager;
 
 @RunWith(TestRunner.class)
 @ContextConfiguration("/it-context.xml")
@@ -70,8 +70,7 @@ public abstract class AbstractIT {
   public final void setupAbstractTest() {
     ChromeOptions opts = new ChromeOptions();
     opts.setHeadless(true);
-    // large width is important so that all columns of handsontables get rendered
-    opts.addArguments("--disable-gpu", "--window-size=6000x4000");
+    opts.addArguments("--disable-gpu");
     LoggingPreferences loggingPrefs = new LoggingPreferences();
     loggingPrefs.enable(LogType.BROWSER, Level.ALL);
     opts.setCapability(CapabilityType.LOGGING_PREFS, loggingPrefs);
@@ -80,6 +79,8 @@ public abstract class AbstractIT {
     // don't allow page load or script execution to take longer than 10 seconds
     driver.manage().timeouts().pageLoadTimeout(15, TimeUnit.SECONDS);
     driver.manage().timeouts().setScriptTimeout(15, TimeUnit.SECONDS);
+    // large width is important so that all columns of handsontables get rendered
+    driver.manage().window().setSize(new Dimension(6000, 4000));
 
     // reset test data for each test
     Resource clearData = new FileSystemResource(getScript(CLEAR_DATA_SCRIPT));
@@ -137,7 +138,8 @@ public abstract class AbstractIT {
   private void verifyConstants() {
     if (!constantsComplete()) {
       log.warn("Missing data in constants.js - refreshing");
-      ((JavascriptExecutor) getDriver()).executeScript("jQuery.ajax({type: 'POST', url: '/miso/rest/admin/constants/refresh'})");
+      ((JavascriptExecutor) getDriver())
+          .executeScript("jQuery.ajax({type: 'POST', url: '/miso/rest/admin/constants/refresh'})");
       for (int attempt = 0; attempt < 5; attempt++) {
         try {
           Thread.sleep(30000);
