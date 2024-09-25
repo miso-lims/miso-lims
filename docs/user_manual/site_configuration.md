@@ -78,7 +78,7 @@ will save you from having to press Enter or click on a button or the next item e
 configuration is done on the barcode scanner itself, and you should see the scanner's manual for configuration
 instructions.
 
-It is also possible to use
+It is also possible to use a [Ziath DP5 Mirage Rack Reader](https://www.froggabio.com/azenta_dp5-mirage-rack-reader.html) or
 [Thermo Fisher VisionMate™ High Speed Barcode Readers](https://www.thermofisher.com/order/catalog/product/312800) to
 scan entire boxes of tubes at once. These bulk scanners must be configured by your MISO administrators to work in MISO.
 
