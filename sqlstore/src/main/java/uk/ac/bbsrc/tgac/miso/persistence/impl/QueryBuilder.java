@@ -232,6 +232,10 @@ public class QueryBuilder<R, T> {
     addPredicate(inClause);
   }
 
+  public <X> Predicate makeInPredicate(Path<X> path, SubqueryBuilder<X, ?> subquery) {
+    return criteriaBuilder.in(path).value(subquery.build());
+  }
+
   public <X> void addNotInPredicate(Path<X> path, Collection<X> items) {
     In<X> inClause = criteriaBuilder.in(path);
     items.forEach(item -> inClause.value(item));
@@ -324,10 +328,10 @@ public class QueryBuilder<R, T> {
         criteriaBuilder.between(transferJoin.get(ListTransferView_.transferTime), start, end)));
   }
 
-  public void addDistributionRecipientPredicate(String query, String collectionProperty, String itemIdProperty,
+  public void addDistributionRecipientPredicate(String text, String collectionProperty, String itemIdProperty,
       String id) {
-    if (LimsUtils.isStringBlankOrNull(query)) {
-      Subquery<?> subquery = createSubquery(Long.class);
+    if (LimsUtils.isStringBlankOrNull(text)) {
+      Subquery<Long> subquery = query.subquery(Long.class);
       Root<ListTransferView> subqueryRoot = subquery.from(ListTransferView.class);
 
       Join<ListTransferView, ?> join = getSingularJoin(subqueryRoot, collectionProperty, null);
@@ -336,12 +340,12 @@ public class QueryBuilder<R, T> {
       this.query.where(criteriaBuilder.not(root.get(id).in(subquery)));
     } else {
       Join<T, ListTransferView> transferJoin = getSetJoin(root, "listTransferViews", ListTransferView.class);
-      addTextRestriction(transferJoin.get(ListTransferView_.recipient), query);
+      addTextRestriction(transferJoin.get(ListTransferView_.recipient), text);
     }
   }
 
-  public <X> Subquery<X> createSubquery(Class<X> resultClass) {
-    return query.subquery(resultClass);
+  public <X, Y> SubqueryBuilder<X, Y> makeSubquery(Class<Y> entityClass, Class<X> resultClass) {
+    return new SubqueryBuilder<>(query, entityClass, resultClass);
   }
 
   public void addSort(Expression<?> expression, boolean ascending) {
