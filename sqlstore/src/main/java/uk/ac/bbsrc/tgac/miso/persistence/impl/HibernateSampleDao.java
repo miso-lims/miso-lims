@@ -482,8 +482,18 @@ public class HibernateSampleDao extends HibernateSaveDao<Sample>
         builder.getJoin(builder.getRoot(DetailedSampleImpl.class), DetailedSampleImpl_.parentAttributes);
     Join<ParentAttributes, ParentIdentityAttributes> identityAttributes =
         builder.getJoin(parentAttributes, ParentAttributes_.identityAttributes);
-    builder.addTextRestriction(Arrays.asList(identityAttributes.get(ParentIdentityAttributes_.externalName),
-        builder.getRoot(SampleTissueImpl.class).get(SampleTissueImpl_.secondaryIdentifier)), query);
+    Predicate externalNamePredicate =
+        builder.makeTextRestriction(identityAttributes.get(ParentIdentityAttributes_.externalName), query);
+
+    SubqueryBuilder<Long, SampleTissueImpl> subqueryBuilder = builder.makeSubquery(SampleTissueImpl.class, Long.class);
+    Root<SampleTissueImpl> subqueryRoot = subqueryBuilder.getRoot();
+    subqueryBuilder.setColumn(subqueryRoot.get(SampleTissueImpl_.sampleId));
+    subqueryBuilder
+        .addPredicate(builder.makeTextRestriction(subqueryRoot.get(SampleTissueImpl_.secondaryIdentifier), query));
+    Predicate secondaryIdentifierPredicate =
+        builder.makeInPredicate(builder.getRoot().get(SampleImpl_.sampleId), subqueryBuilder);
+
+    builder.addPredicate(builder.getCriteriaBuilder().or(externalNamePredicate, secondaryIdentifierPredicate));
   }
 
   @Override
