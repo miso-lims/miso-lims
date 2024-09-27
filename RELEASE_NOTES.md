@@ -7,6 +7,26 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.23.0] - 2024-09-27
+
+### Changed
+
+* the "/miso/" portion previously included in most MISO URLs has been removed. Old links will continue
+  to function, redirecting automatically to the new address
+
+### Fixed
+
+* Errors when bulk creating/editing items using a requisition with multiple assays
+* Advanced search on the samples list using the "external" term was only including tissue-level
+  samples (detailed sample)
+
+### Upgrade Notes
+
+* The following `security.properties` entries are no longer needed for LDAP/AD authentication:
+  * `security.ldap.userDnBase`
+  * `security.ldap.usernameAttribute`
+
+
 ## [2.22.0] - 2024-08-29
 
 ### Added
