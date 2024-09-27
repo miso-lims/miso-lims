@@ -918,44 +918,51 @@ BulkUtils = (function ($) {
             type: "dropdown",
             data: "requisitionId",
             includeSaved: false,
-            source: [],
             getItemLabel: Utils.array.getAlias,
             getItemValue: Utils.array.getId,
             disabled: true,
             onChange: function (rowIndex, newValue, api) {
               var requisition = api.getValueObject(rowIndex, "requisitionId");
               var projectSelected = api.getValueObject(rowIndex, dataProject);
-              if (!requisition) {
+              if (requisition && requisition.id) {
+                var assays = null;
+                if (requisition.assayIds && requisition.assayIds.length) {
+                  assays = requisition.assayIds.map(function (id) {
+                    return Utils.array.findUniqueOrThrow(
+                      Utils.array.idPredicate(id),
+                      Constants.assays
+                    );
+                  });
+                }
+                api.updateField(rowIndex, "requisitionAssayIds", {
+                  source: (function () {
+                    if (!assays || !assays.length) {
+                      return [];
+                    } else if (assays.length === 1) {
+                      return assays;
+                    } else {
+                      return [assays];
+                    }
+                  })(),
+                  value: (function () {
+                    if (!assays || !assays.length) {
+                      return null;
+                    } else if (assays.length === 1) {
+                      return Assay.utils.makeLabel(assays[0]);
+                    } else {
+                      return "(" + assays.length + " assays)";
+                    }
+                  })(),
+                  disabled: true,
+                });
+              } else if (requisition && projectSelected && projectSelected.assayIds !== null) {
+                // requisition without an ID (creating a new requisition)
+                BulkUtils.updateProjectAssays(projectSelected, api, rowIndex);
+              } else {
                 api.updateField(rowIndex, "requisitionAssayIds", {
                   source: [],
                   value: null,
                   disabled: true,
-                });
-              } else if (requisition.id) {
-                api.updateField(rowIndex, "requisitionAssayIds", {
-                  source: Constants.assays.filter(function (x) {
-                    return !x.archived || x.id === requisition.assayId;
-                  }),
-                  value: !requisition.assayId
-                    ? null
-                    : (function () {
-                        var assay = Utils.array.findUniqueOrThrow(
-                          Utils.array.idPredicate(requisition.assayId),
-                          Constants.assays
-                        );
-                        return Assay.utils.makeLabel(assay);
-                      })(),
-                  disabled: true,
-                });
-              } else if (projectSelected && projectSelected.assayIds !== null) {
-                BulkUtils.updateProjectAssays(projectSelected, api, rowIndex);
-              } else {
-                api.updateField(rowIndex, "requisitionAssayIds", {
-                  source: Constants.assays.filter(function (x) {
-                    return !x.archived;
-                  }),
-                  value: null,
-                  disabled: false,
                 });
               }
             },
@@ -981,27 +988,41 @@ BulkUtils = (function ($) {
             }
           },
           omit: pageMode !== "create",
-          setData: function (object, value, rowIndex, api) {
-            if (pageMode !== "create") {
-              return;
-            }
-            var assay = api.getValueObject(rowIndex, "requisitionAssayIds");
-            if (assay) {
-              object.requisitionAssayIds = [assay.id];
-            } else {
-              object.requisitionAssayIds = null;
-            }
-          },
           type: pageMode === "create" ? "dropdown" : "text",
           description:
             "The assay assigned to the requisition that the item belongs to. For receipt, the options are limited to the assays assigned to the project. Additional assays may be added on the Edit Requisition page.",
-          source: function (data) {
-            return Constants.assays.filter(function (x) {
-              return !x.archived || x.id === data.requisitionAssayId;
+          source: function (data, api) {
+            // needed for after save
+            if (!data.requisitionAssayIds || !data.requisitionAssayIds.length) {
+              return [];
+            }
+            var assays = data.requisitionAssayIds.map(function (id) {
+              return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(id), Constants.assays);
             });
+            if (assays.length === 1) {
+              return assays;
+            } else {
+              return [assays];
+            }
           },
-          getItemLabel: Assay.utils.makeLabel,
-          getItemValue: Utils.array.getId,
+          getItemLabel: function (item) {
+            if (Array.isArray(item)) {
+              if (item.length === 1) {
+                return Assay.utils.makeLabel(item[0]);
+              } else {
+                return "(" + item.length + " assays)";
+              }
+            } else {
+              return Assay.utils.makeLabel(item);
+            }
+          },
+          getItemValue: function (item) {
+            if (Array.isArray(item)) {
+              return item.map(Utils.array.getId);
+            } else {
+              return [item.id];
+            }
+          },
           disabled: true,
         };
       },
