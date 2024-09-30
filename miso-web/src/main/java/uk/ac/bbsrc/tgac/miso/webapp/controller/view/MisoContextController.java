@@ -28,7 +28,7 @@ public class MisoContextController {
 
     RedirectView redirect = new RedirectView(target, true);
     redirect.setExposeModelAttributes(false);
-    redirect.setStatusCode(HttpStatus.MOVED_PERMANENTLY);
+    redirect.setStatusCode(HttpStatus.PERMANENT_REDIRECT);
     return redirect;
   }
 
