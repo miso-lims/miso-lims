@@ -69,12 +69,6 @@ public class QueryBuilder<R, T> {
     }
   }
 
-  public QueryBuilder(Session session, Class<T> entityClass, Class<R> resultClass,
-      TupleTransformer<R> resultTransformer) {
-    this(session, entityClass, resultClass);
-    this.resultTransformer = resultTransformer;
-  }
-
   public Session getSession() {
     return session;
   }
@@ -210,6 +204,13 @@ public class QueryBuilder<R, T> {
         .findFirst();
   }
 
+  /**
+   * Set individual columns to return instead of the full object. This should only be used with a
+   * resultClass of Tuple, or when the resultClass has a constructor to which JPA/Hibernate will be
+   * able to map the data. For more complicated mappings, use ProjectionQueryBuilder instead
+   * 
+   * @param paths
+   */
   public void setColumns(Path<?>... paths) {
     query.multiselect(paths);
   }
@@ -379,7 +380,7 @@ public class QueryBuilder<R, T> {
         : buildQuery().setFirstResult(offset).getResultList();
   }
 
-  private Query<R> buildQuery() {
+  public Query<R> buildQuery() {
     applyPredicates();
     if (!root.getJoins().isEmpty() && query.getGroupList().isEmpty()) {
       query.distinct(true);

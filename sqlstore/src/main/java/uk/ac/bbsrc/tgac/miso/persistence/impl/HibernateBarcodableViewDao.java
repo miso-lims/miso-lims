@@ -170,12 +170,9 @@ public class HibernateBarcodableViewDao implements BarcodableViewDao {
   }
 
   private <T> BarcodableReference getItemWithBarcode(String identificationBarcode, Class<T> implementationClass,
-      String entityTypeLabel, String idField,
-      String primaryLabelField, String secondaryLabelField) throws IOException {
-
-    QueryBuilder<BarcodableReference, T> builder =
-        new QueryBuilder<BarcodableReference, T>(currentSession(), implementationClass, BarcodableReference.class,
-            new BarcodableReference.TupleTransformer(entityTypeLabel));
+      String entityTypeLabel, String idField, String primaryLabelField, String secondaryLabelField) throws IOException {
+    ProjectionQueryBuilder<BarcodableReference, T> builder = new ProjectionQueryBuilder<BarcodableReference, T>(
+        currentSession(), implementationClass, new BarcodableReference.TupleTransformer(entityTypeLabel));
     Root<?> root = builder.getRoot();
     builder.addPredicate(
         builder.getCriteriaBuilder().equal(root.get("identificationBarcode"), identificationBarcode));
