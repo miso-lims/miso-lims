@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Streams;
@@ -109,7 +108,7 @@ public class HibernateProgressDaoIT extends AbstractDAOTest {
     long id = dao.save(progress).getId();
     Session session = entityManager.unwrap(Session.class);
     session.flush();
-    session.evict(progress);
+    session.clear();
     return id;
   }
 
