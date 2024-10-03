@@ -41,15 +41,16 @@ public interface BoxScan {
    * the tube in the specified position
    */
   public String getBarcode(int row, int column);
-  
+
   /**
-   * Gets all of the barcodes in array form. Implementors should return defensive copies if necessary to enforce immutability
-   * 
-   * @return a 2D array containing all of the scanned barcodes. The outer array contains the rows, and the inner array contains columns 
+   * Gets the barcodes in array form.
+   *
+   * @return a 2D array containing all the scanned barcodes. The outer array contains the
+   rows, and the inner array contains columns
    * (e.g. position "B10" = result[1,9])
    */
   public String[][] getBarcodesArray();
-  
+
   /**
    * Gets all of the positions and associated barcodes, no tube indicators ("No Tube") and unreadable tube indicators ("No Read") in map 
    * form. Implementors should return defensive copies if necessary to enforce immutability
