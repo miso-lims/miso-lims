@@ -17,7 +17,8 @@ import uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScanner;
 
 @Configuration
 public class BoxScannerConfigurer {
-
+  private static final String visionMateScanner = "visionmate";
+  private static final String dp5MirageScanner = "dp5mirage";
   protected static final Logger log = LoggerFactory.getLogger(BoxScannerConfigurer.class);
 
   @Value("${miso.boxscanner.servers:}")
@@ -37,9 +38,9 @@ public class BoxScannerConfigurer {
       String[] configParts = configStrings[i].split(":");
       if (configParts.length != 4
           || !Pattern.compile("^ *[a-zA-Z0-9][a-zA-Z0-9 ]{0,100} *$").matcher(configParts[0]).matches()
-          || !(configParts[1].equals("visionmate") || configParts[1].equals("dp5mirage"))
+          || !(configParts[1].equals(visionMateScanner) || configParts[1].equals(dp5MirageScanner)
           || !Pattern.compile("^ *[a-zA-Z0-9\\.-]+ *$").matcher(configParts[2]).matches()
-          || !Pattern.compile("^ *\\d{1,5} *$").matcher(configParts[3]).matches()) {
+          || !Pattern.compile("^ *\\d{1,5} *$").matcher(configParts[3]).matches())) {
         throw new IllegalArgumentException("Invalid box scanner configuration: " + configStrings[i]);
       }
       String name = configParts[0].trim();
@@ -48,7 +49,7 @@ public class BoxScannerConfigurer {
       int port = Integer.parseInt(configParts[3]);
 
       // Create correct scanner based on type
-      if (type.equals("visionmate")) {
+      if (type.equals(visionMateScanner)) {
         VisionMateScanner scanner;
         try {
           scanner = new VisionMateScanner(host, port);
@@ -57,7 +58,7 @@ public class BoxScannerConfigurer {
         }
         scanners.put(name, scanner);
       }
-      else if (type.equals("dp5mirage")) {
+      else if (type.equals(dp5MirageScanner)) {
         DP5MirageScanner scanner;
         try {
           scanner = new DP5MirageScanner(host, port);
