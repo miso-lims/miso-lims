@@ -20,6 +20,10 @@ Starting with version 1.29.0, the format of this file is based on
 * Advanced search on the samples list using the "external" term was only including tissue-level
   samples (detailed sample)
 
+### Known Issues
+
+* Error when attempting to print barcodes
+
 ### Upgrade Notes
 
 * The following `security.properties` entries are no longer needed for LDAP/AD authentication:

@@ -780,11 +780,11 @@ var Utils = Utils || {
     );
   },
   printDialog: function (type, ids) {
-    Utils.printSelectDialog(function (printer, copies) {
+    Utils.printSelectDialog(function (printerId, copies) {
       Utils.ajaxWithDialog(
         "Printing",
         "POST",
-        Urls.rest.printers.print,
+        Urls.rest.printers.print(printerId),
         {
           type: type,
           ids: ids,
