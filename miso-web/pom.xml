@@ -376,6 +376,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!-- generate metadata for reflection on method parameters. Required to so that
+          PathVariable/RequestParam annotations don't require specification of names -->
+          <parameters>true</parameters>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
