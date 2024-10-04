@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [2.23.1] - 2024-10-04
+
+### Fixed
+
+* Error when attempting to print barcodes
+
+
 ## [2.23.0] - 2024-09-27
 
 ### Changed
