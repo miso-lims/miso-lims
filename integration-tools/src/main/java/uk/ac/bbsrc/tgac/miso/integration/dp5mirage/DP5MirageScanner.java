@@ -13,6 +13,7 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
@@ -39,12 +40,8 @@ public class DP5MirageScanner implements BoxScanner {
 
   // Getters
   private String getParameterAppend(Map<String,String> parameters) {
-    String appendQuery = "";
-
-    for (Entry<String, String> entry : parameters.entrySet()) {
-      appendQuery = appendQuery + entry.getKey() + "=" + entry.getValue() + "&";
-    }
-    return appendQuery;
+    return parameters.entrySet().stream().map(e -> new StringBuilder(e.getKey()).append("=").append(e.getValue()).toString()).collect(
+        Collectors.joining("&"));
   }
 
   /**
