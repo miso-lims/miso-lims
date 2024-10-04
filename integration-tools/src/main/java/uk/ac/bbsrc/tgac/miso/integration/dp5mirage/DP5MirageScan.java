@@ -17,6 +17,7 @@ public class DP5MirageScan implements BoxScan {
   private final JsonNode scanData;
   private final String[][] barcodes;
   private final Map<String, String> barcodesMap;
+  private final DP5MirageScanPosition[] scanPositionData;
 
   /**
    * Constructs a new DP5MirageScan to wrap scan data from a DP5MirageScanner
@@ -27,6 +28,7 @@ public class DP5MirageScan implements BoxScan {
     this.scanData = scanData;
     this.barcodes = getBarcodesArray();
     this.barcodesMap = getBarcodesMap();
+    this.scanPositionData = getFormattedScan();
   }
 
   /**
@@ -97,7 +99,6 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public Map<String, String> getBarcodesMap() {
-    // Create unmodifiableMap
     Map<String, String> barcodesMap = new HashMap<>();
     for (int row = 0; row < barcodes.length; row++) {
       for (int col = 0; col < barcodes[row].length; col++) {
@@ -113,7 +114,7 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public boolean isFull() {
-    for(DP5MirageScanPosition position: getFormattedScan()) {
+    for(DP5MirageScanPosition position: scanPositionData) {
       if(position.getDecodeStatus().equals("EMPTY")) {
         return false;
       }
@@ -126,7 +127,7 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public boolean isEmpty() {
-    for(DP5MirageScanPosition position: getFormattedScan()) {
+    for(DP5MirageScanPosition position: scanPositionData) {
       if(position.getDecodeStatus().equals("SUCCESS") || position.getDecodeStatus().equals("ERROR")) {
         return false;
       }
@@ -149,7 +150,7 @@ public class DP5MirageScan implements BoxScan {
   @Override
   public int getTubeCount() {
     int tubeCounter = 0;
-    for(DP5MirageScanPosition position: getFormattedScan()) {
+    for(DP5MirageScanPosition position: scanPositionData) {
       if(!position.getDecodeStatus().equals("EMPTY")) {
         tubeCounter++;
       }
@@ -163,7 +164,7 @@ public class DP5MirageScan implements BoxScan {
    */
   @Override
   public boolean hasReadErrors() {
-    for(DP5MirageScanPosition position: getFormattedScan()) {
+    for(DP5MirageScanPosition position: scanPositionData) {
       if(position.getDecodeStatus().equals("ERROR")) {
         return true;
       }
