@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.integration.test;
 
 import static org.junit.Assert.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.Map;
 
