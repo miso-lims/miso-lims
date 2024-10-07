@@ -29,8 +29,8 @@ import uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScan;
  */
 public class DP5MirageScanner implements BoxScanner {
 
-  private String host;
-  private int port;
+  private final String host;
+  private final int port;
   private HttpClient httpClient;
   private HttpRequest request;
   private static final int postActionTimeout = 10;
@@ -103,11 +103,13 @@ public class DP5MirageScanner implements BoxScanner {
       scanResults = mapper.readTree(response.body());
 
     } catch (IOException | InterruptedException | URISyntaxException e) {
-      throw new IntegrationException("Error communicating with the scanner", e);
+      throw new IntegrationException("Error communicating with the scanner",
+          e);
     }
     if (response.statusCode() != 200) {
-      // Throw error of incorrect output
-      throw new IntegrationException("Error reported by the scanner");
+      throw new IntegrationException(String.format("Error reported by the scanner \n "
+              + "Check if this container_uid parameter is correct: %s",
+          parameters.get("container_uid")));
     }
     return scanResults;
   }
