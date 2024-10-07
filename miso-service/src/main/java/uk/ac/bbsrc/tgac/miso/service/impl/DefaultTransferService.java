@@ -9,10 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,12 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.PoolBoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.SampleBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.Lab;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.TransferChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferItem;
@@ -36,7 +34,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferNotification;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.*;
+import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
+import uk.ac.bbsrc.tgac.miso.core.service.LabService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
+import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
+import uk.ac.bbsrc.tgac.miso.core.service.TransferNotificationService;
+import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -50,12 +58,17 @@ import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 public class DefaultTransferService extends AbstractSaveService<Transfer> implements TransferService {
 
   private static final String ERROR_QC_NOTE_REQUIRED = "A QC note is required when QC is failed";
-  private static final String ERROR_UNAUTHORIZED_ITEM_MODIFY = "Only administrators and members of the sender group can modify items";
-  private static final String ERROR_UNAUTHORIZED_QC = "Only administrators and members of the recipient group can set QC results";
-  private static final String ERROR_UNAUTHORIZED_RECEIPT = "Only administrators and members of the recipient group can mark receipt";
+  private static final String ERROR_UNAUTHORIZED_ITEM_MODIFY =
+      "Only administrators and members of the sender group can modify items";
+  private static final String ERROR_UNAUTHORIZED_QC =
+      "Only administrators and members of the recipient group can set QC results";
+  private static final String ERROR_UNAUTHORIZED_RECEIPT =
+      "Only administrators and members of the recipient group can mark receipt";
   private static final String ERROR_DISTRIBUTION_NOT_RECEIVED = "Items transferred externally must be marked received";
-  private static final String ERROR_MULTIPLE_RECEIPT = "Items can only have one receipt (external lab to internal group) transfer";
-  private static final String ERROR_MULTIPLE_DISTRIBUTION = "Items can only have one distribution (internal group to external named recipient) transfer";
+  private static final String ERROR_MULTIPLE_RECEIPT =
+      "Items can only have one receipt (external lab to internal group) transfer";
+  private static final String ERROR_MULTIPLE_DISTRIBUTION =
+      "Items can only have one distribution (internal group to external named recipient) transfer";
 
   @Autowired
   private TransferStore transferStore;
@@ -113,48 +126,45 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     loadChildEntity(object.getSenderGroup(), object::setSenderGroup, groupService);
     loadChildEntity(object.getSenderLab(), object::setSenderLab, labService);
     loadChildEntity(object.getRecipientGroup(), object::setRecipientGroup, groupService);
+
     for (TransferSample item : object.getSampleTransfers()) {
-      loadItem(item, item::setItem, sampleService, SampleBoxPosition::new, Sample::setBoxPosition);
+      updateAndLoadItem(object, item.getItem(), item::setItem, sampleService);
     }
     for (TransferLibrary item : object.getLibraryTransfers()) {
-      loadItem(item, item::setItem, libraryService, LibraryBoxPosition::new, Library::setBoxPosition);
+      updateAndLoadItem(object, item.getItem(), item::setItem, libraryService);
     }
     for (TransferLibraryAliquot item : object.getLibraryAliquotTransfers()) {
-      loadItem(item, item::setItem, libraryAliquotService, LibraryAliquotBoxPosition::new, LibraryAliquot::setBoxPosition);
+      updateAndLoadItem(object, item.getItem(), item::setItem, libraryAliquotService);
     }
     for (TransferPool item : object.getPoolTransfers()) {
-      loadItem(item, item::setItem, poolService, PoolBoxPosition::new, Pool::setBoxPosition);
+      updateAndLoadItem(object, item.getItem(), item::setItem, poolService);
     }
   }
 
-  private <T extends Boxable, U extends TransferItem<T>, V extends AbstractBoxPosition> void loadItem(U item, Consumer<T> setter,
-      ProviderService<T> service, Supplier<V> positionConstructor, BiConsumer<T, V> positionSetter) throws IOException {
-    Box box = item.getItem().getBox();
-    if (box != null) {
-      box = boxService.get(box.getId());
-    }
-    String position = item.getItem().getBoxPosition();
-    loadChildEntity(item.getItem(), setter, service);
-    // detach to prevent Hibernate from prematurely detecting changes in this entity
-    transferStore.detachEntity(item.getItem());
-    setBoxPosition(item, box, position, positionConstructor, positionSetter);
-  }
+  private <T extends Boxable> void updateAndLoadItem(Transfer transfer, T item, Consumer<T> setter,
+      SaveService<T> service)
+      throws IOException {
+    // Item needs to be loaded before validation so we can check for conflicting transfers, but updating
+    // location needs to happen before loading so we can manage the supplied vs. persisted objects
+    boxService.throwIfBoxPositionIsFilled(item);
+    boxService.updateBoxableLocation(item);
 
-  private <T extends Boxable, U extends TransferItem<T>, V extends AbstractBoxPosition> void setBoxPosition(U item,
-      Box box, String position, Supplier<V> positionConstructor, BiConsumer<T, V> positionSetter) {
-    if (box == null) {
-      positionSetter.accept(item.getItem(), null);
-    } else {
-      V boxPosition = positionConstructor.get();
-      boxPosition.setItemId(item.getItem().getId());
-      boxPosition.setBox(box);
-      boxPosition.setPosition(position);
-      positionSetter.accept(item.getItem(), boxPosition);
+    T managedItem = service.get(item.getId());
+
+    // If distribution, remove items from boxes, set volume zero
+    if (transfer.isDistribution()) {
+      // Need to work with managedItem because the submitted item may be missing a lot of fields
+      managedItem.removeFromBox();
+      managedItem.setVolume(BigDecimal.ZERO);
+      service.update(managedItem);
     }
+
+    setter.accept(managedItem);
   }
 
   @Override
-  protected void collectValidationErrors(Transfer transfer, Transfer beforeChange, List<ValidationError> errors) throws IOException {
+  protected void collectValidationErrors(Transfer transfer, Transfer beforeChange, List<ValidationError> errors)
+      throws IOException {
     if (transfer.getSenderLab() == null && transfer.getSenderGroup() == null) {
       errors.add(new ValidationError("A sender lab (external) or group (internal) must be set"));
     } else if (transfer.getSenderLab() != null && transfer.getSenderGroup() != null) {
@@ -180,13 +190,15 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     if (!authorizationManager.isAdminUser() && transfer.getSenderGroup() != null) {
       if (!authorizationManager.isGroupMember(transfer.getSenderGroup())
           && (beforeChange == null
-              || (beforeChange.getSenderGroup() != null && beforeChange.getSenderGroup().getId() != transfer.getSenderGroup().getId()))) {
+              || (beforeChange.getSenderGroup() != null
+                  && beforeChange.getSenderGroup().getId() != transfer.getSenderGroup().getId()))) {
         errors.add(new ValidationError("senderGroupId", "Sender group must be a group that you are a member of"));
       }
       if (beforeChange != null && beforeChange.getSenderGroup() != null
           && beforeChange.getSenderGroup().getId() != transfer.getSenderGroup().getId()
           && !authorizationManager.isGroupMember(beforeChange.getSenderGroup())) {
-        errors.add(new ValidationError("senderGroupId", "Only administrators and members of the sender group can change sender group"));
+        errors.add(new ValidationError("senderGroupId",
+            "Only administrators and members of the sender group can change sender group"));
       }
     }
     if (transfer.getRecipient() == null && transfer.getRecipientGroup() == null) {
@@ -196,18 +208,22 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     }
     if (!authorizationManager.isAdminUser() && !authorizationManager.isGroupMember(transfer.getSenderGroup())) {
       if (transfer.getRecipient() != null && !transfer.getRecipient().equals(beforeChange.getRecipient())) {
-        errors.add(new ValidationError("recipient", "Only administrators and members of the sender group can change recipient"));
+        errors.add(new ValidationError("recipient",
+            "Only administrators and members of the sender group can change recipient"));
       }
       if (transfer.getRecipientGroup() != null && beforeChange != null && beforeChange.getRecipientGroup() != null
           && transfer.getRecipientGroup().getId() != beforeChange.getRecipientGroup().getId()) {
         errors
-            .add(new ValidationError("recipientGroupId", "Only administrators and members of the sender group can change recipient group"));
+            .add(new ValidationError("recipientGroupId",
+                "Only administrators and members of the sender group can change recipient group"));
       }
     }
     if (!authorizationManager.isAdminUser() && !authorizationManager.isGroupMember(transfer.getRecipientGroup())
         && transfer.getSenderLab() != null && (beforeChange == null
-            || (beforeChange.getSenderLab() != null && beforeChange.getSenderLab().getId() != transfer.getSenderLab().getId()))) {
-      errors.add(new ValidationError("senderLabId", "Only administrators and members of the recipient group can change sender lab"));
+            || (beforeChange.getSenderLab() != null
+                && beforeChange.getSenderLab().getId() != transfer.getSenderLab().getId()))) {
+      errors.add(new ValidationError("senderLabId",
+          "Only administrators and members of the recipient group can change sender lab"));
     }
 
     if (transfer.getSampleTransfers().isEmpty() && transfer.getLibraryTransfers().isEmpty()
@@ -234,13 +250,14 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
       Function<Transfer, Set<U>> getItems, List<ValidationError> errors) throws IOException {
     Set<U> items = getItems.apply(transfer);
     Set<U> beforeChangeItems = beforeChange == null ? null : getItems.apply(beforeChange);
-    if (items.stream().anyMatch(item -> Boolean.FALSE.equals(item.isQcPassed()) && LimsUtils.isStringEmptyOrNull(item.getQcNote()))) {
+    if (items.stream()
+        .anyMatch(item -> Boolean.FALSE.equals(item.isQcPassed()) && LimsUtils.isStringEmptyOrNull(item.getQcNote()))) {
       errors.add(new ValidationError("items", ERROR_QC_NOTE_REQUIRED));
     }
     if (beforeChange != null && !authorizationManager.isAdminUser() && transfer.getSenderGroup() != null
         && !authorizationManager.isGroupMember(transfer.getSenderGroup())
         && (items.size() != beforeChangeItems.size() || items.stream().anyMatch(item -> beforeChangeItems.stream()
-                .noneMatch(beforeItem -> beforeItem.getItem().getId() == item.getItem().getId())))) {
+            .noneMatch(beforeItem -> beforeItem.getItem().getId() == item.getItem().getId())))) {
       errors.add(new ValidationError("items", ERROR_UNAUTHORIZED_ITEM_MODIFY));
     }
     if (!authorizationManager.isAdminUser()) {
@@ -255,8 +272,9 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
         }
       } else {
         if (!authorizationManager.isGroupMember(transfer.getRecipientGroup()) && items.stream().anyMatch(item -> {
-          U beforeChangeItem = beforeChangeItems.stream().filter(before -> before.getItem().getId() == item.getItem().getId())
-              .findFirst().orElse(null);
+          U beforeChangeItem =
+              beforeChangeItems.stream().filter(before -> before.getItem().getId() == item.getItem().getId())
+                  .findFirst().orElse(null);
           return beforeChangeItem != null && isChanged(item, beforeChangeItem);
         })) {
           errors.add(new ValidationError("items",
@@ -281,7 +299,7 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
         .anyMatch(item -> item.getTransferViews().stream()
             .anyMatch(itemTransfer -> itemTransfer.isDistribution()
                 && (!transfer.isSaved() || itemTransfer.getId() != transfer.getId())))) {
-                  errors.add(new ValidationError("items", ERROR_MULTIPLE_DISTRIBUTION));
+      errors.add(new ValidationError("items", ERROR_MULTIPLE_DISTRIBUTION));
     }
   }
 
@@ -336,21 +354,14 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     to.setRecipient(from.getRecipient());
     to.setRecipientGroup(from.getRecipientGroup());
 
-    applyItemChanges(to, from, Transfer::getSampleTransfers, SampleBoxPosition::new, Sample::setBoxPosition);
-    applyItemChanges(to, from, Transfer::getLibraryTransfers, LibraryBoxPosition::new, Library::setBoxPosition);
-    applyItemChanges(to, from, Transfer::getLibraryAliquotTransfers, LibraryAliquotBoxPosition::new, LibraryAliquot::setBoxPosition);
-    applyItemChanges(to, from, Transfer::getPoolTransfers, PoolBoxPosition::new, Pool::setBoxPosition);
-
-    if (to.getRecipient() != null) {
-      to.getSampleTransfers().forEach(item -> item.getItem().setBoxPosition(null));
-      to.getLibraryTransfers().forEach(item -> item.getItem().setBoxPosition(null));
-      to.getLibraryAliquotTransfers().forEach(item -> item.getItem().setBoxPosition(null));
-      to.getPoolTransfers().forEach(item -> item.getItem().setBoxPosition(null));
-    }
+    applyItemChanges(to, from, Transfer::getSampleTransfers);
+    applyItemChanges(to, from, Transfer::getLibraryTransfers);
+    applyItemChanges(to, from, Transfer::getLibraryAliquotTransfers);
+    applyItemChanges(to, from, Transfer::getPoolTransfers);
   }
 
-  private <T extends Boxable, U extends TransferItem<T>, V extends AbstractBoxPosition> void applyItemChanges(Transfer to, Transfer from,
-      Function<Transfer, Set<U>> getItems, Supplier<V> positionConstructor, BiConsumer<T, V> positionSetter) throws IOException {
+  private <T extends Boxable, U extends TransferItem<T>, V extends AbstractBoxPosition> void applyItemChanges(
+      Transfer to, Transfer from, Function<Transfer, Set<U>> getItems) throws IOException {
     Set<U> toItems = getItems.apply(to);
     Set<U> fromItems = getItems.apply(from);
     for (Iterator<U> iterator = toItems.iterator(); iterator.hasNext();) {
@@ -361,7 +372,8 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
       if (fromItem == null) {
         iterator.remove();
         transferStore.deleteTransferItem(toItem);
-        writeItemsChangeLog(to, String.format("Item removed: %s (%s)", toItem.getItem().getAlias(), toItem.getItem().getName()));
+        writeItemsChangeLog(to,
+            String.format("Item removed: %s (%s)", toItem.getItem().getAlias(), toItem.getItem().getName()));
       } else {
         StringBuilder sb = new StringBuilder();
         boolean changed = false;
@@ -382,7 +394,6 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
           changed = true;
           toItem.setQcNote(fromItem.getQcNote());
         }
-        setBoxPosition(toItem, fromItem.getItem().getBox(), fromItem.getItem().getBoxPosition(), positionConstructor, positionSetter);
         if (changed) {
           writeItemsChangeLog(to, sb.toString());
         }
@@ -393,7 +404,8 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
       if (toItems.stream().noneMatch(toItem -> toItem.getItem().getId() == fromItem.getItem().getId())) {
         fromItem.setTransfer(to);
         toItems.add(fromItem);
-        writeItemsChangeLog(to, String.format("Item added: %s (%s)", fromItem.getItem().getAlias(), fromItem.getItem().getName()));
+        writeItemsChangeLog(to,
+            String.format("Item added: %s (%s)", fromItem.getItem().getAlias(), fromItem.getItem().getName()));
       }
     }
   }
@@ -470,30 +482,13 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   }
 
   @Override
-  protected void afterSave(Transfer object) throws IOException {
-    // Individual services are responsible for updating box locations, or setting volume to 0 and removing items from boxes if distributed
-    updateAllItems(object.getSampleTransfers(), sampleService);
-    updateAllItems(object.getLibraryTransfers(), libraryService);
-    updateAllItems(object.getLibraryAliquotTransfers(), libraryAliquotService);
-    updateAllItems(object.getPoolTransfers(), poolService);
-  }
-
-  private <T extends Boxable, U extends TransferItem<T>> void updateAllItems(Set<U> items, SaveService<T> service)
-      throws IOException {
-    for (U item : items) {
-      // detach to prevent Hibernate from prematurely detecting changes in this entity
-      transferStore.detachEntity(item.getItem());
-      service.update(item.getItem());
-    }
-  }
-
-  @Override
   public long countPendingForUser(User user) throws IOException {
     return transferStore.countPendingForGroups(user.getGroups());
   }
 
   @Override
-  public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferTime) throws IOException {
+  public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferTime)
+      throws IOException {
     return transferStore.listByProperties(sender, recipient, project, transferTime);
   }
 
