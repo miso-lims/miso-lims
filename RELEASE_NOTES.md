@@ -13,6 +13,10 @@ Starting with version 1.29.0, the format of this file is based on
 
 * Error when attempting to print barcodes
 
+### Known Issues
+
+* Subprojects not showing up correctly in several places
+
 
 ## [2.23.0] - 2024-09-27
 
@@ -30,6 +34,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * Error when attempting to print barcodes
+* Subprojects not showing up correctly in several places
 
 ### Upgrade Notes
 
@@ -49,6 +54,10 @@ Starting with version 1.29.0, the format of this file is based on
 * The ampersand ("&") character was not allowed in SOP URLs
 * When importing Excel files, numbers were being converted to scientific notation
 
+### Known Issues
+
+* Subprojects not showing up correctly in several places
+
 ### Upgrade Notes
 
 * Updated Pinery to 2.36.0
@@ -60,6 +69,7 @@ Starting with version 1.29.0, the format of this file is based on
 
 * Error adding storage to freezers
 * Error searching by date for some pages
+* Subprojects not showing up correctly in several places
 
 
 ## [2.21.1] - 2024-08-16
@@ -72,6 +82,7 @@ Starting with version 1.29.0, the format of this file is based on
 
 * Error adding storage to freezers
 * Error searching by date for some pages
+* Subprojects not showing up correctly in several places
 
 
 ## [2.21.0] - 2024-08-15
@@ -94,6 +105,7 @@ Starting with version 1.29.0, the format of this file is based on
 * Pinery showing the wrong value for "Target Cell Revovery" sample attribute 
 * Error adding storage to freezers
 * Error searching by date for some pages
+* Subprojects not showing up correctly in several places
 
 ## [2.20.0] - 2024-06-20
 
@@ -111,6 +123,10 @@ Starting with version 1.29.0, the format of this file is based on
 * Attempting to add a requisition pause with an end date already set resulted in the error "Submitted
   pause ID not found"
 
+### Known Issues
+
+* Subprojects not showing up correctly in several places
+
 
 ## [2.19.0] - 2024-06-07
 
@@ -124,6 +140,10 @@ Starting with version 1.29.0, the format of this file is based on
 * The Move to Requisition action did not allow you to enter a stop reason
 * Sort by project for samples, libraries, library aliquots fails with error and displays "No data available in table."
 * Effects of the Move to Requisition action were not recorded in the affected requisitions' changelogs
+
+### Known Issues
+
+* Subprojects not showing up correctly in several places
 
 
 ## [2.18.0] - 2024-05-09
@@ -139,6 +159,10 @@ Starting with version 1.29.0, the format of this file is based on
   error when later looking up the libraries
 * Errors deleting requisitions with supplemental samples or libraries
 
+### Known Issues
+
+* Subprojects not showing up correctly in several places
+
 
 ## [2.17.1] - 2024-04-25
 
@@ -152,6 +176,7 @@ Starting with version 1.29.0, the format of this file is based on
   running Flyway repair, moving to the next MISO version, and running Flyway migrate as usual.
   However, if you have been using MISO in this state, your database may be corrupt and should be
   rolled back. Note that this version did not get an official release for this reason.
+* Subprojects not showing up correctly in several places
 
 ## [2.17.0] - 2024-04-25
 
@@ -176,6 +201,7 @@ Starting with version 1.29.0, the format of this file is based on
   running Flyway repair, moving to the next MISO version, and running Flyway migrate as usual.
   However, if you have been using MISO in this state, your database may be corrupt and should be
   rolled back. Note that this version did not get an official release for this reason.
+* Subprojects not showing up correctly in several places
 
 ## [2.16.0] - 2024-04-11
 
@@ -191,6 +217,10 @@ Starting with version 1.29.0, the format of this file is based on
 * Library qualification design code can now be specified for assay tests involving low-depth
   sequencing. This is for tests where the sequenced library aliquot has a different design code than
   the library (detailed sample)
+
+### Known Issues
+
+* Subprojects not showing up correctly in several places
 
 
 ## [2.15.0] - 2024-03-28
@@ -209,6 +239,10 @@ Starting with version 1.29.0, the format of this file is based on
 
 * The Edit Requisition page included some items that should have been removed from the requisition
   because they or their parents were moved to a different requisition
+
+### Known Issues
+
+* Subprojects not showing up correctly in several places
 
 
 ## [2.14.0] - 2024-02-15
@@ -232,6 +266,10 @@ Starting with version 1.29.0, the format of this file is based on
 * In advanced searches, including a colon in a general/termless search produced an error even if the colon was properly escaped
 * Some pages showing attachment lists were not refreshed after adding new attachments
 
+### Known Issues
+
+* Subprojects not showing up correctly in several places
+
 
 ## [2.13.0] - 2024-01-26
 
@@ -242,6 +280,10 @@ Starting with version 1.29.0, the format of this file is based on
 ### Upgrade Notes
 
 * Updated Pinery to v2.32.1
+
+### Known Issues
+
+* Subprojects not showing up correctly in several places
 
 
 ## [2.12.0] - 2024-01-18
@@ -260,6 +302,10 @@ Starting with version 1.29.0, the format of this file is based on
 * Error creating/updating transfers to include certain samples
 * Parts of the Edit Library page did not load correctly when the effective external names included certain characters (detailed sample)
 
+### Known Issues
+
+* Subprojects not showing up correctly in several places
+
 
 ## [2.11.0] - 2023-12-14
 
@@ -275,12 +321,20 @@ Starting with version 1.29.0, the format of this file is based on
 
 * Improved error message when failing to add samples to a requisition
 
+### Known Issues
+
+* Subprojects not showing up correctly in several places
+
 
 ## [2.10.1] - 2023-11-23
 
 ### Fixed
 
 * Error attaching files to multiple samples from different projects
+
+### Known Issues
+
+* Subprojects not showing up correctly in several places
 
 
 ## [2.10.0] - 2023-11-16
@@ -305,6 +359,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * Error attaching files to multiple samples from different projects
+* Subprojects not showing up correctly in several places
 
 
 ## [2.9.1] - 2023-11-02
@@ -312,6 +367,10 @@ Starting with version 1.29.0, the format of this file is based on
 ### Fixed
 
 * Sorting the Requisition list by entered date
+
+### Known Issues
+
+* Subprojects not showing up correctly in several places
 
 
 ## [2.9.0] - 2023-10-19
@@ -323,6 +382,10 @@ Starting with version 1.29.0, the format of this file is based on
 * Turn-around time targets in Pinery assays
 * Project column in sample, library, and library aliquot tables in transfer notification emails
 * Entry time column on the Requisitions list
+
+### Known Issues
+
+* Subprojects not showing up correctly in several places
 
 
 ## [2.8.0] - 2023-10-06
@@ -338,6 +401,10 @@ Starting with version 1.29.0, the format of this file is based on
 ### Fixed
 
 * Display of error message when there is an issue loading JIRA issues on the Edit Run page
+
+### Known Issues
+
+* Subprojects not showing up correctly in several places
 
 
 ## [2.7.0] - 2023-09-21
@@ -355,6 +422,10 @@ Starting with version 1.29.0, the format of this file is based on
   * changed
   * entered
 
+### Known Issues
+
+* Subprojects not showing up correctly in several places
+
 
 ## [2.6.0] - 2023-09-07
 
@@ -367,6 +438,10 @@ Starting with version 1.29.0, the format of this file is based on
 
 * update version of ChromeDriver for tests
 
+### Known Issues
+
+* Subprojects not showing up correctly in several places
+
 
 ## [2.5.0] - 2023-08-11
 
@@ -378,6 +453,10 @@ Starting with version 1.29.0, the format of this file is based on
 
 * Bug where line breaks don't work in Project field additional details
 * Unexpected error when attempting to save some sample classes
+
+### Known Issues
+
+* Subprojects not showing up correctly in several places
 
 
 ## [2.4.0] - 2023-07-27
@@ -398,6 +477,10 @@ Starting with version 1.29.0, the format of this file is based on
 * Errors when using some date patterns in advanced search
 * Pinery samples having multiple values for the same attribute name
 
+### Known Issues
+
+* Subprojects not showing up correctly in several places
+
 
 ## [2.3.0] - 2023-07-14
 
@@ -408,6 +491,10 @@ Starting with version 1.29.0, the format of this file is based on
 ### Fixed
 
 * An issue where it wasn't possible to close some dialogs
+
+### Known Issues
+
+* Subprojects not showing up correctly in several places
 
 
 ## [2.2.0] - 2023-06-30
@@ -432,6 +519,10 @@ Starting with version 1.29.0, the format of this file is based on
   * When editing items, rows will be sorted by ID
 * Some detailed sample columns were included in download sheets when using plain sample mode
 
+### Known Issues
+
+* Subprojects not showing up correctly in several places
+
 
 ## [2.1.0] - 2023-06-15
 
@@ -451,6 +542,10 @@ Starting with version 1.29.0, the format of this file is based on
 
 * When using the miso-lims-webapp Docker image, dates may be shifted by one day when saving
 * Box location (freezer) changes were not logged
+
+### Known Issues
+
+* Subprojects not showing up correctly in several places
 
 ### Upgrade Notes
 
