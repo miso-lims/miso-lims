@@ -231,7 +231,8 @@ public class BulkPoolQCIT extends AbstractIT {
   private PoolQC getLatestQc() {
     QueryBuilder<PoolQC, PoolQC> builder = new QueryBuilder<>(getSession(), PoolQC.class, PoolQC.class);
     builder.addSort(builder.getRoot().get(PoolQC_.qcId), false);
-    return builder.getSingleResultOrNull();
+    List<PoolQC> results = builder.getResultList(1, 0);
+    return results == null || results.isEmpty() ? null : results.get(0);
   }
 
 }
