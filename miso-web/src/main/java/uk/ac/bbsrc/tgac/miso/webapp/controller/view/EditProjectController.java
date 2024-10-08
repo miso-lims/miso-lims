@@ -113,7 +113,8 @@ public class EditProjectController {
     if (scheme != null) {
       ObjectNode config = namingConfig.putObject(property);
       config.put("codeRequired", !scheme.nullProjectCodeAllowed());
-      config.put("codeModifiable", scheme.nullProjectCodeAllowed() || !projectService.hasSamples(project));
+      config.put("codeModifiable",
+          scheme.nullProjectCodeAllowed() || !project.isSaved() || !projectService.hasSamples(project));
     }
   }
 
