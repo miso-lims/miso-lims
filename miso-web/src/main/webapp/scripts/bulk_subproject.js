@@ -27,7 +27,7 @@ BulkTarget.subproject = (function ($) {
           type: "dropdown",
           data: "parentProjectId",
           source: config.projects,
-          getItemLabel: Utils.array.getAlias,
+          getItemLabel: Utils.array.get("title"),
           getItemValue: Utils.array.getId,
           sortSource: true,
           required: true,

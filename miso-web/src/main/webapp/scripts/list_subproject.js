@@ -65,15 +65,15 @@ ListTarget.subproject = {
         include: true,
         iSortPriority: 0,
         mRender: function (data, type, full) {
-          var projectAlias =
+          var projectTitle =
             Utils.array.maybeGetProperty(
               Utils.array.findFirstOrNull(Utils.array.idPredicate(data), config.projects),
-              "alias"
+              "title"
             ) || "Unknown";
           if (type === "display") {
-            return '<a href="' + Urls.ui.projects.edit(data) + '">' + projectAlias + "</a>";
+            return '<a href="' + Urls.ui.projects.edit(data) + '">' + projectTitle + "</a>";
           } else {
-            return projectAlias;
+            return projectTitle;
           }
         },
       },
