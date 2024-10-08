@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
-import javax.servlet.DispatcherType;
 import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
@@ -26,6 +25,8 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+
+import jakarta.servlet.DispatcherType;
 
 @Configuration
 @EnableWebSecurity

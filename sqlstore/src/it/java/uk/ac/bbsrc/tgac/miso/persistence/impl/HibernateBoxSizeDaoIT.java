@@ -19,7 +19,7 @@ public class HibernateBoxSizeDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateBoxSizeDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -49,7 +49,7 @@ public class HibernateBoxSizeDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    BoxSize saved = (BoxSize) getSessionFactory().getCurrentSession().get(BoxSize.class, savedId);
+    BoxSize saved = (BoxSize) currentSession().get(BoxSize.class, savedId);
     assertEquals(rows, saved.getRows().intValue());
     assertEquals(cols, saved.getColumns().intValue());
   }
@@ -59,7 +59,7 @@ public class HibernateBoxSizeDaoIT extends AbstractDAOTest {
     long id = 1L;
     int rows = 7;
     int cols = 5;
-    BoxSize boxSize = (BoxSize) getSessionFactory().getCurrentSession().get(BoxSize.class, id);
+    BoxSize boxSize = (BoxSize) currentSession().get(BoxSize.class, id);
     assertNotEquals(rows, boxSize.getRows().intValue());
     assertNotEquals(cols, boxSize.getColumns().intValue());
     boxSize.setRows(rows);
@@ -68,14 +68,14 @@ public class HibernateBoxSizeDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    BoxSize saved = (BoxSize) getSessionFactory().getCurrentSession().get(BoxSize.class, id);
+    BoxSize saved = (BoxSize) currentSession().get(BoxSize.class, id);
     assertEquals(rows, saved.getRows().intValue());
     assertEquals(cols, saved.getColumns().intValue());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    BoxSize boxSize = (BoxSize) getSessionFactory().getCurrentSession().get(BoxSize.class, 1L);
+    BoxSize boxSize = (BoxSize) currentSession().get(BoxSize.class, 1L);
     assertNotNull(boxSize);
     assertEquals(2L, sut.getUsage(boxSize));
   }

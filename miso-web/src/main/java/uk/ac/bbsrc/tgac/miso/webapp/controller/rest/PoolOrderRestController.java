@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -20,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
@@ -89,7 +88,8 @@ public class PoolOrderRestController extends RestController {
   }
 
   @PutMapping("/{orderId}")
-  public @ResponseBody PoolOrderDto update(@PathVariable long orderId, @RequestBody PoolOrderDto dto) throws IOException {
+  public @ResponseBody PoolOrderDto update(@PathVariable long orderId, @RequestBody PoolOrderDto dto)
+      throws IOException {
     return RestUtils.updateObject("Pool Order", orderId, dto, Dtos::to, poolOrderService, Dtos::asDto);
   }
 
@@ -103,7 +103,8 @@ public class PoolOrderRestController extends RestController {
   @PostMapping(value = "/indexchecker")
   @ResponseBody
   public IndexResponseDto indexChecker(@RequestBody(required = true) List<Long> ids) throws IOException {
-    List<LibraryAliquot> aliquots = ids.stream().map(WhineyFunction.rethrow(libraryAliquotService::get)).collect(Collectors.toList());
+    List<LibraryAliquot> aliquots =
+        ids.stream().map(WhineyFunction.rethrow(libraryAliquotService::get)).collect(Collectors.toList());
     IndexResponseDto response = new IndexResponseDto();
     List<Library> libraries = aliquots.stream().map(LibraryAliquot::getLibrary).collect(Collectors.toList());
     response.setDuplicateIndices(indexChecker.getDuplicateIndicesSequences(libraries));
@@ -115,16 +116,16 @@ public class PoolOrderRestController extends RestController {
   public @ResponseBody DataTablesResponseDto<PoolOrderDto> list(@PathVariable String status, HttpServletRequest request)
       throws IOException {
     switch (PoolOrder.Status.get(status)) {
-    case OUTSTANDING:
-      return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.draft(false),
-          PaginationFilter.fulfilled(false));
-    case FULFILLED:
-      return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.fulfilled(true));
-    case DRAFT:
-      return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.draft(true),
-          PaginationFilter.fulfilled(false));
-    default:
-      throw new RestException("Unknown pool order status: " + status, Status.BAD_REQUEST);
+      case OUTSTANDING:
+        return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.draft(false),
+            PaginationFilter.fulfilled(false));
+      case FULFILLED:
+        return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.fulfilled(true));
+      case DRAFT:
+        return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.draft(true),
+            PaginationFilter.fulfilled(false));
+      default:
+        throw new RestException("Unknown pool order status: " + status, Status.BAD_REQUEST);
     }
   }
 

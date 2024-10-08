@@ -2,13 +2,12 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -55,16 +54,23 @@ public class RunPosition implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
       RunPositionId other = (RunPositionId) obj;
       if (container == null) {
-        if (other.container != null) return false;
-      } else if (!container.equals(other.container)) return false;
+        if (other.container != null)
+          return false;
+      } else if (!container.equals(other.container))
+        return false;
       if (run == null) {
-        if (other.run != null) return false;
-      } else if (!run.equals(other.run)) return false;
+        if (other.run != null)
+          return false;
+      } else if (!run.equals(other.run))
+        return false;
       return true;
     }
 
@@ -120,19 +126,28 @@ public class RunPosition implements Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     RunPosition other = (RunPosition) obj;
     if (container == null) {
-      if (other.container != null) return false;
-    } else if (!container.equals(other.container)) return false;
+      if (other.container != null)
+        return false;
+    } else if (!container.equals(other.container))
+      return false;
     if (position == null) {
-      if (other.position != null) return false;
-    } else if (!position.equals(other.position)) return false;
+      if (other.position != null)
+        return false;
+    } else if (!position.equals(other.position))
+      return false;
     if (run == null) {
-      if (other.run != null) return false;
-    } else if (!run.equals(other.run)) return false;
+      if (other.run != null)
+        return false;
+    } else if (!run.equals(other.run))
+      return false;
     return true;
   }
 

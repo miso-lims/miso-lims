@@ -1,24 +1,6 @@
-/*
- * Copyright 2002-2014 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.util.form;
 
 import java.util.Collection;
-
-import javax.servlet.jsp.JspException;
 
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.util.ObjectUtils;
@@ -28,14 +10,18 @@ import org.springframework.web.servlet.tags.form.OptionTag;
 import org.springframework.web.servlet.tags.form.OptionsTag;
 import org.springframework.web.servlet.tags.form.TagWriter;
 
+import jakarta.servlet.jsp.JspException;
+
 /**
  * Databinding-aware JSP tag that renders an HTML '{@code select}' element.
  *
  * <p>
- * Inner '{@code option}' tags can be rendered using one of the approaches supported by the OptionWriter class.
+ * Inner '{@code option}' tags can be rendered using one of the approaches supported by the
+ * OptionWriter class.
  *
  * <p>
- * Also supports the use of nested {@link OptionTag OptionTags} or (typically one) nested {@link OptionsTag}.
+ * Also supports the use of nested {@link OptionTag OptionTags} or (typically one) nested
+ * {@link OptionsTag}.
  *
  * @author Rob Harrop
  * @author Juergen Hoeller
@@ -46,7 +32,8 @@ import org.springframework.web.servlet.tags.form.TagWriter;
 public class SelectTag extends AbstractHtmlInputElementTag {
 
   /**
-   * The {@link javax.servlet.jsp.PageContext} attribute under which the bound value is exposed to inner {@link OptionTag OptionTags}.
+   * The {@link javax.servlet.jsp.PageContext} attribute under which the bound value is exposed to
+   * inner {@link OptionTag OptionTags}.
    */
   public static final String LIST_VALUE_PAGE_ATTRIBUTE = "uk.ac.bbsrc.tgac.miso.webapp.util.form.SelectTag.listValue";
 
@@ -105,7 +92,8 @@ public class SelectTag extends AbstractHtmlInputElementTag {
   }
 
   /**
-   * Clears the {@link TagWriter} that might have been left over when using nested {@link OptionTag options}.
+   * Clears the {@link TagWriter} that might have been left over when using nested {@link OptionTag
+   * options}.
    */
   @Override
   public void doFinally() {
@@ -150,7 +138,8 @@ public class SelectTag extends AbstractHtmlInputElementTag {
   }
 
   /**
-   * Get the value of the HTML '{@code multiple}' attribute rendered on the final '{@code select}' element.
+   * Get the value of the HTML '{@code multiple}' attribute rendered on the final '{@code select}'
+   * element.
    */
   protected boolean getMultiple() {
     return this.multiple;
@@ -183,8 +172,7 @@ public class SelectTag extends AbstractHtmlInputElementTag {
   /**
    * Set the {@link Iterable} of objects used to generate the inner '{@code option}' tags.
    * 
-   * @param items
-   *          the items that comprise the options of this selection
+   * @param items the items that comprise the options of this selection
    */
   public void setItems(Object items) {
     this.items = items;
@@ -202,22 +190,24 @@ public class SelectTag extends AbstractHtmlInputElementTag {
   }
 
   /**
-   * Set the value of the HTML '{@code multiple}' attribute rendered on the final '{@code select}' element.
+   * Set the value of the HTML '{@code multiple}' attribute rendered on the final '{@code select}'
+   * element.
    */
   public void setMultiple(boolean multiple) {
     this.multiple = multiple;
   }
 
   /**
-   * Set the value of the HTML '{@code size}' attribute rendered on the final '{@code select}' element.
+   * Set the value of the HTML '{@code size}' attribute rendered on the final '{@code select}'
+   * element.
    */
   public void setSize(String size) {
     this.size = size;
   }
 
   /**
-   * If using a multi-select, a hidden element is needed to make sure all items are correctly unselected on the server-side in response to a
-   * {@code null} post.
+   * If using a multi-select, a hidden element is needed to make sure all items are correctly
+   * unselected on the server-side in response to a {@code null} post.
    */
   private void writeHiddenTagIfNecessary(TagWriter tagWriter) throws JspException {
     if (getMultiple()) {
@@ -233,8 +223,8 @@ public class SelectTag extends AbstractHtmlInputElementTag {
   /**
    * Renders the HTML '{@code select}' tag to the supplied {@link TagWriter}.
    * <p>
-   * Renders nested '{@code option}' tags if the {@link #setItems items} property is set, otherwise exposes the bound value for the nested
-   * {@link OptionTag OptionTags}.
+   * Renders nested '{@code option}' tags if the {@link #setItems items} property is set, otherwise
+   * exposes the bound value for the nested {@link OptionTag OptionTags}.
    */
   @SuppressWarnings("unchecked")
   @Override

@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.hibernate.type.StringType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,13 +30,12 @@ public class TimestampConversionIT extends AbstractIT {
   public void verifyConfiguredTimezones() {
     assertEquals(EASTERN_TIME_ZONE, TimeZone.getDefault());
 
-    Object[] results = (Object[]) getSession().createSQLQuery("SELECT @@session.time_zone, @@system_time_zone")
-        .addScalar("@@session.time_zone", StringType.INSTANCE)
-        .addScalar("@@system_time_zone", StringType.INSTANCE)
-        .uniqueResult();
+    Object[] results =
+        (Object[]) getSession().createNativeQuery("SELECT @@session.time_zone, @@system_time_zone", Object[].class)
+            .uniqueResult();
 
-    assertEquals("Session should default to system time zone", "SYSTEM", results[0]);
-    assertEquals("System time zone should be UTC", "UTC", results[1]);
+    assertEquals("Session should default to system time zone", "SYSTEM", (String) results[0]);
+    assertEquals("System time zone should be UTC", "UTC", (String) results[1]);
   }
 
   @Test

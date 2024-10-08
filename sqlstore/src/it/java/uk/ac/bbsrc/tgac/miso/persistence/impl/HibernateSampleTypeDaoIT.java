@@ -19,7 +19,7 @@ public class HibernateSampleTypeDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateSampleTypeDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -53,7 +53,7 @@ public class HibernateSampleTypeDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    SampleType saved = (SampleType) getSessionFactory().getCurrentSession().get(SampleType.class, savedId);
+    SampleType saved = (SampleType) currentSession().get(SampleType.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -61,24 +61,24 @@ public class HibernateSampleTypeDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long typeId = 1L;
     String newName = "New Name";
-    SampleType st = (SampleType) getSessionFactory().getCurrentSession().get(SampleType.class, typeId);
+    SampleType st = (SampleType) currentSession().get(SampleType.class, typeId);
     assertNotEquals(newName, st.getName());
     st.setName(newName);
     assertEquals(typeId, sut.update(st));
 
     clearSession();
 
-    SampleType saved = (SampleType) getSessionFactory().getCurrentSession().get(SampleType.class, typeId);
+    SampleType saved = (SampleType) currentSession().get(SampleType.class, typeId);
     assertEquals(newName, saved.getName());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    SampleType genomic = (SampleType) getSessionFactory().getCurrentSession().get(SampleType.class, 1L);
+    SampleType genomic = (SampleType) currentSession().get(SampleType.class, 1L);
     assertEquals("GENOMIC", genomic.getName());
     assertTrue(sut.getUsage(genomic) > 10L);
 
-    SampleType synthetic = (SampleType) getSessionFactory().getCurrentSession().get(SampleType.class, 3L);
+    SampleType synthetic = (SampleType) currentSession().get(SampleType.class, 3L);
     assertEquals("SYNTHETIC", synthetic.getName());
     assertEquals(0L, sut.getUsage(synthetic));
   }

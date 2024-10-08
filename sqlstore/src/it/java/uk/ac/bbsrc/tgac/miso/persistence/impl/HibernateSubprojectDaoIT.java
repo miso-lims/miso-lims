@@ -26,7 +26,7 @@ public class HibernateSubprojectDaoIT extends AbstractHibernateSaveDaoTest<Subpr
   @Override
   public HibernateSubprojectDao constructTestSubject() {
     HibernateSubprojectDao sut = new HibernateSubprojectDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

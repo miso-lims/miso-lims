@@ -5,13 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
 import org.hibernate.annotations.Immutable;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity

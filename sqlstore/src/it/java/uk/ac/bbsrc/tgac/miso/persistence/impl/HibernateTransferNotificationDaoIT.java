@@ -24,7 +24,7 @@ public class HibernateTransferNotificationDaoIT
   @Override
   public HibernateTransferNotificationDao constructTestSubject() {
     HibernateTransferNotificationDao sut = new HibernateTransferNotificationDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 
@@ -42,7 +42,8 @@ public class HibernateTransferNotificationDaoIT
   @SuppressWarnings("unchecked")
   @Override
   public UpdateParameters<TransferNotification, String> getUpdateParams() {
-    return new UpdateParameters<>(2L, TransferNotification::getRecipientName, TransferNotification::setRecipientName, "someone");
+    return new UpdateParameters<>(2L, TransferNotification::getRecipientName, TransferNotification::setRecipientName,
+        "someone");
   }
 
   @Test

@@ -5,26 +5,24 @@ import java.util.Date;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.hibernate.annotations.Sort;
-import org.hibernate.annotations.SortType;
+import org.hibernate.annotations.SortNatural;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
@@ -59,7 +57,7 @@ public class ProgressImpl implements Progress {
   private Date lastModified;
 
   @OneToMany(targetEntity = AbstractProgressStep.class, mappedBy = "id.progress", fetch = FetchType.EAGER)
-  @Sort(type = SortType.NATURAL)
+  @SortNatural
   private SortedSet<ProgressStep> steps;
 
   @Override
@@ -136,20 +134,30 @@ public class ProgressImpl implements Progress {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     ProgressImpl other = (ProgressImpl) obj;
     if (creationTime == null) {
-      if (other.creationTime != null) return false;
-    } else if (!creationTime.equals(other.creationTime)) return false;
+      if (other.creationTime != null)
+        return false;
+    } else if (!creationTime.equals(other.creationTime))
+      return false;
     if (lastModified == null) {
-      if (other.lastModified != null) return false;
-    } else if (!lastModified.equals(other.lastModified)) return false;
+      if (other.lastModified != null)
+        return false;
+    } else if (!lastModified.equals(other.lastModified))
+      return false;
     if (user == null) {
-      if (other.user != null) return false;
-    } else if (!user.equals(other.user)) return false;
-    if (workflowProgressId != other.workflowProgressId) return false;
+      if (other.user != null)
+        return false;
+    } else if (!user.equals(other.user))
+      return false;
+    if (workflowProgressId != other.workflowProgressId)
+      return false;
     return workflowName == other.workflowName;
   }
 

@@ -27,7 +27,7 @@ public class HibernateListContainerViewDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateListContainerViewDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -92,7 +92,8 @@ public class HibernateListContainerViewDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSearchByEntered() throws IOException {
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.ENTERED));
+    testSearch(
+        PaginationFilter.date(LimsUtils.parseDate("2017-01-01"), LimsUtils.parseDate("2018-01-01"), DateType.ENTERED));
   }
 
   @Test

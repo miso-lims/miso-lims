@@ -3,11 +3,10 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.List;
 
-import javax.persistence.criteria.Join;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Run_;

@@ -9,18 +9,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Transient;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Transient;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -36,7 +35,7 @@ public class DetailedSampleImpl extends SampleImpl implements DetailedSample {
 
   private static final long serialVersionUID = 1L;
 
-  @ManyToOne(optional = true, targetEntity = DetailedSampleImpl.class, fetch = FetchType.EAGER)
+  @ManyToOne(optional = true, targetEntity = DetailedSampleImpl.class, fetch = FetchType.LAZY)
   @JoinColumn(name = "parentId", nullable = true)
   private DetailedSample parent;
 

@@ -3,11 +3,11 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 
 public class SubqueryBuilder<R, T> {
   private final Subquery<R> subquery;

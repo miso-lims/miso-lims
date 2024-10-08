@@ -2,36 +2,36 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 public class HibernateDeletionDaoIT extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   private HibernateDeletionDao sut;
 
   @Before
   public void setup() {
     sut = new HibernateDeletionDao();
-    sut.setSessionFactory(sessionFactory);
+    sut.setEntityManager(entityManager);
   }
 
   @Test
@@ -55,7 +55,7 @@ public class HibernateDeletionDaoIT extends AbstractDAOTest {
   }
 
   private <T extends Deletable> void testDelete(Class<T> targetClass, long targetId) {
-    Session session = sessionFactory.getCurrentSession();
+    Session session = entityManager.unwrap(Session.class);
     @SuppressWarnings("unchecked")
     T deletable = (T) session.get(targetClass, targetId);
     assertNotNull(deletable);
@@ -63,14 +63,15 @@ public class HibernateDeletionDaoIT extends AbstractDAOTest {
     assertNotNull(user);
     String targetType = deletable.getDeleteType();
 
-    Criteria getExpectedDeletion = session.createCriteria(Deletion.class)
-        .add(Restrictions.eq("targetType", targetType))
-        .add(Restrictions.eq("targetId", targetId));
-    assertNull(getExpectedDeletion.uniqueResult());
+    QueryBuilder<Deletion, Deletion> builder = new QueryBuilder<>(session, Deletion.class, Deletion.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(Deletion_.targetType), targetType));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(Deletion_.targetId), targetId));
+
+    assertNull(builder.getSingleResultOrNull());
 
     sut.delete(deletable, user);
     assertNull(session.get(targetClass, targetId));
-    assertNotNull(getExpectedDeletion.uniqueResult());
+    assertNotNull(builder.getSingleResultOrNull());
   }
 
 }

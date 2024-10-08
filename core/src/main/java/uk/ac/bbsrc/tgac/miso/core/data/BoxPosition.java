@@ -2,13 +2,12 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition.BoxPositionId;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
@@ -50,16 +49,23 @@ public class BoxPosition implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
       BoxPositionId other = (BoxPositionId) obj;
       if (box == null) {
-        if (other.box != null) return false;
-      } else if (!box.equals(other.box)) return false;
+        if (other.box != null)
+          return false;
+      } else if (!box.equals(other.box))
+        return false;
       if (position == null) {
-        if (other.position != null) return false;
-      } else if (!position.equals(other.position)) return false;
+        if (other.position != null)
+          return false;
+      } else if (!position.equals(other.position))
+        return false;
       return true;
     }
 
@@ -128,19 +134,28 @@ public class BoxPosition implements Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     BoxPosition other = (BoxPosition) obj;
     if (box == null) {
-      if (other.box != null) return false;
-    } else if (!box.equals(other.box)) return false;
+      if (other.box != null)
+        return false;
+    } else if (!box.equals(other.box))
+      return false;
     if (boxableId == null) {
-      if (other.boxableId != null) return false;
-    } else if (!boxableId.equals(other.boxableId)) return false;
+      if (other.boxableId != null)
+        return false;
+    } else if (!boxableId.equals(other.boxableId))
+      return false;
     if (position == null) {
-      if (other.position != null) return false;
-    } else if (!position.equals(other.position)) return false;
+      if (other.position != null)
+        return false;
+    } else if (!position.equals(other.position))
+      return false;
     return true;
   }
 

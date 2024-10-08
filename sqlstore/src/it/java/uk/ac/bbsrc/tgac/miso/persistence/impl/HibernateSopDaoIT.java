@@ -21,7 +21,7 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
   @Override
   public HibernateSopDao constructTestSubject() {
     HibernateSopDao sut = new HibernateSopDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

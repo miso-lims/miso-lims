@@ -22,7 +22,7 @@ public class HibernateStorageLocationDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateStorageLocationDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test

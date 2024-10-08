@@ -563,7 +563,8 @@ public class DefaultBoxService implements BoxService {
     if (boxable.getBox() != null) {
       Box managedNew = boxStore.get(boxable.getBox().getId());
       addBoxContentsChangeLog(managedNew,
-          String.format("Added %s (%s) to %s", boxable.getAlias(), boxable.getName(), boxable.getBoxPosition()));
+          String.format("Added %s (%s) to %s", managedOriginal.getAlias(), managedOriginal.getName(),
+              boxable.getBoxPosition()));
       managedNew.getBoxPositions().put(boxable.getBoxPosition(),
           new BoxPosition(managedNew, boxable.getBoxPosition(), boxable.getEntityType(), boxable.getId()));
       managedNew.setChangeDetails(authorizationManager.getCurrentUser());

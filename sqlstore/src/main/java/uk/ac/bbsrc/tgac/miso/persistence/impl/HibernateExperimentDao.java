@@ -5,13 +5,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Root;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.CriteriaBuilder.In;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Root;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment_;

@@ -21,7 +21,7 @@ public class HibernateListTransferViewDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateListTransferViewDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -32,7 +32,8 @@ public class HibernateListTransferViewDaoIT extends AbstractDAOTest {
   @Test
   public void testSearchByRecipientGroups() throws Exception {
     @SuppressWarnings("unchecked")
-    List<Group> groups = currentSession().createCriteria(Group.class).list();
+    QueryBuilder<Group, Group> builder = new QueryBuilder<>(currentSession(), Group.class, Group.class);
+    List<Group> groups = builder.getResultList();
     testSearch(PaginationFilter.recipientGroups(groups));
   }
 

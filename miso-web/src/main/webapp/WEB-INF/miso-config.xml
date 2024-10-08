@@ -22,24 +22,26 @@
   ~ **********************************************************************
 -->
 
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:context="http://www.springframework.org/schema/context"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans 
-                      http://www.springframework.org/schema/beans/spring-beans.xsd
-                      http://www.springframework.org/schema/tx 
-                      http://www.springframework.org/schema/tx/spring-tx.xsd
-                      http://www.springframework.org/schema/context 
-                      http://www.springframework.org/schema/context/spring-context.xsd"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+                      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
   default-autowire="byName">
 
-  <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+  <bean id="jspViewResolver"
+    class="org.springframework.web.servlet.view.InternalResourceViewResolver">
     <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
   </bean>
-  
-  <bean id="authorizationManager" class="uk.ac.bbsrc.tgac.miso.service.security.DefaultAuthorizationManager" />
 
-  <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-    <property name="maxUploadSizePerFile" value="10485760" /> <!-- 10MB -->
+  <bean id="authorizationManager"
+    class="uk.ac.bbsrc.tgac.miso.service.security.DefaultAuthorizationManager" />
+
+  <bean id="multipartResolver"
+    class="org.springframework.web.multipart.support.StandardServletMultipartResolver">
+    <!--<property
+    name="maxUploadSizePerFile" value="10485760" />--> <!-- 10MB -->
   </bean>
 
   <bean id="misoFileManager" class="uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager">
@@ -47,6 +49,7 @@
   </bean>
 
   <!-- further naming scheme config happens in MisoAppListener -->
-  <bean id="namingSchemeResolverService" name="namingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService" />
+  <bean id="namingSchemeResolverService" name="namingSchemeResolverService"
+    class="uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService" />
 
 </beans>

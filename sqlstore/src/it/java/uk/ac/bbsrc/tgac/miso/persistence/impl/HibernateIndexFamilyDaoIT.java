@@ -19,7 +19,7 @@ public class HibernateIndexFamilyDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateIndexFamilyDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -56,7 +56,7 @@ public class HibernateIndexFamilyDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    IndexFamily saved = (IndexFamily) getSessionFactory().getCurrentSession().get(IndexFamily.class, savedId);
+    IndexFamily saved = (IndexFamily) currentSession().get(IndexFamily.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -64,20 +64,20 @@ public class HibernateIndexFamilyDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String name = "New Name";
-    IndexFamily fam = (IndexFamily) getSessionFactory().getCurrentSession().get(IndexFamily.class, id);
+    IndexFamily fam = (IndexFamily) currentSession().get(IndexFamily.class, id);
     assertNotEquals(name, fam.getName());
     fam.setName(name);
     sut.update(fam);
 
     clearSession();
 
-    IndexFamily saved = (IndexFamily) getSessionFactory().getCurrentSession().get(IndexFamily.class, id);
+    IndexFamily saved = (IndexFamily) currentSession().get(IndexFamily.class, id);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    IndexFamily fam = (IndexFamily) getSessionFactory().getCurrentSession().get(IndexFamily.class, 1L);
+    IndexFamily fam = (IndexFamily) currentSession().get(IndexFamily.class, 1L);
     assertEquals("TruSeq Single Index", fam.getName());
     assertEquals(14L, sut.getUsage(fam));
   }

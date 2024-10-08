@@ -19,7 +19,7 @@ public class HibernateLibrarySpikeInDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateLibrarySpikeInDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -64,7 +64,7 @@ public class HibernateLibrarySpikeInDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    LibrarySpikeIn saved = (LibrarySpikeIn) getSessionFactory().getCurrentSession().get(LibrarySpikeIn.class, savedId);
+    LibrarySpikeIn saved = (LibrarySpikeIn) currentSession().get(LibrarySpikeIn.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -72,20 +72,20 @@ public class HibernateLibrarySpikeInDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Alias";
-    LibrarySpikeIn spikeIn = (LibrarySpikeIn) getSessionFactory().getCurrentSession().get(LibrarySpikeIn.class, id);
+    LibrarySpikeIn spikeIn = (LibrarySpikeIn) currentSession().get(LibrarySpikeIn.class, id);
     assertNotEquals(alias, spikeIn.getAlias());
     spikeIn.setAlias(alias);
     sut.update(spikeIn);
 
     clearSession();
 
-    LibrarySpikeIn saved = (LibrarySpikeIn) getSessionFactory().getCurrentSession().get(LibrarySpikeIn.class, id);
+    LibrarySpikeIn saved = (LibrarySpikeIn) currentSession().get(LibrarySpikeIn.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    LibrarySpikeIn spikeIn = (LibrarySpikeIn) getSessionFactory().getCurrentSession().get(LibrarySpikeIn.class, 1L);
+    LibrarySpikeIn spikeIn = (LibrarySpikeIn) currentSession().get(LibrarySpikeIn.class, 1L);
     assertEquals("ERCC Mix 1", spikeIn.getAlias());
     assertEquals(0L, sut.getUsage(spikeIn));
   }

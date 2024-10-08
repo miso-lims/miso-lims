@@ -13,8 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
@@ -31,6 +29,7 @@ import com.eaglegenomics.simlims.core.Group;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;

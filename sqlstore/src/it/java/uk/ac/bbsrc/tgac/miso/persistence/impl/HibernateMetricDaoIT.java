@@ -20,7 +20,7 @@ public class HibernateMetricDaoIT extends AbstractHibernateSaveDaoTest<Metric, H
   @Override
   public HibernateMetricDao constructTestSubject() {
     HibernateMetricDao sut = new HibernateMetricDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

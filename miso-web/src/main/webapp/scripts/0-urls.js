@@ -384,7 +384,7 @@ Urls = (function () {
     instrumentTypeDatatable: idUrlFunction(instrumentRestBase + "/dt/instrument-type"),
     list: instrumentRestBase,
     createRecord: function (instrumentId) {
-      return instrumentRestBase + "/" + instrumentId + "/servicerecords/";
+      return instrumentRestBase + "/" + instrumentId + "/servicerecords";
     },
   };
 
@@ -1136,7 +1136,7 @@ Urls = (function () {
     updateFreezer: idUrlFunction(storageLocationRestBase + "/freezers"),
     queryByBarcode: storageLocationRestBase + "/bybarcode",
     createRecord: function (locationId) {
-      return storageLocationRestBase + "/" + locationId + "/servicerecords/";
+      return storageLocationRestBase + "/" + locationId + "/servicerecords";
     },
   };
 
@@ -1342,7 +1342,7 @@ Urls = (function () {
       return workflowRestBase + "/" + workflowId + "/step/" + stepNumber;
     },
     processInput: function (workflowId, stepNumber) {
-      return workflowRestBase + "/" + workflowId + "/step/" + stepNumber + "/";
+      return workflowRestBase + "/" + workflowId + "/step/" + stepNumber;
     },
     latestStep: middleIdUrlFunction(workflowRestBase, "/step/latest"),
     execute: middleIdUrlFunction(workflowRestBase, "/execute"),

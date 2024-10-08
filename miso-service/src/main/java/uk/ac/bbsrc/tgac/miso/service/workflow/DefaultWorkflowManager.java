@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.annotations.VisibleForTesting;
 
+import jakarta.annotation.Resource;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep.FactoryType;
@@ -61,7 +60,8 @@ public class DefaultWorkflowManager implements WorkflowManager {
 
   @Override
   public Workflow processInput(Workflow workflow, int stepNumber, String input) throws IOException {
-    List<String> errors = workflow.processInput(stepNumber, makeProgressStep(input, workflow.getStep(stepNumber).getInputTypes()));
+    List<String> errors =
+        workflow.processInput(stepNumber, makeProgressStep(input, workflow.getStep(stepNumber).getInputTypes()));
     if (!errors.isEmpty()) {
       throw new ValidationException(errors.stream().map(err -> new ValidationError(err)).collect(Collectors.toList()));
     }
@@ -85,7 +85,8 @@ public class DefaultWorkflowManager implements WorkflowManager {
         .collect(Collectors.toList());
 
     throw new ValidationException(Collections.singletonList(
-        new ValidationError(String.format("No %s found matching '%s'", LimsUtils.joinWithConjunction(names, "or"), input))));
+        new ValidationError(
+            String.format("No %s found matching '%s'", LimsUtils.joinWithConjunction(names, "or"), input))));
   }
 
   /**
@@ -103,7 +104,8 @@ public class DefaultWorkflowManager implements WorkflowManager {
   }
 
   private void save(Progress progress) throws IOException {
-    if (progress.getUser() != null) authorizationManager.throwIfNotOwner(progress.getUser());
+    if (progress.getUser() != null)
+      authorizationManager.throwIfNotOwner(progress.getUser());
     if (!progress.isSaved()) {
       create(progress);
     } else {
@@ -144,7 +146,8 @@ public class DefaultWorkflowManager implements WorkflowManager {
   @Override
   public Workflow loadWorkflow(long id) throws IOException {
     Progress progress = progressStore.get(id);
-    if (progress == null) return null;
+    if (progress == null)
+      return null;
 
     authorizationManager.throwIfNotOwner(progress.getUser());
     return progress.getWorkflowName().createWorkflow(progress);
@@ -158,7 +161,8 @@ public class DefaultWorkflowManager implements WorkflowManager {
 
   @Override
   public void execute(Workflow workflow) throws IOException {
-    if (!workflow.isComplete()) throw new IllegalArgumentException("Workflow is not complete");
+    if (!workflow.isComplete())
+      throw new IllegalArgumentException("Workflow is not complete");
 
     workflow.execute(workflowExecutor);
     progressStore.delete(workflow.getProgress());

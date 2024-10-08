@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -33,13 +32,14 @@ public class BoxableRestController extends RestController {
 
   @GetMapping(value = "/search", produces = "application/json")
   @ResponseBody
-  public List<BoxableDto> search(@RequestParam("q") String search, HttpServletRequest request, HttpServletResponse response,
+  public List<BoxableDto> search(@RequestParam("q") String search, HttpServletRequest request,
+      HttpServletResponse response,
       UriComponentsBuilder uriBuilder) {
     List<BoxableView> results = boxService.getBoxableViewsBySearch(search);
     return Dtos.asBoxableDtos(results);
   }
 
-  @PostMapping(value = "/query-by-box", produces = { "application/json" })
+  @PostMapping(value = "/query-by-box", produces = {"application/json"})
   @ResponseBody
   public List<BoxableDto> getBoxablesInBulk(@RequestBody List<String> names) throws IOException {
     List<Box> boxes = boxService.list(0, 0, true, "id", PaginationFilter.bulkLookup(names));

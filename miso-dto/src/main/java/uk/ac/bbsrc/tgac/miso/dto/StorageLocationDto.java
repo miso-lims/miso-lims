@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.annotation.Nonnull;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLabel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.LocationUnit;

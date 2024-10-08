@@ -7,13 +7,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -24,15 +26,15 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class HibernateWorksetDaoIT extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   private HibernateWorksetDao sut;
 
   @Before
   public void setup() {
     sut = new HibernateWorksetDao();
-    sut.setSessionFactory(sessionFactory);
+    sut.setEntityManager(entityManager);
   }
 
   @Test
@@ -77,8 +79,8 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
     workset.setDescription(desc);
     sut.update(workset);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    entityManager.unwrap(Session.class).flush();
+    entityManager.unwrap(Session.class).clear();
 
     Workset saved = sut.get(1L);
     assertEquals(alias, saved.getAlias());
@@ -90,7 +92,8 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
     Workset workset = sut.get(1L);
     assertEquals(3, workset.getWorksetSamples().size());
 
-    Sample sample = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 4L);
+    Sample sample =
+        (Sample) entityManager.unwrap(Session.class).get(SampleImpl.class, 4L);
     WorksetSample addition = new WorksetSample();
     addition.setItem(sample);
     addition.setWorkset(workset);
@@ -98,8 +101,8 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
     workset.getWorksetSamples().add(addition);
     sut.update(workset);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    entityManager.unwrap(Session.class).flush();
+    entityManager.unwrap(Session.class).clear();
 
     Workset saved = sut.get(1L);
     assertEquals(4, saved.getWorksetSamples().size());
@@ -112,8 +115,8 @@ public class HibernateWorksetDaoIT extends AbstractDAOTest {
     workset.getWorksetSamples().remove(removal);
     sut.update(workset);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    entityManager.unwrap(Session.class).flush();
+    entityManager.unwrap(Session.class).clear();
 
     Workset saved = sut.get(1L);
     assertEquals(2, saved.getWorksetSamples().size());

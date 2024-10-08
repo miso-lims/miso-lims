@@ -1,8 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.WorkflowStep;
 

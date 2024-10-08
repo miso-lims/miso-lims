@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 
 import com.eaglegenomics.simlims.core.User;
 
-import io.prometheus.client.Gauge;
+import io.prometheus.metrics.core.metrics.Gauge;
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -65,10 +65,12 @@ public class NotificationManager {
   private static final String STRIPED_ROW_STYLE = "background-color: #F0F0FF;";
   private static final String ERROR_STYLE = "font-weight: bold;";
 
-  private static final Gauge smtpWindowSent = Gauge.build().name("miso_notification_manager_smtp_window_sent")
-      .help("The number of emails that MISO has sent within the throttle window").register();
-  private static final Gauge smtpFailed = Gauge.build().name("miso_notification_manager_smtp_failed")
-      .help("The number of emails that MISO has failed to send").register();
+  private static final Gauge smtpWindowSent = Gauge.builder().name("miso_notification_manager_smtp_window_sent")
+      .help("The number of emails that MISO has sent within the throttle window")
+      .register();
+  private static final Gauge smtpFailed = Gauge.builder().name("miso_notification_manager_smtp_failed")
+      .help("The number of emails that MISO has failed to send")
+      .register();
 
   @Value("${miso.smtp.host:#{null}}")
   private String smtpHost;

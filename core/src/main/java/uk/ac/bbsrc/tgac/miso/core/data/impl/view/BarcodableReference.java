@@ -2,43 +2,28 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
 import java.util.List;
 
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
-
 public class BarcodableReference {
 
-  public static class ResultTransformer implements org.hibernate.transform.ResultTransformer {
-
-    private static final long serialVersionUID = 1L;
-
+  public static class TupleTransformer implements org.hibernate.query.TupleTransformer<BarcodableReference> {
     private final String entityType;
 
-    public ResultTransformer(String entityType) {
+    public TupleTransformer(String entityType) {
       this.entityType = entityType;
     }
 
     @Override
-    public Object transformTuple(Object[] tuple, String[] aliases) {
+    public BarcodableReference transformTuple(Object[] tuple, String[] aliases) {
       String secondaryLabel = tuple.length < 3 ? null : (String) tuple[2];
       return new BarcodableReference(entityType, (long) tuple[0], (String) tuple[1], secondaryLabel);
     }
 
-    @SuppressWarnings("rawtypes")
-    @Override
-    public List transformList(List collection) {
-      return collection;
-    }
-
   };
 
-  public static ProjectionList makeProjectionList(String primaryLabelProperty, String secondaryLabelProperty) {
-    ProjectionList projections = Projections.projectionList()
-        .add(Projections.property("id"))
-        .add(Projections.property(primaryLabelProperty));
-    if (secondaryLabelProperty != null) {
-      projections.add(Projections.property(secondaryLabelProperty));
+  public static class ResultListTransformer implements org.hibernate.query.ResultListTransformer<BarcodableReference> {
+    @Override
+    public List<BarcodableReference> transformList(List<BarcodableReference> collection) {
+      return collection;
     }
-    return projections;
   }
 
   private final String entityType;

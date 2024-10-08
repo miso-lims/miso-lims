@@ -3,16 +3,15 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.view.box;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
 import org.hibernate.annotations.Immutable;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;

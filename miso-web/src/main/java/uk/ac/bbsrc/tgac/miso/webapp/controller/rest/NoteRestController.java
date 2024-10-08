@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.eaglegenomics.simlims.core.Note;
 
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.NoteService;

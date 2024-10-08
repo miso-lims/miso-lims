@@ -9,11 +9,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 
@@ -21,15 +21,15 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateSiblingNumberGenerator implements SiblingNumberGenerator {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
-  private Session currentSession() {
-    return sessionFactory.getCurrentSession();
+  public Session currentSession() {
+    return entityManager.unwrap(Session.class);
   }
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override

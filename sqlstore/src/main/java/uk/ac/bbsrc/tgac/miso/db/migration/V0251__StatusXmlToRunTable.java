@@ -21,10 +21,12 @@ import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 import org.xml.sax.InputSource;
 
 /**
- * Migration to remove a xml file from the MySql database. The useful values from the xml file are copied to fields in the database.
+ * Migration to remove a xml file from the MySql database. The useful values from the xml file are
+ * copied to fields in the database.
  * 
- * Flyway migration to pull four values out of an xml file stored in the xml field of the Status table. Four new columns are added to the
- * Run table and the four values from the xml file are copied to the four new columns. The xml filed in the Status table is then deleted.
+ * Flyway migration to pull four values out of an xml file stored in the xml field of the Status
+ * table. Four new columns are added to the Run table and the four values from the xml file are
+ * copied to the four new columns. The xml filed in the Status table is then deleted.
  *
  */
 public class V0251__StatusXmlToRunTable implements JdbcMigration {
@@ -43,7 +45,8 @@ public class V0251__StatusXmlToRunTable implements JdbcMigration {
 
   private Map<String, String> getStatusXml(Connection connection) throws SQLException {
     Map<String, String> result = new HashMap<>();
-    PreparedStatement statement = connection.prepareStatement("SELECT s.runName, s.xml FROM Status AS s WHERE s.xml IS NOT NULL");
+    PreparedStatement statement =
+        connection.prepareStatement("SELECT s.runName, s.xml FROM Status AS s WHERE s.xml IS NOT NULL");
     logger.log(Level.INFO, String.format("Get status xml: '%s'", statement.toString()));
     ResultSet rs = statement.executeQuery();
     try {
@@ -78,7 +81,8 @@ public class V0251__StatusXmlToRunTable implements JdbcMigration {
 
   private void updateStatusColumns(Connection connection, Map<String, StatusValues> statusValues) throws SQLException {
     PreparedStatement statement = connection
-        .prepareStatement("UPDATE Run SET numCycles = ?, imgCycle = ?, scoreCycle = ?, callCycle = ? WHERE alias LIKE ?;");
+        .prepareStatement(
+            "UPDATE Run SET numCycles = ?, imgCycle = ?, scoreCycle = ?, callCycle = ? WHERE alias LIKE ?;");
     try {
       statusValues.entrySet().stream().forEach(e -> {
         try {
@@ -139,8 +143,9 @@ public class V0251__StatusXmlToRunTable implements JdbcMigration {
         scoreCycle = scoreCycleTemp;
         callCycle = callCycleTemp;
         logger.log(Level.INFO,
-            String.format("Read values from xml: numCycles=%d imgCycle=%d scoreCycle=%d, callCycle=%d", numCycles, imgCycle, scoreCycle,
-            callCycle));
+            String.format("Read values from xml: numCycles=%d imgCycle=%d scoreCycle=%d, callCycle=%d", numCycles,
+                imgCycle, scoreCycle,
+                callCycle));
       }
     }
 
