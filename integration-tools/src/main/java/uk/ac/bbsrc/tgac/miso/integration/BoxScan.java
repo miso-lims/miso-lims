@@ -43,15 +43,6 @@ public interface BoxScan {
   public String getBarcode(int row, int column);
 
   /**
-   * Gets the barcodes in array form.
-   *
-   * @return a 2D array containing all the scanned barcodes. The outer array contains the
-   rows, and the inner array contains columns
-   * (e.g. position "B10" = result[1,9])
-   */
-  public String[][] getBarcodesArray();
-
-  /**
    * Gets all of the positions and associated barcodes, no tube indicators ("No Tube") and unreadable tube indicators ("No Read") in map 
    * form. Implementors should return defensive copies if necessary to enforce immutability
    * 
