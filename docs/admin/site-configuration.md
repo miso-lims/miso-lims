@@ -314,10 +314,9 @@ Interval in milliseconds to poll Run Scanner(s). Defaults to `300000` (5 minutes
 ### `miso.boxscanner.servers`
 
 Config for Visionmate or DP5Mirage bulk barcode scanners. Enter in format `<name>:<type>:<host/IP>:<port>`. Multiple scanners may be
-specified by using a comma to separate.
+specified by using a comma to separate. Valid types include: (visionmate / dp5mirage).
 
-Example: `Lab 1 Scanner:visionmate:192.168.0.120:8000,Lab 2 Scanner:dp5mirage:scanner.example.
-com:8000`
+Example: `Lab 1 Scanner:visionmate:192.168.0.120:8000,Lab 2 Scanner:dp5mirage:scanner.example.com:8000`
 
 ### `miso.project.report.links`
 

@@ -47,11 +47,6 @@ public class VisionMateScan implements BoxScan {
   }
 
   @Override
-  public String[][] getBarcodesArray() {
-    return scan.getBarcodes();
-  }
-
-  @Override
   public Map<String, String> getBarcodesMap() {
     String[][] array = scan.getBarcodes();
     Map<String, String> map = new HashMap<>();

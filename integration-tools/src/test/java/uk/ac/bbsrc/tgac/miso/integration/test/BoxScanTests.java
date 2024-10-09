@@ -2,13 +2,14 @@ package uk.ac.bbsrc.tgac.miso.integration.test;
 
 import static org.junit.Assert.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
+import uk.ac.bbsrc.tgac.miso.integration.dp5mirage.DP5MirageScanner.DP5MirageScanPosition;
 
 public abstract class BoxScanTests<T extends BoxScan> {
   
@@ -41,7 +42,7 @@ public abstract class BoxScanTests<T extends BoxScan> {
    * </OL>
    */
   protected abstract T getErredScan();
-  
+
   @Test
   public void testReferenceConversions() {
     BoxScan fullScan = getFullScan();
@@ -53,37 +54,27 @@ public abstract class BoxScanTests<T extends BoxScan> {
   @Test
   public void testCollectionComparison() {
     BoxScan fullScan = getFullScan();
-    String[][] array = fullScan.getBarcodesArray();
-    assertEquals(array[0][0], "11111");
-    assertEquals(array[1][0], "22222");
-    assertEquals(array[0][1], "33333");
-    assertEquals(array[1][1], "44444");
-    
     Map<String, String> map = fullScan.getBarcodesMap();
-    assertEquals(array[0][0], map.get("A01"));
-    assertEquals(array[1][0], map.get("B01"));
-    assertEquals(array[0][1], map.get("A02"));
-    assertEquals(array[1][1], map.get("B02"));
+    assertEquals(map.get(BoxUtils.getPositionString(0, 0)), "11111");
+    assertEquals(map.get(BoxUtils.getPositionString(1, 0)), "22222");
+    assertEquals(map.get(BoxUtils.getPositionString(0, 1)), "33333");
+    assertEquals(map.get(BoxUtils.getPositionString(1, 1)), "44444");
+    assertEquals(map.get(BoxUtils.getPositionString(0, 0)), map.get("A01"));
+    assertEquals(map.get(BoxUtils.getPositionString(1, 0)), map.get("B01"));
+    assertEquals(map.get(BoxUtils.getPositionString(0, 1)), map.get("A02"));
+    assertEquals(map.get(BoxUtils.getPositionString(1, 1)), map.get("B02"));
   }
-  
+
   @Test
   public void testImmutability() {
     BoxScan fullScan = getFullScan();
-    
-    String[][] array = fullScan.getBarcodesArray();
-    assertEquals(array[0][0], "11111");
-    
     Map<String, String> map = fullScan.getBarcodesMap();
-    assertEquals(array[0][0], map.get("A01"));
-    
-    array[0][0] = "changed";
-    map.put("A01", "changed");
-    
-    array = fullScan.getBarcodesArray();
-    assertEquals(array[0][0], "11111");
-    
+    assertEquals(map.get(BoxUtils.getPositionString(0, 0)), "11111");
+    assertEquals(BoxUtils.getPositionString(0, 0), "A01");
+    map.put(BoxUtils.getPositionString(0, 0), "changed");
     map = fullScan.getBarcodesMap();
-    assertEquals(array[0][0], map.get("A01"));
+    assertEquals(map.get(BoxUtils.getPositionString(0, 0)), "11111");
+    assertEquals(map.get(BoxUtils.getPositionString(0, 0)), map.get("A01"));
   }
   
   @Test
