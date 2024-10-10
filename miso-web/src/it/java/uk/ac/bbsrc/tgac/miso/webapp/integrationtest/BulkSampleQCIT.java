@@ -225,6 +225,7 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   private SampleQC getLatestQc() {
     QueryBuilder<SampleQC, SampleQC> builder = new QueryBuilder<>(getSession(), SampleQC.class, SampleQC.class);
     builder.addSort(builder.getRoot().get(SampleQC_.qcId), false);
-    return builder.getSingleResultOrNull();
+    List<SampleQC> results = builder.getResultList(1, 0);
+    return results == null || results.isEmpty() ? null : results.get(0);
   }
 }
