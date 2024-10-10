@@ -350,6 +350,10 @@ public class DefaultPoolService implements PoolService {
     Set<PoolElement> additions = source.stream()
         .filter(notInOther(targetAliquots))
         .collect(Collectors.toSet());
+    for (PoolElement targetElement : target.getPoolContents()) {
+      loadChildEntity(targetElement::setAliquot, targetElement.getAliquot(), listLibraryAliquotViewService,
+          "pooledElements");
+    }
     for (PoolElement sourcePd : additions) {
       ListLibraryAliquotView v = listLibraryAliquotViewService.get(sourcePd.getAliquot().getId());
       if (v == null) {
