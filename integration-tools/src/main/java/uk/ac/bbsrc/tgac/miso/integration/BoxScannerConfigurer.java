@@ -31,8 +31,9 @@ public class BoxScannerConfigurer {
       return scanners;
     }
 
-    // config format: "<name>:<type>:<ip>:<port>" e.g. "Scanner Name:visionmate:127.0.0.1:9000"
-    // multiple scanners may be comma-separated
+    // config format: "<name>:<type>:<host/IP address>:<port>"
+    // e.g. "Scanner 1:visionmate:127.0.0.1:9000" and "Scanner 2:dp5mirage:scanner.example.com:9000"
+    // multiple scanners may be comma-separated. Supported types (visionmate / dp5mirage)
     String[] configStrings = configLine.split(",");
     for (int i = 0; i < configStrings.length; i++) {
       String[] configParts = configStrings[i].split(":");

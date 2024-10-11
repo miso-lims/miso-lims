@@ -2,11 +2,9 @@ package uk.ac.bbsrc.tgac.miso.integration.dp5mirage;
 
 import static uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils.getPostParamRequest;
 
-import ca.on.oicr.gsi.visionmate.Scan;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Version;
