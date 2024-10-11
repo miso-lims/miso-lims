@@ -7,6 +7,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
 
 /*
  * Skeleton implementation of a Boxable item
@@ -20,6 +21,12 @@ public abstract class AbstractBoxable implements Boxable {
   private boolean discarded;
   @Column(nullable = true)
   private BigDecimal volume;
+
+  @Transient
+  private Long pendingBoxId;
+
+  @Transient
+  private String pendingBoxPosition;
 
   @Override
   public BigDecimal getVolume() {
@@ -41,6 +48,33 @@ public abstract class AbstractBoxable implements Boxable {
     if (discarded)
       volume = BigDecimal.ZERO;
     this.discarded = discarded;
+  }
+
+  @Override
+  public Long getPendingBoxId() {
+    return pendingBoxId;
+  }
+
+  @Override
+  public String getPendingBoxPosition() {
+    return pendingBoxPosition;
+  }
+
+  @Override
+  public void setPendingBoxId(Long pendingBoxId) {
+    this.pendingBoxId = pendingBoxId;
+  }
+
+  @Override
+  public void setPendingBoxPosition(String pendingBoxPosition) {
+    this.pendingBoxPosition = pendingBoxPosition;
+  }
+
+  @Override
+  public void moveBoxPositionToPending() {
+    setPendingBoxId(getBox() == null ? null : getBox().getId());
+    setPendingBoxPosition(getBoxPosition());
+    removeFromBox();
   }
 
   @Override

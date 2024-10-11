@@ -4,7 +4,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -206,7 +205,7 @@ public class DefaultLibraryService implements LibraryService {
     }
     requisitionService.findOrCreateRequisition(library);
     loadChildEntities(library);
-    boxService.throwIfBoxPositionIsFilled(library);
+    boxService.prepareBoxableLocation(library, false);
     User changeUser = authorizationManager.getCurrentUser();
     library.setChangeDetails(changeUser);
     validateParentOrThrow(library);
@@ -255,8 +254,7 @@ public class DefaultLibraryService implements LibraryService {
     Library managed = get(library.getId());
     User changeUser = authorizationManager.getCurrentUser();
     managed.setChangeDetails(changeUser);
-    maybeRemoveFromBox(library, managed);
-    boxService.throwIfBoxPositionIsFilled(library);
+    boxService.prepareBoxableLocation(library, managed.getDistributionTransfer() != null);
     library.setSample(sampleService.get(library.getSample().getId()));
     LimsUtils.updateParentVolume(library, managed, changeUser);
     boolean validateAliasUniqueness = !managed.getAlias().equals(library.getAlias());
@@ -452,14 +450,6 @@ public class DefaultLibraryService implements LibraryService {
       }
       dTarget.setGroupId(dSource.getGroupId());
       dTarget.setGroupDescription(dSource.getGroupDescription());
-    }
-  }
-
-  private void maybeRemoveFromBox(Library library, Library managed) {
-    if (library.isDiscarded() || library.getDistributionTransfer() != null
-        || managed.getDistributionTransfer() != null) {
-      library.setBoxPosition(null);
-      library.setVolume(BigDecimal.ZERO);
     }
   }
 

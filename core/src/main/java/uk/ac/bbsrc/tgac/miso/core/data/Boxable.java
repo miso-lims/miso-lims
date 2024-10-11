@@ -92,79 +92,81 @@ public interface Boxable extends Aliasable, Barcodable, Nameable, Serializable {
     }
   }
 
-  public EntityType getEntityType();
+  EntityType getEntityType();
 
-  /**
-   * Returns the alias of this Sample object.
-   *
-   * @return String alias.
-   */
-  @Override
-  public String getAlias();
+  Box getBox();
 
-  public Box getBox();
+  String getBoxPosition();
 
-  public String getBoxPosition();
+  Long getPendingBoxId();
 
-  public Date getLastModified();
+  void setPendingBoxId(Long pendingBoxId);
 
-  public String getLocationBarcode();
+  String getPendingBoxPosition();
+
+  void setPendingBoxPosition(String pendingBoxPosition);
+
+  void moveBoxPositionToPending();
+
+  Date getLastModified();
+
+  String getLocationBarcode();
 
   /**
    * Returns the volume of the Implementor
    * 
    * @return volume
    */
-  public BigDecimal getVolume();
+  BigDecimal getVolume();
 
   /**
    * Returns whether or not the Implementor has been emptied
    * 
    * @return emptied
    */
-  public boolean isDiscarded();
+  boolean isDiscarded();
 
   /**
    * Sets the alias of this Sample object.
    *
    * @param alias alias.
    */
-  public void setAlias(String alias);
+  void setAlias(String alias);
 
   /**
    * Sets the 'emptied' attribute for the Implementor
    * 
    * @param boolean emptied
    */
-  public void setDiscarded(boolean emptied);
+  void setDiscarded(boolean emptied);
 
   /**
    * Sets the volume of the Implementor
    * 
    * @param volume
    */
-  public void setVolume(BigDecimal volume);
+  void setVolume(BigDecimal volume);
 
-  public Long getPreMigrationId();
+  Long getPreMigrationId();
 
-  public void setLastModified(Date lastModified);
+  void setLastModified(Date lastModified);
 
-  public void setLastModifier(User user);
+  void setLastModifier(User user);
 
   /**
    * Remove Box and position information from this Boxable
    */
-  public void removeFromBox();
+  void removeFromBox();
 
-  public Set<ListTransferView> getTransferViews();
+  Set<ListTransferView> getTransferViews();
 
-  public default ListTransferView getReceiptTransfer() {
+  default ListTransferView getReceiptTransfer() {
     return getTransferViews().stream()
         .filter(ListTransferView::isReceipt)
         .findFirst().orElse(null);
   }
 
-  public default ListTransferView getDistributionTransfer() {
+  default ListTransferView getDistributionTransfer() {
     return getTransferViews().stream()
         .filter(ListTransferView::isDistribution)
         .findFirst().orElse(null);

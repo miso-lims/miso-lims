@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -531,44 +532,53 @@ public class DefaultBoxService implements BoxService {
     this.namingSchemeHolder = namingSchemeHolder;
   }
 
+  public void prepareBoxableLocation(Boxable pendingBoxable, boolean existingDistributionTransfer) throws IOException {
+    if (pendingBoxable.isDiscarded() || pendingBoxable.getDistributionTransfer() != null
+        || existingDistributionTransfer) {
+      pendingBoxable.removeFromBox();
+      pendingBoxable.setVolume(BigDecimal.ZERO);
+    }
+
+    throwIfBoxPositionIsFilled(pendingBoxable);
+    pendingBoxable.moveBoxPositionToPending();
+  }
+
   @Override
-  public void updateBoxableLocation(Boxable boxable) throws IOException {
-    BoxableId boxableId = new BoxableId(boxable.getEntityType(), boxable.getId());
-    Boxable managedOriginal = boxStore.getBoxable(boxableId);
-    if (boxable.getBox() == null && managedOriginal.getBox() == null) {
+  public void updateBoxableLocation(Boxable pendingBoxable) throws IOException {
+    if (pendingBoxable.getBox() != null || pendingBoxable.getBoxPosition() != null) {
+      throw new IllegalStateException(
+          "Box position not moved to pending. prepareBoxableLocation should be called first.");
+    }
+
+    BoxableId boxableId = new BoxableId(pendingBoxable.getEntityType(), pendingBoxable.getId());
+    Boxable managedOriginalBoxable = boxStore.getBoxable(boxableId);
+    if (pendingBoxable.getPendingBoxId() == null && managedOriginalBoxable.getBox() == null) {
       return;
     }
-    if ((boxable.getBox() != null && managedOriginal.getBox() != null
-        && boxable.getBox().getId() == managedOriginal.getBox().getId()
-        && boxable.getBoxPosition().equals(managedOriginal.getBoxPosition()))) {
-      // Note: for new items, boxable.box.boxPosition[boxable.boxPosition] may not match
-      // boxable.boxPosition because it doesn't (and we don't want it to) cascade update.
-      // boxable.boxPosition stays as it is because Hibernate won't overwrite the changes you've made to
-      // the object with the current session. boxable.box should be a refreshed object with the correct,
-      // persisted boxPositions though.
-      BoxPosition temp = managedOriginal.getBox().getBoxPositions().get(managedOriginal.getBoxPosition());
-      if (temp != null && temp.getBoxableId().equals(boxableId)) {
-        return;
-      }
+    if ((pendingBoxable.getPendingBoxId() != null && managedOriginalBoxable.getBox() != null
+        && pendingBoxable.getPendingBoxId().longValue() == managedOriginalBoxable.getBox().getId()
+        && pendingBoxable.getPendingBoxPosition().equals(managedOriginalBoxable.getBoxPosition()))) {
+      return;
     }
-    if (managedOriginal.getBox() != null) {
-      Box box = get(managedOriginal.getBox().getId());
-      box.getBoxPositions().remove(managedOriginal.getBoxPosition());
-      addBoxContentsChangeLog(managedOriginal.getBox(),
-          String.format("Removed %s (%s) from %s", managedOriginal.getAlias(), managedOriginal.getName(),
-              managedOriginal.getBoxPosition()));
+    if (managedOriginalBoxable.getBox() != null) {
+      Box box = get(managedOriginalBoxable.getBox().getId());
+      box.getBoxPositions().remove(managedOriginalBoxable.getBoxPosition());
+      addBoxContentsChangeLog(managedOriginalBoxable.getBox(),
+          String.format("Removed %s (%s) from %s", managedOriginalBoxable.getAlias(), managedOriginalBoxable.getName(),
+              managedOriginalBoxable.getBoxPosition()));
       box.setChangeDetails(authorizationManager.getCurrentUser());
       boxStore.save(box);
     }
-    if (boxable.getBox() != null) {
-      Box managedNew = boxStore.get(boxable.getBox().getId());
-      addBoxContentsChangeLog(managedNew,
-          String.format("Added %s (%s) to %s", managedOriginal.getAlias(), managedOriginal.getName(),
-              boxable.getBoxPosition()));
-      managedNew.getBoxPositions().put(boxable.getBoxPosition(),
-          new BoxPosition(managedNew, boxable.getBoxPosition(), boxable.getEntityType(), boxable.getId()));
-      managedNew.setChangeDetails(authorizationManager.getCurrentUser());
-      boxStore.save(managedNew);
+    if (pendingBoxable.getPendingBoxId() != null) {
+      Box managedNewBox = boxStore.get(pendingBoxable.getPendingBoxId());
+      addBoxContentsChangeLog(managedNewBox,
+          String.format("Added %s (%s) to %s", managedOriginalBoxable.getAlias(), managedOriginalBoxable.getName(),
+              pendingBoxable.getPendingBoxPosition()));
+      managedNewBox.getBoxPositions().put(pendingBoxable.getPendingBoxPosition(),
+          new BoxPosition(managedNewBox, pendingBoxable.getPendingBoxPosition(), pendingBoxable.getEntityType(),
+              pendingBoxable.getId()));
+      managedNewBox.setChangeDetails(authorizationManager.getCurrentUser());
+      boxStore.save(managedNewBox);
     }
   }
 
@@ -577,8 +587,7 @@ public class DefaultBoxService implements BoxService {
     return deletionStore;
   }
 
-  @Override
-  public void throwIfBoxPositionIsFilled(Boxable boxable) throws IOException {
+  private void throwIfBoxPositionIsFilled(Boxable boxable) throws IOException {
     if (boxable.getBox() == null || boxable.getBoxPosition() == null) {
       return;
     }

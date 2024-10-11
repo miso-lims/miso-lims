@@ -180,7 +180,7 @@ public class DefaultPoolService implements PoolService {
     pool.setName(generateTemporaryName());
     loadPoolElements(pool.getPoolContents(), pool);
     pool.setChangeDetails(authorizationManager.getCurrentUser());
-    boxService.throwIfBoxPositionIsFilled(pool);
+    boxService.prepareBoxableLocation(pool, false);
     validateChange(pool, null);
     poolStore.create(pool);
 
@@ -202,8 +202,7 @@ public class DefaultPoolService implements PoolService {
   @Override
   public long update(Pool pool) throws IOException {
     Pool managed = poolStore.get(pool.getId());
-    maybeRemoveFromBox(pool, managed);
-    boxService.throwIfBoxPositionIsFilled(pool);
+    boxService.prepareBoxableLocation(pool, managed.getDistributionTransfer() != null);
     if (pool.getConcentration() == null) {
       pool.setConcentrationUnits(null);
     }
@@ -251,13 +250,6 @@ public class DefaultPoolService implements PoolService {
     long savedId = poolStore.update(managed);
     boxService.updateBoxableLocation(pool);
     return savedId;
-  }
-
-  private void maybeRemoveFromBox(Pool pool, Pool managed) {
-    if (pool.isDiscarded() || pool.getDistributionTransfer() != null || managed.getDistributionTransfer() != null) {
-      pool.setBoxPosition(null);
-      pool.setVolume(BigDecimal.ZERO);
-    }
   }
 
   private void refreshPoolElements(Pool pool) throws IOException {

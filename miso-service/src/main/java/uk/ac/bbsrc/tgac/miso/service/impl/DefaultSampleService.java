@@ -253,7 +253,7 @@ public class DefaultSampleService implements SampleService {
   public long create(Sample sample) throws IOException {
     requisitionService.findOrCreateRequisition(sample);
     loadChildEntities(sample);
-    boxService.throwIfBoxPositionIsFilled(sample);
+    boxService.prepareBoxableLocation(sample, false);
     User changeUser = authorizationManager.getCurrentUser();
     sample.setChangeDetails(changeUser);
     if (isDetailedSample(sample)) {
@@ -792,8 +792,7 @@ public class DefaultSampleService implements SampleService {
     User changeUser = authorizationManager.getCurrentUser();
     managed.setChangeDetails(changeUser);
     boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
-    maybeRemoveFromBox(sample, managed);
-    boxService.throwIfBoxPositionIsFilled(sample);
+    boxService.prepareBoxableLocation(sample, managed.getDistributionTransfer() != null);
     if (sample.getParent() != null) {
       ((DetailedSample) sample).setParent((DetailedSample) get(sample.getParent().getId()));
     }
@@ -816,13 +815,6 @@ public class DefaultSampleService implements SampleService {
     }
     boxService.updateBoxableLocation(sample);
     return sample.getId();
-  }
-
-  private void maybeRemoveFromBox(Sample sample, Sample managed) {
-    if (sample.isDiscarded() || sample.getDistributionTransfer() != null || managed.getDistributionTransfer() != null) {
-      sample.setBoxPosition(null);
-      sample.setVolume(BigDecimal.ZERO);
-    }
   }
 
   private void validateChange(Sample sample, Sample beforeChange) throws IOException {

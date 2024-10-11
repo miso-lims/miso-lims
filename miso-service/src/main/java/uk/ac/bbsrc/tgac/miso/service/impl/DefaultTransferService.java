@@ -146,7 +146,7 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
       throws IOException {
     // Item needs to be loaded before validation so we can check for conflicting transfers, but updating
     // location needs to happen before loading so we can manage the supplied vs. persisted objects
-    boxService.throwIfBoxPositionIsFilled(item);
+    boxService.prepareBoxableLocation(item, transfer.isDistribution());
     boxService.updateBoxableLocation(item);
 
     T managedItem = service.get(item.getId());
@@ -154,7 +154,6 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     // If distribution, remove items from boxes, set volume zero
     if (transfer.isDistribution()) {
       // Need to work with managedItem because the submitted item may be missing a lot of fields
-      managedItem.removeFromBox();
       managedItem.setVolume(BigDecimal.ZERO);
       service.update(managedItem);
     }
