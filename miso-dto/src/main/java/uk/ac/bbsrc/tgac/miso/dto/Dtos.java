@@ -860,7 +860,7 @@ public class Dtos {
     }
     dto.setStrStatus(from.getStrStatus().getLabel());
     setInteger(dto::setSlidesConsumed, from.getSlidesConsumed(), true);
-    setId(dto::setReferenceSlideId, from.getReferenceSlide());
+    setLong(dto::setReferenceSlideId, from.getReferenceSlideId(), true);
     return dto;
   }
 
@@ -885,7 +885,7 @@ public class Dtos {
       to.setStrStatus(from.getStrStatus());
     }
     setInteger(to::setSlidesConsumed, from.getSlidesConsumed(), true);
-    setObject(to::setReferenceSlide, SampleSlideImpl::new, from.getReferenceSlideId());
+    setLong(to::setReferenceSlideId, from.getReferenceSlideId(), true);
     return to;
   }
 
@@ -1190,7 +1190,7 @@ public class Dtos {
     SampleTissuePieceDto dto = new SampleTissuePieceDto();
     dto.setSlidesConsumed(from.getSlidesConsumed());
     dto.setTissuePieceTypeId(from.getTissuePieceType().getId());
-    setId(dto::setReferenceSlideId, from.getReferenceSlide());
+    setLong(dto::setReferenceSlideId, from.getReferenceSlideId(), true);
     return dto;
   }
 
@@ -1207,7 +1207,7 @@ public class Dtos {
     tissuePieceType.setId(from.getTissuePieceTypeId());
     to.setTissuePieceType(tissuePieceType);
     to.setSlidesConsumed(from.getSlidesConsumed());
-    setObject(to::setReferenceSlide, SampleSlideImpl::new, from.getReferenceSlideId());
+    setLong(to::setReferenceSlideId, from.getReferenceSlideId(), true);
     return to;
   }
 

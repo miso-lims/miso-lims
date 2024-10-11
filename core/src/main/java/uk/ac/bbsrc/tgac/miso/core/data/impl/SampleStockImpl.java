@@ -4,13 +4,9 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 
@@ -26,9 +22,7 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
 
   private Integer slidesConsumed;
 
-  @ManyToOne(targetEntity = SampleSlideImpl.class, fetch = FetchType.LAZY)
-  @JoinColumn(name = "referenceSlideId")
-  private SampleSlide referenceSlide;
+  private Long referenceSlideId;
 
   @Override
   public StrStatus getStrStatus() {
@@ -56,13 +50,13 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   }
 
   @Override
-  public SampleSlide getReferenceSlide() {
-    return referenceSlide;
+  public Long getReferenceSlideId() {
+    return referenceSlideId;
   }
 
   @Override
-  public void setReferenceSlide(SampleSlide referenceSlide) {
-    this.referenceSlide = referenceSlide;
+  public void setReferenceSlideId(Long referenceSlideId) {
+    this.referenceSlideId = referenceSlideId;
   }
 
   @Override
