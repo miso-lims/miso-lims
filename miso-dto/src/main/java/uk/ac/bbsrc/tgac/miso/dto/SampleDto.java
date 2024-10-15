@@ -93,6 +93,8 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
   private int libraryCount = 0;
   private Long sopId;
   private String worksetAddedTime;
+  private Boolean requisitionStopped;
+  private Boolean requisitionPaused;
 
   public Long getId() {
     return id;
@@ -465,4 +467,15 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
     this.worksetAddedTime = worksetAddedTime;
   }
 
+  public boolean getRequsitionStopped() { return requisitionStopped; }
+
+  public void setRequisitionStopped(Boolean requisitionStopped) {
+    this.requisitionStopped = requisitionStopped;
+  }
+
+  public boolean getRequisitionPaused() { return requisitionPaused; }
+
+  public void setRequisitionPaused(Boolean requisitionPaused) {
+    this.requisitionPaused = requisitionPaused;
+  }
 }

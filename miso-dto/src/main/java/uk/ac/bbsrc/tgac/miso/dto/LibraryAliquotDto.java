@@ -74,6 +74,8 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
   private Long requisitionId;
   private String requisitionAlias;
   private List<Long> requisitionAssayIds;
+  private Boolean requisitionStopped;
+  private Boolean requisitionPaused;
 
   public Long getId() {
     return id;
@@ -507,4 +509,15 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
     this.requisitionAssayIds = requisitionAssayIds;
   }
 
+  public boolean getRequsitionStopped() { return requisitionStopped; }
+
+  public void setRequisitionStopped(Boolean requisitionStopped) {
+    this.requisitionStopped = requisitionStopped;
+  }
+
+  public boolean getRequisitionPaused() { return requisitionPaused; }
+
+  public void setRequisitionPaused(Boolean requisitionPaused) {
+    this.requisitionPaused = requisitionPaused;
+  }
 }
