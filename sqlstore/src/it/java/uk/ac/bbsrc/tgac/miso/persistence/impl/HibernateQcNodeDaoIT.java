@@ -23,7 +23,8 @@ public class HibernateQcNodeDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetForSample() throws Exception {
-    // Test hierarchy: Identity SAM15 < Tissue SAM17 > Stock SAM18 > Aliquot SAM19 > LIB15 > LDI15
+    // Test hierarchy: Identity SAM15 < Tissue SAM17 > Slide SAM25 > Stock SAM18 > Aliquot SAM19 > LIB15
+    // > LDI15
 
     QcNode root = sut.getForSample(17L);
     assertNotNull(root);
@@ -31,6 +32,9 @@ public class HibernateQcNodeDaoIT extends AbstractDAOTest {
     List<? extends QcNode> children = root.getChildren();
     assertEquals(1, children.size());
     assertEquals("SAM17", children.get(0).getName());
+    children = children.get(0).getChildren();
+    assertEquals(1, children.size());
+    assertEquals("SAM25", children.get(0).getName());
     children = children.get(0).getChildren();
     assertEquals(1, children.size());
     assertEquals("SAM18", children.get(0).getName());

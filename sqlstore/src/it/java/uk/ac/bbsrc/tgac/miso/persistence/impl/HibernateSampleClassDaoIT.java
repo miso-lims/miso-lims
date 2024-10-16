@@ -47,7 +47,7 @@ public class HibernateSampleClassDaoIT extends AbstractDAOTest {
   public void testList() throws IOException {
     List<SampleClass> list = sut.list();
     assertNotNull(list);
-    assertEquals(4, list.size());
+    assertEquals(5, list.size());
   }
 
   @Test

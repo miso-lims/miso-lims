@@ -1127,6 +1127,13 @@ public class DefaultSampleService implements SampleService {
     if (libraries > 0) {
       result.addError(ValidationError.forDeletionUsage(object, libraries, Pluralizer.libraries(libraries)));
     }
+    if (LimsUtils.isSampleSlide(object)) {
+      long references = sampleStore.getUsageAsReferenceSlide(object);
+      if (references > 0) {
+        result.addError(ValidationError.forDeletionUsage(object, references,
+            Pluralizer.samples(references) + " (as reference slide)"));
+      }
+    }
     return result;
   }
 

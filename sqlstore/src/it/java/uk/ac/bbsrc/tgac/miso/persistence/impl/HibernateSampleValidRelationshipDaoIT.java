@@ -27,7 +27,7 @@ public class HibernateSampleValidRelationshipDaoIT extends AbstractDAOTest {
   public void testList() throws Exception {
     List<SampleValidRelationship> relationships = sut.list();
     assertNotNull(relationships);
-    assertEquals(4, relationships.size());
+    assertEquals(6, relationships.size());
   }
 
   @Test

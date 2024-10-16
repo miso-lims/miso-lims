@@ -15,7 +15,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -63,7 +62,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   @Test
   public void testListAll() throws IOException {
     Collection<Sample> samples = dao.list();
-    assertEquals(24, samples.size());
+    assertEquals(25, samples.size());
   }
 
   @Test
@@ -213,21 +212,21 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void getSamplesOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(0, 2, false, "id");
     assertEquals(2, samples.size());
-    assertEquals(24L, samples.get(0).getId());
+    assertEquals(25L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesOffsetThreeWithThreeSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(3, 3, false, "id");
     assertEquals(3, samples.size());
-    assertEquals(21L, samples.get(0).getId());
+    assertEquals(22L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesOffsetTwoWithTwoSamplesPerPageOrderLastModTest() throws Exception {
     List<Sample> samples = dao.list(2, 2, false, "lastModified");
     assertEquals(2, samples.size());
-    assertEquals(24L, samples.get(0).getId());
+    assertEquals(23L, samples.get(0).getId());
   }
 
   @Test
@@ -440,6 +439,12 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     assertNotNull(ids);
     assertEquals(1, ids.size());
     assertTrue(ids.contains(stockId));
+  }
+
+  @Test
+  public void testGetUsageAsReferenceSlide() throws Exception {
+    Sample slide = (Sample) currentSession().get(SampleImpl.class, 25L);
+    assertEquals(1L, dao.getUsageAsReferenceSlide(slide));
   }
 
 }

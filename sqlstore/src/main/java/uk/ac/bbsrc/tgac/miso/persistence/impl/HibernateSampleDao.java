@@ -51,8 +51,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissuePieceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissuePieceImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
@@ -384,9 +388,26 @@ public class HibernateSampleDao extends HibernateSaveDao<Sample>
   public long getChildSampleCount(Sample sample) {
     LongQueryBuilder<DetailedSampleImpl> builder = new LongQueryBuilder<>(currentSession(), DetailedSampleImpl.class);
     builder.addPredicate(
-        sample == null ? builder.getCriteriaBuilder().isNull(builder.getRoot().get(DetailedSampleImpl_.parent))
-            : builder.getCriteriaBuilder().equal(builder.getRoot().get(DetailedSampleImpl_.parent), sample));
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(DetailedSampleImpl_.parent), sample));
     return builder.getCount();
+  }
+
+  @Override
+  public long getUsageAsReferenceSlide(Sample sample) throws IOException {
+    LongQueryBuilder<SampleStockImpl> stockBuilder = new LongQueryBuilder<>(currentSession(), SampleStockImpl.class);
+    stockBuilder.addPredicate(
+        stockBuilder.getCriteriaBuilder().equal(stockBuilder.getRoot().get(SampleStockImpl_.REFERENCE_SLIDE_ID),
+            sample.getId()));
+    long stockReferences = stockBuilder.getCount();
+
+    LongQueryBuilder<SampleTissuePieceImpl> pieceBuilder =
+        new LongQueryBuilder<>(currentSession(), SampleTissuePieceImpl.class);
+    pieceBuilder.addPredicate(
+        pieceBuilder.getCriteriaBuilder().equal(pieceBuilder.getRoot().get(SampleTissuePieceImpl_.REFERENCE_SLIDE_ID),
+            sample.getId()));
+    long pieceReferences = pieceBuilder.getCount();
+
+    return stockReferences + pieceReferences;
   }
 
   @Override

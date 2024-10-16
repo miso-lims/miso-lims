@@ -89,6 +89,8 @@ public interface SampleStore extends SaveDao<Sample>, PaginatedDataSource<Sample
 
         long getChildSampleCount(Sample sample);
 
+        long getUsageAsReferenceSlide(Sample sample) throws IOException;
+
         /**
          * @param sample the "current" sample
          * @return a reference to the sample in the same project as the "current" sample with the next ID in

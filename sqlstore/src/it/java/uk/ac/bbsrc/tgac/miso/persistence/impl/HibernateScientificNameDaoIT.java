@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
-
-import java.util.Arrays;
 
 public class HibernateScientificNameDaoIT
     extends AbstractHibernateSaveDaoTest<ScientificName, HibernateScientificNameDao> {
@@ -41,7 +41,7 @@ public class HibernateScientificNameDaoIT
 
   @Test
   public void testGetUsageBySamples() throws Exception {
-    testGetUsage(HibernateScientificNameDao::getUsageBySamples, 1L, 24L);
+    testGetUsage(HibernateScientificNameDao::getUsageBySamples, 1L, 25L);
   }
 
   @Test
