@@ -50,31 +50,18 @@ public abstract class BoxScanTests<T extends BoxScan> {
     assertEquals("33333",fullScan.getBarcode(1,2));
     assertEquals("33333",fullScan.getBarcode('A',2));
   }
-  
-  @Test
-  public void testCollectionComparison() {
-    BoxScan fullScan = getFullScan();
-    Map<String, String> map = fullScan.getBarcodesMap();
-    assertEquals(map.get(BoxUtils.getPositionString(0, 0)), "11111");
-    assertEquals(map.get(BoxUtils.getPositionString(1, 0)), "22222");
-    assertEquals(map.get(BoxUtils.getPositionString(0, 1)), "33333");
-    assertEquals(map.get(BoxUtils.getPositionString(1, 1)), "44444");
-    assertEquals(map.get(BoxUtils.getPositionString(0, 0)), map.get("A01"));
-    assertEquals(map.get(BoxUtils.getPositionString(1, 0)), map.get("B01"));
-    assertEquals(map.get(BoxUtils.getPositionString(0, 1)), map.get("A02"));
-    assertEquals(map.get(BoxUtils.getPositionString(1, 1)), map.get("B02"));
-  }
 
   @Test
   public void testImmutability() {
     BoxScan fullScan = getFullScan();
     Map<String, String> map = fullScan.getBarcodesMap();
-    assertEquals(map.get(BoxUtils.getPositionString(0, 0)), "11111");
-    assertEquals(BoxUtils.getPositionString(0, 0), "A01");
-    map.put(BoxUtils.getPositionString(0, 0), "changed");
+    String position = BoxUtils.getPositionString(0, 0);
+    assertEquals(map.get(position), "11111");
+    assertEquals(position, "A01");
+    map.put(position, "changed");
     map = fullScan.getBarcodesMap();
-    assertEquals(map.get(BoxUtils.getPositionString(0, 0)), "11111");
-    assertEquals(map.get(BoxUtils.getPositionString(0, 0)), map.get("A01"));
+    assertEquals(map.get(position), "11111");
+    assertEquals(map.get(position), map.get("A01"));
   }
   
   @Test

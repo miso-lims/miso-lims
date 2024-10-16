@@ -144,7 +144,7 @@ public class IntegrationUtils {
     return out.toByteArray();
   }
 
-  public static String getParameterAppend(Map<String,String> parameters) {
+  private static String getParameterAppend(Map<String,String> parameters) {
     return parameters.entrySet().stream().map(e -> new StringBuilder(e.getKey()).append("=").append(e.getValue()).toString()).collect(
         Collectors.joining("&"));
   }
