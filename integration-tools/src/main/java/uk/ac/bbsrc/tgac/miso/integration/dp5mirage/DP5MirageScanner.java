@@ -70,6 +70,13 @@ public class DP5MirageScanner implements BoxScanner {
       response = httpClient.send(getPostParamRequest("/scan", urlStub(), DP5MirageScanner.params),
           BodyHandlers.ofString());
 
+      // Check if valid before parsing
+      if (response.statusCode() != 200) {
+        throw new IntegrationException(String.format("Error reported by the scanner \n "
+                + "Check if this container_uid parameter is correct: %s",
+            DP5MirageScanner.params.get("container_uid")));
+      }
+
       // Parse JSON into a JsonNode
       ObjectMapper mapper = new ObjectMapper();
       JsonNode rootNode = mapper.readTree(response.body());
@@ -80,11 +87,6 @@ public class DP5MirageScanner implements BoxScanner {
 
     } catch (IOException | InterruptedException | URISyntaxException e) {
       throw new IntegrationException("Error communicating with the scanner", e);
-    }
-    if (response.statusCode() != 200) {
-      throw new IntegrationException(String.format("Error reported by the scanner \n "
-              + "Check if this container_uid parameter is correct: %s",
-          DP5MirageScanner.params.get("container_uid")));
     }
 
     return records == null ? null : new DP5MirageScan(records);
