@@ -66,7 +66,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
   @Bean(name = "objectMapper")
   public ObjectMapper objectMapper() {
     ObjectMapper mapper = Jackson2ObjectMapperBuilder.json()
-        // .modulesToInstall(new JsonStringValidator())
+        .modulesToInstall(new JsonStringValidator())
         .build();
     mapper.getFactory().setCharacterEscapes(new JsonCharacterEscapes())
         .configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true);
