@@ -19,7 +19,7 @@ public class HibernateTissuePieceTypeDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateTissuePieceTypeDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -48,7 +48,8 @@ public class HibernateTissuePieceTypeDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    TissuePieceType saved = (TissuePieceType) getSessionFactory().getCurrentSession().get(TissuePieceType.class, savedId);
+    TissuePieceType saved =
+        (TissuePieceType) currentSession().get(TissuePieceType.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -56,20 +57,20 @@ public class HibernateTissuePieceTypeDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String name = "New Name";
-    TissuePieceType type = (TissuePieceType) getSessionFactory().getCurrentSession().get(TissuePieceType.class, id);
+    TissuePieceType type = (TissuePieceType) currentSession().get(TissuePieceType.class, id);
     assertNotEquals(name, type.getName());
     type.setName(name);
     sut.update(type);
 
     clearSession();
 
-    TissuePieceType saved = (TissuePieceType) getSessionFactory().getCurrentSession().get(TissuePieceType.class, id);
+    TissuePieceType saved = (TissuePieceType) currentSession().get(TissuePieceType.class, id);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsageByTissuePieces() throws IOException {
-    TissuePieceType type = (TissuePieceType) getSessionFactory().getCurrentSession().get(TissuePieceType.class, 1L);
+    TissuePieceType type = (TissuePieceType) currentSession().get(TissuePieceType.class, 1L);
     assertEquals("LCM Tube", type.getName());
     assertEquals(0L, sut.getUsage(type));
   }

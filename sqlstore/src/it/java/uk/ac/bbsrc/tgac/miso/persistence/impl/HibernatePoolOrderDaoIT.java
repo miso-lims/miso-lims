@@ -23,7 +23,7 @@ public class HibernatePoolOrderDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernatePoolOrderDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -58,7 +58,7 @@ public class HibernatePoolOrderDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    PoolOrder saved = (PoolOrder) getSessionFactory().getCurrentSession().get(PoolOrder.class, savedId);
+    PoolOrder saved = (PoolOrder) currentSession().get(PoolOrder.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -66,14 +66,14 @@ public class HibernatePoolOrderDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Alias";
-    PoolOrder order = (PoolOrder) getSessionFactory().getCurrentSession().get(PoolOrder.class, id);
+    PoolOrder order = (PoolOrder) currentSession().get(PoolOrder.class, id);
     assertNotEquals(alias, order.getAlias());
     order.setAlias(alias);
     sut.update(order);
 
     clearSession();
 
-    PoolOrder saved = (PoolOrder) getSessionFactory().getCurrentSession().get(PoolOrder.class, id);
+    PoolOrder saved = (PoolOrder) currentSession().get(PoolOrder.class, id);
     assertEquals(alias, saved.getAlias());
   }
 

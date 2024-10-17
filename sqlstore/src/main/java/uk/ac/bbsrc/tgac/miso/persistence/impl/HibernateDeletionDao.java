@@ -4,18 +4,17 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion_;
@@ -28,16 +27,15 @@ import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 @Repository
 public class HibernateDeletionDao implements DeletionStore, JpaCriteriaPaginatedDataSource<Deletion, Deletion> {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public Session currentSession() {
+    return entityManager.unwrap(Session.class);
   }
 
-  @Override
-  public Session currentSession() {
-    return sessionFactory.getCurrentSession();
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override
@@ -48,8 +46,8 @@ public class HibernateDeletionDao implements DeletionStore, JpaCriteriaPaginated
     deletion.setDescription(deletable.getDeleteDescription());
     deletion.setUser(user);
     deletion.setChangeTime(new Date());
-    currentSession().delete(deletable);
-    currentSession().save(deletion);
+    currentSession().remove(deletable);
+    currentSession().persist(deletion);
   }
 
   @Override

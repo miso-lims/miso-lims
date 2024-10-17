@@ -3,11 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 import java.io.IOException;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response.Status;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +18,10 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.annotation.Resource;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
@@ -95,7 +94,7 @@ public class MenuController {
 
   @GetMapping("/error")
   public ModelAndView showError(ModelMap model, HttpServletRequest request) {
-    int statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+    int statusCode = (Integer) request.getAttribute("jakarta.servlet.error.status_code");
     Status status = Status.fromStatusCode(statusCode);
     model.addAttribute("genericMessage", statusCode);
     if (status == null) {

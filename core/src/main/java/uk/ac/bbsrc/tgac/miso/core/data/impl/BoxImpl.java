@@ -3,16 +3,15 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.MapKeyColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
@@ -33,8 +32,7 @@ public class BoxImpl extends AbstractBox {
   /**
    * Construct new Box with defaults, and an empty SecurityProfile
    */
-  public BoxImpl() {
-  }
+  public BoxImpl() {}
 
   @Override
   public boolean isFreePosition(String position) {
@@ -44,10 +42,13 @@ public class BoxImpl extends AbstractBox {
 
   @Override
   public boolean isValidPosition(String position) {
-    if (!position.matches("[A-Z][0-9][0-9]")) return false;
-    if (BoxUtils.fromRowChar(position.charAt(0)) >= getSize().getRows()) return false;
+    if (!position.matches("[A-Z][0-9][0-9]"))
+      return false;
+    if (BoxUtils.fromRowChar(position.charAt(0)) >= getSize().getRows())
+      return false;
     int col = BoxUtils.tryParseInt(position.substring(1, 3));
-    if (col < 0 || col > getSize().getColumns()) return false; // columns are zero-indexed in database
+    if (col < 0 || col > getSize().getColumns())
+      return false; // columns are zero-indexed in database
     return true;
   }
 
@@ -57,9 +58,10 @@ public class BoxImpl extends AbstractBox {
     if (BoxUtils.fromRowChar(position.charAt(0)) >= getSize().getRows())
       throw new IndexOutOfBoundsException("Row letter too large!" + position);
     int col = BoxUtils.tryParseInt(position.substring(1, 3));
-    if (col <= 0 || col > getSize().getColumns()) throw new IndexOutOfBoundsException("Column value too large!");
+    if (col <= 0 || col > getSize().getColumns())
+      throw new IndexOutOfBoundsException("Column value too large!");
   }
-  
+
   @Override
   public int getPositionCount() {
     return getSize().getColumns() * getSize().getRows();
@@ -69,7 +71,7 @@ public class BoxImpl extends AbstractBox {
   public int getFreeCount() {
     return getPositionCount() - getTubeCount();
   }
-  
+
   @Override
   public int getTubeCount() {
     return boxPositions.size();
@@ -87,7 +89,7 @@ public class BoxImpl extends AbstractBox {
   public void setBoxPositions(Map<String, BoxPosition> boxPositions) {
     this.boxPositions = boxPositions;
   }
-  
+
   @Override
   public String toString() {
     return new ToStringBuilder(this)

@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,14 +19,19 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer_;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.QueryBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkLibraryPage.LibColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
@@ -823,11 +827,13 @@ public class BulkLibraryIT extends AbstractIT {
   }
 
   protected void assertReceiptAttributes(Map<String, String> attributes, Library library) {
-    TransferLibrary receipt = (TransferLibrary) getSession().createCriteria(TransferLibrary.class)
-        .createAlias("transfer", "transfer")
-        .add(Restrictions.eq("item", library))
-        .add(Restrictions.isNotNull("transfer.senderLab"))
-        .uniqueResult();
+    QueryBuilder<TransferLibrary, TransferLibrary> builder =
+        new QueryBuilder<>(getSession(), TransferLibrary.class, TransferLibrary.class);
+    Join<TransferLibrary, Transfer> join = builder.getJoin(builder.getRoot(), TransferLibrary_.transfer);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(TransferLibrary_.item), library));
+    builder.addPredicate(builder.getCriteriaBuilder().isNotNull(join.get(Transfer_.senderLab)));
+    TransferLibrary receipt = builder.getSingleResultOrNull();
+
     assertNotNull("A receipt transfer should be created", receipt);
 
     assertEntityAttribute(LibColumns.RECEIVE_DATE, attributes, receipt,

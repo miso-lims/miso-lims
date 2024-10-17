@@ -2,16 +2,16 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "LibraryDesignCode")
-public class LibraryDesignCode implements Deletable, Identifiable, Serializable {
+public class LibraryDesignCode implements Deletable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -91,19 +91,28 @@ public class LibraryDesignCode implements Deletable, Identifiable, Serializable 
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     LibraryDesignCode other = (LibraryDesignCode) obj;
     if (code == null) {
-      if (other.code != null) return false;
-    } else if (!code.equals(other.code)) return false;
+      if (other.code != null)
+        return false;
+    } else if (!code.equals(other.code))
+      return false;
     if (description == null) {
-      if (other.description != null) return false;
-    } else if (!description.equals(other.description)) return false;
+      if (other.description != null)
+        return false;
+    } else if (!description.equals(other.description))
+      return false;
     if (targetedSequencingRequired == null) {
-      if (other.targetedSequencingRequired != null) return false;
-    } else if (!targetedSequencingRequired.equals(other.targetedSequencingRequired)) return false;
+      if (other.targetedSequencingRequired != null)
+        return false;
+    } else if (!targetedSequencingRequired.equals(other.targetedSequencingRequired))
+      return false;
     return true;
   }
 

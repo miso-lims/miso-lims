@@ -1,11 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
-import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.type.TissuePieceType;
 
@@ -21,9 +19,7 @@ public class SampleTissuePieceImpl extends SampleTissueProcessingImpl implements
   @JoinColumn(name = "tissuePieceType")
   private TissuePieceType tissuePieceType;
 
-  @ManyToOne(targetEntity = SampleSlideImpl.class)
-  @JoinColumn(name = "referenceSlideId")
-  private SampleSlide referenceSlide;
+  private Long referenceSlideId;
 
   @Override
   public Integer getSlidesConsumed() {
@@ -46,13 +42,13 @@ public class SampleTissuePieceImpl extends SampleTissueProcessingImpl implements
   }
 
   @Override
-  public SampleSlide getReferenceSlide() {
-    return referenceSlide;
+  public Long getReferenceSlideId() {
+    return referenceSlideId;
   }
 
   @Override
-  public void setReferenceSlide(SampleSlide referenceSlide) {
-    this.referenceSlide = referenceSlide;
+  public void setReferenceSlideId(Long referenceSlideId) {
+    this.referenceSlideId = referenceSlideId;
   }
 
 }

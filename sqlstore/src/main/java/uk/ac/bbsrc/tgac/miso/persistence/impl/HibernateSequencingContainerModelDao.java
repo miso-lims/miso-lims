@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.criteria.Join;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel_;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -48,18 +47,21 @@ public class HibernateSequencingContainerModelDao extends HibernateSaveDao<Seque
 
     if (LimsUtils.isStringEmptyOrNull(search)) {
       builder.addPredicate(
-          builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingContainerModel_.fallback), true));
+          builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingContainerModel_.fallback),
+              true));
       model = (SequencingContainerModel) builder.getSingleResultOrNull();
     } else {
       builder.addPredicate(builder.getCriteriaBuilder().or(
           builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingContainerModel_.alias), search),
-          builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingContainerModel_.identificationBarcode),
+          builder.getCriteriaBuilder().equal(
+              builder.getRoot().get(SequencingContainerModel_.identificationBarcode),
               search)));
       model = (SequencingContainerModel) builder.getSingleResultOrNull();
       if (model == null) {
         // remove search restriction and get fallback option if search did not retrieve anything
         QueryBuilder<SequencingContainerModel, SequencingContainerModel> fallback =
-            new QueryBuilder<>(currentSession(), SequencingContainerModel.class, SequencingContainerModel.class);
+            new QueryBuilder<>(currentSession(), SequencingContainerModel.class,
+                SequencingContainerModel.class);
         Join<SequencingContainerModel, InstrumentModel> instrumentJoin =
             fallback.getJoin(fallback.getRoot(), SequencingContainerModel_.instrumentModels);
         fallback.addPredicate(fallback.getCriteriaBuilder()
@@ -67,7 +69,8 @@ public class HibernateSequencingContainerModelDao extends HibernateSaveDao<Seque
         fallback.addPredicate(fallback.getCriteriaBuilder()
             .equal(fallback.getRoot().get(SequencingContainerModel_.partitionCount), partitionCount));
         fallback.addPredicate(
-            fallback.getCriteriaBuilder().equal(fallback.getRoot().get(SequencingContainerModel_.fallback), true));
+            fallback.getCriteriaBuilder().equal(fallback.getRoot().get(SequencingContainerModel_.fallback),
+                true));
         model = (SequencingContainerModel) fallback.getSingleResultOrNull();
       }
     }
@@ -79,10 +82,12 @@ public class HibernateSequencingContainerModelDao extends HibernateSaveDao<Seque
     QueryBuilder<SequencingContainerModel, SequencingContainerModel> builder =
         new QueryBuilder<>(currentSession(), SequencingContainerModel.class, SequencingContainerModel.class);
     builder.addPredicate(
-        builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingContainerModel_.platformType), platform));
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingContainerModel_.platformType),
+            platform));
     builder.addPredicate(builder.getCriteriaBuilder().or(
         builder.getCriteriaBuilder().like(builder.getRoot().get(SequencingContainerModel_.alias), search + '%'),
-        builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingContainerModel_.identificationBarcode),
+        builder.getCriteriaBuilder().equal(
+            builder.getRoot().get(SequencingContainerModel_.identificationBarcode),
             search)));
     return builder.getResultList();
   }
@@ -92,7 +97,8 @@ public class HibernateSequencingContainerModelDao extends HibernateSaveDao<Seque
     QueryBuilder<SequencingContainerModel, SequencingContainerModel> builder =
         new QueryBuilder<>(currentSession(), SequencingContainerModel.class, SequencingContainerModel.class);
     builder.addPredicate(
-        builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingContainerModel_.platformType), platform));
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingContainerModel_.platformType),
+            platform));
     builder.addPredicate(
         builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingContainerModel_.alias), alias));
     return builder.getSingleResultOrNull();
@@ -104,7 +110,8 @@ public class HibernateSequencingContainerModelDao extends HibernateSaveDao<Seque
     QueryBuilder<SequencingContainerModel, SequencingContainerModel> builder =
         new QueryBuilder<>(currentSession(), SequencingContainerModel.class, SequencingContainerModel.class);
     builder.addPredicate(
-        builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingContainerModel_.platformType), platform));
+        builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingContainerModel_.platformType),
+            platform));
     builder.addPredicate(builder.getCriteriaBuilder()
         .equal(builder.getRoot().get(SequencingContainerModel_.identificationBarcode), identificationBarcode));
     return builder.getSingleResultOrNull();

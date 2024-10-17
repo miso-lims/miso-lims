@@ -23,7 +23,7 @@ public class HibernateTissueTypeDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateTissueTypeDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -55,13 +55,13 @@ public class HibernateTissueTypeDaoIT extends AbstractDAOTest {
     TissueType tt = new TissueTypeImpl();
     tt.setAlias(alias);
     tt.setDescription("descriptive stuff");
-    User user = (User) getSessionFactory().getCurrentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().get(UserImpl.class, 1L);
     tt.setChangeDetails(user);
     long savedId = sut.create(tt);
 
     clearSession();
 
-    TissueType saved = (TissueType) getSessionFactory().getCurrentSession().get(TissueTypeImpl.class, savedId);
+    TissueType saved = (TissueType) currentSession().get(TissueTypeImpl.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -69,20 +69,20 @@ public class HibernateTissueTypeDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Name";
-    TissueType tt = (TissueType) getSessionFactory().getCurrentSession().get(TissueTypeImpl.class, id);
+    TissueType tt = (TissueType) currentSession().get(TissueTypeImpl.class, id);
     assertNotEquals(alias, tt.getAlias());
     tt.setAlias(alias);
     sut.update(tt);
 
     clearSession();
 
-    TissueType saved = (TissueType) getSessionFactory().getCurrentSession().get(TissueTypeImpl.class, id);
+    TissueType saved = (TissueType) currentSession().get(TissueTypeImpl.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    TissueType tt = (TissueType) getSessionFactory().getCurrentSession().get(TissueTypeImpl.class, 1L);
+    TissueType tt = (TissueType) currentSession().get(TissueTypeImpl.class, 1L);
     assertEquals("Test Type", tt.getAlias());
     assertEquals(5L, sut.getUsage(tt));
   }

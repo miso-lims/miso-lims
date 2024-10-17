@@ -3,15 +3,14 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -213,7 +212,8 @@ public class Metric implements Aliasable, Deletable, Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(metricId, alias, category, thresholdType, units, sortPriority, nucleicAcidType, tissueMaterial, tissueType,
+    return Objects.hash(metricId, alias, category, thresholdType, units, sortPriority, nucleicAcidType, tissueMaterial,
+        tissueType,
         negateTissueType, tissueOrigin, containerModel, readLength, readLength2);
   }
 

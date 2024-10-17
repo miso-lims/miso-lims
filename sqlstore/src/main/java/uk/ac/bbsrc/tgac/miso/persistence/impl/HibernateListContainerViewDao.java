@@ -4,17 +4,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Index_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
@@ -43,16 +42,15 @@ import uk.ac.bbsrc.tgac.miso.persistence.ListContainerViewDao;
 public class HibernateListContainerViewDao
     implements ListContainerViewDao, JpaCriteriaPaginatedDataSource<ListContainerView, ListContainerView> {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public Session currentSession() {
+    return entityManager.unwrap(Session.class);
   }
 
-  @Override
-  public Session currentSession() {
-    return sessionFactory.getCurrentSession();
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override

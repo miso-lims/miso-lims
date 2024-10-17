@@ -16,7 +16,7 @@ public class HibernateStorageLabelDaoIT extends AbstractHibernateSaveDaoTest<Sto
   @Override
   public HibernateStorageLabelDao constructTestSubject() {
     HibernateStorageLabelDao sut = new HibernateStorageLabelDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

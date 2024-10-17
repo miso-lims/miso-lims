@@ -1,25 +1,3 @@
-/* Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * * *********************************************************************
- * *
- * * This file is part of MISO.
- * *
- * * MISO is free software: you can redistribute it and/or modify
- * * it under the terms of the GNU General Public License as published by
- * * the Free Software Foundation, either version 3 of the License, or
- * * (at your option) any later version.
- * *
- * * MISO is distributed in the hope that it will be useful,
- * * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * * GNU General Public License for more details.
- * *
- * * You should have received a copy of the GNU General Public License
- * * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- * *
- * * *********************************************************************
- * */
-
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
@@ -28,7 +6,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,6 +16,8 @@ import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
@@ -54,8 +33,8 @@ public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
   @Spy
   private JdbcTemplate jdbcTemplate;
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @InjectMocks
   private HibernateInstrumentModelDao dao;
@@ -64,7 +43,7 @@ public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
-    dao.setSessionFactory(sessionFactory);
+    dao.setEntityManager(entityManager);
   }
 
   @Test

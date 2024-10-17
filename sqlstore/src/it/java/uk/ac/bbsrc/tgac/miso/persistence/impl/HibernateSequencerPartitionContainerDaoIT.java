@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -34,8 +36,8 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
   @Rule
   public final ExpectedException exception = ExpectedException.none();
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Mock
   private SecurityStore securityDao;
@@ -48,7 +50,7 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
   @Before
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
-    dao.setSessionFactory(sessionFactory);
+    dao.setEntityManager(entityManager);
 
     emptyUser.setId(1L);
     when(securityDao.getUserById(ArgumentMatchers.anyLong())).thenReturn(emptyUser);
@@ -95,7 +97,7 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
     SequencerPartitionContainer spc = dao.get(4L);
 
     SequencingContainerModel model =
-        (SequencingContainerModel) sessionFactory.getCurrentSession().get(SequencingContainerModel.class, 1L);
+        (SequencingContainerModel) entityManager.unwrap(Session.class).get(SequencingContainerModel.class, 1L);
     spc.setModel(model);
     spc.setLastModifier(emptyUser);
     Run run = Mockito.mock(Run.class);
@@ -138,7 +140,7 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
     Date now = new Date();
     pc.setIdentificationBarcode(identificationBarcode);
     SequencingContainerModel model =
-        (SequencingContainerModel) sessionFactory.getCurrentSession().get(SequencingContainerModel.class, 1L);
+        (SequencingContainerModel) entityManager.unwrap(Session.class).get(SequencingContainerModel.class, 1L);
     pc.setModel(model);
     pc.setCreationTime(now);
     pc.setCreator(emptyUser);

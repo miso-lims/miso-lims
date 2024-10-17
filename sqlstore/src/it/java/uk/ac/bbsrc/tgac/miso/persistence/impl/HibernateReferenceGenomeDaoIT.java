@@ -21,7 +21,7 @@ public class HibernateReferenceGenomeDaoIT extends AbstractDAOTest {
   @Before
   public void setUp() throws Exception {
     dao = new HibernateReferenceGenomeDao();
-    dao.setSessionFactory(getSessionFactory());
+    dao.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -72,7 +72,8 @@ public class HibernateReferenceGenomeDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    ReferenceGenome saved = (ReferenceGenome) getSessionFactory().getCurrentSession().get(ReferenceGenomeImpl.class, savedId);
+    ReferenceGenome saved =
+        (ReferenceGenome) currentSession().get(ReferenceGenomeImpl.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -80,20 +81,21 @@ public class HibernateReferenceGenomeDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Alias";
-    ReferenceGenome ref = (ReferenceGenome) getSessionFactory().getCurrentSession().get(ReferenceGenomeImpl.class, id);
+    ReferenceGenome ref = (ReferenceGenome) currentSession().get(ReferenceGenomeImpl.class, id);
     assertNotEquals(alias, ref.getAlias());
     ref.setAlias(alias);
     dao.update(ref);
 
     clearSession();
 
-    ReferenceGenome saved = (ReferenceGenome) getSessionFactory().getCurrentSession().get(ReferenceGenomeImpl.class, id);
+    ReferenceGenome saved =
+        (ReferenceGenome) currentSession().get(ReferenceGenomeImpl.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    ReferenceGenome ref = (ReferenceGenome) getSessionFactory().getCurrentSession().get(ReferenceGenomeImpl.class, 1L);
+    ReferenceGenome ref = (ReferenceGenome) currentSession().get(ReferenceGenomeImpl.class, 1L);
     assertEquals("Human hg19 random", ref.getAlias());
     assertEquals(2L, dao.getUsage(ref));
   }

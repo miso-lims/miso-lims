@@ -8,15 +8,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.CriteriaBuilder.In;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
@@ -64,12 +63,12 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
 
   @Override
   public void saveSupplementalSample(RequisitionSupplementalSample sample) throws IOException {
-    currentSession().save(sample);
+    currentSession().persist(sample);
   }
 
   @Override
   public void removeSupplementalSample(RequisitionSupplementalSample sample) throws IOException {
-    currentSession().delete(sample);
+    currentSession().remove(sample);
   }
 
   @Override
@@ -86,12 +85,12 @@ public class HibernateRequisitionDao extends HibernateSaveDao<Requisition>
 
   @Override
   public void saveSupplementalLibrary(RequisitionSupplementalLibrary library) throws IOException {
-    currentSession().save(library);
+    currentSession().persist(library);
   }
 
   @Override
   public void removeSupplementalLibrary(RequisitionSupplementalLibrary library) throws IOException {
-    currentSession().delete(library);
+    currentSession().remove(library);
   }
 
   @Override

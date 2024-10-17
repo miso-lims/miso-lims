@@ -6,12 +6,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
-
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControlEntity;
@@ -19,9 +18,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.persistence.QcTargetStore;
 
 public abstract class HibernateQcStore<T extends QC> implements QcTargetStore {
-
-  @Autowired
-  private SessionFactory sessionFactory;
 
   private final Class<? extends QualityControllable<T>> entityClass;
   private final Class<T> qcClass;
@@ -31,12 +27,15 @@ public abstract class HibernateQcStore<T extends QC> implements QcTargetStore {
     this.qcClass = qcClass;
   }
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
+
+  public Session currentSession() {
+    return entityManager.unwrap(Session.class);
   }
 
-  protected Session currentSession() {
-    return sessionFactory.getCurrentSession();
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override
@@ -58,26 +57,27 @@ public abstract class HibernateQcStore<T extends QC> implements QcTargetStore {
   public long save(QC qc) throws IOException {
     T castedQc = qcClass.cast(qc);
     if (!qc.isSaved()) {
-      return (long) currentSession().save(castedQc);
+      currentSession().persist(castedQc);
+      return qc.getId();
     } else {
-      currentSession().update(castedQc);
-      return castedQc.getId();
+      return currentSession().merge(castedQc).getId();
     }
   }
 
   @Override
   public void deleteControlRun(QcControlRun controlRun) throws IOException {
-    currentSession().delete(controlRun);
+    currentSession().remove(controlRun);
   }
 
   @Override
   public long createControlRun(QcControlRun controlRun) throws IOException {
-    return (long) currentSession().save(controlRun);
+    currentSession().persist(controlRun);
+    return controlRun.getId();
   }
 
   @Override
   public long updateControlRun(QcControlRun controlRun) throws IOException {
-    currentSession().update(controlRun);
+    currentSession().merge(controlRun);
     return controlRun.getId();
   }
 

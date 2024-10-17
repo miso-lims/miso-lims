@@ -60,7 +60,7 @@ public abstract class AbstractHibernateQcDaoTest<T extends QC, U extends Hiberna
   @Before
   public void setUp() throws Exception {
     dao = constructTestSubject();
-    dao.setSessionFactory(getSessionFactory());
+    dao.setEntityManager(getEntityManager());
   }
 
   public abstract U constructTestSubject();

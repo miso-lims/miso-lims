@@ -22,7 +22,7 @@ public class HibernateSequencingParametersDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateSequencingParametersDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test

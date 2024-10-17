@@ -3,8 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.List;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -44,7 +43,8 @@ public class GroupRestController extends RestController {
   }
 
   @PostMapping("/{groupId}/users")
-  public @ResponseBody GroupDto addMembers(@PathVariable long groupId, @RequestBody List<Long> userIds) throws IOException {
+  public @ResponseBody GroupDto addMembers(@PathVariable long groupId, @RequestBody List<Long> userIds)
+      throws IOException {
     Group group = getGroup(groupId);
     for (Long userId : userIds) {
       User user = userService.get(userId);
@@ -59,7 +59,8 @@ public class GroupRestController extends RestController {
   }
 
   @PostMapping("/{groupId}/users/remove")
-  public @ResponseBody GroupDto removeMembers(@PathVariable long groupId, @RequestBody List<Long> userIds) throws IOException {
+  public @ResponseBody GroupDto removeMembers(@PathVariable long groupId, @RequestBody List<Long> userIds)
+      throws IOException {
     Group group = getGroup(groupId);
     for (Long userId : userIds) {
       group.getUsers().removeIf(u -> u.getId() == userId.longValue());

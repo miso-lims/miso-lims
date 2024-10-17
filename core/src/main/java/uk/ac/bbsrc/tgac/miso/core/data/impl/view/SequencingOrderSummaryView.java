@@ -5,21 +5,17 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import org.hibernate.annotations.Immutable;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -125,11 +121,11 @@ public class SequencingOrderSummaryView implements Serializable {
   public void setPurpose(String purpose) {
     this.purpose = purpose;
   }
-  
+
   public Date getLastUpdated() {
     return lastUpdated;
   }
-  
+
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
@@ -162,7 +158,8 @@ public class SequencingOrderSummaryView implements Serializable {
     return noContainerModelFulfillmentView;
   }
 
-  public void setNoContainerModelFulfillmentView(SequencingOrderNoContainerModelFulfillmentView noContainerModelFulfillmentView) {
+  public void setNoContainerModelFulfillmentView(
+      SequencingOrderNoContainerModelFulfillmentView noContainerModelFulfillmentView) {
     this.noContainerModelFulfillmentView = noContainerModelFulfillmentView;
   }
 

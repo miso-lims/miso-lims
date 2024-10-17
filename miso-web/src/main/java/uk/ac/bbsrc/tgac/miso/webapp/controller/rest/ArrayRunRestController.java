@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import jakarta.servlet.http.HttpServletRequest;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
@@ -45,19 +44,20 @@ public class ArrayRunRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<ArrayRun, ArrayRunDto> jQueryBackend = new JQueryDataTableBackend<ArrayRun, ArrayRunDto>() {
+  private final JQueryDataTableBackend<ArrayRun, ArrayRunDto> jQueryBackend =
+      new JQueryDataTableBackend<ArrayRun, ArrayRunDto>() {
 
-    @Override
-    protected ArrayRunDto asDto(ArrayRun model) {
-      return Dtos.asDto(model);
-    }
+        @Override
+        protected ArrayRunDto asDto(ArrayRun model) {
+          return Dtos.asDto(model);
+        }
 
-    @Override
-    protected PaginatedDataSource<ArrayRun> getSource() throws IOException {
-      return arrayRunService;
-    }
+        @Override
+        protected PaginatedDataSource<ArrayRun> getSource() throws IOException {
+          return arrayRunService;
+        }
 
-  };
+      };
 
   @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
@@ -67,7 +67,8 @@ public class ArrayRunRestController extends RestController {
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<ArrayRunDto> dataTableByProject(@PathVariable("id") Long id, HttpServletRequest request) throws IOException {
+  public DataTablesResponseDto<ArrayRunDto> dataTableByProject(@PathVariable("id") Long id, HttpServletRequest request)
+      throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
 
@@ -84,7 +85,8 @@ public class ArrayRunRestController extends RestController {
   }
 
   @GetMapping(value = "/array-search")
-  public @ResponseBody List<ArrayDto> findArrays(@RequestParam(name = "q", required = true) String search) throws IOException {
+  public @ResponseBody List<ArrayDto> findArrays(@RequestParam(name = "q", required = true) String search)
+      throws IOException {
     if (LimsUtils.isStringEmptyOrNull(search)) {
       return new ArrayList<>();
     }

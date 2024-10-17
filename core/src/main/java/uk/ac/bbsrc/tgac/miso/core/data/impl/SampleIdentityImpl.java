@@ -6,12 +6,11 @@ import java.math.BigDecimal;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -57,13 +56,15 @@ public class SampleIdentityImpl extends DetailedSampleImpl implements SampleIden
   }
 
   /**
-   * Convenience method to take external name strings and split them at commas and trim excess whitespace
+   * Convenience method to take external name strings and split them at commas and trim excess
+   * whitespace
    * 
    * @param externalNameString
    * @return Set<String> external name(s) set
    */
   public static Set<String> getSetFromString(String externalNameString) {
-    return COMMA.splitAsStream(externalNameString).map(part -> part.trim().replaceAll("\\s+", " ")).collect(Collectors.toSet());
+    return COMMA.splitAsStream(externalNameString).map(part -> part.trim().replaceAll("\\s+", " "))
+        .collect(Collectors.toSet());
   }
 
   @Override

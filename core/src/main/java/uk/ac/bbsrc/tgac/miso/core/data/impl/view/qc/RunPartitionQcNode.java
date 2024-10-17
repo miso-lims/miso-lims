@@ -5,16 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
 import org.hibernate.annotations.Immutable;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.RunPartitionQcNode.RunPartitionQcNodeId;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -131,7 +130,7 @@ public class RunPartitionQcNode implements QcNode {
 
   @Override
   public Long[] getIds() {
-    return new Long[] { getRun().getId(), getPartition().getId() };
+    return new Long[] {getRun().getId(), getPartition().getId()};
   }
 
   @Override

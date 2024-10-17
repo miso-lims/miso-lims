@@ -15,7 +15,7 @@ public class HibernateSubmissionDaoIT extends AbstractHibernateSaveDaoTest<Submi
   @Override
   public HibernateSubmissionDao constructTestSubject() {
     HibernateSubmissionDao sut = new HibernateSubmissionDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

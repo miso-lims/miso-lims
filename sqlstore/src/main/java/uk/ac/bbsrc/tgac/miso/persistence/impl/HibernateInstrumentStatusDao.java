@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatusPositionRun;
@@ -21,15 +21,19 @@ import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStatusStore;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateInstrumentStatusDao implements InstrumentStatusStore {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
-  private Session currentSession() {
-    return getSessionFactory().getCurrentSession();
+  public Session currentSession() {
+    return entityManager.unwrap(Session.class);
   }
 
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
+  public EntityManager getEntityManager() {
+    return entityManager;
+  }
+
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override
@@ -66,10 +70,6 @@ public class HibernateInstrumentStatusDao implements InstrumentStatusStore {
     }
 
     return instruments;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
   }
 
 }

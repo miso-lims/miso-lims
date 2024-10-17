@@ -10,7 +10,6 @@ import java.util.logging.Level;
 import javax.sql.DataSource;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -32,6 +31,8 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ContextConfiguration;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.HomePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LoginPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestRunner;
@@ -51,8 +52,8 @@ public abstract class AbstractIT {
 
   private static Boolean constantsComplete = false;
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Autowired
   private DataSource dataSource;
@@ -117,7 +118,7 @@ public abstract class AbstractIT {
   }
 
   protected final Session getSession() {
-    return sessionFactory.openSession();
+    return entityManager.unwrap(Session.class);
   }
 
   protected final HomePage login() {

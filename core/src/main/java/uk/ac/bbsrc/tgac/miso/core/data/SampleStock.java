@@ -16,31 +16,29 @@ public interface SampleStock extends DetailedSample {
   /**
    * @return the short tandem repeat QC status for this SampleAnalyte
    */
-  public StrStatus getStrStatus();
+  StrStatus getStrStatus();
 
   /**
    * Sets the short tandem repeat QC status for this SampleAnalyte
    * 
    * @param strStatus
    */
-  public void setStrStatus(StrStatus strStatus);
+  void setStrStatus(StrStatus strStatus);
 
   /**
    * Convenience method for setting the short tandem repeat QC status for this SampleAnalyte
    * 
-   * @param strStatus
-   *          must match an existing {@link StrStatus} label
-   * @throws IllegalArgumentException
-   *           if no StrStatus with the requested label exists
+   * @param strStatus must match an existing {@link StrStatus} label
+   * @throws IllegalArgumentException if no StrStatus with the requested label exists
    */
-  public void setStrStatus(String strStatus);
+  void setStrStatus(String strStatus);
 
-  public Integer getSlidesConsumed();
+  Integer getSlidesConsumed();
 
-  public void setSlidesConsumed(Integer slidesConsumed);
+  void setSlidesConsumed(Integer slidesConsumed);
 
-  public SampleSlide getReferenceSlide();
+  Long getReferenceSlideId();
 
-  public void setReferenceSlide(SampleSlide referenceSlide);
+  void setReferenceSlideId(Long referenceSlideId);
 
 }

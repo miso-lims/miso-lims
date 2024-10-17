@@ -4,20 +4,18 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 /**
@@ -30,7 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
  */
 @Entity
 @Table(name = "_Group")
-public class Group implements Serializable, Comparable<Group>, Deletable, Identifiable {
+public class Group implements Serializable, Comparable<Group>, Deletable {
 
   private static final long serialVersionUID = 1L;
   private static final long UNSAVED_ID = 0L;
@@ -43,7 +41,7 @@ public class Group implements Serializable, Comparable<Group>, Deletable, Identi
 
   @ManyToMany(targetEntity = UserImpl.class)
   @Fetch(FetchMode.SUBSELECT)
-  @JoinTable(name = "User_Group", joinColumns = { @JoinColumn(name = "groups_groupId") }, inverseJoinColumns = {
+  @JoinTable(name = "User_Group", joinColumns = {@JoinColumn(name = "groups_groupId")}, inverseJoinColumns = {
       @JoinColumn(name = "users_userId")
   })
   private Set<User> users = new HashSet<>();

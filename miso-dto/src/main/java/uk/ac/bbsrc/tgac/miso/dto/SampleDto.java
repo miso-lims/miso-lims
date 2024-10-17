@@ -4,15 +4,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;

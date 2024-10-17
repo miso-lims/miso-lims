@@ -7,13 +7,15 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
@@ -25,28 +27,28 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateArrayRunDaoIT extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   private HibernateArrayRunDao sut;
 
   @Before
   public void setup() {
     sut = new HibernateArrayRunDao();
-    sut.setSessionFactory(sessionFactory);
+    sut.setEntityManager(entityManager);
   }
 
   @Test
   public void testSaveNew() throws Exception {
     ArrayRun run = new ArrayRun();
     run.setAlias("TestArrayRun");
-    Instrument inst = (Instrument) sessionFactory.getCurrentSession().get(InstrumentImpl.class, 3L);
+    Instrument inst = (Instrument) entityManager.unwrap(Session.class).get(InstrumentImpl.class, 3L);
     run.setInstrument(inst);
     run.setHealth(HealthType.Running);
     Date now = new Date();
     LocalDate today = LocalDate.now();
     run.setStartDate(today);
-    User user = (User) sessionFactory.getCurrentSession().get(UserImpl.class, 1L);
+    User user = (User) entityManager.unwrap(Session.class).get(UserImpl.class, 1L);
     run.setCreator(user);
     run.setCreationTime(now);
     run.setLastModifier(user);
