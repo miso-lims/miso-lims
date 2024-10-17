@@ -468,7 +468,7 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
     this.worksetAddedTime = worksetAddedTime;
   }
 
-  public boolean getRequsitionStopped() { return requisitionStopped; }
+  public boolean getRequisitionStopped() { return requisitionStopped; }
 
   public void setRequisitionStopped(Boolean requisitionStopped) {
     this.requisitionStopped = requisitionStopped;
