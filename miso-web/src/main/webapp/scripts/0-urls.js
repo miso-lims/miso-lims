@@ -105,10 +105,10 @@ Urls = (function () {
   var attachmentRestBase = restBase + "/attachments";
   rest.attachments = {
     delete: function (entityType, entityId, attachmentId) {
-      return "/attachments/" + entityType + "/" + entityId + "/" + attachmentId;
+      return attachmentRestBase + "/" + entityType + "/" + entityId + "/" + attachmentId;
     },
     link: function (entityType, entityId) {
-      return "/attachments/" + entityType + "/" + entityId;
+      return attachmentRestBase + "/" + entityType + "/" + entityId;
     },
   };
 
