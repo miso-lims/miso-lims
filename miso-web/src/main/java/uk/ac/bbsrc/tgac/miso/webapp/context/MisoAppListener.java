@@ -12,6 +12,8 @@ import java.util.TimeZone;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javax.management.MalformedObjectNameException;
+
 import org.apache.logging.log4j.core.config.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
+import io.prometheus.jmx.JmxCollector;
 import io.prometheus.metrics.instrumentation.jvm.JvmMetrics;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
@@ -101,15 +104,11 @@ public class MisoAppListener implements ServletContextListener {
 
     initializeNamingSchemes(context, misoProperties);
 
-    // TODO: re-enable Hibernate and JMX collectors
-    // SessionFactory sessionFactory =
-    // context.getBean(EntityManagerFactory.class).unwrap(SessionFactory.class);
-    // new HibernateStatisticsCollector(sessionFactory, "spring").register();
-    // try {
-    // new JmxCollector(context.getResource("classpath:tomcat-prometheus.yml").getFile()).register();
-    // } catch (MalformedObjectNameException | IOException e) {
-    // log.error("Failed to load Prometheus configuration.", e);
-    // }
+    try {
+      new JmxCollector(context.getResource("classpath:tomcat-prometheus.yml").getFile()).register();
+    } catch (MalformedObjectNameException | IOException e) {
+      throw new IllegalStateException("Failed to load Prometheus configuration.", e);
+    }
   }
 
   private void linkMapsDir(ServletContext application, String fileStoragePath) {

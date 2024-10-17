@@ -77,14 +77,10 @@
       <groupId>io.prometheus</groupId>
       <artifactId>prometheus-metrics-exporter-servlet-jakarta</artifactId>
     </dependency>
-    <!--<dependency>
-      <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient_hibernate</artifactId>
-    </dependency>
     <dependency>
       <groupId>io.prometheus.jmx</groupId>
       <artifactId>collector</artifactId>
-    </dependency>-->
+    </dependency>
     <dependency>
       <groupId>jakarta.servlet.jsp</groupId>
       <artifactId>jakarta.servlet.jsp-api</artifactId>
