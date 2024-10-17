@@ -17,6 +17,18 @@ WarningTarget.sample = {
         headerMessage: "This entity does not exist except for sample tracking purposes!",
         level: "info",
       },
+        {
+              include: , // TODO Boolean
+              headerMessage: "Requisition is stopped",
+              tableMessage: "", // TODO String
+              level "error",
+            },
+            {
+              include: , // TODO Boolean
+              headerMessage: "Requisition is paused",
+              tableMessage: "", // TODO String
+              level "error",
+            },
       Warning.common.qcFailure(sample),
       Warning.common.effectiveQcFailure(sample),
     ];

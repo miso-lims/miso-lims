@@ -509,7 +509,7 @@ public class LibraryAliquotDto extends AbstractBoxableDto implements UpstreamQcF
     this.requisitionAssayIds = requisitionAssayIds;
   }
 
-  public boolean getRequsitionStopped() { return requisitionStopped; }
+  public boolean getRequisitionStopped() { return requisitionStopped; }
 
   public void setRequisitionStopped(Boolean requisitionStopped) {
     this.requisitionStopped = requisitionStopped;
