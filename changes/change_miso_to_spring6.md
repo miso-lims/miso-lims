@@ -1,1 +1,0 @@
-Updated to Spring 6 and Hibernate 6

@@ -15,7 +15,7 @@ required:
 Application Server:
 
 * JDK 17
-* Tomcat 9
+* Tomcat 10
 
 Database Server:
 
@@ -85,7 +85,7 @@ Refer to [Development Alternatives](#development-alternatives) for a different w
 Download the [Flyway command line tool](https://flywaydb.org/download/community) version 5.2.4 and install it.
 Newer versions of Flyway may cause issues, and are not recommended.
 
-The application server needs Tomcat [9](https://tomcat.apache.org/download-90.cgi).
+The application server needs [Tomcat 10](https://tomcat.apache.org/download-10.cgi).
 
 Create a file called `ROOT.xml` in the following directory
 `$CATALINA_HOME/conf/Catalina/localhost`, creating the directory if necessary,
@@ -125,7 +125,7 @@ Extract the `setup_files.tar.gz` file and copy `miso.properties` to
 `$CATALINA_HOME/conf/Catalina/localhost/miso.properties`. This file contains site-specific configuration that you should
 review and modify as appropriate. See [Site Configuration](../site-configuration) for more information.
 
-Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if you installed Tomcat through apt, `/etc/default/tomcat9`:
+Append the following line to `$CATALINA_HOME/bin/setenv.sh` or, if you installed Tomcat through apt, `/etc/default/tomcat10`:
 
     JAVA_OPTS="$JAVA_OPTS -Dsecurity.method=jdbc -Xmx768M"
 
@@ -258,7 +258,7 @@ If you encounter other errors migrating the database, make sure that you are usi
 # Server Deployment Troubleshooting
 
 * Whenever unexpected behaviour arises, be sure to check the build logs, located at `${CATALINA_BASE}/logs`. Read through the output of `catalina.out`, `catalina.<date>.log`, and `localhost.<date>.log`.
-* Ensure you are using the correct version of Java with Tomcat. This can be checked in `catalina.out`. In case you are not, append/modify the value of `$JAVA_HOME` in `setenv.sh` or `/etc/default/tomcat9`. 
+* Ensure you are using the correct version of Java with Tomcat. This can be checked in `catalina.out`. In case you are not, append/modify the value of `$JAVA_HOME` in `setenv.sh` or `/etc/default/tomcat10`. 
 * If file access for `/storage/miso` is causing an error, [this](https://stackoverflow.com/questions/56827735/how-to-allow-tomcat-war-app-to-write-in-folder) may help.
 
 
