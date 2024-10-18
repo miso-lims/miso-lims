@@ -67,7 +67,7 @@ var Box = Box || {
     Box.dialogHeight = Box.boxJSON.rows * 40 + 300;
     Box.scanDialog = Box.ScanDialog(scannerName);
     Box.prepareScannerDialog = Box.PrepareScannerDialog(scannerName);
-    Box.scanDiff = Box.ScanDiff();
+    Box.scanDiff = Box.ScanDiff(scannerName);
     Box.prepareScannerDialog.show();
   },
 
