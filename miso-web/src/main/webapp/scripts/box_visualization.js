@@ -552,7 +552,7 @@
         position: [jQuery(window).width() / 2 - Box.dialogWidth / 2, 50],
         buttons: {
           Retry: function () {
-            Box.initScan();
+            Box.initScan(scannerName);
           },
           Cancel: function () {
             jQuery("#dialogDialog").dialog("close");
@@ -565,7 +565,7 @@
     return self;
   };
 
-  Box.ScanDiff = function () {
+  Box.ScanDiff = function (scannerName) {
     var self = new BoxVisual();
 
     self.show = function (results) {
@@ -642,7 +642,7 @@
             }
           },
           Rescan: function () {
-            Box.initScan();
+            Box.initScan(scannerName);
           },
           Cancel: function () {
             jQuery("#dialogDialog").dialog("close");
