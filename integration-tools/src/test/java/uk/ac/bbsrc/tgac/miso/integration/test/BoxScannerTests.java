@@ -101,5 +101,4 @@ public abstract class BoxScannerTests<T extends BoxScanner> {
     BoxScan scan = scanner.getScan();
     assertNull(scan);
   }
-
 }
