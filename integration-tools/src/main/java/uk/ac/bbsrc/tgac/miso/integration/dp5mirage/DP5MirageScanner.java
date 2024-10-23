@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Version;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Collections;
@@ -24,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * the scanner software via API.
  * For proper usage, see {@link BoxScanner}
  */
-
 public class DP5MirageScanner implements BoxScanner {
 
   private final String host;
@@ -65,12 +65,13 @@ public class DP5MirageScanner implements BoxScanner {
   public BoxScan getScan() throws IntegrationException{
     HttpResponse<String> response;
     List<DP5MirageScanPosition> records;
+
     try {
-      // JSON response from Scanner
+      // Send the request and receive the response
       response = httpClient.send(getPostParamRequest("/scan", urlStub(), DP5MirageScanner.params),
           BodyHandlers.ofString());
 
-      // Parse JSON into a JsonNode
+      // Parse into a JsonNode
       ObjectMapper mapper = new ObjectMapper();
       JsonNode rootNode = mapper.readTree(response.body());
       JsonNode barcodesNode = rootNode.get("tubeBarcode");

@@ -59,7 +59,8 @@ public class DP5MirageScan implements BoxScan {
         barcodesMap.put(key, position.barcode());
       }
     }
-    return Collections.unmodifiableMap(barcodesMap);
+    return barcodesMap; // Collections.unmodifiableMap(barcodesMap); failed testImmutability with
+    // this line
   }
 
   @Override
