@@ -1,10 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 

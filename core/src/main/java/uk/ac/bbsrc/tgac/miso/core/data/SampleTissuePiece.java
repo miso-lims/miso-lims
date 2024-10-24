@@ -4,18 +4,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.TissuePieceType;
 
 public interface SampleTissuePiece extends SampleTissueProcessing {
 
-  public static final String SUBCATEGORY_NAME = "Tissue Piece";
+  static final String SUBCATEGORY_NAME = "Tissue Piece";
 
-  public TissuePieceType getTissuePieceType();
+  TissuePieceType getTissuePieceType();
 
-  public void setTissuePieceType(TissuePieceType type);
+  void setTissuePieceType(TissuePieceType type);
 
-  public Integer getSlidesConsumed();
+  Integer getSlidesConsumed();
 
-  public void setSlidesConsumed(Integer slidesConsumed);
+  void setSlidesConsumed(Integer slidesConsumed);
 
-  public SampleSlide getReferenceSlide();
+  Long getReferenceSlideId();
 
-  public void setReferenceSlide(SampleSlide referenceSlide);
+  void setReferenceSlideId(Long referenceSlideId);
 
 }

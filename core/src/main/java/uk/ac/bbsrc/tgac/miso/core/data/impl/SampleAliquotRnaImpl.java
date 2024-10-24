@@ -1,8 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotRna;
 
 @Entity

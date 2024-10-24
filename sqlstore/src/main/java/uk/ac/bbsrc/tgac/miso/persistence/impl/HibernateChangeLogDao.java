@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.persistence.ChangeLogStore;
 
@@ -13,20 +13,21 @@ import uk.ac.bbsrc.tgac.miso.persistence.ChangeLogStore;
 @Repository
 public class HibernateChangeLogDao implements ChangeLogStore {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public Session currentSession() {
+    return entityManager.unwrap(Session.class);
   }
 
-  private Session currentSession() {
-    return sessionFactory.getCurrentSession();
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override
   public Long create(ChangeLog changeLog) {
-    return (Long) currentSession().save(changeLog);
+    currentSession().persist(changeLog);
+    return changeLog.getId();
   }
 
 }

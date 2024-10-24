@@ -6,7 +6,6 @@ import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtil
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,6 +16,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl_;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.QueryBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSequencingOrderPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSequencingOrderPage.Columns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
@@ -30,7 +31,8 @@ public class BulkSequencingOrderIT extends AbstractIT {
 
   @Test
   public void testCreateSetup() {
-    BulkSequencingOrderPage page = BulkSequencingOrderPage.getForCreate(getDriver(), getBaseUrl(), Sets.newHashSet(120001L, 120002L, 120003L));
+    BulkSequencingOrderPage page =
+        BulkSequencingOrderPage.getForCreate(getDriver(), getBaseUrl(), Sets.newHashSet(120001L, 120002L, 120003L));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     List<String> expectedColumns = BulkSequencingOrderPage.Columns.all();
@@ -43,7 +45,8 @@ public class BulkSequencingOrderIT extends AbstractIT {
 
   @Test
   public void testCreate() {
-    BulkSequencingOrderPage page = BulkSequencingOrderPage.getForCreate(getDriver(), getBaseUrl(), Sets.newHashSet(120001L));
+    BulkSequencingOrderPage page =
+        BulkSequencingOrderPage.getForCreate(getDriver(), getBaseUrl(), Sets.newHashSet(120001L));
     HandsOnTable table = page.getTable();
 
     // test initial values
@@ -71,10 +74,12 @@ public class BulkSequencingOrderIT extends AbstractIT {
     assertColumnValues(savedTable, 0, changes, "post-save");
 
     Pool pool = (Pool) getSession().get(PoolImpl.class, 120001L);
-    @SuppressWarnings("unchecked")
-    List<SequencingOrder> orders = getSession().createCriteria(SequencingOrderImpl.class)
-        .add(Restrictions.eq("pool", pool))
-        .list();
+
+    QueryBuilder<SequencingOrder, SequencingOrderImpl> builder =
+        new QueryBuilder<>(getSession(), SequencingOrderImpl.class, SequencingOrder.class);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(SequencingOrderImpl_.pool), pool));
+    List<SequencingOrder> orders = builder.getResultList();
+
     assertEquals(1, orders.size());
     assertEquals(changes.get(Columns.PARAMETERS), orders.get(0).getSequencingParameter().getName());
     assertEquals(Integer.valueOf(3), orders.get(0).getPartitions());

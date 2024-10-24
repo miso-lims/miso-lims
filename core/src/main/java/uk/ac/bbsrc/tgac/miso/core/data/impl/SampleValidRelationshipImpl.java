@@ -3,25 +3,24 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
-
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.persistence.UniqueConstraint;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 
 @Entity
-@Table(name = "SampleValidRelationship", uniqueConstraints = @UniqueConstraint(columnNames = { "parentId", "childId" }))
+@Table(name = "SampleValidRelationship", uniqueConstraints = @UniqueConstraint(columnNames = {"parentId", "childId"}))
 public class SampleValidRelationshipImpl implements SampleValidRelationship, Serializable {
 
   private static final long serialVersionUID = 1L;

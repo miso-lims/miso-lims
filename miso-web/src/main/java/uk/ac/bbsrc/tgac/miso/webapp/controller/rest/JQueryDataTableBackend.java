@@ -10,13 +10,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import jakarta.servlet.http.HttpServletRequest;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -28,7 +27,8 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
 
   protected abstract Dto asDto(Model model);
 
-  public DataTablesResponseDto<Dto> get(HttpServletRequest request, AdvancedSearchParser advancedSearchParser, PaginationFilter... filters)
+  public DataTablesResponseDto<Dto> get(HttpServletRequest request, AdvancedSearchParser advancedSearchParser,
+      PaginationFilter... filters)
       throws IOException {
     if (request.getParameterMap().size() > 0) {
       long numItems = getSource().count(filters);
@@ -59,14 +59,16 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
       if (!isStringEmptyOrNull(sSearch)) {
         additionalFilters
             .addAll(Arrays.asList(
-                advancedSearchParser.parseQuery(sSearch, SecurityContextHolder.getContext().getAuthentication().getName(), errorHandler)));
+                advancedSearchParser.parseQuery(sSearch,
+                    SecurityContextHolder.getContext().getAuthentication().getName(), errorHandler)));
         numMatches = getSource().count(additionalFilters.toArray(filters));
       } else {
         numMatches = numItems;
       }
-      Collection<Model> models = getSource().list(errorHandler, iDisplayStart, iDisplayLength, "asc".equalsIgnoreCase(sSortDir),
-          sortCol,
-          additionalFilters.toArray(filters));
+      Collection<Model> models =
+          getSource().list(errorHandler, iDisplayStart, iDisplayLength, "asc".equalsIgnoreCase(sSortDir),
+              sortCol,
+              additionalFilters.toArray(filters));
 
       List<Dto> dtos = new ArrayList<>();
       for (Model model : models) {

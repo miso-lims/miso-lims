@@ -9,9 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import javax.annotation.Resource;
-import javax.ws.rs.core.Response.Status;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +26,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import jakarta.annotation.Resource;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
@@ -73,7 +72,8 @@ public class EditBoxController {
 
   @GetMapping(value = "/bulk/new")
   public ModelAndView newBoxes(@RequestParam("quantity") Integer quantity, ModelMap model) throws IOException {
-    if (quantity == null || quantity <= 0) throw new RestException("Must specify quantity of boxes to create", Status.BAD_REQUEST);
+    if (quantity == null || quantity <= 0)
+      throw new RestException("Must specify quantity of boxes to create", Status.BAD_REQUEST);
 
     return new BulkCreateBoxBackend(quantity, mapper).create(model);
   }
@@ -94,7 +94,8 @@ public class EditBoxController {
   @GetMapping(value = "/{boxId}")
   public ModelAndView setupForm(@PathVariable Long boxId, ModelMap model) throws IOException {
     Box box = boxService.get(boxId);
-    if (box == null) throw new NotFoundException("No box found for ID " + boxId.toString());
+    if (box == null)
+      throw new NotFoundException("No box found for ID " + boxId.toString());
     if (box.getSize().getRows() == 8 && box.getSize().getColumns() == 12) {
       model.put("fragmentAnalyserCompatible", true);
     }

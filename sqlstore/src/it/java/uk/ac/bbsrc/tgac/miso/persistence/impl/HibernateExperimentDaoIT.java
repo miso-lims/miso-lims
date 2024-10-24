@@ -30,7 +30,7 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
   @Before
   public void setup() throws Exception {
     dao = new HibernateExperimentDao();
-    dao.setSessionFactory(getSessionFactory());
+    dao.setEntityManager(getEntityManager());
   }
 
   /**

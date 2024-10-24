@@ -24,7 +24,7 @@ public class HibernatePoolDaoSearchIT extends PaginationFilterSinkIT {
   @Override
   protected PaginatedDataSource<?> constructTestSubject() {
     HibernatePoolDao sut = new HibernatePoolDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

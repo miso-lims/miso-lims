@@ -2,11 +2,10 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.Set;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 

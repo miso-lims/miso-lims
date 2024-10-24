@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Cache;
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -106,8 +108,8 @@ public class AdminRestController extends DefaultRestController {
   @Autowired
   private SampleService sampleService;
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Autowired
   private ConstantsController constantsController;
@@ -124,15 +126,15 @@ public class AdminRestController extends DefaultRestController {
       throw new RestException("Could not determine if user is admin.", e);
     }
 
-    Cache cache = sessionFactory.getCache();
+    Cache cache = entityManager.unwrap(Session.class).getSessionFactory().getCache();
 
     if (cache == null) {
       return false;
     }
-    cache.evictCollectionRegions();
+    cache.evictCollectionData();
     cache.evictDefaultQueryRegion();
-    cache.evictEntityRegions();
-    cache.evictNaturalIdRegions();
+    cache.evictEntityData();
+    cache.evictNaturalIdData();
     cache.evictQueryRegions();
     return true;
   }
@@ -150,7 +152,8 @@ public class AdminRestController extends DefaultRestController {
     List<RegenerationResponse> response = new ArrayList<>();
     response.add(RegenerationResponse.regenerate("samples", sampleService, sampleService::update));
     response.add(RegenerationResponse.regenerate("libraries", libraryService, libraryService::update));
-    response.add(RegenerationResponse.regenerate("libraryaliquots", libraryAliquotService, libraryAliquotService::update));
+    response
+        .add(RegenerationResponse.regenerate("libraryaliquots", libraryAliquotService, libraryAliquotService::update));
     response.add(RegenerationResponse.regenerate("pools", poolService, poolService::update));
     response.add(RegenerationResponse.regenerate("boxes", boxService, boxService::save));
     return response;

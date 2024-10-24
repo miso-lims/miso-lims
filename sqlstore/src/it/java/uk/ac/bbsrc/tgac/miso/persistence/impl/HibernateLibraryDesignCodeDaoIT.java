@@ -19,7 +19,7 @@ public class HibernateLibraryDesignCodeDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateLibraryDesignCodeDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -66,7 +66,8 @@ public class HibernateLibraryDesignCodeDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    LibraryDesignCode saved = (LibraryDesignCode) getSessionFactory().getCurrentSession().get(LibraryDesignCode.class, savedId);
+    LibraryDesignCode saved =
+        (LibraryDesignCode) currentSession().get(LibraryDesignCode.class, savedId);
     assertEquals(code, saved.getCode());
   }
 
@@ -74,27 +75,31 @@ public class HibernateLibraryDesignCodeDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String code = "NU";
-    LibraryDesignCode designCode = (LibraryDesignCode) getSessionFactory().getCurrentSession().get(LibraryDesignCode.class, id);
+    LibraryDesignCode designCode =
+        (LibraryDesignCode) currentSession().get(LibraryDesignCode.class, id);
     assertNotEquals(code, designCode.getCode());
     designCode.setCode(code);
     sut.update(designCode);
 
     clearSession();
 
-    LibraryDesignCode saved = (LibraryDesignCode) getSessionFactory().getCurrentSession().get(LibraryDesignCode.class, id);
+    LibraryDesignCode saved =
+        (LibraryDesignCode) currentSession().get(LibraryDesignCode.class, id);
     assertEquals(code, saved.getCode());
   }
 
   @Test
   public void testGetUsageByLibraries() throws IOException {
-    LibraryDesignCode designCode = (LibraryDesignCode) getSessionFactory().getCurrentSession().get(LibraryDesignCode.class, 1L);
+    LibraryDesignCode designCode =
+        (LibraryDesignCode) currentSession().get(LibraryDesignCode.class, 1L);
     assertEquals("TT", designCode.getCode());
     assertEquals(1L, sut.getUsageByLibraries(designCode));
   }
 
   @Test
   public void testGetUsageByLibraryDesigns() throws IOException {
-    LibraryDesignCode designCode = (LibraryDesignCode) getSessionFactory().getCurrentSession().get(LibraryDesignCode.class, 1L);
+    LibraryDesignCode designCode =
+        (LibraryDesignCode) currentSession().get(LibraryDesignCode.class, 1L);
     assertEquals("TT", designCode.getCode());
     assertEquals(2L, sut.getUsageByLibraryDesigns(designCode));
   }

@@ -6,11 +6,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.criteria.Join;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
@@ -74,7 +73,7 @@ public class HibernateTransferNotificationDao extends HibernateSaveDao<TransferN
 
   @Override
   public void delete(TransferNotification notification) throws IOException {
-    currentSession().delete(notification);
+    currentSession().remove(notification);
   }
 
 }

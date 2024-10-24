@@ -5,12 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -19,6 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Sets;
 
+import jakarta.persistence.criteria.CriteriaBuilder.In;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel_;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
@@ -159,12 +158,13 @@ public class HibernateInstrumentModelDao extends HibernateSaveDao<InstrumentMode
 
   @Override
   public long createPosition(InstrumentPosition position) throws IOException {
-    return (long) currentSession().save(position);
+    currentSession().persist(position);
+    return position.getId();
   }
 
   @Override
   public void deletePosition(InstrumentPosition position) throws IOException {
-    currentSession().delete(position);
+    currentSession().remove(position);
   }
 
   @Override

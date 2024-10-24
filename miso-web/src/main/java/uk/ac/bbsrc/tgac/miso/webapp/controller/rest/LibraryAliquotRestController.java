@@ -9,11 +9,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -31,6 +26,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -71,17 +69,18 @@ public class LibraryAliquotRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<ListLibraryAliquotView, LibraryAliquotDto> jQueryBackend = new JQueryDataTableBackend<>() {
-    @Override
-    protected LibraryAliquotDto asDto(ListLibraryAliquotView model) {
-      return Dtos.asDto(model);
-    }
+  private final JQueryDataTableBackend<ListLibraryAliquotView, LibraryAliquotDto> jQueryBackend =
+      new JQueryDataTableBackend<>() {
+        @Override
+        protected LibraryAliquotDto asDto(ListLibraryAliquotView model) {
+          return Dtos.asDto(model);
+        }
 
-    @Override
-    protected PaginatedDataSource<ListLibraryAliquotView> getSource() throws IOException {
-      return listLibraryAliquotViewService;
-    }
-  };
+        @Override
+        protected PaginatedDataSource<ListLibraryAliquotView> getSource() throws IOException {
+          return listLibraryAliquotViewService;
+        }
+      };
 
   @Autowired
   private LibraryAliquotService libraryAliquotService;
@@ -111,16 +110,18 @@ public class LibraryAliquotRestController extends RestController {
     return RestUtils.getObject("Library Aliquot", aliquotId, libraryAliquotService, ldi -> Dtos.asDto(ldi, false));
   }
 
-  @PostMapping(headers = { "Content-type=application/json" })
+  @PostMapping(headers = {"Content-type=application/json"})
   @ResponseBody
   public LibraryAliquotDto create(@RequestBody LibraryAliquotDto aliquotDto)
       throws IOException {
-    return RestUtils.createObject("Library Aliquot", aliquotDto, Dtos::to, libraryAliquotService, ldi -> Dtos.asDto(ldi, false));
+    return RestUtils.createObject("Library Aliquot", aliquotDto, Dtos::to, libraryAliquotService,
+        ldi -> Dtos.asDto(ldi, false));
   }
 
-  @PutMapping(value = "/{aliquotId}", headers = { "Content-type=application/json" })
+  @PutMapping(value = "/{aliquotId}", headers = {"Content-type=application/json"})
   @ResponseBody
-  public LibraryAliquotDto update(@PathVariable Long aliquotId, @RequestBody LibraryAliquotDto aliquotDto) throws IOException {
+  public LibraryAliquotDto update(@PathVariable Long aliquotId, @RequestBody LibraryAliquotDto aliquotDto)
+      throws IOException {
     return RestUtils.updateObject("Library Aliquot", aliquotId, aliquotDto, Dtos::to, libraryAliquotService,
         ldi -> Dtos.asDto(ldi, false));
   }
@@ -151,19 +152,21 @@ public class LibraryAliquotRestController extends RestController {
 
   @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
-  public DataTablesResponseDto<LibraryAliquotDto> getByProject(@PathVariable("id") Long id, HttpServletRequest request) throws IOException {
+  public DataTablesResponseDto<LibraryAliquotDto> getByProject(@PathVariable("id") Long id, HttpServletRequest request)
+      throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
 
   @GetMapping(value = "/dt/pool/{id}/available", produces = "application/json")
-  public @ResponseBody DataTablesResponseDto<LibraryAliquotDto> getAvailable(@PathVariable("id") Long poolId, HttpServletRequest request)
+  public @ResponseBody DataTablesResponseDto<LibraryAliquotDto> getAvailable(@PathVariable("id") Long poolId,
+      HttpServletRequest request)
       throws IOException {
 
     final Pool pool = poolService.get(poolId);
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.platformType(pool.getPlatformType()));
   }
 
-  @PostMapping(value = "/query", produces = { "application/json" })
+  @PostMapping(value = "/query", produces = {"application/json"})
   @ResponseBody
   public List<LibraryAliquotDto> getLibraryAliquotsInBulk(@RequestBody List<String> names) throws IOException {
     return listLibraryAliquotViewService.list(0, 0, true, "id", PaginationFilter.bulkLookup(names))
@@ -183,6 +186,7 @@ public class LibraryAliquotRestController extends RestController {
   private static Stream<Sample> getSample(LibraryAliquot aliquot) {
     return Stream.of(aliquot.getLibrary().getSample());
   }
+
   private final RelationFinder<LibraryAliquot> parentFinder = (new RelationFinder<LibraryAliquot>() {
 
     @Override
@@ -190,12 +194,16 @@ public class LibraryAliquotRestController extends RestController {
       return libraryAliquotService.listByIdList(ids);
     }
   })//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, LibraryAliquotRestController::getSample))//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, LibraryAliquotRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class,
+          LibraryAliquotRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class,
+          LibraryAliquotRestController::getSample))//
       .add(new RelationFinder.ParentSampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
           LibraryAliquotRestController::getSample))//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class, LibraryAliquotRestController::getSample))//
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class, LibraryAliquotRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleStock.CATEGORY_NAME, SampleStock.class,
+          LibraryAliquotRestController::getSample))//
+      .add(new RelationFinder.ParentSampleAdapter<>(SampleAliquot.CATEGORY_NAME, SampleAliquot.class,
+          LibraryAliquotRestController::getSample))//
       .add(new RelationFinder.RelationAdapter<LibraryAliquot, Sample, SampleDto>("Sample") {
 
         @Override
@@ -223,7 +231,8 @@ public class LibraryAliquotRestController extends RestController {
 
   @PostMapping(value = "/parents/{category}")
   @ResponseBody
-  public List<?> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+  public List<?> getParents(@PathVariable("category") String category, @RequestBody List<Long> ids,
+      HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return parentFinder.list(ids, category);
   }
@@ -268,7 +277,8 @@ public class LibraryAliquotRestController extends RestController {
 
   @PostMapping(value = "/children/{category}")
   @ResponseBody
-  public List<?> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids, HttpServletRequest request,
+  public List<?> getChildren(@PathVariable("category") String category, @RequestBody List<Long> ids,
+      HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return childFinder.list(ids, category);
   }
@@ -291,11 +301,13 @@ public class LibraryAliquotRestController extends RestController {
     libraryAliquotService.bulkDelete(aliquots);
   }
 
-  @GetMapping(value = "/dt/workset/{id}", produces = { "application/json" })
+  @GetMapping(value = "/dt/workset/{id}", produces = {"application/json"})
   @ResponseBody
-  public DataTablesResponseDto<LibraryAliquotDto> getDTLibraryAliquotsByWorkset(@PathVariable("id") Long id, HttpServletRequest request)
-          throws IOException {
-    DataTablesResponseDto<LibraryAliquotDto> response = jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
+  public DataTablesResponseDto<LibraryAliquotDto> getDTLibraryAliquotsByWorkset(@PathVariable("id") Long id,
+      HttpServletRequest request)
+      throws IOException {
+    DataTablesResponseDto<LibraryAliquotDto> response =
+        jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
     if (!response.getAaData().isEmpty()) {
       Map<Long, Date> addedTimes = worksetService.getLibraryAliquotAddedTimes(id);
       for (LibraryAliquotDto dto : response.getAaData()) {

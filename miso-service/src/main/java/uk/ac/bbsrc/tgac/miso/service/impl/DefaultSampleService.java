@@ -253,7 +253,7 @@ public class DefaultSampleService implements SampleService {
   public long create(Sample sample) throws IOException {
     requisitionService.findOrCreateRequisition(sample);
     loadChildEntities(sample);
-    boxService.throwIfBoxPositionIsFilled(sample);
+    boxService.prepareBoxableLocation(sample, false);
     User changeUser = authorizationManager.getCurrentUser();
     sample.setChangeDetails(changeUser);
     if (isDetailedSample(sample)) {
@@ -729,23 +729,12 @@ public class DefaultSampleService implements SampleService {
         } else if (detailed instanceof SampleTissuePiece) {
           SampleTissuePiece tissuePiece = (SampleTissuePiece) detailed;
           tissuePiece.setTissuePieceType(tissuePieceTypeDao.get(tissuePiece.getTissuePieceType().getId()));
-          if (tissuePiece.getReferenceSlide() != null) {
-            Sample ref = deproxify(get(tissuePiece.getReferenceSlide().getId()));
-            tissuePiece.setReferenceSlide((SampleSlide) ref);
-          }
         }
       }
       if (isAliquotSample(detailed)) {
         SampleAliquot sa = (SampleAliquot) detailed;
         if (sa.getSamplePurpose() != null && sa.getSamplePurpose().isSaved()) {
           sa.setSamplePurpose(samplePurposeDao.get(sa.getSamplePurpose().getId()));
-        }
-      }
-      if (isStockSample(detailed)) {
-        SampleStock stock = (SampleStock) detailed;
-        if (stock.getReferenceSlide() != null) {
-          Sample ref = deproxify(get(stock.getReferenceSlide().getId()));
-          stock.setReferenceSlide((SampleSlide) ref);
         }
       }
       if (isTissueSample(detailed)) {
@@ -792,8 +781,7 @@ public class DefaultSampleService implements SampleService {
     User changeUser = authorizationManager.getCurrentUser();
     managed.setChangeDetails(changeUser);
     boolean validateAliasUniqueness = !managed.getAlias().equals(sample.getAlias());
-    maybeRemoveFromBox(sample, managed);
-    boxService.throwIfBoxPositionIsFilled(sample);
+    boxService.prepareBoxableLocation(sample, managed.getDistributionTransfer() != null);
     if (sample.getParent() != null) {
       ((DetailedSample) sample).setParent((DetailedSample) get(sample.getParent().getId()));
     }
@@ -816,13 +804,6 @@ public class DefaultSampleService implements SampleService {
     }
     boxService.updateBoxableLocation(sample);
     return sample.getId();
-  }
-
-  private void maybeRemoveFromBox(Sample sample, Sample managed) {
-    if (sample.isDiscarded() || sample.getDistributionTransfer() != null || managed.getDistributionTransfer() != null) {
-      sample.setBoxPosition(null);
-      sample.setVolume(BigDecimal.ZERO);
-    }
   }
 
   private void validateChange(Sample sample, Sample beforeChange) throws IOException {
@@ -874,16 +855,21 @@ public class DefaultSampleService implements SampleService {
     }
   }
 
-  private void validateReferenceSlide(DetailedSample sample, List<ValidationError> errors) {
-    SampleSlide reference = null;
+  private void validateReferenceSlide(DetailedSample sample, List<ValidationError> errors) throws IOException {
+    Long referenceId = null;
     if (isTissuePieceSample(sample)) {
-      reference = ((SampleTissuePiece) sample).getReferenceSlide();
+      referenceId = ((SampleTissuePiece) sample).getReferenceSlideId();
     } else if (isStockSample(sample)) {
-      reference = ((SampleStock) deproxify(sample)).getReferenceSlide();
+      referenceId = ((SampleStock) deproxify(sample)).getReferenceSlideId();
     } else {
       return;
     }
-    if (reference != null) {
+    if (referenceId != null) {
+      DetailedSample reference = (DetailedSample) deproxify(get(referenceId));
+      if (reference == null) {
+        errors.add(new ValidationError("referenceSlideId", "Reference slide not found"));
+        return;
+      }
       Sample tissue = getParent(SampleTissue.class, sample);
       Sample referenceTissue = getParent(SampleTissue.class, reference);
       if (tissue.getId() != referenceTissue.getId()) {
@@ -993,7 +979,7 @@ public class DefaultSampleService implements SampleService {
     }
     target.setStrStatus(source.getStrStatus());
     target.setSlidesConsumed(source.getSlidesConsumed());
-    target.setReferenceSlide(source.getReferenceSlide());
+    target.setReferenceSlideId(source.getReferenceSlideId());
   }
 
   private void applyTissueChanges(SampleTissue target, SampleTissue source) {
@@ -1022,7 +1008,7 @@ public class DefaultSampleService implements SampleService {
     } else if (source instanceof SampleTissuePiece) {
       ((SampleTissuePiece) target).setSlidesConsumed(((SampleTissuePiece) source).getSlidesConsumed());
       ((SampleTissuePiece) target).setTissuePieceType(((SampleTissuePiece) source).getTissuePieceType());
-      ((SampleTissuePiece) target).setReferenceSlide(((SampleTissuePiece) source).getReferenceSlide());
+      ((SampleTissuePiece) target).setReferenceSlideId(((SampleTissuePiece) source).getReferenceSlideId());
     } else if (source instanceof SampleSingleCell) {
       ((SampleSingleCell) target)
           .setInitialCellConcentration(((SampleSingleCell) source).getInitialCellConcentration());
@@ -1140,6 +1126,13 @@ public class DefaultSampleService implements SampleService {
     final int libraries = libraryService.listBySampleId(object.getId()).size();
     if (libraries > 0) {
       result.addError(ValidationError.forDeletionUsage(object, libraries, Pluralizer.libraries(libraries)));
+    }
+    if (LimsUtils.isSampleSlide(object)) {
+      long references = sampleStore.getUsageAsReferenceSlide(object);
+      if (references > 0) {
+        result.addError(ValidationError.forDeletionUsage(object, references,
+            Pluralizer.samples(references) + " (as reference slide)"));
+      }
     }
     return result;
   }

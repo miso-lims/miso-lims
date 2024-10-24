@@ -2,16 +2,14 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 
 @Entity
-public class StorageLocationMap implements Deletable, Identifiable, Serializable {
+public class StorageLocationMap implements Deletable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -66,17 +64,25 @@ public class StorageLocationMap implements Deletable, Identifiable, Serializable
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     StorageLocationMap other = (StorageLocationMap) obj;
     if (description == null) {
-      if (other.description != null) return false;
-    } else if (!description.equals(other.description)) return false;
+      if (other.description != null)
+        return false;
+    } else if (!description.equals(other.description))
+      return false;
     if (filename == null) {
-      if (other.filename != null) return false;
-    } else if (!filename.equals(other.filename)) return false;
-    if (mapId != other.mapId) return false;
+      if (other.filename != null)
+        return false;
+    } else if (!filename.equals(other.filename))
+      return false;
+    if (mapId != other.mapId)
+      return false;
     return true;
   }
 

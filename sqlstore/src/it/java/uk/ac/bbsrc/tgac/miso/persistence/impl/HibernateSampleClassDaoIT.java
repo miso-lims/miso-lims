@@ -24,7 +24,7 @@ public class HibernateSampleClassDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateSampleClassDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -47,7 +47,7 @@ public class HibernateSampleClassDaoIT extends AbstractDAOTest {
   public void testList() throws IOException {
     List<SampleClass> list = sut.list();
     assertNotNull(list);
-    assertEquals(4, list.size());
+    assertEquals(5, list.size());
   }
 
   @Test
@@ -66,7 +66,7 @@ public class HibernateSampleClassDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    SampleClass saved = (SampleClass) getSessionFactory().getCurrentSession().get(SampleClassImpl.class, savedId);
+    SampleClass saved = (SampleClass) currentSession().get(SampleClassImpl.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -74,20 +74,20 @@ public class HibernateSampleClassDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Alias";
-    SampleClass sampleClass = (SampleClass) getSessionFactory().getCurrentSession().get(SampleClassImpl.class, id);
+    SampleClass sampleClass = (SampleClass) currentSession().get(SampleClassImpl.class, id);
     assertNotEquals(alias, sampleClass.getAlias());
     sampleClass.setAlias(alias);
     sut.update(sampleClass);
 
     clearSession();
 
-    SampleClass saved = (SampleClass) getSessionFactory().getCurrentSession().get(SampleClassImpl.class, id);
+    SampleClass saved = (SampleClass) currentSession().get(SampleClassImpl.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    SampleClass sampleClass = (SampleClass) getSessionFactory().getCurrentSession().get(SampleClassImpl.class, 2L);
+    SampleClass sampleClass = (SampleClass) currentSession().get(SampleClassImpl.class, 2L);
     assertEquals("Primary Tumor Tissue", sampleClass.getAlias());
     assertEquals(5L, sut.getUsage(sampleClass));
   }

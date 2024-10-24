@@ -3,8 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import jakarta.servlet.http.HttpServletRequest;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -36,18 +35,19 @@ public class InstrumentModelRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<InstrumentModel, InstrumentModelDto> jQueryBackend = new JQueryDataTableBackend<InstrumentModel, InstrumentModelDto>() {
+  private final JQueryDataTableBackend<InstrumentModel, InstrumentModelDto> jQueryBackend =
+      new JQueryDataTableBackend<InstrumentModel, InstrumentModelDto>() {
 
-    @Override
-    protected InstrumentModelDto asDto(InstrumentModel model) {
-      return Dtos.asDto(model);
-    }
+        @Override
+        protected InstrumentModelDto asDto(InstrumentModel model) {
+          return Dtos.asDto(model);
+        }
 
-    @Override
-    protected PaginatedDataSource<InstrumentModel> getSource() throws IOException {
-      return instrumentModelService;
-    }
-  };
+        @Override
+        protected PaginatedDataSource<InstrumentModel> getSource() throws IOException {
+          return instrumentModelService;
+        }
+      };
 
   @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody

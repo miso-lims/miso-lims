@@ -19,7 +19,7 @@ public class HibernateArrayModelDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateArrayModelDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -56,7 +56,7 @@ public class HibernateArrayModelDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    ArrayModel saved = (ArrayModel) getSessionFactory().getCurrentSession().get(ArrayModel.class, savedId);
+    ArrayModel saved = (ArrayModel) currentSession().get(ArrayModel.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -64,20 +64,20 @@ public class HibernateArrayModelDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Name";
-    ArrayModel arrayModel = (ArrayModel) getSessionFactory().getCurrentSession().get(ArrayModel.class, id);
+    ArrayModel arrayModel = (ArrayModel) currentSession().get(ArrayModel.class, id);
     assertNotEquals(alias, arrayModel.getAlias());
     arrayModel.setAlias(alias);
     sut.update(arrayModel);
 
     clearSession();
 
-    ArrayModel saved = (ArrayModel) getSessionFactory().getCurrentSession().get(ArrayModel.class, id);
+    ArrayModel saved = (ArrayModel) currentSession().get(ArrayModel.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    ArrayModel arrayModel = (ArrayModel) getSessionFactory().getCurrentSession().get(ArrayModel.class, 1L);
+    ArrayModel arrayModel = (ArrayModel) currentSession().get(ArrayModel.class, 1L);
     assertEquals("Test BeadChip", arrayModel.getAlias());
     assertEquals(1L, sut.getUsage(arrayModel));
   }

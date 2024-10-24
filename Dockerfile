@@ -67,7 +67,7 @@ ENTRYPOINT ["/run-flyway"]
 ## Tomcat webapp
 #######################################################
 
-FROM tomcat:9-jdk17-temurin as webapp
+FROM tomcat:10.1-jdk17-temurin as webapp
 
 COPY ./.docker/tomcat/setenv.sh /usr/local/tomcat/bin/
 COPY ./.docker/tomcat/logging.properties ${CATALINA_HOME}/conf/

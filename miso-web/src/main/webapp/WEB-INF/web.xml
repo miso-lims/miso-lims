@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
-                      http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/web-app_4_0.xsd" version="4.0">
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/web-app_4_0.xsd"
+  version="4.0">
 
   <display-name>MISO LIMS</display-name>
   <filter>
@@ -52,6 +53,9 @@
     <servlet-name>miso</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
+    <multipart-config>
+      <max-file-size>10485760</max-file-size> <!-- 10MB -->
+    </multipart-config>
   </servlet>
   <servlet-mapping>
     <servlet-name>miso</servlet-name>
@@ -88,7 +92,7 @@
   <servlet>
     <servlet-name>metrics</servlet-name>
     <servlet-class>
-      io.prometheus.client.exporter.MetricsServlet
+      io.prometheus.metrics.exporter.servlet.jakarta.PrometheusMetricsServlet
     </servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
@@ -109,7 +113,7 @@
       <http-only>true</http-only>
     </cookie-config>
   </session-config>
-  
+
   <context-param>
     <param-name>miso.propertiesFile</param-name>
     <param-value>classpath:miso.properties</param-value>

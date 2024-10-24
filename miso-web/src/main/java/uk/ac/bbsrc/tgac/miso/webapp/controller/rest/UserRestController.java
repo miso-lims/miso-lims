@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
@@ -92,7 +91,8 @@ public class UserRestController extends RestController {
   }
 
   @PostMapping("/{userId}/password")
-  public @ResponseBody UserDto changePassword(@PathVariable long userId, @RequestBody PasswordChangeDto dto) throws IOException {
+  public @ResponseBody UserDto changePassword(@PathVariable long userId, @RequestBody PasswordChangeDto dto)
+      throws IOException {
     if (!securityManager.isPasswordMutable()) {
       throw new RestException("Cannot change password in MISO directly.", Status.BAD_REQUEST);
     }

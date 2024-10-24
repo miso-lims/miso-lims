@@ -5,29 +5,27 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Timestamped;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 @Entity
 @Table(name = "TargetedSequencing")
-public class TargetedSequencing implements Deletable, Identifiable, Serializable, Timestamped {
+public class TargetedSequencing implements Deletable, Serializable, Timestamped {
 
   private static final long serialVersionUID = 1L;
   public static final long UNSAVED_ID = 0L;
@@ -184,18 +182,27 @@ public class TargetedSequencing implements Deletable, Identifiable, Serializable
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     TargetedSequencing other = (TargetedSequencing) obj;
     if (alias == null) {
-      if (other.alias != null) return false;
-    } else if (!alias.equals(other.alias)) return false;
-    if (archived != other.archived) return false;
+      if (other.alias != null)
+        return false;
+    } else if (!alias.equals(other.alias))
+      return false;
+    if (archived != other.archived)
+      return false;
     if (description == null) {
-      if (other.description != null) return false;
-    } else if (!description.equals(other.description)) return false;
-    if (targetedSequencingId != other.targetedSequencingId) return false;
+      if (other.description != null)
+        return false;
+    } else if (!description.equals(other.description))
+      return false;
+    if (targetedSequencingId != other.targetedSequencingId)
+      return false;
     return true;
   }
 

@@ -2,12 +2,12 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "BoxUse")
@@ -53,14 +53,20 @@ public class BoxUse implements Aliasable, Deletable, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     BoxUse other = (BoxUse) obj;
     if (alias == null) {
-      if (other.alias != null) return false;
-    } else if (!alias.equals(other.alias)) return false;
-    if (id != other.id) return false;
+      if (other.alias != null)
+        return false;
+    } else if (!alias.equals(other.alias))
+      return false;
+    if (id != other.id)
+      return false;
     return true;
   }
 

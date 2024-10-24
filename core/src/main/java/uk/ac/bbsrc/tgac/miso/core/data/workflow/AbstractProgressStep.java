@@ -2,16 +2,15 @@ package uk.ac.bbsrc.tgac.miso.core.data.workflow;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.ProgressImpl;
 
 @Entity
@@ -133,14 +132,20 @@ public abstract class AbstractProgressStep implements ProgressStep {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
       ProgressStepId other = (ProgressStepId) obj;
       if (progress == null) {
-        if (other.progress != null) return false;
-      } else if (!progress.equals(other.progress)) return false;
-      if (stepNumber != other.stepNumber) return false;
+        if (other.progress != null)
+          return false;
+      } else if (!progress.equals(other.progress))
+        return false;
+      if (stepNumber != other.stepNumber)
+        return false;
       return true;
     }
   }

@@ -20,7 +20,7 @@ public class HibernateContactDaoIT extends AbstractHibernateSaveDaoTest<Contact,
   @Override
   public HibernateContactDao constructTestSubject() {
     HibernateContactDao sut = new HibernateContactDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

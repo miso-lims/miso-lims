@@ -2,15 +2,14 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -34,7 +33,7 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
   @ManyToOne
   @JoinColumn(name = "libraryDesign", nullable = true)
   private LibraryDesign libraryDesign;
-  
+
   @ManyToOne
   @JoinColumn(name = "libraryDesignCodeId", nullable = false)
   private LibraryDesignCode libraryDesignCode;
@@ -126,9 +125,12 @@ public class DetailedLibraryImpl extends LibraryImpl implements DetailedLibrary 
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     DetailedLibraryImpl other = (DetailedLibraryImpl) obj;
     return new EqualsBuilder()
         .appendSuper(super.equals(obj))

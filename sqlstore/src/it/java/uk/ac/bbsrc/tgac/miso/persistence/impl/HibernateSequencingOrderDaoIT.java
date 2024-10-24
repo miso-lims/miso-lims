@@ -18,7 +18,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
-public class HibernateSequencingOrderDaoIT extends AbstractHibernateSaveDaoTest<SequencingOrder, HibernateSequencingOrderDao> {
+public class HibernateSequencingOrderDaoIT
+    extends AbstractHibernateSaveDaoTest<SequencingOrder, HibernateSequencingOrderDao> {
 
   public HibernateSequencingOrderDaoIT() {
     super(SequencingOrderImpl.class, 2L, 2);
@@ -27,7 +28,7 @@ public class HibernateSequencingOrderDaoIT extends AbstractHibernateSaveDaoTest<
   @Override
   public HibernateSequencingOrderDao constructTestSubject() {
     HibernateSequencingOrderDao sut = new HibernateSequencingOrderDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 
@@ -60,7 +61,8 @@ public class HibernateSequencingOrderDaoIT extends AbstractHibernateSaveDaoTest<
   public void testListByAttributes() throws Exception {
     Pool pool = (Pool) currentSession().get(PoolImpl.class, 1L);
     RunPurpose purpose = (RunPurpose) currentSession().get(RunPurpose.class, 1L);
-    SequencingContainerModel containerModel = (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, 1L);
+    SequencingContainerModel containerModel =
+        (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, 1L);
     SequencingParameters parameters = (SequencingParameters) currentSession().get(SequencingParameters.class, 1L);
     assertEquals(1, getTestSubject().listByAttributes(pool, purpose, null, parameters, 1).size());
     assertEquals(1, getTestSubject().listByAttributes(pool, purpose, containerModel, parameters, 2).size());

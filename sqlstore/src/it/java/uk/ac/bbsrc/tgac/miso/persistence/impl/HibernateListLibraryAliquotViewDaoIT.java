@@ -4,25 +4,26 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 
 public class HibernateListLibraryAliquotViewDaoIT extends AbstractDAOTest {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   private HibernateListLibraryAliquotViewDao sut;
 
   @Before
   public void setup() {
     sut = new HibernateListLibraryAliquotViewDao();
-    sut.setSessionFactory(sessionFactory);
+    sut.setEntityManager(entityManager);
   }
 
   @Test

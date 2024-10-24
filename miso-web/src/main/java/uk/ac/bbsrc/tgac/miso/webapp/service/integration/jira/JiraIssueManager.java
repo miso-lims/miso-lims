@@ -1,23 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
- * TGAC *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
- * General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with MISO. If not, see
- * <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.service.integration.jira;
 
 import java.io.IOException;
@@ -45,7 +25,7 @@ import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 
-import io.prometheus.client.Gauge;
+import io.prometheus.metrics.core.metrics.Gauge;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
@@ -67,8 +47,9 @@ public class JiraIssueManager implements IssueTrackerManager {
   private static final String REST_API_URL = "/rest/api/";
   private static final String JIRA_REST_API_VERSION = "2";
 
-  private static final Gauge errorGauge = Gauge.build().name("miso_jira_issue_manager_errors")
-      .help("The number of consecutive failures to retrieve JIRA issues").register();
+  private static final Gauge errorGauge = Gauge.builder().name("miso_jira_issue_manager_errors")
+      .help("The number of consecutive failures to retrieve JIRA issues")
+      .register();
 
   private final DateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 

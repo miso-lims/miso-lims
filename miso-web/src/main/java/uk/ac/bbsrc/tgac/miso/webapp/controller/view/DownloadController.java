@@ -1,34 +1,9 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpServletResponse;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -80,41 +56,48 @@ public class DownloadController {
   }
 
   @RequestMapping(value = "/sample/forms/{hashcode}", method = RequestMethod.GET)
-  protected void downloadSampleExportFile(@PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
+  protected void downloadSampleExportFile(@PathVariable Integer hashcode, HttpServletResponse response)
+      throws Exception {
     lookupAndRetrieveFile(Sample.class, "forms", hashcode, response);
   }
 
   @RequestMapping(value = "/library/forms/{hashcode}", method = RequestMethod.GET)
-  protected void downloadLibraryExportFile(@PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
+  protected void downloadLibraryExportFile(@PathVariable Integer hashcode, HttpServletResponse response)
+      throws Exception {
     lookupAndRetrieveFile(Library.class, "forms", hashcode, response);
   }
 
   @RequestMapping(value = "/submission/{id}/{hashcode}", method = RequestMethod.GET)
-  protected void downloadSubmissionFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
+  protected void downloadSubmissionFile(@PathVariable Long id, @PathVariable Integer hashcode,
+      HttpServletResponse response)
       throws Exception {
-      lookupAndRetrieveFile(Submission.class, "SUB" + id, hashcode, response);
+    lookupAndRetrieveFile(Submission.class, "SUB" + id, hashcode, response);
   }
 
   @RequestMapping(value = "/libraryqc/{id}/{hashcode}", method = RequestMethod.GET)
-  protected void downloadLibraryQcFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
+  protected void downloadLibraryQcFile(@PathVariable Long id, @PathVariable Integer hashcode,
+      HttpServletResponse response)
       throws IOException {
     libraryService.get(id); // service invoked for permission check only
     lookupAndRetrieveFile(LibraryQC.class, id.toString(), hashcode, response);
   }
 
   @RequestMapping(value = "/sampleqc/{id}/{hashcode}", method = RequestMethod.GET)
-  protected void downloadSampleQcFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
+  protected void downloadSampleQcFile(@PathVariable Long id, @PathVariable Integer hashcode,
+      HttpServletResponse response)
       throws Exception {
     qcService.get(QcTarget.Sample, id); // service invoked for permission check only
     lookupAndRetrieveFile(SampleQC.class, id.toString(), hashcode, response);
   }
 
   @RequestMapping(value = "/box/forms/{hashcode}", method = RequestMethod.GET)
-  protected void downloadBoxContentsFile(@PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
+  protected void downloadBoxContentsFile(@PathVariable Integer hashcode, HttpServletResponse response)
+      throws Exception {
     lookupAndRetrieveFile(Box.class, "forms", hashcode, response);
   }
 
-  private void lookupAndRetrieveFile(Class<?> cl, String id, Integer hashcode, HttpServletResponse response) throws IOException {
+  private void lookupAndRetrieveFile(Class<?> cl, String id, Integer hashcode, HttpServletResponse response)
+      throws IOException {
     // lookup
     String filename = null;
     for (String s : filesManager.getFileNames(cl, id)) {

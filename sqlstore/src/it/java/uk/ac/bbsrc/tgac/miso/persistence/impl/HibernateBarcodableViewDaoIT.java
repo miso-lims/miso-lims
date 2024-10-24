@@ -8,13 +8,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableReference;
@@ -27,13 +28,13 @@ public class HibernateBarcodableViewDaoIT extends AbstractDAOTest {
 
   private HibernateBarcodableViewDao dao;
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Before
   public void setup() {
     dao = new HibernateBarcodableViewDao();
-    dao.setSessionFactory(sessionFactory);
+    dao.setEntityManager(entityManager);
   }
 
   @Test
@@ -109,12 +110,15 @@ public class HibernateBarcodableViewDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSearchByBarcodeIncorrectEntityType() {
-    assertTrue(dao.searchByBarcode("LDI1::TEST_0001_Bn_P_PE_300_WG", Collections.singletonList(EntityType.BOX)).isEmpty());
+    assertTrue(
+        dao.searchByBarcode("LDI1::TEST_0001_Bn_P_PE_300_WG", Collections.singletonList(EntityType.BOX)).isEmpty());
   }
 
   @Test
   public void testSearchByBarcodeIncorrectEntityTypes() {
-    assertTrue(dao.searchByBarcode("LDI1::TEST_0001_Bn_P_PE_300_WG", Arrays.asList(EntityType.BOX, EntityType.CONTAINER)).isEmpty());
+    assertTrue(
+        dao.searchByBarcode("LDI1::TEST_0001_Bn_P_PE_300_WG", Arrays.asList(EntityType.BOX, EntityType.CONTAINER))
+            .isEmpty());
   }
 
   @Test
@@ -142,7 +146,8 @@ public class HibernateBarcodableViewDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSearchByAliasMultipleType() {
-    testSearchByAlias("TEST_0001_TISSUE_2", Arrays.asList(EntityType.BOX, EntityType.SAMPLE, EntityType.LIBRARY), EntityType.SAMPLE, 17);
+    testSearchByAlias("TEST_0001_TISSUE_2", Arrays.asList(EntityType.BOX, EntityType.SAMPLE, EntityType.LIBRARY),
+        EntityType.SAMPLE, 17);
   }
 
   @Test
@@ -197,13 +202,15 @@ public class HibernateBarcodableViewDaoIT extends AbstractDAOTest {
     assertNull(dao.checkForExisting("notabarcode"));
   }
 
-  private void testSearchByBarcode(String identificationBarcode, Collection<EntityType> typeFilter, EntityType targetType,
+  private void testSearchByBarcode(String identificationBarcode, Collection<EntityType> typeFilter,
+      EntityType targetType,
       long targetId) {
     List<BarcodableView> results = dao.searchByBarcode(identificationBarcode, typeFilter);
     assertSingleResult(results, targetType, targetId);
   }
 
-  private void testSearchByAlias(String alias, Collection<EntityType> typeFilter, EntityType targetType, long targetId) {
+  private void testSearchByAlias(String alias, Collection<EntityType> typeFilter, EntityType targetType,
+      long targetId) {
     List<BarcodableView> results = dao.searchByAlias(alias, typeFilter);
     assertSingleResult(results, targetType, targetId);
   }

@@ -6,10 +6,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.metamodel.SingularAttribute;
-
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition_;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
