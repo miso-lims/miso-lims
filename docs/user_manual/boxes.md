@@ -223,7 +223,7 @@ sources of error are:
  * The network is down or MISO cannot connect to the scanner
     * Fix these problems first, then rescan.
  * Specific to Ziath DP5 Mirage Rack Reader 
-    * Check if Container UID on the software matches the default value of 'mirage96sbs' 
+    * Check if Container UID on the DP5 application has a container named: 'mirage96sbs' 
 
 ## Exporting Box Information
 

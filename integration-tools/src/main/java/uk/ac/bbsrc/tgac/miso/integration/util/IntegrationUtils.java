@@ -11,8 +11,11 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,12 +24,6 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.codec.binary.Base64OutputStream;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,24 +148,23 @@ public class IntegrationUtils {
 
   /**
    * Sending a POST request
-   * @param action
-   * @param urlStub
+   * @param uri
    * @param parameters
    * @return
    * @throws URISyntaxException
    */
-  public static HttpRequest getPostParamRequest(String action, String urlStub,
-      Map<String,String> parameters) throws URISyntaxException
-  {
+  public static HttpResponse<String> GetPostParamRequest(HttpClient httpClient, URI uri,
+      Map<String, String> parameters)
+      throws URISyntaxException, IOException, InterruptedException {
     int postActionTimeout = 10;
-    URI uri = URI.create(urlStub + action);
     if(parameters != null) {
       String queryParam = IntegrationUtils.getParameterAppend(parameters);
       uri= new URI(uri.getScheme(), uri.getAuthority(),
           uri.getPath(), queryParam, uri.getFragment());
     }
-    return HttpRequest.newBuilder().uri(uri)
+
+    return httpClient.send(HttpRequest.newBuilder().uri(uri)
         .timeout(Duration.ofSeconds(postActionTimeout))
-        .POST(BodyPublishers.ofString("")).build();
+        .POST(BodyPublishers.ofString("")).build(), BodyHandlers.ofString());
   }
 }

@@ -13,7 +13,6 @@ import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.dp5mirage.DP5MirageScanner.DP5MirageScanPosition;
 
 public class DP5MirageScan implements BoxScan {
-  private final List<DP5MirageScanPosition> scanData;
   private final Map<String, String> barcodesMap;
 
   /**
@@ -22,8 +21,7 @@ public class DP5MirageScan implements BoxScan {
    * @param scanData scan data retrieved using a {@link DP5MirageScanner}
    */
   public DP5MirageScan(List<DP5MirageScanPosition> scanData) {
-    this.scanData = scanData;
-    this.barcodesMap = buildBarcodesMap();
+    this.barcodesMap = buildBarcodesMap(scanData);
   }
 
   @Override
@@ -34,7 +32,7 @@ public class DP5MirageScan implements BoxScan {
   @Override
   public String getBarcode(char row, int column) {
     // We need to subtract 1 from column because of zero-based index
-    return barcodesMap.get(BoxUtils.getPositionString(BoxUtils.fromRowChar(row), column -1));
+    return barcodesMap.get(BoxUtils.getPositionString(BoxUtils.fromRowChar(row), column -1 ));
   }
 
   @Override
@@ -49,8 +47,10 @@ public class DP5MirageScan implements BoxScan {
 
   @Override
   public boolean isFull() {
-    for(DP5MirageScanPosition position: scanData) {
-      if(position.decodeStatus().equals("EMPTY")) {
+    for(Map.Entry<String, String> barcode : barcodesMap.entrySet())
+    {
+      if(barcode.getValue().equals(getNoTubeLabel()))
+      {
         return false;
       }
     }
@@ -59,8 +59,10 @@ public class DP5MirageScan implements BoxScan {
 
   @Override
   public boolean isEmpty() {
-    for(DP5MirageScanPosition position: scanData) {
-      if(position.decodeStatus().equals("SUCCESS") || position.decodeStatus().equals("ERROR")) {
+    for(Map.Entry<String, String> barcode : barcodesMap.entrySet())
+    {
+      if(!barcode.getValue().equals(getNoTubeLabel()))
+      {
         return false;
       }
     }
@@ -75,8 +77,10 @@ public class DP5MirageScan implements BoxScan {
   @Override
   public int getTubeCount() {
     int tubeCounter = 0;
-    for(DP5MirageScanPosition position: scanData) {
-      if(!position.decodeStatus().equals("EMPTY")) {
+    for(Map.Entry<String, String> barcode : barcodesMap.entrySet())
+    {
+      if(!barcode.getValue().equals(getNoTubeLabel()))
+      {
         tubeCounter++;
       }
     }
@@ -85,8 +89,10 @@ public class DP5MirageScan implements BoxScan {
 
   @Override
   public boolean hasReadErrors() {
-    for(DP5MirageScanPosition position: scanData) {
-      if(position.decodeStatus().equals("ERROR")) {
+    for(Map.Entry<String, String> barcode : barcodesMap.entrySet())
+    {
+      if(barcode.getValue().equals(getNoReadLabel()))
+      {
         return true;
       }
     }
@@ -107,13 +113,13 @@ public class DP5MirageScan implements BoxScan {
   @Override
   public int getRowCount() {
     SortedSet<String> keys = new TreeSet<>(barcodesMap.keySet());
-    return scanData.get(keys.size() -1).row();
+    return BoxUtils.getRowNumber(keys.last()) +1;
   }
 
   @Override
   public int getColumnCount() {
     SortedSet<String> keys = new TreeSet<>(barcodesMap.keySet());
-    return scanData.get(keys.size() -1).column();
+    return BoxUtils.getColumnNumber(keys.last());
   }
 
   @Override
@@ -125,7 +131,7 @@ public class DP5MirageScan implements BoxScan {
   /**
    * @return a map containing box positions and barcode values
    */
-  private Map<String, String> buildBarcodesMap() {
+  private Map<String, String> buildBarcodesMap(List<DP5MirageScanPosition> scanData) {
     Map<String, String> barcodesMap = new HashMap<>();
     for(DP5MirageScanPosition position: scanData) {
       // -1 for zero indexed box positions

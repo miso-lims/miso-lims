@@ -1,15 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.integration.dp5mirage;
 
-import static uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils.getPostParamRequest;
+import static uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils.GetPostParamRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Collections;
 import java.util.List;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
@@ -30,7 +30,6 @@ public class DP5MirageScanner implements BoxScanner {
   private final String host;
   private final int port;
   private final HttpClient httpClient;
-  private static final String REMOTE_STUB = "/dp5/remote/v1";
   private static final Map<String, String> params = Collections.singletonMap("container_uid",
       "mirage96sbs");
 
@@ -51,11 +50,6 @@ public class DP5MirageScanner implements BoxScanner {
     this.httpClient = HttpClient.newBuilder().version(Version.HTTP_2).build();
   }
 
-  // Helper Methods
-  private String urlStub() {
-    return String.format("http://%s:%s%s", host,port,REMOTE_STUB);
-  }
-
   @Override
   public void prepareScan(int expectedRows, int expectedColumns) throws IntegrationException {
     // No preparation needed before scanning
@@ -66,15 +60,29 @@ public class DP5MirageScanner implements BoxScanner {
     HttpResponse<String> response;
     List<DP5MirageScanPosition> records;
     try {
+      URI uri = URI.create(String.format("http://%s:%s/dp5/remote/v1/scan", host, port));
+
       // JSON response from Scanner
-      response = httpClient.send(getPostParamRequest("/scan", urlStub(), DP5MirageScanner.params),
-          BodyHandlers.ofString());
+      response = GetPostParamRequest(httpClient, uri, DP5MirageScanner.params);
 
       // Check if valid before parsing
       if (response.statusCode() != 200) {
-        throw new IntegrationException(String.format("Error reported by the scanner \n "
-                + "Check if this container_uid parameter is correct: %s",
-            DP5MirageScanner.params.get("container_uid")));
+        if (response.statusCode() == 488) {
+          throw new IntegrationException("Linear Reader is not configured or connected. Please "
+              + "check this before rescanning.");
+        }
+        else if (response.statusCode() == 459 || response.statusCode() == 468) {
+          throw new IntegrationException("The scan is not found or the scan result is not ready.");
+        }
+        else if (response.statusCode() == 477) {
+          throw new IntegrationException("Failed to read a barcode.");
+        }
+
+        throw new IntegrationException(String.format("Error reported by the scanner. \n "
+                + "Check that a container with the container ID: %s is created on the DP5 "
+            + "application. \n There could be a scanner type mismatch or the scanner is not "
+            + "connected, please check these before rescanning.", DP5MirageScanner.params.get(
+                "container_uid")));
       }
 
       // Parse JSON into a JsonNode

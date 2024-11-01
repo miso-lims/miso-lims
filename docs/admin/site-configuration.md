@@ -315,11 +315,10 @@ Interval in milliseconds to poll Run Scanner(s). Defaults to `300000` (5 minutes
 
 Config for Visionmate or DP5Mirage bulk barcode scanners. Enter in format 
 `<name>:<type>:<host/IP address>:<port>`. Multiple scanners may be specified by using a comma to 
-separate. Valid types include: (visionmate / dp5mirage).
+separate. Valid types include: `visionmate` and `dp5mirage`.
 
-For DP5Mirage bulk barcode scanner, the container UID also needs to be configured. This is used 
-to retrieve scan data. The container UID used by default is set to 
-'mirage96sbs' which the matches the Container ID on the scanning software.
+For the DP5Mirage bulk barcode scanner, you must create a container on the DP5 software 
+application with the expected Container ID name set to 'mirage96sbs'.
 
 Example: `Lab 1 Scanner:visionmate:192.168.0.120:8000,Lab 2 Scanner:dp5mirage:scanner.example.com:8000`
 
