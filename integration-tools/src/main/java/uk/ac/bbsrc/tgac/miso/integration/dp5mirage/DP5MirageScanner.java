@@ -65,24 +65,50 @@ public class DP5MirageScanner implements BoxScanner {
       // JSON response from Scanner
       response = GetPostParamRequest(httpClient, uri, DP5MirageScanner.params);
 
+      String errorMessage = "Error reported by the scanner.";
+      String actionMessage = "please check this before rescanning.";
+
       // Check if valid before parsing
       if (response.statusCode() != 200) {
-        if (response.statusCode() == 488) {
-          throw new IntegrationException("Linear Reader is not configured or connected. Please "
-              + "check this before rescanning.");
+        if (response.statusCode() == 453) {
+          throw new IntegrationException(String.format(" %s Container is not found. Check that a "
+              + "container with the"
+              + " container ID: %s is created on the DP5 application", errorMessage,
+              DP5MirageScanner.params.get(
+              "container_uid")));
         }
-        else if (response.statusCode() == 459 || response.statusCode() == 468) {
-          throw new IntegrationException("The scan is not found or the scan result is not ready.");
+        else if (response.statusCode() == 456) {
+          throw new IntegrationException(String.format("%s Scanner type mismatch. %s",
+              errorMessage, actionMessage));
+        }
+        else if (response.statusCode() == 459) {
+          throw new IntegrationException(String.format("%s The scan is not found. Try rescanning "
+              + "after a short period of time.", errorMessage));
+        }
+        else if (response.statusCode() == 461) {
+          throw new IntegrationException(String.format("%s Scanner not connected. %s",
+              errorMessage, actionMessage));
+        }
+        else if (response.statusCode() == 468) {
+          throw new IntegrationException(String.format("%s Scan result is not ready. Try "
+                  + "rescanning after a short period of time.",
+              errorMessage));
         }
         else if (response.statusCode() == 477) {
-          throw new IntegrationException("Failed to read a barcode.");
+          throw new IntegrationException(String.format("%s Failed to read a barcode. %s",
+              errorMessage, actionMessage));
         }
-
-        throw new IntegrationException(String.format("Error reported by the scanner. \n "
-                + "Check that a container with the container ID: %s is created on the DP5 "
-            + "application. \n There could be a scanner type mismatch or the scanner is not "
-            + "connected, please check these before rescanning.", DP5MirageScanner.params.get(
-                "container_uid")));
+        else if (response.statusCode() == 478) {
+          throw new IntegrationException(String.format("%s Scanner not found. %s", errorMessage,
+              actionMessage));
+        }
+        else if (response.statusCode() == 488) {
+          throw new IntegrationException(String.format("%s Linear Reader is not configured. %s",
+              errorMessage, actionMessage));
+        }
+        else {
+          throw new IntegrationException(errorMessage);
+        }
       }
 
       // Parse JSON into a JsonNode
