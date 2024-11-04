@@ -20,14 +20,14 @@ WarningTarget.sample = {
         {
               include: , // TODO Boolean
               headerMessage: "Requisition is stopped",
-              tableMessage: "", // TODO String
-              level "error",
+              tableMessage: "Requisition is stopped",
+              level: "error",
             },
             {
               include: , // TODO Boolean
               headerMessage: "Requisition is paused",
-              tableMessage: "", // TODO String
-              level "error",
+              tableMessage: "Requisition is stopped",
+              level: "error",
             },
       Warning.common.qcFailure(sample),
       Warning.common.effectiveQcFailure(sample),

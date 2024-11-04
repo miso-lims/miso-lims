@@ -614,6 +614,8 @@ public class Dtos {
       setId(dto::setEffectiveRequisitionId, requisition);
       setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
+      dto.setRequisitionPaused(!requisition.getPauses().isEmpty());
+      dto.setRequisitionStopped(requisition.isStopped());
     }
 
     return dto;
@@ -1493,6 +1495,8 @@ public class Dtos {
     if (requisition != null) {
       setId(dto::setRequisitionId, requisition);
       setString(dto::setRequisitionAlias, requisition.getAlias());
+      dto.setRequisitionPaused(!requisition.getPauses().isEmpty());
+      dto.setRequisitionStopped(requisition.isStopped());
     } else {
       requisition = getEffectiveRequisition(from);
     }
@@ -1500,6 +1504,8 @@ public class Dtos {
       setId(dto::setEffectiveRequisitionId, requisition);
       setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
+      dto.setRequisitionPaused(!requisition.getPauses().isEmpty());
+      dto.setRequisitionStopped(requisition.isStopped());
     }
 
     return dto;
@@ -1791,6 +1797,8 @@ public class Dtos {
       setId(dto::setRequisitionId, requisition);
       setString(dto::setRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
+      dto.setRequisitionPaused(!requisition.getPauses().isEmpty());
+      dto.setRequisitionStopped(requisition.isStopped());
     }
 
     return dto;
