@@ -82,6 +82,11 @@
       <artifactId>spring-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <!-- Only needed for tests (DB migration), but does not work with test scope -->
+      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+      <artifactId>sqlstore</artifactId>
+    </dependency>
   </dependencies>
 
   <profiles>
