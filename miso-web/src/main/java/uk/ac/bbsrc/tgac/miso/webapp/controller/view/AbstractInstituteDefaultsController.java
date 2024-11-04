@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +16,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
@@ -63,7 +62,8 @@ public abstract class AbstractInstituteDefaultsController<Model extends Aliasabl
 
       @Override
       protected Stream<Model> load(List<Long> modelIds) throws IOException {
-        return modelIds.stream().map(WhineyFunction.rethrow(AbstractInstituteDefaultsController.this::get)).sorted(new AliasComparator<>());
+        return modelIds.stream().map(WhineyFunction.rethrow(AbstractInstituteDefaultsController.this::get))
+            .sorted(new AliasComparator<>());
       }
 
       @Override

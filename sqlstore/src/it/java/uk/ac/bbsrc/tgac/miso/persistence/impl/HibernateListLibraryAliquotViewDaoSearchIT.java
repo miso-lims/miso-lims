@@ -26,7 +26,7 @@ public class HibernateListLibraryAliquotViewDaoSearchIT extends PaginationFilter
   @Override
   protected PaginatedDataSource<?> constructTestSubject() {
     HibernateListLibraryAliquotViewDao sut = new HibernateListLibraryAliquotViewDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

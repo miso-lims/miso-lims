@@ -22,12 +22,13 @@ public abstract class HibernateSaveDao<T extends Identifiable> extends Hibernate
 
   @Override
   public long create(T object) throws IOException {
-    return (long) currentSession().save(object);
+    currentSession().persist(object);
+    return object.getId();
   }
 
   @Override
   public long update(T object) throws IOException {
-    currentSession().update(object);
+    currentSession().merge(object);
     return object.getId();
   }
 

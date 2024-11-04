@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
@@ -47,8 +49,8 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   @Rule
   public final ExpectedException exception = ExpectedException.none();
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @InjectMocks
   private HibernateBoxDao dao;
@@ -56,7 +58,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   @Before
   public void setup() throws IOException, MisoNamingException {
     MockitoAnnotations.initMocks(this);
-    dao.setSessionFactory(sessionFactory);
+    dao.setEntityManager(entityManager);
   }
 
   @Test
@@ -116,7 +118,8 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
 
   @Test
   public void testRemoveBoxableViewFromBox() throws Exception {
-    Sample s = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 15L);
+    Sample s =
+        (Sample) entityManager.unwrap(Session.class).get(SampleImpl.class, 15L);
     Box box = dao.get(1);
     BoxPosition bp = box.getBoxPositions().get("A01");
     assertNotNull(bp);
@@ -124,8 +127,8 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     BoxableView item = makeBoxableView(s);
     dao.removeBoxableFromBox(item);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    entityManager.unwrap(Session.class).flush();
+    entityManager.unwrap(Session.class).clear();
 
     Box again = dao.get(1);
     assertFalse(again.getBoxPositions().containsKey("A01"));
@@ -133,15 +136,17 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
 
   @Test
   public void testRemoveBoxableViewUnneccessary() throws Exception {
-    Sample before = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 1L);
+    Sample before =
+        (Sample) entityManager.unwrap(Session.class).get(SampleImpl.class, 1L);
     assertNull(before.getBox());
     BoxableView item = makeBoxableView(before);
     dao.removeBoxableFromBox(item);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    entityManager.unwrap(Session.class).flush();
+    entityManager.unwrap(Session.class).clear();
 
-    Sample after = (Sample) sessionFactory.getCurrentSession().get(SampleImpl.class, 1L);
+    Sample after =
+        (Sample) entityManager.unwrap(Session.class).get(SampleImpl.class, 1L);
     assertNull(after.getBox());
   }
 
@@ -192,7 +197,8 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     boxSize.setRows(3);
     boxSize.setId(1l);
     box.setSize(boxSize);
-    BoxUse boxuse = (BoxUse) sessionFactory.getCurrentSession().get(BoxUse.class, 1L);
+    BoxUse boxuse =
+        (BoxUse) entityManager.unwrap(Session.class).get(BoxUse.class, 1L);
     box.setUse(boxuse);
 
     long boxId = dao.save(box);
@@ -225,8 +231,8 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     box.getBoxPositions().put(toPos, toBp);
     dao.save(box);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    entityManager.unwrap(Session.class).flush();
+    entityManager.unwrap(Session.class).clear();
 
     Box again = dao.get(boxId);
     assertNull(again.getBoxPositions().get(fromPos));
@@ -259,8 +265,8 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     toBox.getBoxPositions().put(toPos, toBp);
     dao.save(toBox);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    entityManager.unwrap(Session.class).flush();
+    entityManager.unwrap(Session.class).clear();
 
     Box saved = dao.get(toBoxId);
     assertNotNull(saved);
@@ -496,8 +502,8 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     box.getBoxPositions().put(insertPos, bp);
     dao.save(box);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    entityManager.unwrap(Session.class).flush();
+    entityManager.unwrap(Session.class).clear();
 
     Box saved = dao.get(1L);
     assertEquals(3, saved.getBoxPositions().size());
@@ -514,8 +520,8 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     box.getBoxPositions().remove(removePos);
     dao.save(box);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    entityManager.unwrap(Session.class).flush();
+    entityManager.unwrap(Session.class).clear();
 
     Box saved = dao.get(1L);
     assertEquals(1, saved.getBoxPositions().size());
@@ -537,8 +543,8 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     item.setDiscarded(true);
     dao.saveBoxable(item);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    entityManager.unwrap(Session.class).flush();
+    entityManager.unwrap(Session.class).clear();
 
     Boxable saved = dao.getBoxable(new BoxableId(EntityType.SAMPLE, 15L));
     assertTrue(saved.isDiscarded());

@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
@@ -31,24 +8,22 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
@@ -58,13 +33,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
 /**
- * An Experiment contains design information about a sequencing experiment, as part of a parent {@link Study}.
+ * An Experiment contains design information about a sequencing experiment, as part of a parent
+ * {@link Study}.
  */
 @Entity
 @Table(name = "Experiment")
 public class Experiment implements Comparable<Experiment>, Nameable, ChangeLoggable, Deletable, Serializable {
   @Entity
-  @Embeddable
   @Table(name = "Experiment_Run_Partition")
   public static class RunPartition implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -116,19 +91,28 @@ public class Experiment implements Comparable<Experiment>, Nameable, ChangeLogga
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
       RunPartition other = (RunPartition) obj;
       if (experiment == null) {
-        if (other.experiment != null) return false;
-      } else if (!experiment.equals(other.experiment)) return false;
+        if (other.experiment != null)
+          return false;
+      } else if (!experiment.equals(other.experiment))
+        return false;
       if (partition == null) {
-        if (other.partition != null) return false;
-      } else if (!partition.equals(other.partition)) return false;
+        if (other.partition != null)
+          return false;
+      } else if (!partition.equals(other.partition))
+        return false;
       if (run == null) {
-        if (other.run != null) return false;
-      } else if (!run.equals(other.run)) return false;
+        if (other.run != null)
+          return false;
+      } else if (!run.equals(other.run))
+        return false;
       return true;
     }
   }
@@ -151,8 +135,8 @@ public class Experiment implements Comparable<Experiment>, Nameable, ChangeLogga
   private long experimentId = UNSAVED_ID;
 
   @ManyToMany(targetEntity = KitImpl.class)
-  @JoinTable(name = "Experiment_Kit", inverseJoinColumns = { @JoinColumn(name = "kits_kitId") }, joinColumns = {
-      @JoinColumn(name = "experiments_experimentId") })
+  @JoinTable(name = "Experiment_Kit", inverseJoinColumns = {@JoinColumn(name = "kits_kitId")}, joinColumns = {
+      @JoinColumn(name = "experiments_experimentId")})
   private Collection<Kit> kits = new HashSet<>();
 
   @ManyToOne(targetEntity = UserImpl.class)
@@ -201,8 +185,10 @@ public class Experiment implements Comparable<Experiment>, Nameable, ChangeLogga
   @Override
   @CoverageIgnore
   public int compareTo(Experiment t) {
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
+    if (getId() < t.getId())
+      return -1;
+    if (getId() > t.getId())
+      return 1;
     return 0;
   }
 
@@ -222,9 +208,12 @@ public class Experiment implements Comparable<Experiment>, Nameable, ChangeLogga
   @Override
   @CoverageIgnore
   public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof Experiment)) return false;
+    if (obj == null)
+      return false;
+    if (obj == this)
+      return true;
+    if (!(obj instanceof Experiment))
+      return false;
     final Experiment them = (Experiment) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
@@ -309,8 +298,10 @@ public class Experiment implements Comparable<Experiment>, Nameable, ChangeLogga
     } else {
       final int PRIME = 37;
       int hashcode = 1;
-      if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
-      if (getAlias() != null) hashcode = 37 * hashcode + getAlias().hashCode();
+      if (getName() != null)
+        hashcode = PRIME * hashcode + getName().hashCode();
+      if (getAlias() != null)
+        hashcode = 37 * hashcode + getAlias().hashCode();
       return hashcode;
     }
   }

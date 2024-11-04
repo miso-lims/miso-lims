@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -22,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
@@ -65,7 +64,7 @@ public class ArrayRestController extends RestController {
 
   };
 
-  @GetMapping(value = "/dt",  produces = "application/json")
+  @GetMapping(value = "/dt", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<ArrayDto> dataTable(HttpServletRequest request) throws IOException {
     return jQueryBackend.get(request, advancedSearchParser);
@@ -78,7 +77,8 @@ public class ArrayRestController extends RestController {
   }
 
   @PutMapping(value = "/{arrayId}")
-  public @ResponseBody ArrayDto update(@PathVariable(name = "arrayId", required = true) long arrayId, @RequestBody ArrayDto dto)
+  public @ResponseBody ArrayDto update(@PathVariable(name = "arrayId", required = true) long arrayId,
+      @RequestBody ArrayDto dto)
       throws IOException {
     return RestUtils.updateObject("Array", arrayId, dto, WhineyFunction.rethrow(d -> {
       Array existing = arrayService.get(arrayId);
@@ -133,7 +133,8 @@ public class ArrayRestController extends RestController {
   }
 
   @GetMapping(value = "/sample-search")
-  public @ResponseBody List<SampleDto> findSamples(@RequestParam(name = "q", required = true) String search) throws IOException {
+  public @ResponseBody List<SampleDto> findSamples(@RequestParam(name = "q", required = true) String search)
+      throws IOException {
     if (LimsUtils.isStringEmptyOrNull(search)) {
       return new ArrayList<>();
     }
@@ -142,7 +143,8 @@ public class ArrayRestController extends RestController {
   }
 
   @GetMapping(value = "/{arrayId}/changelog")
-  public @ResponseBody List<ChangeLogDto> getChangelog(@PathVariable(name = "arrayId", required = true) long arrayId) throws IOException {
+  public @ResponseBody List<ChangeLogDto> getChangelog(@PathVariable(name = "arrayId", required = true) long arrayId)
+      throws IOException {
     Array array = arrayService.get(arrayId);
     if (array == null) {
       throw new RestException(ERROR_NOTFOUND, Status.NOT_FOUND);

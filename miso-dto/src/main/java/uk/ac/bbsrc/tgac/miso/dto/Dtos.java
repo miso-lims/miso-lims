@@ -26,8 +26,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nonnull;
-
 import org.apache.commons.lang.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +40,7 @@ import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.type.IndexSequencing;
+import jakarta.annotation.Nonnull;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
@@ -861,7 +860,7 @@ public class Dtos {
     }
     dto.setStrStatus(from.getStrStatus().getLabel());
     setInteger(dto::setSlidesConsumed, from.getSlidesConsumed(), true);
-    setId(dto::setReferenceSlideId, from.getReferenceSlide());
+    setLong(dto::setReferenceSlideId, from.getReferenceSlideId(), true);
     return dto;
   }
 
@@ -886,7 +885,7 @@ public class Dtos {
       to.setStrStatus(from.getStrStatus());
     }
     setInteger(to::setSlidesConsumed, from.getSlidesConsumed(), true);
-    setObject(to::setReferenceSlide, SampleSlideImpl::new, from.getReferenceSlideId());
+    setLong(to::setReferenceSlideId, from.getReferenceSlideId(), true);
     return to;
   }
 
@@ -1191,7 +1190,7 @@ public class Dtos {
     SampleTissuePieceDto dto = new SampleTissuePieceDto();
     dto.setSlidesConsumed(from.getSlidesConsumed());
     dto.setTissuePieceTypeId(from.getTissuePieceType().getId());
-    setId(dto::setReferenceSlideId, from.getReferenceSlide());
+    setLong(dto::setReferenceSlideId, from.getReferenceSlideId(), true);
     return dto;
   }
 
@@ -1208,7 +1207,7 @@ public class Dtos {
     tissuePieceType.setId(from.getTissuePieceTypeId());
     to.setTissuePieceType(tissuePieceType);
     to.setSlidesConsumed(from.getSlidesConsumed());
-    setObject(to::setReferenceSlide, SampleSlideImpl::new, from.getReferenceSlideId());
+    setLong(to::setReferenceSlideId, from.getReferenceSlideId(), true);
     return to;
   }
 

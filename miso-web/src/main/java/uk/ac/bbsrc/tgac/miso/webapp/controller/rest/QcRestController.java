@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
@@ -36,7 +35,7 @@ public class QcRestController extends RestController {
   @Autowired
   private AsyncOperationManager asyncOperationManager;
 
-  @PostMapping(headers = { "Content-type=application/json" })
+  @PostMapping(headers = {"Content-type=application/json"})
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public QcDto create(@RequestBody QcDto qc) throws IOException {
@@ -72,7 +71,8 @@ public class QcRestController extends RestController {
 
   @PostMapping(value = "/bulk-delete")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public @ResponseBody void bulkDelete(@RequestParam String qcTarget, @RequestBody(required = true) List<Long> ids) throws IOException {
+  public @ResponseBody void bulkDelete(@RequestParam String qcTarget, @RequestBody(required = true) List<Long> ids)
+      throws IOException {
     List<QC> items = new ArrayList<>();
     QcTarget target = null;
     try {

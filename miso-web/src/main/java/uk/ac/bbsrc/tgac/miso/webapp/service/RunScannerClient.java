@@ -24,6 +24,13 @@ import org.springframework.web.client.RestTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
+import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.ProgressiveRequestDto;
+import ca.on.oicr.gsi.runscanner.dto.ProgressiveResponseDto;
+import io.prometheus.metrics.core.metrics.Counter;
+import io.prometheus.metrics.core.metrics.Gauge;
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -37,50 +44,47 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
-import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.ProgressiveRequestDto;
-import ca.on.oicr.gsi.runscanner.dto.ProgressiveResponseDto;
-
-import io.prometheus.client.Counter;
-import io.prometheus.client.Gauge;
-
 @Service
 public class RunScannerClient {
   private static final LatencyHistogram acquireTime = new LatencyHistogram("miso_runscanner_client_acquire_time",
       "Time to acquire the lock to put save runs (in seconds).");
 
-  private static final Gauge badRunCount = Gauge.build()
+  private static final Gauge badRunCount = Gauge.builder()
       .name("miso_runscanner_client_bad_runs").help("The number of runs that failed to save.").register();
 
-  private static final Gauge fallbackContainerModelCount = Gauge.build()
-      .name("miso_runscanner_client_bad_container_models").help("The number of runs that have unknown container models.").register();
+  private static final Gauge fallbackContainerModelCount = Gauge.builder()
+      .name("miso_runscanner_client_bad_container_models")
+      .help("The number of runs that have unknown container models.").register();
 
-  private static final Gauge unknownSequencingKitCount = Gauge.build()
-      .name("miso_runscanner_client_unknown_sequencing_kits").help("The number of runs that have unknown sequencing kits.").register();
+  private static final Gauge unknownSequencingKitCount = Gauge.builder()
+      .name("miso_runscanner_client_unknown_sequencing_kits")
+      .help("The number of runs that have unknown sequencing kits.").register();
 
   private static final Logger log = LoggerFactory.getLogger(RunScannerClient.class);
 
-  private static final Counter saveCount = Counter.build().name("miso_runscanner_client_run_count").help("The number of runs processed.")
-      .register();
-  private static final Counter saveFailures = Counter.build()
+  private static final Counter saveCount =
+      Counter.builder().name("miso_runscanner_client_run_count").help("The number of runs processed.")
+          .register();
+  private static final Counter saveFailures = Counter.builder()
       .name("miso_runscanner_client_save_errors").help("The number of times a run failed to be saved.").register();
 
-  private static final Counter saveNew = Counter.build()
+  private static final Counter saveNew = Counter.builder()
       .name("miso_runscanner_client_save_new").help("The number of times a new run was found.").register();
 
   private static final LatencyHistogram saveTime = new LatencyHistogram("miso_runscanner_client_save_time",
       "Time to save a run (in seconds).");
 
-  private static final Counter saveUpdate = Counter.build()
-      .name("miso_runscanner_client_save_update").help("The number of times a run was found in the database.").register();
+  private static final Counter saveUpdate = Counter.builder()
+      .name("miso_runscanner_client_save_update").help("The number of times a run was found in the database.")
+      .register();
 
-  private static final Gauge scanTimestamp = Gauge.build()
-      .name("miso_runscanner_client_scan_timestamp").help("The UNIX time when the client last attempted to scan the servers.").register();
+  private static final Gauge scanTimestamp = Gauge.builder()
+      .name("miso_runscanner_client_scan_timestamp")
+      .help("The UNIX time when the client last attempted to scan the servers.").register();
 
-  private static final Counter serverFailures = Counter.build()
-      .name("miso_runscanner_client_read_errors").help("The number of times the server failed to respond.").labelNames("url").register();
+  private static final Counter serverFailures = Counter.builder()
+      .name("miso_runscanner_client_read_errors").help("The number of times the server failed to respond.")
+      .labelNames("url").register();
 
   private static final LatencyHistogram serverReadTime = new LatencyHistogram("miso_runscanner_client_read_time",
       "Time to download updates from a server in seconds.", "url");
@@ -115,59 +119,60 @@ public class RunScannerClient {
           // Determine whether the SequencingParameters are of the correct type
           Predicate<SequencingParameters> isMatchingSequencingParameters;
           switch (dto.getPlatformType()) {
-          case ILLUMINA:
-            isMatchingSequencingParameters = params -> {
-              IlluminaNotificationDto illuminaDto = (IlluminaNotificationDto) dto;
-              if (params.getInstrumentModel().getPlatformType() != PlatformType.ILLUMINA) {
-                return false;
-              }
-              if (params.getChemistry() != Dtos.getMisoIlluminaChemistryFromRunscanner(illuminaDto.getChemistry())) {
-                return false;
-              }
-              // If we are talking to an old Run Scanner that doens't provide read lengths, use the old logic
-              if (illuminaDto.getReadLengths() == null) {
-                // The read length must match the first read length
-                if (Math.abs(params.getReadLength() - illuminaDto.getReadLength()) < 2) {
-                  // if there is no second read length, then this must be single ended
-                  if (params.getReadLength2() == 0) {
-                    return !illuminaDto.isPairedEndRun();
-                  } else {
-                    // If there is, it must be paired and symmetric
-                    return illuminaDto.isPairedEndRun() && params.getReadLength() == params.getReadLength2();
-                  }
-                } else {
+            case ILLUMINA:
+              isMatchingSequencingParameters = params -> {
+                IlluminaNotificationDto illuminaDto = (IlluminaNotificationDto) dto;
+                if (params.getInstrumentModel().getPlatformType() != PlatformType.ILLUMINA) {
                   return false;
                 }
-              }
-              // If we have real read lengths, check they match what we see from Run Scanner
-              if (illuminaDto.getReadLengths().size() == 0) {
-                return false;
-              }
-              if (Math.abs(params.getReadLength() - illuminaDto.getReadLengths().get(0)) > 1) {
-                return false;
-              }
-              // If no second read is provided, make sure none is required
-              if (illuminaDto.getReadLengths().size() == 1) {
-                return params.getReadLength2() == 0;
-              }
-              // Otherwise, check the second read matches the right length
-              return Math.abs(params.getReadLength2() - illuminaDto.getReadLengths().get(1)) < 2;
-            };
-            break;
-          case OXFORDNANOPORE:
-            isMatchingSequencingParameters = params -> params.getInstrumentModel().getPlatformType() == PlatformType.OXFORDNANOPORE &&
-                params.getRunType().equals(((OxfordNanoporeNotificationDto) dto).getRunType());
-            break;
-          default:
-            isMatchingSequencingParameters = params -> params.getInstrumentModel()
-                .getPlatformType() == Dtos.getMisoPlatformTypeFromRunscanner(dto.getPlatformType());
-            break;
+                if (params.getChemistry() != Dtos.getMisoIlluminaChemistryFromRunscanner(illuminaDto.getChemistry())) {
+                  return false;
+                }
+                // If we are talking to an old Run Scanner that doens't provide read lengths, use the old logic
+                if (illuminaDto.getReadLengths() == null) {
+                  // The read length must match the first read length
+                  if (Math.abs(params.getReadLength() - illuminaDto.getReadLength()) < 2) {
+                    // if there is no second read length, then this must be single ended
+                    if (params.getReadLength2() == 0) {
+                      return !illuminaDto.isPairedEndRun();
+                    } else {
+                      // If there is, it must be paired and symmetric
+                      return illuminaDto.isPairedEndRun() && params.getReadLength() == params.getReadLength2();
+                    }
+                  } else {
+                    return false;
+                  }
+                }
+                // If we have real read lengths, check they match what we see from Run Scanner
+                if (illuminaDto.getReadLengths().size() == 0) {
+                  return false;
+                }
+                if (Math.abs(params.getReadLength() - illuminaDto.getReadLengths().get(0)) > 1) {
+                  return false;
+                }
+                // If no second read is provided, make sure none is required
+                if (illuminaDto.getReadLengths().size() == 1) {
+                  return params.getReadLength2() == 0;
+                }
+                // Otherwise, check the second read matches the right length
+                return Math.abs(params.getReadLength2() - illuminaDto.getReadLengths().get(1)) < 2;
+              };
+              break;
+            case OXFORDNANOPORE:
+              isMatchingSequencingParameters =
+                  params -> params.getInstrumentModel().getPlatformType() == PlatformType.OXFORDNANOPORE &&
+                      params.getRunType().equals(((OxfordNanoporeNotificationDto) dto).getRunType());
+              break;
+            default:
+              isMatchingSequencingParameters = params -> params.getInstrumentModel()
+                  .getPlatformType() == Dtos.getMisoPlatformTypeFromRunscanner(dto.getPlatformType());
+              break;
           }
 
           GetLaneContents laneContents = new GetLaneContents() {
             /**
-             * Get getLaneContents implementation from DTO.
-             * Illumina DTOs have a unique implementation of getLaneContents.
+             * Get getLaneContents implementation from DTO. Illumina DTOs have a unique implementation of
+             * getLaneContents.
              */
             @Override
             public Optional<String> getLaneContents(int lane) {
@@ -238,7 +243,7 @@ public class RunScannerClient {
           entry.getValue().update(response);
         } catch (Exception e) {
           log.error("Failed to get runs from " + entry.getKey(), e);
-          serverFailures.labels(entry.getKey()).inc();
+          serverFailures.labelValues(entry.getKey()).inc();
         }
         if (response != null) {
           processResults(response.getUpdates());

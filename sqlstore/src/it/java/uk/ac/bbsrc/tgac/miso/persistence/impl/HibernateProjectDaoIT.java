@@ -28,7 +28,7 @@ public class HibernateProjectDaoIT extends AbstractHibernateSaveDaoTest<Project,
   @Override
   public HibernateProjectDao constructTestSubject() {
     HibernateProjectDao sut = new HibernateProjectDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 
@@ -70,7 +70,7 @@ public class HibernateProjectDaoIT extends AbstractHibernateSaveDaoTest<Project,
 
   @Test
   public void testGetUsage() throws Exception {
-    testGetUsage(HibernateProjectDao::getUsage, 1L, 21L);
+    testGetUsage(HibernateProjectDao::getUsage, 1L, 22L);
   }
 
   @Test

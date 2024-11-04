@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.AttachmentUsage;
@@ -16,19 +16,19 @@ import uk.ac.bbsrc.tgac.miso.persistence.AttachableStore;
 @Repository
 public class HibernateAttachableDao implements AttachableStore {
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
+  @PersistenceContext
+  private EntityManager entityManager;
 
   public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
+    return entityManager.unwrap(Session.class);
+  }
+
+  public EntityManager getEntityManager() {
+    return entityManager;
+  }
+
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override
@@ -38,7 +38,7 @@ public class HibernateAttachableDao implements AttachableStore {
 
   @Override
   public void save(Attachable object) {
-    currentSession().save(object);
+    currentSession().persist(object);
   }
 
   @Override
@@ -62,12 +62,12 @@ public class HibernateAttachableDao implements AttachableStore {
 
   @Override
   public void delete(FileAttachment attachment) {
-    currentSession().delete(attachment);
+    currentSession().remove(attachment);
   }
 
   @Override
   public void save(FileAttachment attachment) {
-    currentSession().save(attachment);
+    currentSession().persist(attachment);
   }
 
 }

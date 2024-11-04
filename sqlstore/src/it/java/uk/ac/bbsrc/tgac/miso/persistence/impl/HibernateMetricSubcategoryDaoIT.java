@@ -10,7 +10,8 @@ import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.MetricSubcategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.MetricCategory;
 
-public class HibernateMetricSubcategoryDaoIT extends AbstractHibernateSaveDaoTest<MetricSubcategory, HibernateMetricSubcategoryDao> {
+public class HibernateMetricSubcategoryDaoIT
+    extends AbstractHibernateSaveDaoTest<MetricSubcategory, HibernateMetricSubcategoryDao> {
 
   public HibernateMetricSubcategoryDaoIT() {
     super(MetricSubcategory.class, 3L, 4);
@@ -19,7 +20,7 @@ public class HibernateMetricSubcategoryDaoIT extends AbstractHibernateSaveDaoTes
   @Override
   public HibernateMetricSubcategoryDao constructTestSubject() {
     HibernateMetricSubcategoryDao sut = new HibernateMetricSubcategoryDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

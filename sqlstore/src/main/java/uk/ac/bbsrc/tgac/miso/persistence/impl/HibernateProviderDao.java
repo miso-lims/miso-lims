@@ -5,26 +5,25 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.persistence.ProviderDao;
 
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  EntityManager entityManager;
 
   private final Class<T> resultClass;
   private final Class<? extends T> entityClass;
@@ -39,12 +38,12 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
     this.entityClass = resultClass;
   }
 
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
+  public EntityManager getEntityManager() {
+    return entityManager;
   }
 
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   protected Class<T> getResultClass() {
@@ -56,7 +55,7 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
   }
 
   public Session currentSession() {
-    return getSessionFactory().getCurrentSession();
+    return getEntityManager().unwrap(Session.class);
   }
 
   @Override

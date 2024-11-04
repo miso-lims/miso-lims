@@ -1,23 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
- * TGAC *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
- * General Public License as published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with MISO. If not, see
- * <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import java.io.IOException;
@@ -33,21 +13,19 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.management.MalformedObjectNameException;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 
 import org.apache.logging.log4j.core.config.Configurator;
-import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
-import io.prometheus.client.hibernate.HibernateStatisticsCollector;
-import io.prometheus.client.hotspot.DefaultExports;
 import io.prometheus.jmx.JmxCollector;
+import io.prometheus.metrics.instrumentation.jvm.JvmMetrics;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.generation.NameGenerator;
@@ -80,7 +58,7 @@ public class MisoAppListener implements ServletContextListener {
   @Override
   public void contextInitialized(ServletContextEvent event) {
     // Export all JVM HotSpot stats to Prometheus
-    DefaultExports.initialize();
+    JvmMetrics.builder().register();
 
     ServletContext application = event.getServletContext();
     XmlWebApplicationContext context =
@@ -126,11 +104,10 @@ public class MisoAppListener implements ServletContextListener {
 
     initializeNamingSchemes(context, misoProperties);
 
-    new HibernateStatisticsCollector(context.getBeanFactory().getBean(SessionFactory.class), "spring").register();
     try {
       new JmxCollector(context.getResource("classpath:tomcat-prometheus.yml").getFile()).register();
     } catch (MalformedObjectNameException | IOException e) {
-      log.error("Failed to load Prometheus configuration.", e);
+      throw new IllegalStateException("Failed to load Prometheus configuration.", e);
     }
   }
 

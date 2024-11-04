@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
@@ -31,10 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +26,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -94,19 +70,20 @@ public class ContainerRestController extends RestController {
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
 
-  private final JQueryDataTableBackend<ListContainerView, ListContainerViewDto> jQueryBackend = new JQueryDataTableBackend<ListContainerView, ListContainerViewDto>() {
+  private final JQueryDataTableBackend<ListContainerView, ListContainerViewDto> jQueryBackend =
+      new JQueryDataTableBackend<ListContainerView, ListContainerViewDto>() {
 
-    @Override
-    protected ListContainerViewDto asDto(ListContainerView model) {
-      return Dtos.asDto(model);
-    }
+        @Override
+        protected ListContainerViewDto asDto(ListContainerView model) {
+          return Dtos.asDto(model);
+        }
 
-    @Override
-    protected PaginatedDataSource<ListContainerView> getSource() throws IOException {
-      return listContainerViewService;
-    }
+        @Override
+        protected PaginatedDataSource<ListContainerView> getSource() throws IOException {
+          return listContainerViewService;
+        }
 
-  };
+      };
 
   @GetMapping(value = "/{containerBarcode}", produces = "application/json")
   public @ResponseBody List<ContainerDto> jsonRest(@PathVariable String containerBarcode) throws IOException {
@@ -165,7 +142,8 @@ public class ContainerRestController extends RestController {
     private final String containerId;
 
     @SuppressWarnings("unused")
-    public SerialNumberValidationDto(@JsonProperty("serialNumber") String serialNumber, @JsonProperty("containerId") String containerId) {
+    public SerialNumberValidationDto(@JsonProperty("serialNumber") String serialNumber,
+        @JsonProperty("containerId") String containerId) {
       this.serialNumber = serialNumber;
       this.containerId = containerId;
     }
@@ -181,7 +159,8 @@ public class ContainerRestController extends RestController {
 
   @PostMapping(value = "/validate-serial-number")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void validateSerialNumber(@RequestBody SerialNumberValidationDto params, HttpServletRequest request, HttpServletResponse response,
+  public void validateSerialNumber(@RequestBody SerialNumberValidationDto params, HttpServletRequest request,
+      HttpServletResponse response,
       UriComponentsBuilder uriBuilder) throws IOException {
     String serialNumber = params.getSerialNumber();
     String maybeContainerId = params.getContainerId();
@@ -219,7 +198,8 @@ public class ContainerRestController extends RestController {
   }
 
   @PutMapping("/{containerId}")
-  public @ResponseBody ContainerDto update(@PathVariable long containerId, @RequestBody ContainerDto dto) throws IOException {
+  public @ResponseBody ContainerDto update(@PathVariable long containerId, @RequestBody ContainerDto dto)
+      throws IOException {
     SequencerPartitionContainer original = containerService.get(containerId);
     return RestUtils.updateObject("Container", containerId, dto, d -> {
       SequencerPartitionContainer container = Dtos.to(d);

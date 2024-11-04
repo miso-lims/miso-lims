@@ -7,7 +7,8 @@ import org.junit.Test;
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetCategory;
 
-public class HibernateWorksetCategoryDaoIT extends AbstractHibernateSaveDaoTest<WorksetCategory, HibernateWorksetCategoryDao> {
+public class HibernateWorksetCategoryDaoIT
+    extends AbstractHibernateSaveDaoTest<WorksetCategory, HibernateWorksetCategoryDao> {
 
   public HibernateWorksetCategoryDaoIT() {
     super(WorksetCategory.class, 1L, 2);
@@ -16,7 +17,7 @@ public class HibernateWorksetCategoryDaoIT extends AbstractHibernateSaveDaoTest<
   @Override
   public HibernateWorksetCategoryDao constructTestSubject() {
     HibernateWorksetCategoryDao sut = new HibernateWorksetCategoryDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

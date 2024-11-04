@@ -2,9 +2,8 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 

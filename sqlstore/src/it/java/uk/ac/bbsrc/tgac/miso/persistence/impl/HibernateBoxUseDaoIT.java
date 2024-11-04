@@ -18,7 +18,7 @@ public class HibernateBoxUseDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateBoxUseDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -53,7 +53,7 @@ public class HibernateBoxUseDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    BoxUse saved = (BoxUse) getSessionFactory().getCurrentSession().get(BoxUse.class, savedId);
+    BoxUse saved = (BoxUse) currentSession().get(BoxUse.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -61,20 +61,20 @@ public class HibernateBoxUseDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Alias";
-    BoxUse boxUse = (BoxUse) getSessionFactory().getCurrentSession().get(BoxUse.class, id);
+    BoxUse boxUse = (BoxUse) currentSession().get(BoxUse.class, id);
     assertNotEquals(alias, boxUse.getAlias());
     boxUse.setAlias(alias);
     sut.update(boxUse);
 
     clearSession();
 
-    BoxUse saved = (BoxUse) getSessionFactory().getCurrentSession().get(BoxUse.class, id);
+    BoxUse saved = (BoxUse) currentSession().get(BoxUse.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    BoxUse boxUse = (BoxUse) getSessionFactory().getCurrentSession().get(BoxUse.class, 1L);
+    BoxUse boxUse = (BoxUse) currentSession().get(BoxUse.class, 1L);
     assertEquals("boxuse1", boxUse.getAlias());
     assertEquals(2L, sut.getUsage(boxUse));
   }

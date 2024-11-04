@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Arrays;
@@ -12,22 +13,21 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.persistence.Query;
-import javax.persistence.Table;
-import javax.persistence.Tuple;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.SetJoin;
-import javax.persistence.metamodel.SingularAttribute;
-
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Group_;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.Table;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.SetJoin;
+import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -74,7 +74,8 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
       // try a quicker approach
       Table tableAnnotation = getEntityClass().getAnnotation(Table.class);
       if (tableAnnotation != null) {
-        Query query = currentSession().createNativeQuery("SELECT COUNT(*) FROM " + tableAnnotation.name());
+        Query query =
+            currentSession().createNativeQuery("SELECT COUNT(*) FROM " + tableAnnotation.name(), BigInteger.class);
         return ((BigInteger) query.getSingleResult()).longValueExact();
       }
     }
@@ -126,6 +127,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     QueryBuilder<Tuple, T> resultQueryBuilder = new QueryBuilder<>(currentSession(), getEntityClass(), Tuple.class);
 
     Path<?> idProperty = idQueryBuilder.getRoot().get(getIdProperty());
+    Path<?> resultIdProperty = resultQueryBuilder.getRoot().get(getIdProperty());
     Path<?> sortProperty = sortCol == null ? null : propertyForSortColumn(idQueryBuilder, sortCol);
     Path<?> resultSortProperty = sortCol == null ? null : propertyForSortColumn(resultQueryBuilder, sortCol);
     if (sortProperty != null && !idProperty.equals(sortProperty)) {
@@ -139,10 +141,10 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     // deterministic)
     if (sortProperty != null && !idProperty.equals(sortProperty)) {
       idQueryBuilder.addSort(idProperty, true);
-      resultQueryBuilder.addSort(idProperty, true);
+      resultQueryBuilder.addSort(resultIdProperty, true);
     } else {
       idQueryBuilder.addSort(idProperty, ascending);
-      resultQueryBuilder.addSort(idProperty, ascending);
+      resultQueryBuilder.addSort(resultIdProperty, ascending);
     }
 
     for (PaginationFilter filter : filters) {
@@ -156,7 +158,7 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
       return Collections.emptyList();
     }
     // We do this in two steps to make a smaller query that that the database can optimise
-    resultQueryBuilder.addPredicate(idProperty.in(ids));
+    resultQueryBuilder.addPredicate(resultIdProperty.in(ids));
     // We additionally need to select the sort column in the result set for the database to provide us
     // with duplicate-free results sorted by the column specified.
     resultQueryBuilder.setColumns(resultQueryBuilder.getRoot(), resultSortProperty);
@@ -244,6 +246,12 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
         LocalDate startDate = LocalDate.ofInstant(start.toInstant(), ZoneId.systemDefault());
         LocalDate endDate = LocalDate.ofInstant(end.toInstant(), ZoneId.systemDefault());
         builder.addPredicate(builder.getCriteriaBuilder().between(localDateProperty, startDate, endDate));
+      } else if (propertyPath.getJavaType() == Timestamp.class) {
+        @SuppressWarnings("unchecked")
+        Path<Timestamp> timestampProperty = (Path<Timestamp>) propertyPath;
+        Timestamp startDate = new Timestamp(start.getTime());
+        Timestamp endDate = new Timestamp(end.getTime());
+        builder.addPredicate(builder.getCriteriaBuilder().between(timestampProperty, startDate, endDate));
       } else {
         throw new IllegalArgumentException("Unhandled date class: %s".formatted(propertyPath.getJavaType().getName()));
       }

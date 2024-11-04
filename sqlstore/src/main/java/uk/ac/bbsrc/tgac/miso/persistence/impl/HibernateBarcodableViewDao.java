@@ -8,16 +8,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import javax.persistence.criteria.Root;
-
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.Root;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl_;
@@ -48,15 +47,15 @@ public class HibernateBarcodableViewDao implements BarcodableViewDao {
           this::getPoolWithBarcode,
           this::getBoxWithBarcode, this::getContainerWithBarcode, this::getContainerModelWithBarcode);
 
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
+  @PersistenceContext
+  private EntityManager entityManager;
 
   public Session currentSession() {
-    return sessionFactory.getCurrentSession();
+    return entityManager.unwrap(Session.class);
+  }
+
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override
@@ -170,12 +169,10 @@ public class HibernateBarcodableViewDao implements BarcodableViewDao {
         SequencingContainerModel_.ALIAS, null);
   }
 
-  private BarcodableReference getItemWithBarcode(String identificationBarcode, Class<?> implementationClass,
-      String entityTypeLabel, String idField,
-      String primaryLabelField, String secondaryLabelField) throws IOException {
-
-    QueryBuilder<?, ?> builder = new QueryBuilder<>(currentSession(), implementationClass, Object[].class,
-        new BarcodableReference.ResultTransformer(entityTypeLabel));
+  private <T> BarcodableReference getItemWithBarcode(String identificationBarcode, Class<T> implementationClass,
+      String entityTypeLabel, String idField, String primaryLabelField, String secondaryLabelField) throws IOException {
+    ProjectionQueryBuilder<BarcodableReference, T> builder = new ProjectionQueryBuilder<BarcodableReference, T>(
+        currentSession(), implementationClass, new BarcodableReference.TupleTransformer(entityTypeLabel));
     Root<?> root = builder.getRoot();
     builder.addPredicate(
         builder.getCriteriaBuilder().equal(root.get("identificationBarcode"), identificationBarcode));

@@ -4,8 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-import javax.persistence.MappedSuperclass;
-
+import jakarta.persistence.MappedSuperclass;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -79,7 +78,8 @@ public abstract class TransferItem<T extends Boxable> implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(received, qcPassed, qcNote, distributedVolume, distributedBoxAlias, distributedBoxPosition, getItem());
+    return Objects.hash(received, qcPassed, qcNote, distributedVolume, distributedBoxAlias, distributedBoxPosition,
+        getItem());
   }
 
   @Override

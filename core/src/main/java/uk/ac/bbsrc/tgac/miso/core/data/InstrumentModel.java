@@ -1,58 +1,35 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
- * A Platform describes metadata about potentially any hardware item, but is usually linked to a sequencer implementation.
+ * A Platform describes metadata about potentially any hardware item, but is usually linked to a
+ * sequencer implementation.
  * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @Entity
 @Table(name = "InstrumentModel")
-public class InstrumentModel implements Comparable<InstrumentModel>, Deletable, Identifiable, Serializable {
+public class InstrumentModel implements Comparable<InstrumentModel>, Deletable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -85,8 +62,9 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Deletable, 
 
   @ManyToMany
   @JoinTable(name = "SequencingContainerModel_InstrumentModel", joinColumns = {
-      @JoinColumn(name = "instrumentModelId", nullable = false) }, inverseJoinColumns = {
-          @JoinColumn(name = "sequencingContainerModelId", nullable = false) })
+      @JoinColumn(name = "instrumentModelId", nullable = false)},
+      inverseJoinColumns = {
+          @JoinColumn(name = "sequencingContainerModelId", nullable = false)})
   private Set<SequencingContainerModel> containerModels;
 
   @Override
@@ -163,9 +141,12 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Deletable, 
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof InstrumentModel)) return false;
+    if (obj == null)
+      return false;
+    if (obj == this)
+      return true;
+    if (!(obj instanceof InstrumentModel))
+      return false;
     InstrumentModel them = (InstrumentModel) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
@@ -183,16 +164,20 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Deletable, 
     } else {
       final int PRIME = 37;
       int hashcode = -1;
-      if (getPlatformType() != null) hashcode = PRIME * hashcode + getPlatformType().hashCode();
-      if (getDescription() != null) hashcode = PRIME * hashcode + getDescription().hashCode();
+      if (getPlatformType() != null)
+        hashcode = PRIME * hashcode + getPlatformType().hashCode();
+      if (getDescription() != null)
+        hashcode = PRIME * hashcode + getDescription().hashCode();
       return hashcode;
     }
   }
 
   @Override
   public int compareTo(InstrumentModel t) {
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
+    if (getId() < t.getId())
+      return -1;
+    if (getId() > t.getId())
+      return 1;
     return 0;
   }
 

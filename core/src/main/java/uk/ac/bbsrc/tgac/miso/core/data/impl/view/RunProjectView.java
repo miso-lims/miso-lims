@@ -2,10 +2,10 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
 import org.hibernate.annotations.Immutable;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @Entity
 @Immutable
@@ -45,14 +45,20 @@ public class RunProjectView implements Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     RunProjectView other = (RunProjectView) obj;
     if (projects == null) {
-      if (other.projects != null) return false;
-    } else if (!projects.equals(other.projects)) return false;
-    if (runId != other.runId) return false;
+      if (other.projects != null)
+        return false;
+    } else if (!projects.equals(other.projects))
+      return false;
+    if (runId != other.runId)
+      return false;
     return true;
   }
 

@@ -45,7 +45,8 @@ public enum Backend {
     public boolean print(byte[] content, JsonNode configuration, User user) {
       try {
         DocFlavor flavor = new DocFlavor("application/vnd.cups-raster", "[B");
-        for (PrintService service : PrintServiceLookup.lookupPrintServices(flavor, new HashPrintRequestAttributeSet())) {
+        for (PrintService service : PrintServiceLookup.lookupPrintServices(flavor,
+            new HashPrintRequestAttributeSet())) {
           DocPrintJob job = service.createPrintJob();
           Doc doc = new SimpleDoc(content, flavor, null);
           job.print(doc, null);
@@ -60,7 +61,7 @@ public enum Backend {
     }
   },
   DEBUG() {
-    @SuppressWarnings({ "squid:S2629", "squid:S1172" })
+    @SuppressWarnings({"squid:S2629", "squid:S1172"})
     @Override
     public boolean print(byte[] content, JsonNode configuration, User user) {
       StringBuilder buffer = new StringBuilder();
@@ -74,7 +75,7 @@ public enum Backend {
   },
   LINE_PRINTER("host", "queue") {
 
-    @SuppressWarnings({ "squid:S3457" })
+    @SuppressWarnings({"squid:S3457"})
     @Override
     public boolean print(byte[] content, JsonNode configuration, User user) {
       String host = configuration.get("host").asText();
@@ -150,9 +151,11 @@ public enum Backend {
     }
 
   };
+
   private static final Logger log = LoggerFactory.getLogger(Backend.class);
 
-  protected static boolean sendFtpFile(String host, String username, String password, String directory, String filename, byte[] content) {
+  protected static boolean sendFtpFile(String host, String username, String password, String directory, String filename,
+      byte[] content) {
 
     try {
       FTPClient ftp = TransmissionUtils.ftpConnect(host, username, password);
@@ -211,7 +214,8 @@ public enum Backend {
    * Send the supplied data to the printer
    * 
    * @param content The printer-specific data to be printed
-   * @param configuration A string containing backend-specific configuration parameters to find the printer encoded as JSON.
+   * @param configuration A string containing backend-specific configuration parameters to find the
+   *        printer encoded as JSON.
    * @return
    */
   public boolean print(byte[] context, String configuration, User user) {

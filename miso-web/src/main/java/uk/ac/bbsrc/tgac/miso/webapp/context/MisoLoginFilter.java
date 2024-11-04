@@ -2,9 +2,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -20,6 +17,8 @@ import org.springframework.security.web.context.RequestAttributeSecurityContextR
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 
 public class MisoLoginFilter extends UsernamePasswordAuthenticationFilter {

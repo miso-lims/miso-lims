@@ -7,8 +7,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletResponse;
 import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
@@ -50,7 +49,8 @@ public class AttachmentController {
 
   @PostMapping(value = "/{entityType}/{entityId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void acceptUpload(@PathVariable String entityType, @PathVariable long entityId, @RequestParam(required = false) Long categoryId,
+  public void acceptUpload(@PathVariable String entityType, @PathVariable long entityId,
+      @RequestParam(required = false) Long categoryId,
       @RequestParam("files") MultipartFile files[]) throws IOException {
     Attachable item = fileAttachmentService.get(entityType, entityId);
     if (item == null) {
@@ -96,7 +96,8 @@ public class AttachmentController {
   }
 
   @GetMapping(value = "/{entityType}/{entityId}/{fileId}")
-  public void downloadAttachment(@PathVariable String entityType, @PathVariable long entityId, @PathVariable long fileId,
+  public void downloadAttachment(@PathVariable String entityType, @PathVariable long entityId,
+      @PathVariable long fileId,
       HttpServletResponse response) throws IOException {
     Attachable item = fileAttachmentService.get(entityType, entityId);
     if (item == null) {

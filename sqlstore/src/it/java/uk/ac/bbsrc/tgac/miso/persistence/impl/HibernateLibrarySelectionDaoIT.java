@@ -19,7 +19,7 @@ public class HibernateLibrarySelectionDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateLibrarySelectionDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -55,7 +55,8 @@ public class HibernateLibrarySelectionDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    LibrarySelectionType saved = (LibrarySelectionType) getSessionFactory().getCurrentSession().get(LibrarySelectionType.class, savedId);
+    LibrarySelectionType saved =
+        (LibrarySelectionType) currentSession().get(LibrarySelectionType.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -63,27 +64,31 @@ public class HibernateLibrarySelectionDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String name = "New Name";
-    LibrarySelectionType type = (LibrarySelectionType) getSessionFactory().getCurrentSession().get(LibrarySelectionType.class, id);
+    LibrarySelectionType type =
+        (LibrarySelectionType) currentSession().get(LibrarySelectionType.class, id);
     assertNotEquals(name, type.getName());
     type.setName(name);
     sut.update(type);
 
     clearSession();
 
-    LibrarySelectionType saved = (LibrarySelectionType) getSessionFactory().getCurrentSession().get(LibrarySelectionType.class, id);
+    LibrarySelectionType saved =
+        (LibrarySelectionType) currentSession().get(LibrarySelectionType.class, id);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsageByLibraries() throws IOException {
-    LibrarySelectionType type = (LibrarySelectionType) getSessionFactory().getCurrentSession().get(LibrarySelectionType.class, 1L);
+    LibrarySelectionType type =
+        (LibrarySelectionType) currentSession().get(LibrarySelectionType.class, 1L);
     assertEquals("RT-PCR", type.getName());
     assertEquals(15L, sut.getUsageByLibraries(type));
   }
 
   @Test
   public void testGetUsageByLibraryDesigns() throws IOException {
-    LibrarySelectionType type = (LibrarySelectionType) getSessionFactory().getCurrentSession().get(LibrarySelectionType.class, 1L);
+    LibrarySelectionType type =
+        (LibrarySelectionType) currentSession().get(LibrarySelectionType.class, 1L);
     assertEquals(2L, sut.getUsageByLibraryDesigns(type));
   }
 

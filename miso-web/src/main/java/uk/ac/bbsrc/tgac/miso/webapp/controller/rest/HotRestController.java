@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Controller;
@@ -17,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.DelimitedSpreadsheetWrapper;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.ExcelSpreadsheetWrapper;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.OpenDocumentSpreadsheetWrapper;
@@ -57,7 +56,8 @@ public class HotRestController extends RestController {
   @PostMapping(value = "/spreadsheet", produces = "application/octet-stream")
   public HttpEntity<byte[]> downloadSpreadsheet(@RequestParam(name = "format", required = true) String format,
       @RequestBody SpreadsheetDataDto dto, HttpServletResponse response) {
-    return MisoWebUtils.generateSpreadsheet(dto.getHeaders(), dto.getRows(), detailedSample, SpreadSheetFormat.valueOf(format), response);
+    return MisoWebUtils.generateSpreadsheet(dto.getHeaders(), dto.getRows(), detailedSample,
+        SpreadSheetFormat.valueOf(format), response);
   }
 
   public static class ColumnDataDto {
@@ -89,21 +89,24 @@ public class HotRestController extends RestController {
   }
 
   @PostMapping("/import")
-  public @ResponseBody List<ColumnDataDto> importSpreadsheet(@RequestParam("file") MultipartFile file) throws IOException {
-    String extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1).toLowerCase();
+  public @ResponseBody List<ColumnDataDto> importSpreadsheet(@RequestParam("file") MultipartFile file)
+      throws IOException {
+    String extension =
+        file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1).toLowerCase();
     SpreadsheetWrapper sheet = null;
     switch (extension) {
-    case "xlsx":
-      sheet = new ExcelSpreadsheetWrapper(file.getInputStream());
-      break;
-    case "ods":
-      sheet = new OpenDocumentSpreadsheetWrapper(file.getInputStream());
-      break;
-    case "csv":
-      sheet = new DelimitedSpreadsheetWrapper(file.getInputStream());
-      break;
-    default:
-      throw new RestException("Unknown file extension: " + extension + ". Only xlsx, ods, and csv files are accepted", Status.BAD_REQUEST);
+      case "xlsx":
+        sheet = new ExcelSpreadsheetWrapper(file.getInputStream());
+        break;
+      case "ods":
+        sheet = new OpenDocumentSpreadsheetWrapper(file.getInputStream());
+        break;
+      case "csv":
+        sheet = new DelimitedSpreadsheetWrapper(file.getInputStream());
+        break;
+      default:
+        throw new RestException("Unknown file extension: " + extension + ". Only xlsx, ods, and csv files are accepted",
+            Status.BAD_REQUEST);
     }
 
     int rows = sheet.getRowCount();
@@ -119,7 +122,8 @@ public class HotRestController extends RestController {
         }
         columns.add(new ColumnDataDto(header));
       } catch (IllegalArgumentException e) {
-        throw new RestException(String.format("Failed to parse heading cell at row 0, column %d", i), Status.BAD_REQUEST);
+        throw new RestException(String.format("Failed to parse heading cell at row 0, column %d", i),
+            Status.BAD_REQUEST);
       }
     }
     for (int rowNum = 1; rowNum < sheet.getRowCount(); rowNum++) {

@@ -31,7 +31,7 @@ public class HibernateTransferDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateTransferDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test

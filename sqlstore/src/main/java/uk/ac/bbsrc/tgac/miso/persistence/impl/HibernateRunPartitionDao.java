@@ -35,12 +35,12 @@ public class HibernateRunPartitionDao extends HibernateProviderDao<RunPartition>
 
   @Override
   public void create(RunPartition runPartition) throws IOException {
-    currentSession().save(runPartition);
+    currentSession().persist(runPartition);
   }
 
   @Override
   public void update(RunPartition runPartition) throws IOException {
-    currentSession().update(runPartition);
+    currentSession().merge(runPartition);
   }
 
   @Override
@@ -51,7 +51,7 @@ public class HibernateRunPartitionDao extends HibernateProviderDao<RunPartition>
     List<RunPartition> runPartitions = builder.getResultList();
 
     for (RunPartition runPartition : runPartitions) {
-      currentSession().delete(runPartition);
+      currentSession().remove(runPartition);
     }
   }
 
@@ -68,7 +68,7 @@ public class HibernateRunPartitionDao extends HibernateProviderDao<RunPartition>
     List<RunPartition> items = builder.getResultList();
 
     for (RunPartition item : items) {
-      currentSession().delete(item);
+      currentSession().remove(item);
     }
   }
 

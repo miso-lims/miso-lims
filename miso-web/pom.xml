@@ -52,16 +52,6 @@
       <artifactId>oauth-signature</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-fileupload</groupId>
-      <artifactId>commons-fileupload</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-io</groupId>
-          <artifactId>commons-io</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
@@ -77,41 +67,41 @@
     </dependency>
     <dependency>
       <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient</artifactId>
+      <artifactId>prometheus-metrics-core</artifactId>
     </dependency>
     <dependency>
       <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient_hotspot</artifactId>
+      <artifactId>prometheus-metrics-instrumentation-jvm</artifactId>
     </dependency>
     <dependency>
       <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient_servlet</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient_hibernate</artifactId>
+      <artifactId>prometheus-metrics-exporter-servlet-jakarta</artifactId>
     </dependency>
     <dependency>
       <groupId>io.prometheus.jmx</groupId>
       <artifactId>collector</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet.jsp</groupId>
-      <artifactId>javax.servlet.jsp-api</artifactId>
+      <groupId>jakarta.servlet.jsp</groupId>
+      <artifactId>jakarta.servlet.jsp-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jstl</artifactId>
+      <groupId>jakarta.servlet.jsp.jstl</groupId>
+      <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>org.glassfish.web</groupId>
+      <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>net.sf.json-lib</groupId>
@@ -179,7 +169,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.hibernate</groupId>
+      <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-core</artifactId>
     </dependency>
     <dependency>
@@ -382,6 +372,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!-- generate metadata for reflection on method parameters. Required to so that
+          PathVariable/RequestParam annotations don't require specification of names -->
+          <parameters>true</parameters>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -546,7 +541,7 @@
           <plugin>
             <!-- launch standalone Tomcat server and deploy MISO -->
             <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
+            <artifactId>cargo-maven3-plugin</artifactId>
             <executions>
               <execution>
                 <id>start-container</id>
@@ -574,11 +569,11 @@
             </executions>
             <configuration>
               <container>
-                <containerId>tomcat9x</containerId>
+                <containerId>tomcat10x</containerId>
                 <artifactInstaller>
                   <groupId>org.apache.tomcat</groupId>
                   <artifactId>tomcat</artifactId>
-                  <version>9.0.70</version>
+                  <version>10.1.30</version>
                 </artifactInstaller>
                 <systemProperties>
                   <security.method>jdbc</security.method>
@@ -586,7 +581,7 @@
               </container>
               <configuration>
                 <type>standalone</type>
-                <home>${project.build.directory}/tomcat9</home>
+                <home>${project.build.directory}/tomcat10</home>
                 <properties>
                   <cargo.servlet.port>${miso.it.tomcat.servlet.port}</cargo.servlet.port>
                   <cargo.tomcat.ajp.port>${miso.it.tomcat.ajp.port}</cargo.tomcat.ajp.port>
@@ -797,7 +792,7 @@
           <plugin>
             <!-- launch standalone Tomcat server and deploy MISO -->
             <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
+            <artifactId>cargo-maven3-plugin</artifactId>
             <executions>
               <execution>
                 <id>start-container</id>
@@ -818,11 +813,11 @@
             </executions>
             <configuration>
               <container>
-                <containerId>tomcat9x</containerId>
+                <containerId>tomcat10x</containerId>
                 <artifactInstaller>
                   <groupId>org.apache.tomcat</groupId>
                   <artifactId>tomcat</artifactId>
-                  <version>9.0.70</version>
+                  <version>10.1.30</version>
                 </artifactInstaller>
                 <systemProperties>
                   <security.method>jdbc</security.method>
@@ -830,7 +825,7 @@
               </container>
               <configuration>
                 <type>standalone</type>
-                <home>${project.build.directory}/tomcat9</home>
+                <home>${project.build.directory}/tomcat10</home>
                 <properties>
                   <cargo.servlet.port>${miso.it.plain.tomcat.servlet.port}</cargo.servlet.port>
                   <cargo.tomcat.ajp.port>${miso.it.plain.tomcat.ajp.port}</cargo.tomcat.ajp.port>

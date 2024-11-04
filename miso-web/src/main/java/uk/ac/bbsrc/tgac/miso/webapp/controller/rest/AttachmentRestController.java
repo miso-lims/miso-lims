@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
@@ -70,7 +69,8 @@ public class AttachmentRestController extends RestController {
 
   @DeleteMapping("/{entityType}/{entityId}/{fileId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteAttachment(@PathVariable String entityType, @PathVariable long entityId, @PathVariable long fileId) throws IOException {
+  public void deleteAttachment(@PathVariable String entityType, @PathVariable long entityId, @PathVariable long fileId)
+      throws IOException {
     Attachable item = getAttachable(entityType, entityId, true);
 
     FileAttachment attachment = item.getAttachments().stream()
@@ -86,7 +86,8 @@ public class AttachmentRestController extends RestController {
       if (isTargetObject) {
         throw new RestException(entityType + " not found", Status.NOT_FOUND);
       } else {
-        throw new RestException(String.format("Source object %s %d not found", entityType, entityId), Status.BAD_REQUEST);
+        throw new RestException(String.format("Source object %s %d not found", entityType, entityId),
+            Status.BAD_REQUEST);
       }
     }
     return item;

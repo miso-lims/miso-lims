@@ -320,17 +320,20 @@ INSERT INTO TissuePieceType(tissuePieceTypeId, abbreviation, name, v2NamingCode)
 (1, 'LCM', 'LCM Tube', 'TL'),
 (2, 'C', 'Curls', 'TC');
 
-INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
-VALUES (1,'Identity','Identity',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
-(2,'Primary Tumor Tissue','Tissue',1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
-(3,'Stock','Stock',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00'),
-(4,'Aliquot','Aliquot',1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00');
+INSERT INTO `SampleClass`(`sampleClassId`, `alias`, `sampleCategory`, sampleSubcategory, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES (1,'Identity','Identity', NULL ,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
+(2,'Primary Tumor Tissue','Tissue', NULL ,1,'2016-04-05 14:57:00',1,'2016-04-05 14:57:00'),
+(3,'Stock','Stock', NULL ,1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00'),
+(4,'Aliquot','Aliquot', NULL ,1,'2017-05-31 14:57:00',1,'2017-05-31 14:57:00'),
+(5, 'Slides', 'Tissue Processing', 'Slide', 1, '2024-10-16 12:39:00', 1, '2024-10-16 12:39:00');
 
 INSERT INTO SampleValidRelationship(sampleValidRelationshipId, parentId, childId, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 1, 2, 1, '2021-02-23 10:41:00', 1, '2021-02-23 10:41:00'),
 (2, 2, 3, 1, '2021-02-23 10:41:00', 1, '2021-02-23 10:41:00'),
 (3, 3, 4, 1, '2021-02-23 10:41:00', 1, '2021-02-23 10:41:00'),
-(4, 4, 4, 1, '2021-02-23 10:41:00', 1, '2021-02-23 10:41:00');
+(4, 4, 4, 1, '2021-02-23 10:41:00', 1, '2021-02-23 10:41:00'),
+(5, 2, 5, 1, '2024-10-16 12:39:00', 1, '2024-10-16 12:39:00'),
+(6, 5, 3, 1, '2024-10-16 12:39:00', 1, '2024-10-16 12:39:00');
 
 INSERT INTO SamplePurpose(samplePurposeId, alias, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 'Sequencing', 1, '2021-02-18 16:21:00', 1, '2021-02-18 16:21:00'),
@@ -477,13 +480,24 @@ INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 INSERT INTO Requisition_SupplementalSample(requisitionId, sampleId) VALUES
 (2, 21);
 
+-- Tissue Processing - Slides
+INSERT INTO Sample(discriminator, sampleId, name, alias, project_projectId, sampleType,
+  scientificNameId, lastModifier, lastModified, creator, created, sampleClassId, archived, parentId,
+  siblingNumber, isSynthetic, nonStandardAlias, initialSlides, slides) VALUES
+('Slide', 25, 'SAM25', 'TEST_0001_SLIDE_1', 1, 'GENOMIC',
+  1, 1, '2024-10-16 12:39:00', 1, '2024-10-16 12:39:00', 5, FALSE, 17,
+  1, FALSE, FALSE, 3, 3);
+
+INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
+(25, 15, 17);
+
 -- Stocks
 INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`,
   qcUser, qcDate, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`, sopId,
-  `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator) VALUES
+  `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator, referenceSlideId) VALUES
 (18,NULL,'SAM18','stock1','SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',1,
   1,'2016-07-07','TEST_0001_STOCK_1',1,1,NULL,NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19', 1,
-  3,0,17,1,NULL,0, FALSE, 'Stock');
+  3,0,25,1,NULL,0, FALSE, 'Stock', 25);
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (18, 15, 17);

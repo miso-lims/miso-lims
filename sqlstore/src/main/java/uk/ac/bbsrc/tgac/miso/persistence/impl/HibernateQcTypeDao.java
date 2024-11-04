@@ -69,12 +69,13 @@ public class HibernateQcTypeDao extends HibernateSaveDao<QcType> implements Qual
 
   @Override
   public long createControl(QcControl control) throws IOException {
-    return (long) currentSession().save(control);
+    currentSession().persist(control);
+    return control.getId();
   }
 
   @Override
   public void deleteControl(QcControl control) throws IOException {
-    currentSession().delete(control);
+    currentSession().remove(control);
   }
 
   @Override

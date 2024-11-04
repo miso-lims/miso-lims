@@ -43,7 +43,7 @@ public class HibernateAssayDao extends HibernateSaveDao<Assay>
 
   @Override
   public void deleteAssayMetric(AssayMetric metric) throws IOException {
-    currentSession().delete(metric);
+    currentSession().remove(metric);
   }
 
 }

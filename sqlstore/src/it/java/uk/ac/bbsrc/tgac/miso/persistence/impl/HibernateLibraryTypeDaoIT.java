@@ -20,7 +20,7 @@ public class HibernateLibraryTypeDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateLibraryTypeDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -75,7 +75,7 @@ public class HibernateLibraryTypeDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    LibraryType saved = (LibraryType) getSessionFactory().getCurrentSession().get(LibraryType.class, savedId);
+    LibraryType saved = (LibraryType) currentSession().get(LibraryType.class, savedId);
     assertEquals(desc, saved.getDescription());
   }
 
@@ -83,27 +83,27 @@ public class HibernateLibraryTypeDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String desc = "New Desc";
-    LibraryType type = (LibraryType) getSessionFactory().getCurrentSession().get(LibraryType.class, id);
+    LibraryType type = (LibraryType) currentSession().get(LibraryType.class, id);
     assertNotEquals(desc, type.getDescription());
     type.setDescription(desc);
     sut.update(type);
 
     clearSession();
 
-    LibraryType saved = (LibraryType) getSessionFactory().getCurrentSession().get(LibraryType.class, id);
+    LibraryType saved = (LibraryType) currentSession().get(LibraryType.class, id);
     assertEquals(desc, saved.getDescription());
   }
 
   @Test
   public void testGetUsageByLibraries() throws IOException {
-    LibraryType type = (LibraryType) getSessionFactory().getCurrentSession().get(LibraryType.class, 3L);
+    LibraryType type = (LibraryType) currentSession().get(LibraryType.class, 3L);
     assertEquals("mRNA Seq", type.getDescription());
     assertEquals(15L, sut.getUsageByLibraries(type));
   }
 
   @Test
   public void testGetUsageByLibraryTemplates() throws IOException {
-    LibraryType type = (LibraryType) getSessionFactory().getCurrentSession().get(LibraryType.class, 1L);
+    LibraryType type = (LibraryType) currentSession().get(LibraryType.class, 1L);
     assertEquals("Paired End", type.getDescription());
     assertEquals(0L, sut.getUsageByLibraryTemplates(type));
   }

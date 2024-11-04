@@ -7,22 +7,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import org.hibernate.annotations.Immutable;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
@@ -60,7 +59,7 @@ public class ListContainerView implements Serializable {
 
   @ManyToMany
   @JoinTable(name = "Run_SequencerPartitionContainer", joinColumns = {
-      @JoinColumn(name = "containers_containerId") }, inverseJoinColumns = { @JoinColumn(name = "Run_runId") })
+      @JoinColumn(name = "containers_containerId")}, inverseJoinColumns = {@JoinColumn(name = "Run_runId")})
   private Set<ListContainerRunView> runs;
 
   @ManyToOne(targetEntity = UserImpl.class)

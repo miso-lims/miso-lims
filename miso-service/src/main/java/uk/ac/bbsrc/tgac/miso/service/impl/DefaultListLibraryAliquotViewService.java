@@ -25,7 +25,7 @@ public class DefaultListLibraryAliquotViewService implements ListLibraryAliquotV
   }
 
   @Override
-  public ListLibraryAliquotView get(Long aliquotId) throws IOException {
+  public ListLibraryAliquotView get(long aliquotId) throws IOException {
     return listLibraryAliquotViewDao.get(aliquotId);
   }
 
@@ -35,9 +35,8 @@ public class DefaultListLibraryAliquotViewService implements ListLibraryAliquotV
   }
 
   @Override
-  public List<ListLibraryAliquotView> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
-      PaginationFilter... filter)
-      throws IOException {
+  public List<ListLibraryAliquotView> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir,
+      String sortCol, PaginationFilter... filter) throws IOException {
     return listLibraryAliquotViewDao.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 

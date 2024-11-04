@@ -1,39 +1,15 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 
@@ -74,8 +50,7 @@ public class LibraryType implements Comparable<LibraryType>, Deletable, Identifi
   /**
    * Sets the libraryTypeId of this LibraryType object.
    * 
-   * @param libraryTypeId
-   *          libraryTypeId.
+   * @param libraryTypeId libraryTypeId.
    */
   @Override
   public void setId(long libraryTypeId) {
@@ -94,8 +69,7 @@ public class LibraryType implements Comparable<LibraryType>, Deletable, Identifi
   /**
    * Sets the description of this LibraryType object.
    * 
-   * @param description
-   *          description.
+   * @param description description.
    */
   public void setDescription(String description) {
     this.description = description;
@@ -113,8 +87,7 @@ public class LibraryType implements Comparable<LibraryType>, Deletable, Identifi
   /**
    * Sets the platformType of this LibraryType object.
    * 
-   * @param platformType
-   *          platformType.
+   * @param platformType platformType.
    */
   public void setPlatformType(PlatformType platformType) {
     this.platformType = platformType;
@@ -138,9 +111,12 @@ public class LibraryType implements Comparable<LibraryType>, Deletable, Identifi
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof LibraryType)) return false;
+    if (obj == null)
+      return false;
+    if (obj == this)
+      return true;
+    if (!(obj instanceof LibraryType))
+      return false;
     LibraryType them = (LibraryType) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
@@ -153,8 +129,10 @@ public class LibraryType implements Comparable<LibraryType>, Deletable, Identifi
       return Long.valueOf(getId()).intValue();
     } else {
       int hashcode = -1;
-      if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
-      if (getPlatformType() != null) hashcode = 37 * hashcode + getPlatformType().hashCode();
+      if (getDescription() != null)
+        hashcode = 37 * hashcode + getDescription().hashCode();
+      if (getPlatformType() != null)
+        hashcode = 37 * hashcode + getPlatformType().hashCode();
       return hashcode;
     }
   }

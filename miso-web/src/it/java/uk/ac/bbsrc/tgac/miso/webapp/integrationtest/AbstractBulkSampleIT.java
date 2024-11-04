@@ -7,9 +7,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
-import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 
+import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -35,8 +35,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissuePieceImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.QueryBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BulkSamplePage.SamColumns;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
@@ -88,11 +92,13 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertReceiptAttributes(Map<String, String> attributes, Sample sample) {
-    TransferSample receipt = (TransferSample) getSession().createCriteria(TransferSample.class)
-        .createAlias("transfer", "transfer")
-        .add(Restrictions.eq("item", sample))
-        .add(Restrictions.isNotNull("transfer.senderLab"))
-        .uniqueResult();
+    QueryBuilder<TransferSample, TransferSample> builder =
+        new QueryBuilder<>(getSession(), TransferSample.class, TransferSample.class);
+    Join<TransferSample, Transfer> join = builder.getJoin(builder.getRoot(), TransferSample_.transfer);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(TransferSample_.item), sample));
+    builder.addPredicate(builder.getCriteriaBuilder().isNotNull(join.get(Transfer_.senderLab)));
+    TransferSample receipt = builder.getSingleResultOrNull();
+
     assertNotNull("A receipt transfer should be created", receipt);
 
     assertEntityAttribute(SamColumns.RECEIVE_DATE, attributes, receipt,

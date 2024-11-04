@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response.Status;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,6 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
@@ -70,7 +70,8 @@ public class IndexRestController extends RestController {
 
   @GetMapping("/dt/platform/{platform}")
   @ResponseBody
-  public DataTablesResponseDto<IndexDto> dataTableByPlatform(@PathVariable("platform") String platform, HttpServletRequest request)
+  public DataTablesResponseDto<IndexDto> dataTableByPlatform(@PathVariable("platform") String platform,
+      HttpServletRequest request)
       throws IOException {
     PlatformType platformType = null;
     try {
@@ -84,8 +85,7 @@ public class IndexRestController extends RestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<IndexDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<IndexDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate("Index", dtos, Dtos::to, indexService, true);
   }
 
@@ -166,7 +166,8 @@ public class IndexRestController extends RestController {
   }
 
   @PostMapping("/search")
-  public @ResponseBody List<IndexSearchResult> searchIndexFamilies(@RequestBody IndexSearchRequest request) throws IOException {
+  public @ResponseBody List<IndexSearchResult> searchIndexFamilies(@RequestBody IndexSearchRequest request)
+      throws IOException {
     return indexFamilyService.list().stream()
         .map(fam -> {
           IndexSearchResult result = new IndexSearchResult();

@@ -8,8 +8,6 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Date;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -19,20 +17,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SampleChangeLog_;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class HibernateChangeLogDaoIT extends AbstractDAOTest {
 
   @Mock
   private HibernateSecurityDao securityDAO;
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @InjectMocks
   private HibernateChangeLogDao sut;
@@ -47,17 +54,16 @@ public class HibernateChangeLogDaoIT extends AbstractDAOTest {
     MockitoAnnotations.initMocks(this);
     user.setId(1L);
     when(securityDAO.getUserById(anyLong())).thenReturn(user);
-    sut.setSessionFactory(sessionFactory);
-    libraryDao.setSessionFactory(sessionFactory);
+    sut.setEntityManager(entityManager);
+    libraryDao.setEntityManager(entityManager);
   }
 
   private Collection<ChangeLog> listSampleChangelogs(long libraryId) {
-    @SuppressWarnings("unchecked")
-    Collection<ChangeLog> list = currentSession().createCriteria(SampleChangeLog.class)
-        .createAlias("sample", "sample")
-        .add(Restrictions.eq("sample.id", libraryId))
-        .list();
-    return list;
+    QueryBuilder<ChangeLog, SampleChangeLog> builder =
+        new QueryBuilder<>(currentSession(), SampleChangeLog.class, ChangeLog.class);
+    Join<SampleChangeLog, SampleImpl> join = builder.getJoin(builder.getRoot(), SampleChangeLog_.sample);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(join.get(SampleImpl_.sampleId), libraryId));
+    return builder.getResultList();
   }
 
   @Test
@@ -78,12 +84,11 @@ public class HibernateChangeLogDaoIT extends AbstractDAOTest {
   }
 
   private Collection<ChangeLog> listLibraryChangelogs(long libraryId) {
-    @SuppressWarnings("unchecked")
-    Collection<ChangeLog> list = currentSession().createCriteria(LibraryChangeLog.class)
-        .createAlias("library", "library")
-        .add(Restrictions.eq("library.id", libraryId))
-        .list();
-    return list;
+    QueryBuilder<ChangeLog, LibraryChangeLog> builder =
+        new QueryBuilder<>(currentSession(), LibraryChangeLog.class, ChangeLog.class);
+    Join<LibraryChangeLog, LibraryImpl> join = builder.getJoin(builder.getRoot(), LibraryChangeLog_.library);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(join.get(LibraryImpl_.libraryId), libraryId));
+    return builder.getResultList();
   }
 
   @Test

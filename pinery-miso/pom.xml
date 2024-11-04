@@ -20,8 +20,8 @@
     <mysql.pw>tgaclims</mysql.pw>
     <db.params>
       autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER&amp;cacheDefaultTimeZone=false</db.params>
-    <pinery.version>2.36.0</pinery.version>
-    <spring-version>5.3.27</spring-version><!-- must match version used by Pinery -->
+    <pinery.version>3.0.0</pinery.version>
+    <spring.version>6.1.13</spring.version><!-- must match version used by Pinery -->
   </properties>
 
   <dependencies>
@@ -64,6 +64,10 @@
       <artifactId>mysql-connector-j</artifactId>
     </dependency>
     <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -79,6 +83,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <!-- Only needed for tests (DB migration), but does not work with test scope -->
       <groupId>uk.ac.bbsrc.tgac.miso</groupId>
       <artifactId>sqlstore</artifactId>
     </dependency>

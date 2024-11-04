@@ -2,8 +2,6 @@ package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.OptionalDouble;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -35,8 +33,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelCanvas.FontStyle;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -124,7 +120,8 @@ public enum PrintableField implements PrintableText {
 
         @Override
         public String visitLibraryAliquot(LibraryAliquot libraryAliquot) {
-          return LimsUtils.makeConcentrationLabel(libraryAliquot.getConcentration(), libraryAliquot.getConcentrationUnits());
+          return LimsUtils.makeConcentrationLabel(libraryAliquot.getConcentration(),
+              libraryAliquot.getConcentrationUnits());
         }
 
         @Override
@@ -186,7 +183,8 @@ public enum PrintableField implements PrintableText {
 
         @Override
         public String visitLibraryAliquotDetailed(DetailedLibraryAliquot libraryAliquot) {
-          return libraryAliquot.getLibraryDesignCode() == null ? visitLibraryDetailed((DetailedLibrary) libraryAliquot.getLibrary())
+          return libraryAliquot.getLibraryDesignCode() == null
+              ? visitLibraryDetailed((DetailedLibrary) libraryAliquot.getLibrary())
               : libraryAliquot.getLibraryDesignCode().getCode();
         }
 
@@ -329,7 +327,8 @@ public enum PrintableField implements PrintableText {
 
         @Override
         public String visitContainer(SequencerPartitionContainer container) {
-          return String.format("%s: %d", container.getModel().getPlatformType().getPluralPartitionName(), container.getPartitions().size());
+          return String.format("%s: %d", container.getModel().getPlatformType().getPluralPartitionName(),
+              container.getPartitions().size());
         }
 
         @Override
@@ -339,7 +338,8 @@ public enum PrintableField implements PrintableText {
 
         @Override
         public String visitLibraryAliquot(LibraryAliquot libraryAliquot) {
-          return libraryAliquot.getDnaSize() == null ? visitLibrary(libraryAliquot.getLibrary()) : libraryAliquot.getDnaSize().toString();
+          return libraryAliquot.getDnaSize() == null ? visitLibrary(libraryAliquot.getLibrary())
+              : libraryAliquot.getDnaSize().toString();
         }
 
         @Override
@@ -381,7 +381,8 @@ public enum PrintableField implements PrintableText {
 
   };
 
-  private static <T extends DetailedSample> BarcodableVisitor<String> getParentSampleField(Class<T> clazz, Function<T, String> getter) {
+  private static <T extends DetailedSample> BarcodableVisitor<String> getParentSampleField(Class<T> clazz,
+      Function<T, String> getter) {
     return new BarcodableVisitor<>() {
 
       @Override
@@ -406,7 +407,8 @@ public enum PrintableField implements PrintableText {
   }
 
   private static String unescapeHtml(String string) {
-    if (string == null) return null;
+    if (string == null)
+      return null;
     return StringEscapeUtils.unescapeHtml(string);
   }
 

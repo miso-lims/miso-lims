@@ -4,7 +4,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -159,7 +158,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
     loadChildEntities(aliquot);
     User changeUser = authorizationManager.getCurrentUser();
     aliquot.setCreator(changeUser);
-    boxService.throwIfBoxPositionIsFilled(aliquot);
+    boxService.prepareBoxableLocation(aliquot, false);
 
     if (aliquot.getConcentration() == null) {
       aliquot.setConcentrationUnits(null);
@@ -206,8 +205,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
     LibraryAliquot managed = get(aliquot.getId());
     User changeUser = authorizationManager.getCurrentUser();
     managed.setChangeDetails(changeUser);
-    maybeRemoveFromBox(aliquot, managed);
-    boxService.throwIfBoxPositionIsFilled(aliquot);
+    boxService.prepareBoxableLocation(aliquot, managed.getDistributionTransfer() != null);
 
     loadChildEntities(aliquot);
     LimsUtils.updateParentVolume(aliquot, managed, changeUser);
@@ -264,14 +262,6 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
       if (detailed.getLibraryDesignCode() != null) {
         detailed.setLibraryDesignCode(libraryDesignCodeService.get(detailed.getLibraryDesignCode().getId()));
       }
-    }
-  }
-
-  private void maybeRemoveFromBox(LibraryAliquot aliquot, LibraryAliquot managed) {
-    if (aliquot.isDiscarded() || aliquot.getDistributionTransfer() != null
-        || managed.getDistributionTransfer() != null) {
-      aliquot.setBoxPosition(null);
-      aliquot.setVolume(BigDecimal.ZERO);
     }
   }
 

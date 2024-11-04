@@ -15,9 +15,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
@@ -32,7 +29,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.prometheus.client.Gauge;
+import io.prometheus.metrics.core.metrics.Gauge;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import uk.ac.bbsrc.tgac.miso.Version;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
@@ -127,8 +126,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 @Controller
 public class ConstantsController {
 
-  private static final Gauge constantsTimestamp = Gauge
-      .build("miso_constants_timestamp", "The epoch time of the last build of the constants.js file.").register();
+  private static final Gauge constantsTimestamp = Gauge.builder().name("miso_constants_timestamp")
+      .help("The epoch time of the last build of the constants.js file.")
+      .register();
 
   private String constantsJs;
 

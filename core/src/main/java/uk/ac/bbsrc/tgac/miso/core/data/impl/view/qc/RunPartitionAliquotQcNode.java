@@ -4,15 +4,14 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
 import org.hibernate.annotations.Immutable;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.RunPartitionAliquotQcNode.RunPartitionAliquotQcNodeId;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -128,7 +127,7 @@ public class RunPartitionAliquotQcNode implements QcNode {
 
   @Override
   public Long[] getIds() {
-    return new Long[] { getRun().getId(), getPartition().getId(), getAliquot().getId() };
+    return new Long[] {getRun().getId(), getPartition().getId(), getAliquot().getId()};
   }
 
   @Override
@@ -148,7 +147,8 @@ public class RunPartitionAliquotQcNode implements QcNode {
 
   @Override
   public String getLabel() {
-    return String.format("%s partition %d - %s", getRun().getAlias(), getPartition().getPartitionNumber(), getAliquot().getAlias());
+    return String.format("%s partition %d - %s", getRun().getAlias(), getPartition().getPartitionNumber(),
+        getAliquot().getAlias());
   }
 
   public RunLibraryQcStatus getQcStatus() {

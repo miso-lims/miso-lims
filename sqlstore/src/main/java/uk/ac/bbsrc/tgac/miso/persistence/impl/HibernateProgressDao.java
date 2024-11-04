@@ -2,17 +2,16 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.util.List;
 
-import javax.persistence.criteria.Join;
-
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.workflow.AbstractProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.ProgressImpl;
@@ -22,19 +21,19 @@ import uk.ac.bbsrc.tgac.miso.persistence.ProgressStore;
 @Transactional(rollbackFor = Exception.class)
 @Repository
 public class HibernateProgressDao implements ProgressStore {
-  @Autowired
-  private SessionFactory sessionFactory;
-
-  public SessionFactory getSessionFactory() {
-    return sessionFactory;
-  }
-
-  public void setSessionFactory(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
-  }
+  @PersistenceContext
+  private EntityManager entityManager;
 
   public Session currentSession() {
-    return sessionFactory.getCurrentSession();
+    return entityManager.unwrap(Session.class);
+  }
+
+  public EntityManager getEntityManager() {
+    return entityManager;
+  }
+
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
   @Override
@@ -57,7 +56,7 @@ public class HibernateProgressDao implements ProgressStore {
   @Override
   public List<Progress> listByUserId(long id) {
     QueryBuilder<Progress, ProgressImpl> builder =
-        new QueryBuilder<>(currentSession(), ProgressImpl.class, Progress.class, Criteria.DISTINCT_ROOT_ENTITY);
+        new QueryBuilder<>(currentSession(), ProgressImpl.class, Progress.class);
     Join<ProgressImpl, UserImpl> userJoin = builder.getJoin(builder.getRoot(), ProgressImpl_.user);
     builder.addPredicate(builder.getCriteriaBuilder().equal(userJoin.get(UserImpl_.userId), id));
 
@@ -68,16 +67,19 @@ public class HibernateProgressDao implements ProgressStore {
   @Override
   public Progress save(Progress progress) {
     if (!progress.isSaved()) {
-      currentSession().save(progress);
-    } else {
-      currentSession().update(progress);
+      currentSession().persist(progress);
     }
 
     if (progress.getSteps() != null) {
       for (ProgressStep step : progress.getSteps()) {
-        currentSession().saveOrUpdate(step);
+        if (currentSession().get(AbstractProgressStep.class, step.getId()) == null) {
+          currentSession().persist(step);
+        } else {
+          currentSession().merge(step);
+        }
       }
     }
+    currentSession().merge(progress);
 
     return progress;
   }
@@ -85,12 +87,12 @@ public class HibernateProgressDao implements ProgressStore {
   @Override
   public void delete(Progress progress) {
     progress.getSteps().forEach(this::delete);
-    currentSession().delete(progress);
+    currentSession().remove(progress);
   }
 
   @Override
   public void delete(ProgressStep step) {
-    currentSession().delete(step);
+    currentSession().remove(step);
     currentSession().flush();
   }
 

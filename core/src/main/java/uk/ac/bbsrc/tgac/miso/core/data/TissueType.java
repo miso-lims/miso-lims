@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 
-public interface TissueType extends Deletable, Identifiable, Serializable, Timestamped {
+public interface TissueType extends Deletable, Serializable, Timestamped {
 
   public String getAlias();
 

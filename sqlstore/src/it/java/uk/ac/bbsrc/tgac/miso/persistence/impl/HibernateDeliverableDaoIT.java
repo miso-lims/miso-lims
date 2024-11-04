@@ -19,7 +19,7 @@ public class HibernateDeliverableDaoIT extends AbstractHibernateSaveDaoTest<Deli
   @Override
   public HibernateDeliverableDao constructTestSubject() {
     HibernateDeliverableDao sut = new HibernateDeliverableDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

@@ -15,7 +15,7 @@ public class HibernateChangeLoggableDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateChangeLoggableDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test

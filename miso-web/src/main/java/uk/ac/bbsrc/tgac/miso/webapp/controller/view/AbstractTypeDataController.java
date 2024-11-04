@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
@@ -22,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
@@ -56,7 +55,8 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
     return bulkCreate(quantity, model, null);
   }
 
-  protected final ModelAndView bulkCreate(Integer quantity, ModelMap model, BiConsumer<ObjectNode, ObjectMapper> configurer)
+  protected final ModelAndView bulkCreate(Integer quantity, ModelMap model,
+      BiConsumer<ObjectNode, ObjectMapper> configurer)
       throws IOException {
     if (quantity == null || quantity <= 0) {
       throw new RestException("Must specify quantity to create", Status.BAD_REQUEST);
@@ -82,7 +82,8 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
     return bulkEdit(idString, model, null);
   }
 
-  protected final ModelAndView bulkEdit(String idString, ModelMap model, BiConsumer<ObjectNode, ObjectMapper> configurer)
+  protected final ModelAndView bulkEdit(String idString, ModelMap model,
+      BiConsumer<ObjectNode, ObjectMapper> configurer)
       throws IOException {
     ObjectNode config = makeBaseConfig();
     addHotConfig(config, mapper);
@@ -122,7 +123,8 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
     return config;
   }
 
-  private void addHotAttributes(String title, ObjectNode config, PageMode pageMode, ModelMap model) throws JsonProcessingException {
+  private void addHotAttributes(String title, ObjectNode config, PageMode pageMode, ModelMap model)
+      throws JsonProcessingException {
     model.put("title", title);
     model.put("target", hotTarget);
     config.put(PageMode.PROPERTY, pageMode.getLabel());
@@ -130,7 +132,8 @@ public abstract class AbstractTypeDataController<T extends Identifiable, R> {
   }
 
   /**
-   * Override to provide additional config for both bulk pages and listing. Default implementation does nothing
+   * Override to provide additional config for both bulk pages and listing. Default implementation
+   * does nothing
    *
    * @param config
    * @param mapper

@@ -1,8 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockRna;
 
 @Entity
@@ -33,13 +32,18 @@ public class SampleStockRnaImpl extends SampleStockImpl implements SampleStockRn
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (!super.equals(obj)) return false;
-    if (getClass() != obj.getClass()) return false;
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
     SampleStockRnaImpl other = (SampleStockRnaImpl) obj;
     if (dnaseTreated == null) {
-      if (other.dnaseTreated != null) return false;
-    } else if (!dnaseTreated.equals(other.dnaseTreated)) return false;
+      if (other.dnaseTreated != null)
+        return false;
+    } else if (!dnaseTreated.equals(other.dnaseTreated))
+      return false;
     return true;
   }
 

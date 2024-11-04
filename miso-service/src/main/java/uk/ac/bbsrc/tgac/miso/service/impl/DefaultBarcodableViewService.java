@@ -5,12 +5,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.annotation.Resource;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
@@ -47,7 +46,7 @@ public class DefaultBarcodableViewService implements BarcodableViewService {
     EntityType entityType = view.getId().getTargetType();
     long id = view.getId().getTargetId();
     @SuppressWarnings("unchecked")
-    T barcodable  = (T) barcodableServicesMap.get(entityType).get(id);
+    T barcodable = (T) barcodableServicesMap.get(entityType).get(id);
 
     return barcodable;
   }

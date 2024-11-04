@@ -12,13 +12,12 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -50,7 +49,7 @@ public abstract class RelationFinder<M extends Identifiable> {
 
     public final List<D> handle(Collection<M> items) throws IOException, JsonProcessingException {
       List<String> errors = new ArrayList<>();
-      
+
       Stream<P> relationStream = Stream.empty();
       for (M item : items) {
         relationStream = Stream.concat(relationStream, find(item, errors::add));
@@ -71,6 +70,7 @@ public abstract class RelationFinder<M extends Identifiable> {
   public static ParentSampleAdapter<Sample> parent(String category, Class<? extends DetailedSample> targetClass) {
     return new ParentSampleAdapter<>(category, true, targetClass, Stream::of);
   }
+
   public static final class ParentSampleAdapter<M extends Identifiable> extends RelationAdapter<M, Sample, SampleDto> {
     private final ThrowingFunction<M, Stream<Sample>, IOException> getSample;
     private final Class<? extends DetailedSample> targetClass;
@@ -140,6 +140,7 @@ public abstract class RelationFinder<M extends Identifiable> {
   public static ChildrenSampleAdapter child(String category, Class<? extends DetailedSample> targetClass) {
     return new ChildrenSampleAdapter(category, targetClass);
   }
+
   public static class ChildrenSampleAdapter extends RelationAdapter<Sample, DetailedSample, SampleDto> {
 
     public ChildrenSampleAdapter(String category, Class<? extends DetailedSample> targetClass) {
@@ -164,9 +165,11 @@ public abstract class RelationFinder<M extends Identifiable> {
       return children.stream();
     }
 
-    private static Stream<DetailedSample> searchChildren(Class<? extends DetailedSample> targetChildClass, DetailedSample model) {
+    private static Stream<DetailedSample> searchChildren(Class<? extends DetailedSample> targetChildClass,
+        DetailedSample model) {
       return model.getChildren().stream()
-          .flatMap(child -> Stream.concat(Stream.of(child).filter(targetChildClass::isInstance), searchChildren(targetChildClass, child)));
+          .flatMap(child -> Stream.concat(Stream.of(child).filter(targetChildClass::isInstance),
+              searchChildren(targetChildClass, child)));
     }
 
     public static Stream<Library> searchChildrenLibraries(Sample model, LibraryService libraryService) {
@@ -174,7 +177,8 @@ public abstract class RelationFinder<M extends Identifiable> {
         Stream<Library> libraries = libraryService.listBySampleId(model.getId()).stream();
         if (LimsUtils.isDetailedSample(model)) {
           libraries = Stream.concat(libraries,
-              ((DetailedSample) model).getChildren().stream().flatMap(child -> searchChildrenLibraries(child, libraryService)));
+              ((DetailedSample) model).getChildren().stream()
+                  .flatMap(child -> searchChildrenLibraries(child, libraryService)));
         }
         return libraries;
       } catch (IOException e) {

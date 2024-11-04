@@ -1,49 +1,10 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -53,6 +14,20 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -65,12 +40,13 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  */
 @Entity
 @Table(name = "User")
-public class UserImpl implements User, Serializable {
+public class UserImpl implements User {
 
   private static final long serialVersionUID = 1L;
 
   /**
-   * Use this ID to indicate that a user has not yet been saved, and therefore does not yet have a unique ID.
+   * Use this ID to indicate that a user has not yet been saved, and therefore does not yet have a
+   * unique ID.
    */
   private static final long UNSAVED_ID = 0L;
 
@@ -86,15 +62,16 @@ public class UserImpl implements User, Serializable {
   private boolean active = true;
 
   @ElementCollection
-  @CollectionTable(name = "User_FavouriteWorkflows", joinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId"))
+  @CollectionTable(name = "User_FavouriteWorkflows",
+      joinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId"))
   @Column(name = "favouriteWorkflow")
   @Enumerated(EnumType.STRING)
   private Set<WorkflowName> favouriteWorkflows = new HashSet<>();
 
   @ManyToMany(targetEntity = Group.class)
   @Fetch(FetchMode.SUBSELECT)
-  @JoinTable(name = "User_Group", inverseJoinColumns = { @JoinColumn(name = "groups_groupId") }, joinColumns = {
-      @JoinColumn(name = "users_userId") })
+  @JoinTable(name = "User_Group", inverseJoinColumns = {@JoinColumn(name = "groups_groupId")}, joinColumns = {
+      @JoinColumn(name = "users_userId")})
   private Set<Group> groups = new HashSet<>();
 
   @Lob
@@ -222,11 +199,12 @@ public class UserImpl implements User, Serializable {
   public void setRoles(String[] roles) {
     StringBuilder roleString = new StringBuilder();
     for (String role : roles) {
-      if (!LimsUtils.isStringEmptyOrNull(role)) roleString.append(role);
+      if (!LimsUtils.isStringEmptyOrNull(role))
+        roleString.append(role);
     }
     this.roles = roleString.toString();
   }
-  
+
   @Override
   public Set<WorkflowName> getFavouriteWorkflows() {
     return favouriteWorkflows;
@@ -242,9 +220,12 @@ public class UserImpl implements User, Serializable {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) return false;
-    if (obj == this) return true;
-    if (!(obj instanceof User)) return false;
+    if (obj == null)
+      return false;
+    if (obj == this)
+      return true;
+    if (!(obj instanceof User))
+      return false;
     User them = (User) obj;
     if (!isSaved() || !them.isSaved()) {
       return this.getLoginName().equals(them.getLoginName());
@@ -259,8 +240,10 @@ public class UserImpl implements User, Serializable {
       return ((Long) getId()).intValue();
     } else {
       int hashcode = 1;
-      if (getLoginName() != null) hashcode = 37 * hashcode + getLoginName().hashCode();
-      if (getEmail() != null) hashcode = 37 * hashcode + getEmail().hashCode();
+      if (getLoginName() != null)
+        hashcode = 37 * hashcode + getLoginName().hashCode();
+      if (getEmail() != null)
+        hashcode = 37 * hashcode + getEmail().hashCode();
       return hashcode;
     }
   }
@@ -283,8 +266,10 @@ public class UserImpl implements User, Serializable {
 
   @Override
   public int compareTo(User t) {
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
+    if (getId() < t.getId())
+      return -1;
+    if (getId() > t.getId())
+      return 1;
     return 0;
   }
 

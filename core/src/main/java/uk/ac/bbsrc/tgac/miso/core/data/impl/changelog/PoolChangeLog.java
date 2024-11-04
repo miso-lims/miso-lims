@@ -1,16 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.changelog;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
-import org.hibernate.annotations.Index;
-import org.hibernate.annotations.Table;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -18,8 +16,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.PoolBoxableView;
 
 @Entity
-@Table(appliesTo = "PoolChangeLog", indexes = {
-    @Index(name = "PoolChangeLog_poolId_changeTime", columnNames = {"poolId", "changeTime"})})
+@Table(name = "PoolChangeLog", indexes = {
+    @Index(name = "PoolChangeLog_poolId_changeTime", columnList = "poolId, changeTime")})
 public class PoolChangeLog extends AbstractChangeLog {
 
   private static final long serialVersionUID = 1L;

@@ -23,7 +23,7 @@ public class HibernateTissueOriginDaoIT extends AbstractHibernateSaveDaoTest<Tis
   @Override
   public HibernateTissueOriginDao constructTestSubject() {
     HibernateTissueOriginDao sut = new HibernateTissueOriginDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

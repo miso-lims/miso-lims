@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.json.JsonWriteFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +12,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.bind.support.SessionAttributeStore;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+
+import com.fasterxml.jackson.core.json.JsonWriteFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
@@ -58,7 +59,8 @@ public class WebConfig extends WebMvcConfigurationSupport {
 
   @Bean
   public Map<ProgressStep.FactoryType, ProgressStepFactory> progressStepFactoryMap() {
-    return progressStepFactories.stream().collect(Collectors.toMap(ProgressStepFactory::getFactoryType, Function.identity()));
+    return progressStepFactories.stream()
+        .collect(Collectors.toMap(ProgressStepFactory::getFactoryType, Function.identity()));
   }
 
   @Bean(name = "objectMapper")

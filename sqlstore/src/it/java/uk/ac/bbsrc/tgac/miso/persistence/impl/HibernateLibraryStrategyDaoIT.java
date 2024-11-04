@@ -19,7 +19,7 @@ public class HibernateLibraryStrategyDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     sut = new HibernateLibraryStrategyDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
   }
 
   @Test
@@ -55,7 +55,8 @@ public class HibernateLibraryStrategyDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    LibraryStrategyType saved = (LibraryStrategyType) getSessionFactory().getCurrentSession().get(LibraryStrategyType.class, savedId);
+    LibraryStrategyType saved =
+        (LibraryStrategyType) currentSession().get(LibraryStrategyType.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -63,27 +64,31 @@ public class HibernateLibraryStrategyDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String name = "New Name";
-    LibraryStrategyType type = (LibraryStrategyType) getSessionFactory().getCurrentSession().get(LibraryStrategyType.class, id);
+    LibraryStrategyType type =
+        (LibraryStrategyType) currentSession().get(LibraryStrategyType.class, id);
     assertNotEquals(name, type.getName());
     type.setName(name);
     sut.update(type);
 
     clearSession();
 
-    LibraryStrategyType saved = (LibraryStrategyType) getSessionFactory().getCurrentSession().get(LibraryStrategyType.class, id);
+    LibraryStrategyType saved =
+        (LibraryStrategyType) currentSession().get(LibraryStrategyType.class, id);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsageByLibraries() throws IOException {
-    LibraryStrategyType type = (LibraryStrategyType) getSessionFactory().getCurrentSession().get(LibraryStrategyType.class, 1L);
+    LibraryStrategyType type =
+        (LibraryStrategyType) currentSession().get(LibraryStrategyType.class, 1L);
     assertEquals("WGS", type.getName());
     assertEquals(15L, sut.getUsageByLibraries(type));
   }
 
   @Test
   public void testGetUsageByLibraryDesigns() throws IOException {
-    LibraryStrategyType type = (LibraryStrategyType) getSessionFactory().getCurrentSession().get(LibraryStrategyType.class, 1L);
+    LibraryStrategyType type =
+        (LibraryStrategyType) currentSession().get(LibraryStrategyType.class, 1L);
     assertEquals("WGS", type.getName());
     assertEquals(2L, sut.getUsageByLibraryDesigns(type));
   }

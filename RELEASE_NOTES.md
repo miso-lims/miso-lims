@@ -16,6 +16,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * Subprojects not showing up correctly in several places
+* Errors deleting and linking attachments
 
 
 ## [2.23.0] - 2024-09-27
@@ -35,6 +36,7 @@ Starting with version 1.29.0, the format of this file is based on
 
 * Error when attempting to print barcodes
 * Subprojects not showing up correctly in several places
+* Errors deleting and linking attachments
 
 ### Upgrade Notes
 

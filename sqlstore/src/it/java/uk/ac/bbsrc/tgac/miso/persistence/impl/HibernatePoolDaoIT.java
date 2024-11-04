@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
+import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -88,8 +90,8 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   @Rule
   public final ExpectedException exception = ExpectedException.none();
 
-  @Autowired
-  private SessionFactory sessionFactory;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @InjectMocks
   private HibernatePoolDao dao;
@@ -97,7 +99,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    dao.setSessionFactory(sessionFactory);
+    dao.setEntityManager(entityManager);
   }
 
   @Test
@@ -300,8 +302,8 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     assertEquals("LDI8 should be removed from collection", originalSize - 1, pool.getPoolContents().size());
     dao.update(pool);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    entityManager.unwrap(Session.class).flush();
+    entityManager.unwrap(Session.class).clear();
 
     Pool saved = dao.get(3L);
     int savedSize = saved.getPoolContents().size();
@@ -313,13 +315,13 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     Pool pool = dao.get(1L);
     int originalSize = pool.getPoolContents().size();
     ListLibraryAliquotView ldi =
-        (ListLibraryAliquotView) sessionFactory.getCurrentSession().get(ListLibraryAliquotView.class, 14L);
+        (ListLibraryAliquotView) entityManager.unwrap(Session.class).get(ListLibraryAliquotView.class, 14L);
     PoolElement element = new PoolElement(pool, ldi);
     pool.getPoolContents().add(element);
     dao.update(pool);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    entityManager.unwrap(Session.class).flush();
+    entityManager.unwrap(Session.class).clear();
 
     Pool saved = dao.get(1L);
     int savedSize = saved.getPoolContents().size();
@@ -337,8 +339,8 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     });
     dao.update(pool);
 
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    entityManager.unwrap(Session.class).flush();
+    entityManager.unwrap(Session.class).clear();
 
     Pool saved = dao.get(1L);
     saved.getPoolContents().forEach(pd -> {

@@ -18,7 +18,7 @@ public class HibernateRunPurposeDaoIT extends AbstractHibernateSaveDaoTest<RunPu
   @Override
   public HibernateRunPurposeDao constructTestSubject() {
     HibernateRunPurposeDao sut = new HibernateRunPurposeDao();
-    sut.setSessionFactory(getSessionFactory());
+    sut.setEntityManager(getEntityManager());
     return sut;
   }
 

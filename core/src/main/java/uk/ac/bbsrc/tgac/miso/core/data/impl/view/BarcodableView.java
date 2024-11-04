@@ -1,13 +1,18 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.view;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Immutable;
 
-import javax.persistence.*;
-import java.io.Serializable;
-
-import static uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 
 @Entity
 @Immutable
