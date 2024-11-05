@@ -61,11 +61,7 @@ public class BoxScannerConfigurer {
       }
       else if (type.equals(DP5MIRAGE_SCANNER)) {
         DP5MirageScanner scanner;
-        try {
-          scanner = new DP5MirageScanner(host, port);
-        } catch (IntegrationException e) {
-          throw new IllegalStateException("Failed to initialize DP5Mirage scanner '" + name + "'", e);
-        }
+        scanner = new DP5MirageScanner(host, port);
         scanners.put(name, scanner);
       }
     }
