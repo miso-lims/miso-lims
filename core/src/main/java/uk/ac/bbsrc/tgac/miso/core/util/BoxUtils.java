@@ -99,7 +99,8 @@ public class BoxUtils {
    */
   public static int getColumnNumber(String position) {
     validateReference(position);
-    return Integer.parseInt(position.substring(1, position.length()));
+    // Need to subtract 1 to account for zero-indexed column number.
+    return Integer.parseInt(position.substring(1, position.length())) - 1;
   }
 
   /**

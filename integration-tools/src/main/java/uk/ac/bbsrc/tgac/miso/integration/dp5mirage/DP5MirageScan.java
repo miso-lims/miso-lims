@@ -31,12 +31,14 @@ public class DP5MirageScan implements BoxScan {
 
   @Override
   public String getBarcode(char row, int column) {
-    // We need to subtract 1 from column because of zero-based index
-    return barcodesMap.get(BoxUtils.getPositionString(BoxUtils.fromRowChar(row), column -1 ));
+    // Conversion from char row is already a zero-based index
+    // We need to subtract 1 from column to account for zero-based index
+    return barcodesMap.get(BoxUtils.getPositionString(BoxUtils.fromRowChar(row), column -1));
   }
 
   @Override
   public String getBarcode(int row, int column) {
+    // We need to subtract 1 from row and column to account for zero-based index
     return barcodesMap.get(BoxUtils.getPositionString(row -1, column -1));
   }
 
@@ -113,13 +115,13 @@ public class DP5MirageScan implements BoxScan {
   @Override
   public int getRowCount() {
     SortedSet<String> keys = new TreeSet<>(barcodesMap.keySet());
-    return BoxUtils.getRowNumber(keys.last()) +1;
+    return BoxUtils.getRowNumber(keys.last()) + 1;
   }
 
   @Override
   public int getColumnCount() {
     SortedSet<String> keys = new TreeSet<>(barcodesMap.keySet());
-    return BoxUtils.getColumnNumber(keys.last());
+    return BoxUtils.getColumnNumber(keys.last()) + 1;
   }
 
   @Override
