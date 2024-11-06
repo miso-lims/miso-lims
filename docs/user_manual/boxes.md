@@ -189,8 +189,10 @@ The page will refresh and the box will be empty.
 ## Scanning a Box
 
 If your MISO is configured to use a box scanner, then the box contents can be updated in one operation using
-that box scanner (at the time of this writing, only the Thermo Fisher VisionMate High Speed Barcode Reader
-is supported). A MISO box must be scannable (part of the box size attribute) in order to have the scanning
+that box scanner (at the time of this writing, the Thermo Fisher VisionMate High Speed Barcode 
+Reader and Azenta Life Sciences' Ziath DP5 Mirage Rack Reader
+are supported). A MISO box must be scannable (part of the box size attribute) in order to have the 
+scanning
 option available.
 
 To scan a box, first open the box scanner software on the computer (outside of MISO). Then, go to the Edit Box
@@ -220,6 +222,8 @@ sources of error are:
     * Ensure that the tube barcode is correctly associated with an item in MISO.
  * The network is down or MISO cannot connect to the scanner
     * Fix these problems first, then rescan.
+ * Specific to Ziath DP5 Mirage Rack Reader 
+    * Check if Container UID on the DP5 application has a container named: 'mirage96sbs' 
 
 ## Exporting Box Information
 

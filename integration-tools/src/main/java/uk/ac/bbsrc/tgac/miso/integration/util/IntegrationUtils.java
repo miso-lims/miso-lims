@@ -8,18 +8,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.codec.binary.Base64OutputStream;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,38 +38,6 @@ import org.slf4j.LoggerFactory;
  */
 public class IntegrationUtils {
   private static final Logger log = LoggerFactory.getLogger(IntegrationUtils.class);
-
-  public static String makePostRequest(String host, int port, String query) throws IntegrationException {
-    if (query == null || query.isEmpty()) {
-      throw new IntegrationException("Query must be populated when calling makePostRequest.");
-    }
-
-    String rtn = null;
-    HttpClient httpclient = HttpClientBuilder.create().build();
-    String url = "http://" + host + ":" + port + "/miso/";
-
-    try {
-      HttpPost httpPost = new HttpPost(url);
-      // Request parameters and other properties.
-      httpPost.setHeader("content-type", "application/x-www-form-urlencoded");
-      System.out.println(query);
-      httpPost.setEntity(new StringEntity(query));
-
-      // Execute and get the response.
-      HttpResponse response = httpclient.execute(httpPost);
-      rtn = EntityUtils.toString(response.getEntity());
-      if (rtn.charAt(0) == '"' && rtn.charAt(rtn.length() - 1) == '"') {
-        System.out.println("Removing quotes");
-        rtn = rtn.substring(1, rtn.length() - 1);
-      }
-    } catch (IOException ex) {
-      ex.printStackTrace();
-      throw new IntegrationException("Cannot connect to " + url + " Cause: " + ex.getMessage());
-
-    }
-    return rtn;
-
-  }
 
   /**
    * Sets up the socket connection to a given host
@@ -167,5 +139,33 @@ public class IntegrationUtils {
     }
     bis.close();
     return out.toByteArray();
+  }
+
+  private static String getParameterAppend(Map<String,String> parameters) {
+    return parameters.entrySet().stream().map(e -> new StringBuilder(e.getKey()).append("=").append(e.getValue()).toString()).collect(
+        Collectors.joining("&"));
+  }
+
+  /**
+   * Sending a POST request
+   * @param httpClient
+   * @param uri
+   * @param parameters
+   * @return
+   * @throws URISyntaxException
+   */
+  public static HttpResponse<String> GetPostParamRequest(HttpClient httpClient, URI uri,
+      Map<String, String> parameters)
+      throws URISyntaxException, IOException, InterruptedException {
+    int postActionTimeout = 10;
+    if(parameters != null) {
+      String queryParam = IntegrationUtils.getParameterAppend(parameters);
+      uri= new URI(uri.getScheme(), uri.getAuthority(),
+          uri.getPath(), queryParam, uri.getFragment());
+    }
+
+    return httpClient.send(HttpRequest.newBuilder().uri(uri)
+        .timeout(Duration.ofSeconds(postActionTimeout))
+        .POST(BodyPublishers.ofString("")).build(), BodyHandlers.ofString());
   }
 }

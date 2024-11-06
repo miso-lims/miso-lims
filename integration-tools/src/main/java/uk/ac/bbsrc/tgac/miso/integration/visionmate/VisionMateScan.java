@@ -33,7 +33,7 @@ public class VisionMateScan implements BoxScan {
    */
   @Override
   public String getBarcode(String position) {
-    return getBarcode(BoxUtils.getRowNumber(position) +1, BoxUtils.getColumnNumber(position));
+    return getBarcode(BoxUtils.getRowNumber(position) +1, BoxUtils.getColumnNumber(position) +1);
   }
 
   @Override
@@ -44,12 +44,6 @@ public class VisionMateScan implements BoxScan {
   @Override
   public String getBarcode(int row, int column) {
     return scan.getBarcode(row, column);
-  }
-
-  @Override
-  public String[][] getBarcodesArray() {
-    // scan is immutable and already returns a defensive copy, so returning this does not break immutability
-    return scan.getBarcodes();
   }
 
   @Override
