@@ -818,11 +818,21 @@ public class DefaultSampleService implements SampleService {
     validateDetailedQcStatus(sample, errors);
 
     if (isDetailedSample(sample)) {
-      validateSubproject(sample, beforeChange, errors);
-      validateReferenceSlide((DetailedSample) sample, errors);
-      validateGroupDescription((DetailedSample) sample, errors);
-      if (sample.getRequisition() != null && ((DetailedSample) sample).isSynthetic()) {
-        errors.add(new ValidationError("requisitionId", "Ghost samples cannot be added to requisitions"));
+      DetailedSample detailed = (DetailedSample) sample;
+      validateSubproject(detailed, beforeChange, errors);
+      validateReferenceSlide(detailed, errors);
+      validateGroupDescription(detailed, errors);
+      if (detailed.isSynthetic()) {
+        if (detailed.getRequisition() != null) {
+          errors.add(new ValidationError("requisitionId", "Ghost samples cannot be added to requisitions"));
+        }
+        if (isTissueSample(detailed)) {
+          SampleTissue match = sampleStore.getMatchingGhostTissue((SampleTissue) detailed);
+          if (match != null && match.getId() != detailed.getId()) {
+            errors.add(new ValidationError(
+                "There is already a ghost tissue with this combination of identity, tissue type, tissue origin, times received, tube number, passage number, and timepoint."));
+          }
+        }
       }
     }
 
@@ -835,8 +845,8 @@ public class DefaultSampleService implements SampleService {
     }
   }
 
-  private void validateSubproject(Sample sample, Sample beforeChange, List<ValidationError> errors) throws IOException {
-    DetailedSample detailed = (DetailedSample) sample;
+  private void validateSubproject(DetailedSample detailed, Sample beforeChange, List<ValidationError> errors)
+      throws IOException {
     if (detailed.getSubproject() != null
         && detailed.getSubproject().getParentProject().getId() != detailed.getProject().getId()) {
       errors.add(new ValidationError("subprojectId", "Subproject does not belong to the selected project"));
