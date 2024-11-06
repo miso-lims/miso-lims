@@ -33,7 +33,7 @@ public class VisionMateScan implements BoxScan {
    */
   @Override
   public String getBarcode(String position) {
-    return getBarcode(BoxUtils.getRowNumber(position) +1, BoxUtils.getColumnNumber(position));
+    return getBarcode(BoxUtils.getRowNumber(position) +1, BoxUtils.getColumnNumber(position) +1);
   }
 
   @Override

@@ -148,6 +148,7 @@ public class IntegrationUtils {
 
   /**
    * Sending a POST request
+   * @param httpClient
    * @param uri
    * @param parameters
    * @return

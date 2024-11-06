@@ -32,13 +32,13 @@ public class DP5MirageScan implements BoxScan {
   @Override
   public String getBarcode(char row, int column) {
     // Conversion from char row is already a zero-based index
-    // We need to subtract 1 from column to account for zero-based index
+    // We need to subtract one from column to account for zero-based index
     return barcodesMap.get(BoxUtils.getPositionString(BoxUtils.fromRowChar(row), column -1));
   }
 
   @Override
   public String getBarcode(int row, int column) {
-    // We need to subtract 1 from row and column to account for zero-based index
+    // We need to subtract one from row and column to account for zero-based index
     return barcodesMap.get(BoxUtils.getPositionString(row -1, column -1));
   }
 
@@ -136,7 +136,7 @@ public class DP5MirageScan implements BoxScan {
   private Map<String, String> buildBarcodesMap(List<DP5MirageScanPosition> scanData) {
     Map<String, String> barcodesMap = new HashMap<>();
     for(DP5MirageScanPosition position: scanData) {
-      // -1 for zero indexed box positions
+      // Subtract one for zero-based index box position
       String key = BoxUtils.getPositionString(position.row() -1, position.column() -1);
 
       // Replace null barcode value with either "No Read" or "No Tube" else put barcode value in map

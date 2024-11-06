@@ -72,7 +72,7 @@ public class DP5MirageScanner implements BoxScanner {
       if (response.statusCode() != 200) {
         if (response.statusCode() == 453) {
           throwScanError(String.format("Container is not found. Check that a container with the "
-                  + "container ID: %s is created on the DP5 application.", DP5MirageScanner.params.get(
+                  + "container ID: %s is created on the DP5 application", DP5MirageScanner.params.get(
                       "container_uid")),
               true);
         }
@@ -80,24 +80,24 @@ public class DP5MirageScanner implements BoxScanner {
           throwScanError("Scanner type mismatch", false);
         }
         else if (response.statusCode() == 459) {
-          throwScanError("The scan is not found. Try rescanning after a short period of time,",
+          throwScanError("The scan is not found. Try rescanning after a short period of time",
               true);
         }
         else if (response.statusCode() == 461) {
           throwScanError("The Scanner is not connected. Please check the connection before "
-              + "rescanning.",true);
+              + "rescanning",true);
         }
         else if (response.statusCode() == 468) {
-          throwScanError("Scan result is not ready." ,false);
+          throwScanError("Scan result is not ready" ,false);
         }
         else if (response.statusCode() == 477) {
-          throwScanError("Failed to read a barcode." ,false);
+          throwScanError("Failed to read a barcode" ,false);
         }
         else if (response.statusCode() == 478) {
-          throwScanError("Scanner not found." ,false);
+          throwScanError("Scanner not found" ,false);
         }
         else if (response.statusCode() == 488) {
-          throwScanError("Linear Reader is not configured." ,false);
+          throwScanError("Linear Reader is not configured" ,false);
         }
         else {
           throwScanError("", false);
