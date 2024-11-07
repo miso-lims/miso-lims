@@ -78,10 +78,12 @@ public class DP5MirageScannerTests extends BoxScannerTests<DP5MirageScanner> {
 
   @Override
   protected void prePrepare() {
+    // No prePrepare needed
   }
 
   @Override
   protected void preGet() {
+    // No preGet needed
   }
 
   @Test
@@ -95,7 +97,7 @@ public class DP5MirageScannerTests extends BoxScannerTests<DP5MirageScanner> {
                 + "\"2024-10-07T19:20:17.413Z\", \"containerBarcode\": "
                 + "\"empty-container-barcode\", \"scanTimeAnswers\": null,  "
                 + "\"containerName\": \"96 SBS rack\", \"containerUid\": "
-                + "\"simulatemirage96sbs\", \"demoImage\": null, \"containerGuid\": "
+                + "\"mirage96sbs\", \"demoImage\": null, \"containerGuid\": "
                 + "\"f156992b-36c7-7987-3a78-2012542ta2e\", \"rawImage\": null,  "
                 + "\"annotatedImage\": null, \"linearReaderImage\": null, \"tubeBarcode\": [{"
                 + "\"row\": 1, \"y\": 0, \"x\": 0, \"decodeStatus\": \"SUCCESS\", "
@@ -125,7 +127,7 @@ public class DP5MirageScannerTests extends BoxScannerTests<DP5MirageScanner> {
                 + "\"2024-10-07T19:20:17.413Z\", \"containerBarcode\": "
                 + "\"empty-container-barcode\", \"scanTimeAnswers\": null,  "
                 + "\"containerName\": \"96 SBS rack\", \"containerUid\": "
-                + "\"simulatemirage96sbs\", \"demoImage\": null, \"containerGuid\": "
+                + "\"mirage96sbs\", \"demoImage\": null, \"containerGuid\": "
                 + "\"f156992b-36c7-7987-3a78-2012542ta2e\", \"rawImage\": null,  "
                 + "\"annotatedImage\": null, \"linearReaderImage\": null, \"tubeBarcode\": [{"
                 + "\"row\": 1, \"y\": 0, \"x\": 0, \"decodeStatus\": \"SUCCESS\", "
@@ -157,7 +159,7 @@ public class DP5MirageScannerTests extends BoxScannerTests<DP5MirageScanner> {
                 + "\"2024-10-07T19:20:17.413Z\", \"containerBarcode\": "
                 + "\"empty-container-barcode\", \"scanTimeAnswers\": null,  "
                 + "\"containerName\": \"96 SBS rack\", \"containerUid\": "
-                + "\"simulatemirage96sbs\", \"demoImage\": null, \"containerGuid\": "
+                + "\"mirage96sbs\", \"demoImage\": null, \"containerGuid\": "
                 + "\"f156992b-36c7-7987-3a78-2012542ta2e\", \"rawImage\": null,  "
                 + "\"annotatedImage\": null, \"linearReaderImage\": null, \"tubeBarcode\": [{"
                 + "\"row\": 1, \"y\": 0, \"x\": 0, \"decodeStatus\": \"SUCCESS\", "
