@@ -76,8 +76,8 @@ public interface SampleStore extends SaveDao<Sample>, PaginatedDataSource<Sample
                         throws IOException;
 
         /**
-         * Find a ghost Tissue with Identity, Tissue Origin, Tissue Type, times received, tube number, and
-         * passage number matching the provided Tissue
+         * Find a ghost Tissue with Identity, Tissue Origin, Tissue Type, times received, tube number,
+         * passage number, and timepoint matching the provided Tissue
          * 
          * @param tissue partially-formed tissue, minimally containing all of the above-noted attributes.
          *        Tissue Origin, Tissue Type, and parent (Identity) must have their IDs set. Passage number
