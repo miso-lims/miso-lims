@@ -1,1 +1,0 @@
-Rescan function was not working after a box scanning error

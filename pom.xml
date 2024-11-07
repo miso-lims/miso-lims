@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.ac.bbsrc.tgac.miso</groupId>
   <artifactId>miso</artifactId>
-  <version>2.23.2-SNAPSHOT</version>
+  <version>3.0.0</version>
   <packaging>pom</packaging>
   <name>MISO LIMS</name>
   <url>http://miso-lims.github.io/miso-lims/</url>

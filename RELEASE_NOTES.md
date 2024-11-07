@@ -7,6 +7,32 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.0.0] - 2024-11-07
+
+### Added
+
+* DP5Mirage Scanner is now supported. The following sections of the User Manual should be helpful
+  * [Boxes](https://miso-lims.readthedocs.io/projects/docs/en/latest/user_manual/boxes/#scanning-a-box)
+  * [Configuration](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/site-configuration/#integration)
+
+### Fixed
+
+* Potential situation where multiple ghost tissues have the same donor, tissue type, tissue origin,
+  times received, tube number, passage number, and timepoint, which causes an issue when attempting to
+  receive more samples with the same attributes (detailed sample)
+* Subprojects not showing up correctly in several places
+* Rescan function was not working after a box scanning error
+* Errors deleting and linking attachments
+* Sample advanced search using is:ghost or is:real were returning no results (detailed sample)
+
+### Upgrade Notes
+
+* If you use any box scanners with MISO, you will need to update your `miso.properties`. The `miso.
+  visionmate.servers` property has been renamed to `miso.boxscanner.servers` and its format has
+  changed to include the scanner type. See [site-configuration](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/site-configuration/#miso.boxscanner.servers) for more details.
+* MISO now requires Tomcat 10 and will not run on older versions
+
+
 ## [2.23.1] - 2024-10-04
 
 ### Fixed
