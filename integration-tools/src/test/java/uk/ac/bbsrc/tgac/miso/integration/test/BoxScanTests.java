@@ -57,7 +57,11 @@ public abstract class BoxScanTests<T extends BoxScan> {
     String position = BoxUtils.getPositionString(0, 0);
     assertEquals(map.get(position), "11111");
     assertEquals(position, "A01");
-    map.put(position, "changed");
+    try {
+      map.put(position, "changed");
+    } catch (UnsupportedOperationException e) {
+      // ignore exception. This means the map itself is immutable
+    }
     map = fullScan.getBarcodesMap();
     assertEquals(map.get(position), "11111");
     assertEquals(map.get(position), map.get("A01"));

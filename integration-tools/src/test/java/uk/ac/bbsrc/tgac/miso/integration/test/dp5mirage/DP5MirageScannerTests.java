@@ -143,7 +143,6 @@ public class DP5MirageScannerTests extends BoxScannerTests<DP5MirageScanner> {
     client.prepareScan(2, 2);
     simulateScan(getSampleScan("22222"));
     preGet();
-
     BoxScan scan = client.getScan();
     assertEquals("22222", scan.getBarcode(1, 1));
   }
