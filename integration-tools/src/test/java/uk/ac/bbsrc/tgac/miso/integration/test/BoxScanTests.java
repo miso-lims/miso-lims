@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
-import uk.ac.bbsrc.tgac.miso.integration.dp5mirage.DP5MirageScanner.DP5MirageScanPosition;
 
 public abstract class BoxScanTests<T extends BoxScan> {
   
@@ -74,7 +73,6 @@ public abstract class BoxScanTests<T extends BoxScan> {
     assertEquals(fullScan.getMaximumTubeCount(), 4);
     assertEquals(fullScan.getTubeCount(), 4);
     assertFalse(fullScan.hasReadErrors());
-    
   }
   
   @Test
@@ -104,5 +102,4 @@ public abstract class BoxScanTests<T extends BoxScan> {
     assertTrue("A02".equals(errPositions.get(0)) || "A02".equals(errPositions.get(1)));
     assertTrue("B01".equals(errPositions.get(0)) || "B01".equals(errPositions.get(1)));
   }
-  
 }

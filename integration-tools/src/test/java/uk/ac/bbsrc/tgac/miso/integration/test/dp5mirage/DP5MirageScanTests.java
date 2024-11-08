@@ -22,10 +22,10 @@ public class DP5MirageScanTests extends BoxScanTests<DP5MirageScan> {
   @Override
   protected DP5MirageScan getEmptyScan() {
     List<DP5MirageScanPosition> records = new ArrayList<>();
-    records.add(new DP5MirageScanPosition("null", "EMPTY", 1, 1, 1, 1));
-    records.add(new DP5MirageScanPosition("null", "EMPTY", 1, 2, 1, 2));
-    records.add(new DP5MirageScanPosition("null", "EMPTY", 2, 1, 2, 1));
-    records.add(new DP5MirageScanPosition("null", "EMPTY", 2, 2, 2, 2));
+    records.add(new DP5MirageScanPosition("No Tube", "EMPTY", 1, 1, 1, 1));
+    records.add(new DP5MirageScanPosition("No Tube", "EMPTY", 1, 2, 1, 2));
+    records.add(new DP5MirageScanPosition("No Tube", "EMPTY", 2, 1, 2, 1));
+    records.add(new DP5MirageScanPosition("No Tube", "EMPTY", 2, 2, 2, 2));
 
     return new DP5MirageScan(records);
   }
