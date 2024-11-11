@@ -489,6 +489,8 @@ public class Dtos {
       setId(dto::setRequisitionId, requisition);
       setString(dto::setRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
+      dto.setRequisitionPaused(!requisition.getPauses().isEmpty());
+      dto.setRequisitionStopped(requisition.isStopped());
     }
 
     return dto;
