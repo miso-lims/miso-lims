@@ -158,6 +158,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
@@ -489,8 +490,15 @@ public class Dtos {
       setId(dto::setRequisitionId, requisition);
       setString(dto::setRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
-      dto.setRequisitionPaused(!requisition.getPauses().isEmpty());
       dto.setRequisitionStopped(requisition.isStopped());
+      for (RequisitionPause pause: requisition.getPauses())
+      {
+        LocalDate endDate = pause.getEndDate();
+        if (endDate == null || endDate.isAfter(LocalDate.now()))
+        {
+          dto.setRequisitionPaused(true);
+        }
+      }
     }
 
     return dto;
@@ -616,8 +624,15 @@ public class Dtos {
       setId(dto::setEffectiveRequisitionId, requisition);
       setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
-      dto.setRequisitionPaused(!requisition.getPauses().isEmpty());
       dto.setRequisitionStopped(requisition.isStopped());
+      for (RequisitionPause pause: requisition.getPauses())
+      {
+        LocalDate endDate = pause.getEndDate();
+        if (endDate == null || endDate.isAfter(LocalDate.now()))
+        {
+          dto.setRequisitionPaused(true);
+        }
+      }
     }
 
     return dto;
@@ -1497,8 +1512,15 @@ public class Dtos {
     if (requisition != null) {
       setId(dto::setRequisitionId, requisition);
       setString(dto::setRequisitionAlias, requisition.getAlias());
-      dto.setRequisitionPaused(!requisition.getPauses().isEmpty());
       dto.setRequisitionStopped(requisition.isStopped());
+      for (RequisitionPause pause: requisition.getPauses())
+      {
+        LocalDate endDate = pause.getEndDate();
+        if (endDate == null || endDate.isAfter(LocalDate.now()))
+        {
+          dto.setRequisitionPaused(true);
+        }
+      }
     } else {
       requisition = getEffectiveRequisition(from);
     }
@@ -1506,8 +1528,15 @@ public class Dtos {
       setId(dto::setEffectiveRequisitionId, requisition);
       setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
-      dto.setRequisitionPaused(!requisition.getPauses().isEmpty());
       dto.setRequisitionStopped(requisition.isStopped());
+      for (RequisitionPause pause: requisition.getPauses())
+      {
+        LocalDate endDate = pause.getEndDate();
+        if (endDate == null || endDate.isAfter(LocalDate.now()))
+        {
+          dto.setRequisitionPaused(true);
+        }
+      }
     }
 
     return dto;
@@ -1799,8 +1828,15 @@ public class Dtos {
       setId(dto::setRequisitionId, requisition);
       setString(dto::setRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
-      dto.setRequisitionPaused(!requisition.getPauses().isEmpty());
       dto.setRequisitionStopped(requisition.isStopped());
+      for (RequisitionPause pause: requisition.getPauses())
+      {
+        LocalDate endDate = pause.getEndDate();
+        if (endDate == null || endDate.isAfter(LocalDate.now()))
+        {
+          dto.setRequisitionPaused(true);
+        }
+      }
     }
 
     return dto;

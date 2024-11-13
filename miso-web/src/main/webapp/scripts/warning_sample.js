@@ -19,14 +19,14 @@ WarningTarget.sample = {
       },
       {
         include: sample.requisitionStopped === true,
-        headerMessage: "Requisition is stopped",
-        tableMessage: "Requisition has been stopped",
+        headerMessage: "Requisition has been stopped",
+        tableMessage: "Requisition stopped",
         level: "error",
       },
       {
         include: sample.requisitionPaused === true,
-        headerMessage: "Requisition is paused",
-        tableMessage: "Requisition has been stopped",
+        headerMessage: "Requisition has been paused",
+        tableMessage: "Requisition paused",
         level: "error",
       },
       Warning.common.qcFailure(sample),

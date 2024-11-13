@@ -690,13 +690,13 @@ public class LibraryDto extends AbstractBoxableDto
     this.projectCode = projectCode;
   }
 
-  public boolean getRequisitionStopped() { return requisitionStopped; }
+  public Boolean getRequisitionStopped() { return requisitionStopped; }
 
   public void setRequisitionStopped(Boolean requisitionStopped) {
     this.requisitionStopped = requisitionStopped;
   }
 
-  public boolean getRequisitionPaused() { return requisitionPaused; }
+  public Boolean getRequisitionPaused() { return requisitionPaused; }
 
   public void setRequisitionPaused(Boolean requisitionPaused) {
     this.requisitionPaused = requisitionPaused;
