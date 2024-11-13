@@ -25,6 +25,10 @@ Starting with version 1.29.0, the format of this file is based on
 * Errors deleting and linking attachments
 * Sample advanced search using is:ghost or is:real were returning no results (detailed sample)
 
+### Known Issues
+
+* Pinery-MISO's interactive Swagger docs generating incorrect URLs in some configurations
+
 ### Upgrade Notes
 
 * If you use any box scanners with MISO, you will need to update your `miso.properties`. The `miso.

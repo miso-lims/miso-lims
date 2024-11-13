@@ -12,15 +12,10 @@ want to use a different data source. If you instead write your applications to u
 you only need to write a new Pinery implementation (or use an existing one) and all of your other
 applications remain functional.
 
-The Pinery project contains some other useful modules for working with Pinery-MISO
+The Pinery project also contains **pinery-client** - a Java library for consuming Pinery data.
 
-* **pinery-to-flatfile utility**: dumps all Pinery data to *.tsv flat files
-* **pinery-lims-flatfile**: another Pinery webservice implementation that reads data from *.tsv flat files
-* **pinery-client**: A client library for consuming Pinery data
-
-If the pinery-miso webapp is under heavy load, a good option is to use pinery-to-flatfile to dump the
-pinery-miso data into files on an hourly basis, and deploy a pinery-lims-flatfile webapp to read
-from these. Clients can then use the flatfile webapp instead, to reduce strain on the MISO DB.
+If the pinery-miso webapp is under heavy load, or there is a lot of data, you can configure caching
+to improve performance.
 
 ## Deploying Pinery-MISO
 
@@ -33,9 +28,15 @@ from these. Clients can then use the flatfile webapp instead, to reduce strain o
 
 2. Stop tomcat
 
-3. Configure database connection. Copy the [properties file](src/main/resources/pinery-miso.properties) to
-   `${CATALINA_HOME}/conf/Catalina/localhost/` and modify it as appropriate. Since this is a
-   read-only service, the database user only requires read access.
+3. Configure Pinery-MISO. Copy the [properties file](src/main/resources/pinery-miso.properties) to
+   `${CATALINA_HOME}/conf/Catalina/localhost/` and modify it as appropriate.
+   - Database connection parameters - since this is a read-only service, the database user only
+     requires read access.
+   - Caching - enable if desired, and set an update interval in seconds. An interval of `0` (zero)
+     means that the cache will need to be updated manually by calling the `/updatecache` endpoint.
+   - If you are deploying Pinery-MISO behind a reverse-proxy and find that the Swagger docs are not
+     working properly, it may be necessary to configure the base URL for Swagger. You can do this by
+     setting the `swagger.baseUrl` property.
 
 4. Deploy the webapp:
   * Copy the [example context file](src/main/resources/context-example.xml) to
