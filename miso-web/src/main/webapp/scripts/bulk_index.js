@@ -59,7 +59,7 @@ BulkTarget.index = (function ($) {
           title: "Sequence",
           data: "sequence",
           type: "text",
-          maxLength: 24,
+          maxLength: 120,
           required: true,
           regex: "^[ACGT]+$",
           description: "Can only include the characters [A, C, G, T]",
