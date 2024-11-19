@@ -98,6 +98,8 @@ public class LibraryDto extends AbstractBoxableDto
   private Long effectiveRequisitionId;
   private String effectiveRequisitionAlias;
   private List<Long> requisitionAssayIds;
+  private Boolean requisitionStopped;
+  private Boolean requisitionPaused;
 
   public String getAlias() {
     return alias;
@@ -686,5 +688,17 @@ public class LibraryDto extends AbstractBoxableDto
 
   public void setProjectCode(String projectCode) {
     this.projectCode = projectCode;
+  }
+
+  public Boolean getRequisitionStopped() { return requisitionStopped; }
+
+  public void setRequisitionStopped(Boolean requisitionStopped) {
+    this.requisitionStopped = requisitionStopped;
+  }
+
+  public Boolean getRequisitionPaused() { return requisitionPaused; }
+
+  public void setRequisitionPaused(Boolean requisitionPaused) {
+    this.requisitionPaused = requisitionPaused;
   }
 }

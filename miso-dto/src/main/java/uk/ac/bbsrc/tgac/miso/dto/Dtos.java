@@ -489,6 +489,10 @@ public class Dtos {
       setId(dto::setRequisitionId, requisition);
       setString(dto::setRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
+      dto.setRequisitionStopped(requisition.isStopped());
+      dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
+          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
+      ));
     }
 
     return dto;
@@ -614,6 +618,10 @@ public class Dtos {
       setId(dto::setEffectiveRequisitionId, requisition);
       setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
+      dto.setRequisitionStopped(requisition.isStopped());
+      dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
+          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
+      ));
     }
 
     return dto;
@@ -1500,6 +1508,10 @@ public class Dtos {
       setId(dto::setEffectiveRequisitionId, requisition);
       setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
+      dto.setRequisitionStopped(requisition.isStopped());
+      dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
+          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
+      ));
     }
 
     return dto;
@@ -1791,6 +1803,10 @@ public class Dtos {
       setId(dto::setRequisitionId, requisition);
       setString(dto::setRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
+      dto.setRequisitionStopped(requisition.isStopped());
+      dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
+          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
+      ));
     }
 
     return dto;

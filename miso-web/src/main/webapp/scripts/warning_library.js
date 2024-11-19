@@ -22,6 +22,18 @@ WarningTarget.library = {
         headerMessage: "Low Quality Library",
         tableMessage: Constants.warningMessages.lowQualityLibraries,
       },
+      {
+        include: library.requisitionStopped === true,
+        headerMessage: "Requisition has been stopped",
+        tableMessage: "Requisition stopped",
+        level: "error",
+      },
+      {
+        include: library.requisitionPaused === true,
+        headerMessage: "Requisition has been paused",
+        tableMessage: "Requisition paused",
+        level: "error",
+      },
       Warning.common.qcFailure(library),
       Warning.common.effectiveQcFailure(library),
     ];
