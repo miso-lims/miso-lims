@@ -490,7 +490,9 @@ public class Dtos {
       setString(dto::setRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
       dto.setRequisitionStopped(requisition.isStopped());
-      dto.setRequisitionPaused(updateRequisitionPausedStatus(requisition));
+      dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
+          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
+      ));
     }
 
     return dto;
@@ -617,7 +619,9 @@ public class Dtos {
       setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
       dto.setRequisitionStopped(requisition.isStopped());
-      dto.setRequisitionPaused(updateRequisitionPausedStatus(requisition));
+      dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
+          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
+      ));
     }
 
     return dto;
@@ -797,12 +801,6 @@ public class Dtos {
       }
     }
     return parent;
-  }
-
-  private static Boolean updateRequisitionPausedStatus(Requisition requisition) {
-    return requisition.getPauses().stream().anyMatch(
-        pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
-    );
   }
 
   public static TissueMaterialDto asDto(@Nonnull TissueMaterial from) {
@@ -1504,7 +1502,9 @@ public class Dtos {
       setId(dto::setRequisitionId, requisition);
       setString(dto::setRequisitionAlias, requisition.getAlias());
       dto.setRequisitionStopped(requisition.isStopped());
-      dto.setRequisitionPaused(updateRequisitionPausedStatus(requisition));
+      dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
+          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
+      ));
     } else {
       requisition = getEffectiveRequisition(from);
     }
@@ -1513,7 +1513,9 @@ public class Dtos {
       setString(dto::setEffectiveRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
       dto.setRequisitionStopped(requisition.isStopped());
-      dto.setRequisitionPaused(updateRequisitionPausedStatus(requisition));
+      dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
+          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
+      ));
     }
 
     return dto;
@@ -1806,7 +1808,9 @@ public class Dtos {
       setString(dto::setRequisitionAlias, requisition.getAlias());
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
       dto.setRequisitionStopped(requisition.isStopped());
-      dto.setRequisitionPaused(updateRequisitionPausedStatus(requisition));
+      dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
+          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
+      ));
     }
 
     return dto;
