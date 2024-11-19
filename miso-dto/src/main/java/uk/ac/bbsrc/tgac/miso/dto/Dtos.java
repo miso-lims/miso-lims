@@ -1501,10 +1501,6 @@ public class Dtos {
     if (requisition != null) {
       setId(dto::setRequisitionId, requisition);
       setString(dto::setRequisitionAlias, requisition.getAlias());
-      dto.setRequisitionStopped(requisition.isStopped());
-      dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
-          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
-      ));
     } else {
       requisition = getEffectiveRequisition(from);
     }
