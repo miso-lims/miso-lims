@@ -43,7 +43,7 @@ public class DP5MirageScannerTests extends BoxScannerTests<DP5MirageScanner> {
 
   @Override
   protected void simulateScan(BoxScan scan) {
-    // Check barcode and return stubbed response depending on barcode in first position [1,1]
+    // Return a specific canned HTTP response, depending on the barcode in first position [1,1]
     if (scan.getBarcode(1, 1).equals("11111")) {
       stubFor(post(urlEqualTo("/dp5/remote/v1/scan?container_uid=mirage96sbs"))
           .willReturn(aResponse()
