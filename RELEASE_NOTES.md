@@ -7,6 +7,22 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.1.0] - 2024-11-21
+
+### Added
+
+* "Consent" sample attribute in Pinery
+* Added header and table warnings for stopped and paused requisitions
+
+### Changed
+
+* Index sequence max length to 120 characters/bases
+
+### Fixed
+
+* Pinery-MISO's interactive Swagger docs generating incorrect URLs in some configurations
+
+
 ## [3.0.0] - 2024-11-07
 
 ### Added
