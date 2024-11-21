@@ -1235,7 +1235,8 @@ public class MisoClient implements Lims {
       LATEST_TRANSFER_REQUEST("latest_transfer_request", "Latest Transfer Request"), //
       BATCH_ID("batch_id", "Batch ID"), //
       TIMEPOINT("timepoint", "Timepoint"), //
-      REQUISITION_ID("requisitionId", "Requisition ID");
+      REQUISITION_ID("requisitionId", "Requisition ID"), //
+      CONSENT("consentLevel", "Consent");
 
       private final String sqlKey;
       private final String attributeKey;
