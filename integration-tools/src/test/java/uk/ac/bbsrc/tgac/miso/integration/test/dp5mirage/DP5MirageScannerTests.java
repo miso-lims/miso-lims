@@ -1,5 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.integration.test.dp5mirage;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +13,6 @@ import uk.ac.bbsrc.tgac.miso.integration.dp5mirage.DP5MirageScan;
 import uk.ac.bbsrc.tgac.miso.integration.dp5mirage.DP5MirageScanner;
 import uk.ac.bbsrc.tgac.miso.integration.dp5mirage.DP5MirageScanner.DP5MirageScanPosition;
 import uk.ac.bbsrc.tgac.miso.integration.test.BoxScannerTests;
-import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -24,7 +26,7 @@ public class DP5MirageScannerTests extends BoxScannerTests<DP5MirageScanner> {
   private static DP5MirageScanner client;
 
   @BeforeClass
-  public static void setup() throws IntegrationException {
+  public static void setup() {
     server = new WireMockServer(WireMockConfiguration.wireMockConfig().dynamicPort());
     server.start();
     WireMock.configureFor("localhost", server.port());
@@ -37,76 +39,66 @@ public class DP5MirageScannerTests extends BoxScannerTests<DP5MirageScanner> {
   }
 
   @Override
-  protected DP5MirageScanner getScanner() throws IntegrationException {
+  protected DP5MirageScanner getScanner() {
     return client;
   }
 
   @Override
   protected void simulateScan(BoxScan scan) {
-    // Return a specific canned HTTP response, depending on the barcode in first position [1,1]
-    if (scan.getBarcode(1, 1).equals("11111")) {
-      stubFor(post(urlEqualTo("/dp5/remote/v1/scan?container_uid=mirage96sbs"))
-          .willReturn(aResponse()
-              .withStatus(200)
-              .withHeader("Content-Type", "application/json")
-              .withBody("{\"scanId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\", \"scanTime\": "
-                  + "\"2024-10-07T19:20:17.413Z\", \"containerBarcode\": "
-                  + "\"empty-container-barcode\", \"scanTimeAnswers\": null,  "
-                  + "\"containerName\": \"96 SBS rack\", \"containerUid\": "
-                  + "\"mirage96sbs\", \"demoImage\": null, \"containerGuid\": "
-                  + "\"f156992b-36c7-7987-3a78-2012542ta2e\", \"rawImage\": null,  "
-                  + "\"annotatedImage\": null, \"linearReaderImage\": null, \"tubeBarcode\": [{"
-                  + "\"row\": 1, \"y\": 0, \"x\": 0, \"decodeStatus\": \"SUCCESS\", "
-                  + "\"column\": 1, \"barcode\": \"11111\"}, {\"row\": 1, "
-                  + "\"y\": 0, \"x\": 0, \"decodeStatus\": \"EMPTY\", \"column\": "
-                  + "2, \"barcode\": \"null\"}, {\"row\": 2, \"y\": 0, "
-                  + "\"x\": 0, \"decodeStatus\": \"EMPTY\", \"column\": 1, "
-                  + "\"barcode\": \"null\"}, {\"row\": 2, \"y\": 0, "
-                  + "\"x\": 0, \"decodeStatus\": \"EMPTY\", \"column\": 2, "
-                  + "\"barcode\": \"null\"}]}")));
+    // Create the scan object node
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode scanObjectNode = mapper.createObjectNode();
+    ArrayNode tubeBarcodeArrayNode = mapper.createArrayNode();
+
+    // Create all the fields required from a scan
+    scanObjectNode.put("scanId", "3fa85f64-5717-4562-b3fc-2c963f66afa6");
+    scanObjectNode.put("scanTime", "2024-10-07T19:20:17.413Z");
+    scanObjectNode.put("containerBarcode", "container-barcode");
+    scanObjectNode.put("scanTimeAnswers", "null");
+    scanObjectNode.put("containerName", "96 SBS rack");
+    scanObjectNode.put("containerBarcode", "empty-container-barcode");
+    scanObjectNode.put("containerUid", "mirage96sbs");
+    scanObjectNode.put("demoImage", "null");
+    scanObjectNode.put("containerGuid", "f156992b-36c7-7987-3a78-2012542ta2e");
+    scanObjectNode.put("rawImage", "null");
+    scanObjectNode.put("annotatedImage", "null");
+    scanObjectNode.put("linearReaderImage", "null");
+
+    // Grab row and column information from the test scan
+    int rows = scan.getRowCount();
+    int cols = scan.getColumnCount();
+    for (int col = 1; col <= cols; col++) {
+      for (int row = 1; row <= rows; row++) {
+        // create ObjectNode for each tubeBarcode position
+        ObjectNode positionObjectNode = mapper.createObjectNode();
+        positionObjectNode.put("row", row);
+        positionObjectNode.put("y", col);
+        positionObjectNode.put("x", row);
+        // Get the decode status
+        if (scan.getBarcode(row, col).equals("No Tube")) {
+          positionObjectNode.put("decodeStatus", "EMPTY");
+        }
+        else if (scan.getBarcode(row, col).equals("No Read")) {
+          positionObjectNode.put("decodeStatus","ERROR");
+        }
+        else {
+          positionObjectNode.put("decodeStatus","SUCCESS");
+        }
+        positionObjectNode.put("column", col);
+        positionObjectNode.put("barcode", scan.getBarcode(row, col));
+
+        // Add the position to the arrayNode
+        tubeBarcodeArrayNode.add(positionObjectNode);
+      }
     }
-    else if (scan.getBarcode(1, 1).equals("22222")) {
-      stubFor(post(urlEqualTo("/dp5/remote/v1/scan?container_uid=mirage96sbs"))
-          .willReturn(aResponse()
-              .withStatus(200)
-              .withHeader("Content-Type", "application/json")
-              .withBody("{\"scanId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\", \"scanTime\": "
-                  + "\"2024-10-07T19:20:17.413Z\", \"containerBarcode\": "
-                  + "\"empty-container-barcode\", \"scanTimeAnswers\": null,  "
-                  + "\"containerName\": \"96 SBS rack\", \"containerUid\": "
-                  + "\"mirage96sbs\", \"demoImage\": null, \"containerGuid\": "
-                  + "\"f156992b-36c7-7987-3a78-2012542ta2e\", \"rawImage\": null,  "
-                  + "\"annotatedImage\": null, \"linearReaderImage\": null, \"tubeBarcode\": [{"
-                  + "\"row\": 1, \"y\": 0, \"x\": 0, \"decodeStatus\": \"SUCCESS\", "
-                  + "\"column\": 1, \"barcode\": \"22222\"}, {\"row\": 1, "
-                  + "\"y\": 0, \"x\": 0, \"decodeStatus\": \"EMPTY\", \"column\": "
-                  + "2, \"barcode\": \"null\"}, {\"row\": 2, \"y\": 0, "
-                  + "\"x\": 0, \"decodeStatus\": \"EMPTY\", \"column\": 1, "
-                  + "\"barcode\": \"null\"}, {\"row\": 2, \"y\": 0, "
-                  + "\"x\": 0, \"decodeStatus\": \"EMPTY\", \"column\": 2, "
-                  + "\"barcode\": \"null\"}]}")));
-    }
-    else if (scan.getBarcode(1, 1).equals("33333")) {
-      stubFor(post(urlEqualTo("/dp5/remote/v1/scan?container_uid=mirage96sbs"))
-          .willReturn(aResponse()
-              .withStatus(200)
-              .withHeader("Content-Type", "application/json")
-              .withBody("{\"scanId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\", \"scanTime\": "
-                  + "\"2024-10-07T19:20:17.413Z\", \"containerBarcode\": "
-                  + "\"empty-container-barcode\", \"scanTimeAnswers\": null,  "
-                  + "\"containerName\": \"96 SBS rack\", \"containerUid\": "
-                  + "\"mirage96sbs\", \"demoImage\": null, \"containerGuid\": "
-                  + "\"f156992b-36c7-7987-3a78-2012542ta2e\", \"rawImage\": null,  "
-                  + "\"annotatedImage\": null, \"linearReaderImage\": null, \"tubeBarcode\": [{"
-                  + "\"row\": 1, \"y\": 0, \"x\": 0, \"decodeStatus\": \"SUCCESS\", "
-                  + "\"column\": 1, \"barcode\": \"33333\"}, {\"row\": 1, "
-                  + "\"y\": 0, \"x\": 0, \"decodeStatus\": \"EMPTY\", \"column\": "
-                  + "2, \"barcode\": \"null\"}, {\"row\": 2, \"y\": 0, "
-                  + "\"x\": 0, \"decodeStatus\": \"EMPTY\", \"column\": 1, "
-                  + "\"barcode\": \"null\"}, {\"row\": 2, \"y\": 0, "
-                  + "\"x\": 0, \"decodeStatus\": \"EMPTY\", \"column\": 2, "
-                  + "\"barcode\": \"null\"}]}")));
-    }
+    scanObjectNode.put("tubeBarcode", tubeBarcodeArrayNode);
+
+    // Create the stubbed mock response
+    stubFor(post(urlEqualTo("/dp5/remote/v1/scan?container_uid=mirage96sbs"))
+    .willReturn(aResponse()
+          .withStatus(200)
+          .withHeader("Content-Type", "application/json")
+          .withBody(scanObjectNode.toString())));
   }
 
   @Override
