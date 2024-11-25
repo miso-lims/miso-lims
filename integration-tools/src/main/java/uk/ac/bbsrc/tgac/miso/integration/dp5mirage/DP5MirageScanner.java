@@ -110,7 +110,6 @@ public class DP5MirageScanner implements BoxScanner {
 
       // Convert the 'barcodes' array into a list of barcodePositionData records
       records = mapper.convertValue(rootNode.get("tubeBarcode"), new TypeReference<>() {});
-
     } catch (IOException | InterruptedException | URISyntaxException e) {
       throw new IntegrationException("Error communicating with the scanner", e);
     }

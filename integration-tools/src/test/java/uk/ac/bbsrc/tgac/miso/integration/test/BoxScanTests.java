@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
-import uk.ac.bbsrc.tgac.miso.integration.dp5mirage.DP5MirageScanner.DP5MirageScanPosition;
 
 public abstract class BoxScanTests<T extends BoxScan> {
   
@@ -58,7 +57,11 @@ public abstract class BoxScanTests<T extends BoxScan> {
     String position = BoxUtils.getPositionString(0, 0);
     assertEquals(map.get(position), "11111");
     assertEquals(position, "A01");
-    map.put(position, "changed");
+    try {
+      map.put(position, "changed");
+    } catch (UnsupportedOperationException e) {
+      // ignore exception. This means the map itself is immutable
+    }
     map = fullScan.getBarcodesMap();
     assertEquals(map.get(position), "11111");
     assertEquals(map.get(position), map.get("A01"));
@@ -74,7 +77,6 @@ public abstract class BoxScanTests<T extends BoxScan> {
     assertEquals(fullScan.getMaximumTubeCount(), 4);
     assertEquals(fullScan.getTubeCount(), 4);
     assertFalse(fullScan.hasReadErrors());
-    
   }
   
   @Test
@@ -104,5 +106,4 @@ public abstract class BoxScanTests<T extends BoxScan> {
     assertTrue("A02".equals(errPositions.get(0)) || "A02".equals(errPositions.get(1)));
     assertTrue("B01".equals(errPositions.get(0)) || "B01".equals(errPositions.get(1)));
   }
-  
 }
