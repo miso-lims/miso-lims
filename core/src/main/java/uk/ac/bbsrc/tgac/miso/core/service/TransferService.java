@@ -17,10 +17,29 @@ public interface TransferService extends DeleterService<Transfer>, ListService<T
 
   public long countPendingForUser(User user) throws IOException;
 
-  public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferTime) throws IOException;
+  public List<Transfer> listByProperties(Lab sender, Group recipient, Project project, Date transferTime)
+      throws IOException;
 
+  /**
+   * Adds a sample to a transfer by persisting a TransferSample which links them. This is intended for
+   * receipt or internal transfers only, which should not cause further changes to the sample, and as
+   * such, no validation of the sample is performed.
+   * 
+   * @param transferSample
+   * @throws IOException
+   * @throws IllegalArgumentException if a distribution transfer is involved
+   */
   public void addTransferSample(TransferSample transferSample) throws IOException;
 
+  /**
+   * Adds a library to a transfer by persisting a TransferLibrary which links them. This is intended
+   * for receipt or internal transfers only, which should not cause further changes to the library,
+   * and as such, no validation of the library is performed.
+   * 
+   * @param transferLibrary
+   * @throws IOException
+   * @throws IllegalArgumentException if a distribution transfer is involved
+   */
   public void addTransferLibrary(TransferLibrary transferLibrary) throws IOException;
 
 }

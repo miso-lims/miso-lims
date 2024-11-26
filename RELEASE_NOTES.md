@@ -22,6 +22,12 @@ Starting with version 1.29.0, the format of this file is based on
 
 * Pinery-MISO's interactive Swagger docs generating incorrect URLs in some configurations
 
+### Known Issues
+
+* Unexpected error when attempting to add supplemental samples/libraries to a requisition
+* Unexpected error when attempting to move a sample/library to a different requisition using the
+  "Move to Req" feature
+
 
 ## [3.0.0] - 2024-11-07
 
@@ -44,6 +50,9 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * Pinery-MISO's interactive Swagger docs generating incorrect URLs in some configurations
+* Unexpected error when attempting to add supplemental samples/libraries to a requisition            
+* Unexpected error when attempting to move a sample/library to a different requisition using the     
+  "Move to Req" feature
 
 ### Upgrade Notes
 

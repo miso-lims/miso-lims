@@ -84,6 +84,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
+import uk.ac.bbsrc.tgac.miso.persistence.HibernateUtilDao;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
@@ -102,6 +103,8 @@ public class DefaultSampleService implements SampleService {
 
   @Autowired
   private SampleStore sampleStore;
+  @Autowired
+  private HibernateUtilDao hibernateUtilDao;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -777,6 +780,7 @@ public class DefaultSampleService implements SampleService {
 
   @Override
   public long update(Sample sample) throws IOException {
+    hibernateUtilDao.detach(sample);
     Sample managed = get(sample.getId());
     User changeUser = authorizationManager.getCurrentUser();
     managed.setChangeDetails(changeUser);

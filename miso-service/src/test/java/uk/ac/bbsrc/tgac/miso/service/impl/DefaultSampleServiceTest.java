@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.persistence.HibernateUtilDao;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
@@ -77,6 +78,8 @@ public class DefaultSampleServiceTest {
 
   @Mock
   private SampleStore sampleStore;
+  @Mock
+  private HibernateUtilDao hibernateUtilDao;
   @Mock
   private AuthorizationManager authorizationManager;
   @Mock
