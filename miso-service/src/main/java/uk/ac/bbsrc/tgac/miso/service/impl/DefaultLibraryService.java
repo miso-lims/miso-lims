@@ -73,6 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
+import uk.ac.bbsrc.tgac.miso.persistence.HibernateUtilDao;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
 
@@ -84,6 +85,8 @@ public class DefaultLibraryService implements LibraryService {
   private LibraryStore libraryDao;
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private HibernateUtilDao hibernateUtilDao;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -251,6 +254,7 @@ public class DefaultLibraryService implements LibraryService {
 
   @Override
   public long update(Library library) throws IOException {
+    hibernateUtilDao.detach(library);
     Library managed = get(library.getId());
     User changeUser = authorizationManager.getCurrentUser();
     managed.setChangeDetails(changeUser);

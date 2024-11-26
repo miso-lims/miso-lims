@@ -158,7 +158,7 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
       service.update(managedItem);
     }
 
-    setter.accept(managedItem);
+    setter.accept(service.get(item.getId()));
   }
 
   @Override
@@ -493,24 +493,28 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
 
   @Override
   public void addTransferSample(TransferSample transferSample) throws IOException {
+    if (transferSample.getTransfer().isDistribution()) {
+      throw new IllegalArgumentException("Method not intended for use with distribution transfers");
+    }
     Transfer managedTransfer = get(transferSample.getTransfer().getId());
     Sample managedSample = sampleService.get(transferSample.getItem().getId());
     transferSample.setTransfer(managedTransfer);
     transferSample.setItem(managedSample);
     validateAddition(managedTransfer, transferSample);
     transferStore.update(managedTransfer);
-    sampleService.update(managedSample);
   }
 
   @Override
   public void addTransferLibrary(TransferLibrary transferLibrary) throws IOException {
+    if (transferLibrary.getTransfer().isDistribution()) {
+      throw new IllegalArgumentException("Method not intended for use with distribution transfers");
+    }
     Transfer managedTransfer = get(transferLibrary.getTransfer().getId());
     Library managedLibrary = libraryService.get(transferLibrary.getItem().getId());
     transferLibrary.setTransfer(managedTransfer);
     transferLibrary.setItem(managedLibrary);
     validateAddition(managedTransfer, transferLibrary);
     transferStore.update(managedTransfer);
-    libraryService.update(managedLibrary);
   }
 
   @Override
