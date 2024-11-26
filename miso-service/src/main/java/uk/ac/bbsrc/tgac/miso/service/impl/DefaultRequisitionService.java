@@ -305,7 +305,8 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
 
   @Override
   public void removeSupplementalLibraries(Requisition requisition, Collection<Library> libraries) throws IOException {
-    for (Library library : libraries) {
+    List<Library> managed = libraryService.listByIdList(libraries.stream().map(Library::getId).toList());
+    for (Library library : managed) {
       RequisitionSupplementalLibrary supplemental = requisitionDao.getSupplementalLibrary(requisition, library);
       if (supplemental == null) {
         throw new ValidationException("Supplemental library %s not found".formatted(library.getAlias()));
@@ -356,7 +357,8 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
 
   @Override
   public void addSupplementalSamples(Requisition requisition, Collection<Sample> samples) throws IOException {
-    for (Sample sample : samples) {
+    List<Sample> managed = sampleService.listByIdList(samples.stream().map(Sample::getId).toList());
+    for (Sample sample : managed) {
       if (LimsUtils.isDetailedSample(sample) && ((DetailedSample) sample).isSynthetic()) {
         throw new ValidationException("Ghost samples cannot be added as supplemental samples");
       }
