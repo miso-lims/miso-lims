@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.1.2] - 2024-11-27
+
+### Fixed
+
+* Unexpected error when attempting to add supplemental libraries to a requisition
+
+
 ## [3.1.1] - 2024-11-27
 
 ### Fixed
