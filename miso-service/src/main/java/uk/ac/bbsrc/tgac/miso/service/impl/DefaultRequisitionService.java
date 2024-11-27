@@ -296,7 +296,8 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
 
   @Override
   public void addSupplementalLibraries(Requisition requisition, Collection<Library> libraries) throws IOException {
-    for (Library library : libraries) {
+    List<Library> managed = libraryService.listByIdList(libraries.stream().map(Library::getId).toList());
+    for (Library library : managed) {
       RequisitionSupplementalLibrary supplemental = new RequisitionSupplementalLibrary(requisition.getId(), library);
       requisitionDao.saveSupplementalLibrary(supplemental);
     }
@@ -305,8 +306,7 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
 
   @Override
   public void removeSupplementalLibraries(Requisition requisition, Collection<Library> libraries) throws IOException {
-    List<Library> managed = libraryService.listByIdList(libraries.stream().map(Library::getId).toList());
-    for (Library library : managed) {
+    for (Library library : libraries) {
       RequisitionSupplementalLibrary supplemental = requisitionDao.getSupplementalLibrary(requisition, library);
       if (supplemental == null) {
         throw new ValidationException("Supplemental library %s not found".formatted(library.getAlias()));

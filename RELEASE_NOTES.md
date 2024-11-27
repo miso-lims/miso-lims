@@ -11,9 +11,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ### Fixed
 
-* Unexpected error when attempting to add supplemental samples/libraries to a requisition
+* Unexpected error when attempting to add supplemental samples to a requisition
 * Unexpected error when attempting to move a sample/library to a different requisition using the "Move
   to Req" feature
+
+### Known Issues
+
+* Unexpected error when attempting to add supplemental libraries to a requisition
 
 
 ## [3.1.0] - 2024-11-21
