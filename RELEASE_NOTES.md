@@ -13,6 +13,10 @@ Starting with version 1.29.0, the format of this file is based on
 
 * Unexpected error when attempting to add supplemental libraries to a requisition
 
+### Known Issues
+
+* 404 Not Found error when attempting to view location maps
+
 
 ## [3.1.1] - 2024-11-27
 
@@ -25,6 +29,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Known Issues
 
 * Unexpected error when attempting to add supplemental libraries to a requisition
+* 404 Not Found error when attempting to view location maps
 
 
 ## [3.1.0] - 2024-11-21
@@ -47,6 +52,7 @@ Starting with version 1.29.0, the format of this file is based on
 * Unexpected error when attempting to add supplemental samples/libraries to a requisition
 * Unexpected error when attempting to move a sample/library to a different requisition using the
   "Move to Req" feature
+* 404 Not Found error when attempting to view location maps
 
 
 ## [3.0.0] - 2024-11-07
@@ -73,6 +79,7 @@ Starting with version 1.29.0, the format of this file is based on
 * Unexpected error when attempting to add supplemental samples/libraries to a requisition            
 * Unexpected error when attempting to move a sample/library to a different requisition using the     
   "Move to Req" feature
+* 404 Not Found error when attempting to view location maps
 
 ### Upgrade Notes
 
