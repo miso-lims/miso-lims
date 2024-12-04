@@ -3,9 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.context;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
@@ -36,8 +33,10 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
- * The custom MISO context listener class. On webapp context init, we can do some startup checks,
- * e.g. checking the existence of required directories/files for sane app startup
+ * The custom MISO context listener class. On webapp context init, we can do
+ * some startup checks,
+ * e.g. checking the existence of required directories/files for sane app
+ * startup
  * 
  * @author Rob Davey
  * @since 0.0.2
@@ -61,8 +60,8 @@ public class MisoAppListener implements ServletContextListener {
     JvmMetrics.builder().register();
 
     ServletContext application = event.getServletContext();
-    XmlWebApplicationContext context =
-        (XmlWebApplicationContext) WebApplicationContextUtils.getRequiredWebApplicationContext(application);
+    XmlWebApplicationContext context = (XmlWebApplicationContext) WebApplicationContextUtils
+        .getRequiredWebApplicationContext(application);
 
     // resolve property file configuration placeholders
     MisoPropertyExporter exporter = (MisoPropertyExporter) context.getBean("propertyConfigurer");
@@ -97,9 +96,9 @@ public class MisoAppListener implements ServletContextListener {
     } else {
       log.info(dirchecks.get("ok"));
     }
-    linkMapsDir(application, fileStoragePath);
 
-    // set headless property so JFreeChart doesn't try to use the X rendering system to generate images
+    // set headless property so JFreeChart doesn't try to use the X rendering system
+    // to generate images
     System.setProperty("java.awt.headless", "true");
 
     initializeNamingSchemes(context, misoProperties);
@@ -108,22 +107,6 @@ public class MisoAppListener implements ServletContextListener {
       new JmxCollector(context.getResource("classpath:tomcat-prometheus.yml").getFile()).register();
     } catch (MalformedObjectNameException | IOException e) {
       throw new IllegalStateException("Failed to load Prometheus configuration.", e);
-    }
-  }
-
-  private void linkMapsDir(ServletContext application, String fileStoragePath) {
-    try {
-      Path target = Paths.get(fileStoragePath, "freezermaps");
-      if (!Files.exists(target)) {
-        Files.createDirectory(target);
-      }
-      Path link = Paths.get(application.getRealPath("/"), "freezermaps");
-      if (Files.exists(link)) {
-        Files.delete(link);
-      }
-      Files.createSymbolicLink(link, target);
-    } catch (IOException e) {
-      throw new IllegalStateException("Failed to link freezer maps directory", e);
     }
   }
 
