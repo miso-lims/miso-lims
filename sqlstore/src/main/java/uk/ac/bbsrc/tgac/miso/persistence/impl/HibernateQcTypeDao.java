@@ -7,17 +7,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC_;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun_;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType_;
@@ -47,19 +43,7 @@ public class HibernateQcTypeDao extends HibernateSaveDao<QcType> implements Qual
   }
 
   private LongQueryBuilder<?> getBuilderForQcTarget(QcType qcType) {
-    switch (qcType.getQcTarget()) {
-      case Container:
-        return new LongQueryBuilder<>(currentSession(), ContainerQC.class);
-      case Library:
-        return new LongQueryBuilder<>(currentSession(), LibraryQC.class);
-      case Pool:
-        return new LongQueryBuilder<>(currentSession(), PoolQC.class);
-      case Sample:
-        return new LongQueryBuilder<>(currentSession(), SampleQC.class);
-      default:
-        throw new IllegalArgumentException(
-            "Unhandled QC target: " + qcType.getQcTarget() == null ? "null" : qcType.getQcTarget().getLabel());
-    }
+    return new LongQueryBuilder<>(currentSession(), qcType.getQcTarget().getEntityClass());
   }
 
   @Override
