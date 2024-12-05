@@ -7,6 +7,15 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.1.3] - 2024-12-05
+
+### Fixed
+
+* Error saving QC types for requisitions
+* Export Box to Excel feature was not working
+* 404 Not Found error when attempting to view location maps
+
+
 ## [3.1.2] - 2024-11-27
 
 ### Fixed
