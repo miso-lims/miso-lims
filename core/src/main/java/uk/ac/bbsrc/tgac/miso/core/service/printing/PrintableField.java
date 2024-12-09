@@ -157,6 +157,11 @@ public enum PrintableField implements PrintableText {
         }
 
         @Override
+        public String visitLibraryAliquot(LibraryAliquot libraryAliquot) {
+          return libraryAliquot.getDescription();
+        }
+
+        @Override
         public String visitPool(Pool pool) {
           return pool.getDescription();
         }
