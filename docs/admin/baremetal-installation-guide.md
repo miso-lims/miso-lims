@@ -45,6 +45,11 @@ The database server needs to have [MySQL 8.0](https://www.mysql.com/). The tool
 the application is developed, but it can be installed on a different server so
 long as it can access the database server.
 
+**Important**: The Flyway install will likely include a `jre` directory containing the Java 8 JRE.
+If it does, Flyway will use this instead of the system Java. MISO requires JDK 17, so this will
+cause an error when you try to run the migration. To fix this, simply delete Flyway's `jre`
+directory.
+
 It is best to set a default timezone for MySQL. You can configure this in
 `my.cnf`. The simplest and recommended option is to set it to UTC by adding the
 following lines:
@@ -249,11 +254,15 @@ should **NOT** be granted global (`*.*`) privileges, so this should be a differe
 jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&connectionTimeZone=SERVER&cacheDefaultTimeZone=false&useSSL=false
 ```
 
-If you run into an issue with migration `V0611`, ensure that the user running Flyway has read and write permissions on
-`MISO_FILES_DIR`.
+If you run into an issue with migration `V0611`, ensure that the user running Flyway has read and
+write permissions on `MISO_FILES_DIR`.
 
-If you encounter other errors migrating the database, make sure that you are using the recommended version of Flyway
-(see [Prerequisites](#prerequisites)).
+If you encounter an error regarding class file versions, Flyway is using an incompatible JRE. If
+the Flyway install contains a `jre` directory, delete it so that Flyway uses the system JRE instead.
+Ensure that a Java 17 JDK is installed and is the system default.
+
+If you encounter other errors migrating the database, make sure that you are using the recommended
+version of Flyway (see [Prerequisites](#prerequisites)).
 
 # Server Deployment Troubleshooting
 

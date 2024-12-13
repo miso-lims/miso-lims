@@ -43,7 +43,7 @@ Launch the plain sample demo with docker-compose:
 ```bash
 cd miso-lims-compose
 # configuration
-export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && export MISO_DB_ROOT_PASSWORD_FILE=./.miso_root_password && export MISO_TAG=latest
+export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_password MISO_DB_ROOT_PASSWORD_FILE=./.miso_root_password MISO_TAG=latest
 # create the password files specified above
 echo "changeme" > ./.miso_db_password
 echo "changeme" > ./.miso_root_password
@@ -59,7 +59,7 @@ Launch the detailed sample demo with docker-compose:
 ```bash
 cd miso-lims-compose
 # configuration
-export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && export MISO_DB_ROOT_PASSWORD_FILE=./.miso_root_password && export MISO_TAG=latest
+export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_password MISO_DB_ROOT_PASSWORD_FILE=./.miso_root_password MISO_TAG=latest
 # create the password files specified above
 echo "changeme" > ./.miso_db_password
 echo "changeme" > ./.miso_root_password
@@ -108,8 +108,9 @@ We suggest the following:
 1. Mount the MySQL database and MISO files storage location to permanent, backed-up locations (see [Adding Persistent Storage](#adding-persistent-storage)).
 3. Pre-load desired data (if any) by binding SQL files to the flyway container (see [Pre-loading data with Flyway](#pre-loading-data-with-flyway).
 4. Modify and mount the miso.properties file to have your desired configuration (see [Modifying the miso.properties file](#modifying-the-misoproperties-file).
-5. Change the username and password for the database using the environmental variables
-6. Enable HTTPS (see [Configuring HTTPS](#configuring-https)).
+5. Change the username and password for the database using the environmental variables.
+6. Enable HTTPS (see [Configuring HTTPS](#configuring-https)). SSL is required to connect to MISO
+over a network.
 
 ## Upgrading to new versions
 
