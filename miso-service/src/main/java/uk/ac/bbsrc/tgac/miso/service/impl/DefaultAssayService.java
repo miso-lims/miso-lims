@@ -123,7 +123,7 @@ public class DefaultAssayService extends AbstractSaveService<Assay> implements A
     to.setDescription(from.getDescription());
     to.setArchived(from.isArchived());
     ValidationUtils.applySetChanges(to.getAssayTests(), from.getAssayTests());
-    applyMetricChanges(to.getAssayMetrics(), from.getAssayMetrics());
+    applyMetricChanges(to, from.getAssayMetrics());
     to.setCaseTargetDays(from.getCaseTargetDays());
     to.setReceiptTargetDays(from.getReceiptTargetDays());
     to.setExtractionTargetDays(from.getExtractionTargetDays());
@@ -135,7 +135,8 @@ public class DefaultAssayService extends AbstractSaveService<Assay> implements A
     to.setReleaseTargetDays(from.getReleaseTargetDays());
   }
 
-  private void applyMetricChanges(Set<AssayMetric> to, Set<AssayMetric> from) throws IOException {
+  private void applyMetricChanges(Assay toAssay, Set<AssayMetric> from) throws IOException {
+    Set<AssayMetric> to = toAssay.getAssayMetrics();
     for (Iterator<AssayMetric> iterator = to.iterator(); iterator.hasNext();) {
       AssayMetric toItem = iterator.next();
       if (from.stream().noneMatch(fromItem -> fromItem.getMetric().getId() == toItem.getMetric().getId())) {
@@ -149,6 +150,7 @@ public class DefaultAssayService extends AbstractSaveService<Assay> implements A
           .findFirst().orElse(null);
       if (toItem == null) {
         to.add(fromItem);
+        fromItem.setAssay(toAssay);
       } else {
         toItem.setMaximumThreshold(fromItem.getMaximumThreshold());
         toItem.setMinimumThreshold(fromItem.getMinimumThreshold());
