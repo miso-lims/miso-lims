@@ -22,7 +22,7 @@ BulkTarget.sop = (function () {
     },
     getColumns: function (config, api) {
       return [
-        BulkUtils.columns.simpleAlias(100),
+        BulkUtils.columns.simpleAlias(200),
         {
           title: "Version",
           type: "text",

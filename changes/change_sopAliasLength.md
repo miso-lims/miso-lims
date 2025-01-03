@@ -1,0 +1,1 @@
+Increased sop alias max length to 200 characters

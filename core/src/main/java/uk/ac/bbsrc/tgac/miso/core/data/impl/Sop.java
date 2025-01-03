@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 import java.util.Objects;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -38,7 +39,9 @@ public class Sop implements Aliasable, Deletable, Serializable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long sopId = UNSAVED_ID;
 
+  @Column(length = 200)
   private String alias;
+
   private String version;
 
   @Enumerated(EnumType.STRING)
