@@ -1149,6 +1149,12 @@ BulkTarget.sample = (function ($) {
           columns = columns.concat(BulkUtils.columns.parentUsed);
         }
         columns = columns.concat(BulkUtils.columns.concentration());
+      } else if (
+        (config.pageMode === "edit" && targetCategory === "Tissue Processing") ||
+        config.pageMode === "create"
+      ) {
+        columns = columns.concat(BulkUtils.columns.volume(true, config));
+        columns = columns.concat(BulkUtils.columns.concentration());
       }
 
       columns.push(
