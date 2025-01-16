@@ -7,6 +7,18 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.2.0] - 2025-01-16
+
+### Changed
+
+* Increased sop alias max length to 200 characters
+
+### Fixed
+
+* Error saving assay updates after adding metrics
+* Library aliquot descriptions would not print on labels
+
+
 ## [3.1.3] - 2024-12-05
 
 ### Fixed
