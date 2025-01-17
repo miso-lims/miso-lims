@@ -63,6 +63,7 @@ FormTarget.freezer = (function ($) {
               getItemLabel: Utils.array.get("label"),
               getItemValue: Utils.array.getId,
               sortSource: Utils.sorting.standardSort("label"),
+              description: "A storage label to associate with the freezer",
             },
             {
               title: "Barcode",
@@ -90,6 +91,7 @@ FormTarget.freezer = (function ($) {
                 form.updateField("mapAnchor", settings);
                 updateMapLink(form, config.locationMaps);
               },
+              description: "The location map on which the freezer appears",
             },
             {
               title: "Map Anchor",
@@ -99,6 +101,9 @@ FormTarget.freezer = (function ($) {
               onChange: function (newValue, form) {
                 updateMapLink(form, config.locationMaps);
               },
+              description:
+                "Anchor tag ID to use in a link to the location map in order to highlight this " +
+                "freezer. For this to work, the map must be designed to include such anchor IDs",
             },
             {
               title: "View Map",
@@ -115,6 +120,7 @@ FormTarget.freezer = (function ($) {
               data: "probeId",
               type: "text",
               maxLength: 50,
+              description: "Identifier used in a monitoring system",
             },
             {
               title: "Retired",
