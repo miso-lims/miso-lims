@@ -1148,7 +1148,7 @@ BulkTarget.sample = (function ($) {
         !config.isLibraryReceipt
       ) {
         columns = columns.concat(BulkUtils.columns.volume(true, config));
-        if (Constants.isDetailedSample && !show["Tissue Processing"]) {
+        if (Constants.isDetailedSample && targetCategory !== "Tissue Processing") {
           columns = columns.concat(BulkUtils.columns.parentUsed);
         }
         columns = columns.concat(BulkUtils.columns.concentration());

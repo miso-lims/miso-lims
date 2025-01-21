@@ -37,10 +37,10 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
   private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.INITIAL_SLIDES, SamColumns.SLIDES,
       SamColumns.THICKNESS, SamColumns.STAIN, SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS, SamColumns.MARKED_AREA,
-      SamColumns.MARKED_AREA_PERCENT_TUMOUR);
+      SamColumns.MARKED_AREA_PERCENT_TUMOUR, SamColumns.INITIAL_VOLUME, SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
   private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED,
-      SamColumns.REFERENCE_SLIDE);
+      SamColumns.REFERENCE_SLIDE, SamColumns.INITIAL_VOLUME, SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
   private BulkSamplePage getEditPage(List<Long> ids) {
     return BulkSamplePage.getForEdit(getDriver(), getBaseUrl(), ids);
