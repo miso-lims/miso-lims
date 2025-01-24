@@ -57,15 +57,18 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
   private static final Set<String> slideColumns =
       Sets.newHashSet(SamColumns.SOP, SamColumns.SLIDES, SamColumns.THICKNESS, SamColumns.STAIN,
           SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS, SamColumns.MARKED_AREA,
-          SamColumns.MARKED_AREA_PERCENT_TUMOUR);
+          SamColumns.MARKED_AREA_PERCENT_TUMOUR,
+          SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
   // columns specific to creating curls
   private static final Set<String> tissuePieceColumns =
-      Sets.newHashSet(SamColumns.SOP, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED);
+      Sets.newHashSet(SamColumns.SOP, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED,
+          SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
   // columns specific to creating single cells (tissue processing)
   private static final Set<String> singleCellColumns =
-      Sets.newHashSet(SamColumns.SOP, SamColumns.INITIAL_CELL_CONC, SamColumns.DIGESTION);
+      Sets.newHashSet(SamColumns.SOP, SamColumns.INITIAL_CELL_CONC, SamColumns.DIGESTION,
+          SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
   // columns specific to creating stocks
   private static final Set<String> stockColumns =
