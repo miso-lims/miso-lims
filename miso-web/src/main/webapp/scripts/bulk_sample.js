@@ -1141,11 +1141,14 @@ BulkTarget.sample = (function ($) {
       );
 
       if (
-        (!Constants.isDetailedSample || show["Stock"] || show["Aliquot"]) &&
+        (!Constants.isDetailedSample ||
+          show["Stock"] ||
+          show["Aliquot"] ||
+          show["Tissue Processing"]) &&
         !config.isLibraryReceipt
       ) {
         columns = columns.concat(BulkUtils.columns.volume(true, config));
-        if (Constants.isDetailedSample) {
+        if (Constants.isDetailedSample && targetCategory !== "Tissue Processing") {
           columns = columns.concat(BulkUtils.columns.parentUsed);
         }
         columns = columns.concat(BulkUtils.columns.concentration());
