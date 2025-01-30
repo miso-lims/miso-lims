@@ -7,6 +7,14 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.3.0] - 2025-01-30
+
+### Added
+
+* Volume and concentration metrics when creating/editing tissue processing samples
+* Help text to clarify some of the freezer fields
+
+
 ## [3.2.0] - 2025-01-16
 
 ### Changed
