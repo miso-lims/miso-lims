@@ -165,13 +165,9 @@ public class DefaultQcTypeService implements QcTypeService {
       }
     }
 
-    if (!qcType.isArchived()) {
-      List<QcType> dupes = qcTypeStore.listByNameAndTarget(qcType.getName(), qcType.getQcTarget());
-      if (dupes.stream().anyMatch(dupe -> dupe.getId() != qcType.getId() && !dupe.isArchived())) {
-        errors.add(new ValidationError("name",
-            String.format("There is already a non-archived %s QC type with this name",
-                qcType.getQcTarget().getLabel())));
-      }
+    if (isSetAndChanged(QcType::getName, qcType, beforeChange)
+        && qcTypeStore.getByNameAndTarget(qcType.getName(), qcType.getQcTarget()) != null) {
+      errors.add(ValidationError.forDuplicate(qcType.getQcTarget().getLabel() + " QC type", "name"));
     }
 
     for (KitDescriptor kit : qcType.getKitDescriptors()) {
