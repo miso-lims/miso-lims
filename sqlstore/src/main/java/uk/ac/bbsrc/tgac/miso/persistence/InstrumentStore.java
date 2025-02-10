@@ -17,7 +17,9 @@ public interface InstrumentStore extends SaveDao<Instrument>, PaginatedDataSourc
    * @return the Instrument
    * @throws IOException
    */
-  public Instrument getByName(String name) throws IOException;
+  Instrument getByName(String name) throws IOException;
+
+  Instrument getByBarcode(String barcode) throws IOException;
 
   /**
    * Get the Instrument which was the pre-upgrade Instrument for the Instrument provided (by its id)
@@ -27,16 +29,16 @@ public interface InstrumentStore extends SaveDao<Instrument>, PaginatedDataSourc
    * @throws IOException if there is more than one pre-upgrade Instrument for the provided Instrument,
    *         or there are any other IO errors
    */
-  public Instrument getByUpgradedInstrument(long upgradedInstrumentId) throws IOException;
+  Instrument getByUpgradedInstrument(long upgradedInstrumentId) throws IOException;
 
-  public List<Instrument> listByType(InstrumentType type) throws IOException;
+  List<Instrument> listByType(InstrumentType type) throws IOException;
 
-  public long getUsageByRuns(Instrument instrument) throws IOException;
+  long getUsageByRuns(Instrument instrument) throws IOException;
 
-  public long getUsageByArrayRuns(Instrument instrument) throws IOException;
+  long getUsageByArrayRuns(Instrument instrument) throws IOException;
 
-  public long getUsageByQcs(Instrument instrument) throws IOException;
+  long getUsageByQcs(Instrument instrument) throws IOException;
 
-  public Instrument getByServiceRecord(ServiceRecord record) throws IOException;
+  Instrument getByServiceRecord(ServiceRecord record) throws IOException;
 
 }

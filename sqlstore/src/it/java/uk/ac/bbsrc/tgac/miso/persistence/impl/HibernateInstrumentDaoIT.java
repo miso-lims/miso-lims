@@ -12,20 +12,16 @@ import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.google.common.annotations.VisibleForTesting;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.persistence.ServiceRecordStore;
 
 public class HibernateInstrumentDaoIT extends AbstractDAOTest {
 
@@ -133,6 +129,15 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
     Instrument instrument = dao.getByName(name);
     assertNotNull(instrument);
     assertEquals(name, instrument.getName());
+  }
+
+  @Test
+  public void testGetByBarcode() throws Exception {
+    String barcode = "inst4444";
+    Instrument instrument = dao.getByBarcode(barcode);
+    assertNotNull(instrument);
+    assertEquals(barcode, instrument.getName());
+    assertEquals("miseq1", instrument.getName());
   }
 
   @Test
