@@ -213,13 +213,13 @@ INSERT INTO InstrumentPosition(positionId, instrumentModelId, alias) VALUES
 (2, 16, 'B'),
 (3, 16, 'C');
 
-INSERT INTO `Instrument`(`instrumentId`, `name`, `instrumentModelId`, defaultPurposeId, upgradedInstrumentId, dateDecommissioned) VALUES
-(1, 'SN7001179', 16, 1, NULL, NULL),
-(2, 'h1180', 16, 1, NULL, NULL),
-(3, 'iScan_1', 30, 1, NULL, NULL),
-(4, 'miseq1', 1, 1, NULL, NULL),
-(5, 'qcer', 2, NULL, NULL, NULL),
-(6, 'old hiseq', 16, 1, 2, '2021-03-08 10:36:00');
+INSERT INTO `Instrument`(`instrumentId`, `name`, identificationBarcode, `instrumentModelId`, defaultPurposeId, upgradedInstrumentId, dateDecommissioned) VALUES
+(1, 'SN7001179', 'inst1111', 16, 1, NULL, NULL),
+(2, 'h1180', 'inst2222', 16, 1, NULL, NULL),
+(3, 'iScan_1', 'inst3333', 30, 1, NULL, NULL),
+(4, 'miseq1', 'inst4444', 1, 1, NULL, NULL),
+(5, 'qcer', 'inst5555', 2, NULL, NULL, NULL),
+(6, 'old hiseq', 'inst6666', 16, 1, 2, '2021-03-08 10:36:00');
 
 INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`, instrumentModelId) VALUES
 (2,'Bioanalyzer','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Library','nM', NULL),
