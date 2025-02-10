@@ -136,7 +136,7 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
     String barcode = "inst4444";
     Instrument instrument = dao.getByBarcode(barcode);
     assertNotNull(instrument);
-    assertEquals(barcode, instrument.getName());
+    assertEquals(barcode, instrument.getIdentificationBarcode());
     assertEquals("miseq1", instrument.getName());
   }
 
