@@ -762,7 +762,7 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListQcTypesSetup() throws Exception {
     testPageSetup(ListTarget.QC_TYPE, Sets.newHashSet(Columns.NAME, Columns.DESCRIPTION, Columns.TARGET, Columns.UNITS,
-        Columns.CORRESPONDING_FIELD, Columns.AUTO_UPDATE_FIELD));
+        Columns.CORRESPONDING_FIELD, Columns.AUTO_UPDATE_FIELD, Columns.ARCHIVED));
   }
 
   @Test
