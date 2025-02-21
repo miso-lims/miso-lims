@@ -133,7 +133,8 @@
             <br />
 
             <c:if test="${detailedSample}">
-              <miso:list-section id="list_extractions" name="Extractions" target="sample" items="${extractions}" />
+              <miso:list-section-ajax id="list_preparedsamples" name="Prepared Samples" target="sample" 
+                config="{requisitionId: ${requisition.id}, filter: 'samples-prepared'}" />
             </c:if>
             <miso:list-section-ajax id="list_preparedlibraries" name="Prepared Libraries" target="library"
               config="{ requisitionId: ${requisition.id}, relation: 'indirect' }" />

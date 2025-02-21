@@ -203,6 +203,32 @@ public class SampleRestController extends RestController {
         PaginationFilter.arrayed(true));
   }
 
+  @GetMapping(value = "/dt/samples-prepared/{id}", produces = {"application/json"})
+  @ResponseBody
+  public DataTablesResponseDto<SampleDto> getPreparedSamplessByRequisition(@PathVariable("id") long id,
+      HttpServletRequest request) throws IOException {
+    log.debug("Fetching derivatives for requisition: {}", id);
+
+    List<Sample> requisitionedSamples = sampleService.list(0, 0, false, "id", PaginationFilter.requisitionId(id));
+    List<Sample> supplementalSamples =
+        sampleService.list(0, 0, false, "id", PaginationFilter.supplementalToRequisitionId(id));
+
+    Set<Long> sampleIds = Stream.concat(requisitionedSamples.stream(), supplementalSamples.stream())
+        .map(Sample::getId)
+        .collect(Collectors.toSet());
+
+    List<Sample> stockSamples = sampleService.getChildren(sampleIds, SampleStock.CATEGORY_NAME, id);
+    List<Sample> tissueSamples = sampleService.getChildren(sampleIds, SampleTissue.CATEGORY_NAME, id);
+    List<Sample> aliquotSamples = sampleService.getChildren(sampleIds, SampleAliquot.CATEGORY_NAME, id);
+
+    List<Sample> allSamples = Stream.of(stockSamples.stream(), tissueSamples.stream(), aliquotSamples.stream())
+        .flatMap(stream -> stream)
+        .collect(Collectors.toList());
+
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.ids(
+        allSamples.stream().map(Sample::getId).collect(Collectors.toList())));
+  }
+
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody SampleDto createSample(@RequestBody SampleDto sampleDto)

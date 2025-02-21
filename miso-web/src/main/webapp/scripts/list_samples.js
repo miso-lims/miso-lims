@@ -16,6 +16,8 @@ ListTarget.sample = (function () {
       } else if (config.requisitionId) {
         if (config.supplemental) {
           return Urls.rest.samples.requisitionSupplementalDatatable(config.requisitionId);
+        } else if (config.filter === "samples-prepared") {
+          return Urls.rest.samples.samplesPreparedDatatable(config.requisitionId);
         } else {
           return Urls.rest.samples.requisitionDatatable(config.requisitionId);
         }

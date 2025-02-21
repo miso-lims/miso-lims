@@ -32,7 +32,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -44,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
-import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
@@ -125,11 +123,6 @@ public class RequisitionController {
     Set<Long> sampleIds = Stream.concat(requisitionedSamples.stream(), supplementalSamples.stream())
         .map(Sample::getId)
         .collect(Collectors.toSet());
-    List<Sample> extractions = sampleService.getChildren(sampleIds, SampleStock.CATEGORY_NAME, requisition.getId());
-    List<SampleDto> extractionDtos = extractions.stream()
-        .map(sam -> Dtos.asDto(sam, false))
-        .collect(Collectors.toList());
-    model.put("extractions", extractionDtos);
 
     List<Library> requisitionedLibraries =
         libraryService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisition.getId()));

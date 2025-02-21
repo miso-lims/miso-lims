@@ -937,6 +937,7 @@ Urls = (function () {
     requisitionSupplementalDatatable: idUrlFunction(
       sampleRestBase + "/dt/requisition-supplemental"
     ),
+    samplesPreparedDatatable: idUrlFunction(sampleRestBase + "/dt/samples-prepared"),
     findRelated: sampleRestBase + "/find-related",
   };
 
