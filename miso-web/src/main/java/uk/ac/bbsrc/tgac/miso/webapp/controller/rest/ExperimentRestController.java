@@ -31,10 +31,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 import uk.ac.bbsrc.tgac.miso.dto.KitConsumableDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 
 @Controller
 @RequestMapping("/rest/experiments")
-public class ExperimentRestController extends RestController {
+public class ExperimentRestController extends AbstractRestController {
 
   @Autowired
   private ContainerService containerService;

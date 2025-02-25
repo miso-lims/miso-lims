@@ -18,10 +18,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableViewService;
 import uk.ac.bbsrc.tgac.miso.dto.BarcodableDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 
 @Controller
 @RequestMapping("/rest/barcodables")
-public class BarcodableSearchRestController extends RestController {
+public class BarcodableSearchRestController extends AbstractRestController {
   private static final String BASEURL = "/miso";
 
   @Autowired
@@ -50,20 +51,20 @@ public class BarcodableSearchRestController extends RestController {
 
   private String makeUrlComponent(Barcodable.EntityType entityType) {
     switch (entityType) {
-    case SAMPLE:
-      return "sample";
-    case BOX:
-      return "box";
-    case POOL:
-      return "pool";
-    case LIBRARY:
-      return "library";
-    case LIBRARY_ALIQUOT:
-      return "libraryaliquot";
-    case CONTAINER:
-      return "container";
-    default:
-      return null;
+      case SAMPLE:
+        return "sample";
+      case BOX:
+        return "box";
+      case POOL:
+        return "pool";
+      case LIBRARY:
+        return "library";
+      case LIBRARY_ALIQUOT:
+        return "libraryaliquot";
+      case CONTAINER:
+        return "container";
+      default:
+        return null;
     }
   }
 

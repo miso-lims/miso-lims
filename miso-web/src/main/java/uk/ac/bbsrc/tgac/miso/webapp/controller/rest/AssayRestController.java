@@ -17,10 +17,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
 import uk.ac.bbsrc.tgac.miso.dto.AssayDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 
 @Controller
 @RequestMapping("/rest/assays")
-public class AssayRestController extends RestController {
+public class AssayRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Assay";
 

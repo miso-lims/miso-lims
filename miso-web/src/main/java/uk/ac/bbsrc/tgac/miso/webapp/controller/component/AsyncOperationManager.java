@@ -34,7 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestUtils;
 
 @Component

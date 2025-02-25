@@ -21,11 +21,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.MetricSubcategory;
 import uk.ac.bbsrc.tgac.miso.core.service.MetricSubcategoryService;
 import uk.ac.bbsrc.tgac.miso.dto.MetricSubcategoryDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/metricsubcategories")
-public class MetricSubcategoryRestController extends RestController {
+public class MetricSubcategoryRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Metric Subcategory";
 
@@ -39,18 +40,21 @@ public class MetricSubcategoryRestController extends RestController {
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<MetricSubcategoryDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, MetricSubcategoryDto::to, metricSubcategoryService, true);
+    return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, MetricSubcategoryDto::to,
+        metricSubcategoryService, true);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<MetricSubcategoryDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, MetricSubcategoryDto::to, metricSubcategoryService, true);
+    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, MetricSubcategoryDto::to,
+        metricSubcategoryService, true);
   }
 
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
-    return asyncOperationManager.getAsyncProgress(uuid, MetricSubcategory.class, metricSubcategoryService, MetricSubcategoryDto::from);
+    return asyncOperationManager.getAsyncProgress(uuid, MetricSubcategory.class, metricSubcategoryService,
+        MetricSubcategoryDto::from);
   }
 
   @PostMapping(value = "/bulk-delete")

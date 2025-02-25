@@ -30,12 +30,14 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
 import uk.ac.bbsrc.tgac.miso.dto.ServiceRecordDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 
 @Controller
 @RequestMapping("/rest/instruments")
-public class InstrumentRestController extends RestController {
+public class InstrumentRestController extends AbstractRestController {
 
   @Autowired
   private AdvancedSearchParser advancedSearchParser;

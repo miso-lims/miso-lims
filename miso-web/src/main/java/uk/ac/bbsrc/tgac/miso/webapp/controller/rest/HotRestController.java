@@ -21,11 +21,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.ExcelSpreadsheetWrapper;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.OpenDocumentSpreadsheetWrapper;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadsheetWrapper;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
 @RequestMapping("/rest/hot")
-public class HotRestController extends RestController {
+public class HotRestController extends AbstractRestController {
 
   public static class SpreadsheetDataDto {
 

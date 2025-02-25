@@ -14,11 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.ArrayModelService;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/arraymodels")
-public class ArrayModelRestController extends RestController {
+public class ArrayModelRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Array Model";
 
@@ -31,8 +32,7 @@ public class ArrayModelRestController extends RestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<ArrayModelDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<ArrayModelDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, arrayModelService, true);
   }
 

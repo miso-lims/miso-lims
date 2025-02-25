@@ -48,12 +48,14 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ListContainerViewDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
 @RequestMapping("/rest/containers")
-public class ContainerRestController extends RestController {
+public class ContainerRestController extends AbstractRestController {
 
   @Autowired
   private ContainerService containerService;

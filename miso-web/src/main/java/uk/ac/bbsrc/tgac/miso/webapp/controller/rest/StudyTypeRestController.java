@@ -14,11 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.StudyTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.StudyTypeDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/studytypes")
-public class StudyTypeRestController extends RestController {
+public class StudyTypeRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Study Type";
 
@@ -31,8 +32,7 @@ public class StudyTypeRestController extends RestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<StudyTypeDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<StudyTypeDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, studyTypeService, true);
   }
 

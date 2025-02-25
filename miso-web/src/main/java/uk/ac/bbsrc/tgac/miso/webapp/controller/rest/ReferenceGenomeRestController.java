@@ -14,11 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ReferenceGenomeDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/referencegenomes")
-public class ReferenceGenomeRestController extends RestController {
+public class ReferenceGenomeRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Reference Genome";
 
@@ -31,8 +32,7 @@ public class ReferenceGenomeRestController extends RestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<ReferenceGenomeDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<ReferenceGenomeDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, referenceGenomeService, true);
   }
 

@@ -22,10 +22,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.GroupDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 
 @Controller
 @RequestMapping("/rest/groups")
-public class GroupRestController extends RestController {
+public class GroupRestController extends AbstractRestController {
 
   @Autowired
   private GroupService groupService;

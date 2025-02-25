@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
@@ -33,7 +10,6 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -53,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateIndexDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.*;
 
 @Controller
@@ -156,7 +133,8 @@ public class EditLibraryTemplateController {
     LibraryTemplateDto dto = Dtos.asDto(template);
     model.put("template", template);
     model.put("templateDto", mapper.writeValueAsString(dto));
-    model.put("templateProjects", mapper.writeValueAsString(template.getProjects().stream().map(Dtos::asDto).collect(Collectors.toList())));
+    model.put("templateProjects",
+        mapper.writeValueAsString(template.getProjects().stream().map(Dtos::asDto).collect(Collectors.toList())));
     return new ModelAndView("/WEB-INF/pages/editLibraryTemplate.jsp", model);
   }
 
@@ -178,7 +156,8 @@ public class EditLibraryTemplateController {
   }
 
   @GetMapping("/{templateId}/indices/add")
-  public ModelAndView addIndices(@PathVariable("templateId") long templateId, @RequestParam("quantity") int quantity, ModelMap model)
+  public ModelAndView addIndices(@PathVariable("templateId") long templateId, @RequestParam("quantity") int quantity,
+      ModelMap model)
       throws IOException {
     LibraryTemplate template = getTemplateWithIndexFamily(templateId);
     return new BulkCreateTemplateIndicesBackend(template, quantity, mapper).create(model);
@@ -210,7 +189,8 @@ public class EditLibraryTemplateController {
   }
 
   @GetMapping("/{templateId}/indices/edit")
-  public ModelAndView editIndices(@PathVariable("templateId") long templateId, @RequestParam("positions") String positions, ModelMap model)
+  public ModelAndView editIndices(@PathVariable("templateId") long templateId,
+      @RequestParam("positions") String positions, ModelMap model)
       throws IOException {
     LibraryTemplate template = getTemplateWithIndexFamily(templateId);
     return new BulkEditTemplateIndicesBackend(template, mapper).edit(positions, model);

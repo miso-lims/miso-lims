@@ -20,10 +20,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentStatusService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentStatusDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 
 @Controller
 @RequestMapping("/rest/instrumentstatus")
-public class InstrumentStatusRestController extends RestController {
+public class InstrumentStatusRestController extends AbstractRestController {
 
   private enum RunningPositions {
     NONE, SOME, ALL; // Note: order is important - ordinals used for sorting

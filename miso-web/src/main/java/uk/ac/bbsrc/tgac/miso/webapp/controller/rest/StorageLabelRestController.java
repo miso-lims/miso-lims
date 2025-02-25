@@ -20,11 +20,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLabel;
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLabelService;
 import uk.ac.bbsrc.tgac.miso.dto.StorageLabelDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/storagelabels")
-public class StorageLabelRestController extends RestController {
+public class StorageLabelRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Storage Label";
 

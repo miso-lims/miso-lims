@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.StorageLabelDto;
 import uk.ac.bbsrc.tgac.miso.dto.StorageLocationDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
@@ -129,7 +128,7 @@ public class EditFreezerController {
 
   private ModelAndView setupFreezerForm(StorageLocation freezer, ModelMap model) throws IOException {
     if (freezer == null || freezer.getLocationUnit() != LocationUnit.FREEZER) {
-      throw new RestException("Freezer not found");
+      throw new NotFoundException("Freezer not found");
     }
     model.addAttribute(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     model.put("title", "Freezer " + freezer.getId());
