@@ -31,10 +31,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.SubmissionService;
 import uk.ac.bbsrc.tgac.miso.core.util.EnaSubmissionPreparation;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SubmissionDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 
 @Controller
 @RequestMapping("/rest/submissions")
-public class SubmissionRestController extends RestController {
+public class SubmissionRestController extends AbstractRestController {
   @Autowired
   private SubmissionService submissionService;
   @Autowired

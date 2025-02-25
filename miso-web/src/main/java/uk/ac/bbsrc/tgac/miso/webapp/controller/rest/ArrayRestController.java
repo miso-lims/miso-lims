@@ -33,11 +33,13 @@ import uk.ac.bbsrc.tgac.miso.dto.ChangeLogDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/arrays")
-public class ArrayRestController extends RestController {
+public class ArrayRestController extends AbstractRestController {
 
   private static final String ERROR_NOTFOUND = "Array not found";
 

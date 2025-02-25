@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
@@ -58,7 +58,8 @@ public class InstrumentModelsController {
     return instrumentModelPage(instrumentModel, model);
   }
 
-  private ModelAndView instrumentModelPage(InstrumentModel instrumentModel, ModelMap model) throws JsonProcessingException {
+  private ModelAndView instrumentModelPage(InstrumentModel instrumentModel, ModelMap model)
+      throws JsonProcessingException {
     InstrumentModelDto dto = Dtos.asDto(instrumentModel);
     model.put("modelDto", mapper.writeValueAsString(dto));
     return new ModelAndView("/WEB-INF/pages/editInstrumentModel.jsp", model);

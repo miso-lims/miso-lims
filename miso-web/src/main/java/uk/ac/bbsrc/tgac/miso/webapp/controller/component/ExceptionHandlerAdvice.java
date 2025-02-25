@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -45,7 +44,8 @@ public class ExceptionHandlerAdvice {
   public ModelAndView showUnknownError(final Exception e) {
     logException(e);
     return withMessages("Server Error",
-        "An unexpected error has occurred. If the problem persists, please report it to your MISO administrators", true);
+        "An unexpected error has occurred. If the problem persists, please report it to your MISO administrators",
+        true);
   }
 
   private ModelAndView fromExceptionMessage(String genericMessage, Exception e, boolean possibleBug) {

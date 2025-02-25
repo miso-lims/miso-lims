@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.mail.EmailException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
@@ -125,7 +125,8 @@ public class TransferController {
     return setupForm(transfer, PageMode.CREATE, true, false, model);
   }
 
-  private <T extends Boxable, U extends TransferItem<T>> void addItems(String typeName, String idString, ProviderService<T> service,
+  private <T extends Boxable, U extends TransferItem<T>> void addItems(String typeName, String idString,
+      ProviderService<T> service,
       Supplier<U> constructor, Supplier<Set<U>> setGetter) throws IOException {
     if (idString == null) {
       return;
@@ -141,7 +142,8 @@ public class TransferController {
     }
   }
 
-  private <T extends Boxable, U extends TransferItem<T>> void addBoxItems(String idString, Transfer transfer) throws IOException {
+  private <T extends Boxable, U extends TransferItem<T>> void addBoxItems(String idString, Transfer transfer)
+      throws IOException {
     if (idString == null) {
       return;
     }
@@ -153,28 +155,28 @@ public class TransferController {
       for (BoxPosition item : box.getBoxPositions().values()) {
         long itemId = item.getBoxableId().getTargetId();
         switch (item.getBoxableId().getTargetType()) {
-        case SAMPLE:
-          TransferSample transferSample = new TransferSample();
-          transferSample.setItem(sampleService.get(itemId));
-          transfer.getSampleTransfers().add(transferSample);
-          break;
-        case LIBRARY:
-          TransferLibrary transferLibrary = new TransferLibrary();
-          transferLibrary.setItem(libraryService.get(itemId));
-          transfer.getLibraryTransfers().add(transferLibrary);
-          break;
-        case LIBRARY_ALIQUOT:
-          TransferLibraryAliquot transferLibraryAliquot = new TransferLibraryAliquot();
-          transferLibraryAliquot.setItem(libraryAliquotService.get(itemId));
-          transfer.getLibraryAliquotTransfers().add(transferLibraryAliquot);
-          break;
-        case POOL:
-          TransferPool transferPool = new TransferPool();
-          transferPool.setItem(poolService.get(itemId));
-          transfer.getPoolTransfers().add(transferPool);
-          break;
-        default:
-          throw new IllegalArgumentException("Unexpected boxable type: " + item.getBoxableId().getTargetType());
+          case SAMPLE:
+            TransferSample transferSample = new TransferSample();
+            transferSample.setItem(sampleService.get(itemId));
+            transfer.getSampleTransfers().add(transferSample);
+            break;
+          case LIBRARY:
+            TransferLibrary transferLibrary = new TransferLibrary();
+            transferLibrary.setItem(libraryService.get(itemId));
+            transfer.getLibraryTransfers().add(transferLibrary);
+            break;
+          case LIBRARY_ALIQUOT:
+            TransferLibraryAliquot transferLibraryAliquot = new TransferLibraryAliquot();
+            transferLibraryAliquot.setItem(libraryAliquotService.get(itemId));
+            transfer.getLibraryAliquotTransfers().add(transferLibraryAliquot);
+            break;
+          case POOL:
+            TransferPool transferPool = new TransferPool();
+            transferPool.setItem(poolService.get(itemId));
+            transfer.getPoolTransfers().add(transferPool);
+            break;
+          default:
+            throw new IllegalArgumentException("Unexpected boxable type: " + item.getBoxableId().getTargetType());
         }
       }
     }
@@ -198,11 +200,13 @@ public class TransferController {
         || (editReceipt && transfer.getSenderGroup() == null);
 
     List<TransferNotification> notifications = transferNotificationService.listByTransferId(id);
-    model.put("notifications", mapper.writeValueAsString(notifications.stream().map(Dtos::asDto).collect(Collectors.toList())));
+    model.put("notifications",
+        mapper.writeValueAsString(notifications.stream().map(Dtos::asDto).collect(Collectors.toList())));
     return setupForm(transfer, PageMode.EDIT, editSend, editReceipt, model);
   }
 
-  public ModelAndView setupForm(Transfer transfer, PageMode pageMode, boolean editSend, boolean editReceipt, ModelMap model)
+  public ModelAndView setupForm(Transfer transfer, PageMode pageMode, boolean editSend, boolean editReceipt,
+      ModelMap model)
       throws IOException {
     ObjectNode formConfig = mapper.createObjectNode();
     formConfig.put(PageMode.PROPERTY, pageMode.getLabel());

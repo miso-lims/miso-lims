@@ -26,13 +26,14 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.WorkflowStateDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 
 /**
  * Responsible for handling all workflow AJAX requests
  */
 @Controller
 @RequestMapping("/rest/workflows")
-public class WorkflowRestController extends RestController {
+public class WorkflowRestController extends AbstractRestController {
   @Autowired
   WorkflowManager workflowManager;
 
@@ -43,7 +44,8 @@ public class WorkflowRestController extends RestController {
   private AuthorizationManager authorizationManager;
 
   @PostMapping(value = "/{workflowId}/step/{stepNumber}")
-  public @ResponseBody WorkflowStateDto process(@PathVariable("workflowId") long workflowId, @PathVariable("stepNumber") int stepNumber,
+  public @ResponseBody WorkflowStateDto process(@PathVariable("workflowId") long workflowId,
+      @PathVariable("stepNumber") int stepNumber,
       @RequestParam("input") String input) throws IOException {
     Workflow workflow = workflowManager.loadWorkflow(workflowId);
     workflowManager.processInput(workflow, stepNumber, input);
@@ -58,7 +60,8 @@ public class WorkflowRestController extends RestController {
   }
 
   @GetMapping(value = "/{workflowId}/step/{stepNumber}")
-  public @ResponseBody WorkflowStateDto getStep(@PathVariable("workflowId") long workflowId, @PathVariable("stepNumber") int stepNumber)
+  public @ResponseBody WorkflowStateDto getStep(@PathVariable("workflowId") long workflowId,
+      @PathVariable("stepNumber") int stepNumber)
       throws IOException {
     Workflow workflow = workflowManager.loadWorkflow(workflowId);
     return Dtos.asDto(workflow, stepNumber);

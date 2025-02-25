@@ -14,11 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ScientificNameDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/scientificnames")
-public class ScientificNameRestController extends RestController {
+public class ScientificNameRestController extends AbstractRestController {
 
   @Autowired
   private ScientificNameService scientificNameService;
@@ -29,8 +30,7 @@ public class ScientificNameRestController extends RestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<ScientificNameDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<ScientificNameDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate("Scientific Name", dtos, Dtos::to, scientificNameService, true);
   }
 

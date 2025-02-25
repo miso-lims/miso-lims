@@ -14,11 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.AttachmentCategoryService;
 import uk.ac.bbsrc.tgac.miso.dto.AttachmentCategoryDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/attachmentcategories")
-public class AttachmentCategoryRestController extends RestController {
+public class AttachmentCategoryRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Attachment Category";
 
@@ -31,8 +32,7 @@ public class AttachmentCategoryRestController extends RestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<AttachmentCategoryDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<AttachmentCategoryDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, attachmentCategoryService, true);
   }
 
@@ -44,7 +44,8 @@ public class AttachmentCategoryRestController extends RestController {
 
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
-    return asyncOperationManager.getAsyncProgress(uuid, AttachmentCategory.class, attachmentCategoryService, Dtos::asDto);
+    return asyncOperationManager.getAsyncProgress(uuid, AttachmentCategory.class, attachmentCategoryService,
+        Dtos::asDto);
   }
 
   @PostMapping(value = "/bulk-delete")

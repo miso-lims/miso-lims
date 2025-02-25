@@ -22,11 +22,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.ContactRoleService;
 import uk.ac.bbsrc.tgac.miso.dto.ContactRoleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/contactroles")
-public class ContactRoleRestController extends RestController {
+public class ContactRoleRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Contact Role";
 

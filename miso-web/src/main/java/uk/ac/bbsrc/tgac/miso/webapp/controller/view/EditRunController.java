@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
@@ -35,12 +12,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.fasterxml.jackson.core.SerializableString;
-import com.fasterxml.jackson.core.io.CharacterEscapes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunPartitionAliquotDto;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.JsonArrayCollector;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.RunMetricsSource;
@@ -89,7 +64,8 @@ public class EditRunController {
   /**
    * Get a stream of source of metrics
    * 
-   * Normally, metrics collected by run scanner are stored in the MISO database, but it is possible to provide others here.
+   * Normally, metrics collected by run scanner are stored in the MISO database, but it is possible to
+   * provide others here.
    */
   public Stream<RunMetricsSource> getSources() {
     return Stream.concat(Stream.of(Run::getMetrics), StreamSupport.stream(METRICS.spliterator(), false));
@@ -138,14 +114,16 @@ public class EditRunController {
   @GetMapping("/{runId}")
   public ModelAndView setupForm(@PathVariable Long runId, ModelMap model) throws IOException {
     Run run = runService.get(runId);
-    if (run == null) throw new NotFoundException("No run found with ID " + runId);
+    if (run == null)
+      throw new NotFoundException("No run found with ID " + runId);
     return setupForm(run, model);
   }
 
   @GetMapping("/alias/{runAlias}")
   public ModelAndView setupForm(@PathVariable String runAlias, ModelMap model) throws IOException {
     Run run = runService.getRunByAlias(runAlias);
-    if (run == null) throw new NotFoundException("No run found with alias " + runAlias);
+    if (run == null)
+      throw new NotFoundException("No run found with alias " + runAlias);
     return setupForm(run, model);
   }
 
@@ -165,7 +143,8 @@ public class EditRunController {
         model.put("partitionNames", mapper.writeValueAsString(
             run.getSequencerPartitionContainers().get(0).getPartitions().stream()
                 .sorted(Comparator.comparing(Partition::getPartitionNumber))
-                .map(partition -> partition.getPool() == null ? "N/A" : partition.getPool().getAlias()).collect(Collectors.toList())));
+                .map(partition -> partition.getPool() == null ? "N/A" : partition.getPool().getAlias())
+                .collect(Collectors.toList())));
       } else {
         model.put("partitionNames", "[]");
       }
@@ -173,23 +152,24 @@ public class EditRunController {
     }
 
     model.put("runPositions", run.getRunPositions().stream().map(Dtos::asDto).collect(Collectors.toList()));
-    model.put("runPartitions", run.getSequencerPartitionContainers().stream().flatMap(container -> container.getPartitions().stream())
-        .map(WhineyFunction.rethrow(partition -> {
-          PartitionDto dto = Dtos.asDto(partition, false, indexChecker);
-          RunPartition runPartition = runPartitionService.get(run, partition);
-          if (runPartition != null) {
-            if (runPartition.getQcType() != null) {
-              dto.setQcType(runPartition.getQcType().getId());
-              dto.setQcNotes(runPartition.getNotes());
-            }
-            if (runPartition.getPurpose() != null) {
-              dto.setRunPurposeId(runPartition.getPurpose().getId());
-            }
-          } else {
-            dto.setQcNotes("");
-          }
-          return dto;
-        })).collect(Collectors.toList()));
+    model.put("runPartitions",
+        run.getSequencerPartitionContainers().stream().flatMap(container -> container.getPartitions().stream())
+            .map(WhineyFunction.rethrow(partition -> {
+              PartitionDto dto = Dtos.asDto(partition, false, indexChecker);
+              RunPartition runPartition = runPartitionService.get(run, partition);
+              if (runPartition != null) {
+                if (runPartition.getQcType() != null) {
+                  dto.setQcType(runPartition.getQcType().getId());
+                  dto.setQcNotes(runPartition.getNotes());
+                }
+                if (runPartition.getPurpose() != null) {
+                  dto.setRunPurposeId(runPartition.getPurpose().getId());
+                }
+              } else {
+                dto.setQcNotes("");
+              }
+              return dto;
+            })).collect(Collectors.toList()));
     model.put("runAliquots", getRunAliquots(run));
     MisoWebUtils.addIssues(issueTrackerManager, () -> issueTrackerManager.searchIssues(run.getAlias()), model);
     model.put("run", run);
@@ -200,7 +180,8 @@ public class EditRunController {
     partitionConfig.put("runId", run.getId());
     partitionConfig.put("isFull", run.isFull());
     partitionConfig.put("showContainer", true);
-    partitionConfig.put("sequencingParametersId", run.getSequencingParameters() == null ? 0 : run.getSequencingParameters().getId());
+    partitionConfig.put("sequencingParametersId",
+        run.getSequencingParameters() == null ? 0 : run.getSequencingParameters().getId());
     partitionConfig.put("showPool", true);
     model.put("partitionConfig", mapper.writeValueAsString(partitionConfig));
     model.put("experiments",

@@ -29,10 +29,12 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ServiceRecordDto;
 import uk.ac.bbsrc.tgac.miso.dto.StorageLocationDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 
 @Controller
 @RequestMapping("/rest/storagelocations")
-public class StorageLocationRestController extends RestController {
+public class StorageLocationRestController extends AbstractRestController {
 
   @Autowired
   private StorageLocationService storageLocationService;

@@ -22,11 +22,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RunLibraryQcStatusDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/runlibraryqcstatuses")
-public class RunLibraryQcStatusRestController extends RestController {
+public class RunLibraryQcStatusRestController extends AbstractRestController {
 
   @Autowired
   private RunLibraryQcStatusService runLibraryQcStatusService;
@@ -46,18 +47,21 @@ public class RunLibraryQcStatusRestController extends RestController {
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<RunLibraryQcStatusDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkCreate("Run-Library QC Status", dtos, Dtos::to, runLibraryQcStatusService, true);
+    return asyncOperationManager.startAsyncBulkCreate("Run-Library QC Status", dtos, Dtos::to,
+        runLibraryQcStatusService, true);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<RunLibraryQcStatusDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkUpdate("Run-Library QC Status", dtos, Dtos::to, runLibraryQcStatusService, true);
+    return asyncOperationManager.startAsyncBulkUpdate("Run-Library QC Status", dtos, Dtos::to,
+        runLibraryQcStatusService, true);
   }
 
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
-    return asyncOperationManager.getAsyncProgress(uuid, RunLibraryQcStatus.class, runLibraryQcStatusService, Dtos::asDto);
+    return asyncOperationManager.getAsyncProgress(uuid, RunLibraryQcStatus.class, runLibraryQcStatusService,
+        Dtos::asDto);
   }
 
 }

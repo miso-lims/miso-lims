@@ -21,10 +21,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ServiceRecordDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 
 @Controller
 @RequestMapping("/rest/servicerecords")
-public class ServiceRecordRestController extends RestController {
+public class ServiceRecordRestController extends AbstractRestController {
 
   @Autowired
   private ServiceRecordService serviceRecordService;

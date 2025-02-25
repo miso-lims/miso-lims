@@ -23,11 +23,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.service.ContactService;
 import uk.ac.bbsrc.tgac.miso.dto.ContactDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/contacts")
-public class ContactRestController extends RestController {
+public class ContactRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Contact";
 

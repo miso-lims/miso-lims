@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
+package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.util.Map;
@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestUtils;
 
 /**
  * Class for handling exceptions occurring in REST Controller classes

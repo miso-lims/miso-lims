@@ -14,11 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibrarySpikeInDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/libraryspikeins")
-public class LibrarySpikeInRestController extends RestController {
+public class LibrarySpikeInRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Library Spike-In";
 
@@ -37,8 +38,7 @@ public class LibrarySpikeInRestController extends RestController {
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkUpdateAsync(@RequestBody List<LibrarySpikeInDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<LibrarySpikeInDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, Dtos::to, librarySpikeInService, true);
   }
 
