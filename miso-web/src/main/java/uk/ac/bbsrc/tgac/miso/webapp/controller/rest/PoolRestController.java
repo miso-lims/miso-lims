@@ -81,6 +81,8 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -94,7 +96,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
  */
 @Controller
 @RequestMapping("/rest/pools")
-public class PoolRestController extends RestController {
+public class PoolRestController extends AbstractRestController {
 
   @Autowired
   private IndexChecker indexChecker;

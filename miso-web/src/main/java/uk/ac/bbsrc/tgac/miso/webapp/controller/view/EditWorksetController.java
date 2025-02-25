@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
@@ -32,7 +32,7 @@ public class EditWorksetController {
   private WorksetService worksetService;
   @Autowired
   private ObjectMapper mapper;
-  
+
   @RequestMapping("/new")
   public ModelAndView newArray(ModelMap model) {
     model.addAttribute(MODEL_ATTR_TITLE, "New Workset");
@@ -41,7 +41,8 @@ public class EditWorksetController {
   }
 
   @RequestMapping("/{worksetId}")
-  public ModelAndView setupForm(@PathVariable(name = "worksetId", required = true) long worksetId, ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable(name = "worksetId", required = true) long worksetId, ModelMap model)
+      throws IOException {
     model.addAttribute(MODEL_ATTR_TITLE, "Workset " + worksetId);
     model.addAttribute(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     Workset workset = worksetService.get(worksetId);

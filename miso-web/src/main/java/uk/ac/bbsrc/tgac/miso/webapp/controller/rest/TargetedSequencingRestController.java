@@ -26,12 +26,13 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.TargetedSequencingDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/targetedsequencings")
-public class TargetedSequencingRestController extends RestController {
+public class TargetedSequencingRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Targeted Sequencing";
 

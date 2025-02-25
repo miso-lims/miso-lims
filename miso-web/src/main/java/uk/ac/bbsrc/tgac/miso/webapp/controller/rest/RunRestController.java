@@ -90,6 +90,8 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.dto.StudyDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
@@ -102,7 +104,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
  */
 @Controller
 @RequestMapping("/rest/runs")
-public class RunRestController extends RestController {
+public class RunRestController extends AbstractRestController {
   public static class RunPartitionQCRequest {
     private List<Long> partitionIds;
     private Long qcTypeId;

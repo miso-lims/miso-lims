@@ -25,11 +25,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/qcs")
-public class QcRestController extends RestController {
+public class QcRestController extends AbstractRestController {
   @Autowired
   private QualityControlService qcService;
   @Autowired

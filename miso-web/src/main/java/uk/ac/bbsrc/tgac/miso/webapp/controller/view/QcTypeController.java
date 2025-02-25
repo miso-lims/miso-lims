@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +18,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.service.QcTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
 @RequestMapping("/qctype")
 public class QcTypeController extends AbstractInstituteDefaultsController<QcType, QcTypeDto> {
-  
+
   @Autowired
   private QcTypeService qcTypeService;
   @Autowired

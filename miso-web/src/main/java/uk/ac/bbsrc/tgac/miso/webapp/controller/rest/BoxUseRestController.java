@@ -22,11 +22,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.BoxUseService;
 import uk.ac.bbsrc.tgac.miso.dto.BoxUseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/boxuses")
-public class BoxUseRestController extends RestController {
+public class BoxUseRestController extends AbstractRestController {
 
   @Autowired
   private BoxUseService boxUseService;

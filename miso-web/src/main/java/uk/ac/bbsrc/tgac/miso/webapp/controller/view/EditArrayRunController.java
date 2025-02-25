@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,6 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
@@ -59,7 +59,8 @@ public class EditArrayRunController {
   }
 
   @RequestMapping("/{arrayRunId}")
-  public ModelAndView setupForm(@PathVariable(name = "arrayRunId", required = true) long arrayRunId, ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable(name = "arrayRunId", required = true) long arrayRunId, ModelMap model)
+      throws IOException {
     ArrayRun run = arrayRunService.get(arrayRunId);
     if (run == null) {
       throw new NotFoundException("Array Run not found");

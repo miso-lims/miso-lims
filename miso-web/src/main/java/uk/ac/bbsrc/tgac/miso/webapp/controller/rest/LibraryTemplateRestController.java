@@ -34,12 +34,13 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateIndexDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/librarytemplates")
-public class LibraryTemplateRestController extends RestController {
+public class LibraryTemplateRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Library Template";
 

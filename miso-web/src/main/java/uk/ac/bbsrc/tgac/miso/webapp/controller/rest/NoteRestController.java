@@ -27,10 +27,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 
 @Controller
 @RequestMapping("/rest/notes")
-public class NoteRestController extends RestController {
+public class NoteRestController extends AbstractRestController {
   public static class NoteRequest {
     private boolean internalOnly;
     private String text;

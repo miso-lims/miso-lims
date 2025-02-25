@@ -45,12 +45,14 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunPartitionAliquotDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/requisitions")
-public class RequisitionRestController extends RestController {
+public class RequisitionRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Requisition";
   private static final String SAMPLE_TYPE_LABEL = "Sample";

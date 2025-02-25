@@ -48,6 +48,8 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderCompletionDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingOrderDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse;
@@ -55,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.PoolPickerResponse.PoolPickerEntry;
 
 @Controller
 @RequestMapping("/rest")
-public class SequencingOrderRestController extends RestController {
+public class SequencingOrderRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Sequencing Order";
 

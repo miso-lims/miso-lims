@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
 import uk.ac.bbsrc.tgac.miso.dto.AssayDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPageWithAuthorization;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;

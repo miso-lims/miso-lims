@@ -14,11 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/sequencingparameters")
-public class SequencingParametersRestController extends RestController {
+public class SequencingParametersRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Sequencing Parameters";
 
@@ -31,8 +32,7 @@ public class SequencingParametersRestController extends RestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<SequencingParametersDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<SequencingParametersDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, sequencingParametersService, true);
   }
 
@@ -44,7 +44,8 @@ public class SequencingParametersRestController extends RestController {
 
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
-    return asyncOperationManager.getAsyncProgress(uuid, SequencingParameters.class, sequencingParametersService, Dtos::asDto);
+    return asyncOperationManager.getAsyncProgress(uuid, SequencingParameters.class, sequencingParametersService,
+        Dtos::asDto);
   }
 
   @PostMapping(value = "/bulk-delete")

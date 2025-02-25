@@ -21,11 +21,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.WorkstationDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/workstations")
-public class WorkstationRestController extends RestController {
+public class WorkstationRestController extends AbstractRestController {
 
   @Autowired
   private WorkstationService workstationService;

@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +28,6 @@ import com.eaglegenomics.simlims.core.Group;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -71,7 +69,8 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleStockDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
@@ -157,8 +156,9 @@ public class EditSampleController {
   @GetMapping(value = "/{sampleId}")
   public ModelAndView setupForm(@PathVariable Long sampleId, ModelMap model) throws IOException {
     Sample sample = sampleService.get(sampleId);
-    if (sample == null)
+    if (sample == null) {
       throw new NotFoundException("No sample found for ID " + sampleId.toString());
+    }
 
     model.put("title", "Sample " + sampleId);
 
@@ -311,7 +311,7 @@ public class EditSampleController {
     Long boxId = getLongInput("boxId", form, false);
 
     if (quantity == null || quantity <= 0)
-      throw new RestException("Must specify quantity of samples to create", Status.BAD_REQUEST);
+      throw new ClientErrorException("Must specify quantity of samples to create");
 
     final SampleDto template;
 
@@ -343,8 +343,7 @@ public class EditSampleController {
   private void confirmClassesExist(String targetCategory) throws IOException {
     List<SampleClass> categoryClasses = sampleClassService.listByCategory(targetCategory);
     if (categoryClasses.isEmpty()) {
-      throw new RestException(String.format("No classes available for category '%s'", targetCategory),
-          Status.BAD_REQUEST);
+      throw new ClientErrorException(String.format("No classes available for category '%s'", targetCategory));
     }
   }
 
@@ -362,7 +361,7 @@ public class EditSampleController {
       case SampleAliquot.CATEGORY_NAME:
         return new SampleAliquotDto();
       default:
-        throw new RestException("Unknown sample category : " + sampleCategory, Status.BAD_REQUEST);
+        throw new ClientErrorException("Unknown sample category : " + sampleCategory);
     }
   }
 
@@ -477,7 +476,7 @@ public class EditSampleController {
           if (sourceCategory == null) {
             sourceCategory = detailed.getSampleClass().getSampleCategory();
           } else if (!sourceCategory.equals(detailed.getSampleClass().getSampleCategory())) {
-            throw new RestException("Parents must all be of the same sample category", Status.BAD_REQUEST);
+            throw new ClientErrorException("Parents must all be of the same sample category");
           }
         }
         sourceCategory = ((DetailedSample) parents.get(0)).getSampleClass().getSampleCategory();

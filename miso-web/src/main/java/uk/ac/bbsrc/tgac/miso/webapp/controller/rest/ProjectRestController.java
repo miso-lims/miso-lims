@@ -27,6 +27,8 @@ import uk.ac.bbsrc.tgac.miso.dto.AttachmentDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 /**
@@ -38,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
  */
 @Controller
 @RequestMapping("/rest/projects")
-public class ProjectRestController extends RestController {
+public class ProjectRestController extends AbstractRestController {
 
   @Autowired
   private ProjectService projectService;

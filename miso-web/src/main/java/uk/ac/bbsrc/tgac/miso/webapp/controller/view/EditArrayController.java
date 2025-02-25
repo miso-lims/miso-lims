@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ArrayModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
@@ -45,12 +45,14 @@ public class EditArrayController {
   public ModelAndView newArray(ModelMap model) throws IOException {
     model.addAttribute(PageMode.PROPERTY, PageMode.CREATE.getLabel());
     List<ArrayModel> models = arrayModelService.list();
-    model.addAttribute(MODEL_ATTR_MODELS, mapper.writeValueAsString(models.stream().map(Dtos::asDto).collect(Collectors.toList())));
+    model.addAttribute(MODEL_ATTR_MODELS,
+        mapper.writeValueAsString(models.stream().map(Dtos::asDto).collect(Collectors.toList())));
     return new ModelAndView(JSP, model);
   }
 
   @RequestMapping("/{arrayId}")
-  public ModelAndView setupForm(@PathVariable(name = "arrayId", required = true) long arrayId, ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable(name = "arrayId", required = true) long arrayId, ModelMap model)
+      throws IOException {
     model.addAttribute(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     Array array = arrayService.get(arrayId);
     if (array == null) {
