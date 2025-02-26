@@ -207,26 +207,36 @@ public class SampleRestController extends RestController {
   @ResponseBody
   public DataTablesResponseDto<SampleDto> getPreparedSamplessByRequisition(@PathVariable("id") long id,
       HttpServletRequest request) throws IOException {
-    log.debug("Fetching derivatives for requisition: {}", id);
-
     List<Sample> requisitionedSamples = sampleService.list(0, 0, false, "id", PaginationFilter.requisitionId(id));
     List<Sample> supplementalSamples =
         sampleService.list(0, 0, false, "id", PaginationFilter.supplementalToRequisitionId(id));
-
-    Set<Long> sampleIds = Stream.concat(requisitionedSamples.stream(), supplementalSamples.stream())
+    Set<Long> rootSampleIds = Stream.concat(requisitionedSamples.stream(), supplementalSamples.stream())
         .map(Sample::getId)
         .collect(Collectors.toSet());
-
-    List<Sample> stockSamples = sampleService.getChildren(sampleIds, SampleStock.CATEGORY_NAME, id);
-    List<Sample> tissueSamples = sampleService.getChildren(sampleIds, SampleTissue.CATEGORY_NAME, id);
-    List<Sample> aliquotSamples = sampleService.getChildren(sampleIds, SampleAliquot.CATEGORY_NAME, id);
-
-    List<Sample> allSamples = Stream.of(stockSamples.stream(), tissueSamples.stream(), aliquotSamples.stream())
-        .flatMap(stream -> stream)
-        .collect(Collectors.toList());
-
+    Set<Long> allDerivativeSampleIds = new HashSet<>();
+    List<Sample> tissueSamples = sampleService.getChildren(rootSampleIds, SampleTissue.CATEGORY_NAME, id);
+    Set<Long> tissueSampleIds = tissueSamples.stream()
+        .map(Sample::getId)
+        .collect(Collectors.toSet());
+    allDerivativeSampleIds.addAll(tissueSampleIds);
+    List<Sample> tissueProcessingSamples = sampleService.getChildren(
+        tissueSampleIds, SampleTissueProcessing.CATEGORY_NAME, id);
+    Set<Long> tissueProcessingIds = tissueProcessingSamples.stream()
+        .map(Sample::getId)
+        .collect(Collectors.toSet());
+    allDerivativeSampleIds.addAll(tissueProcessingIds);
+    List<Sample> stockSamples = sampleService.getChildren(rootSampleIds, SampleStock.CATEGORY_NAME, id);
+    Set<Long> stockSampleIds = stockSamples.stream()
+        .map(Sample::getId)
+        .collect(Collectors.toSet());
+    allDerivativeSampleIds.addAll(stockSampleIds);
+    List<Sample> aliquotSamples = sampleService.getChildren(stockSampleIds, SampleAliquot.CATEGORY_NAME, id);
+    Set<Long> aliquotSampleIds = aliquotSamples.stream()
+        .map(Sample::getId)
+        .collect(Collectors.toSet());
+    allDerivativeSampleIds.addAll(aliquotSampleIds);
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.ids(
-        allSamples.stream().map(Sample::getId).collect(Collectors.toList())));
+        new ArrayList<>(allDerivativeSampleIds)));
   }
 
   @PostMapping

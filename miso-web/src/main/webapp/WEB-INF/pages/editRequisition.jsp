@@ -98,7 +98,7 @@
             </div>
             <div id="req_samples_section" class="expandable_section">
               <miso:list-section-ajax id="list_samples" name="Requisitioned Samples" target="sample"
-                config="{requisitionId: ${requisition.id}, supplemental: false, requisition: ${requisitionDto}, collapseId: 'req_samples_section'}" />
+                config="{requisitionId: ${requisition.id}, relation: 'requisitioned', requisition: ${requisitionDto}, collapseId: 'req_samples_section'}" />
             </div>
 
             <div class="sectionDivider"
@@ -108,7 +108,7 @@
             </div>
             <div id="supl_samples_section" class="expandable_section">
               <miso:list-section-ajax id="list_supplementalsamples" name="Supplemental Samples" target="sample"
-                config="{requisitionId: ${requisition.id}, supplemental: true, requisition: ${requisitionDto}, identities: ${identityDtos}, collapseId: 'supl_samples_section'}" />
+                  config="{requisitionId: ${requisition.id}, relation: 'supplemental', requisition: ${requisitionDto}, identities: ${identityDtos}, collapseId: 'supl_samples_section'}" />
             </div>
 
             <div class="sectionDivider"
@@ -134,7 +134,7 @@
 
             <c:if test="${detailedSample}">
               <miso:list-section-ajax id="list_preparedsamples" name="Prepared Samples" target="sample" 
-                config="{requisitionId: ${requisition.id}, filter: 'samples-prepared'}" />
+                config="{requisitionId: ${requisition.id}, relation: 'indirect'}" />
             </c:if>
             <miso:list-section-ajax id="list_preparedlibraries" name="Prepared Libraries" target="library"
               config="{ requisitionId: ${requisition.id}, relation: 'indirect' }" />
