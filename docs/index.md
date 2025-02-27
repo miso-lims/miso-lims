@@ -11,4 +11,3 @@ Sequencing centres differ not only in terms of their scale and output, but also 
 
 Hence, we are developing MISO, an open-source LIMS for recording sequencing metadata. We are using freely available tools that are industry standard, well documented, and easy to set up on minimal hardware. As a bare system, MISO can store relevant metadata based on a wide array of NGS sequencing platforms (e.g. Illumina, Roche 454, ABI SOLiD, PacBio RS, and Oxford Nanopore) and public repository data submission schemas (e.g. the Sequence Read Archive at the EBI), and has many features common to bespoke and proprietary LIMS, such as secure authentication, fine-grained access control, location and barcode tracking, boxes and worksets.
 
-You can also follow the project on Twitter: [@misolims](http://www.twitter.com/misolims)
