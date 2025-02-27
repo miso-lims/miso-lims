@@ -176,10 +176,6 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   protected void assertSingleCellAttributes(Map<String, String> attributes, SampleSingleCell sample) {
     assertEntityAttribute(SamColumns.INITIAL_CELL_CONC, attributes, sample,
         s -> emptyIfNull(s.getInitialCellConcentration()));
-    assertEntityAttribute(SamColumns.TARGET_CELL_RECOVERY, attributes, sample,
-        s -> emptyIfNull(s.getTargetCellRecovery()));
-    assertEntityAttribute(SamColumns.LOADING_CELL_CONC, attributes, sample,
-        s -> emptyIfNull(s.getLoadingCellConcentration()));
     assertEntityAttribute(SamColumns.DIGESTION, attributes, sample, s -> s.getDigestion());
   }
 

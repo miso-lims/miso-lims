@@ -15,8 +15,6 @@ public class SampleSingleCellImpl extends SampleTissueProcessingImpl implements 
 
   @Column
   private BigDecimal initialCellConcentration;
-  private Integer targetCellRecovery;
-  private BigDecimal loadingCellConcentration;
   private String digestion;
 
   @Override
@@ -27,26 +25,6 @@ public class SampleSingleCellImpl extends SampleTissueProcessingImpl implements 
   @Override
   public void setInitialCellConcentration(BigDecimal initialCellConcentration) {
     this.initialCellConcentration = initialCellConcentration;
-  }
-
-  @Override
-  public Integer getTargetCellRecovery() {
-    return targetCellRecovery;
-  }
-
-  @Override
-  public void setTargetCellRecovery(Integer targetCellRecovery) {
-    this.targetCellRecovery = targetCellRecovery;
-  }
-
-  @Override
-  public BigDecimal getLoadingCellConcentration() {
-    return loadingCellConcentration;
-  }
-
-  @Override
-  public void setLoadingCellConcentration(BigDecimal loadingCellConcentration) {
-    this.loadingCellConcentration = loadingCellConcentration;
   }
 
   @Override
@@ -65,8 +43,6 @@ public class SampleSingleCellImpl extends SampleTissueProcessingImpl implements 
     int result = super.hashCode();
     result = prime * result + ((digestion == null) ? 0 : digestion.hashCode());
     result = prime * result + ((initialCellConcentration == null) ? 0 : initialCellConcentration.hashCode());
-    result = prime * result + ((targetCellRecovery == null) ? 0 : targetCellRecovery.hashCode());
-    result = prime * result + ((loadingCellConcentration == null) ? 0 : loadingCellConcentration.hashCode());
     return result;
   }
 
@@ -88,16 +64,6 @@ public class SampleSingleCellImpl extends SampleTissueProcessingImpl implements 
       if (other.initialCellConcentration != null)
         return false;
     } else if (!initialCellConcentration.equals(other.initialCellConcentration))
-      return false;
-    if (targetCellRecovery == null) {
-      if (other.targetCellRecovery != null)
-        return false;
-    } else if (!targetCellRecovery.equals(other.targetCellRecovery))
-      return false;
-    if (loadingCellConcentration == null) {
-      if (other.loadingCellConcentration != null)
-        return false;
-    } else if (!loadingCellConcentration.equals(other.loadingCellConcentration))
       return false;
     return true;
   }

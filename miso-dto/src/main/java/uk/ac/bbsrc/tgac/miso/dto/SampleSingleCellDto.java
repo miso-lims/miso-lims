@@ -8,8 +8,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 public class SampleSingleCellDto extends SampleTissueProcessingDto implements SampleSingleCellRelative {
 
   private String initialCellConcentration;
-  private Integer targetCellRecovery;
-  private String loadingCellConcentration;
   private String digestion;
 
   @Override
@@ -20,26 +18,6 @@ public class SampleSingleCellDto extends SampleTissueProcessingDto implements Sa
   @Override
   public void setInitialCellConcentration(String initialCellConcentration) {
     this.initialCellConcentration = initialCellConcentration;
-  }
-
-  @Override
-  public Integer getTargetCellRecovery() {
-    return targetCellRecovery;
-  }
-
-  @Override
-  public void setTargetCellRecovery(Integer targetCellRecovery) {
-    this.targetCellRecovery = targetCellRecovery;
-  }
-
-  @Override
-  public String getLoadingCellConcentration() {
-    return loadingCellConcentration;
-  }
-
-  @Override
-  public void setLoadingCellConcentration(String loadingCellConcentration) {
-    this.loadingCellConcentration = loadingCellConcentration;
   }
 
   @Override
