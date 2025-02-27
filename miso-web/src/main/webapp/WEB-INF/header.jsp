@@ -71,7 +71,6 @@
     <sec:authorize access="isAuthenticated()">
       <div id="loggedInBanner">
         <a id="userManualLink" target="_blank" rel="noopener noreferrer">Help</a> |
-        <a href="https://gitter.im/miso-lims/users" target="_blank" rel="noopener noreferrer">Chat</a> |
         <c:if test="${misoBugUrl != null}">
           <a href="${misoBugUrl}" target="_blank" rel="noopener noreferrer">Report a problem</a> |
         </c:if>
