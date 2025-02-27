@@ -120,9 +120,3 @@ To run your own MISO instance in the long term, download the
 
 Installation and configuration details can be found in the [MISO building and deploying guide](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/installation-guide/).
 
-## Contact and Community
-
-- [MISO Twitter](https://twitter.com/misolims) : for news and updates
-- [MISO Community Gitter](https://gitter.im/miso-lims/community) : for user group and developer questions and discussion
-- [MISO Users Gitter](https://gitter.im/miso-lims/users) : for user group questions and discussion
-- [MISO Developers Gitter](https://gitter.im/miso-lims/developers) : for developer questions and discussion
