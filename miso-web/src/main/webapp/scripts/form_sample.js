@@ -580,21 +580,6 @@ FormTarget.sample = (function ($) {
               type: "decimal",
               precision: 14,
               scale: 10,
-              description: "Initial concentration of cells in the sample at the time of receipt",
-            },
-            {
-              title: "Target Cell Recovery",
-              data: "targetCellRecovery",
-              type: "int",
-              min: 0,
-            },
-            {
-              title: "Loading Cell Concentration",
-              data: "loadingCellConcentration",
-              type: "decimal",
-              precision: 14,
-              scale: 10,
-              description: "Concentration of cells prepared for loading into the instrument",
             },
             {
               title: "Digestion",

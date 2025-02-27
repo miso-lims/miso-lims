@@ -6,14 +6,6 @@ public interface SampleSingleCellRelative {
 
   public void setInitialCellConcentration(String initialCellConcentration);
 
-  public Integer getTargetCellRecovery();
-
-  public void setTargetCellRecovery(Integer targetCellRecovery);
-
-  public String getLoadingCellConcentration();
-
-  public void setLoadingCellConcentration(String loadingCellConcentration);
-
   public String getDigestion();
 
   public void setDigestion(String digestion);
