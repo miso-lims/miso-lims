@@ -213,14 +213,14 @@ public class SampleRestController extends RestController {
     Set<Long> sampleIds = Stream.concat(requisitionedSamples.stream(), supplementalSamples.stream())
         .map(Sample::getId)
         .collect(Collectors.toSet());
-    List<Sample> stockSamples = sampleService.getChildren(sampleIds, SampleStock.CATEGORY_NAME, id);
-    List<Sample> tissueSamples = sampleService.getChildren(sampleIds, SampleTissue.CATEGORY_NAME, id);
-    List<Sample> aliquotSamples = sampleService.getChildren(sampleIds, SampleAliquot.CATEGORY_NAME, id);
-    List<Sample> allSamples = Stream.of(stockSamples.stream(), tissueSamples.stream(), aliquotSamples.stream())
-        .flatMap(stream -> stream)
+    List<Long> allSampleIds = Stream.of(
+        sampleService.getChildren(sampleIds, SampleTissue.CATEGORY_NAME, id).stream(),
+        sampleService.getChildren(sampleIds, SampleTissueProcessing.CATEGORY_NAME, id).stream(),
+        sampleService.getChildren(sampleIds, SampleStock.CATEGORY_NAME, id).stream(),
+        sampleService.getChildren(sampleIds, SampleAliquot.CATEGORY_NAME, id).stream())
+        .flatMap(stream -> stream.map(Sample::getId))
         .collect(Collectors.toList());
-    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.ids(
-        allSamples.stream().map(Sample::getId).collect(Collectors.toList())));
+    return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.ids(allSampleIds));
   }
 
   @PostMapping
