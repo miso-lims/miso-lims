@@ -1,0 +1,1 @@
+Extractions table on the Edit Requisition Page to Prepared Samples, which now displays all downstream samples (detailed sample)

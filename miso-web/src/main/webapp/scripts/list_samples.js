@@ -14,10 +14,15 @@ ListTarget.sample = (function () {
       } else if (config.worksetId) {
         return Urls.rest.samples.worksetDatatable(config.worksetId);
       } else if (config.requisitionId) {
-        if (config.supplemental) {
-          return Urls.rest.samples.requisitionSupplementalDatatable(config.requisitionId);
-        } else {
-          return Urls.rest.samples.requisitionDatatable(config.requisitionId);
+        switch (config.relation) {
+          case "requisitioned":
+            return Urls.rest.samples.requisitionDatatable(config.requisitionId);
+          case "supplemental":
+            return Urls.rest.samples.requisitionSupplementalDatatable(config.requisitionId);
+          case "indirect":
+            return Urls.rest.samples.samplesPreparedDatatable(config.requisitionId);
+          default:
+            throw Error("Unexpected requisition relation: " + config.relation);
         }
       }
       return Urls.rest.samples.datatable;
@@ -29,7 +34,7 @@ ListTarget.sample = (function () {
       var actions = BulkTarget.sample.getBulkActions(config);
 
       if (config.requisitionId) {
-        if (config.supplemental) {
+        if (config.relation === "supplemental") {
           actions.unshift({
             name: "Remove",
             action: function (items) {
@@ -42,7 +47,7 @@ ListTarget.sample = (function () {
               );
             },
           });
-        } else {
+        } else if (config.relation === "requisitioned") {
           actions.unshift(
             {
               name: "Remove",
@@ -99,7 +104,7 @@ ListTarget.sample = (function () {
       var actions = [];
 
       if (config.requisitionId) {
-        if (config.supplemental) {
+        if (config.relation === "supplemental") {
           actions.push({
             name: "Add",
             handler: function () {
@@ -110,7 +115,7 @@ ListTarget.sample = (function () {
               }
             },
           });
-        } else {
+        } else if (config.relation === "requisitioned") {
           actions.push({
             name: "Add",
             handler: function () {
