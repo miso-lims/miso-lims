@@ -7,6 +7,27 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.4.0] - 2025-02-28
+
+### Added
+
+* Archived column on the QC Types list
+
+### Changed
+
+* Extractions table on the Edit Requisition Page to Prepared Samples, which now displays all downstream samples (detailed sample)
+
+### Fixed
+
+* Instruments were allowed to have duplicate barcodes
+* QC types for the same target were allowed to have duplicate names. This was causing a bug when
+  adding QCs where the wrong options were given after selecting a duplicated QC type
+
+### Upgrade Notes
+
+* Updated Runscanner to 2.1.0
+
+
 ## [3.3.0] - 2025-01-30
 
 ### Added
