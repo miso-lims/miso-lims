@@ -13,15 +13,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 
 public class MisoLoginFilter extends UsernamePasswordAuthenticationFilter {
+
+  private static final RequestMatcher URI_MATCHER = new AntPathRequestMatcher("/api/**");
 
   @Autowired
   private UserService userService;
@@ -33,11 +41,23 @@ public class MisoLoginFilter extends UsernamePasswordAuthenticationFilter {
   private String emailDomain;
 
   public MisoLoginFilter() {
-    // Save security context in HTTP session and request attribute (match Spring Security 6 default)
+    // Save security context in HTTP session and request attribute (match Spring
+    // Security 6 default)
     super.setSecurityContextRepository(
         new DelegatingSecurityContextRepository(
             new HttpSessionSecurityContextRepository(),
             new RequestAttributeSecurityContextRepository()));
+  }
+
+  @Override
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+      throws IOException, ServletException {
+    if (URI_MATCHER.matches((HttpServletRequest) request)) {
+      // request handled by ApiKeyAuthenticationFilter
+      chain.doFilter(request, response);
+      return;
+    }
+    super.doFilter(request, response, chain);
   }
 
   @Override

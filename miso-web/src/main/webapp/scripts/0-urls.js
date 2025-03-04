@@ -27,6 +27,12 @@ Urls = (function () {
     regenerateBarcodes: adminRestBase + "/barcode/regen",
   };
 
+  // API Keys
+  var apiKeyRestBase = restBase + "/apikeys";
+  rest.apiKeys = {
+    create: apiKeyRestBase,
+  };
+
   // Arrays
   var arrayUiBase = "/array";
   ui.arrays = {
