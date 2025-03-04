@@ -1105,3 +1105,7 @@ INSERT INTO Project_Contact (projectId, contactId, contactRoleId) VALUES
 (1, 1, 2),
 (2, 1, 3),
 (3, 2, 4);
+
+INSERT INTO ApiKey(keyId, userId, apiKey, apiSecret, creator, created) VALUES
+-- unencrypted key: LwTTBMu4QSOeTWp7Uo7Bva0Jm0+Zpnxb-jw24z317EwhjoqtswuROsj1DFXoD9WT6
+(1, 1, 'LwTTBMu4QSOeTWp7Uo7Bva0Jm0+Zpnxb', '{bcrypt}$2a$10$l2gtUtIdwV98avW6C7DYZOkhDdRKuiYADiOm33UkkdabaxjITvpDS', 1, '2025-03-11 15:10:00');

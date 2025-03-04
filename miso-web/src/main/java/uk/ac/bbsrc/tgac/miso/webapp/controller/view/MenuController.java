@@ -22,7 +22,9 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response.Status;
+import uk.ac.bbsrc.tgac.ApiKeyDto;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.ApiKeyService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
 @Controller
@@ -39,6 +41,9 @@ public class MenuController {
   private Boolean detailedSample;
   @Value("${miso.genomeFolder:}")
   private String genomeFolder;
+
+  @Autowired
+  private ApiKeyService apiKeyService;
   @Autowired
   private ObjectMapper mapper;
 
@@ -68,6 +73,7 @@ public class MenuController {
     model.put("userRealName", realName);
     model.put("userId", user.getId());
     model.put("userGroups", groups.toString());
+    model.put("apiKeys", apiKeyService.list().stream().map(ApiKeyDto::from).toList());
     return new ModelAndView("/WEB-INF/pages/myAccount.jsp", model);
   }
 
