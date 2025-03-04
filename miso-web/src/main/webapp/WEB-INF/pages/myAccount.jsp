@@ -8,35 +8,30 @@
       <div class="portlet-header">My Account</div>
       <div class="portlet-content">
         User: ${userRealName} <a href="<c:url value='/user/${userId}'/>">Edit</a><br/>
-        Groups: ${userGroups}<br/><br/>
-        API Key: ${apiKey}
+        Groups: ${userGroups}<br/>
       </div>
     </div>
-
-    <div class="column">
-      <c:if test="${miso:isAdmin()}">
-        <div class="portlet">
-          <div class="portlet-header">Administration</div>
-          <div class="portlet-content">
-            <a href="javascript:void(0);" onclick="Admin.clearCache();">Clear Cache</a><br/>
-            <c:if test="${autoGenerateIdBarcodes}">
-              <a href="javascript:void(0);" onclick="Admin.regenBarcodes();">Regenerate All Barcodes</a><br/>
-            </c:if>
-            <a href="javascript:void(0);" onclick="Admin.refreshConstants();">Refresh Constants</a><br/>
-          </div>
+    <br/>
+    <c:if test="${miso:isAdmin()}">
+      <div class="portlet">
+        <div class="portlet-header">Administration</div>
+        <div class="portlet-content">
+          <a href="javascript:void(0);" onclick="Admin.clearCache();">Clear Cache</a><br/>
+          <c:if test="${autoGenerateIdBarcodes}">
+            <a href="javascript:void(0);" onclick="Admin.regenBarcodes();">Regenerate All Barcodes</a><br/>
+          </c:if>
+          <a href="javascript:void(0);" onclick="Admin.refreshConstants();">Refresh Constants</a><br/>
+          
+          <miso:list-section id="list_apikeys" name="API Keys" target="apikey" alwaysShow="true"
+              items="${apiKeys}" config="{}" />
         </div>
-      </c:if>
-    </div>
+      </div>
+    </c:if>
   </div>
 </div>
 
 <script type="text/javascript">
   jQuery(function () {
-    jQuery(".column").sortable({
-      connectWith: '.column',
-      handle: '.portlet-header'
-    });
-
     jQuery(".portlet").addClass("ui-widget ui-widget-content ui-helper-clearfix ui-corner-all")
         .find(".portlet-header")
         .addClass("ui-widget-header ui-corner-all")
@@ -48,8 +43,6 @@
       jQuery(this).toggleClass("ui-icon-minusthick").toggleClass("ui-icon-plusthick");
       jQuery(this).parents(".portlet:first").find(".portlet-content").toggle();
     });
-
-    jQuery(".column").disableSelection();
   });
 
 </script>
