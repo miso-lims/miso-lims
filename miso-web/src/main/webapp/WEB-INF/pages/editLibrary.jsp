@@ -83,24 +83,68 @@
         </div>
       </li>
     </ul>
-    <c:if test="${fn:length(library.notes) > 0}">
-      <div class="note" style="clear:both">
-        <c:forEach items="${library.notes}" var="note" varStatus="n">
-          <div class="exppreview" id="library-notes-${n.count}">
-            <b>${note.creationDate}</b>: ${note.text}
-              <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-                <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
-                  <span style="color:#000000">
-                    <a href='#' onclick="Utils.notes.deleteNote('library', '${library.id}', '${note.id}'); return false;">
-                      <span class="ui-icon ui-icon-trash note-delete-icon"></span>
-                    </a>
-                  </span>
-                </c:if>
-              </span>
-          </div>
+    <table class="dataTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Alias</th>
+          <th>Note</th>
+          <th>Owner</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <c:forEach items="${library.notes}" var="note">
+          <tr>
+            <td>${library.name}</td>
+            <td>${library.alias}</td>
+            <td>${note.text}</td>
+            <td>${note.owner.loginName}</td>
+            <td>${note.creationDate}</td>
+            <td>
+              <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
+                <a href="#" onclick="Utils.notes.deleteNote('library', '${library.id}', '${note.id}'); return false;">
+                  <span class="ui-icon ui-icon-trash note-delete-icon"></span>
+                </a>
+              </c:if>
+            </td>
+          </tr>
         </c:forEach>
-      </div>
-    </c:if>
+        <c:forEach items="${sampleNotes}" var="note">
+          <tr>
+            <td>${sampleName}</td>
+            <td>${sampleAlias}</td>
+            <td>${note.text}</td>
+            <td>${note.owner.loginName}</td>
+            <td>${note.creationDate}</td>
+            <td>
+              <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
+                <a href="#" onclick="Utils.notes.deleteNote('sample', '${sampleId}', '${note.id}'); return false;">
+                  <span class="ui-icon ui-icon-trash note-delete-icon"></span>
+                </a>
+              </c:if>
+            </td>
+          </tr>
+        </c:forEach>
+        <c:forEach items="${parentSampleNotes}" var="note">
+      <tr>
+        <td>${note.parentName}</td> 
+        <td>${note.parentAlias}</td>
+        <td>${note.note.text}</td>
+        <td>${note.note.owner.loginName}</td>
+        <td>${note.note.creationDate}</td>
+        <td>
+          <c:if test="${miso:isCurrentUser(note.note.owner.loginName) or miso:isAdmin()}">
+            <a href="#" onclick="Utils.notes.deleteNote('sample', '${parentSampleId}', '${note.note.id}'); return false;">
+              <span class="ui-icon ui-icon-trash note-delete-icon"></span>
+            </a>
+          </c:if>
+        </td>
+      </tr>
+      </c:forEach>
+      </tbody>
+    </table>
   </div>
 </c:if>
 

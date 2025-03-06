@@ -7,12 +7,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.acls.model.NotFoundException;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.Group;
+import com.eaglegenomics.simlims.core.Note;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -202,7 +205,34 @@ public class EditSampleController {
         Dtos::asDto);
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 
+    model.put("sampleNotes", sample.getNotes());
+    model.put("sampleName", sample.getName());
+    model.put("sampleAlias", sample.getAlias());
+
+    if (sample instanceof DetailedSample detailedSample) {
+      model.put("parentSampleNotes", getAllParentNotes(detailedSample));
+    }
     return new ModelAndView("/WEB-INF/pages/editSample.jsp", model);
+  }
+
+  private List<Map<String, Object>> getAllParentNotes(DetailedSample sample) {
+    List<Map<String, Object>> parentNotes = new ArrayList<>();
+    for (DetailedSample parent = sample.getParent(); parent != null; parent = parent.getParent()) {
+      String parentName = parent.getName();
+      String parentAlias = parent.getAlias();
+
+      for (Note note : parent.getNotes()) {
+        Map<String, Object> noteWithMetadata = new HashMap<>();
+        noteWithMetadata.put("note", note);
+        noteWithMetadata.put("parentName", parentName);
+        noteWithMetadata.put("parentAlias", parentAlias);
+
+        parentNotes.add(noteWithMetadata);
+      }
+    }
+    Logger logger = org.slf4j.LoggerFactory.getLogger(EditSampleController.class);
+    logger.info("Collected Parent Notes: {}", parentNotes.size()); // Debugging
+    return parentNotes;
   }
 
   private void setRelatedSlideDtos(Sample sample, SampleDto dto) {
