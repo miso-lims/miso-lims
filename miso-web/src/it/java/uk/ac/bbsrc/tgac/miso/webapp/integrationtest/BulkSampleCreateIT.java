@@ -67,7 +67,8 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
   // columns specific to creating single cells (tissue processing)
   private static final Set<String> singleCellColumns =
-      Sets.newHashSet(SamColumns.SOP, SamColumns.INITIAL_CELL_CONC, SamColumns.DIGESTION,
+      Sets.newHashSet(SamColumns.SOP, SamColumns.INITIAL_CELL_CONC, SamColumns.TARGET_CELL_RECOVERY,
+          SamColumns.LOADING_CELL_CONC, SamColumns.DIGESTION,
           SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
   // columns specific to creating stocks
