@@ -1190,6 +1190,8 @@ public class Dtos {
   private static SampleSingleCellDto asSingleCellSampleDto(@Nonnull SampleSingleCell from) {
     SampleSingleCellDto dto = new SampleSingleCellDto();
     setString(dto::setInitialCellConcentration, from.getInitialCellConcentration());
+    setInteger(dto::setTargetCellRecovery, from.getTargetCellRecovery(), true);
+    setString(dto::setLoadingCellConcentration, from.getLoadingCellConcentration());
     setString(dto::setDigestion, from.getDigestion());
     return dto;
   }
@@ -1205,6 +1207,8 @@ public class Dtos {
   private static SampleSingleCell toSingleCellSample(@Nonnull SampleSingleCellRelative from) {
     SampleSingleCell to = new SampleSingleCellImpl();
     setBigDecimal(to::setInitialCellConcentration, from.getInitialCellConcentration());
+    setInteger(to::setTargetCellRecovery, from.getTargetCellRecovery(), true);
+    setBigDecimal(to::setLoadingCellConcentration, from.getLoadingCellConcentration());
     setString(to::setDigestion, from.getDigestion());
     return to;
   }

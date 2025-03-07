@@ -1026,6 +1026,9 @@ public class DefaultSampleService implements SampleService {
     } else if (source instanceof SampleSingleCell) {
       ((SampleSingleCell) target)
           .setInitialCellConcentration(((SampleSingleCell) source).getInitialCellConcentration());
+      ((SampleSingleCell) target).setTargetCellRecovery(((SampleSingleCell) source).getTargetCellRecovery());
+      ((SampleSingleCell) target)
+          .setLoadingCellConcentration(((SampleSingleCell) source).getLoadingCellConcentration());
       ((SampleSingleCell) target).setDigestion(((SampleSingleCell) source).getDigestion());
     }
   }
