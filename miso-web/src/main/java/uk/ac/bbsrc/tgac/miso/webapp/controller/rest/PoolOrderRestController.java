@@ -31,11 +31,13 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/poolorders")
-public class PoolOrderRestController extends RestController {
+public class PoolOrderRestController extends AbstractRestController {
 
   @Autowired
   private AdvancedSearchParser advancedSearchParser;

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,11 +23,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
-import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
 import uk.ac.bbsrc.tgac.miso.dto.WorkstationDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 
 @Controller
 @RequestMapping("/instrument")
@@ -38,8 +37,6 @@ public class EditInstrumentController {
   private AuthorizationManager authorizationManager;
   @Autowired
   private InstrumentService instrumentService;
-  @Autowired
-  private ServiceRecordService serviceRecordService;
   @Autowired
   private WorkstationService workstationService;
   @Autowired

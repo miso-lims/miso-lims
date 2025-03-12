@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
@@ -42,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -80,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingParametersDto;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
@@ -143,9 +120,11 @@ public class EditPoolController {
       model.put("title", "Pool " + poolId);
     }
 
-    if (pool == null) throw new NotFoundException("No pool found for ID " + poolId.toString());
+    if (pool == null) {
+      throw new NotFoundException("No pool found for ID " + poolId.toString());
+    }
     PoolDto poolDto = Dtos.asDto(pool, true, false, indexChecker);
-    
+
     model.put("pool", pool);
     if (poolId == null) {
       model.put("partitions", Collections.emptyList());
@@ -160,7 +139,8 @@ public class EditPoolController {
       model.put("orders", Dtos.asSequencingOrderDtos(sequencingOrderService.getByPool(pool), indexChecker));
     }
 
-    model.put("poolorders", poolOrderService.getAllByPoolId(pool.getId()).stream().map(order -> Dtos.asDto(order)).collect(Collectors.toList()));
+    model.put("poolorders", poolOrderService.getAllByPoolId(pool.getId()).stream().map(order -> Dtos.asDto(order))
+        .collect(Collectors.toList()));
 
     model.put("duplicateIndicesSequences", mapper.writeValueAsString(poolDto.getDuplicateIndicesSequences()));
     model.put("nearDuplicateIndicesSequences", mapper.writeValueAsString(poolDto.getNearDuplicateIndicesSequences()));
@@ -174,7 +154,8 @@ public class EditPoolController {
 
   @ModelAttribute
   public void addSequencingParameters(ModelMap model) throws IOException {
-    Collection<SequencingParametersDto> sequencingParameters = Dtos.asSequencingParametersDtos(sequencingParametersService.list());
+    Collection<SequencingParametersDto> sequencingParameters =
+        Dtos.asSequencingParametersDtos(sequencingParametersService.list());
     JSONArray array = new JSONArray();
     array.addAll(sequencingParameters);
     model.put("sequencingParametersJson", array.toString());
@@ -232,7 +213,8 @@ public class EditPoolController {
         throw new IllegalStateException("Not enough pools to merge");
       }
 
-      List<PlatformType> platformTypes = parents.stream().map(Pool::getPlatformType).distinct().collect(Collectors.toList());
+      List<PlatformType> platformTypes =
+          parents.stream().map(Pool::getPlatformType).distinct().collect(Collectors.toList());
       if (platformTypes.size() > 1) {
         throw new IllegalArgumentException("Cannot merge pools from multiple platforms: "
             + String.join(", ", platformTypes.stream().map(Enum::name).toArray(CharSequence[]::new)));
@@ -252,8 +234,9 @@ public class EditPoolController {
         for (int i = 0; i < parentIds.size(); i++) {
           if (parentIds.get(i).equals(Long.valueOf(parent.getId()))) {
             for (PoolElement element : parent.getPoolContents()) {
-              LibraryAliquotDto existing = aliquotDtos.stream().filter(d -> d.getId().equals(element.getAliquot().getId()))
-                  .findFirst().orElse(null);
+              LibraryAliquotDto existing =
+                  aliquotDtos.stream().filter(d -> d.getId().equals(element.getAliquot().getId()))
+                      .findFirst().orElse(null);
               if (existing == null) {
                 LibraryAliquotDto ldiDto = Dtos.asDto(element.getAliquot());
                 ldiDto.setProportion(element.getProportion() * proportions.get(i));
@@ -301,10 +284,12 @@ public class EditPoolController {
       List<Long> parentIds = LimsUtils.parseIds(parentIdsString);
       List<Integer> proportions = parseProportions(proportionsString);
 
-      //This is packaged in a List only because prepare() wants a List. There's only ever 1 PoolDto in here.
+      // This is packaged in a List only because prepare() wants a List. There's only ever 1 PoolDto in
+      // here.
       List<PoolDto> dtos = Lists.newArrayList(createDtoFromParents(parentIds, proportions));
       PoolDto newDto = dtos.get(0);
-      if(strictPools) newDto.setMergeChild(true);
+      if (strictPools)
+        newDto.setMergeChild(true);
 
       dtos.set(0, newDto);
 

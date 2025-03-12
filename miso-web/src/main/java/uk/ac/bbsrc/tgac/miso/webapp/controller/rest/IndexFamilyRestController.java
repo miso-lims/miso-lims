@@ -18,10 +18,11 @@ import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.IndexFamilyDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 
 @Controller
 @RequestMapping("/rest/indexfamilies")
-public class IndexFamilyRestController extends RestController {
+public class IndexFamilyRestController extends AbstractRestController {
 
   @Autowired
   private IndexFamilyService indexFamilyService;
@@ -38,7 +39,8 @@ public class IndexFamilyRestController extends RestController {
   }
 
   @PutMapping("/{familyId}")
-  public @ResponseBody IndexFamilyDto update(@PathVariable long familyId, @RequestBody IndexFamilyDto dto) throws IOException {
+  public @ResponseBody IndexFamilyDto update(@PathVariable long familyId, @RequestBody IndexFamilyDto dto)
+      throws IOException {
     return RestUtils.updateObject("Index Family", familyId, dto, Dtos::to, indexFamilyService, d -> {
       constantsController.refreshConstants();
       return Dtos.asDto(d);

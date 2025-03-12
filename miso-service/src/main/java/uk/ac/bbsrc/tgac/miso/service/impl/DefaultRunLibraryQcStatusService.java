@@ -21,7 +21,8 @@ import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class DefaultRunLibraryQcStatusService extends AbstractSaveService<RunLibraryQcStatus> implements RunLibraryQcStatusService {
+public class DefaultRunLibraryQcStatusService extends AbstractSaveService<RunLibraryQcStatus>
+    implements RunLibraryQcStatusService {
 
   @Autowired
   private RunLibraryQcStatusDao runLibraryQcStatusDao;
@@ -63,7 +64,13 @@ public class DefaultRunLibraryQcStatusService extends AbstractSaveService<RunLib
   }
 
   @Override
-  protected void collectValidationErrors(RunLibraryQcStatus object, RunLibraryQcStatus beforeChange, List<ValidationError> errors)
+  public RunLibraryQcStatus getByDescription(String description) throws IOException {
+    return runLibraryQcStatusDao.getByDescription(description);
+  }
+
+  @Override
+  protected void collectValidationErrors(RunLibraryQcStatus object, RunLibraryQcStatus beforeChange,
+      List<ValidationError> errors)
       throws IOException {
     if (ValidationUtils.isChanged(RunLibraryQcStatus::getDescription, object, beforeChange)
         && runLibraryQcStatusDao.getByDescription(object.getDescription()) != null) {

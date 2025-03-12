@@ -45,12 +45,14 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PrinterDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/printers")
 
-public class PrinterRestController extends RestController {
+public class PrinterRestController extends AbstractRestController {
   public static class BoxPositionPrintRequest {
     private long boxId;
     private int copies;

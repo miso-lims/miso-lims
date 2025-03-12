@@ -69,6 +69,8 @@ import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -82,7 +84,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
  */
 @Controller
 @RequestMapping("/rest/libraries")
-public class LibraryRestController extends RestController {
+public class LibraryRestController extends AbstractRestController {
 
   private static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 

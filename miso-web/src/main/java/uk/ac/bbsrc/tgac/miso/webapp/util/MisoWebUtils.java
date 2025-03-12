@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -39,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.ThrowingSupplier;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.util

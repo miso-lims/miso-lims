@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 
 public abstract class RelationFinder<M extends Identifiable> {
   protected static final Logger log = LoggerFactory.getLogger(RelationFinder.class);

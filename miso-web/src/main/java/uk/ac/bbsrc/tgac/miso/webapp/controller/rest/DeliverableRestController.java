@@ -21,11 +21,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.service.DeliverableService;
 import uk.ac.bbsrc.tgac.miso.dto.DeliverableDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/deliverables")
-public class DeliverableRestController extends RestController {
+public class DeliverableRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Deliverable";
 

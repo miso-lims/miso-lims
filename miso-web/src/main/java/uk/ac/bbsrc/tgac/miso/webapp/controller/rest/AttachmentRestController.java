@@ -19,11 +19,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 
 @Controller
 @RequestMapping("/rest/attachments")
-public class AttachmentRestController extends RestController {
+public class AttachmentRestController extends AbstractRestController {
 
   @Autowired
   private FileAttachmentService fileAttachmentService;

@@ -29,11 +29,12 @@ import uk.ac.bbsrc.tgac.miso.dto.ArrayDto;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/arrayruns")
-public class ArrayRunRestController extends RestController {
+public class ArrayRunRestController extends AbstractRestController {
 
   @Autowired
   private ArrayRunService arrayRunService;

@@ -32,11 +32,13 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.KitDescriptorDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/kitdescriptors")
-public class KitDescriptorRestController extends RestController {
+public class KitDescriptorRestController extends AbstractRestController {
 
   @Autowired
   private KitDescriptorService kitDescriptorService;
