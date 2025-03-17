@@ -43,11 +43,11 @@ public class DefaultUserServiceTest {
   @Test
   public void testValidateAndEncodePasswordTooShort() {
     try {
-      sut.validateAndEncodePassword("$H0rt", true);
+      sut.validateAndEncodePassword("$H0rtP4sS", true);
       fail("Expected ValidationException");
     } catch (ValidationException exception) {
       assertTrue(exception.getErrors().stream().map(ValidationError::getMessage)
-          .anyMatch("Must be at least 8 characters long"::equals));
+          .anyMatch("Must be at least 15 characters long"::equals));
     }
   }
 
@@ -64,7 +64,7 @@ public class DefaultUserServiceTest {
 
   @Test
   public void testValidateAndEncodePasswordGood() {
-    String password = sut.validateAndEncodePassword("P@ssw0rd", true);
+    String password = sut.validateAndEncodePassword("P@ssw0rd1SF1ft33n", true);
     assertNotNull(password);
     assertEquals(ENCODED, password);
   }

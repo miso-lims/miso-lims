@@ -63,8 +63,8 @@ public class DefaultUserService implements UserService {
       return null;
     }
     String passwordProperty = newUser ? "password" : "newPassword";
-    if (password.length() < 8) {
-      throw new ValidationException(new ValidationError(passwordProperty, "Must be at least 8 characters long"));
+    if (password.length() < 15) {
+      throw new ValidationException(new ValidationError(passwordProperty, "Must be at least 15 characters long"));
     }
     int complexity = 0;
     for (String characterClass : characterClasses) {
