@@ -71,36 +71,7 @@
     <div id="notes_arrowclick" class="toggleLeftDown"></div>
   </div>
   <div id="notes">
-    <h1>Notes</h1>
-    <ul class="sddm">
-      <li>
-        <a id="notesMenuHandle" onmouseover="mopen('notesMenu')" onmouseout="mclosetime()">Options
-          <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-        </a>
-
-        <div id="notesMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-          <a onclick="Utils.notes.showNoteDialog('library', ${library.id});" href="javascript:void(0);" class="add">Add Note</a>
-        </div>
-      </li>
-    </ul>
-    <c:if test="${fn:length(library.notes) > 0}">
-      <div class="note" style="clear:both">
-        <c:forEach items="${library.notes}" var="note" varStatus="n">
-          <div class="exppreview" id="library-notes-${n.count}">
-            <b>${note.creationDate}</b>: ${note.text}
-              <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-                <c:if test="${miso:isCurrentUser(note.owner.loginName) or miso:isAdmin()}">
-                  <span style="color:#000000">
-                    <a href='#' onclick="Utils.notes.deleteNote('library', '${library.id}', '${note.id}'); return false;">
-                      <span class="ui-icon ui-icon-trash note-delete-icon"></span>
-                    </a>
-                  </span>
-                </c:if>
-              </span>
-          </div>
-        </c:forEach>
-      </div>
-    </c:if>
+    <miso:list-section-ajax id="list_note" name="Notes" target="note" config="{ libraryId: ${library.id}, entityType: 'library' }"/>
   </div>
 </c:if>
 

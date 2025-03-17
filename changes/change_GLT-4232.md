@@ -1,0 +1,1 @@
+Notes table on the Edit Sample and Edit Library pages to display all notes from parent entities in the direct hierarchy, each parent note includes the name and alias of the associated sample or library
