@@ -74,7 +74,7 @@ public enum PlatformType {
       return new IonTorrentRun();
     }
   }, //
-  PACBIO("PacBio", "8Pac", "SMRT Cell", "SMRT Cells", null) {
+  PACBIO("PacBio", "SMRT Cell", "SMRT Cell Contents", "SMRT Cells Contents", null) {
     @Override
     public Run createRun() {
       return new PacBioRun();
