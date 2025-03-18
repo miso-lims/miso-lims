@@ -469,7 +469,7 @@ Box.ui = {
 
     var actions = [
       {
-        name: "Print Barcodes by Position",
+        name: "Print Barcodes by Row",
         action: function () {
           // Ignore items; it's a mess of different object types
           Utils.printSelectDialog(function (printer, copies) {
@@ -483,6 +483,37 @@ Box.ui = {
               "Printing",
               "POST",
               Urls.rest.printers.printBoxPositions(printer),
+              {
+                boxId: Box.boxId,
+                positions: input,
+                copies: copies,
+              },
+              function (result) {
+                Utils.showOkDialog("Printing", [
+                  result == input.length
+                    ? "Barcodes sent to printer."
+                    : result + " of " + input.length + " printed.",
+                ]);
+              }
+            );
+          });
+        },
+      },
+      {
+        name: "Print Barcodes by Column",
+        action: function () {
+          // Ignore items; it's a mess of different object types
+          Utils.printSelectDialog(function (printer, copies) {
+            var input =
+              items.length == 0
+                ? Box.boxJSON.items.map(function (i) {
+                    return i.coordinates;
+                  })
+                : positionStrings;
+            Utils.ajaxWithDialog(
+              "Printing",
+              "POST",
+              Urls.rest.printers.printBoxPositionsByColumn(printer),
               {
                 boxId: Box.boxId,
                 positions: input,
