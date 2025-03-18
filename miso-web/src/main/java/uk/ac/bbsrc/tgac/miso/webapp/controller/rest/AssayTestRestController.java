@@ -9,6 +9,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayTestService;
 import uk.ac.bbsrc.tgac.miso.dto.AssayTestDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/rest/assaytests")
-public class AssayTestRestController extends RestController {
+public class AssayTestRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Assay Test";
 
@@ -29,8 +30,7 @@ public class AssayTestRestController extends RestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<AssayTestDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<AssayTestDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, AssayTestDto::to, assayTestService, true);
   }
 

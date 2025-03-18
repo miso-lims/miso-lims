@@ -14,11 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleTypeDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/sampletypes")
-public class SampleTypeRestController extends RestController {
+public class SampleTypeRestController extends AbstractRestController {
 
   @Autowired
   private SampleTypeService sampleTypeService;
@@ -29,8 +30,7 @@ public class SampleTypeRestController extends RestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<SampleTypeDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<SampleTypeDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate("Sample Type", dtos, Dtos::to, sampleTypeService, true);
   }
 

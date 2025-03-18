@@ -14,11 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibrarySelectionTypeDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/libraryselections")
-public class LibrarySelectionRestController extends RestController {
+public class LibrarySelectionRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Library Selection Type";
 
@@ -31,8 +32,7 @@ public class LibrarySelectionRestController extends RestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<LibrarySelectionTypeDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<LibrarySelectionTypeDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, librarySelectionService, true);
   }
 
@@ -44,7 +44,8 @@ public class LibrarySelectionRestController extends RestController {
 
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
-    return asyncOperationManager.getAsyncProgress(uuid, LibrarySelectionType.class, librarySelectionService, Dtos::asDto);
+    return asyncOperationManager.getAsyncProgress(uuid, LibrarySelectionType.class, librarySelectionService,
+        Dtos::asDto);
   }
 
   @PostMapping(value = "/bulk-delete")

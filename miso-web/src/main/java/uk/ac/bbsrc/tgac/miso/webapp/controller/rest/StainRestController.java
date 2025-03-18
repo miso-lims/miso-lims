@@ -14,11 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.StainService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.StainDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/stains")
-public class StainRestController extends RestController {
+public class StainRestController extends AbstractRestController {
 
   @Autowired
   private StainService stainService;
@@ -29,8 +30,7 @@ public class StainRestController extends RestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<StainDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<StainDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate("Stain", dtos, Dtos::to, stainService, true);
   }
 

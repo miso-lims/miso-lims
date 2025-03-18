@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
@@ -29,7 +6,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,48 +23,51 @@ import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 
 @Controller
 @RequestMapping("/experiment")
 public class EditExperimentController {
 
-  @Autowired
-  private ExperimentService experimentService;
-  @Autowired
-  private IndexChecker indexChecker;
-  @Autowired
-  private ObjectMapper mapper;
+    @Autowired
+    private ExperimentService experimentService;
+    @Autowired
+    private IndexChecker indexChecker;
+    @Autowired
+    private ObjectMapper mapper;
 
-  @GetMapping(value = "/{experimentId}")
-  public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
-    Experiment experiment = experimentService.get(experimentId);
-    if (experiment == null) throw new NotFoundException("No experiment found for ID " + experimentId.toString());
-    ObjectNode consumableConfig = mapper.createObjectNode();
-    consumableConfig.put("experimentId", experiment.getId());
-    Stream
-        .<KitDescriptor> concat(//
-            Stream.of(experiment.getLibrary().getKitDescriptor()), //
-            experiment.getRunPartitions().stream()//
-                .map(RunPartition::getPartition)//
-                .flatMap(partition -> Stream.of(partition.getSequencerPartitionContainer().getClusteringKit(),
-                    partition.getSequencerPartitionContainer().getMultiplexingKit())))//
-        .filter(Objects::nonNull)//
-        .distinct()//
-        .map(Dtos::asDto)//
-        .forEach(
-            consumableConfig.putArray("allowedDescriptors")::addPOJO);
+    @GetMapping(value = "/{experimentId}")
+    public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
+        Experiment experiment = experimentService.get(experimentId);
+        if (experiment == null)
+            throw new NotFoundException("No experiment found for ID " + experimentId.toString());
+        ObjectNode consumableConfig = mapper.createObjectNode();
+        consumableConfig.put("experimentId", experiment.getId());
+        Stream
+                .<KitDescriptor>concat(//
+                        Stream.of(experiment.getLibrary().getKitDescriptor()), //
+                        experiment.getRunPartitions().stream()//
+                                .map(RunPartition::getPartition)//
+                                .flatMap(partition -> Stream.of(
+                                        partition.getSequencerPartitionContainer().getClusteringKit(),
+                                        partition.getSequencerPartitionContainer().getMultiplexingKit())))//
+                .filter(Objects::nonNull)//
+                .distinct()//
+                .map(Dtos::asDto)//
+                .forEach(
+                        consumableConfig.putArray("allowedDescriptors")::addPOJO);
 
-    model.put("experiment", experiment);
-    model.put("experimentDto", mapper.writeValueAsString(Dtos.asDto(experiment)));
-    model.put("consumables", experiment.getKits().stream().map(Dtos::asDto).collect(Collectors.toList()));
-    model.put("consumableConfig", mapper.writeValueAsString(consumableConfig));
-    model.put("runPartitions",
-        experiment.getRunPartitions().stream()
-            .map(entry -> new ExperimentDto.RunPartitionDto(Dtos.asDto(entry.getRun()),
-                Dtos.asDto(entry.getPartition(), indexChecker)))
-            .collect(Collectors.toList()));
-    model.put("title", "Edit Experiment");
-    return new ModelAndView("/WEB-INF/pages/editExperiment.jsp", model);
-  }
+        model.put("experiment", experiment);
+        model.put("experimentDto", mapper.writeValueAsString(Dtos.asDto(experiment)));
+        model.put("consumables", experiment.getKits().stream().map(Dtos::asDto).collect(Collectors.toList()));
+        model.put("consumableConfig", mapper.writeValueAsString(consumableConfig));
+        model.put("runPartitions",
+                experiment.getRunPartitions().stream()
+                        .map(entry -> new ExperimentDto.RunPartitionDto(Dtos.asDto(entry.getRun()),
+                                Dtos.asDto(entry.getPartition(), indexChecker)))
+                        .collect(Collectors.toList()));
+        model.put("title", "Edit Experiment");
+        return new ModelAndView("/WEB-INF/pages/editExperiment.jsp", model);
+    }
 
 }

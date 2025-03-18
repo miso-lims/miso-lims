@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
+package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * Abstract class meant to be extended by all REST controllers. Adds exception handling for all
  * exceptions
  */
-public abstract class RestController {
+public abstract class AbstractRestController {
 
   @Autowired
   private ObjectMapper mapper;

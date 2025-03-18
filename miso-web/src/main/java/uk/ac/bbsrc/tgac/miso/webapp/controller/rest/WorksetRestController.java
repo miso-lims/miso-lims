@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,12 +48,14 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ListWorksetViewDto;
 import uk.ac.bbsrc.tgac.miso.dto.WorksetDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 
 @Controller
 @RequestMapping("/rest/worksets")
-public class WorksetRestController extends RestController {
+public class WorksetRestController extends AbstractRestController {
 
   @Autowired
   private WorksetService worksetService;
@@ -328,7 +329,7 @@ public class WorksetRestController extends RestController {
       TriConsumer<Workset, Workset, Collection<T>> moveFunction) throws IOException {
     Workset sourceWorkset = worksetService.get(sourceWorksetId);
     if (sourceWorkset == null) {
-      throw new NotFoundException(String.format("Source workset %d not found", sourceWorksetId));
+      throw new RestException(String.format("Source workset %d not found", sourceWorksetId), Status.NOT_FOUND);
     }
     if (dto.getTargetWorksetId() == null) {
       throw new ClientErrorException("Target workset ID missing");

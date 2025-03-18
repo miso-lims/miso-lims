@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
+package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.util.HashMap;
 import java.util.Map;

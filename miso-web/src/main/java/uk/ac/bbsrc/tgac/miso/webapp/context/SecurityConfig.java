@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -27,11 +29,17 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 
 import jakarta.servlet.DispatcherType;
+import uk.ac.bbsrc.tgac.miso.core.service.ApiKeyService;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
+
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+  }
 
   @Bean
   public AuthenticationSuccessHandler successHandler() {
@@ -60,8 +68,8 @@ public class SecurityConfig {
   @Bean
   public RememberMeServices rememberMeServices(UserDetailsService userDetailsService,
       PersistentTokenRepository tokenRepository) {
-    PersistentTokenBasedRememberMeServices services =
-        new PersistentTokenBasedRememberMeServices("miso", userDetailsService, tokenRepository);
+    PersistentTokenBasedRememberMeServices services = new PersistentTokenBasedRememberMeServices("miso",
+        userDetailsService, tokenRepository);
     services.setParameter("_spring_security_remember_me");
     return services;
   }
@@ -79,13 +87,18 @@ public class SecurityConfig {
   }
 
   @Bean
+  public ApiKeyAuthenticationFilter apiKeyFilter(ApiKeyService apiKeyService) {
+    return new ApiKeyAuthenticationFilter(apiKeyService);
+  }
+
+  @Bean
   public SessionRegistry sessionRegistry() {
     return new SessionRegistryImpl();
   }
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http, MisoLoginFilter loginFilter,
-      RememberMeServices rememberMeServices) throws Exception {
+      ApiKeyAuthenticationFilter apiKeyFilter, RememberMeServices rememberMeServices) throws Exception {
     return http
         .authorizeHttpRequests(authorizeRequests -> authorizeRequests
             // opting into Spring Security 6.0 defaults
@@ -102,17 +115,20 @@ public class SecurityConfig {
                 "/accessDenied",
                 "/error")
             .permitAll()
+            .requestMatchers("/api/**")
+            .hasRole("APIUSER")
             .requestMatchers("/admin/**")
             .hasRole("ADMIN")
             .anyRequest()
             .hasRole("INTERNAL"))
         .addFilter(loginFilter)
+        .addFilterBefore(apiKeyFilter, MisoLoginFilter.class)
         .formLogin(formLogin -> formLogin
             .loginPage("/login").permitAll())
         .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
         .csrf(csrf -> csrf.disable())
         .logout(logout -> logout.logoutSuccessUrl("/login"))
-        .exceptionHandling().accessDeniedPage("/accessDenied").and()
+        .exceptionHandling(handling -> handling.accessDeniedPage("/accessDenied"))
         // Opting into Spring Security 6.0 defaults
         .securityContext(securityContext -> securityContext
             .requireExplicitSave(true)

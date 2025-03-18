@@ -121,7 +121,6 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.MetricDto;
 import uk.ac.bbsrc.tgac.miso.dto.MetricSubcategoryDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestException;
 
 @Controller
 public class ConstantsController {
