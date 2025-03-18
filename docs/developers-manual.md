@@ -128,7 +128,7 @@ ending up on Github.
 
         flyway.user=dbadmin
         flyway.password=dbadmin
-        flyway.url=flyway.url=jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&connectionTimeZone=SERVER&cacheDefaultTimeZone=false&useSSL=false
+        flyway.url=jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&connectionTimeZone=SERVER&cacheDefaultTimeZone=false&useSSL=false
         flyway.placeholders.filesDir=/var/miso/files/
 
 5. If you have an existing database that you'd like to clear and rebuild, run Flyway Clean to wipe it out
