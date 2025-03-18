@@ -469,64 +469,65 @@ Box.ui = {
 
     var actions = [
       {
-        name: "Print Barcodes by Row",
+        name: "Print Barcodes by Position",
         action: function () {
           // Ignore items; it's a mess of different object types
-          Utils.printSelectDialog(function (printer, copies) {
-            var input =
-              items.length == 0
-                ? Box.boxJSON.items.map(function (i) {
-                    return i.coordinates;
-                  })
-                : positionStrings;
-            Utils.ajaxWithDialog(
-              "Printing",
-              "POST",
-              Urls.rest.printers.printBoxPositions(printer),
-              {
-                boxId: Box.boxId,
-                positions: input,
-                copies: copies,
+          var dialog = jQuery("#dialogDialog");
+          jQuery("#dialogInfoBelow").html("");
+          jQuery("#dialogInfoAbove").html(
+            "<p>Please select how you would like to sort the barcodes for printing.</p>"
+          );
+          jQuery("#dialogVisual").html(
+            '<p><input type="radio" name="sortOrder" id="sortByRow" value="row" checked/><label for="sortByRow"> Sort by Row</label> ' +
+              '<input type="radio" name="sortOrder" id="sortByColumn" value="column"/><label for="sortByColumn"> Sort by Column</label></p>'
+          );
+          dialog.dialog({
+            autoOpen: true,
+            width: 500,
+            height: 300,
+            modal: true,
+            resizable: false,
+            title: "Print Barcodes",
+            position: { my: "center", at: "center", of: window },
+            buttons: {
+              Print: function () {
+                var sortOrder = jQuery('input[name="sortOrder"]:checked').val() || "row";
+                dialog.dialog("close");
+                Utils.printSelectDialog(function (printer, copies) {
+                  var input =
+                    items.length == 0
+                      ? Box.boxJSON.items.map(function (i) {
+                          return i.coordinates;
+                        })
+                      : positionStrings;
+                  var url =
+                    sortOrder === "column"
+                      ? Urls.rest.printers.printBoxPositionsByColumn(printer)
+                      : Urls.rest.printers.printBoxPositions(printer);
+
+                  Utils.ajaxWithDialog(
+                    "Printing",
+                    "POST",
+                    url,
+                    {
+                      boxId: Box.boxId,
+                      positions: input,
+                      copies: copies,
+                    },
+                    function (result) {
+                      Utils.showOkDialog("Printing", [
+                        result == input.length
+                          ? "Barcodes sent to printer."
+                          : result + " of " + input.length + " printed.",
+                      ]);
+                    }
+                  );
+                });
               },
-              function (result) {
-                Utils.showOkDialog("Printing", [
-                  result == input.length
-                    ? "Barcodes sent to printer."
-                    : result + " of " + input.length + " printed.",
-                ]);
-              }
-            );
-          });
-        },
-      },
-      {
-        name: "Print Barcodes by Column",
-        action: function () {
-          // Ignore items; it's a mess of different object types
-          Utils.printSelectDialog(function (printer, copies) {
-            var input =
-              items.length == 0
-                ? Box.boxJSON.items.map(function (i) {
-                    return i.coordinates;
-                  })
-                : positionStrings;
-            Utils.ajaxWithDialog(
-              "Printing",
-              "POST",
-              Urls.rest.printers.printBoxPositionsByColumn(printer),
-              {
-                boxId: Box.boxId,
-                positions: input,
-                copies: copies,
+              Cancel: function () {
+                dialog.dialog("close");
               },
-              function (result) {
-                Utils.showOkDialog("Printing", [
-                  result == input.length
-                    ? "Barcodes sent to printer."
-                    : result + " of " + input.length + " printed.",
-                ]);
-              }
-            );
+            },
           });
         },
       },
