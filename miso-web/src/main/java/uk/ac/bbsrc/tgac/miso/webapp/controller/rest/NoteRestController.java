@@ -5,9 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -29,6 +27,7 @@ import com.eaglegenomics.simlims.core.Note;
 
 import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -39,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
+import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.NoteDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
@@ -86,26 +86,26 @@ public class NoteRestController extends AbstractRestController {
 
   @GetMapping("/{entityType}/{entityId}/dt")
   @ResponseBody
-  public Map<String, Object> getNotesForDataTable(
+  public DataTablesResponseDto<NoteDto> getNotesForDataTable(
       @PathVariable String entityType,
       @PathVariable long entityId,
-      @RequestParam(value = "draw", defaultValue = "1") int draw,
-      @RequestParam(value = "start", defaultValue = "0") int start,
-      @RequestParam(value = "length", defaultValue = "10") int length,
+      @RequestParam(value = "sEcho", defaultValue = "1") Long sEcho,
+      @RequestParam(value = "iDisplayStart", defaultValue = "0") Integer iDisplayStart,
+      @RequestParam(value = "iDisplayLength", defaultValue = "10") Integer iDisplayLength,
       @RequestParam(value = "includeRelated", defaultValue = "true") boolean includeRelated) throws IOException {
 
     List<NoteDto> notes = getNotesList(entityType, entityId, includeRelated);
 
-    Map<String, Object> response = new HashMap<>();
-    response.put("draw", draw);
-    response.put("recordsTotal", notes.size());
-    response.put("recordsFiltered", notes.size());
+    DataTablesResponseDto<NoteDto> response = new DataTablesResponseDto<>();
+    response.setSEcho(sEcho);
+    response.setITotalRecords((long) notes.size());
+    response.setITotalDisplayRecords((long) notes.size());
 
-    if (length > 0 && start < notes.size()) {
-      int end = Math.min(start + length, notes.size());
-      response.put("data", notes.subList(start, end));
+    if (iDisplayLength > 0 && iDisplayStart < notes.size()) {
+      int end = Math.min(iDisplayStart + iDisplayLength, notes.size());
+      response.setAaData(notes.subList(iDisplayStart, end));
     } else {
-      response.put("data", notes);
+      response.setAaData(notes);
     }
 
     return response;
@@ -145,7 +145,7 @@ public class NoteRestController extends AbstractRestController {
     NoteService<Identifiable> typedService = (NoteService<Identifiable>) service;
     typedService.addNote(entity, note);
 
-    return toDto(note, entity);
+    return NoteDto.from(note, (HierarchyEntity) entity);
   }
 
   @DeleteMapping("/{entityType}/{entityId}/{noteIds}")
@@ -174,6 +174,54 @@ public class NoteRestController extends AbstractRestController {
     }
   }
 
+  public static class BulkDeleteRequest {
+    private String entityType;
+    private long entityId;
+    private List<Long> ids;
+
+    public String getEntityType() {
+      return entityType;
+    }
+
+    public void setEntityType(String entityType) {
+      this.entityType = entityType;
+    }
+
+    public long getEntityId() {
+      return entityId;
+    }
+
+    public void setEntityId(long entityId) {
+      this.entityId = entityId;
+    }
+
+    public List<Long> getIds() {
+      return ids;
+    }
+
+    public void setIds(List<Long> ids) {
+      this.ids = ids;
+    }
+  }
+
+  @PostMapping("/bulk-delete")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDeleteNotes(@RequestBody BulkDeleteRequest request) throws IOException {
+    NoteService<? extends Identifiable> service = serviceForEntityType(request.getEntityType());
+    Identifiable entity = service.get(request.getEntityId());
+
+    if (entity == null) {
+      throw new RestException(request.getEntityType() + " not found", Status.NOT_FOUND);
+    }
+
+    @SuppressWarnings("unchecked")
+    NoteService<Identifiable> typedService = (NoteService<Identifiable>) service;
+
+    for (Long noteId : request.getIds()) {
+      typedService.deleteNote(entity, noteId);
+    }
+  }
+
 
   private List<NoteDto> getNotesList(String entityType, long entityId, boolean includeRelated) throws IOException {
     NoteService<? extends Identifiable> service = serviceForEntityType(entityType);
@@ -190,7 +238,7 @@ public class NoteRestController extends AbstractRestController {
     List<Note> notes = typedService.getNotes(entity);
 
     for (Note note : notes) {
-      noteDtos.add(toDto(note, entity));
+      noteDtos.add(NoteDto.from(note, (HierarchyEntity) entity));
     }
 
     if (includeRelated) {
@@ -217,7 +265,7 @@ public class NoteRestController extends AbstractRestController {
     List<Note> sampleNotes = sampleService.getNotes(sample);
 
     for (Note note : sampleNotes) {
-      NoteDto dto = toDto(note, sample);
+      NoteDto dto = NoteDto.from(note, sample);
       dto.setSource(source);
       noteDtos.add(dto);
     }
@@ -237,33 +285,7 @@ public class NoteRestController extends AbstractRestController {
     }
   }
 
-  private NoteDto toDto(Note note, Identifiable entity) {
-    NoteDto dto = new NoteDto();
-    dto.setId(Long.valueOf(note.getId()));
-    dto.setText(note.getText());
-    dto.setInternalOnly(note.isInternalOnly());
-    dto.setCreationDate(note.getCreationDate().toString());
-    dto.setOwnerName(note.getOwner() != null ? note.getOwner().getFullName() : "Unknown");
-    dto.setEntityId(Long.valueOf(entity.getId()));
-    dto.setEntityType(entity.getClass().getSimpleName());
-
-    if (entity instanceof Sample) {
-      Sample sample = (Sample) entity;
-      dto.setEntityName(sample.getName());
-      dto.setEntityAlias(sample.getAlias());
-    } else if (entity instanceof Library) {
-      Library library = (Library) entity;
-      dto.setEntityName(library.getName());
-      dto.setEntityAlias(library.getAlias());
-    } else {
-      dto.setEntityName("Unknown");
-      dto.setEntityAlias("");
-    }
-
-    return dto;
-  }
-
-  private NoteService<?> serviceForEntityType(String entityType) {
+  private NoteService<? extends Identifiable> serviceForEntityType(String entityType) {
     switch (entityType) {
       case "sample":
         return sampleService;

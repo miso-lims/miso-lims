@@ -10,17 +10,13 @@ ListTarget.note = (function () {
         return null;
       }
 
-      return "/rest/notes/" + entityType + "/" + id + "/dt?includeRelated=true";
-    },
-    getQueryUrl: function () {
-      return "/rest/notes/search";
+      return Urls.rest.notes.datatable(entityType, id) + "?includeRelated=true";
     },
     createBulkActions: function (config, entityId) {
       return [
         {
           name: "Delete",
           action: function (items) {
-            if (items.length === 0) return;
             var id = config.sampleId || config.libraryId || entityId;
             var entityType = config.entityType;
             if (!id || !entityType) {
@@ -34,8 +30,7 @@ ListTarget.note = (function () {
 
               return typeMatches && idMatches;
             });
-
-            if (currentEntityNotes.length === 0) {
+            if (currentEntityNotes.length !== items.length || currentEntityNotes.length === 0) {
               Utils.showOkDialog("Error", ["Cannot delete notes from parent entities."]);
               return;
             }
@@ -45,11 +40,20 @@ ListTarget.note = (function () {
               lines.push("* " + note.text);
               ids.push(note.id);
             });
-            var url = "/rest/notes/" + entityType + "/" + id + "/" + ids.join(",");
             Utils.showConfirmDialog("Delete Notes", "Delete", lines, function () {
-              Utils.ajaxWithDialog("Deleting Notes", "DELETE", url, null, function () {
-                Utils.page.pageReload();
-              });
+              Utils.ajaxWithDialog(
+                "Deleting Notes",
+                "POST",
+                Urls.rest.notes.bulkDelete,
+                {
+                  entityType: entityType,
+                  entityId: id,
+                  ids: ids,
+                },
+                function () {
+                  Utils.page.pageReload();
+                }
+              );
             });
           },
         },
@@ -66,39 +70,7 @@ ListTarget.note = (function () {
               Utils.showOkDialog("Error", ["Cannot determine which entity to add a note to."]);
               return;
             }
-            Utils.showDialog(
-              "Create New Note",
-              "Add Note",
-              [
-                {
-                  label: "Internal Only?",
-                  property: "internalOnly",
-                  type: "checkbox",
-                  value: true,
-                },
-                {
-                  label: "Text",
-                  property: "text",
-                  type: "textarea",
-                  rows: 3,
-                  required: true,
-                },
-              ],
-              function (results) {
-                var url = "/rest/notes/" + entityType + "/" + id;
-
-                Utils.ajaxWithDialog(
-                  "Adding Note",
-                  "POST",
-                  url,
-                  {
-                    internalOnly: results.internalOnly,
-                    text: results.text,
-                  },
-                  Utils.page.pageReload
-                );
-              }
-            );
+            Utils.notes.showNoteDialog(entityType, id);
           },
         },
       ];
@@ -150,59 +122,9 @@ ListTarget.note = (function () {
       },
     ],
     processData: function (data) {
-      return Array.isArray(data) ? data : data.data || [];
+      return data;
     },
-    bServerSide: true,
+    bServerSide: false,
     bStateSave: false,
   };
 })();
-
-Utils.notes = {
-  showNoteDialog: function (entityType, entityId) {
-    Utils.showDialog(
-      "Create New Note",
-      "Add Note",
-      [
-        {
-          label: "Internal Only?",
-          property: "internalOnly",
-          type: "checkbox",
-          value: true,
-        },
-        {
-          label: "Text",
-          property: "text",
-          type: "textarea",
-          rows: 3,
-          required: true,
-        },
-      ],
-      function (results) {
-        var url = "/rest/notes/" + entityType + "/" + entityId;
-
-        Utils.ajaxWithDialog(
-          "Adding Note",
-          "POST",
-          url,
-          {
-            internalOnly: results.internalOnly,
-            text: results.text,
-          },
-          Utils.page.pageReload
-        );
-      }
-    );
-  },
-
-  deleteNote: function (entityType, entityId, noteId) {
-    Utils.showConfirmDialog(
-      "Delete Note",
-      "Delete",
-      ["Are you sure you wish to delete this note?"],
-      function () {
-        var url = "/rest/notes/" + entityType + "/" + entityId + "/" + noteId;
-        Utils.ajaxWithDialog("Deleting Note", "DELETE", url, null, Utils.page.pageReload);
-      }
-    );
-  },
-};
