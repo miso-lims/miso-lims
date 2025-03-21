@@ -471,7 +471,6 @@ Box.ui = {
       {
         name: "Print Barcodes by Position",
         action: function () {
-          // Ignore items; it's a mess of different object types
           var dialog = jQuery("#dialogDialog");
           jQuery("#dialogInfoBelow").html("");
           jQuery("#dialogInfoAbove").html(
@@ -493,6 +492,7 @@ Box.ui = {
               Print: function () {
                 var sortOrder = jQuery('input[name="sortOrder"]:checked').val() || "row";
                 dialog.dialog("close");
+                // Ignore items; it's a mess of different object types
                 Utils.printSelectDialog(function (printer, copies) {
                   var input =
                     items.length == 0
