@@ -107,6 +107,10 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   private String multiplexingKitLot;
 
+  @Column(name = "movieTime")
+  private double movieTime;
+
+
   @ManyToOne
   @JoinColumn(name = "sequencingContainerModelId")
   private SequencingContainerModel model;
@@ -184,6 +188,16 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @Override
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
+  }
+
+  @Override
+  public double getMovieTime() {
+    return movieTime;
+  }
+
+  @Override
+  public void setMovieTime(double movieTime) {
+    this.movieTime = movieTime;
   }
 
   @Override
