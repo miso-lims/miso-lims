@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 import java.util.ArrayList;
@@ -40,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
+import uk.ac.bbsrc.tgac.miso.core.data.UltimaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 
@@ -90,6 +68,12 @@ public enum PlatformType {
     public SequencerPartitionContainer createContainer() {
       return new OxfordNanoporeContainer();
     }
+  }, //
+  ULTIMA("Ultima", "Wafer", "Wafer Contents", "Wafer Contents", null) {
+    @Override
+    public Run createRun() {
+      return new UltimaRun();
+    }
   };
 
   /**
@@ -113,8 +97,7 @@ public enum PlatformType {
   /**
    * Constructs a PlatformType based on a given key
    * 
-   * @param key
-   *          of type String
+   * @param key of type String
    */
   PlatformType(String key, String containerName, String partitionName, String pluralPartitionName, String sraName) {
     this.key = key;
@@ -127,8 +110,7 @@ public enum PlatformType {
   /**
    * Returns a PlatformType given an enum key
    * 
-   * @param key
-   *          of type String
+   * @param key of type String
    * @return PlatformType
    */
   public static PlatformType get(String key) {

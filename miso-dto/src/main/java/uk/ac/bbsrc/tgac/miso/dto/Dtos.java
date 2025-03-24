@@ -126,6 +126,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.UltimaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
@@ -283,6 +284,7 @@ import uk.ac.bbsrc.tgac.miso.dto.run.PacBioRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunPositionDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.SolidRunDto;
+import uk.ac.bbsrc.tgac.miso.dto.run.UltimaRunDto;
 
 @SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
@@ -491,8 +493,7 @@ public class Dtos {
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
       dto.setRequisitionStopped(requisition.isStopped());
       dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
-          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
-      ));
+          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))));
     }
 
     return dto;
@@ -620,8 +621,7 @@ public class Dtos {
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
       dto.setRequisitionStopped(requisition.isStopped());
       dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
-          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
-      ));
+          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))));
     }
 
     return dto;
@@ -1514,8 +1514,7 @@ public class Dtos {
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
       dto.setRequisitionStopped(requisition.isStopped());
       dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
-          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
-      ));
+          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))));
     }
 
     return dto;
@@ -1809,8 +1808,7 @@ public class Dtos {
       dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
       dto.setRequisitionStopped(requisition.isStopped());
       dto.setRequisitionPaused(requisition.getPauses().stream().anyMatch(
-          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))
-      ));
+          pause -> (pause.getEndDate() == null || pause.getEndDate().isAfter(LocalDate.now()))));
     }
 
     return dto;
@@ -2155,6 +2153,8 @@ public class Dtos {
       return dto;
     } else if (from instanceof PacBioRun) {
       return new PacBioRunDto();
+    } else if (from instanceof UltimaRun) {
+      return new UltimaRunDto();
     } else {
       throw new IllegalArgumentException("Unknown run type");
     }
@@ -2219,6 +2219,8 @@ public class Dtos {
       return run;
     } else if (from instanceof PacBioRunDto) {
       return new PacBioRun();
+    } else if (from instanceof UltimaRunDto) {
+      return new UltimaRun();
     } else {
       throw new IllegalArgumentException("Unknown run type");
     }
