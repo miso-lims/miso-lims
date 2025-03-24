@@ -29,6 +29,12 @@ FormTarget.container = (function ($) {
               },
             },
             {
+              title: "Movie Time",
+              data: "movieTime",
+              type: "text",
+              required: true,
+            },
+            {
               title: "Serial Number",
               data: "identificationBarcode",
               type: "text",
