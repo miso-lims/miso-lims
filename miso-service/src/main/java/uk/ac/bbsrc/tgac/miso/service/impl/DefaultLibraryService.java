@@ -254,6 +254,8 @@ public class DefaultLibraryService implements LibraryService {
 
   @Override
   public long update(Library library) throws IOException {
+    // Detach to maintain separation between submitted and managed entities in-case submission was from
+    // another service
     hibernateUtilDao.detach(library);
     Library managed = get(library.getId());
     User changeUser = authorizationManager.getCurrentUser();

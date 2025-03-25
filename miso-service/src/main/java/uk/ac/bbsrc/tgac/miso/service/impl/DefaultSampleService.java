@@ -780,6 +780,8 @@ public class DefaultSampleService implements SampleService {
 
   @Override
   public long update(Sample sample) throws IOException {
+    // Detach to maintain separation between submitted and managed entities in-case submission was from
+    // another service
     hibernateUtilDao.detach(sample);
     Sample managed = get(sample.getId());
     User changeUser = authorizationManager.getCurrentUser();

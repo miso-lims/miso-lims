@@ -49,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
+import uk.ac.bbsrc.tgac.miso.persistence.HibernateUtilDao;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
 
@@ -88,6 +89,8 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
   private Boolean autoGenerateIdBarcodes;
   @Autowired
   private TransactionTemplate transactionTemplate;
+  @Autowired
+  private HibernateUtilDao hibernateUtilDao;
 
   @Override
   public LibraryAliquot get(long id) throws IOException {
@@ -202,6 +205,9 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
 
   @Override
   public long update(LibraryAliquot aliquot) throws IOException {
+    // Detach to maintain separation between submitted and managed entities in-case submission was from
+    // another service
+    hibernateUtilDao.detach(aliquot);
     LibraryAliquot managed = get(aliquot.getId());
     User changeUser = authorizationManager.getCurrentUser();
     managed.setChangeDetails(changeUser);
