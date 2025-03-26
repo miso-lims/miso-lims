@@ -466,6 +466,9 @@ Box.ui = {
       // types of all box contents
       items = Box.boxJSON.items;
     }
+    var positions = items.map(function (item) {
+      return item.coordinates;
+    });
 
     var actions = [
       {
@@ -480,55 +483,51 @@ Box.ui = {
             '<p><input type="radio" name="sortOrder" id="sortByRow" value="row" checked/><label for="sortByRow"> Sort by Row</label> ' +
               '<input type="radio" name="sortOrder" id="sortByColumn" value="column"/><label for="sortByColumn"> Sort by Column</label></p>'
           );
-          dialog.dialog({
-            autoOpen: true,
-            width: 500,
-            height: 300,
-            modal: true,
-            resizable: false,
-            title: "Print Barcodes",
-            position: { my: "center", at: "center", of: window },
-            buttons: {
-              Print: function () {
-                var sortOrder = jQuery('input[name="sortOrder"]:checked').val() || "row";
-                dialog.dialog("close");
-                // Ignore items; it's a mess of different object types
-                Utils.printSelectDialog(function (printer, copies) {
-                  var input =
-                    items.length == 0
-                      ? Box.boxJSON.items.map(function (i) {
-                          return i.coordinates;
-                        })
-                      : positionStrings;
-                  var url =
-                    sortOrder === "column"
-                      ? Urls.rest.printers.printBoxPositionsByColumn(printer)
-                      : Urls.rest.printers.printBoxPositions(printer);
+          Utils.showDialog(
+            "Print Barcodes",
+            "Print",
+            [
+              {
+                label: "Sort Order",
+                type: "select",
+                property: "sortOrder",
+                values: ["row", "column"],
+                getLabel: function (value) {
+                  return value === "row" ? "Sort by Row" : "Sort by Column";
+                },
+                required: true,
+              },
+            ],
+            function (result) {
+              var sortOrder = result.sortOrder || "row";
+              Utils.printSelectDialog(function (printer, copies) {
+                var url =
+                  sortOrder === "column"
+                    ? Urls.rest.printers.printBoxPositionsByColumn(printer)
+                    : Urls.rest.printers.printBoxPositions(printer);
 
-                  Utils.ajaxWithDialog(
-                    "Printing",
-                    "POST",
-                    url,
-                    {
-                      boxId: Box.boxId,
-                      positions: input,
-                      copies: copies,
-                    },
-                    function (result) {
-                      Utils.showOkDialog("Printing", [
-                        result == input.length
-                          ? "Barcodes sent to printer."
-                          : result + " of " + input.length + " printed.",
-                      ]);
-                    }
-                  );
-                });
-              },
-              Cancel: function () {
-                dialog.dialog("close");
-              },
+                Utils.ajaxWithDialog(
+                  "Printing",
+                  "POST",
+                  url,
+                  {
+                    boxId: Box.boxId,
+                    positions: positions,
+                    copies: copies,
+                  },
+                  function (result) {
+                    Utils.showOkDialog("Printing", [
+                      result == positions.length
+                        ? "Barcodes sent to printer."
+                        : result + " of " + positions.length + " printed.",
+                    ]);
+                  }
+                );
+              });
             },
-          });
+            null,
+            function () {}
+          );
         },
       },
     ];

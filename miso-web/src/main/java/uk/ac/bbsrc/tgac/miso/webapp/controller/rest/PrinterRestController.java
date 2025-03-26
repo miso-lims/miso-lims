@@ -55,6 +55,7 @@ public class PrinterRestController extends RestController {
     private long boxId;
     private int copies;
     private Set<String> positions;
+    private String sortOrder;
 
     public long getBoxId() {
       return boxId;
@@ -68,6 +69,10 @@ public class PrinterRestController extends RestController {
       return positions;
     }
 
+    public String getSortOrder() {
+      return sortOrder;
+    }
+
     public void setBoxId(long boxId) {
       this.boxId = boxId;
     }
@@ -78,6 +83,10 @@ public class PrinterRestController extends RestController {
 
     public void setPositions(Set<String> positions) {
       this.positions = positions;
+    }
+
+    public void setSortOrder(String sortOrder) {
+      this.sortOrder = sortOrder;
     }
   }
 
@@ -239,36 +248,21 @@ public class PrinterRestController extends RestController {
       throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
     }
     Box box = boxService.get(request.getBoxId());
-    return printer.printBarcode(user, request.getCopies(),
-        box.getBoxPositions().entrySet().stream()//
-            .filter(e -> request.getPositions().contains(e.getKey()))//
-            .sorted(Comparator.comparing(Entry::getKey))//
-            .map(WhineyFunction.rethrow(this::loadBarcodable)));
-  }
-
-  @PostMapping(value = "{printerId}/boxpositionsbycolumn", headers = {"Content-type=application/json"})
-  @ResponseBody
-  public long boxPositionsByColumn(@PathVariable("printerId") Long printerId,
-      @RequestBody BoxPositionPrintRequest request)
-      throws IOException {
-    User user = authorizationManager.getCurrentUser();
-    Printer printer = printerService.get(printerId);
-    if (printer == null) {
-      throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
+    Comparator<Entry<String, BoxPosition>> comparator;
+    if ("column".equalsIgnoreCase(request.getSortOrder())) {
+      comparator = Comparator.comparing((Entry<String, BoxPosition> e) -> {
+        String pos = e.getKey();
+        int col = Integer.parseInt(pos.substring(1));
+        char row = pos.charAt(0);
+        return col + (row - 'A') * 1000;
+      });
+    } else {
+      comparator = Comparator.comparing(Entry::getKey);
     }
-    Box box = boxService.get(request.getBoxId());
-    Comparator<String> columnFirstComparator = (pos1, pos2) -> {
-      int col1 = Integer.parseInt(pos1.substring(1));
-      int col2 = Integer.parseInt(pos2.substring(1));
-      char row1 = pos1.charAt(0);
-      char row2 = pos2.charAt(0);
-      int colCompare = Integer.compare(col1, col2);
-      return colCompare != 0 ? colCompare : Character.compare(row1, row2);
-    };
     return printer.printBarcode(user, request.getCopies(),
-        box.getBoxPositions().entrySet().stream()//
-            .filter(e -> request.getPositions().contains(e.getKey()))//
-            .sorted(Comparator.comparing(Entry::getKey, columnFirstComparator))//
+        box.getBoxPositions().entrySet().stream()
+            .filter(e -> request.getPositions().contains(e.getKey()))
+            .sorted(comparator)
             .map(WhineyFunction.rethrow(this::loadBarcodable)));
   }
 
