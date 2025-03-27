@@ -343,6 +343,7 @@ public class DefaultSampleService implements SampleService {
     if (child.getParent() == null || !isSampleSlide(child.getParent())) {
       return;
     }
+    child = deproxify(child);
     SampleSlide parent = (SampleSlide) deproxify(child.getParent());
     Integer slidesConsumed = null;
     if (isTissuePieceSample(child)) {
