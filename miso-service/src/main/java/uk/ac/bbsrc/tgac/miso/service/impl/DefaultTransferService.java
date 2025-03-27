@@ -34,7 +34,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferNotification;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
@@ -42,13 +41,13 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferNotificationService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.persistence.HibernateUtilDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.persistence.TransferStore;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
@@ -89,11 +88,11 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   @Autowired
   private ChangeLogService changeLogService;
   @Autowired
-  private BoxService boxService;
-  @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private HibernateUtilDao hibernateUtilDao;
 
   @Override
   public List<Transfer> list() throws IOException {
@@ -128,37 +127,42 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
     loadChildEntity(object.getRecipientGroup(), object::setRecipientGroup, groupService);
 
     for (TransferSample item : object.getSampleTransfers()) {
-      updateAndLoadItem(object, item.getItem(), item::setItem, sampleService);
+      item.setItem(sampleService.get(item.getItem().getId()));
     }
     for (TransferLibrary item : object.getLibraryTransfers()) {
-      updateAndLoadItem(object, item.getItem(), item::setItem, libraryService);
+      item.setItem(libraryService.get(item.getItem().getId()));
     }
     for (TransferLibraryAliquot item : object.getLibraryAliquotTransfers()) {
-      updateAndLoadItem(object, item.getItem(), item::setItem, libraryAliquotService);
+      item.setItem(libraryAliquotService.get(item.getItem().getId()));
     }
     for (TransferPool item : object.getPoolTransfers()) {
-      updateAndLoadItem(object, item.getItem(), item::setItem, poolService);
+      item.setItem(poolService.get(item.getItem().getId()));
     }
   }
 
-  private <T extends Boxable> void updateAndLoadItem(Transfer transfer, T item, Consumer<T> setter,
-      SaveService<T> service)
-      throws IOException {
-    // Item needs to be loaded before validation so we can check for conflicting transfers, but updating
-    // location needs to happen before loading so we can manage the supplied vs. persisted objects
-    boxService.prepareBoxableLocation(item, transfer.isDistribution());
-    boxService.updateBoxableLocation(item);
-
-    T managedItem = service.get(item.getId());
-
-    // If distribution, remove items from boxes, set volume zero
+  @Override
+  protected void beforeValidate(Transfer transfer) throws IOException {
+    Consumer<TransferItem<?>> action = null;
     if (transfer.isDistribution()) {
-      // Need to work with managedItem because the submitted item may be missing a lot of fields
-      managedItem.setVolume(BigDecimal.ZERO);
-      service.update(managedItem);
+      // Mark all items received for distribution transfers; record distributed volume and location
+      action = item -> {
+        item.setTransfer(transfer);
+        item.setReceived(true);
+        if (item.getItem().getVolume() != null && item.getItem().getVolume().compareTo(BigDecimal.ZERO) > 0) {
+          item.setDistributedVolume(item.getItem().getVolume());
+        }
+        if (item.getItem().getBox() != null) {
+          item.setDistributedBoxAlias(item.getItem().getBox().getAlias());
+          item.setDistributedBoxPosition(item.getItem().getBoxPosition());
+        }
+      };
+    } else {
+      action = item -> item.setTransfer(transfer);
     }
-
-    setter.accept(service.get(item.getId()));
+    transfer.getSampleTransfers().forEach(action);
+    transfer.getLibraryTransfers().forEach(action);
+    transfer.getLibraryAliquotTransfers().forEach(action);
+    transfer.getPoolTransfers().forEach(action);
   }
 
   @Override
@@ -451,33 +455,29 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
   }
 
   @Override
-  protected void beforeValidate(Transfer transfer) throws IOException {
-    Consumer<TransferItem<?>> action = null;
-    if (transfer.isDistribution()) {
-      // Mark all items received for distribution transfers; record distributed volume and location
-      action = item -> {
-        item.setTransfer(transfer);
-        item.setReceived(true);
-        if (item.getItem().getVolume() != null && item.getItem().getVolume().compareTo(BigDecimal.ZERO) > 0) {
-          item.setDistributedVolume(item.getItem().getVolume());
-        }
-        if (item.getItem().getBox() != null) {
-          item.setDistributedBoxAlias(item.getItem().getBox().getAlias());
-          item.setDistributedBoxPosition(item.getItem().getBoxPosition());
-        }
-      };
-    } else {
-      action = item -> item.setTransfer(transfer);
-    }
-    transfer.getSampleTransfers().forEach(action);
-    transfer.getLibraryTransfers().forEach(action);
-    transfer.getLibraryAliquotTransfers().forEach(action);
-    transfer.getPoolTransfers().forEach(action);
+  protected void beforeSave(Transfer object) throws IOException {
+    object.setChangeDetails(authorizationManager.getCurrentUser());
   }
 
   @Override
-  protected void beforeSave(Transfer object) throws IOException {
-    object.setChangeDetails(authorizationManager.getCurrentUser());
+  protected void afterSave(Transfer object) throws IOException {
+    if (object.isDistribution()) {
+      // Individual services should check for distribution and take the appropriate actions
+      // Detach to maintain separation between submitted and managed entities
+      hibernateUtilDao.detach(object);
+      for (TransferSample sample : object.getSampleTransfers()) {
+        sampleService.update(sample.getItem());
+      }
+      for (TransferLibrary library : object.getLibraryTransfers()) {
+        libraryService.update(library.getItem());
+      }
+      for (TransferLibraryAliquot aliquot : object.getLibraryAliquotTransfers()) {
+        libraryAliquotService.update(aliquot.getItem());
+      }
+      for (TransferPool pool : object.getPoolTransfers()) {
+        poolService.update(pool.getItem());
+      }
+    }
   }
 
   @Override

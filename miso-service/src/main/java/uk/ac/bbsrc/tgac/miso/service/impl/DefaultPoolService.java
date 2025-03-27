@@ -55,6 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.persistence.HibernateUtilDao;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolStore;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
 
@@ -96,6 +97,8 @@ public class DefaultPoolService implements PoolService {
   private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
   private BarcodableReferenceService barcodableReferenceService;
+  @Autowired
+  private HibernateUtilDao hibernateUtilDao;
 
   public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
@@ -201,6 +204,9 @@ public class DefaultPoolService implements PoolService {
 
   @Override
   public long update(Pool pool) throws IOException {
+    // Detach to maintain separation between submitted and managed entities in-case submission was from
+    // another service
+    hibernateUtilDao.detach(pool);
     Pool managed = poolStore.get(pool.getId());
     boxService.prepareBoxableLocation(pool, managed.getDistributionTransfer() != null);
     if (pool.getConcentration() == null) {
