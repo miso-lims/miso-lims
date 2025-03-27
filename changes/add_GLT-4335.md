@@ -1,1 +1,0 @@
-Option to Print Barcodes by Column in addition to Print Barcodes by Row on Edit Box page

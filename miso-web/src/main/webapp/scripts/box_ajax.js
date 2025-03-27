@@ -466,68 +466,48 @@ Box.ui = {
       // types of all box contents
       items = Box.boxJSON.items;
     }
-    var positions = items.map(function (item) {
-      return item.coordinates;
-    });
 
     var actions = [
       {
         name: "Print Barcodes by Position",
         action: function () {
-          var dialog = jQuery("#dialogDialog");
-          jQuery("#dialogInfoBelow").html("");
-          jQuery("#dialogInfoAbove").html(
-            "<p>Please select how you would like to sort the barcodes for printing.</p>"
-          );
-          jQuery("#dialogVisual").html(
-            '<p><input type="radio" name="sortOrder" id="sortByRow" value="row" checked/><label for="sortByRow"> Sort by Row</label> ' +
-              '<input type="radio" name="sortOrder" id="sortByColumn" value="column"/><label for="sortByColumn"> Sort by Column</label></p>'
-          );
-          Utils.showDialog(
-            "Print Barcodes",
-            "Print",
-            [
-              {
-                label: "Sort Order",
-                type: "select",
-                property: "sortOrder",
-                values: ["row", "column"],
-                getLabel: function (value) {
-                  return value === "row" ? "Sort by Row" : "Sort by Column";
-                },
-                required: true,
-              },
-            ],
-            function (result) {
-              var sortOrder = result.sortOrder || "row";
-              Utils.printSelectDialog(function (printer, copies) {
-                var url =
-                  sortOrder === "column"
-                    ? Urls.rest.printers.printBoxPositionsByColumn(printer)
-                    : Urls.rest.printers.printBoxPositions(printer);
+          // Ignore items; it's a mess of different object types
 
-                Utils.ajaxWithDialog(
-                  "Printing",
-                  "POST",
-                  url,
-                  {
-                    boxId: Box.boxId,
-                    positions: positions,
-                    copies: copies,
-                  },
-                  function (result) {
-                    Utils.showOkDialog("Printing", [
-                      result == positions.length
-                        ? "Barcodes sent to printer."
-                        : result + " of " + positions.length + " printed.",
-                    ]);
-                  }
-                );
-              });
+          var additionalFields = [
+            {
+              label: "Print by",
+              type: "select",
+              property: "order",
+              required: true,
+              values: ["column", "row"],
             },
-            null,
-            function () {}
-          );
+          ];
+          Utils.printSelectDialog(function (printer, copies, result) {
+            var input =
+              items.length == 0
+                ? Box.boxJSON.items.map(function (i) {
+                    return i.coordinates;
+                  })
+                : positionStrings;
+            Utils.ajaxWithDialog(
+              "Printing",
+              "POST",
+              Urls.rest.printers.printBoxPositions(printer),
+              {
+                boxId: Box.boxId,
+                positions: input,
+                copies: copies,
+                sortOrder: result.order,
+              },
+              function (result) {
+                Utils.showOkDialog("Printing", [
+                  result == input.length
+                    ? "Barcodes sent to printer."
+                    : result + " of " + input.length + " printed.",
+                ]);
+              }
+            );
+          }, additionalFields);
         },
       },
     ];

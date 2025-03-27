@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelElement;
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
@@ -251,10 +252,7 @@ public class PrinterRestController extends RestController {
     Comparator<Entry<String, BoxPosition>> comparator;
     if ("column".equalsIgnoreCase(request.getSortOrder())) {
       comparator = Comparator.comparing((Entry<String, BoxPosition> e) -> {
-        String pos = e.getKey();
-        int col = Integer.parseInt(pos.substring(1));
-        char row = pos.charAt(0);
-        return col + (row - 'A') * 1000;
+        return BoxUtils.getColumnNumber(e.getKey());
       });
     } else {
       comparator = Comparator.comparing(Entry::getKey);

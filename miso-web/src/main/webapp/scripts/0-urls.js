@@ -744,7 +744,6 @@ Urls = (function () {
     print: idUrlFunction(printerRestBase),
     printBoxContents: middleIdUrlFunction(printerRestBase, "/boxcontents"),
     printBoxPositions: middleIdUrlFunction(printerRestBase, "/boxpositions"),
-    printBoxPositionsByColumn: middleIdUrlFunction(printerRestBase, "/boxpositionsbycolumn"),
   };
 
   // Projects
