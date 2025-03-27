@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -87,17 +86,13 @@ public abstract class HibernateQcStore<T extends QC> implements QcTargetStore {
       return Collections.emptyList();
     }
 
-    QueryBuilder<? extends QualityControllable<T>, ? extends QualityControllable<T>> builder =
-        new QueryBuilder<>(currentSession(), entityClass, entityClass);
+    QueryBuilder<T, T> builder = new QueryBuilder<>(currentSession(), qcClass, qcClass);
     In<Long> inClause = builder.getCriteriaBuilder().in(builder.getRoot().get(getIdProperty()));
     for (Long id : ids) {
       inClause.value(id);
     }
     builder.addPredicate(inClause);
-
-    List<T> results = new ArrayList<>();
-    builder.getResultList().forEach(result -> results.addAll(entityClass.cast(result).getQCs()));
-    return results;
+    return builder.getResultList();
   }
 
   public abstract String getIdProperty();
