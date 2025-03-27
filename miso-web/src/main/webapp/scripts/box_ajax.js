@@ -472,7 +472,17 @@ Box.ui = {
         name: "Print Barcodes by Position",
         action: function () {
           // Ignore items; it's a mess of different object types
-          Utils.printSelectDialog(function (printer, copies) {
+
+          var additionalFields = [
+            {
+              label: "Print by",
+              type: "select",
+              property: "order",
+              required: true,
+              values: ["column", "row"],
+            },
+          ];
+          Utils.printSelectDialog(function (printer, copies, result) {
             var input =
               items.length == 0
                 ? Box.boxJSON.items.map(function (i) {
@@ -487,6 +497,7 @@ Box.ui = {
                 boxId: Box.boxId,
                 positions: input,
                 copies: copies,
+                sortOrder: result.order,
               },
               function (result) {
                 Utils.showOkDialog("Printing", [
@@ -496,7 +507,7 @@ Box.ui = {
                 ]);
               }
             );
-          });
+          }, additionalFields);
         },
       },
     ];

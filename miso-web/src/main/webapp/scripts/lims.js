@@ -740,39 +740,44 @@ var Utils = Utils || {
       request.send();
     }
   },
-  printSelectDialog: function (callback) {
+  printSelectDialog: function (callback, additionalFields) {
     Utils.ajaxWithDialog(
       "Getting Printers",
       "GET",
       Urls.rest.printers.list,
       null,
       function (printers) {
+        var fields = [
+          {
+            property: "printer",
+            label: "Printer",
+            required: true,
+            type: "select",
+            value: window.localStorage.getItem("miso-printer"),
+            values: printers.filter(function (printer) {
+              return printer.available;
+            }),
+            getLabel: Utils.array.getName,
+          },
+          {
+            property: "copies",
+            label: "Copies",
+            required: true,
+            type: "int",
+            value: 1,
+          },
+        ];
+        if (additionalFields) {
+          fields = fields.concat(additionalFields);
+        }
+
         Utils.showDialog(
           "Select Printer",
           "Print",
-          [
-            {
-              property: "printer",
-              label: "Printer",
-              required: true,
-              type: "select",
-              value: window.localStorage.getItem("miso-printer"),
-              values: printers.filter(function (printer) {
-                return printer.available;
-              }),
-              getLabel: Utils.array.getName,
-            },
-            {
-              property: "copies",
-              label: "Copies",
-              required: true,
-              type: "int",
-              value: 1,
-            },
-          ],
+          fields,
           function (result) {
             window.localStorage.setItem("miso-printer", result.printer.name);
-            callback(result.printer.id, Math.max(1, result.copies));
+            callback(result.printer.id, Math.max(1, result.copies), result);
           },
           null
         );
