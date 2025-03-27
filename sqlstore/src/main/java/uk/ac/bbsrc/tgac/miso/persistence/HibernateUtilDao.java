@@ -14,6 +14,9 @@ public class HibernateUtilDao {
   EntityManager entityManager;
 
   public void detach(Object entity) {
+    // Need to flush before detaching - otherwise a previously-persisted entity wouldn't be persisted,
+    // and Hibernate also throws an exception for this reason
+    entityManager.flush();
     entityManager.detach(entity);
   }
 
