@@ -7,6 +7,31 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.5.0] - 2025-03-27
+
+### Added
+
+* Initial support for Ultima sequencing
+* REST API for integration with QC systems. For details, see the
+  [QC Software Integration](https://miso-lims.readthedocs.io/projects/docs/en/latest/user_manual/qc_integration/#rest-api)
+  section of the user manual
+* Target Cell Recovery and Loading Cell Concentration fields to the Single Cell subcategory of Tissue Processing sample classes
+
+### Changed
+
+* The Print Barcodes by Position action on the Edit Box page now allows printing by column or row
+* Renamed PacBio run page tables to better represent what their contents are.
+* Update minimum password length to 15 characters for JDBC authentication. This does not affect LDAP/AD authentication.
+
+### Fixed
+
+* Error when trying to add some samples to a distribution transfer
+* Items added to distribution transfers were not being removed from boxes and having their distributed
+  location recorded
+* The bulk Add/Edit QCs pages were displaying the wrong items after saving
+* Unexpected error creating new library types
+
+
 ## [3.4.0] - 2025-02-28
 
 ### Added

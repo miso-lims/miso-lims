@@ -1,3 +1,4 @@
+-- apikeys
 CREATE TABLE ApiKey (
   keyId bigint NOT NULL AUTO_INCREMENT,
   userId bigint NOT NULL,
@@ -10,3 +11,11 @@ CREATE TABLE ApiKey (
   CONSTRAINT fk_apikey_creator FOREIGN KEY (creator) REFERENCES User (userId),
   CONSTRAINT uk_apikey_key UNIQUE (apiKey)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ultima
+CREATE TABLE RunUltima (
+  runId bigint NOT NULL,
+  PRIMARY KEY (runId),
+  CONSTRAINT fk_runultima_run FOREIGN KEY (runId) REFERENCES Run (runId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
