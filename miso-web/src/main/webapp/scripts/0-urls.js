@@ -661,6 +661,10 @@ Urls = (function () {
     remove: function (entityType, entityId, noteId) {
       return noteRestBase + "/" + entityType + "/" + entityId + "/" + noteId;
     },
+    datatable: function (entityType, entityId) {
+      return noteRestBase + "/" + entityType + "/" + entityId + "/dt";
+    },
+    bulkDelete: noteRestBase + "/bulk-delete",
   };
 
   // Partition QC Types

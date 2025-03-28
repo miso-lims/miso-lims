@@ -220,6 +220,15 @@ public class DefaultRunService implements RunService {
   }
 
   @Override
+  public List<Note> getNotes(Run run) throws IOException {
+    Run managed = runDao.get(run.getId());
+    if (managed == null) {
+      throw new IOException("Run with ID " + run.getId() + " not found.");
+    }
+    return new ArrayList<>(managed.getNotes());
+  }
+
+  @Override
   public long create(Run run) throws IOException {
     loadChildEntities(run);
     validateChanges(null, run);
