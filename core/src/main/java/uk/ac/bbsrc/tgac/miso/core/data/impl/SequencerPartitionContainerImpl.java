@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
@@ -107,9 +108,8 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   private String multiplexingKitLot;
 
-  @Column(name = "movieTime")
-  private double movieTime;
-
+  @Column(name = "sequencingParametersId")
+  private SequencingParameters sequencingParametersId;
 
   @ManyToOne
   @JoinColumn(name = "sequencingContainerModelId")
@@ -191,13 +191,13 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   }
 
   @Override
-  public double getMovieTime() {
-    return movieTime;
+  public SequencingParameters getSequencingParametersId() {
+    return sequencingParametersId;
   }
 
   @Override
-  public void setMovieTime(double movieTime) {
-    this.movieTime = movieTime;
+  public void setSequencingParametersId(SequencingParameters sequencingParametersId) {
+    this.sequencingParametersId = sequencingParametersId;
   }
 
   @Override

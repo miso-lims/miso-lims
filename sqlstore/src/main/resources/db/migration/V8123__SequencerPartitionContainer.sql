@@ -1,0 +1,1 @@
+ALTER TABLE SequencerPartitionContainer ADD COLUMN sequencingParametersId bigint DEFAULT 0;
