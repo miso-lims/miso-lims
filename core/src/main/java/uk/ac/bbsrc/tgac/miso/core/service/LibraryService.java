@@ -34,7 +34,7 @@ public interface LibraryService
    *         supplementary samples
    * @throws IOException
    */
-  List<Long> listIdsByRequisitionId(long requisitionId) throws IOException;
+  List<Long> listPreparedIdsByRequisitionId(long requisitionId) throws IOException;
 
   /**
    * Get IDs of all libraries descended from the provided sample IDs

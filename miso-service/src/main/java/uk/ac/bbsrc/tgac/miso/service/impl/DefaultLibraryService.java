@@ -778,7 +778,7 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   @Override
-  public List<Long> listIdsByRequisitionId(long requisitionId) throws IOException {
+  public List<Long> listPreparedIdsByRequisitionId(long requisitionId) throws IOException {
     return libraryDao.listIdsBySampleRequisitionId(requisitionId);
   }
 
