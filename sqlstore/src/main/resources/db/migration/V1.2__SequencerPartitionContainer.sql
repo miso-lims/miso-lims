@@ -1,1 +1,0 @@
-ALTER TABLE SequencerPartitionContainer ADD COLUMN movieTime smallint DEFAULT 0;
