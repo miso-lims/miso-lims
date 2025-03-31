@@ -22,9 +22,9 @@ public interface SequencerPartitionContainer
     extends Comparable<SequencerPartitionContainer>, Barcodable, Serializable, QualityControllable<ContainerQC>,
     Deletable {
 
-  public double getMovieTime();
+  public SequencingParameters getSequencingParametersId();
 
-  public void setMovieTime(double movieTime);
+  public void setSequencingParametersId(SequencingParameters sequencingParametersId);
 
   public String getDescription();
 

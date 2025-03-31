@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContaine
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -346,7 +347,6 @@ public class DefaultRunService implements RunService {
         Run::getDataReviewDate, Run::setDataReviewDate);
 
     List<ValidationError> errors = new ArrayList<>();
-
     if (!changed.getHealth().isDone()) {
       changed.setCompletionDate(null);
     } else if (changed.getCompletionDate() == null) {
@@ -382,6 +382,11 @@ public class DefaultRunService implements RunService {
       errors.add(new ValidationError("sequencingKitLot", "Sequencing kit not specified"));
     }
 
+    //TODO addition for validating movie time for pacbio platform type
+    if(changed.getSequencingParameters().getMovieTime() <= 0 && changed.getPlatformType() == PlatformType.PACBIO) {
+      errors.add(new ValidationError("movieTime", "Movie time is not set"));
+    }
+
     if (isSetAndChanged(Run::getDataReview, changed, before) && changed.getQcPassed() == null) {
       errors.add(new ValidationError("dataReview", "Cannot set data review before QC status"));
     }
@@ -413,6 +418,7 @@ public class DefaultRunService implements RunService {
         }
       }
     }
+
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
@@ -612,9 +618,17 @@ public class DefaultRunService implements RunService {
     User user = userService.getByLoginName("notification");
     final Run target;
 
+
+    //TODO remove these temp logs
+    log.info("Lane count is: {}", laneCount);
+    log.info("ContainerModel is: {}", containerModel);
+    log.info("ContainerSerialNumber is: {}", containerSerialNumber);
+    log.info("SequencerName is: {}", sequencerName);
+
     Run runFromDb = runDao.getByAlias(source.getAlias());
     boolean isNew;
 
+    // No run found in db, create a new one
     if (runFromDb == null) {
       target = source.getPlatformType().createRun();
       target.setAlias(source.getAlias());
@@ -629,18 +643,26 @@ public class DefaultRunService implements RunService {
       isNew = false;
     }
 
+    // last modified
     target.setLastModifier(user);
     boolean isMutated = false;
     isMutated |= updateMetricsFromNotification(source, target);
     isMutated |= updateField(source.getFilePath(), target.getFilePath(), target::setFilePath);
     isMutated |= updateField(source.getStartDate(), target.getStartDate(), target::setStartDate);
 
+    // Validate that we have a sequencer name
     final Instrument sequencer = instrumentService.getByName(sequencerName);
     if (sequencer == null) {
       throw new IllegalArgumentException("No such sequencer: " + sequencerName);
     }
     target.setSequencer(sequencer);
 
+    //TODO we check if we don't have a container model but also have a PacBio run
+    if(containerModel == null && source.getPlatformType() == PlatformType.PACBIO) {
+      log.info(("We don't have a container model from notification dto, check in containers!"));
+    }
+
+    //TODO validate if missing container model
     SequencingContainerModel model =
         containerModelService.find(sequencer.getInstrumentModel(), containerModel, laneCount);
     if (model == null) {
@@ -677,6 +699,8 @@ public class DefaultRunService implements RunService {
         break;
       case IONTORRENT:
       case PACBIO:
+        // Need to update model
+
       case SOLID:
         // Nothing to do
         break;
