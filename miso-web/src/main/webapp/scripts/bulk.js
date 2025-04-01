@@ -1968,6 +1968,8 @@ BulkUtils = (function ($) {
             continue;
           }
           var pastedValue = data[row - coords[0].startRow][col - coords[0].startCol];
+          // remove double spaces sometimes inserted into long strings for some reason
+          pastedValue = pastedValue.replaceAll(/ +/g, " ").trim();
           if (cellSource.indexOf(pastedValue) === -1) {
             var matches = cellSource.filter(function (item) {
               return item.includes(pastedValue);
@@ -1979,8 +1981,10 @@ BulkUtils = (function ($) {
             }
             if (matches.length === 1) {
               data[row - coords[0].startRow][col - coords[0].startCol] = matches[0];
+              continue;
             }
           }
+          data[row - coords[0].startRow][col - coords[0].startCol] = pastedValue;
         }
       }
     });
