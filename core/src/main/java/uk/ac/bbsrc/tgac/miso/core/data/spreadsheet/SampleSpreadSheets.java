@@ -217,6 +217,8 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("External Identifier", true,
           detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
       Column.forString("Sample Type", true, mohSampleType()), //
+      Column.forString("Material", true, detailedSample(SampleTissue.class,
+          tissue -> tissue.getTissueMaterial() == null ? null : tissue.getTissueMaterial().getAlias(), null)), //
       Column.forString("Match Code", true, mohMatchCode()), //
       Column.forString("Alias", Sample::getAlias), //
       Column.forString("Type", true, dnaOrRna()), //
