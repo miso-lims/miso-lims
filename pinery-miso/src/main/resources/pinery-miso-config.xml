@@ -12,7 +12,7 @@
 
   <bean id="misoDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
-    <property name="url" value="jdbc:mysql://${miso.db.host}:${miso.db.port}/${miso.db.name}" />
+    <property name="url" value="jdbc:mysql://${miso.db.host}:${miso.db.port}/${miso.db.name}?connectionTimeZone=SERVER" />
     <property name="username" value="${miso.db.user}" />
     <property name="password" value="${miso.db.pass}" />
   </bean>
