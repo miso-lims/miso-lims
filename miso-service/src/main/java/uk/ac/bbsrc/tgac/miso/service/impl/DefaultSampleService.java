@@ -1111,15 +1111,6 @@ public class DefaultSampleService implements SampleService {
   }
 
   @Override
-  public List<Note> getNotes(Sample sample) throws IOException {
-    Sample managed = sampleStore.get(sample.getId());
-    if (managed == null) {
-      throw new IOException("Sample with ID " + sample.getId() + " not found.");
-    }
-    return new ArrayList<>(managed.getNotes());
-  }
-
-  @Override
   public AuthorizationManager getAuthorizationManager() {
     return authorizationManager;
   }

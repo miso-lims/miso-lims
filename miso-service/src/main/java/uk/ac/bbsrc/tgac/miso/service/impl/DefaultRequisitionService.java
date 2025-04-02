@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -270,15 +269,6 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
     authorizationManager.throwIfNonAdminOrMatchingOwner(deleteNote.getOwner());
     managed.getNotes().remove(deleteNote);
     requisitionDao.update(managed);
-  }
-
-  @Override
-  public List<Note> getNotes(Requisition requisition) throws IOException {
-    Requisition managed = requisitionDao.get(requisition.getId());
-    if (managed == null) {
-      throw new IOException("Requisition with ID " + requisition.getId() + " not found.");
-    }
-    return new ArrayList<>(managed.getNotes());
   }
 
   @Override

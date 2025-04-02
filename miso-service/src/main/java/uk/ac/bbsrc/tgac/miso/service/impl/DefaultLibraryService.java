@@ -326,15 +326,6 @@ public class DefaultLibraryService implements LibraryService {
     libraryDao.update(managed);
   }
 
-  @Override
-  public List<Note> getNotes(Library library) throws IOException {
-    Library managed = libraryDao.get(library.getId());
-    if (managed == null) {
-      throw new IOException("Library with ID " + library.getId() + " not found.");
-    }
-    return new ArrayList<>(managed.getNotes());
-  }
-
   /**
    * Loads persisted objects into library fields. Should be called before saving libraries. Loads all
    * member objects <b>except</b>

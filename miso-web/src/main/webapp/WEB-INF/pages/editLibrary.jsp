@@ -71,7 +71,7 @@
     <div id="notes_arrowclick" class="toggleLeftDown"></div>
   </div>
   <div id="notes">
-    <miso:list-section-ajax id="list_note" name="Notes" target="note" config="{ libraryId: ${library.id}, entityType: 'library' }"/>
+    <miso:list-section id="list_note" name="Notes" target="note" items="${notes}" config="{ entityId: ${library.id}, entityType: 'Library' }" alwaysShow="true"/>
   </div>
 </c:if>
 

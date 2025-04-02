@@ -225,15 +225,6 @@ public class DefaultWorksetService implements WorksetService {
   }
 
   @Override
-  public List<Note> getNotes(Workset workset) throws IOException {
-    Workset managed = worksetStore.get(workset.getId());
-    if (managed == null) {
-      throw new IOException("Workset with ID " + workset.getId() + " not found.");
-    }
-    return new ArrayList<>(managed.getNotes());
-  }
-
-  @Override
   public void addNote(Workset workset, Note note) throws IOException {
     Workset managed = worksetStore.get(workset.getId());
     note.setCreationDate(LocalDate.now(ZoneId.systemDefault()));

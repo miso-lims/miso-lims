@@ -3,34 +3,22 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.eaglegenomics.simlims.core.Note;
 
 import jakarta.ws.rs.core.Response.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.NoteService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
@@ -38,8 +26,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
-import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
-import uk.ac.bbsrc.tgac.miso.dto.NoteDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 
@@ -69,8 +55,6 @@ public class NoteRestController extends AbstractRestController {
 
   }
 
-  protected static final Logger log = LoggerFactory.getLogger(NoteRestController.class);
-
   @Autowired
   private LibraryService libraryService;
   @Autowired
@@ -84,209 +68,68 @@ public class NoteRestController extends AbstractRestController {
   @Autowired
   private WorksetService worksetService;
 
-  @GetMapping("/{entityType}/{entityId}/dt")
-  @ResponseBody
-  public DataTablesResponseDto<NoteDto> getNotesForDataTable(
-      @PathVariable String entityType,
-      @PathVariable long entityId,
-      @RequestParam(value = "sEcho", defaultValue = "1") Long sEcho,
-      @RequestParam(value = "iDisplayStart", defaultValue = "0") Integer iDisplayStart,
-      @RequestParam(value = "iDisplayLength", defaultValue = "10") Integer iDisplayLength,
-      @RequestParam(value = "includeRelated", defaultValue = "true") boolean includeRelated) throws IOException {
-
-    List<NoteDto> notes = getNotesList(entityType, entityId, includeRelated);
-
-    DataTablesResponseDto<NoteDto> response = new DataTablesResponseDto<>();
-    response.setSEcho(sEcho);
-    response.setITotalRecords((long) notes.size());
-    response.setITotalDisplayRecords((long) notes.size());
-
-    if (iDisplayLength > 0 && iDisplayStart < notes.size()) {
-      int end = Math.min(iDisplayStart + iDisplayLength, notes.size());
-      response.setAaData(notes.subList(iDisplayStart, end));
-    } else {
-      response.setAaData(notes);
-    }
-
-    return response;
-  }
-
-  @GetMapping("/{entityType}/{entityId}")
-  @ResponseBody
-  public List<NoteDto> getNotes(
-      @PathVariable String entityType,
-      @PathVariable long entityId,
-      @RequestParam(value = "includeRelated", defaultValue = "false") boolean includeRelated) throws IOException {
-
-    return getNotesList(entityType, entityId, includeRelated);
-  }
-
-  @PostMapping("/{entityType}/{entityId}")
-  @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
-  public NoteDto createNote(
-      @PathVariable String entityType,
-      @PathVariable long entityId,
-      @RequestBody NoteRequest request) throws IOException {
-
-    NoteService<? extends Identifiable> service = serviceForEntityType(entityType);
-    Identifiable entity = service.get(entityId);
-
-    if (entity == null) {
-      throw new RestException(entityType + " not found", Status.NOT_FOUND);
-    }
-
+  private <T extends Identifiable> void addNote(NoteService<T> service, long entityId, NoteRequest request)
+      throws IOException {
+    T entity = service.get(entityId);
     Note note = new Note();
-    note.setText(request.getText());
+
     note.setInternalOnly(request.isInternalOnly());
+    note.setText(request.getText());
     note.setCreationDate(LocalDate.now(ZoneId.systemDefault()));
-
-    @SuppressWarnings("unchecked")
-    NoteService<Identifiable> typedService = (NoteService<Identifiable>) service;
-    typedService.addNote(entity, note);
-
-    return NoteDto.from(note, (HierarchyEntity) entity);
+    service.addNote(entity, note);
   }
 
-  @DeleteMapping("/{entityType}/{entityId}/{noteIds}")
+  @PostMapping(value = "/{entityType}/{entityId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteNotes(
-      @PathVariable String entityType,
-      @PathVariable long entityId,
-      @PathVariable String noteIds) throws IOException {
-
-    NoteService<? extends Identifiable> service = serviceForEntityType(entityType);
-    Identifiable entity = service.get(entityId);
-
-    if (entity == null) {
-      throw new RestException(entityType + " not found", Status.NOT_FOUND);
-    }
-
-    List<Long> noteIdList = Arrays.stream(noteIds.split(","))
-        .map(Long::parseLong)
-        .collect(Collectors.toList());
-
-    @SuppressWarnings("unchecked")
-    NoteService<Identifiable> typedService = (NoteService<Identifiable>) service;
-
-    for (Long noteId : noteIdList) {
-      typedService.deleteNote(entity, noteId);
-    }
+  public void addNote(@PathVariable(name = "entityType") String entityType,
+      @PathVariable(name = "entityId") long entityId,
+      @RequestBody NoteRequest request) throws IOException {
+    addNote(serviceForEntityType(entityType), entityId, request);
   }
 
-  public static class BulkDeleteRequest {
-    private String entityType;
-    private long entityId;
-    private List<Long> ids;
+  private <T extends Identifiable> void deleteNote(NoteService<T> service, long entityId, String entityType,
+      long noteId)
+      throws IOException {
+    T entity = getEntity(entityId, entityType, service, Status.NOT_FOUND);
+    service.deleteNote(entity, noteId);
+  }
 
-    public String getEntityType() {
-      return entityType;
-    }
+  private <T extends Identifiable> void deleteNotes(NoteService<T> service, BulkDeleteRequest request)
+      throws IOException {
+    T entity = getEntity(request.entityId(), request.entityType(), service, Status.BAD_REQUEST);
+    service.deleteNotes(entity, request.noteIds());
+  }
 
-    public void setEntityType(String entityType) {
-      this.entityType = entityType;
+  private <T extends Identifiable> T getEntity(long entityId, String entityType, NoteService<T> service,
+      Status notFoundErrorType)
+      throws IOException {
+    T entity = service.get(entityId);
+    if (entity == null) {
+      throw new RestException(entityType + " not found", notFoundErrorType);
     }
+    return entity;
+  }
 
-    public long getEntityId() {
-      return entityId;
-    }
+  @DeleteMapping(value = "/{entityType}/{entityId}/{noteId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteNote(@PathVariable(name = "entityType") String entityType,
+      @PathVariable(name = "entityId") long entityId,
+      @PathVariable(name = "noteId") long noteId) throws IOException {
+    deleteNote(serviceForEntityType(entityType), entityId, entityType, noteId);
+  }
 
-    public void setEntityId(long entityId) {
-      this.entityId = entityId;
-    }
-
-    public List<Long> getIds() {
-      return ids;
-    }
-
-    public void setIds(List<Long> ids) {
-      this.ids = ids;
-    }
+  public record BulkDeleteRequest(String entityType, long entityId, List<Long> noteIds) {
   }
 
   @PostMapping("/bulk-delete")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDeleteNotes(@RequestBody BulkDeleteRequest request) throws IOException {
-    NoteService<? extends Identifiable> service = serviceForEntityType(request.getEntityType());
-    Identifiable entity = service.get(request.getEntityId());
-
-    if (entity == null) {
-      throw new RestException(request.getEntityType() + " not found", Status.NOT_FOUND);
-    }
-
-    @SuppressWarnings("unchecked")
-    NoteService<Identifiable> typedService = (NoteService<Identifiable>) service;
-
-    for (Long noteId : request.getIds()) {
-      typedService.deleteNote(entity, noteId);
-    }
-  }
-
-
-  private List<NoteDto> getNotesList(String entityType, long entityId, boolean includeRelated) throws IOException {
-    NoteService<? extends Identifiable> service = serviceForEntityType(entityType);
-    Identifiable entity = service.get(entityId);
-
-    if (entity == null) {
-      throw new RestException(entityType + " not found", Status.NOT_FOUND);
-    }
-
-    List<NoteDto> noteDtos = new ArrayList<>();
-
-    @SuppressWarnings("unchecked")
-    NoteService<Identifiable> typedService = (NoteService<Identifiable>) service;
-    List<Note> notes = typedService.getNotes(entity);
-
-    for (Note note : notes) {
-      noteDtos.add(NoteDto.from(note, (HierarchyEntity) entity));
-    }
-
-    if (includeRelated) {
-      if (entityType.equalsIgnoreCase("library") && entity instanceof Library) {
-        Library library = (Library) entity;
-        Sample sample = library.getSample();
-
-        if (sample != null) {
-          addSampleNotes(sample, noteDtos, "sample");
-
-          if (sample instanceof DetailedSample) {
-            addParentSampleNotes((DetailedSample) sample, noteDtos);
-          }
-        }
-      } else if (entityType.equalsIgnoreCase("sample") && entity instanceof DetailedSample) {
-        addParentSampleNotes((DetailedSample) entity, noteDtos);
-      }
-    }
-
-    return noteDtos;
-  }
-
-  private void addSampleNotes(Sample sample, List<NoteDto> noteDtos, String source) throws IOException {
-    List<Note> sampleNotes = sampleService.getNotes(sample);
-
-    for (Note note : sampleNotes) {
-      NoteDto dto = NoteDto.from(note, sample);
-      dto.setSource(source);
-      noteDtos.add(dto);
-    }
-  }
-
-  private void addParentSampleNotes(DetailedSample sample, List<NoteDto> noteDtos) throws IOException {
-    Sample currentParent = sample.getParent();
-
-    while (currentParent != null) {
-      addSampleNotes(currentParent, noteDtos, "parent");
-
-      if (currentParent instanceof DetailedSample) {
-        currentParent = ((DetailedSample) currentParent).getParent();
-      } else {
-        currentParent = null;
-      }
-    }
+    NoteService<? extends Identifiable> service = serviceForEntityType(request.entityType());
+    deleteNotes(service, request);
   }
 
   private NoteService<? extends Identifiable> serviceForEntityType(String entityType) {
-    switch (entityType) {
+    switch (entityType.toLowerCase()) {
       case "sample":
         return sampleService;
       case "library":

@@ -65,7 +65,7 @@
   <div id="notes_arrowclick" class="toggleLeftDown"></div>
 </div>
 <div id="notes">
-  <miso:list-section-ajax id="list_note" name="Notes" target="note" config="{ sampleId: ${sample.id}, entityType: 'sample' }"/>
+  <miso:list-section id="list_note" name="Notes" target="note" items="${notes}" config="{ entityId: ${sample.id}, entityType: 'Sample' }" alwaysShow="true"/>
 </div>
 <br/>
 

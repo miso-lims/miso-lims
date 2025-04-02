@@ -166,15 +166,6 @@ public class DefaultPoolService implements PoolService {
   }
 
   @Override
-  public List<Note> getNotes(Pool pool) throws IOException {
-    Pool managed = poolStore.get(pool.getId());
-    if (managed == null) {
-      throw new IOException("Pool with ID " + pool.getId() + " not found.");
-    }
-    return new ArrayList<>(managed.getNotes());
-  }
-
-  @Override
   public long create(Pool pool) throws IOException {
     if (pool.isDiscarded()) {
       pool.setVolume(BigDecimal.ZERO);
