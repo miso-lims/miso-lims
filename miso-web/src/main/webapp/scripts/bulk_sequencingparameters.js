@@ -102,6 +102,13 @@ BulkTarget.sequencingparameters = (function () {
           data: "runType",
           maxLength: 255,
         },
+        {
+          title: "MovieTime",
+          description: "Should be set for Revio instruments, and 0 for other platforms.",
+          type: "int",
+          data: "movieTime",
+          min: 0,
+        },
       ];
     },
   };

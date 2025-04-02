@@ -59,7 +59,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContaine
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -414,7 +413,6 @@ public class DefaultRunService implements RunService {
       }
     }
 
-
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
@@ -616,7 +614,6 @@ public class DefaultRunService implements RunService {
     Run runFromDb = runDao.getByAlias(source.getAlias());
     boolean isNew;
 
-    // No run found in db, create a new one
     if (runFromDb == null) {
       target = source.getPlatformType().createRun();
       target.setAlias(source.getAlias());
@@ -631,14 +628,12 @@ public class DefaultRunService implements RunService {
       isNew = false;
     }
 
-    // last modified
     target.setLastModifier(user);
     boolean isMutated = false;
     isMutated |= updateMetricsFromNotification(source, target);
     isMutated |= updateField(source.getFilePath(), target.getFilePath(), target::setFilePath);
     isMutated |= updateField(source.getStartDate(), target.getStartDate(), target::setStartDate);
 
-    // Validate that we have a sequencer name
     final Instrument sequencer = instrumentService.getByName(sequencerName);
     if (sequencer == null) {
       throw new IllegalArgumentException("No such sequencer: " + sequencerName);
@@ -681,8 +676,6 @@ public class DefaultRunService implements RunService {
         break;
       case IONTORRENT:
       case PACBIO:
-        // Need to update model
-
       case SOLID:
         // Nothing to do
         break;

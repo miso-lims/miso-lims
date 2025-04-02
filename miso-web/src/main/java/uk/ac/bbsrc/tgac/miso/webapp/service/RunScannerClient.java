@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.webapp.service;
 
-import ca.on.oicr.gsi.runscanner.dto.PacBioNotificationDto;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -129,8 +128,7 @@ public class RunScannerClient {
                 if (params.getChemistry() != Dtos.getMisoIlluminaChemistryFromRunscanner(illuminaDto.getChemistry())) {
                   return false;
                 }
-                // If we are talking to an old Run Scanner that doesn't provide read lengths,
-                // use the old logic
+                // If we are talking to an old Run Scanner that doens't provide read lengths, use the old logic
                 if (illuminaDto.getReadLengths() == null) {
                   // The read length must match the first read length
                   if (Math.abs(params.getReadLength() - illuminaDto.getReadLength()) < 2) {
@@ -165,7 +163,6 @@ public class RunScannerClient {
                   params -> params.getInstrumentModel().getPlatformType() == PlatformType.OXFORDNANOPORE &&
                       params.getRunType().equals(((OxfordNanoporeNotificationDto) dto).getRunType());
               break;
-            case PACBIO:
             default:
               isMatchingSequencingParameters = params -> params.getInstrumentModel()
                   .getPlatformType() == Dtos.getMisoPlatformTypeFromRunscanner(dto.getPlatformType());
