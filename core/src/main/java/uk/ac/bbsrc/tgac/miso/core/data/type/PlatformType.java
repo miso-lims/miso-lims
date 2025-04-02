@@ -50,37 +50,37 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
  * @since 0.0.2
  */
 public enum PlatformType {
-  ILLUMINA("Illumina", "Flow Cell", "Lane", "Lanes", "ILLUMINA", "Run") {
+  ILLUMINA("Illumina", "Flow Cell", "Lane", "Lanes", "ILLUMINA", true) {
     @Override
     public Run createRun() {
       return new IlluminaRun();
     }
   }, //
-  LS454("LS454", "Plate", "Lane", "Lanes", "LS454", "Run") {
+  LS454("LS454", "Plate", "Lane", "Lanes", "LS454", true) {
     @Override
     public Run createRun() {
       return new LS454Run();
     }
   }, //
-  SOLID("Solid", "Slide", "Lane", "Lanes", "ABI_SOLID", "Run") {
+  SOLID("Solid", "Slide", "Lane", "Lanes", "ABI_SOLID", true) {
     @Override
     public Run createRun() {
       return new SolidRun();
     }
   }, //
-  IONTORRENT("IonTorrent", "Chip", "Chip", "Chips", null, "Run") {
+  IONTORRENT("IonTorrent", "Chip", "Chip", "Chips", null, true) {
     @Override
     public Run createRun() {
       return new IonTorrentRun();
     }
   }, //
-  PACBIO("PacBio", "SMRT Cell", "SMRT Cell Contents", "SMRT Cells Contents", null, "Container") {
+  PACBIO("PacBio", "SMRT Cell", "SMRT Cell Contents", "SMRT Cells Contents", null, false) {
     @Override
     public Run createRun() {
       return new PacBioRun();
     }
   }, //
-  OXFORDNANOPORE("Oxford Nanopore", "Flow Cell", "Flow Cell", "Flow Cells", null, "Run") {
+  OXFORDNANOPORE("Oxford Nanopore", "Flow Cell", "Flow Cell", "Flow Cells", null, true) {
     @Override
     public Run createRun() {
       return new OxfordNanoporeRun();
@@ -100,7 +100,7 @@ public enum PlatformType {
   private final String partitionName;
   private final String pluralPartitionName;
   private final String sraName;
-  private final String sequencingParameterLevel;
+  private final boolean atRunLevel;
   /**
    * Field lookup
    */
@@ -118,13 +118,13 @@ public enum PlatformType {
    *          of type String
    */
   PlatformType(String key, String containerName, String partitionName, String pluralPartitionName, String sraName,
-      String sequencingParametersLevel) {
+      boolean atRunLevel) {
     this.key = key;
     this.containerName = containerName;
     this.partitionName = partitionName;
     this.pluralPartitionName = pluralPartitionName;
     this.sraName = sraName;
-    this.sequencingParameterLevel = sequencingParametersLevel;
+    this.atRunLevel = atRunLevel;
   }
 
   /**
@@ -190,5 +190,5 @@ public enum PlatformType {
     return pluralPartitionName;
   }
 
-  public String getSequencingParameterLevel() { return sequencingParameterLevel; }
+  public boolean getAtRunLevel() { return atRunLevel; }
 }
