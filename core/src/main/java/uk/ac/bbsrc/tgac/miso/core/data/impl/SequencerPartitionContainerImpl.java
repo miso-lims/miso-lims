@@ -108,8 +108,9 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
 
   private String multiplexingKitLot;
 
-  @Column(name = "sequencingParametersId")
-  private SequencingParameters sequencingParametersId;
+  @ManyToOne
+  @JoinColumn(name = "sequencingParametersId")
+  private SequencingParameters sequencingParameters;
 
   @ManyToOne
   @JoinColumn(name = "sequencingContainerModelId")
@@ -191,13 +192,13 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   }
 
   @Override
-  public SequencingParameters getSequencingParametersId() {
-    return sequencingParametersId;
+  public SequencingParameters getSequencingParameters() {
+    return sequencingParameters;
   }
 
   @Override
-  public void setSequencingParametersId(SequencingParameters sequencingParametersId) {
-    this.sequencingParametersId = sequencingParametersId;
+  public void setSequencingParameters(SequencingParameters sequencingParameters) {
+    this.sequencingParameters = sequencingParameters;
   }
 
   @Override

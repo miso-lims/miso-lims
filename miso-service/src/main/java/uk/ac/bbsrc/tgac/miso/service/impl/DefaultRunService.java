@@ -382,11 +382,6 @@ public class DefaultRunService implements RunService {
       errors.add(new ValidationError("sequencingKitLot", "Sequencing kit not specified"));
     }
 
-    //TODO addition for validating movie time for pacbio platform type
-    if(changed.getSequencingParameters().getMovieTime() <= 0 && changed.getPlatformType() == PlatformType.PACBIO) {
-      errors.add(new ValidationError("movieTime", "Movie time is not set"));
-    }
-
     if (isSetAndChanged(Run::getDataReview, changed, before) && changed.getQcPassed() == null) {
       errors.add(new ValidationError("dataReview", "Cannot set data review before QC status"));
     }
@@ -618,13 +613,6 @@ public class DefaultRunService implements RunService {
     User user = userService.getByLoginName("notification");
     final Run target;
 
-
-    //TODO remove these temp logs
-    log.info("Lane count is: {}", laneCount);
-    log.info("ContainerModel is: {}", containerModel);
-    log.info("ContainerSerialNumber is: {}", containerSerialNumber);
-    log.info("SequencerName is: {}", sequencerName);
-
     Run runFromDb = runDao.getByAlias(source.getAlias());
     boolean isNew;
 
@@ -657,12 +645,6 @@ public class DefaultRunService implements RunService {
     }
     target.setSequencer(sequencer);
 
-    //TODO we check if we don't have a container model but also have a PacBio run
-    if(containerModel == null && source.getPlatformType() == PlatformType.PACBIO) {
-      log.info(("We don't have a container model from notification dto, check in containers!"));
-    }
-
-    //TODO validate if missing container model
     SequencingContainerModel model =
         containerModelService.find(sequencer.getInstrumentModel(), containerModel, laneCount);
     if (model == null) {

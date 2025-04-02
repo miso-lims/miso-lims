@@ -1,1 +1,0 @@
-ALTER TABLE SequencingParameters ADD COLUMN movieTime bigint DEFAULT 0;

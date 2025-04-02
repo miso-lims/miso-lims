@@ -165,13 +165,7 @@ public class RunScannerClient {
                   params -> params.getInstrumentModel().getPlatformType() == PlatformType.OXFORDNANOPORE &&
                       params.getRunType().equals(((OxfordNanoporeNotificationDto) dto).getRunType());
               break;
-
             case PACBIO:
-              isMatchingSequencingParameters =
-                  params -> params.getInstrumentModel().getPlatformType() == PlatformType.PACBIO &&
-                      params.getMovieTime() > 0.0;
-              PacBioNotificationDto pacBioDto = (PacBioNotificationDto) dto;
-              break;
             default:
               isMatchingSequencingParameters = params -> params.getInstrumentModel()
                   .getPlatformType() == Dtos.getMisoPlatformTypeFromRunscanner(dto.getPlatformType());
