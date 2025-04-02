@@ -208,7 +208,7 @@ public class LibraryRestController extends AbstractRestController {
   public DataTablesResponseDto<LibraryDto> getLibrariesForRequisition(@PathVariable("id") Long id,
       HttpServletRequest request)
       throws IOException {
-    List<Long> libraryIds = libraryService.listIdsByRequisitionId(id);
+    List<Long> libraryIds = libraryService.listPreparedIdsByRequisitionId(id);
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.ids(libraryIds));
   }
 

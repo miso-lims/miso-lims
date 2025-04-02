@@ -159,9 +159,13 @@ public interface JpaCriteriaPaginatedDataSource<R, T extends R>
     }
     // We do this in two steps to make a smaller query that that the database can optimise
     resultQueryBuilder.addPredicate(resultIdProperty.in(ids));
-    // We additionally need to select the sort column in the result set for the database to provide us
-    // with duplicate-free results sorted by the column specified.
-    resultQueryBuilder.setColumns(resultQueryBuilder.getRoot(), resultSortProperty);
+    if (resultSortProperty == null) {
+      resultQueryBuilder.setColumns(resultQueryBuilder.getRoot());
+    } else {
+      // We additionally need to select the sort column in the result set for the database to provide us
+      // with duplicate-free results sorted by the column specified.
+      resultQueryBuilder.setColumns(resultQueryBuilder.getRoot(), resultSortProperty);
+    }
     @SuppressWarnings("unchecked")
     List<R> records = (List<R>) resultQueryBuilder.getResultList().stream().map(x -> x.get(0)).toList();
     return records;
