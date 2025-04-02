@@ -52,7 +52,7 @@ var RunLibraryMetrics = (function ($) {
           var metricCell = $("<td>");
           rowData.metrics.forEach(function (metric) {
             if (metric.title === heading) {
-              metricCell.append($("<div>").text(metric.value), displayThreshold(metric));
+              metricCell.append($("<div>").text(formatValue(metric)), displayThreshold(metric));
               if (!metricPassed(metric)) {
                 metricCell.addClass("failed");
               }
@@ -150,6 +150,21 @@ var RunLibraryMetrics = (function ($) {
       return getAllChanges().length > 0;
     },
   };
+
+  function formatValue(metric) {
+    var decimalPlaces = 0;
+    if (metric.threshold != null) {
+      decimalPlaces = Utils.decimalStrings.getDecimalPlaces(metric.threshold);
+    }
+    if (metric.threshold2 != null) {
+      decimalPlaces = Math.max(
+        decimalPlaces,
+        Utils.decimalStrings.getDecimalPlaces(metric.threshold2)
+      );
+    }
+    decimalPlaces += 1;
+    return Utils.decimalStrings.truncateDecimal(metric.value, decimalPlaces);
+  }
 
   function displayThreshold(metric) {
     return $("<div>").text(" (threshold: " + makeThresholdTypeLabel(metric) + ")");

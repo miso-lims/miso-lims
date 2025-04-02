@@ -1673,8 +1673,8 @@ Utils.notes = {
 Utils.decimalStrings = (function () {
   return {
     add: function (one, two) {
-      var oneDecimalPlaces = getDecimalPlaces(one);
-      var twoDecimalPlaces = getDecimalPlaces(two);
+      var oneDecimalPlaces = Utils.decimalStrings.getDecimalPlaces(one);
+      var twoDecimalPlaces = Utils.decimalStrings.getDecimalPlaces(two);
       var shift = Math.max(oneDecimalPlaces, twoDecimalPlaces);
       var sum =
         decimalStringToInt(one, oneDecimalPlaces, shift) +
@@ -1683,13 +1683,30 @@ Utils.decimalStrings = (function () {
     },
 
     subtract: function (one, two) {
-      var oneDecimalPlaces = getDecimalPlaces(one);
-      var twoDecimalPlaces = getDecimalPlaces(two);
+      var oneDecimalPlaces = Utils.decimalStrings.getDecimalPlaces(one);
+      var twoDecimalPlaces = Utils.decimalStrings.getDecimalPlaces(two);
       var shift = Math.max(oneDecimalPlaces, twoDecimalPlaces);
       var difference =
         decimalStringToInt(one, oneDecimalPlaces, shift) -
         decimalStringToInt(two, twoDecimalPlaces, shift);
       return intToDecimalString(difference, shift);
+    },
+    getDecimalPlaces: function (decimalString) {
+      if (typeof decimalString !== "string") {
+        decimalString = decimalString.toString();
+      }
+      var index = decimalString.indexOf(".");
+      return index === -1 ? 0 : decimalString.length - (index + 1);
+    },
+    truncateDecimal: function (value, decimalPlaces) {
+      if (typeof value !== "string") {
+        value = value.toString();
+      }
+      var decimalIndex = value.indexOf(".");
+      if (decimalIndex > -1) {
+        value = value.substring(0, decimalIndex + decimalPlaces + 1);
+      }
+      return value;
     },
   };
 
@@ -1729,10 +1746,5 @@ Utils.decimalStrings = (function () {
       string = "-" + string;
     }
     return string;
-  }
-
-  function getDecimalPlaces(decimalString) {
-    var index = decimalString.indexOf(".");
-    return index === -1 ? 0 : decimalString.length - (index + 1);
   }
 })();
