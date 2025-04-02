@@ -84,17 +84,6 @@ ListTarget.note = (function () {
         },
       ];
     },
-    aoColumnDefs: [
-      {
-        sDefaultContent: "",
-        aTargets: ["_all"],
-      },
-    ],
-    processData: function (data) {
-      return data;
-    },
-    bServerSide: false,
-    bStateSave: false,
   };
 
   function validateConfig(config) {

@@ -88,8 +88,7 @@ public class NoteRestController extends AbstractRestController {
   }
 
   private <T extends Identifiable> void deleteNote(NoteService<T> service, long entityId, String entityType,
-      long noteId)
-      throws IOException {
+      long noteId) throws IOException {
     T entity = getEntity(entityId, entityType, service, Status.NOT_FOUND);
     service.deleteNote(entity, noteId);
   }
@@ -101,8 +100,7 @@ public class NoteRestController extends AbstractRestController {
   }
 
   private <T extends Identifiable> T getEntity(long entityId, String entityType, NoteService<T> service,
-      Status notFoundErrorType)
-      throws IOException {
+      Status notFoundErrorType) throws IOException {
     T entity = service.get(entityId);
     if (entity == null) {
       throw new RestException(entityType + " not found", notFoundErrorType);

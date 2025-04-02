@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import static uk.ac.bbsrc.tgac.miso.dto.Dtos.*;
 
 import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 
@@ -23,7 +24,7 @@ public class NoteDto {
     setString(dto::setText, note.getText());
     setBoolean(dto::setInternalOnly, note.isInternalOnly(), false);
     setDateString(dto::setCreationDate, note.getCreationDate());
-    setString(dto::setOwnerName, note.getOwner() != null ? note.getOwner().getFullName() : "Unknown");
+    setString(dto::setOwnerName, maybeGetProperty(note.getOwner(), User::getFullName));
     setLong(dto::setEntityId, entity.getId(), true);
     setString(dto::setEntityType, entity.getEntityType().getLabel());
     setString(dto::setEntityName, entity.getName());
