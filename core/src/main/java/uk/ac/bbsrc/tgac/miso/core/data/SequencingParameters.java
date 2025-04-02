@@ -68,7 +68,7 @@ public class SequencingParameters
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
 
-  @Column
+  @Column(nullable = false)
   private int movieTime;
 
   public IlluminaChemistry getChemistry() {
