@@ -62,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.dto.BoxDto;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
+import uk.ac.bbsrc.tgac.miso.dto.NoteDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
@@ -193,6 +194,7 @@ public class EditSampleController {
     SampleDto sampleDto = Dtos.asDto(sample, false, libraries.size());
     setRelatedSlideDtos(sample, sampleDto);
     model.put("sampleDto", !sample.isSaved() ? "null" : mapper.writeValueAsString(sampleDto));
+    model.put("notes", collectNotes(sample));
 
     ObjectNode formConfig = mapper.createObjectNode();
     formConfig.put("detailedSample", isDetailedSampleEnabled());
@@ -203,6 +205,15 @@ public class EditSampleController {
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editSample.jsp", model);
+  }
+
+  private static List<NoteDto> collectNotes(Sample sample) {
+    List<NoteDto> notes = new ArrayList<>();
+    for (Sample current = sample; current != null; current = current.getParent()) {
+      final Sample currentSample = current;
+      current.getNotes().stream().map(note -> NoteDto.from(note, currentSample)).forEach(notes::add);
+    }
+    return notes;
   }
 
   private void setRelatedSlideDtos(Sample sample, SampleDto dto) {
