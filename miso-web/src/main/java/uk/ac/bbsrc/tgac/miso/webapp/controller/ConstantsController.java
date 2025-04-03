@@ -364,6 +364,8 @@ public class ConstantsController {
         dto.put("active", activePlatformTypes.contains(platformType));
         dto.put("partitionName", platformType.getPartitionName());
         dto.put("pluralPartitionName", platformType.getPluralPartitionName());
+        dto.put("isSequencingParameterAtRunLevel",
+            platformType.getIsSequencingParameterAtRunLevel());
       }
       ArrayNode sampleTypes = node.putArray("sampleTypes");
       for (SampleType sampleType : sampleTypeService.list()) {

@@ -68,8 +68,8 @@ public class SequencingParameters
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
 
-  @Column(nullable = false)
-  private int movieTime;
+  @Column
+  private Integer movieTime;
 
   public IlluminaChemistry getChemistry() {
     return chemistry;
@@ -285,9 +285,9 @@ public class SequencingParameters
     return getName() + " (" + getInstrumentModel().getAlias() + ")";
   }
 
-  public int getMovieTime() { return movieTime; }
+  public Integer getMovieTime() { return movieTime; }
 
-  public void setMovieTime(int movieTime) {
+  public void setMovieTime(Integer movieTime) {
     this.movieTime = movieTime;
   }
 }

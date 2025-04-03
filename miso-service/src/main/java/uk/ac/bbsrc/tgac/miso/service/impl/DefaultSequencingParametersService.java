@@ -152,11 +152,11 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
   private void validateMovieTime(SequencingParameters params, List<ValidationError> errors) {
     if(params.getInstrumentModel().getPlatformType() == PlatformType.PACBIO) {
       if(params.getMovieTime() < 0) {
-        errors.add(new ValidationError("movieTime", "MovieTime must be greater than 0"));
+        errors.add(new ValidationError("movieTime", "Movie time must be greater than 0"));
       }
     } else if (params.getMovieTime() > 0) {
-      errors.add(new ValidationError("moveTime", "MovieTome should be omitted for non-PacBio "
-          + "Revio instruments"));
+      errors.add(new ValidationError("movieTime", "Movie time should be omitted for non-PacBio "
+          + "instruments"));
     }
   }
 

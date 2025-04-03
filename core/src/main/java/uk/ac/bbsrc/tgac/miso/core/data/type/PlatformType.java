@@ -84,7 +84,7 @@ public enum PlatformType {
   private final String partitionName;
   private final String pluralPartitionName;
   private final String sraName;
-  private final boolean atRunLevel;
+  private final boolean isSequencingParameterAtRunLevel;
   /**
    * Field lookup
    */
@@ -101,13 +101,13 @@ public enum PlatformType {
    * @param key of type String
    */
   PlatformType(String key, String containerName, String partitionName, String pluralPartitionName, String sraName,
-      boolean atRunLevel) {
+      boolean isSequencingParameterAtRunLevel) {
     this.key = key;
     this.containerName = containerName;
     this.partitionName = partitionName;
     this.pluralPartitionName = pluralPartitionName;
     this.sraName = sraName;
-    this.atRunLevel = atRunLevel;
+    this.isSequencingParameterAtRunLevel = isSequencingParameterAtRunLevel;
   }
 
   /**
@@ -172,5 +172,5 @@ public enum PlatformType {
     return pluralPartitionName;
   }
 
-  public boolean getAtRunLevel() { return atRunLevel; }
+  public boolean getIsSequencingParameterAtRunLevel() { return isSequencingParameterAtRunLevel; }
 }

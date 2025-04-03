@@ -103,8 +103,8 @@ BulkTarget.sequencingparameters = (function () {
           maxLength: 255,
         },
         {
-          title: "MovieTime",
-          description: "Should be set for Revio instruments, and 0 for other platforms.",
+          title: "Movie Time",
+          description: "Should be set for PacBio instruments, and blank for other platforms.",
           type: "int",
           data: "movieTime",
           min: 0,
