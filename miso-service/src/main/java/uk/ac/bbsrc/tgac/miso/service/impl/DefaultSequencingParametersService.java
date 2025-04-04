@@ -154,7 +154,7 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
       if(params.getMovieTime() < 0) {
         errors.add(new ValidationError("movieTime", "Movie time must be greater than 0"));
       }
-    } else if (params.getMovieTime() > 0) {
+    } else if (params.getMovieTime() != null) {
       errors.add(new ValidationError("movieTime", "Movie time should be omitted for non-PacBio "
           + "instruments"));
     }

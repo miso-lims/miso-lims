@@ -28,37 +28,37 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
  * @since 0.0.2
  */
 public enum PlatformType {
-  ILLUMINA("Illumina", "Flow Cell", "Lane", "Lanes", "ILLUMINA", true) {
+  ILLUMINA("Illumina", "Flow Cell", "Lane", "Lanes", "ILLUMINA") {
     @Override
     public Run createRun() {
       return new IlluminaRun();
     }
   }, //
-  LS454("LS454", "Plate", "Lane", "Lanes", "LS454", true) {
+  LS454("LS454", "Plate", "Lane", "Lanes", "LS454") {
     @Override
     public Run createRun() {
       return new LS454Run();
     }
   }, //
-  SOLID("Solid", "Slide", "Lane", "Lanes", "ABI_SOLID", true) {
+  SOLID("Solid", "Slide", "Lane", "Lanes", "ABI_SOLID") {
     @Override
     public Run createRun() {
       return new SolidRun();
     }
   }, //
-  IONTORRENT("IonTorrent", "Chip", "Chip", "Chips", null, true) {
+  IONTORRENT("IonTorrent", "Chip", "Chip", "Chips", null) {
     @Override
     public Run createRun() {
       return new IonTorrentRun();
     }
   }, //
-  PACBIO("PacBio", "SMRT Cell", "SMRT Cell Contents", "SMRT Cells Contents", null, false) {
+  PACBIO("PacBio", "SMRT Cell", "SMRT Cell Contents", "SMRT Cells Contents", null) {
     @Override
     public Run createRun() {
       return new PacBioRun();
     }
   }, //
-  OXFORDNANOPORE("Oxford Nanopore", "Flow Cell", "Flow Cell", "Flow Cells", null, true) {
+  OXFORDNANOPORE("Oxford Nanopore", "Flow Cell", "Flow Cell", "Flow Cells", null) {
     @Override
     public Run createRun() {
       return new OxfordNanoporeRun();
@@ -84,7 +84,6 @@ public enum PlatformType {
   private final String partitionName;
   private final String pluralPartitionName;
   private final String sraName;
-  private final boolean isSequencingParameterAtRunLevel;
   /**
    * Field lookup
    */
@@ -100,14 +99,12 @@ public enum PlatformType {
    * 
    * @param key of type String
    */
-  PlatformType(String key, String containerName, String partitionName, String pluralPartitionName, String sraName,
-      boolean isSequencingParameterAtRunLevel) {
+  PlatformType(String key, String containerName, String partitionName, String pluralPartitionName, String sraName) {
     this.key = key;
     this.containerName = containerName;
     this.partitionName = partitionName;
     this.pluralPartitionName = pluralPartitionName;
     this.sraName = sraName;
-    this.isSequencingParameterAtRunLevel = isSequencingParameterAtRunLevel;
   }
 
   /**
@@ -171,6 +168,4 @@ public enum PlatformType {
   public String getPluralPartitionName() {
     return pluralPartitionName;
   }
-
-  public boolean getIsSequencingParameterAtRunLevel() { return isSequencingParameterAtRunLevel; }
 }
