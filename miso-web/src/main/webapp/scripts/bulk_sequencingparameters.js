@@ -102,6 +102,13 @@ BulkTarget.sequencingparameters = (function () {
           data: "runType",
           maxLength: 255,
         },
+        {
+          title: "Movie Time",
+          description: "Should be set for PacBio instruments, and blank for other platforms.",
+          type: "int",
+          data: "movieTime",
+          min: 0,
+        },
       ];
     },
   };
