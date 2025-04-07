@@ -131,44 +131,75 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
               .collect(Collectors.joining("; ")))), //
   RNA_LIBRARY_PREPARATION("RNA Library Preparation", //
       Arrays.asList(Sample.PLAIN_CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
-      Column.forString("Name", Sample::getName), //
-      Column.forString("Project", sample -> sample.getProject().getCode()), //
-      Column.forString("Alias", Sample::getAlias), //
-      Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
-      Column.forString("Description", Sample::getDescription), //
-      Column.forBigDecimal("Concentration", Sample::getConcentration), //
-      Column.forString("Concentration Units",
-          sam -> sam.getConcentrationUnits() == null ? "" : sam.getConcentrationUnits().getRawLabel()), //
-      Column.forBigDecimal("Volume", Sample::getVolume), //
-      Column.forString("Volume Units", sam -> sam.getVolumeUnits() == null ? "" : sam.getVolumeUnits().getRawLabel()), //
-      Column.forBigDecimal("DV200", sam -> qcValue(sam, "DV200", false)), //
-      Column.forBigDecimal("RIN", sam -> qcValue(sam, "RIN", true)), //
-      Column.forString("QC Status", qcStatusFunction()), //
-      Column.forString("QC Status Note", true,
-          detailedSample(DetailedSample.class, DetailedSample::getDetailedQcStatusNote, "")), //
+      Column.forString("Name", Sample::getName), // A
+      Column.forString("Project", sample -> sample.getProject().getCode()), // B
+      Column.forString("Alias", Sample::getAlias), // C
+      Column.forString("Box Alias", sample -> sample.getBox() == null ? null : sample.getBox().getAlias()), // D
+      Column.forString("Position", sample -> sample.getBoxPosition()), // E
+      Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), // F
+      Column.forString("Description", Sample::getDescription), // G
+      Column.forString("Material", sam -> null), // H
+      Column.forString("Tissue Origin", sam -> null), // I
+      Column.forString("Tissue Type", sam -> null), // J
+      Column.forBigDecimal("Concentration", Sample::getConcentration), // K
+      Column.forBigDecimal("Volume", Sample::getVolume), // L
+      Column.forDouble("DV200", sam -> {
+        // May lose precision, but was requested because it works better in formulas
+        BigDecimal value = qcValue(sam, "DV200", false);
+        return value == null ? null : value.doubleValue();
+      }), // M
+      Column.forFormula("Material Needed", true, "IF(@H = \"FFPE\", 200, 50)"), // N
+      Column.forFormula("SAM Vol. Needed", true, "@N / @K"), // O
+      Column.forFormula("NFW Vol. Needed", true, "IF(@O > 10, 0, 10 - @O)"), // P
+      Column.forFormula("RNAClean Beads", true, "IF(@M < 65, 193, 99)"), // Q
+      Column.forFormula("Frag. Time", true, "IF(@M < 65, IF(@M < 55, 0, 4), 8)"), // R
+      Column.forString("Index Well", true, sam -> null), // S
+      Column.forString("LIB Conc.", true, sam -> null), // T
+      Column.forString("LIB. Avg. Size", true, sam -> null), // U
+      Column.forString("Adapter Contamination", true, sam -> null), // V
+      Column.forString("LIB Vol. Needed for LDI", true, sam -> null), // W
+      Column.forString("RSB Vol. Needed for LDI", true, sam -> null), // X
+      Column.forString("LIB ID", true, sam -> null), // Y
+      Column.forString("LIB Alias", true, sam -> null), // Z
+      Column.forString("LDI ID", true, sam -> null), // AA
+      Column.forString("LDI Alias", true, sam -> null), // AB
       Column.forString("Notes",
           sam -> sam.getNotes() == null ? ""
-              : sam.getNotes().stream().map(Note::getText).collect(Collectors.joining("; ")))), //
+              : sam.getNotes().stream().map(Note::getText).collect(Collectors.joining("; ")))), // AC
   DNA_LIBRARY_PREPARATION("DNA Library Preparation", //
       Arrays.asList(Sample.PLAIN_CATEGORY_NAME, SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
-      Column.forString("Name", Sample::getName), //
-      Column.forString("Project", sample -> sample.getProject().getCode()), //
-      Column.forString("Alias", Sample::getAlias), //
-      Column.forString("Box Alias", sample -> sample.getBox() == null ? null : sample.getBox().getAlias()), //
-      Column.forString("Position", sample -> sample.getBoxPosition()), //
-      Column.forString("Group ID", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
-      Column.forString("Description", Sample::getDescription), //
-      Column.forBigDecimal("Concentration", Sample::getConcentration), //
-      Column.forString("Concentration Units",
-          sam -> sam.getConcentrationUnits() == null ? "" : sam.getConcentrationUnits().getRawLabel()), //
-      Column.forBigDecimal("Volume", Sample::getVolume), //
-      Column.forString("Volume Units", sam -> sam.getVolumeUnits() == null ? "" : sam.getVolumeUnits().getRawLabel()), //
-      Column.forString("QC Status", qcStatusFunction()), //
-      Column.forString("QC Status Note", true,
-          detailedSample(DetailedSample.class, DetailedSample::getDetailedQcStatusNote, "")), //
+      Column.forString("Name", Sample::getName), // A
+      Column.forString("Project", sample -> sample.getProject().getCode()), // B
+      Column.forString("Alias", Sample::getAlias), // C
+      Column.forString("Box Alias", sample -> sample.getBox() == null ? null : sample.getBox().getAlias()), // D
+      Column.forString("Position", sample -> sample.getBoxPosition()), // E
+      Column.forString("Group ID", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), // F
+      Column.forString("Description", Sample::getDescription), // G
+      Column.forString("Material", true, detailedSample(SampleTissue.class,
+          tissue -> tissue.getTissueMaterial() == null ? null : tissue.getTissueMaterial().getAlias(), null)), // H
+      Column.forString("Tissue Origin", true,
+          detailedSample(SampleTissue.class, st -> st.getTissueOrigin().getAlias(), "")), // I
+      Column.forString("Tissue Type", true,
+          detailedSample(SampleTissue.class, st -> st.getTissueType().getAlias(), "")), // J
+      Column.forBigDecimal("Concentration", Sample::getConcentration), // K
+      Column.forBigDecimal("Volume", Sample::getVolume), // L
+      Column.forFormula("Material Needed", true, "IF(@H = \"Fresh Frozen\", 25, 100)"), // M
+      Column.forFormula("SAM Vol. Needed", true, "@M/@K"), // N
+      Column.forFormula("TE Vol. Needed", true, "IF(@N > 50, 0, 50 - @N)"), // O
+      Column.forString("Index Well", true, sam -> null), // P
+      Column.forString("1:10 Conc.", true, sam -> null), // Q
+      Column.forFormula("Actual LIB Conc.", true, "@Q * 10"), // R
+      Column.forString("LIB Avg. Size", true, sam -> null), // S
+      Column.forString("Adapter Contamination", true, sam -> null), // T
+      Column.forString("LIB Vol. Needed for LDI", true, sam -> null), // U
+      Column.forString("TE Vol. Needed for LDI", true, sam -> null), // V
+      Column.forString("LIB ID", true, sam -> null), // W
+      Column.forString("LIB Alias", true, sam -> null), // X
+      Column.forString("LDI ID", true, sam -> null), // Y
+      Column.forString("LDI Alias", true, sam -> null), // Z
       Column.forString("Notes",
           sam -> sam.getNotes() == null ? ""
-              : sam.getNotes().stream().map(Note::getText).collect(Collectors.joining("; ")))), //
+              : sam.getNotes().stream().map(Note::getText).collect(Collectors.joining("; ")))), // AA
   RUNNING_SHEET("Running Sheet", //
       Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
       Column.forString("Alias", Sample::getAlias), //
