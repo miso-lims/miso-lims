@@ -255,7 +255,7 @@ public class PrinterRestController extends AbstractRestController {
     if ("column".equalsIgnoreCase(request.getSortOrder())) {
       comparator = Comparator.comparing((Entry<String, BoxPosition> e) -> {
         return BoxUtils.getColumnNumber(e.getKey());
-      });
+      }).thenComparing(e -> BoxUtils.getRowNumber(e.getKey()));
     } else {
       comparator = Comparator.comparing(Entry::getKey);
     }
