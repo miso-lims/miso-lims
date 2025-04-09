@@ -114,7 +114,8 @@ public abstract class Column<T> {
     return forBigDecimal(name, false, transform);
   }
 
-  public static <T> Column<T> forBigDecimal(String name, boolean detailedSampleOnly, Function<T, BigDecimal> transform) {
+  public static <T> Column<T> forBigDecimal(String name, boolean detailedSampleOnly,
+      Function<T, BigDecimal> transform) {
     return new Column<T>(name, detailedSampleOnly) {
 
       @Override
@@ -159,14 +160,14 @@ public abstract class Column<T> {
           builder.append('"');
           result.codePoints().forEach(codepoint -> {
             switch (codepoint) {
-            case '"':
-              builder.append("\"\"");
-              break;
-            case '\r':
-            case '\n':
-              break;
-            default:
-              builder.appendCodePoint(codepoint);
+              case '"':
+                builder.append("\"\"");
+                break;
+              case '\r':
+              case '\n':
+                break;
+              default:
+                builder.appendCodePoint(codepoint);
             }
           });
           builder.append('"');
@@ -182,6 +183,47 @@ public abstract class Column<T> {
       void setODF(OdfTableCell cell, T value) {
         cell.setStringValue(transform.apply(value));
       }
+    };
+  }
+
+  /**
+   * Create a column definition for filling a spreadsheet column with a formula
+   * 
+   * @param <T> entity type for the row items
+   * @param name spreadsheet column name
+   * @param detailedSampleOnly if true, only include for detailed samples
+   * @param formula the formula. Reference other columns with "@" followed by the column letter (e.g.
+   *        "@A" for the first column)
+   * @return the column definition
+   */
+  public static <T> Column<T> forFormula(String name, boolean detailedSampleOnly, String formula) {
+    return new Column<T>(name, detailedSampleOnly) {
+
+      private static final String COLUMN_REFERENCE_PATTERN = "@([A-Z]+)";
+
+      @Override
+      void appendCsv(StringBuilder builder, T value) {
+        // Do nothing - can't add formulas to csv
+      }
+
+      @Override
+      void setExcel(XSSFCell cell, T value) {
+        if (formula != null) {
+          String updatedFormula =
+              formula.replaceAll(COLUMN_REFERENCE_PATTERN, "$1%d".formatted(cell.getRowIndex() + 1));
+          cell.setCellFormula(updatedFormula);
+        }
+      }
+
+      @Override
+      void setODF(OdfTableCell cell, T value) {
+        if (formula != null) {
+          String updatedFormula = formula.replaceAll(",", ";")
+              .replaceAll(COLUMN_REFERENCE_PATTERN, "[.$1%d]".formatted(cell.getRowIndex() + 1));
+          cell.setFormula(updatedFormula);
+        }
+      }
+
     };
   }
 
