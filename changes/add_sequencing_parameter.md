@@ -1,1 +1,1 @@
-New sequencing parameter `Movie Time` for PacBio instruments
+New sequencing parameter Movie Time for PacBio instruments
