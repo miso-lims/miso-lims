@@ -2031,8 +2031,7 @@ public class Dtos {
       to.setBox(new BoxDto());
       to.getBox().setId(from.getBoxId());
     }
-    to.setLocationLabel(BoxUtils.makeLocationLabel(from.isDiscarded(), from.isDistributed(), null, from.getBoxAlias(),
-        from.getBoxPosition(), from.getBoxLocationBarcode()));
+    to.setLocationLabel(BoxUtils.makeLocationLabel(from));
     to.setLibraryAliquotCount(from.getElements().size());
     setDateTimeString(to::setLastModified, from.getLastModified());
     to.setDuplicateIndices(

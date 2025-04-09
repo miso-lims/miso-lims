@@ -34,7 +34,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
           detailedSample(SampleTissue.class, st -> st.getTissueOrigin().getAlias(), "")), //
       Column.forString("Type", true, dnaOrRna()), //
       Column.forString("Barcode", Sample::getIdentificationBarcode), //
-      Column.forString("Box", sam -> sam.getBox() == null ? null : sam.getBox().getAlias()), //
+      Column.forString("Box", BoxUtils::makeBoxLabel), //
       Column.forString("Position", sam -> sam.getBoxPosition()), //
       Column.forString("Class", true, sampleClass()), //
       Column.forString("External Identifier", true,
@@ -78,7 +78,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Origin", detailedSample(SampleTissue.class, st -> st.getTissueOrigin().getAlias(), "")), //
       Column.forString("Type", detailedSample(SampleTissue.class, st -> st.getTissueType().getAlias(), "")), //
       Column.forString("Barcode", Sample::getIdentificationBarcode), //
-      Column.forString("Box", sam -> sam.getBox() == null ? null : sam.getBox().getAlias()), //
+      Column.forString("Box", BoxUtils::makeBoxLabel), //
       Column.forString("Position", sam -> sam.getBoxPosition()), //
       Column.forString("Class", true, sampleClass()), //
       Column.forString("External Identifier", true,
@@ -134,7 +134,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Name", Sample::getName), // A
       Column.forString("Project", sample -> sample.getProject().getCode()), // B
       Column.forString("Alias", Sample::getAlias), // C
-      Column.forString("Box Alias", sample -> sample.getBox() == null ? null : sample.getBox().getAlias()), // D
+      Column.forString("Box Alias", BoxUtils::makeBoxLabel), // D
       Column.forString("Position", sample -> sample.getBoxPosition()), // E
       Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), // F
       Column.forString("Description", Sample::getDescription), // G
@@ -171,7 +171,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Name", Sample::getName), // A
       Column.forString("Project", sample -> sample.getProject().getCode()), // B
       Column.forString("Alias", Sample::getAlias), // C
-      Column.forString("Box Alias", sample -> sample.getBox() == null ? null : sample.getBox().getAlias()), // D
+      Column.forString("Box Alias", BoxUtils::makeBoxLabel), // D
       Column.forString("Position", sample -> sample.getBoxPosition()), // E
       Column.forString("Group ID", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), // F
       Column.forString("Description", Sample::getDescription), // G
