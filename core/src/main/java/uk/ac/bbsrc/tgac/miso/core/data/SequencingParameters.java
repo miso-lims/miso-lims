@@ -227,7 +227,7 @@ public class SequencingParameters
     result = prime * result + readLength;
     result = prime * result + readLength2;
     result = prime * result + ((runType == null) ? 0 : runType.hashCode());
-    result = prime * result + movieTime;
+    result = prime * result + ((movieTime == null) ? 0 : movieTime.hashCode());
     return result;
   }
 
