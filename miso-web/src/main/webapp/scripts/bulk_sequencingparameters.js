@@ -112,7 +112,7 @@ BulkTarget.sequencingparameters = (function () {
           maxLength: 255,
         },
         {
-          title: "Movie Time",
+          title: "PACBIO Movie Time",
           description: "Should be set for PacBio instruments, and blank for other platforms.",
           type: "int",
           data: "movieTime",
