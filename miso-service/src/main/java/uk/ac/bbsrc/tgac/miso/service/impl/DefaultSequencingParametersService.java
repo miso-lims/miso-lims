@@ -160,8 +160,8 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
             + "to 0"));
       }
     } else if (params.getMovieTime() != null) {
-      errors.add(new ValidationError("movieTime", "Movie time should be omitted for non-PacBio "
-          + "instruments"));
+      errors.add(new ValidationError("movieTime",
+          "Movie time is not valid for " + params.getInstrumentModel().getPlatformType().getKey()));
     }
   }
 
