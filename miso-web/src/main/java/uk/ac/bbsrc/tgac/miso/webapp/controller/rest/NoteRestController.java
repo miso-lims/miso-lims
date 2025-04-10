@@ -3,9 +3,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -29,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
+
 
 @Controller
 @RequestMapping("/rest/notes")
@@ -54,8 +54,6 @@ public class NoteRestController extends AbstractRestController {
     }
 
   }
-
-  protected static final Logger log = LoggerFactory.getLogger(NoteRestController.class);
 
   @Autowired
   private LibraryService libraryService;
@@ -89,11 +87,25 @@ public class NoteRestController extends AbstractRestController {
     addNote(serviceForEntityType(entityType), entityId, request);
   }
 
-  private <T extends Identifiable> void deleteNote(NoteService<T> service, long entityId, long noteId)
-      throws IOException {
-    T entity = service.get(entityId);
+  private <T extends Identifiable> void deleteNote(NoteService<T> service, long entityId, String entityType,
+      long noteId) throws IOException {
+    T entity = getEntity(entityId, entityType, service, Status.NOT_FOUND);
     service.deleteNote(entity, noteId);
+  }
 
+  private <T extends Identifiable> void deleteNotes(NoteService<T> service, BulkDeleteRequest request)
+      throws IOException {
+    T entity = getEntity(request.entityId(), request.entityType(), service, Status.BAD_REQUEST);
+    service.deleteNotes(entity, request.noteIds());
+  }
+
+  private <T extends Identifiable> T getEntity(long entityId, String entityType, NoteService<T> service,
+      Status notFoundErrorType) throws IOException {
+    T entity = service.get(entityId);
+    if (entity == null) {
+      throw new RestException(entityType + " not found", notFoundErrorType);
+    }
+    return entity;
   }
 
   @DeleteMapping(value = "/{entityType}/{entityId}/{noteId}")
@@ -101,11 +113,21 @@ public class NoteRestController extends AbstractRestController {
   public void deleteNote(@PathVariable(name = "entityType") String entityType,
       @PathVariable(name = "entityId") long entityId,
       @PathVariable(name = "noteId") long noteId) throws IOException {
-    deleteNote(serviceForEntityType(entityType), entityId, noteId);
+    deleteNote(serviceForEntityType(entityType), entityId, entityType, noteId);
   }
 
-  private NoteService<?> serviceForEntityType(String entityType) {
-    switch (entityType) {
+  public record BulkDeleteRequest(String entityType, long entityId, List<Long> noteIds) {
+  }
+
+  @PostMapping("/bulk-delete")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDeleteNotes(@RequestBody BulkDeleteRequest request) throws IOException {
+    NoteService<? extends Identifiable> service = serviceForEntityType(request.entityType());
+    deleteNotes(service, request);
+  }
+
+  private NoteService<? extends Identifiable> serviceForEntityType(String entityType) {
+    switch (entityType.toLowerCase()) {
       case "sample":
         return sampleService;
       case "library":

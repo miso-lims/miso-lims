@@ -83,6 +83,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryBatchDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
+import uk.ac.bbsrc.tgac.miso.dto.NoteDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotRnaDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotSingleCellDto;
@@ -236,6 +237,7 @@ public class EditLibraryController {
     model.put("libraryTransfers", library.getTransferViews().stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
+    model.put("notes", collectNotes(library));
 
     ObjectNode formConfig = mapper.createObjectNode();
     formConfig.put("detailedSample", isDetailedSampleEnabled());
@@ -246,6 +248,16 @@ public class EditLibraryController {
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editLibrary.jsp", model);
+  }
+
+  private static List<NoteDto> collectNotes(Library library) {
+    List<NoteDto> notes = new ArrayList<>();
+    library.getNotes().stream().map(note -> NoteDto.from(note, library)).forEach(notes::add);
+    for (Sample current = library.getSample(); current != null; current = current.getParent()) {
+      final Sample currentSample = current;
+      current.getNotes().stream().map(note -> NoteDto.from(note, currentSample)).forEach(notes::add);
+    }
+    return notes;
   }
 
   private boolean alwaysGenerateSampleAliases() {
