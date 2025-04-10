@@ -30,7 +30,7 @@ BulkTarget.sequencingparameters = (function () {
           maxLength: 255,
         },
         {
-          title: "InstrumentModel",
+          title: "Instrument Model",
           type: "dropdown",
           data: "instrumentModelId",
           disabled: config.pageMode === "edit",
@@ -63,6 +63,15 @@ BulkTarget.sequencingparameters = (function () {
               runTypeOptions.value = null;
             }
             api.updateField(rowIndex, "runType", runTypeOptions);
+
+            var movieTimeOptions = {
+              disabled: false,
+            };
+            if(!model || model.platformType !== "PACBIO") {
+            movieTimeOptions.disabled = true;
+            movieTimeOptions.value = null;
+            }
+            api.updateField(rowIndex, "movieTime", movieTimeOptions);
           },
         },
         {
@@ -101,6 +110,13 @@ BulkTarget.sequencingparameters = (function () {
           type: "text",
           data: "runType",
           maxLength: 255,
+        },
+        {
+          title: "PACBIO Movie Time",
+          description: "Should be set for PacBio instruments, and blank for other platforms.",
+          type: "int",
+          data: "movieTime",
+          min: 0,
         },
       ];
     },
