@@ -7,6 +7,29 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.6.0] - 2025-04-10
+
+### Changed
+
+* The MOH Extraction Tracker sample download sheet now includes the tissue material
+* Values displayed on the Run-Library Metrics page will now be truncated to one more decimal place than
+  the metric threshold
+* Several columns on the DNA and RNA Library Preparation sample download sheets
+* On sample download sheets, samples that are not in a box will now list "DISTRIBUTED," "EMPTY," or
+  "Unknown", as appropriate in place of the box alias
+* The Notes table on the Edit Sample and Edit Library pages now displays all notes from parent samples
+  along with any notes from the current item
+
+### Fixed
+
+* Additional spaces were sometimes being inserted when pasting values into bulk pages
+* The Edit Requisition page was not showing run-libraries related to requisitioned and supplemental
+  libraries
+* The Print Barcodes by Position action on the Edit Box page was not sorting the labels correctly when
+  choosing to sort by column
+* Pinery-MISO will now use the database server timezone
+
+
 ## [3.5.0] - 2025-03-27
 
 ### Added
