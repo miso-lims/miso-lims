@@ -94,7 +94,7 @@ INSERT INTO AttachmentCategory(categoryId, alias) VALUES
 (1, 'Category One'),
 (2, 'Category Two');
 
-INSERT INTO IndexFamily(indexFamilyId, platformType, name) VALUES
+INSERT INTO LibraryIndexFamily(indexFamilyId, platformType, name) VALUES
   (1, 'ILLUMINA', 'TruSeq Single Index'),
   (2, 'LS454', '454 Rapid Library'),
   (3, 'ILLUMINA', 'Nextera Dual Index'),
@@ -108,7 +108,7 @@ INSERT INTO IndexFamily(indexFamilyId, platformType, name) VALUES
   (11, 'ILLUMINA', 'SureSelect XT2'),
   (12, 'ILLUMINA', 'NEXTflex 6bp');
 
-INSERT INTO `Indices` (`indexId`, `name`, `sequence`, `indexFamilyId`)
+INSERT INTO LibraryIndex (`indexId`, `name`, `sequence`, `indexFamilyId`)
 VALUES
     (12,'Index 12','CTTGTA',1),
     (11,'Index 11','GGCTAC',1),

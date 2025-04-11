@@ -5,7 +5,7 @@ WarningTarget.orderaliquot = {
         var indices =
           orderaliquot.aliquot.indexIds === null
             ? []
-            : Constants.indexFamilies
+            : Constants.libraryIndexFamilies
                 .reduce(function (acc, family) {
                   return acc.concat(
                     family.indices.filter(function (index) {

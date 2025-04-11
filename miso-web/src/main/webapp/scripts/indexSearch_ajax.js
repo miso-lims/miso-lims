@@ -14,7 +14,7 @@
       Utils.ajaxWithDialog(
         "Index Search",
         "POST",
-        Urls.rest.indices.search,
+        Urls.rest.libraryIndices.search,
         searchData,
         function (data) {
           var results = "";

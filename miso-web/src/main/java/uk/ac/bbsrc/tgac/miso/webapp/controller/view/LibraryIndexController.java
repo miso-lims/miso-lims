@@ -12,39 +12,40 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryIndexFamilyService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryIndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.IndexDto;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryIndexDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
-@RequestMapping("/index")
-public class IndexController extends AbstractTypeDataController<Index, IndexDto> {
+@RequestMapping("/libraryindex")
+public class LibraryIndexController extends AbstractTypeDataController<LibraryIndex, LibraryIndexDto> {
 
   @Autowired
-  private IndexService indexService;
+  private LibraryIndexService indexService;
 
   @Autowired
-  private IndexFamilyService indexFamilyService;
+  private LibraryIndexFamilyService indexFamilyService;
 
   @Autowired
   private AuthorizationManager authorizationManager;
 
-  public IndexController() {
-    super("Indices", "index", "index");
+  public LibraryIndexController() {
+    super("Library Indices", "libraryindex", "libraryindex");
   }
 
   @GetMapping("/bulk/new")
-  public ModelAndView create(@RequestParam("indexFamilyId") long indexFamilyId, @RequestParam("quantity") int quantity, ModelMap model)
+  public ModelAndView create(@RequestParam("indexFamilyId") long indexFamilyId, @RequestParam("quantity") int quantity,
+      ModelMap model)
       throws IOException {
-    final IndexFamily family = indexFamilyService.get(indexFamilyId);
+    final LibraryIndexFamily family = indexFamilyService.get(indexFamilyId);
     if (family == null) {
       throw new ClientErrorException(String.format("Index family %d not found", indexFamilyId));
     }
@@ -56,9 +57,9 @@ public class IndexController extends AbstractTypeDataController<Index, IndexDto>
   @PostMapping("/bulk/edit")
   public ModelAndView edit(@RequestParam Map<String, String> formData, ModelMap model) throws IOException {
     String idString = MisoWebUtils.getStringInput("ids", formData, true);
-    IndexFamily family = null;
+    LibraryIndexFamily family = null;
     for (Long id : LimsUtils.parseIds(idString)) {
-      Index index = indexService.get(id);
+      LibraryIndex index = indexService.get(id);
       if (index != null) {
         if (family == null) {
           family = index.getFamily();
@@ -68,7 +69,7 @@ public class IndexController extends AbstractTypeDataController<Index, IndexDto>
         }
       }
     }
-    final IndexFamily singleFamily = family;
+    final LibraryIndexFamily singleFamily = family;
     return bulkEdit(idString, model, (config, mapper) -> {
       config.set("indexFamily", mapper.valueToTree(Dtos.asDto(singleFamily)));
     });
@@ -80,18 +81,18 @@ public class IndexController extends AbstractTypeDataController<Index, IndexDto>
   }
 
   @Override
-  protected ProviderService<Index> getService() {
+  protected ProviderService<LibraryIndex> getService() {
     return indexService;
   }
 
   @Override
-  protected IndexDto toDto(Index object) {
+  protected LibraryIndexDto toDto(LibraryIndex object) {
     return Dtos.asDto(object);
   }
 
   @Override
-  protected IndexDto makeDto() {
-    return new IndexDto();
+  protected LibraryIndexDto makeDto() {
+    return new LibraryIndexDto();
   }
 
 }

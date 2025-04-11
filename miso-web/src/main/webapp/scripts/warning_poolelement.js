@@ -4,7 +4,7 @@ WarningTarget.poolelement = {
       getWarnings: function (element) {
         var combined = null;
         if (element.indexIds) {
-          var indices = Constants.indexFamilies
+          var indices = Constants.libraryIndexFamilies
             .reduce(function (acc, family) {
               return acc.concat(
                 family.indices.filter(function (index) {

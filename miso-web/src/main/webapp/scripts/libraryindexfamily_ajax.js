@@ -1,4 +1,4 @@
-var IndexFamily = (function ($) {
+var LibraryIndexFamily = (function ($) {
   var indicesContainerSelector = "#listIndicesContainer";
   var indicesListId = "listIndices";
   var indicesListSelector = "#" + indicesListId;
@@ -16,7 +16,7 @@ var IndexFamily = (function ($) {
       );
       ListUtils.createStaticTable(
         indicesListId,
-        ListTarget.index,
+        ListTarget.libraryindex,
         {
           isAdmin: isAdmin,
           indexFamilyId: $("#indexFamilyForm_id").val(),

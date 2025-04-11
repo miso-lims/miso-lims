@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -108,7 +108,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 public class EditLibraryController {
   protected static final Logger log = LoggerFactory.getLogger(EditLibraryController.class);
 
-  private static final IndexFamily INDEX_FAMILY_NEEDS_PLATFORM = new IndexFamily();
+  private static final LibraryIndexFamily INDEX_FAMILY_NEEDS_PLATFORM = new LibraryIndexFamily();
 
   protected static final Comparator<LibraryAliquot> LIBRARY_ALIQUOT_COMPARATOR = (a, b) -> {
     int nameComparison = AlphanumericComparator.INSTANCE.compare(a.getName(), b.getName());

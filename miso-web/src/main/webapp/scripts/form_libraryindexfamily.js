@@ -1,5 +1,5 @@
 FormTarget = FormTarget || {};
-FormTarget.indexfamily = (function ($) {
+FormTarget.libraryindexfamily = (function ($) {
   /*
    * Expected config {
    *   isAdmin: boolean
@@ -12,18 +12,20 @@ FormTarget.indexfamily = (function ($) {
       return Urls.external.userManual("type_data", "indices");
     },
     getSaveUrl: function (family) {
-      return family.id ? Urls.rest.indexFamilies.update(family.id) : Urls.rest.indexFamilies.create;
+      return family.id
+        ? Urls.rest.libraryIndexFamilies.update(family.id)
+        : Urls.rest.libraryIndexFamilies.create;
     },
     getSaveMethod: function (family) {
       return family.id ? "PUT" : "POST";
     },
     getEditUrl: function (family) {
-      return Urls.ui.indexFamilies.edit(family.id);
+      return Urls.ui.libraryIndexFamilies.edit(family.id);
     },
     getSections: function (config, object) {
       return [
         {
-          title: "Index Family Information",
+          title: "Library Index Family Information",
           fields: config.isAdmin
             ? getEditableFields(config, object)
             : getReadOnlyFields(config, object),

@@ -14,7 +14,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
@@ -26,13 +25,12 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.0.3
  */
 @Entity
-@Table(name = "Indices")
-public class Index implements Deletable, Nameable, Serializable {
+public class LibraryIndex implements Deletable, Nameable, Serializable {
 
   private static final long serialVersionUID = 1L;
   private static final Long UNSAVED_ID = 0L;
 
-  public static void sort(final List<Index> indices) {
+  public static void sort(final List<LibraryIndex> indices) {
     Collections.sort(indices, (o1, o2) -> o1.getPosition() - o2.getPosition());
   }
 
@@ -63,7 +61,7 @@ public class Index implements Deletable, Nameable, Serializable {
 
   @ManyToOne
   @JoinColumn(name = "indexFamilyId", nullable = false)
-  private IndexFamily family;
+  private LibraryIndexFamily family;
   @Column(nullable = false)
   private String name;
   @Column(nullable = false)
@@ -77,7 +75,7 @@ public class Index implements Deletable, Nameable, Serializable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long indexId = UNSAVED_ID;
 
-  public IndexFamily getFamily() {
+  public LibraryIndexFamily getFamily() {
     return family;
   }
 
@@ -99,7 +97,7 @@ public class Index implements Deletable, Nameable, Serializable {
     return sequence;
   }
 
-  public void setFamily(IndexFamily family) {
+  public void setFamily(LibraryIndexFamily family) {
     this.family = family;
   }
 
@@ -134,10 +132,10 @@ public class Index implements Deletable, Nameable, Serializable {
   @Override
   public boolean equals(Object obj) {
     return LimsUtils.equalsByIdFirst(this, obj,
-        Index::getFamily,
-        Index::getName,
-        Index::getSequence,
-        Index::getPosition);
+        LibraryIndex::getFamily,
+        LibraryIndex::getName,
+        LibraryIndex::getSequence,
+        LibraryIndex::getPosition);
   }
 
   @Override
@@ -171,7 +169,7 @@ public class Index implements Deletable, Nameable, Serializable {
 
   @Override
   public String getDeleteType() {
-    return "Index";
+    return "Library Index";
   }
 
   @Override

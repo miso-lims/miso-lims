@@ -1,17 +1,17 @@
-ListTarget.index = {
-  name: "Indices",
+ListTarget.libraryindex = {
+  name: "Library Indices",
   createUrl: function (config, projectId) {
     return config.platformType
-      ? Urls.rest.indices.platformDatatable(config.platformType)
-      : Urls.rest.indices.datatable;
+      ? Urls.rest.libraryIndices.platformDatatable(config.platformType)
+      : Urls.rest.libraryIndices.datatable;
   },
   getQueryUrl: null,
   createBulkActions: function (config, projectId) {
     var actions = [];
     if (config.indexFamilyId && config.isAdmin) {
       actions.push(
-        BulkUtils.actions.edit(Urls.ui.indices.bulkEdit),
-        ListUtils.createBulkDeleteAction("Indices", "indices", function (index) {
+        BulkUtils.actions.edit(Urls.ui.libraryIndices.bulkEdit),
+        ListUtils.createBulkDeleteAction("Library Indices", "libraryindices", function (index) {
           return index.name + " (" + index.sequence + ")";
         })
       );
@@ -46,7 +46,7 @@ ListTarget.index = {
                     return;
                   }
                   window.location =
-                    Urls.ui.indices.bulkCreate +
+                    Urls.ui.libraryIndices.bulkCreate +
                     "?" +
                     Utils.page.param({
                       indexFamilyId: config.indexFamilyId,

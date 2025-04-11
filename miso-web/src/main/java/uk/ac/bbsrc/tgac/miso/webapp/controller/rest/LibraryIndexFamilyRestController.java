@@ -14,34 +14,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryIndexFamilyService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.IndexFamilyDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryIndexFamilyDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 
 @Controller
-@RequestMapping("/rest/indexfamilies")
-public class IndexFamilyRestController extends AbstractRestController {
+@RequestMapping("/rest/libraryindexfamilies")
+public class LibraryIndexFamilyRestController extends AbstractRestController {
 
   @Autowired
-  private IndexFamilyService indexFamilyService;
+  private LibraryIndexFamilyService indexFamilyService;
 
   @Autowired
   private ConstantsController constantsController;
 
   @PostMapping
-  public @ResponseBody IndexFamilyDto create(@RequestBody IndexFamilyDto dto) throws IOException {
-    return RestUtils.createObject("Index Family", dto, Dtos::to, indexFamilyService, d -> {
+  public @ResponseBody LibraryIndexFamilyDto create(@RequestBody LibraryIndexFamilyDto dto) throws IOException {
+    return RestUtils.createObject("Library Index Family", dto, Dtos::to, indexFamilyService, d -> {
       constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
   }
 
   @PutMapping("/{familyId}")
-  public @ResponseBody IndexFamilyDto update(@PathVariable long familyId, @RequestBody IndexFamilyDto dto)
+  public @ResponseBody LibraryIndexFamilyDto update(@PathVariable long familyId, @RequestBody LibraryIndexFamilyDto dto)
       throws IOException {
-    return RestUtils.updateObject("Index Family", familyId, dto, Dtos::to, indexFamilyService, d -> {
+    return RestUtils.updateObject("Library Index Family", familyId, dto, Dtos::to, indexFamilyService, d -> {
       constantsController.refreshConstants();
       return Dtos.asDto(d);
     });
@@ -51,7 +51,8 @@ public class IndexFamilyRestController extends AbstractRestController {
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
-    RestUtils.bulkDelete("IndexFamily", ids, indexFamilyService);
+    RestUtils.bulkDelete("Library Index Family", ids, indexFamilyService);
+    constantsController.refreshConstants();
   }
 
 }

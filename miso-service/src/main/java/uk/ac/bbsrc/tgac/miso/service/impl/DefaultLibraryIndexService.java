@@ -7,29 +7,29 @@ import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.transaction.support.TransactionTemplate;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryIndexFamilyService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryIndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
-import uk.ac.bbsrc.tgac.miso.persistence.IndexStore;
+import uk.ac.bbsrc.tgac.miso.persistence.LibraryIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultIndexService extends AbstractSaveService<Index> implements IndexService {
+public class DefaultLibraryIndexService extends AbstractSaveService<LibraryIndex> implements LibraryIndexService {
 
   @Autowired
-  private IndexStore indexStore;
+  private LibraryIndexDao indexStore;
   @Autowired
-  private IndexFamilyService indexFamilyService;
+  private LibraryIndexFamilyService indexFamilyService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -37,7 +37,7 @@ public class DefaultIndexService extends AbstractSaveService<Index> implements I
   @Autowired
   private TransactionTemplate transactionTemplate;
 
-  public void setIndexStore(IndexStore indexStore) {
+  public void setIndexStore(LibraryIndexDao indexStore) {
     this.indexStore = indexStore;
   }
 
@@ -57,7 +57,7 @@ public class DefaultIndexService extends AbstractSaveService<Index> implements I
   }
 
   @Override
-  public SaveDao<Index> getDao() {
+  public SaveDao<LibraryIndex> getDao() {
     return indexStore;
   }
 
@@ -67,47 +67,52 @@ public class DefaultIndexService extends AbstractSaveService<Index> implements I
   }
 
   @Override
-  public Index get(long id) throws IOException {
+  public LibraryIndex get(long id) throws IOException {
     return indexStore.get(id);
   }
 
   @Override
-  public List<Index> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+  public List<LibraryIndex> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter)
       throws IOException {
     return indexStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
   }
 
   @Override
-  public List<Index> listByIdList(List<Long> ids) throws IOException {
+  public List<LibraryIndex> listByIdList(List<Long> ids) throws IOException {
     return indexStore.listByIdList(ids);
   }
 
   @Override
-  protected void loadChildEntities(Index object) throws IOException {
+  protected void loadChildEntities(LibraryIndex object) throws IOException {
     loadChildEntity(object.getFamily(), object::setFamily, indexFamilyService);
   }
 
   @Override
-  protected void collectValidationErrors(Index object, Index beforeChange, List<ValidationError> errors) throws IOException {
-    if (ValidationUtils.isSetAndChanged(Index::getName, object, beforeChange)
+  protected void collectValidationErrors(LibraryIndex object, LibraryIndex beforeChange, List<ValidationError> errors)
+      throws IOException {
+    if (ValidationUtils.isSetAndChanged(LibraryIndex::getName, object, beforeChange)
         && indexStore.getByFamilyPositionAndName(object.getFamily(), object.getPosition(), object.getName()) != null) {
-      errors.add(new ValidationError("name", "This index family already contains an index with this name and position"));
+      errors
+          .add(new ValidationError("name", "This index family already contains an index with this name and position"));
     }
-    if (ValidationUtils.isSetAndChanged(Index::getPosition, object, beforeChange)
+    if (ValidationUtils.isSetAndChanged(LibraryIndex::getPosition, object, beforeChange)
         && indexStore.getByFamilyPositionAndName(object.getFamily(), object.getPosition(), object.getName()) != null) {
-      errors.add(new ValidationError("position", "This index family already contains an index with this name and position"));
+      errors.add(
+          new ValidationError("position", "This index family already contains an index with this name and position"));
     }
     if (beforeChange != null && object.getPosition() != beforeChange.getPosition()) {
       long usage = indexStore.getUsage(beforeChange);
       if (usage > 0L) {
         errors.add(new ValidationError("position",
-            String.format("Cannot change because the index is already used by %d %s", usage, Pluralizer.libraries(usage))));
+            String.format("Cannot change because the index is already used by %d %s", usage,
+                Pluralizer.libraries(usage))));
       }
     }
   }
 
   @Override
-  protected void applyChanges(Index to, Index from) throws IOException {
+  protected void applyChanges(LibraryIndex to, LibraryIndex from) throws IOException {
     to.setName(from.getName());
     to.setSequence(from.getSequence());
     to.setPosition(from.getPosition());
@@ -115,7 +120,7 @@ public class DefaultIndexService extends AbstractSaveService<Index> implements I
   }
 
   @Override
-  public ValidationResult validateDeletion(Index object) throws IOException {
+  public ValidationResult validateDeletion(LibraryIndex object) throws IOException {
     ValidationResult result = new ValidationResult();
     long usage = indexStore.getUsage(object);
     if (usage > 0L) {
@@ -125,7 +130,7 @@ public class DefaultIndexService extends AbstractSaveService<Index> implements I
   }
 
   @Override
-  protected void authorizeUpdate(Index object) throws IOException {
+  protected void authorizeUpdate(LibraryIndex object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 

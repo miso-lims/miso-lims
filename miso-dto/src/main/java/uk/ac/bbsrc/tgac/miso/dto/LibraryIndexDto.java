@@ -2,8 +2,8 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.Set;
 
-public class IndexDto {
-  private IndexFamilyDto family;
+public class LibraryIndexDto {
+  private LibraryIndexFamilyDto family;
   private long id;
   private String label;
   private String name;
@@ -11,7 +11,7 @@ public class IndexDto {
   private String sequence;
   private Set<String> realSequences;
 
-  public IndexFamilyDto getFamily() {
+  public LibraryIndexFamilyDto getFamily() {
     return family;
   }
 
@@ -35,7 +35,7 @@ public class IndexDto {
     return sequence;
   }
 
-  public void setFamily(IndexFamilyDto family) {
+  public void setFamily(LibraryIndexFamilyDto family) {
     this.family = family;
   }
 

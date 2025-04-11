@@ -7,7 +7,7 @@ import java.util.function.Function;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -104,11 +104,11 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
     };
   }
 
-  private static String getSequence(Index index) {
+  private static String getSequence(LibraryIndex index) {
     return index == null ? null : index.getSequence();
   }
 
-  private static String getName(Index index) {
+  private static String getName(LibraryIndex index) {
     return index == null ? null : index.getName();
   }
 

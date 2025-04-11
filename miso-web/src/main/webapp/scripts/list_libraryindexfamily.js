@@ -1,5 +1,5 @@
-ListTarget.indexfamily = {
-  name: "Index Families",
+ListTarget.libraryindexfamily = {
+  name: "Library Index Families",
   getUserManualUrl: function () {
     return Urls.external.userManual("type_data", "indices");
   },
@@ -11,7 +11,13 @@ ListTarget.indexfamily = {
   createBulkActions: function (config, projectId) {
     return !config.isAdmin
       ? []
-      : [ListUtils.createBulkDeleteAction("Index Families", "indexfamilies", Utils.array.getName)];
+      : [
+          ListUtils.createBulkDeleteAction(
+            "Library Index Families",
+            "libraryindexfamilies",
+            Utils.array.getName
+          ),
+        ];
   },
   createStaticActions: function (config, projectId) {
     return !config.isAdmin
@@ -20,7 +26,7 @@ ListTarget.indexfamily = {
           {
             name: "Add",
             handler: function () {
-              window.location = Urls.ui.indexFamilies.create;
+              window.location = Urls.ui.libraryIndexFamilies.create;
             },
           },
         ];
@@ -29,7 +35,7 @@ ListTarget.indexfamily = {
     return [
       ListUtils.labelHyperlinkColumn(
         "Name",
-        Urls.ui.indexFamilies.edit,
+        Urls.ui.libraryIndexFamilies.edit,
         Utils.array.getId,
         "name",
         1,

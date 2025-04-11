@@ -21,29 +21,29 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryIndexFamilyService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryIndexService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.IndexDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.dto.LibraryIndexDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
-@RequestMapping(value = "/rest/indices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-public class IndexRestController extends AbstractRestController {
+@RequestMapping(value = "/rest/libraryindices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public class LibraryIndexRestController extends AbstractRestController {
 
   @Autowired
-  private IndexService indexService;
+  private LibraryIndexService indexService;
   @Autowired
-  private IndexFamilyService indexFamilyService;
+  private LibraryIndexFamilyService indexFamilyService;
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
   @Autowired
@@ -51,28 +51,29 @@ public class IndexRestController extends AbstractRestController {
   @Autowired
   private AsyncOperationManager asyncOperationManager;
 
-  private final JQueryDataTableBackend<Index, IndexDto> jQueryBackend = new JQueryDataTableBackend<Index, IndexDto>() {
+  private final JQueryDataTableBackend<LibraryIndex, LibraryIndexDto> jQueryBackend =
+      new JQueryDataTableBackend<LibraryIndex, LibraryIndexDto>() {
 
-    @Override
-    protected IndexDto asDto(Index model) {
-      return Dtos.asDto(model);
-    }
+        @Override
+        protected LibraryIndexDto asDto(LibraryIndex model) {
+          return Dtos.asDto(model);
+        }
 
-    @Override
-    protected PaginatedDataSource<Index> getSource() throws IOException {
-      return indexService;
-    }
-  };
+        @Override
+        protected PaginatedDataSource<LibraryIndex> getSource() throws IOException {
+          return indexService;
+        }
+      };
 
   @GetMapping("/dt")
   @ResponseBody
-  public DataTablesResponseDto<IndexDto> dataTable(HttpServletRequest request) throws IOException {
+  public DataTablesResponseDto<LibraryIndexDto> dataTable(HttpServletRequest request) throws IOException {
     return jQueryBackend.get(request, advancedSearchParser);
   }
 
   @GetMapping("/dt/platform/{platform}")
   @ResponseBody
-  public DataTablesResponseDto<IndexDto> dataTableByPlatform(@PathVariable("platform") String platform,
+  public DataTablesResponseDto<LibraryIndexDto> dataTableByPlatform(@PathVariable("platform") String platform,
       HttpServletRequest request)
       throws IOException {
     PlatformType platformType = null;
@@ -87,19 +88,19 @@ public class IndexRestController extends AbstractRestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<IndexDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<LibraryIndexDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate("Index", dtos, Dtos::to, indexService, true);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<IndexDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<LibraryIndexDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkUpdate("Index", dtos, Dtos::to, indexService, true);
   }
 
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
-    return asyncOperationManager.getAsyncProgress(uuid, Index.class, indexService, Dtos::asDto);
+    return asyncOperationManager.getAsyncProgress(uuid, LibraryIndex.class, indexService, Dtos::asDto);
   }
 
   @PostMapping(value = "/bulk-delete")
@@ -176,12 +177,12 @@ public class IndexRestController extends AbstractRestController {
           result.setIndexFamily(fam.getName());
           result.setPosition1Matches(fam.getIndices().stream()
               .filter(i -> i.getPosition() == 1)
-              .map(Index::getSequence)
+              .map(LibraryIndex::getSequence)
               .filter(sequence -> request.getPosition1Indices().contains(sequence))
               .count());
           result.setPosition2Matches(fam.getIndices().stream()
               .filter(i -> i.getPosition() == 2)
-              .map(Index::getSequence)
+              .map(LibraryIndex::getSequence)
               .filter(sequence -> request.getPosition2Indices().contains(sequence))
               .count());
           return result;

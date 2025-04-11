@@ -4,7 +4,7 @@
 <div id="contentcolumn">
 
 <h1>
-  <c:choose><c:when test="${pageMode eq 'create'}">Create</c:when><c:otherwise>Edit</c:otherwise></c:choose> Index Family
+  <c:choose><c:when test="${pageMode eq 'create'}">Create</c:when><c:otherwise>Edit</c:otherwise></c:choose> Library Index Family
   <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 
@@ -24,15 +24,15 @@
 <script type="text/javascript">
   jQuery(document).ready(function () {
     var dto = ${indexFamilyDto};
-    var form = FormUtils.createForm('indexFamilyForm', 'save', dto, 'indexfamily', {
+    var form = FormUtils.createForm('indexFamilyForm', 'save', dto, 'libraryindexfamily', {
       pageMode: '${pageMode}',
       isAdmin: ${miso:isAdmin()}
     });
-    IndexFamily.setAdmin(${miso:isAdmin()});
+    LibraryIndexFamily.setAdmin(${miso:isAdmin()});
     if ('${pageMode}' === 'edit') {
-      IndexFamily.setIndices(dto.indices);
+      LibraryIndexFamily.setIndices(dto.indices);
     }
-    Utils.ui.updateHelpLink(FormTarget.indexfamily.getUserManualUrl());
+    Utils.ui.updateHelpLink(FormTarget.libraryindexfamily.getUserManualUrl());
   });
 </script>
 

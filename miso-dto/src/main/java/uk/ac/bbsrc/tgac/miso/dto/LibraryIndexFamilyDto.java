@@ -2,10 +2,10 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
 
-public class IndexFamilyDto {
+public class LibraryIndexFamilyDto {
   private boolean archived;
   private Long id;
-  private List<IndexDto> indices;
+  private List<LibraryIndexDto> indices;
   private String name;
   private String platformType;
   private boolean fakeSequence;
@@ -15,7 +15,7 @@ public class IndexFamilyDto {
     return id;
   }
 
-  public List<IndexDto> getIndices() {
+  public List<LibraryIndexDto> getIndices() {
     return indices;
   }
 
@@ -47,7 +47,7 @@ public class IndexFamilyDto {
     this.id = id;
   }
 
-  public void setIndices(List<IndexDto> indices) {
+  public void setIndices(List<LibraryIndexDto> indices) {
     this.indices = indices;
   }
 

@@ -356,13 +356,13 @@ INSERT INTO _Group (groupId, description, name) VALUES
 INSERT INTO User_Group (users_userId, groups_groupId)
 VALUES (3,1),(3,2),(1,1),(1,3),(4,3);
 
-INSERT INTO IndexFamily (indexFamilyId, name, platformType) VALUES
+INSERT INTO LibraryIndexFamily (indexFamilyId, name, platformType) VALUES
   (1, 'Single Index 6bp', 'ILLUMINA'),
   (2, 'Dual Index 6bp', 'ILLUMINA'),
   (3, 'Similar Index Pair', 'ILLUMINA'),
   (4, 'Unused Family', 'ILLUMINA');
 
-INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
+INSERT INTO LibraryIndex (indexId, indexFamilyId, name, sequence, position) VALUES
   (1,  1, 'Index 01', 'AAAAAA', 1),
   (2,  1, 'Index 02', 'CCCCCC', 1),
   (3,  1, 'Index 03', 'GGGGGG', 1),

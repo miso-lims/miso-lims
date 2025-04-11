@@ -11,24 +11,24 @@ import org.junit.Before;
 import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
-public class HibernateIndexDaoIT extends AbstractDAOTest {
+public class HibernateLibraryIndexDaoIT extends AbstractDAOTest {
 
-  private HibernateIndexDao dao;
+  private HibernateLibraryIndexDao dao;
 
   @Before
   public void setup() {
-    dao = new HibernateIndexDao();
+    dao = new HibernateLibraryIndexDao();
     dao.setEntityManager(getEntityManager());
   }
 
   @Test
   public void testGet() throws Exception {
-    Index indexById = dao.get(8);
+    LibraryIndex indexById = dao.get(8);
     assertEquals(8L, indexById.getId());
     assertEquals("ACTTGA", indexById.getSequence());
     assertEquals("Index 8", indexById.getName());
@@ -38,13 +38,14 @@ public class HibernateIndexDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListIndicesByPlatform() throws Exception {
-    Collection<Index> illumina = dao.list(0, 10, true, "indexId", PaginationFilter.platformType(PlatformType.ILLUMINA));
+    Collection<LibraryIndex> illumina =
+        dao.list(0, 10, true, "indexId", PaginationFilter.platformType(PlatformType.ILLUMINA));
     assertTrue(illumina.size() > 0);
   }
 
   @Test
   public void testList() throws Exception {
-    List<Index> list = dao.list();
+    List<LibraryIndex> list = dao.list();
     assertEquals(80, list.size());
   }
 
@@ -69,10 +70,10 @@ public class HibernateIndexDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetByFamilyPositionAndName() throws Exception {
-    IndexFamily family = (IndexFamily) currentSession().get(IndexFamily.class, 3L);
+    LibraryIndexFamily family = (LibraryIndexFamily) currentSession().get(LibraryIndexFamily.class, 3L);
     int position = 1;
     String name = "N710";
-    Index index = dao.getByFamilyPositionAndName(family, position, name);
+    LibraryIndex index = dao.getByFamilyPositionAndName(family, position, name);
     assertNotNull(index);
     assertEquals(family.getId(), index.getFamily().getId());
     assertEquals(position, index.getPosition());
@@ -81,14 +82,14 @@ public class HibernateIndexDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetUsage() throws Exception {
-    Index index = (Index) currentSession().get(Index.class, 12L);
+    LibraryIndex index = (LibraryIndex) currentSession().get(LibraryIndex.class, 12L);
     assertEquals(1L, dao.getUsage(index));
   }
 
   @Test
   public void testCreate() throws Exception {
-    IndexFamily family = (IndexFamily) currentSession().get(IndexFamily.class, 1L);
-    Index index = new Index();
+    LibraryIndexFamily family = (LibraryIndexFamily) currentSession().get(LibraryIndexFamily.class, 1L);
+    LibraryIndex index = new LibraryIndex();
     index.setFamily(family);
     index.setName("New Index");
     index.setPosition(1);
@@ -96,7 +97,7 @@ public class HibernateIndexDaoIT extends AbstractDAOTest {
     long savedId = dao.create(index);
 
     clearSession();
-    Index saved = (Index) currentSession().get(Index.class, savedId);
+    LibraryIndex saved = (LibraryIndex) currentSession().get(LibraryIndex.class, savedId);
     assertNotNull(saved);
     assertEquals(index.getFamily().getId(), saved.getFamily().getId());
     assertEquals(index.getName(), saved.getName());
@@ -108,14 +109,14 @@ public class HibernateIndexDaoIT extends AbstractDAOTest {
   public void testUpdate() throws Exception {
     long indexId = 15L;
     String newName = "changed";
-    Index index = (Index) currentSession().get(Index.class, indexId);
+    LibraryIndex index = (LibraryIndex) currentSession().get(LibraryIndex.class, indexId);
     assertNotEquals(newName, index.getName());
     index.setName(newName);
     dao.update(index);
 
     clearSession();
 
-    Index updated = (Index) currentSession().get(Index.class, indexId);
+    LibraryIndex updated = (LibraryIndex) currentSession().get(LibraryIndex.class, indexId);
     assertEquals(newName, updated.getName());
   }
 

@@ -1,5 +1,5 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.index = (function ($) {
+BulkTarget.libraryindex = (function ($) {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
@@ -9,16 +9,16 @@ BulkTarget.index = (function ($) {
 
   return {
     getSaveUrl: function () {
-      return Urls.rest.indices.bulkSave;
+      return Urls.rest.libraryIndices.bulkSave;
     },
     getSaveProgressUrl: function (operationId) {
-      return Urls.rest.indices.bulkSaveProgress(operationId);
+      return Urls.rest.libraryIndices.bulkSaveProgress(operationId);
     },
     getUserManualUrl: function () {
       return Urls.external.userManual("type_data", "indices");
     },
     getBulkActions: function (config) {
-      return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.indices.bulkEdit)];
+      return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.libraryIndices.bulkEdit)];
     },
     prepareData: function (data, config) {
       data.forEach(function (index) {

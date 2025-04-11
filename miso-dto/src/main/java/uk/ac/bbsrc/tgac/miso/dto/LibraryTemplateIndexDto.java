@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 
 public class LibraryTemplateIndexDto {
 
@@ -12,7 +12,7 @@ public class LibraryTemplateIndexDto {
     // Default constructor
   }
 
-  public LibraryTemplateIndexDto(String boxPosition, Index index1, Index index2) {
+  public LibraryTemplateIndexDto(String boxPosition, LibraryIndex index1, LibraryIndex index2) {
     this.boxPosition = boxPosition;
     if (index1 != null) {
       this.index1Id = index1.getId();

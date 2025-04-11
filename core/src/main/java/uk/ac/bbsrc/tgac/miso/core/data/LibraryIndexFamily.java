@@ -17,12 +17,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
-import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
-@Table(name = "IndexFamily")
-public class IndexFamily implements Deletable, Nameable, Serializable {
+public class LibraryIndexFamily implements Deletable, Nameable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -32,9 +30,9 @@ public class IndexFamily implements Deletable, Nameable, Serializable {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long indexFamilyId = UNSAVED_ID;
 
-  @OneToMany(targetEntity = Index.class, mappedBy = "family", cascade = CascadeType.REMOVE)
+  @OneToMany(targetEntity = LibraryIndex.class, mappedBy = "family", cascade = CascadeType.REMOVE)
   @OrderBy("position, name")
-  private List<Index> indices;
+  private List<LibraryIndex> indices;
 
   @Column(nullable = false)
   private String name;
@@ -51,16 +49,16 @@ public class IndexFamily implements Deletable, Nameable, Serializable {
     return archived;
   }
 
-  public List<Index> getIndices() {
+  public List<LibraryIndex> getIndices() {
     if (indices == null) {
       indices = new ArrayList<>();
     }
     return indices;
   }
 
-  public Iterable<Index> getIndicesForPosition(int position) {
-    List<Index> selected = new ArrayList<>();
-    for (Index index : getIndices()) {
+  public Iterable<LibraryIndex> getIndicesForPosition(int position) {
+    List<LibraryIndex> selected = new ArrayList<>();
+    for (LibraryIndex index : getIndices()) {
       if (index.getPosition() == position) {
         selected.add(index);
       }
@@ -132,7 +130,7 @@ public class IndexFamily implements Deletable, Nameable, Serializable {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    IndexFamily other = (IndexFamily) obj;
+    LibraryIndexFamily other = (LibraryIndexFamily) obj;
     return new EqualsBuilder()
         .append(archived, other.archived)
         .append(name, other.name)
@@ -147,7 +145,7 @@ public class IndexFamily implements Deletable, Nameable, Serializable {
 
   @Override
   public String getDeleteType() {
-    return "Index Family";
+    return "Library Index Family";
   }
 
   @Override

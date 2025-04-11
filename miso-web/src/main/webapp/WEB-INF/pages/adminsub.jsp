@@ -76,7 +76,6 @@
       <a href="<c:url value="/contactrole/list"/>">Contact Roles</a>
       <a href="<c:url value="/deliverable/list"/>">Deliverables</a>
       <a href="<c:url value="/detailedqcstatus/list"/>">Detailed QC Statuses</a>
-      <a href="<c:url value="/indexfamily/list"/>">Index Families</a>
       <a href="<c:url value="/instrumentmodel/list"/>">Instrument Models</a>
       <a href="<c:url value="/kitdescriptors"/>">Kits</a>
       <a href="<c:url value="/lab/list"/>">Labs</a>
@@ -84,6 +83,7 @@
         <a href="<c:url value="/librarydesign/list"/>">Library Designs</a>
         <a href="<c:url value="/librarydesigncode/list"/>">Library Design Codes</a>
       </c:if>
+      <a href="<c:url value="/libraryindexfamily/list"/>">Library Index Families</a>
       <a href="<c:url value="/libraryselection/list"/>">Library Selection Types</a>
       <a href="<c:url value="/libraryspikein/list"/>">Library Spike-Ins</a>
       <a href="<c:url value="/librarystrategy/list"/>">Library Strategy Types</a>
