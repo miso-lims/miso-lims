@@ -99,6 +99,7 @@
       <a href="<c:url value="/runpurpose/list"/>">Run Purposes</a>
       <c:if test="${detailedSample}">
         <a href="<c:url value="/sampleclass/list"/>">Sample Classes</a>
+        <a href="<c:url value="/sampleindexfamily/list"/>">Sample Index Families</a>
         <a href="<c:url value="/samplepurpose/list"/>">Sample Purposes</a>
       </c:if>
       <a href="<c:url value="/sampletype/list"/>">Sample Types</a>

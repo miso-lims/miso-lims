@@ -1109,3 +1109,16 @@ INSERT INTO Project_Contact (projectId, contactId, contactRoleId) VALUES
 INSERT INTO ApiKey(keyId, userId, apiKey, apiSecret, creator, created) VALUES
 -- unencrypted key: LwTTBMu4QSOeTWp7Uo7Bva0Jm0+Zpnxb-jw24z317EwhjoqtswuROsj1DFXoD9WT6
 (1, 1, 'LwTTBMu4QSOeTWp7Uo7Bva0Jm0+Zpnxb', '{bcrypt}$2a$10$l2gtUtIdwV98avW6C7DYZOkhDdRKuiYADiOm33UkkdabaxjITvpDS', 1, '2025-03-11 15:10:00');
+
+INSERT INTO SampleIndexFamily(indexFamilyId, name) VALUES
+(1, "Fam One"),
+(2, "Fam Two");
+
+INSERT INTO SampleIndex(indexId, name, indexFamilyId) VALUES
+(1, "Index 1-001", 1),
+(2, "Index 1-002", 1),
+(3, "Index 1-003", 1),
+(4, "Index 1-004", 1),
+(5, "Index 2-001", 2),
+(6, "Index 2-002", 2),
+(7, "Index 2-003", 2),

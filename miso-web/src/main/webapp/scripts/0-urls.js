@@ -961,6 +961,32 @@ Urls = (function () {
     update: idUrlFunction(sampleClassRestBase),
   };
 
+  // Sample Index Families
+  var sampleIndexFamilyUiBase = "/sampleindexfamily";
+  ui.sampleIndexFamilies = {
+    create: sampleIndexFamilyUiBase + "/new",
+    edit: idUrlFunction(sampleIndexFamilyUiBase),
+  };
+
+  var sampleIndexFamilyRestBase = restBase + "/sampleindexfamilies";
+  rest.sampleIndexFamilies = {
+    create: sampleIndexFamilyRestBase,
+    update: idUrlFunction(sampleIndexFamilyRestBase),
+  };
+
+  // Sample Indices
+  var sampleIndexUiBase = "/sampleindex";
+  ui.sampleIndices = {
+    bulkCreate: sampleIndexUiBase + "/bulk/new",
+    bulkEdit: sampleIndexUiBase + "/bulk/edit",
+  };
+
+  var sampleIndexRestBase = restBase + "/sampleindices";
+  rest.sampleIndices = {
+    bulkSave: sampleIndexRestBase + "/bulk",
+    bulkSaveProgress: idUrlFunction(sampleIndexRestBase + "/bulk"),
+  };
+
   // Sample Purposes
   var samplePurposeUiBase = "/samplepurpose";
   ui.samplePurposes = {

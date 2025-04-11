@@ -93,6 +93,8 @@ DELETE FROM Run_SequencerPartitionContainer;
 DELETE FROM Sample;
 DELETE FROM SampleChangeLog;
 DELETE FROM SampleClass;
+DELETE FROM SampleIndex;
+DELETE FROM SampleIndexFamily;
 DELETE FROM Sample_Note;
 DELETE FROM SampleNumberPerProject;
 DELETE FROM SamplePurpose;

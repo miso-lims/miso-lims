@@ -92,6 +92,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleIndexFamilyService;
 import uk.ac.bbsrc.tgac.miso.core.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
@@ -121,6 +122,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.MetricDto;
 import uk.ac.bbsrc.tgac.miso.dto.MetricSubcategoryDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleIndexFamilyDto;
 
 @Controller
 public class ConstantsController {
@@ -155,6 +157,8 @@ public class ConstantsController {
   private TissueTypeService tissueTypeService;
   @Autowired
   private TissuePieceTypeService tissuePieceTypeService;
+  @Autowired
+  private SampleIndexFamilyService sampleIndexFamilyService;
   @Autowired
   private LibraryTypeService libraryTypeService;
   @Autowired
@@ -304,6 +308,7 @@ public class ConstantsController {
       addJsonArray(mapper, node, "tissueMaterials", tissueMaterialService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "tissuePieceTypes", tissuePieceTypeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "stains", stainService.list(), Dtos::asDto);
+      addJsonArray(mapper, node, "sampleIndexFamilies", sampleIndexFamilyService.list(), SampleIndexFamilyDto::from);
       addJsonArray(mapper, node, "targetedSequencings", targetedSequencingService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "samplePurposes", samplePurposeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "sequencingParameters", sequencingParametersService.list(), Dtos::asDto);
