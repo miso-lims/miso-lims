@@ -23,7 +23,7 @@ public class OicrLibraryAliquotAliasGenerator
     }
     DetailedLibraryAliquot detailedItem = (DetailedLibraryAliquot) item;
     if (getPlatformType(detailedItem) != PlatformType.ULTIMA) {
-      super.generate(item);
+      return super.generate(item);
     }
     // Ultima library aliquot e.g. PROJ_0001_Pa_P_WG_1-1
     String partial = detailedItem.getLibrary().getAlias() + "-";
