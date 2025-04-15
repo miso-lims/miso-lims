@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
+import uk.ac.bbsrc.tgac.miso.persistence.HibernateUtilDao;
 import uk.ac.bbsrc.tgac.miso.persistence.RequisitionDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
@@ -64,6 +65,8 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   private DeletionStore deletionStore;
   @Autowired
   private TransactionTemplate transactionTemplate;
+  @Autowired
+  private HibernateUtilDao hibernateUtilDao;
 
   @Override
   public DeletionStore getDeletionStore() {
@@ -287,9 +290,11 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
     }
     final Requisition requisition = existing;
     for (Sample sample : samples) {
-      Sample managedSample = sampleService.get(sample.getId());
-      managedSample.setRequisition(requisition);
-      sampleService.save(managedSample);
+      Sample loadedSample = sampleService.get(sample.getId());
+      // Detach to maintain separation between pending changes and managed entity
+      hibernateUtilDao.detach(loadedSample);
+      loadedSample.setRequisition(requisition);
+      sampleService.save(loadedSample);
     }
     return requisition;
   }
@@ -348,9 +353,11 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
     }
     final Requisition requisition = existing;
     for (Library library : libraries) {
-      Library managedLibrary = libraryService.get(library.getId());
-      managedLibrary.setRequisition(requisition);
-      libraryService.update(managedLibrary);
+      Library loadedLibrary = libraryService.get(library.getId());
+      // Detach to maintain separation between pending changes and managed entity
+      hibernateUtilDao.detach(loadedLibrary);
+      loadedLibrary.setRequisition(requisition);
+      libraryService.update(loadedLibrary);
     }
     return requisition;
   }
