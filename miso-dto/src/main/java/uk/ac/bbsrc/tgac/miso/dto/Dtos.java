@@ -1382,6 +1382,7 @@ public class Dtos {
     setInteger(dto::setRead2Length, from.getReadLength2(), false);
     setString(dto::setChemistry, maybeGetProperty(from.getChemistry(), IlluminaChemistry::name));
     setString(dto::setRunType, from.getRunType());
+    setInteger(dto::setMovieTime, from.getMovieTime(), true);
     return dto;
   }
 
@@ -1394,6 +1395,7 @@ public class Dtos {
     setInteger(to::setReadLength2, from.getRead2Length(), false);
     setObject(to::setChemistry, from.getChemistry(), str -> IlluminaChemistry.valueOf(str));
     setString(to::setRunType, from.getRunType());
+    setInteger(to::setMovieTime, from.getMovieTime(), true);
     return to;
   }
 

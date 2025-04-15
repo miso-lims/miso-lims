@@ -108,6 +108,7 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
     validateReadLengths(params, errors);
     validateChemistry(params, errors);
     validateRunType(params, errors);
+    validateMovieTime(params, errors);
   }
 
   private void validateReadLengths(SequencingParameters params, List<ValidationError> errors) {
@@ -148,6 +149,22 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
     }
   }
 
+  private void validateMovieTime(SequencingParameters params, List<ValidationError> errors) {
+    if(params.getInstrumentModel().getPlatformType() == PlatformType.PACBIO) {
+      if(params.getMovieTime() == null) {
+        errors.add(new ValidationError("movieTime", "Movie time value must be specified for "
+            + "PacBio instruments"));
+      }
+      else if(params.getMovieTime() < 0) {
+        errors.add(new ValidationError("movieTime", "Movie time must be greater than or equal "
+            + "to 0"));
+      }
+    } else if (params.getMovieTime() != null) {
+      errors.add(new ValidationError("movieTime",
+          "Movie time is not valid for " + params.getInstrumentModel().getPlatformType().getKey()));
+    }
+  }
+
   @Override
   protected void applyChanges(SequencingParameters to, SequencingParameters from) throws IOException {
     to.setName(from.getName());
@@ -155,6 +172,7 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
     to.setReadLength2(from.getReadLength2());
     to.setChemistry(from.getChemistry());
     to.setRunType(from.getRunType());
+    to.setMovieTime(from.getMovieTime());
   }
 
   @Override

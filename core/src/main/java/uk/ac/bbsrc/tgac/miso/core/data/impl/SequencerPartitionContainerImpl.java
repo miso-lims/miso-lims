@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
@@ -106,6 +107,10 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   private KitDescriptor multiplexingKit;
 
   private String multiplexingKitLot;
+
+  @ManyToOne
+  @JoinColumn(name = "sequencingParametersId")
+  private SequencingParameters sequencingParameters;
 
   @ManyToOne
   @JoinColumn(name = "sequencingContainerModelId")
@@ -184,6 +189,16 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @Override
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
+  }
+
+  @Override
+  public SequencingParameters getSequencingParameters() {
+    return sequencingParameters;
+  }
+
+  @Override
+  public void setSequencingParameters(SequencingParameters sequencingParameters) {
+    this.sequencingParameters = sequencingParameters;
   }
 
   @Override

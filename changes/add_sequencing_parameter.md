@@ -1,0 +1,1 @@
+New sequencing parameter Movie Time for PacBio instruments

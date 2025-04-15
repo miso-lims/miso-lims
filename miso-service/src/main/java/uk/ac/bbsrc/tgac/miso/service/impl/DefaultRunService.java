@@ -346,7 +346,6 @@ public class DefaultRunService implements RunService {
         Run::getDataReviewDate, Run::setDataReviewDate);
 
     List<ValidationError> errors = new ArrayList<>();
-
     if (!changed.getHealth().isDone()) {
       changed.setCompletionDate(null);
     } else if (changed.getCompletionDate() == null) {
