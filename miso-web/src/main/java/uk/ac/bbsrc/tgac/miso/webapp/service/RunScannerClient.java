@@ -29,6 +29,8 @@ import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.ProgressiveRequestDto;
 import ca.on.oicr.gsi.runscanner.dto.ProgressiveResponseDto;
+import ca.on.oicr.gsi.runscanner.dto.PacBioNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.type.Platform;
 import io.prometheus.metrics.core.metrics.Counter;
 import io.prometheus.metrics.core.metrics.Gauge;
 import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
@@ -128,7 +130,8 @@ public class RunScannerClient {
                 if (params.getChemistry() != Dtos.getMisoIlluminaChemistryFromRunscanner(illuminaDto.getChemistry())) {
                   return false;
                 }
-                // If we are talking to an old Run Scanner that doens't provide read lengths, use the old logic
+                // If we are talking to an old Run Scanner that doesn't provide read lengths, use
+                // the old logic
                 if (illuminaDto.getReadLengths() == null) {
                   // The read length must match the first read length
                   if (Math.abs(params.getReadLength() - illuminaDto.getReadLength()) < 2) {
@@ -163,6 +166,22 @@ public class RunScannerClient {
                   params -> params.getInstrumentModel().getPlatformType() == PlatformType.OXFORDNANOPORE &&
                       params.getRunType().equals(((OxfordNanoporeNotificationDto) dto).getRunType());
               break;
+            case PACBIO:
+              isMatchingSequencingParameters = params -> {
+                PacBioNotificationDto pacBioDto = (PacBioNotificationDto) dto;
+                if (params.getInstrumentModel().getPlatformType() != PlatformType.PACBIO) {
+                  return false;
+                }
+                for (PacBioNotificationDto.SMRTCellPosition position :
+                    pacBioDto.getSequencerPositions()) {
+                  if (position.movieLength() == null) {
+                    return false;
+                  }
+                }
+                // From run level
+                return params.getMovieTime() >= 0;
+              };
+              break;
             default:
               isMatchingSequencingParameters = params -> params.getInstrumentModel()
                   .getPlatformType() == Dtos.getMisoPlatformTypeFromRunscanner(dto.getPlatformType());
@@ -179,6 +198,13 @@ public class RunScannerClient {
               return dto.getLaneContents(lane);
             }
           };
+
+          // Validate if we have PacBio and get container model from individual SMRT Cell
+          if (dto.getPlatformType() == Platform.PACBIO && dto.getContainerModel() == null) {
+            PacBioNotificationDto pacBioDto = (PacBioNotificationDto) dto;
+            dto.setContainerModel(pacBioDto.getSequencerPositions().get(0).containerModel());
+            dto.setLaneCount(1); // manually set lane count (partition number to 1)
+          }
 
           Run notificationRun = Dtos.to(dto);
           boolean isNew = runService.processNotification(notificationRun, dto.getLaneCount(), dto.getContainerModel(),
