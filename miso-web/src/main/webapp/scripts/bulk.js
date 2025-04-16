@@ -2015,7 +2015,7 @@ BulkUtils = (function ($) {
         if (index === 0) {
           $(COLUMN_HELP).append("<br>", $("<p>").text("Column Descriptions:"));
         }
-        $(COLUMN_HELP).append($("<p>").text(column.title + " - " + column.description));
+        $(COLUMN_HELP).append($("<p>").html("<b>" + column.title + "</b> - " + column.description));
       });
   }
 

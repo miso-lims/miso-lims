@@ -46,32 +46,10 @@ BulkTarget.sequencingparameters = (function () {
               Utils.array.aliasPredicate(newValue),
               Constants.instrumentModels
             );
-
-            var chemistryOptions = {
-              disabled: false,
-            };
-            if (!model || model.platformType !== "ILLUMINA") {
-              (chemistryOptions.disabled = true), (chemistryOptions.value = "UNKNOWN");
-            }
-            api.updateField(rowIndex, "chemistry", chemistryOptions);
-
-            var runTypeOptions = {
-              disabled: false,
-            };
-            if (!model || model.platformType !== "OXFORDNANOPORE") {
-              runTypeOptions.disabled = true;
-              runTypeOptions.value = null;
-            }
-            api.updateField(rowIndex, "runType", runTypeOptions);
-
-            var movieTimeOptions = {
-              disabled: false,
-            };
-            if(!model || model.platformType !== "PACBIO") {
-            movieTimeOptions.disabled = true;
-            movieTimeOptions.value = null;
-            }
-            api.updateField(rowIndex, "movieTime", movieTimeOptions);
+            togglePlatformField(api, rowIndex, "chemistry", model, "ILLUMINA", "UNKNOWN");
+            togglePlatformField(api, rowIndex, "runType", model, "OXFORDNANOPORE");
+            togglePlatformField(api, rowIndex, "movieTime", model, "PACBIO");
+            togglePlatformField(api, rowIndex, "flows", model, "ULTIMA");
           },
         },
         {
@@ -112,13 +90,32 @@ BulkTarget.sequencingparameters = (function () {
           maxLength: 255,
         },
         {
-          title: "PACBIO Movie Time",
+          title: "PacBio Movie Time",
           description: "Should be set for PacBio instruments, and blank for other platforms.",
           type: "int",
           data: "movieTime",
           min: 0,
         },
+        {
+          title: "Ultima Flows",
+          description: "Should be set for Ultima instruments, and blank for other platforms.",
+          type: "int",
+          data: "flows",
+          min: 0,
+          max: 65535,
+        },
       ];
     },
   };
+
+  function togglePlatformField(api, rowIndex, fieldName, instrumentModel, platform, value) {
+    var options = {
+      disabled: false,
+    };
+    if (!instrumentModel || instrumentModel.platformType !== platform) {
+      options.disabled = true;
+      options.value = value || null;
+    }
+    api.updateField(rowIndex, fieldName, options);
+  }
 })();
