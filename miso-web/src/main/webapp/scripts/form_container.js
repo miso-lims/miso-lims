@@ -77,18 +77,6 @@ FormTarget.container = (function ($) {
               maxLength: 255,
             },
             {
-              title: "Sequencing Parameters",
-              data: "sequencingParametersId",
-              type: "dropdown",
-              nullLabel: "SELECT",
-              source: Constants.sequencingParameters.filter(function (param) {
-                return param.instrumentModelId === object.instrumentModelId;
-              }),
-              getItemLabel: Utils.array.getName,
-              getItemValue: Utils.array.getId,
-              required: true,
-            },
-            {
               title: "Clustering Kit",
               data: "clusteringKitId",
               type: "dropdown",
