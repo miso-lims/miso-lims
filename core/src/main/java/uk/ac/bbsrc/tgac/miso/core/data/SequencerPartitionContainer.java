@@ -22,10 +22,6 @@ public interface SequencerPartitionContainer
     extends Comparable<SequencerPartitionContainer>, Barcodable, Serializable, QualityControllable<ContainerQC>,
     Deletable {
 
-  public SequencingParameters getSequencingParameters();
-
-  public void setSequencingParameters(SequencingParameters sequencingParameters);
-
   public String getDescription();
 
   public void setDescription(String description);
