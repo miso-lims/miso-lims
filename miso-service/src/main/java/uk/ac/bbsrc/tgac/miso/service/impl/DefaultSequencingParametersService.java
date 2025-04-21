@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.transaction.support.TransactionTemplate;
+
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
@@ -28,7 +28,8 @@ import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultSequencingParametersService extends AbstractSaveService<SequencingParameters> implements SequencingParametersService {
+public class DefaultSequencingParametersService extends AbstractSaveService<SequencingParameters>
+    implements SequencingParametersService {
 
   @Autowired
   private SequencingParametersDao sequencingParametersDao;
@@ -97,18 +98,21 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
   }
 
   @Override
-  protected void collectValidationErrors(SequencingParameters params, SequencingParameters beforeChange, List<ValidationError> errors)
+  protected void collectValidationErrors(SequencingParameters params, SequencingParameters beforeChange,
+      List<ValidationError> errors)
       throws IOException {
     if (ValidationUtils.isSetAndChanged(SequencingParameters::getName, params, beforeChange)
         && sequencingParametersDao.getByNameAndInstrumentModel(params.getName(), params.getInstrumentModel()) != null) {
       errors.add(new ValidationError("name",
-          String.format("There are already sequencing parameters for %s with this name.", params.getInstrumentModel().getAlias())));
+          String.format("There are already sequencing parameters for %s with this name.",
+              params.getInstrumentModel().getAlias())));
     }
 
     validateReadLengths(params, errors);
     validateChemistry(params, errors);
     validateRunType(params, errors);
     validateMovieTime(params, errors);
+    validateFlows(params, errors);
   }
 
   private void validateReadLengths(SequencingParameters params, List<ValidationError> errors) {
@@ -121,11 +125,13 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
     if (params.getInstrumentModel().getPlatformType() != PlatformType.ILLUMINA) {
       if (params.getReadLength() != 0) {
         errors.add(new ValidationError("read1Length",
-            String.format("Read lengths must be 0 for %s instruments.", params.getInstrumentModel().getPlatformType().getKey())));
+            String.format("Read lengths must be 0 for %s instruments.",
+                params.getInstrumentModel().getPlatformType().getKey())));
       }
       if (params.getReadLength2() != 0) {
         errors.add(new ValidationError("read2Length",
-            String.format("Read lengths must be 0 for %s instruments.", params.getInstrumentModel().getPlatformType().getKey())));
+            String.format("Read lengths must be 0 for %s instruments.",
+                params.getInstrumentModel().getPlatformType().getKey())));
       }
     }
   }
@@ -150,18 +156,30 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
   }
 
   private void validateMovieTime(SequencingParameters params, List<ValidationError> errors) {
-    if(params.getInstrumentModel().getPlatformType() == PlatformType.PACBIO) {
-      if(params.getMovieTime() == null) {
+    if (params.getInstrumentModel().getPlatformType() == PlatformType.PACBIO) {
+      if (params.getMovieTime() == null) {
         errors.add(new ValidationError("movieTime", "Movie time value must be specified for "
             + "PacBio instruments"));
-      }
-      else if(params.getMovieTime() < 0) {
+      } else if (params.getMovieTime() < 0) {
         errors.add(new ValidationError("movieTime", "Movie time must be greater than or equal "
             + "to 0"));
       }
     } else if (params.getMovieTime() != null) {
       errors.add(new ValidationError("movieTime",
           "Movie time is not valid for " + params.getInstrumentModel().getPlatformType().getKey()));
+    }
+  }
+
+  private void validateFlows(SequencingParameters params, List<ValidationError> errors) {
+    if (params.getInstrumentModel().getPlatformType() == PlatformType.ULTIMA) {
+      if (params.getFlows() == null) {
+        errors.add(new ValidationError("flows", "Flows must be specified for Ultima instruments"));
+      } else if (params.getFlows() < 0 || params.getFlows() > 65535) {
+        errors.add(new ValidationError("flows", "Flows must be between 0 and 65535"));
+      }
+    } else if (params.getFlows() != null) {
+      errors.add(new ValidationError("flows",
+          "Flows should not be specified for " + params.getInstrumentModel().getPlatformType().getKey()));
     }
   }
 
@@ -173,6 +191,7 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
     to.setChemistry(from.getChemistry());
     to.setRunType(from.getRunType());
     to.setMovieTime(from.getMovieTime());
+    to.setFlows(from.getFlows());
   }
 
   @Override
@@ -190,7 +209,8 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
       String message = String.format("%s %s is used by ", object.getDeleteType(), object.getDeleteDescription());
       message += Stream.of(runUsage == 0L ? null : String.format("%d %s", runUsage, Pluralizer.runs(runUsage)),
           poolOrderUsage == 0L ? null : String.format("%d pool %s", poolOrderUsage, Pluralizer.orders(poolOrderUsage)),
-          seqOrderUsage == 0L ? null : String.format("%d sequencing %s", seqOrderUsage, Pluralizer.orders(seqOrderUsage)))
+          seqOrderUsage == 0L ? null
+              : String.format("%d sequencing %s", seqOrderUsage, Pluralizer.orders(seqOrderUsage)))
           .filter(Objects::nonNull)
           .collect(Collectors.joining(", "));
       result.addError(new ValidationError(message));
