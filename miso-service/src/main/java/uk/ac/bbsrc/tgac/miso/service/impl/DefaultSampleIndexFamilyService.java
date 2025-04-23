@@ -11,7 +11,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleIndexFamilyService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleIndexFamilyDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
@@ -65,6 +67,16 @@ public class DefaultSampleIndexFamilyService extends AbstractSaveService<SampleI
   @Override
   protected void applyChanges(SampleIndexFamily to, SampleIndexFamily from) throws IOException {
     to.setName(from.getName());
+  }
+
+  @Override
+  public ValidationResult validateDeletion(SampleIndexFamily object) throws IOException {
+    ValidationResult result = new ValidationResult();
+    long usage = sampleIndexFamilyDao.getUsage(object);
+    if (usage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
+    }
+    return result;
   }
 
 }

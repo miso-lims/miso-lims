@@ -15,4 +15,6 @@ public interface SampleIndexDao extends SaveDao<SampleIndex> {
 
   List<SampleIndex> listByIdList(Collection<Long> ids) throws IOException;
 
+  long getUsage(SampleIndex index) throws IOException;
+
 }

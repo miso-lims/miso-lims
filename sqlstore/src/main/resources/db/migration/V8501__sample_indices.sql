@@ -17,3 +17,7 @@ CREATE TABLE SampleIndex (
     REFERENCES SampleIndexFamily(indexFamilyId),
   CONSTRAINT uk_sampleIndex_family_name UNIQUE (indexFamilyId, name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE Sample
+  ADD COLUMN indexId bigint,
+  ADD CONSTRAINT fk_sample_sampleIndex FOREIGN KEY (indexId) REFERENCES SampleIndex (indexId);

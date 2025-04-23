@@ -10,6 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIndex_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleStockImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueProcessingImpl_;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleIndexDao;
 
 @Transactional(rollbackFor = Exception.class)
@@ -37,6 +41,12 @@ public class HibernateSampleIndexDao extends HibernateSaveDao<SampleIndex> imple
   @Override
   public List<SampleIndex> listByIdList(Collection<Long> ids) throws IOException {
     return listByIdList(SampleIndex_.INDEX_ID, ids);
+  }
+
+  @Override
+  public long getUsage(SampleIndex index) throws IOException {
+    return getUsageBy(SampleTissueProcessingImpl.class, SampleTissueProcessingImpl_.index, index)
+        + getUsageBy(SampleStockImpl.class, SampleStockImpl_.index, index);
   }
 
 }

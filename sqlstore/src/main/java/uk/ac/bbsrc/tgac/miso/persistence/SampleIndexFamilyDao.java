@@ -8,4 +8,6 @@ public interface SampleIndexFamilyDao extends SaveDao<SampleIndexFamily> {
 
   SampleIndexFamily getByName(String name) throws IOException;
 
+  long getUsage(SampleIndexFamily family) throws IOException;
+
 }

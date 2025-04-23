@@ -36,4 +36,9 @@ public class HibernateSampleIndexFamilyDaoIT
     testGetBy(HibernateSampleIndexFamilyDao::getByName, "Fam One", SampleIndexFamily::getName);
   }
 
+  @Test
+  public void testGetUsage() throws Exception {
+    testGetUsage(HibernateSampleIndexFamilyDao::getUsage, 1L, 1L);
+  }
+
 }

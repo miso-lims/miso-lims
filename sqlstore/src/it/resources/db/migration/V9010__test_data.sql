@@ -483,7 +483,7 @@ INSERT INTO Requisition_SupplementalSample(requisitionId, sampleId) VALUES
 -- Tissue Processing - Slides
 INSERT INTO Sample(discriminator, sampleId, name, alias, project_projectId, sampleType,
   scientificNameId, lastModifier, lastModified, creator, created, sampleClassId, archived, parentId,
-  siblingNumber, isSynthetic, nonStandardAlias, initialSlides, slides) VALUES
+  siblingNumber, isSynthetic, nonStandardAlias, initialSlides, slides, indexId) VALUES
 ('Slide', 25, 'SAM25', 'TEST_0001_SLIDE_1', 1, 'GENOMIC',
   1, 1, '2024-10-16 12:39:00', 1, '2024-10-16 12:39:00', 5, FALSE, 17,
   1, FALSE, FALSE, 3, 3);
@@ -497,7 +497,7 @@ INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identifica
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator, referenceSlideId) VALUES
 (18,NULL,'SAM18','stock1','SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',1,
   1,'2016-07-07','TEST_0001_STOCK_1',1,1,NULL,NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19', 1,
-  3,0,25,1,NULL,0, FALSE, 'Stock', 25);
+  3,0,25,1,NULL,0, FALSE, 'Stock', 25, 3);
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (18, 15, 17);

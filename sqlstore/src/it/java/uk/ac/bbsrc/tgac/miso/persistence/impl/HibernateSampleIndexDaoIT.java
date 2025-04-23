@@ -57,4 +57,9 @@ public class HibernateSampleIndexDaoIT extends AbstractHibernateSaveDaoTest<Samp
     testListByIdList(HibernateSampleIndexDao::listByIdList, Lists.newArrayList(1L, 3L, 5L));
   }
 
+  @Test
+  public void testGetUsage() throws Exception {
+    testGetUsage(HibernateSampleIndexDao::getUsage, 3L, 1L);
+  }
+
 }

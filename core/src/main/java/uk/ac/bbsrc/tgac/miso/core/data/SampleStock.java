@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 
 public interface SampleStock extends DetailedSample {
@@ -40,5 +41,9 @@ public interface SampleStock extends DetailedSample {
   Long getReferenceSlideId();
 
   void setReferenceSlideId(Long referenceSlideId);
+
+  SampleIndex getIndex();
+
+  void setIndex(SampleIndex index);
 
 }
