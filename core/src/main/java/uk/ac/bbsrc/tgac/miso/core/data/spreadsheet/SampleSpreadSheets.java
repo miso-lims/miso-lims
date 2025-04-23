@@ -138,9 +138,12 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Position", sample -> sample.getBoxPosition()), // E
       Column.forString("Group ID", effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), // F
       Column.forString("Description", Sample::getDescription), // G
-      Column.forString("Material", sam -> null), // H
-      Column.forString("Tissue Origin", sam -> null), // I
-      Column.forString("Tissue Type", sam -> null), // J
+      Column.forString("Material", true, detailedSample(SampleTissue.class,
+          tissue -> tissue.getTissueMaterial() == null ? null : tissue.getTissueMaterial().getAlias(), null)), // H
+      Column.forString("Tissue Origin", true,
+          detailedSample(SampleTissue.class, st -> st.getTissueOrigin().getAlias(), "")), // I
+      Column.forString("Tissue Type", true,
+          detailedSample(SampleTissue.class, st -> st.getTissueType().getAlias(), "")), // J
       Column.forBigDecimal("Concentration", Sample::getConcentration), // K
       Column.forBigDecimal("Volume", Sample::getVolume), // L
       Column.forDouble("DV200", sam -> {
