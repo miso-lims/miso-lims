@@ -7,6 +7,32 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.7.0] - 2025-04-24
+
+### Added
+
+* New sequencing parameter fields
+  * Movie Time for PacBio instruments
+  * Flows for Ultima instruments
+* Sample indices, which can be set at the tissue processing and stock levels (detailed sample). Note
+  that these options will only appear after you have defined sample index families
+
+### Changed
+
+* The previously existing index families and indices have been renamed to library index families and
+  library indices in several places to distinguish them from sample indices
+* The OICR naming scheme now supports Ultima libraries and library aliquots
+
+### Fixed
+
+* The initial assays assigned to a requisition will no longer be recorded in the changelog; later
+  assay changes will still be recorded
+* When moving samples or libraries between requisitions, the time and user logged were sometimes
+  incorrect
+* The Tissue Material, Origin, and Type fields were left blank on the RNA Library Preparation sample
+  download sheet
+
+
 ## [3.6.0] - 2025-04-10
 
 ### Changed
