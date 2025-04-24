@@ -14,7 +14,9 @@ public class HibernateSampleIndexFamilyDaoIT
 
   @Override
   public HibernateSampleIndexFamilyDao constructTestSubject() {
-    return new HibernateSampleIndexFamilyDao();
+    HibernateSampleIndexFamilyDao sut = new HibernateSampleIndexFamilyDao();
+    sut.setEntityManager(getEntityManager());
+    return sut;
   }
 
   @Override

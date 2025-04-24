@@ -18,7 +18,9 @@ public class HibernateSampleIndexDaoIT extends AbstractHibernateSaveDaoTest<Samp
 
   @Override
   public HibernateSampleIndexDao constructTestSubject() {
-    return new HibernateSampleIndexDao();
+    HibernateSampleIndexDao sut = new HibernateSampleIndexDao();
+    sut.setEntityManager(getEntityManager());
+    return sut;
   }
 
   @Override

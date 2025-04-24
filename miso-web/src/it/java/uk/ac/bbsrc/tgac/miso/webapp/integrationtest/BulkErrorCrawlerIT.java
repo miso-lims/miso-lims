@@ -170,7 +170,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 slugs.add("librarytemplate/1");
                 slugs.add("kitdescriptor/new");
                 slugs.add("kitdescriptor/1");
-                slugs.add("indexfamily/1");
+                slugs.add("libraryindexfamily/1");
                 slugs.add("qctype/102");
                 slugs.add("instrumentmodel/1");
                 slugs.add("sampleclass/new");

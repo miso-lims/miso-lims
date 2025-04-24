@@ -57,7 +57,7 @@ DELETE FROM KitDescriptorChangeLog;
 DELETE FROM KitDescriptor;
 DELETE FROM BoxUse;
 DELETE FROM BoxSize;
-DELETE FROM LibraryIndices;
+DELETE FROM LibraryIndex;
 DELETE FROM LibraryIndexFamily;
 DELETE FROM SequencingParameters;
 DELETE FROM Instrument WHERE upgradedInstrumentId IS NOT NULL;

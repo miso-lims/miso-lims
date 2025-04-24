@@ -35,6 +35,19 @@ INSERT INTO SequencingControlType(sequencingControlTypeId, alias) VALUES
 (1, 'Positive'),
 (2, 'Negative');
 
+INSERT INTO SampleIndexFamily(indexFamilyId, name) VALUES
+(1, "Fam One"),
+(2, "Fam Two");
+
+INSERT INTO SampleIndex(indexId, name, indexFamilyId) VALUES
+(1, "Index 1-001", 1),
+(2, "Index 1-002", 1),
+(3, "Index 1-003", 1),
+(4, "Index 1-004", 1),
+(5, "Index 2-001", 2),
+(6, "Index 2-002", 2),
+(7, "Index 2-003", 2);
+
 INSERT INTO Workstation(workstationId, alias) VALUES
 (1, 'Workstation 1'),
 (2, 'Workstation 2'),
@@ -486,7 +499,7 @@ INSERT INTO Sample(discriminator, sampleId, name, alias, project_projectId, samp
   siblingNumber, isSynthetic, nonStandardAlias, initialSlides, slides, indexId) VALUES
 ('Slide', 25, 'SAM25', 'TEST_0001_SLIDE_1', 1, 'GENOMIC',
   1, 1, '2024-10-16 12:39:00', 1, '2024-10-16 12:39:00', 5, FALSE, 17,
-  1, FALSE, FALSE, 3, 3);
+  1, FALSE, FALSE, 3, 3, 3);
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (25, 15, 17);
@@ -497,7 +510,7 @@ INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identifica
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, discriminator, referenceSlideId) VALUES
 (18,NULL,'SAM18','stock1','SAM18::TEST_0001_STOCK_1','Freezer1_1','GENOMIC',1,
   1,'2016-07-07','TEST_0001_STOCK_1',1,1,NULL,NULL,1,'2016-07-07 13:31:19',1,'2016-07-07 13:31:19', 1,
-  3,0,25,1,NULL,0, FALSE, 'Stock', 25, 3);
+  3,0,25,1,NULL,0, FALSE, 'Stock', 25);
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (18, 15, 17);
@@ -1109,16 +1122,3 @@ INSERT INTO Project_Contact (projectId, contactId, contactRoleId) VALUES
 INSERT INTO ApiKey(keyId, userId, apiKey, apiSecret, creator, created) VALUES
 -- unencrypted key: LwTTBMu4QSOeTWp7Uo7Bva0Jm0+Zpnxb-jw24z317EwhjoqtswuROsj1DFXoD9WT6
 (1, 1, 'LwTTBMu4QSOeTWp7Uo7Bva0Jm0+Zpnxb', '{bcrypt}$2a$10$l2gtUtIdwV98avW6C7DYZOkhDdRKuiYADiOm33UkkdabaxjITvpDS', 1, '2025-03-11 15:10:00');
-
-INSERT INTO SampleIndexFamily(indexFamilyId, name) VALUES
-(1, "Fam One"),
-(2, "Fam Two");
-
-INSERT INTO SampleIndex(indexId, name, indexFamilyId) VALUES
-(1, "Index 1-001", 1),
-(2, "Index 1-002", 1),
-(3, "Index 1-003", 1),
-(4, "Index 1-004", 1),
-(5, "Index 2-001", 2),
-(6, "Index 2-002", 2),
-(7, "Index 2-003", 2),
