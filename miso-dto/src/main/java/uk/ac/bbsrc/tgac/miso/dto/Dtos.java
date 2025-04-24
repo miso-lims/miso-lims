@@ -66,8 +66,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
@@ -81,6 +79,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
 import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
@@ -167,6 +167,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotSingleCellImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleSingleCellImpl;
@@ -869,6 +870,8 @@ public class Dtos {
     dto.setStrStatus(from.getStrStatus().getLabel());
     setInteger(dto::setSlidesConsumed, from.getSlidesConsumed(), true);
     setLong(dto::setReferenceSlideId, from.getReferenceSlideId(), true);
+    setId(dto::setIndexFamilyId, maybeGetProperty(from.getIndex(), SampleIndex::getFamily));
+    setId(dto::setIndexId, from.getIndex());
     return dto;
   }
 
@@ -894,6 +897,7 @@ public class Dtos {
     }
     setInteger(to::setSlidesConsumed, from.getSlidesConsumed(), true);
     setLong(to::setReferenceSlideId, from.getReferenceSlideId(), true);
+    setObject(to::setIndex, SampleIndex::new, from.getIndexId());
     return to;
   }
 
@@ -1135,16 +1139,19 @@ public class Dtos {
 
   private static SampleTissueProcessingDto asTissueProcessingSampleDto(@Nonnull SampleTissueProcessing from) {
     from = deproxify(from);
-
+    SampleTissueProcessingDto to = null;
     if (isSampleSlide(from)) {
-      return asSlideSampleDto((SampleSlide) from);
+      to = asSlideSampleDto((SampleSlide) from);
     } else if (isTissuePieceSample(from)) {
-      return asTissuePieceSampleDto((SampleTissuePiece) from);
+      to = asTissuePieceSampleDto((SampleTissuePiece) from);
     } else if (isProcessingSingleCellSample(from)) {
-      return asSingleCellSampleDto((SampleSingleCell) from);
+      to = asSingleCellSampleDto((SampleSingleCell) from);
     } else {
-      return new SampleTissueProcessingDto();
+      to = new SampleTissueProcessingDto();
     }
+    setId(to::setIndexFamilyId, maybeGetProperty(from.getIndex(), SampleIndex::getFamily));
+    setId(to::setIndexId, from.getIndex());
+    return to;
   }
 
   private static SampleTissueProcessing toTissueProcessingSample(@Nonnull SampleTissueProcessingDto from) {
@@ -1158,6 +1165,7 @@ public class Dtos {
     } else {
       to = new SampleTissueProcessingImpl();
     }
+    setObject(to::setIndex, SampleIndex::new, from.getIndexId());
     return to;
   }
 
@@ -1462,7 +1470,7 @@ public class Dtos {
     }
     setString(dto::setKitLot, from.getKitLot());
     if (from.getIndex1() != null) {
-      IndexFamily family = from.getIndex1().getFamily();
+      LibraryIndexFamily family = from.getIndex1().getFamily();
       dto.setIndexFamilyId(family.getId());
       dto.setIndexFamilyName(family.getName());
       dto.setIndex1Id(from.getIndex1().getId());
@@ -1565,11 +1573,11 @@ public class Dtos {
     setObject(to::setDetailedQcStatus, DetailedQcStatusImpl::new, from.getDetailedQcStatusId());
     setString(to::setDetailedQcStatusNote, from.getDetailedQcStatusNote());
     if (from.getIndex1Id() != null) {
-      Index tb1 = new Index();
+      LibraryIndex tb1 = new LibraryIndex();
       tb1.setId(from.getIndex1Id());
       to.setIndex1(tb1);
       if (from.getIndex2Id() != null) {
-        Index tb2 = new Index();
+        LibraryIndex tb2 = new LibraryIndex();
         tb2.setId(from.getIndex2Id());
         to.setIndex2(tb2);
       }
@@ -1746,12 +1754,14 @@ public class Dtos {
       setBoolean(dto::setLibraryLowQuality, library.isLowQuality(), false);
       setString(dto::setLibraryPlatformType, library.getPlatformType().getKey());
       if (library.getIndex1() != null) {
-        List<Index> indices =
+        List<LibraryIndex> indices =
             Stream.of(library.getIndex1(), library.getIndex2()).filter(Objects::nonNull).collect(Collectors.toList());
-        dto.setIndexIds(indices.stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getId)
-            .collect(Collectors.toList()));
-        dto.setIndexLabels(indices.stream().sorted(Comparator.comparingInt(Index::getPosition)).map(Index::getLabel)
-            .collect(Collectors.toList()));
+        dto.setIndexIds(
+            indices.stream().sorted(Comparator.comparingInt(LibraryIndex::getPosition)).map(LibraryIndex::getId)
+                .collect(Collectors.toList()));
+        dto.setIndexLabels(
+            indices.stream().sorted(Comparator.comparingInt(LibraryIndex::getPosition)).map(LibraryIndex::getLabel)
+                .collect(Collectors.toList()));
       }
       if (sample != null) {
         setLong(dto::setSampleId, sample.getId(), true);
@@ -1870,11 +1880,11 @@ public class Dtos {
     dto.setLocationLabel(BoxUtils.makeLocationLabel(from));
     dto.setIndexIds(Stream.of(from.getParentLibrary().getIndex1(), from.getParentLibrary().getIndex2())
         .filter(Objects::nonNull)
-        .map(Index::getId)
+        .map(LibraryIndex::getId)
         .collect(Collectors.toList()));
     dto.setIndexLabels(Stream.of(from.getParentLibrary().getIndex1(), from.getParentLibrary().getIndex2())
         .filter(Objects::nonNull)
-        .map(Index::getLabel)
+        .map(LibraryIndex::getLabel)
         .collect(Collectors.toList()));
     dto.setTargetedSequencingId(from.getTargetedSequencingId());
     setInteger(dto::setDnaSize, from.getDnaSize(), true);
@@ -2806,12 +2816,12 @@ public class Dtos {
     return to;
   }
 
-  public static IndexDto asDto(@Nonnull Index from) {
+  public static LibraryIndexDto asDto(@Nonnull LibraryIndex from) {
     return asDto(from, true);
   }
 
-  public static IndexDto asDto(@Nonnull Index from, boolean includeFamily) {
-    IndexDto dto = new IndexDto();
+  public static LibraryIndexDto asDto(@Nonnull LibraryIndex from, boolean includeFamily) {
+    LibraryIndexDto dto = new LibraryIndexDto();
     dto.setId(from.getId());
     dto.setLabel(from.getLabel());
     dto.setName(from.getName());
@@ -2824,9 +2834,9 @@ public class Dtos {
     return dto;
   }
 
-  public static Index to(@Nonnull IndexDto from) {
-    Index to = new Index();
-    setObject(to::setFamily, IndexFamily::new, maybeGetProperty(from.getFamily(), IndexFamilyDto::getId));
+  public static LibraryIndex to(@Nonnull LibraryIndexDto from) {
+    LibraryIndex to = new LibraryIndex();
+    setObject(to::setFamily, LibraryIndexFamily::new, maybeGetProperty(from.getFamily(), LibraryIndexFamilyDto::getId));
     setLong(to::setId, from.getId(), false);
     setString(to::setName, from.getName());
     setString(to::setSequence, from.getSequence());
@@ -2835,12 +2845,12 @@ public class Dtos {
     return to;
   }
 
-  public static IndexFamilyDto asDto(@Nonnull IndexFamily from) {
+  public static LibraryIndexFamilyDto asDto(@Nonnull LibraryIndexFamily from) {
     return asDto(from, true);
   }
 
-  private static IndexFamilyDto asDto(@Nonnull IndexFamily from, boolean includeChildren) {
-    IndexFamilyDto dto = new IndexFamilyDto();
+  private static LibraryIndexFamilyDto asDto(@Nonnull LibraryIndexFamily from, boolean includeChildren) {
+    LibraryIndexFamilyDto dto = new LibraryIndexFamilyDto();
     setLong(dto::setId, from.getId(), true);
     setString(dto::setPlatformType, maybeGetProperty(from.getPlatformType(), PlatformType::name));
     setString(dto::setName, from.getName());
@@ -2853,8 +2863,8 @@ public class Dtos {
     return dto;
   }
 
-  public static IndexFamily to(@Nonnull IndexFamilyDto from) {
-    IndexFamily to = new IndexFamily();
+  public static LibraryIndexFamily to(@Nonnull LibraryIndexFamilyDto from) {
+    LibraryIndexFamily to = new LibraryIndexFamily();
     setLong(to::setId, from.getId(), false);
     setObject(to::setPlatformType, from.getPlatformType(), pt -> PlatformType.valueOf(pt));
     setString(to::setName, from.getName());
@@ -2863,7 +2873,7 @@ public class Dtos {
     setBoolean(to::setArchived, from.isArchived(), true);
     if (from.getIndices() != null) {
       to.getIndices().addAll(from.getIndices().stream().map(indexDto -> {
-        Index index = Dtos.to(indexDto);
+        LibraryIndex index = Dtos.to(indexDto);
         index.setFamily(to);
         return index;
       }).collect(Collectors.toList()));
@@ -3851,14 +3861,14 @@ public class Dtos {
       to.setKitDescriptor(kitDescriptor);
     }
     if (from.getIndexFamilyId() != null) {
-      IndexFamily indexFamily = new IndexFamily();
+      LibraryIndexFamily indexFamily = new LibraryIndexFamily();
       indexFamily.setId(from.getIndexFamilyId());
       to.setIndexFamily(indexFamily);
     }
     if (from.getIndexOneIds() != null) {
       to.getIndexOnes().putAll(from.getIndexOneIds().entrySet().stream()
           .collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
-            Index index = new Index();
+            LibraryIndex index = new LibraryIndex();
             index.setId(entry.getValue());
             return index;
           })));
@@ -3866,7 +3876,7 @@ public class Dtos {
     if (from.getIndexTwoIds() != null) {
       to.getIndexTwos().putAll(from.getIndexTwoIds().entrySet().stream()
           .collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
-            Index index = new Index();
+            LibraryIndex index = new LibraryIndex();
             index.setId(entry.getValue());
             return index;
           })));

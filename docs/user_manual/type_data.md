@@ -283,6 +283,31 @@ name and the new version. This way, you continue to track which version of an SO
 
 
 
+## Sample Indices
+
+Note: This item only applies if your site uses [detailed sample mode](../site_configuration/#detailed-sample-mode).
+
+Indices are mainly applied to libraries, but in some cases, there are multiple levels of indexing,
+one of which happens before library preparation. For this, we have sample indices. Sample indices in
+MISO were mainly designed with Cell Ranger in mind. To keep it simple, there are no associated
+sequences - only the index/barcode name that Cell Ranger requires in order to demultiplex the sample
+data. Sample indices can be added to any tissue processing or stock sample classes.
+
+MISO administrators can create, edit, and delete sample index families using the standard interface.
+An index family can only be deleted if it has not been used by any existing samples. MISO
+administrators can add, edit, and delete indices using the standard interface within the Edit Sample
+Index Family page. Note that if you do not have any sample index families defined, the option to add
+indices will not appear when creating or editing samples.
+
+When creating indices, keep in mind that they are sorted alphabetically in dropdowns. If your
+indices are named "Index 1, Index 2... Index 10, Index 11..." then it may be ideal to add zeros
+before the numbers so that they sort in the expected order. e.g. "Index 01, Index 02... Index 10,
+Index 11"
+
+See also: [Library Indices](#library-indices)
+
+
+
 ## Library Types
 
 Library type is a classifier for libraries that depends on the platform type. Library types for Illumina libraries
@@ -378,7 +403,7 @@ any existing runs. QC kits can only be deleted if they are not used by any exist
 
 
 
-## Indices
+## Library Indices
 
 Indices, also known as barcodes or primers, are sequences that are added to libraries in order to identify which
 library each individual DNA fragment came from in a multiplexed pool. An index family is a collection of these indices
@@ -403,7 +428,7 @@ indices.
 
 MISO administrators can create, edit, and delete index families using the standard interface. An index family can only
 be deleted if it has not been used by any existing libraries. MISO administrators can add, edit, and delete indices using
-the standard interface within the Edit Index Family page.
+the standard interface within the Edit Library Index Family page.
 
 Index families may be archived if they are no longer needed. This will prevent them from showing up in the options when
 creating new libraries.
@@ -411,6 +436,8 @@ creating new libraries.
 When creating indices, keep in mind that they are sorted alphabetically in dropdowns. If your indices are named "Index 1,
 Index 2... Index 10, Index 11..." then it may be ideal to add zeros before the numbers so that they sort in the expected
 order. e.g. "Index 01, Index 02... Index 10, Index 11"
+
+See also: [Sample Indices](#sample-indices)
 
 
 

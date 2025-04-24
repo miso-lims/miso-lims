@@ -339,35 +339,6 @@ Urls = (function () {
     check: indexDistanceRestBase,
   };
 
-  // Index Families
-  var indexFamilyUiBase = "/indexfamily";
-  ui.indexFamilies = {
-    create: indexFamilyUiBase + "/new",
-    edit: idUrlFunction(indexFamilyUiBase),
-  };
-
-  var indexFamilyRestBase = restBase + "/indexfamilies";
-  rest.indexFamilies = {
-    create: indexFamilyRestBase,
-    update: idUrlFunction(indexFamilyRestBase),
-  };
-
-  // Indices
-  var indexUiBase = "/index";
-  ui.indices = {
-    bulkCreate: indexUiBase + "/bulk/new",
-    bulkEdit: indexUiBase + "/bulk/edit",
-  };
-
-  var indexRestBase = restBase + "/indices";
-  rest.indices = {
-    bulkSave: indexRestBase + "/bulk",
-    bulkSaveProgress: idUrlFunction(indexRestBase + "/bulk"),
-    datatable: indexRestBase + "/dt",
-    platformDatatable: idUrlFunction(indexRestBase + "/dt/platform"),
-    search: indexRestBase + "/search",
-  };
-
   // Instruments
   var instrumentUiBase = "/instrument";
   ui.instruments = {
@@ -540,6 +511,35 @@ Urls = (function () {
   rest.libraryDesignCodes = {
     bulkSave: libraryDesignCodeRestBase + "/bulk",
     bulkSaveProgress: idUrlFunction(libraryDesignCodeRestBase + "/bulk"),
+  };
+
+  // Library Index Families
+  var libraryIndexFamilyUiBase = "/libraryindexfamily";
+  ui.libraryIndexFamilies = {
+    create: libraryIndexFamilyUiBase + "/new",
+    edit: idUrlFunction(libraryIndexFamilyUiBase),
+  };
+
+  var libraryIndexFamilyRestBase = restBase + "/libraryindexfamilies";
+  rest.libraryIndexFamilies = {
+    create: libraryIndexFamilyRestBase,
+    update: idUrlFunction(libraryIndexFamilyRestBase),
+  };
+
+  // Library Indices
+  var libraryIndexUiBase = "/libraryindex";
+  ui.libraryIndices = {
+    bulkCreate: libraryIndexUiBase + "/bulk/new",
+    bulkEdit: libraryIndexUiBase + "/bulk/edit",
+  };
+
+  var libraryIndexRestBase = restBase + "/libraryindices";
+  rest.libraryIndices = {
+    bulkSave: libraryIndexRestBase + "/bulk",
+    bulkSaveProgress: idUrlFunction(libraryIndexRestBase + "/bulk"),
+    datatable: libraryIndexRestBase + "/dt",
+    platformDatatable: idUrlFunction(libraryIndexRestBase + "/dt/platform"),
+    search: libraryIndexRestBase + "/search",
   };
 
   // Library Selections
@@ -959,6 +959,32 @@ Urls = (function () {
   rest.sampleClasses = {
     create: sampleClassRestBase,
     update: idUrlFunction(sampleClassRestBase),
+  };
+
+  // Sample Index Families
+  var sampleIndexFamilyUiBase = "/sampleindexfamily";
+  ui.sampleIndexFamilies = {
+    create: sampleIndexFamilyUiBase + "/new",
+    edit: idUrlFunction(sampleIndexFamilyUiBase),
+  };
+
+  var sampleIndexFamilyRestBase = restBase + "/sampleindexfamilies";
+  rest.sampleIndexFamilies = {
+    create: sampleIndexFamilyRestBase,
+    update: idUrlFunction(sampleIndexFamilyRestBase),
+  };
+
+  // Sample Indices
+  var sampleIndexUiBase = "/sampleindex";
+  ui.sampleIndices = {
+    bulkCreate: sampleIndexUiBase + "/bulk/new",
+    bulkEdit: sampleIndexUiBase + "/bulk/edit",
+  };
+
+  var sampleIndexRestBase = restBase + "/sampleindices";
+  rest.sampleIndices = {
+    bulkSave: sampleIndexRestBase + "/bulk",
+    bulkSaveProgress: idUrlFunction(sampleIndexRestBase + "/bulk"),
   };
 
   // Sample Purposes

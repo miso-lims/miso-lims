@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -120,8 +120,8 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
   }
 
   private static String listIndices(LibraryAliquot libraryAliquot) {
-    Index index1 = libraryAliquot.getLibrary().getIndex1();
-    Index index2 = libraryAliquot.getLibrary().getIndex2();
+    LibraryIndex index1 = libraryAliquot.getLibrary().getIndex1();
+    LibraryIndex index2 = libraryAliquot.getLibrary().getIndex2();
     if (index1 == null) {
       return null;
     } else if (index2 == null) {
@@ -131,7 +131,7 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
     }
   }
 
-  private static String getSequence(Index index) {
+  private static String getSequence(LibraryIndex index) {
     return index == null ? null : index.getSequence();
   }
 

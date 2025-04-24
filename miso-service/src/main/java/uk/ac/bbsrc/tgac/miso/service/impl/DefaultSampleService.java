@@ -65,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LabService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleIndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
 import uk.ac.bbsrc.tgac.miso.core.service.ScientificNameService;
@@ -125,6 +126,8 @@ public class DefaultSampleService implements SampleService {
   private TissueMaterialDao tissueMaterialDao;
   @Autowired
   private TissuePieceTypeDao tissuePieceTypeDao;
+  @Autowired
+  private SampleIndexService sampleIndexService;
   @Autowired
   private DeletionStore deletionStore;
   @Autowired
@@ -721,6 +724,8 @@ public class DefaultSampleService implements SampleService {
         detailed.setSubproject(subprojectService.get(detailed.getSubproject().getId()));
       }
       if (isTissueProcessingSample(detailed)) {
+        SampleTissueProcessing stp = (SampleTissueProcessing) detailed;
+        loadChildEntity(stp::setIndex, stp.getIndex(), sampleIndexService, "indexId");
         if (detailed instanceof SampleSlide) {
           Stain originalStain = ((SampleSlide) detailed).getStain();
           Stain stain;
@@ -734,6 +739,10 @@ public class DefaultSampleService implements SampleService {
           SampleTissuePiece tissuePiece = (SampleTissuePiece) detailed;
           tissuePiece.setTissuePieceType(tissuePieceTypeDao.get(tissuePiece.getTissuePieceType().getId()));
         }
+      }
+      if (isStockSample(detailed)) {
+        SampleStock ss = (SampleStock) detailed;
+        loadChildEntity(ss::setIndex, ss.getIndex(), sampleIndexService, "indexId");
       }
       if (isAliquotSample(detailed)) {
         SampleAliquot sa = (SampleAliquot) detailed;
@@ -997,6 +1006,7 @@ public class DefaultSampleService implements SampleService {
     target.setStrStatus(source.getStrStatus());
     target.setSlidesConsumed(source.getSlidesConsumed());
     target.setReferenceSlideId(source.getReferenceSlideId());
+    target.setIndex(source.getIndex());
   }
 
   private void applyTissueChanges(SampleTissue target, SampleTissue source) {
@@ -1013,6 +1023,7 @@ public class DefaultSampleService implements SampleService {
   }
 
   private void applyTissueProcessingChanges(SampleTissueProcessing target, SampleTissueProcessing source) {
+    target.setIndex(source.getIndex());
     if (source instanceof SampleSlide) {
       ((SampleSlide) target).setInitialSlides(((SampleSlide) source).getInitialSlides());
       ((SampleSlide) target).setSlides(((SampleSlide) source).getSlides());

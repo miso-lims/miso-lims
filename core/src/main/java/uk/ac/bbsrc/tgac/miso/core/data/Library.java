@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * then sequenced.
  * <p/>
  * Libraries also have a target {@link InstrumentModel} and can be uniquely identified via
- * {@link Index} objects for multiplexing purposes.
+ * {@link LibraryIndex} objects for multiplexing purposes.
  * 
  * @author Rob Davey
  * @since 0.0.2

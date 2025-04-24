@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
@@ -20,7 +20,7 @@ public class PoolImplTest {
     addElement(pool, "TTTTTT");
     assertEquals("8", pool.getLongestIndex());
   }
-  
+
   @Test
   public void testLongestReadDual() {
     PoolImpl pool = new PoolImpl();
@@ -30,7 +30,7 @@ public class PoolImplTest {
     addElement(pool, "TTTTTT", "TTTTTT");
     assertEquals("8,8", pool.getLongestIndex());
   }
-  
+
   @Test
   public void testLongestReadNone() {
     PoolImpl pool = new PoolImpl();
@@ -40,12 +40,12 @@ public class PoolImplTest {
   private void addElement(PoolImpl pool, String index1) {
     addElement(pool, makeIndex(index1, 1), null);
   }
-  
+
   private void addElement(PoolImpl pool, String index1, String index2) {
     addElement(pool, makeIndex(index1, 1), makeIndex(index2, 2));
   }
 
-  private void addElement(PoolImpl pool, Index index1, Index index2) {
+  private void addElement(PoolImpl pool, LibraryIndex index1, LibraryIndex index2) {
     ListLibraryAliquotView ldi = new ListLibraryAliquotView();
     ldi.setParentLibrary(new ParentLibrary());
     ldi.getParentLibrary().setIndex1(index1);
@@ -54,8 +54,8 @@ public class PoolImplTest {
     pool.getPoolContents().add(element);
   }
 
-  private Index makeIndex(String sequence, int position) {
-    Index index = new Index();
+  private LibraryIndex makeIndex(String sequence, int position) {
+    LibraryIndex index = new LibraryIndex();
     index.setSequence(sequence);
     index.setPosition(position);
     return index;

@@ -35,6 +35,19 @@ INSERT INTO SequencingControlType(sequencingControlTypeId, alias) VALUES
 (1, 'Positive'),
 (2, 'Negative');
 
+INSERT INTO SampleIndexFamily(indexFamilyId, name) VALUES
+(1, "Fam One"),
+(2, "Fam Two");
+
+INSERT INTO SampleIndex(indexId, name, indexFamilyId) VALUES
+(1, "Index 1-001", 1),
+(2, "Index 1-002", 1),
+(3, "Index 1-003", 1),
+(4, "Index 1-004", 1),
+(5, "Index 2-001", 2),
+(6, "Index 2-002", 2),
+(7, "Index 2-003", 2);
+
 INSERT INTO Workstation(workstationId, alias) VALUES
 (1, 'Workstation 1'),
 (2, 'Workstation 2'),
@@ -94,7 +107,7 @@ INSERT INTO AttachmentCategory(categoryId, alias) VALUES
 (1, 'Category One'),
 (2, 'Category Two');
 
-INSERT INTO IndexFamily(indexFamilyId, platformType, name) VALUES
+INSERT INTO LibraryIndexFamily(indexFamilyId, platformType, name) VALUES
   (1, 'ILLUMINA', 'TruSeq Single Index'),
   (2, 'LS454', '454 Rapid Library'),
   (3, 'ILLUMINA', 'Nextera Dual Index'),
@@ -108,7 +121,7 @@ INSERT INTO IndexFamily(indexFamilyId, platformType, name) VALUES
   (11, 'ILLUMINA', 'SureSelect XT2'),
   (12, 'ILLUMINA', 'NEXTflex 6bp');
 
-INSERT INTO `Indices` (`indexId`, `name`, `sequence`, `indexFamilyId`)
+INSERT INTO LibraryIndex (`indexId`, `name`, `sequence`, `indexFamilyId`)
 VALUES
     (12,'Index 12','CTTGTA',1),
     (11,'Index 11','GGCTAC',1),
@@ -483,10 +496,10 @@ INSERT INTO Requisition_SupplementalSample(requisitionId, sampleId) VALUES
 -- Tissue Processing - Slides
 INSERT INTO Sample(discriminator, sampleId, name, alias, project_projectId, sampleType,
   scientificNameId, lastModifier, lastModified, creator, created, sampleClassId, archived, parentId,
-  siblingNumber, isSynthetic, nonStandardAlias, initialSlides, slides) VALUES
+  siblingNumber, isSynthetic, nonStandardAlias, initialSlides, slides, indexId) VALUES
 ('Slide', 25, 'SAM25', 'TEST_0001_SLIDE_1', 1, 'GENOMIC',
   1, 1, '2024-10-16 12:39:00', 1, '2024-10-16 12:39:00', 5, FALSE, 17,
-  1, FALSE, FALSE, 3, 3);
+  1, FALSE, FALSE, 3, 3, 3);
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (25, 15, 17);

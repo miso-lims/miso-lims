@@ -6,6 +6,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
@@ -23,6 +25,10 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   private Integer slidesConsumed;
 
   private Long referenceSlideId;
+
+  @ManyToOne
+  @JoinColumn(name = "indexId")
+  private SampleIndex index;
 
   @Override
   public StrStatus getStrStatus() {
@@ -57,6 +63,16 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   @Override
   public void setReferenceSlideId(Long referenceSlideId) {
     this.referenceSlideId = referenceSlideId;
+  }
+
+  @Override
+  public SampleIndex getIndex() {
+    return index;
+  }
+
+  @Override
+  public void setIndex(SampleIndex index) {
+    this.index = index;
   }
 
   @Override

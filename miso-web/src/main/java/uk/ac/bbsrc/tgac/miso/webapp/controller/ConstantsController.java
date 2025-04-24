@@ -35,9 +35,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import uk.ac.bbsrc.tgac.miso.Version;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity.DonorSex;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
@@ -72,13 +72,13 @@ import uk.ac.bbsrc.tgac.miso.core.service.BoxUseService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContactRoleService;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexFamilyService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryIndexFamilyService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryStrategyService;
@@ -92,6 +92,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ReferenceGenomeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleIndexFamilyService;
 import uk.ac.bbsrc.tgac.miso.core.service.SamplePurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleValidRelationshipService;
@@ -121,6 +122,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 import uk.ac.bbsrc.tgac.miso.dto.MetricDto;
 import uk.ac.bbsrc.tgac.miso.dto.MetricSubcategoryDto;
+import uk.ac.bbsrc.tgac.miso.dto.SampleIndexFamilyDto;
 
 @Controller
 public class ConstantsController {
@@ -138,7 +140,7 @@ public class ConstantsController {
   @Autowired
   private KitDescriptorService kitService;
   @Autowired
-  private IndexFamilyService indexFamilyService;
+  private LibraryIndexFamilyService indexFamilyService;
   @Autowired
   private LabService labService;
   @Autowired
@@ -155,6 +157,8 @@ public class ConstantsController {
   private TissueTypeService tissueTypeService;
   @Autowired
   private TissuePieceTypeService tissuePieceTypeService;
+  @Autowired
+  private SampleIndexFamilyService sampleIndexFamilyService;
   @Autowired
   private LibraryTypeService libraryTypeService;
   @Autowired
@@ -304,6 +308,7 @@ public class ConstantsController {
       addJsonArray(mapper, node, "tissueMaterials", tissueMaterialService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "tissuePieceTypes", tissuePieceTypeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "stains", stainService.list(), Dtos::asDto);
+      addJsonArray(mapper, node, "sampleIndexFamilies", sampleIndexFamilyService.list(), SampleIndexFamilyDto::from);
       addJsonArray(mapper, node, "targetedSequencings", targetedSequencingService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "samplePurposes", samplePurposeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "sequencingParameters", sequencingParametersService.list(), Dtos::asDto);
@@ -334,8 +339,8 @@ public class ConstantsController {
       addJsonArray(mapper, node, "sampleSheetFormats", Arrays.asList(SampleSheet.values()), SampleSheet::name);
       addJsonArray(mapper, node, "contactRoles", contactRoleService.list(), Dtos::asDto);
 
-      Collection<IndexFamily> indexFamilies = indexFamilyService.list();
-      addJsonArray(mapper, node, "indexFamilies", indexFamilies, Dtos::asDto);
+      Collection<LibraryIndexFamily> indexFamilies = indexFamilyService.list();
+      addJsonArray(mapper, node, "libraryIndexFamilies", indexFamilies, Dtos::asDto);
       addJsonArray(mapper, node, "qcTypes", qcService.listQcTypes(), Dtos::asDto);
       addJsonArray(mapper, node, "qcTargets", Arrays.asList(QcTarget.values()), Dtos::asDto);
       addJsonArray(mapper, node, "concentrationUnits", Arrays.asList(ConcentrationUnit.values()), Dtos::asDto);

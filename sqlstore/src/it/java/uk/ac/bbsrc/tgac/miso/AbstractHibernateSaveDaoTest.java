@@ -130,7 +130,6 @@ public abstract class AbstractHibernateSaveDaoTest<T extends Identifiable, D ext
     assertEquals(expectedUsage, testMethod.apply(sut, item));
   }
 
-  @SuppressWarnings("unchecked")
   private T getItem(long id) throws IOException {
     return (T) currentSession().get(implClass, id);
   }

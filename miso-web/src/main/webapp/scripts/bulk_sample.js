@@ -991,6 +991,58 @@ BulkTarget.sample = (function ($) {
           description: "When the sample was taken",
         },
         {
+          title: "Index Family",
+          type: "dropdown",
+          data: "indexFamilyId",
+          include:
+            ["Tissue Processing", "Stock"].includes(targetCategory) &&
+            Constants.sampleIndexFamilies &&
+            Constants.sampleIndexFamilies.length,
+          source: Constants.sampleIndexFamilies,
+          sortSource: Utils.sorting.standardSort("name"),
+          getItemLabel: Utils.array.getName,
+          getItemValue: Utils.array.getId,
+          onChange: function (rowIndex, newValue, api) {
+            var family = Utils.array.findFirstOrNull(
+              Utils.array.namePredicate(newValue),
+              Constants.sampleIndexFamilies
+            );
+            var changes = {
+              required: !!family,
+              disabled: !family,
+            };
+            if (family) {
+              changes.source = family.indices;
+            } else {
+              changes.source = [];
+              changes.value = null;
+            }
+            api.updateField(rowIndex, "indexId", changes);
+          },
+        },
+        {
+          title: "Index",
+          type: "dropdown",
+          data: "indexId",
+          include:
+            ["Tissue Processing", "Stock"].includes(targetCategory) &&
+            Constants.sampleIndexFamilies &&
+            Constants.sampleIndexFamilies.length,
+          source: function (sample, api) {
+            if (!sample.indexFamilyId) {
+              return [];
+            }
+            var indexFamily = Utils.array.findUniqueOrThrow(
+              Utils.array.idPredicate(sample.indexFamilyId),
+              Constants.sampleIndexFamilies
+            );
+            return indexFamily.indices;
+          },
+          sortSource: Utils.sorting.standardSort("name"),
+          getItemLabel: Utils.array.getName,
+          getItemValue: Utils.array.getId,
+        },
+        {
           title: "Initial Slides",
           type: "int",
           data: "initialSlides",
