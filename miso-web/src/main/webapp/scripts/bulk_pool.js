@@ -405,6 +405,7 @@ BulkTarget.pool = (function ($) {
             required: true,
             type: "order",
             getLabel: Utils.array.getAlias,
+            //value: partitionCount,
             values: pools,
           },
         ],
@@ -420,6 +421,24 @@ BulkTarget.pool = (function ($) {
           });
         },
         null
+      );
+    }
+    function showContainersDialog(modelId) {
+      Utils.showWizardDialog(
+        "Create Samplesheet",
+        Constants.containerModels
+          .filter(function (m) {
+            return m.instrumentModelIds.indexOf(modelId) !== -1 && !m.archived;
+          })
+          .sort(Utils.sorting.standardSort("alias"))
+          .map(function (model) {
+            return {
+              name: model.alias,
+              handler: function () {
+                showCreateDialog(modelId, model.partitionCount);
+              },
+            };
+          })
       );
     }
     Utils.showWizardDialog(

@@ -411,6 +411,50 @@ var Utils = Utils || {
           input.appendChild(compareTypeControl);
           input.appendChild(valueControl);
           break;
+        case "orderDropdowns":
+          var maxDropdowns = field.value;
+          if (field.values.length == 0) {
+            return;
+          }
+          input = document.createElement("DIV");
+
+          for (var i = 0; i < maxDropdowns; i++) {
+            var label = document.createElement("LABEL");
+            label.innerText = i + 1 + ": ";
+            label.className = "dropdown-label";
+
+            dropdown = document.createElement("SELECT");
+            dropdown.className = "dropdown-menu";
+            var option = document.createElement("OPTION");
+            option.text = "Empty";
+            option.value = 0;
+            dropdown.appendChild(option);
+            if (field.value == option.text) {
+              dropdown.value = 0;
+              output[field.property] = null;
+            }
+
+            field.values.forEach(function (value, index) {
+              var option = document.createElement("OPTION");
+              option.text = field.getLabel ? field.getLabel(value) : value;
+              option.value = index;
+              dropdown.appendChild(option);
+              if (field.value == option.text) {
+                dropdown.value = index;
+                output[field.property] = value;
+              }
+            });
+            dropdown.onchange = function () {
+              output[field.property] = field.values[parseInt(dropdown.value)];
+            };
+            if (!field.value) {
+              output[field.property] = field.values[0];
+            }
+            input.appendChild(label);
+            input.appendChild(dropdown);
+            input.appendChild(document.createElement("BR")); //ensures each lane is on a new line
+          }
+          break;
         case "order":
           input = document.createElement("DIV");
           input.className = "widget ui-corner-top ui-corner-bottom";
