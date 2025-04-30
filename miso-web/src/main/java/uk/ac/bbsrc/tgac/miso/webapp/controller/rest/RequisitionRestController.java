@@ -45,12 +45,14 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunPartitionAliquotDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/requisitions")
-public class RequisitionRestController extends RestController {
+public class RequisitionRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Requisition";
   private static final String SAMPLE_TYPE_LABEL = "Sample";
@@ -276,7 +278,15 @@ public class RequisitionRestController extends RestController {
   @GetMapping("/{requisitionId}/runlibraries")
   public @ResponseBody List<RunPartitionAliquotDto> listRunLibraries(@PathVariable long requisitionId)
       throws IOException {
-    List<Long> libraryIds = libraryService.listIdsByRequisitionId(requisitionId);
+    // requisitioned
+    List<Long> libraryIds = libraryService.list(0, 0, false, null, PaginationFilter.requisitionId(requisitionId))
+        .stream().map(Library::getId).collect(Collectors.toCollection(() -> new ArrayList<>()));
+    // supplemental
+    libraryIds.addAll(libraryService.list(0, 0, false, null,
+        PaginationFilter.supplementalToRequisitionId(requisitionId)).stream().map(Library::getId).toList());
+    // prepared
+    libraryIds.addAll(libraryService.listPreparedIdsByRequisitionId(requisitionId));
+
     List<RunPartitionAliquot> runLibraries = runPartitionAliquotService.listByLibraryIdList(libraryIds);
     return runLibraries.stream().map(Dtos::asDto).collect(Collectors.toList());
   }

@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.Pair;
@@ -100,18 +100,18 @@ public enum IlluminaExperiment {
 
   protected abstract void applyAttribute(Map<String, String> header, Map<String, String> settings);
 
-  private Pair<String, String> buildIndex(Optional<Index> index, int length) {
-    return new Pair<>(index.map(Index::getName).orElse("No Index"),
-        pad(length, index.map(Index::getSequence).orElse("")));
+  private Pair<String, String> buildIndex(Optional<LibraryIndex> index, int length) {
+    return new Pair<>(index.map(LibraryIndex::getName).orElse("No Index"),
+        pad(length, index.map(LibraryIndex::getSequence).orElse("")));
   }
 
-  private Optional<Index> extract(List<Index> indices, int position) {
+  private Optional<LibraryIndex> extract(List<LibraryIndex> indices, int position) {
     return indices.stream()//
         .filter(i -> i.getPosition() == position)//
         .findFirst();
   }
 
-  private Set<String> extractCollection(List<Index> indices, int position) {
+  private Set<String> extractCollection(List<LibraryIndex> indices, int position) {
     return indices.stream()//
         .filter(i -> i.getPosition() == position)//
         .map(i -> i.getRealSequences())//
@@ -199,7 +199,7 @@ public enum IlluminaExperiment {
     for (int lane = 0; lane < pools.size(); lane++) {
       for (final PoolElement element : pools.get(lane).getPoolContents()) {
         ParentLibrary library = element.getAliquot().getParentLibrary();
-        final List<Index> indices = Stream.of(library.getIndex1(), library.getIndex2())
+        final List<LibraryIndex> indices = Stream.of(library.getIndex1(), library.getIndex2())
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
         final List<Pair<Pair<String, String>, Pair<String, String>>> outputIndicies;

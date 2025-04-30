@@ -1,5 +1,6 @@
 SET FOREIGN_KEY_CHECKS=0;
 
+DELETE FROM ApiKey;
 DELETE FROM Array;
 DELETE FROM ArrayChangeLog;
 DELETE FROM ArrayModel;
@@ -22,8 +23,8 @@ DELETE FROM DetailedLibraryTemplate;
 DELETE FROM DetailedQcStatus;
 DELETE FROM Experiment;
 DELETE FROM _Group;
-DELETE FROM IndexFamily;
-DELETE FROM Indices;
+DELETE FROM LibraryIndexFamily;
+DELETE FROM LibraryIndex;
 DELETE FROM Instrument;
 DELETE FROM InstrumentModel;
 DELETE FROM InstrumentPosition;
@@ -92,6 +93,8 @@ DELETE FROM Run_SequencerPartitionContainer;
 DELETE FROM Sample;
 DELETE FROM SampleChangeLog;
 DELETE FROM SampleClass;
+DELETE FROM SampleIndex;
+DELETE FROM SampleIndexFamily;
 DELETE FROM Sample_Note;
 DELETE FROM SampleNumberPerProject;
 DELETE FROM SamplePurpose;

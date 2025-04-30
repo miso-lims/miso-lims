@@ -58,6 +58,10 @@ public class HibernateInstrumentDao extends HibernateSaveDao<Instrument>
     return getBy(InstrumentImpl_.NAME, name);
   }
 
+  @Override
+  public Instrument getByBarcode(String barcode) throws IOException {
+    return getBy(InstrumentImpl_.IDENTIFICATION_BARCODE, barcode);
+  }
 
   @Override
   public Instrument getByUpgradedInstrument(long id) {

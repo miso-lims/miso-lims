@@ -117,6 +117,10 @@ public class DefaultInstrumentService implements InstrumentService {
     if (isSetAndChanged(Instrument::getName, instrument, beforeChange) && getByName(instrument.getName()) != null) {
       errors.add(new ValidationError("name", "There is already an instrument with this name"));
     }
+    if (isSetAndChanged(Instrument::getIdentificationBarcode, instrument, beforeChange)
+        && instrumentDao.getByBarcode(instrument.getIdentificationBarcode()) != null) {
+      errors.add(ValidationError.forDuplicate("instrument", "identificationBarcode", "barcode"));
+    }
     if (isSetAndChanged(Instrument::getUpgradedInstrument, instrument, beforeChange)
         && getByUpgradedInstrumentId(instrument.getUpgradedInstrument().getId()) != null) {
       errors.add(new ValidationError("upgradedInstrumentId",

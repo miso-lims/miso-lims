@@ -57,8 +57,8 @@ DELETE FROM KitDescriptorChangeLog;
 DELETE FROM KitDescriptor;
 DELETE FROM BoxUse;
 DELETE FROM BoxSize;
-DELETE FROM Indices;
-DELETE FROM IndexFamily;
+DELETE FROM LibraryIndex;
+DELETE FROM LibraryIndexFamily;
 DELETE FROM SequencingParameters;
 DELETE FROM Instrument WHERE upgradedInstrumentId IS NOT NULL;
 DELETE FROM Instrument;
@@ -208,11 +208,11 @@ INSERT INTO BoxSize (boxSizeId, `boxSizeRows`, `boxSizeColumns`, `scannable`) VA
 (1, 8, 12, 1),
 (2, 10, 10, 0);
 
-INSERT INTO IndexFamily (indexFamilyId, name, platformType) VALUES
+INSERT INTO LibraryIndexFamily (indexFamilyId, name, platformType) VALUES
   (1, 'Single Index 6bp', 'ILLUMINA'),
   (2, 'Dual Index 6bp', 'ILLUMINA');
 
-INSERT INTO Indices (indexId, indexFamilyId, name, sequence, position) VALUES
+INSERT INTO LibraryIndex (indexId, indexFamilyId, name, sequence, position) VALUES
   (1,  1, 'Index 01', 'AAAAAA', 1),
   (2,  1, 'Index 02', 'CCCCCC', 1),
   (3,  1, 'Index 03', 'GGGGGG', 1),

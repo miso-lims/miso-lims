@@ -38,15 +38,19 @@ FOR EACH ROW
 DROP TRIGGER IF EXISTS RequisitionAssayInsert//
 CREATE TRIGGER RequisitionAssayInsert AFTER INSERT ON Requisition_Assay
 FOR EACH ROW
-  INSERT INTO RequisitionChangeLog(requisitionId, columnsChanged, userId, message, changeTime)
-    SELECT
-      NEW.requisitionId,
-      'assays',
-      lastModifier,
-      CONCAT('Added assay ', (SELECT alias FROM Assay WHERE assayId = NEW.assayId)),
-      lastModified
-    FROM Requisition
-    WHERE requisitionId = NEW.requisitionId//
+  BEGIN
+    IF TIMESTAMPDIFF(HOUR, (SELECT created FROM Requisition WHERE requisitionId = NEW.requisitionId), NOW()) > 0 THEN
+      INSERT INTO RequisitionChangeLog(requisitionId, columnsChanged, userId, message, changeTime)
+        SELECT
+          NEW.requisitionId,
+          'assays',
+          lastModifier,
+          CONCAT('Added assay ', (SELECT alias FROM Assay WHERE assayId = NEW.assayId)),
+          lastModified
+        FROM Requisition
+        WHERE requisitionId = NEW.requisitionId;
+    END IF;
+  END//
 
 DROP TRIGGER IF EXISTS RequisitionAssayDelete//
 CREATE TRIGGER RequisitionAssayDelete AFTER DELETE ON Requisition_Assay

@@ -16,17 +16,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationMapService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 
 @Controller
 @RequestMapping("/rest/locationmaps")
-public class StorageLocationMapRestController extends RestController {
+public class StorageLocationMapRestController extends AbstractRestController {
 
   @Autowired
   private StorageLocationMapService mapService;
 
   @PostMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void upload(@RequestParam("file") MultipartFile file, @RequestParam(name = "description", required = false) String description)
+  public void upload(@RequestParam("file") MultipartFile file,
+      @RequestParam(name = "description", required = false) String description)
       throws IOException {
     String saveDesc = LimsUtils.isStringEmptyOrNull(description) ? null : description;
     mapService.create(file, saveDesc);

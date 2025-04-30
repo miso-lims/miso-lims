@@ -12,8 +12,10 @@ public class OicrLibraryAliasValidator extends RegexValidator {
     final String illuminaRegex = "(" + "[A-Z]{2}" + "|\\?\\?)_(nn|\\d{2,6}|\\dK)_" + designCodeRegex;
     final String ontRegex = "(" + "[A-Z\\d]{3,4}" + ")_" + designCodeRegex + "_\\d+";
     final String pacbioRegex = "\\d{8}_\\d+"; // ...20170913_1
+    final String ultimaRegex = designCodeRegex + "_\\d+(-\\d+)?"; // ...WG_1 for library, ...WG_1-1 for aliquot
     String finalRegex =
-        String.format("^%s(%s|%s(%s|%s))$", identityRegex, pacbioRegex, tissueRegex, illuminaRegex, ontRegex);
+        String.format("^%s(%s|%s(%s|%s|%s))$", identityRegex, pacbioRegex, tissueRegex, illuminaRegex, ontRegex,
+            ultimaRegex);
 
     pattern = Pattern.compile(finalRegex);
   }

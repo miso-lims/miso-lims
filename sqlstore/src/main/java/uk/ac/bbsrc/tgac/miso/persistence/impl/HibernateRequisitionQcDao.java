@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition_;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.RequisitionQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.RequisitionQC_;
 import uk.ac.bbsrc.tgac.miso.persistence.RequisitionQcStore;
 
 @Repository
@@ -30,7 +30,7 @@ public class HibernateRequisitionQcDao extends HibernateQcStore<RequisitionQC> i
 
   @Override
   public String getIdProperty() {
-    return Requisition_.REQUISITION_ID;
+    return RequisitionQC_.QC_ID;
   }
 
 }

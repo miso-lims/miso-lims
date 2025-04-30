@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +27,11 @@ public class HibernateQcTypeDao extends HibernateSaveDao<QcType> implements Qual
   }
 
   @Override
-  public List<QcType> listByNameAndTarget(String name, QcTarget target) throws IOException {
+  public QcType getByNameAndTarget(String name, QcTarget target) throws IOException {
     QueryBuilder<QcType, QcType> builder = new QueryBuilder<>(currentSession(), QcType.class, QcType.class);
     builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(QcType_.name), name));
     builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(QcType_.qcTarget), target));
-    return builder.getResultList();
+    return builder.getSingleResultOrNull();
   }
 
   @Override

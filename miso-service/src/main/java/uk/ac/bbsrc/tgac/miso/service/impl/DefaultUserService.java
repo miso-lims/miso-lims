@@ -34,8 +34,8 @@ public class DefaultUserService implements UserService {
   private AuthorizationManager authorizationManager;
   @Autowired
   private DeletionStore deletionStore;
-  @Autowired(required = false)
-  private PasswordEncoder passwordEncoder; // Will be null if using LDAP/AD authentication
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
   public void setSecurityStore(SecurityStore securityStore) {
     this.securityStore = securityStore;
@@ -58,13 +58,14 @@ public class DefaultUserService implements UserService {
 
   @VisibleForTesting
   protected String validateAndEncodePassword(String password, boolean newUser) {
-    if (newUser && !securityManager.isPasswordMutable() && password == null) {
-      // null expected if using LDAP/AD authentication
+    if (password == null) {
+      // validateChange already checks whether password is set if required. Null expected if using LDAP/AD
+      // authentication or creating an **inactive** user to link to an API key
       return null;
     }
     String passwordProperty = newUser ? "password" : "newPassword";
-    if (password.length() < 8) {
-      throw new ValidationException(new ValidationError(passwordProperty, "Must be at least 8 characters long"));
+    if (password.length() < 15) {
+      throw new ValidationException(new ValidationError(passwordProperty, "Must be at least 15 characters long"));
     }
     int complexity = 0;
     for (String characterClass : characterClasses) {
@@ -115,6 +116,12 @@ public class DefaultUserService implements UserService {
     if (ValidationUtils.isSetAndChanged(User::getLoginName, user, beforeChange)
         && getByLoginName(user.getLoginName()) != null) {
       throw new ValidationException(new ValidationError("loginName", "There is already a user with this login name"));
+    }
+    if (securityManager.isPasswordMutable()) {
+      if (user.isActive() && user.getPassword() == null
+          && (beforeChange == null || beforeChange.getPassword() == null)) {
+        throw new ValidationException(new ValidationError("password", "User requires a password"));
+      }
     }
   }
 

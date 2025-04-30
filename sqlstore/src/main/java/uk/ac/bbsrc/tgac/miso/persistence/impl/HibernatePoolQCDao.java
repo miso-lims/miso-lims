@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC_;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.persistence.PoolQcStore;
 
@@ -31,7 +31,7 @@ public class HibernatePoolQCDao extends HibernateQcStore<PoolQC> implements Pool
 
   @Override
   public String getIdProperty() {
-    return PoolImpl_.POOL_ID;
+    return PoolQC_.QC_ID;
   }
 
 }

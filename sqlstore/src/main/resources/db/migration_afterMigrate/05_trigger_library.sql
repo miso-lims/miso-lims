@@ -42,8 +42,8 @@ FOR EACH ROW
     makeChangeMessage('group description', OLD.groupDescription, NEW.groupDescription),
     makeChangeMessage('group id', OLD.groupId, NEW.groupId),
     makeChangeMessage('SOP', (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = OLD.sopId), (SELECT CONCAT(alias, ' (', version, ')') FROM Sop WHERE sopId = NEW.sopId)),
-    makeChangeMessage('Index 1', (SELECT CONCAT(name, ' (', sequence, ')') FROM Indices WHERE indexId = OLD.index1Id), (SELECT CONCAT(name, ' (', sequence, ')') FROM Indices WHERE indexId = NEW.index1Id)),
-    makeChangeMessage('Index 2', (SELECT CONCAT(name, ' (', sequence, ')') FROM Indices WHERE indexId = OLD.index2Id), (SELECT CONCAT(name, ' (', sequence, ')') FROM Indices WHERE indexId = NEW.index2Id)),
+    makeChangeMessage('Index 1', (SELECT CONCAT(name, ' (', sequence, ')') FROM LibraryIndex WHERE indexId = OLD.index1Id), (SELECT CONCAT(name, ' (', sequence, ')') FROM LibraryIndex WHERE indexId = NEW.index1Id)),
+    makeChangeMessage('Index 2', (SELECT CONCAT(name, ' (', sequence, ')') FROM LibraryIndex WHERE indexId = OLD.index2Id), (SELECT CONCAT(name, ' (', sequence, ')') FROM LibraryIndex WHERE indexId = NEW.index2Id)),
     makeChangeMessage('Requisition', (SELECT alias FROM Requisition WHERE requisitionId = OLD.requisitionId), (SELECT alias FROM Requisition WHERE requisitionId = NEW.requisitionId))
   );
   IF log_message IS NOT NULL AND log_message <> '' THEN

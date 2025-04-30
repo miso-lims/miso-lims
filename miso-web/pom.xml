@@ -6,7 +6,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>3.2.1-SNAPSHOT</version>
+    <version>3.7.1-SNAPSHOT</version>
   </parent>
   <artifactId>miso-web</artifactId>
   <packaging>war</packaging>
@@ -171,10 +171,6 @@
     <dependency>
       <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom</artifactId>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>

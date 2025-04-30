@@ -17,10 +17,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcStatusUpdate;
 import uk.ac.bbsrc.tgac.miso.core.service.QcStatusService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcNodeDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 
 @Controller
 @RequestMapping("/rest/qcstatuses")
-public class QcStatusRestController extends RestController {
+public class QcStatusRestController extends AbstractRestController {
 
   @Autowired
   private QcStatusService qcStatusService;

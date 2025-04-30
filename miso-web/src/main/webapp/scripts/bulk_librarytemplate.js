@@ -128,7 +128,7 @@ BulkTarget.librarytemplate = (function ($) {
               }),
             });
             api.updateField(rowIndex, "indexFamilyId", {
-              source: Constants.indexFamilies.filter(function (x) {
+              source: Constants.libraryIndexFamilies.filter(function (x) {
                 return (
                   x.platformType === platformType.name &&
                   (!x.archived || originalDataByRow[rowIndex].indexFamilyId === x.id)
@@ -225,7 +225,7 @@ BulkTarget.librarytemplate = (function ($) {
             if (item.indexFamilyId) {
               var family = Utils.array.findUniqueOrThrow(
                 Utils.array.idPredicate(item.indexFamilyId),
-                Constants.indexFamilies
+                Constants.libraryIndexFamilies
               );
               return family.name;
             } else {

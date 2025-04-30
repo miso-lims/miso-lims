@@ -23,7 +23,7 @@ var LibraryTemplate = (function ($) {
       libraryTemplateId = template.id;
       var indexFamily = Utils.array.findUniqueOrThrow(
         Utils.array.idPredicate(template.indexFamilyId),
-        Constants.indexFamilies
+        Constants.libraryIndexFamilies
       );
       var indices = [];
       if (template.indexOneIds) {

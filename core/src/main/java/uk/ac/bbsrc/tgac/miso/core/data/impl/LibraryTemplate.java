@@ -21,8 +21,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapKeyColumn;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -78,21 +78,21 @@ public class LibraryTemplate implements Serializable, Deletable {
 
   @ManyToOne
   @JoinColumn(name = "indexFamilyId")
-  private IndexFamily indexFamily;
+  private LibraryIndexFamily indexFamily;
 
-  @ManyToMany(targetEntity = Index.class)
+  @ManyToMany(targetEntity = LibraryIndex.class)
   @MapKeyColumn(name = "position", unique = true)
   @JoinTable(name = "LibraryTemplate_Index1", joinColumns = {@JoinColumn(name = "libraryTemplateId")},
       inverseJoinColumns = {
           @JoinColumn(name = "indexId")})
-  private Map<String, Index> indexOnes;
+  private Map<String, LibraryIndex> indexOnes;
 
-  @ManyToMany(targetEntity = Index.class)
+  @ManyToMany(targetEntity = LibraryIndex.class)
   @MapKeyColumn(name = "position", unique = true)
   @JoinTable(name = "LibraryTemplate_Index2", joinColumns = {@JoinColumn(name = "libraryTemplateId")},
       inverseJoinColumns = {
           @JoinColumn(name = "indexId")})
-  private Map<String, Index> indexTwos;
+  private Map<String, LibraryIndex> indexTwos;
 
   @Override
   public long getId() {
@@ -175,22 +175,22 @@ public class LibraryTemplate implements Serializable, Deletable {
     this.kitDescriptor = kitDescriptor;
   }
 
-  public IndexFamily getIndexFamily() {
+  public LibraryIndexFamily getIndexFamily() {
     return indexFamily;
   }
 
-  public void setIndexFamily(IndexFamily indexFamily) {
+  public void setIndexFamily(LibraryIndexFamily indexFamily) {
     this.indexFamily = indexFamily;
   }
 
-  public Map<String, Index> getIndexOnes() {
+  public Map<String, LibraryIndex> getIndexOnes() {
     if (indexOnes == null) {
       indexOnes = new HashMap<>();
     }
     return indexOnes;
   }
 
-  public Map<String, Index> getIndexTwos() {
+  public Map<String, LibraryIndex> getIndexTwos() {
     if (indexTwos == null) {
       indexTwos = new HashMap<>();
     }

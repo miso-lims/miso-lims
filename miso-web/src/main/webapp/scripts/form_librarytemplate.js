@@ -231,7 +231,7 @@ FormTarget.librarytemplate = (function ($) {
   function getIndexFamilyOptions(platformType, originalObject) {
     return !platformType
       ? []
-      : Constants.indexFamilies.filter(function (family) {
+      : Constants.libraryIndexFamilies.filter(function (family) {
           return (
             family.platformType == platformType.name &&
             (!family.archived || family.id === originalObject.indexFamilyId)

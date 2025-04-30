@@ -20,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
@@ -41,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.persistence.IndexStore;
+import uk.ac.bbsrc.tgac.miso.persistence.LibraryIndexDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
 
 public class HibernateLibraryDaoIT extends AbstractDAOTest {
@@ -52,7 +51,7 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   @PersistenceContext
   private EntityManager entityManager;
   @Mock
-  private IndexStore indexStore;
+  private LibraryIndexDao indexStore;
   @Mock
   private SampleStore sampleStore;
   @Mock

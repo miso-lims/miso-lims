@@ -11,7 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 
@@ -34,11 +34,11 @@ public class ListPoolViewElement implements IndexedLibrary, Serializable {
 
   @ManyToOne
   @JoinColumn(name = "index1Id")
-  private Index index1;
+  private LibraryIndex index1;
 
   @ManyToOne
   @JoinColumn(name = "index2Id")
-  private Index index2;
+  private LibraryIndex index2;
 
   private String subprojectAlias;
   private Boolean subprojectPriority = false;
@@ -103,22 +103,22 @@ public class ListPoolViewElement implements IndexedLibrary, Serializable {
   }
 
   @Override
-  public Index getIndex1() {
+  public LibraryIndex getIndex1() {
     return index1;
   }
 
   @Override
-  public void setIndex1(Index index1) {
+  public void setIndex1(LibraryIndex index1) {
     this.index1 = index1;
   }
 
   @Override
-  public Index getIndex2() {
+  public LibraryIndex getIndex2() {
     return index2;
   }
 
   @Override
-  public void setIndex2(Index index2) {
+  public void setIndex2(LibraryIndex index2) {
     this.index2 = index2;
   }
 

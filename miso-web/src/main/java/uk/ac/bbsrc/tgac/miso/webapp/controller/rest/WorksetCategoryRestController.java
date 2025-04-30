@@ -22,11 +22,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.WorksetCategoryService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SimpleAliasableDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/worksetcategories")
-public class WorksetCategoryRestController extends RestController {
+public class WorksetCategoryRestController extends AbstractRestController {
 
   @Autowired
   private WorksetCategoryService worksetCategoryService;
@@ -46,13 +47,15 @@ public class WorksetCategoryRestController extends RestController {
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<SimpleAliasableDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkCreate("Workset Category", dtos, Dtos::toWorksetCategory, worksetCategoryService, true);
+    return asyncOperationManager.startAsyncBulkCreate("Workset Category", dtos, Dtos::toWorksetCategory,
+        worksetCategoryService, true);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<SimpleAliasableDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkUpdate("Workset Category", dtos, Dtos::toWorksetCategory, worksetCategoryService, true);
+    return asyncOperationManager.startAsyncBulkUpdate("Workset Category", dtos, Dtos::toWorksetCategory,
+        worksetCategoryService, true);
   }
 
   @GetMapping("/bulk/{uuid}")

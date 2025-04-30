@@ -4,11 +4,9 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -40,14 +38,13 @@ public class HibernateQcTypeDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListByNameAndTarget() throws Exception {
+  public void testGetByNameAndTarget() throws Exception {
     String name = "QuBit";
     QcTarget target = QcTarget.Library;
-    List<QcType> qcTypes = dao.listByNameAndTarget(name, target);
-    assertNotNull(qcTypes);
-    assertEquals(1, qcTypes.size());
-    assertEquals(name, qcTypes.get(0).getName());
-    assertEquals(target, qcTypes.get(0).getQcTarget());
+    QcType qcType = dao.getByNameAndTarget(name, target);
+    assertNotNull(qcType);
+    assertEquals(name, qcType.getName());
+    assertEquals(target, qcType.getQcTarget());
   }
 
   @Test

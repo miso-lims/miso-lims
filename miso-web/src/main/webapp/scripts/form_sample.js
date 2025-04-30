@@ -461,6 +461,11 @@ FormTarget.sample = (function ($) {
           ],
         },
         {
+          title: "Tissue Processing",
+          include: config.detailedSample && object.sampleCategory === "Tissue Processing",
+          fields: makeIndexFields(object),
+        },
+        {
           title: "Slide",
           include: config.detailedSample && object.sampleSubcategory === "Slide",
           fields: [
@@ -580,6 +585,21 @@ FormTarget.sample = (function ($) {
               type: "decimal",
               precision: 14,
               scale: 10,
+              description: "Initial concentration of cells in the sample at the time of receipt",
+            },
+            {
+              title: "Target Cell Recovery",
+              data: "targetCellRecovery",
+              type: "int",
+              min: 0,
+            },
+            {
+              title: "Loading Cell Concentration",
+              data: "loadingCellConcentration",
+              type: "decimal",
+              precision: 14,
+              scale: 10,
+              description: "Concentration of cells prepared for loading into the instrument",
             },
             {
               title: "Digestion",
@@ -593,7 +613,7 @@ FormTarget.sample = (function ($) {
         {
           title: "Stock",
           include: config.detailedSample && object.sampleCategory === "Stock",
-          fields: [
+          fields: makeIndexFields(object).concat([
             {
               title: "STR Status",
               data: "strStatus",
@@ -649,7 +669,7 @@ FormTarget.sample = (function ($) {
               scale: 10,
               include: object.sampleSubcategory === "Single Cell (stock)",
             },
-          ],
+          ]),
         },
         {
           title: "Aliquot",
@@ -715,5 +735,52 @@ FormTarget.sample = (function ($) {
         Utils.showOkDialog("Error", ["No metrics applicable to " + sample.sampleCategory]);
       }
     });
+  }
+
+  function makeIndexFields(sample) {
+    return [
+      {
+        title: "Index Family",
+        data: "indexFamilyId",
+        type: "dropdown",
+        include: Constants.sampleIndexFamilies && Constants.sampleIndexFamilies.length,
+        nullLabel: "No indices",
+        source: Constants.sampleIndexFamilies,
+        sortSource: Utils.sorting.standardSort("name"),
+        getItemLabel: Utils.array.getName,
+        getItemValue: Utils.array.getId,
+        onChange: function (newValue, form) {
+          var changes = {
+            disabled: !newValue,
+            required: !!newValue,
+          };
+          if (newValue) {
+            var family = Utils.array.findUniqueOrThrow(
+              Utils.array.idPredicate(newValue),
+              Constants.sampleIndexFamilies
+            );
+            changes.source = family.indices;
+          } else {
+            changes.source = [];
+          }
+          form.updateField("indexId", changes);
+        },
+      },
+      {
+        title: "Index",
+        data: "indexId",
+        type: "dropdown",
+        include: Constants.sampleIndexFamilies && Constants.sampleIndexFamilies.length,
+        source: sample.indexFamilyId
+          ? Utils.array.findUniqueOrThrow(
+              Utils.array.idPredicate(sample.indexFamilyId),
+              Constants.sampleIndexFamilies
+            ).indices
+          : [],
+        sortSource: Utils.sorting.standardSort("name"),
+        getItemLabel: Utils.array.getName,
+        getItemValue: Utils.array.getId,
+      },
+    ];
   }
 })(jQuery);

@@ -174,7 +174,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
     public static final String EXPERIMENTS = "experiments";
     public static final String GROUPS = "admin/groups";
-    public static final String INDEX_FAMILIES = "indexfamily/list";
+    public static final String INDEX_FAMILIES = "libraryindexfamily/list";
     public static final String INSTRUMENTS = "instruments";
     public static final String INSTRUMENT_MODELS = "instrumentmodel/list";
     public static final String KITS = "kitdescriptors";

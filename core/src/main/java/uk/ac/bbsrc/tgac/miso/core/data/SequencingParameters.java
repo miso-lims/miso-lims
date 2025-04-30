@@ -68,6 +68,11 @@ public class SequencingParameters
   @JoinColumn(name = "updatedBy", nullable = false)
   private User updatedBy;
 
+  @Column
+  private Integer movieTime;
+
+  private Integer flows;
+
   public IlluminaChemistry getChemistry() {
     return chemistry;
   }
@@ -224,6 +229,8 @@ public class SequencingParameters
     result = prime * result + readLength;
     result = prime * result + readLength2;
     result = prime * result + ((runType == null) ? 0 : runType.hashCode());
+    result = prime * result + ((movieTime == null) ? 0 : movieTime.hashCode());
+    result = prime * result + ((flows == null) ? 0 : flows.hashCode());
     return result;
   }
 
@@ -237,6 +244,10 @@ public class SequencingParameters
       return false;
     SequencingParameters other = (SequencingParameters) obj;
     if (chemistry != other.chemistry)
+      return false;
+    if (movieTime != other.movieTime)
+      return false;
+    if (flows != other.flows)
       return false;
     if (instrumentModel == null) {
       if (other.instrumentModel != null)
@@ -257,6 +268,7 @@ public class SequencingParameters
         return false;
     } else if (!runType.equals(other.runType))
       return false;
+
     return true;
   }
 
@@ -278,4 +290,19 @@ public class SequencingParameters
     return getName() + " (" + getInstrumentModel().getAlias() + ")";
   }
 
+  public Integer getMovieTime() {
+    return movieTime;
+  }
+
+  public void setMovieTime(Integer movieTime) {
+    this.movieTime = movieTime;
+  }
+
+  public Integer getFlows() {
+    return flows;
+  }
+
+  public void setFlows(Integer flows) {
+    this.flows = flows;
+  }
 }

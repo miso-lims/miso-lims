@@ -784,39 +784,44 @@ var Utils = Utils || {
       request.send();
     }
   },
-  printSelectDialog: function (callback) {
+  printSelectDialog: function (callback, additionalFields) {
     Utils.ajaxWithDialog(
       "Getting Printers",
       "GET",
       Urls.rest.printers.list,
       null,
       function (printers) {
+        var fields = [
+          {
+            property: "printer",
+            label: "Printer",
+            required: true,
+            type: "select",
+            value: window.localStorage.getItem("miso-printer"),
+            values: printers.filter(function (printer) {
+              return printer.available;
+            }),
+            getLabel: Utils.array.getName,
+          },
+          {
+            property: "copies",
+            label: "Copies",
+            required: true,
+            type: "int",
+            value: 1,
+          },
+        ];
+        if (additionalFields) {
+          fields = fields.concat(additionalFields);
+        }
+
         Utils.showDialog(
           "Select Printer",
           "Print",
-          [
-            {
-              property: "printer",
-              label: "Printer",
-              required: true,
-              type: "select",
-              value: window.localStorage.getItem("miso-printer"),
-              values: printers.filter(function (printer) {
-                return printer.available;
-              }),
-              getLabel: Utils.array.getName,
-            },
-            {
-              property: "copies",
-              label: "Copies",
-              required: true,
-              type: "int",
-              value: 1,
-            },
-          ],
+          fields,
           function (result) {
             window.localStorage.setItem("miso-printer", result.printer.name);
-            callback(result.printer.id, Math.max(1, result.copies));
+            callback(result.printer.id, Math.max(1, result.copies), result);
           },
           null
         );
@@ -1712,8 +1717,8 @@ Utils.notes = {
 Utils.decimalStrings = (function () {
   return {
     add: function (one, two) {
-      var oneDecimalPlaces = getDecimalPlaces(one);
-      var twoDecimalPlaces = getDecimalPlaces(two);
+      var oneDecimalPlaces = Utils.decimalStrings.getDecimalPlaces(one);
+      var twoDecimalPlaces = Utils.decimalStrings.getDecimalPlaces(two);
       var shift = Math.max(oneDecimalPlaces, twoDecimalPlaces);
       var sum =
         decimalStringToInt(one, oneDecimalPlaces, shift) +
@@ -1722,13 +1727,30 @@ Utils.decimalStrings = (function () {
     },
 
     subtract: function (one, two) {
-      var oneDecimalPlaces = getDecimalPlaces(one);
-      var twoDecimalPlaces = getDecimalPlaces(two);
+      var oneDecimalPlaces = Utils.decimalStrings.getDecimalPlaces(one);
+      var twoDecimalPlaces = Utils.decimalStrings.getDecimalPlaces(two);
       var shift = Math.max(oneDecimalPlaces, twoDecimalPlaces);
       var difference =
         decimalStringToInt(one, oneDecimalPlaces, shift) -
         decimalStringToInt(two, twoDecimalPlaces, shift);
       return intToDecimalString(difference, shift);
+    },
+    getDecimalPlaces: function (decimalString) {
+      if (typeof decimalString !== "string") {
+        decimalString = decimalString.toString();
+      }
+      var index = decimalString.indexOf(".");
+      return index === -1 ? 0 : decimalString.length - (index + 1);
+    },
+    truncateDecimal: function (value, decimalPlaces) {
+      if (typeof value !== "string") {
+        value = value.toString();
+      }
+      var decimalIndex = value.indexOf(".");
+      if (decimalIndex > -1) {
+        value = value.substring(0, decimalIndex + decimalPlaces + 1);
+      }
+      return value;
     },
   };
 
@@ -1768,10 +1790,5 @@ Utils.decimalStrings = (function () {
       string = "-" + string;
     }
     return string;
-  }
-
-  function getDecimalPlaces(decimalString) {
-    var index = decimalString.indexOf(".");
-    return index === -1 ? 0 : decimalString.length - (index + 1);
   }
 })();

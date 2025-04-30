@@ -130,7 +130,7 @@ ListTarget.orderaliquot = {
           if (!data || !data.length) {
             return "(none)";
           }
-          var indices = Constants.indexFamilies
+          var indices = Constants.libraryIndexFamilies
             .reduce(function (acc, family) {
               return acc.concat(
                 family.indices.filter(function (index) {

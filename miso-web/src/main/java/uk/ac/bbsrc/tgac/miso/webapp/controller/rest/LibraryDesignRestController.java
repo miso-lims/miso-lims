@@ -14,11 +14,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDesignDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/librarydesigns")
-public class LibraryDesignRestController extends RestController {
+public class LibraryDesignRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Library Design";
 
@@ -31,8 +32,7 @@ public class LibraryDesignRestController extends RestController {
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody
-  ObjectNode bulkCreateAsync(@RequestBody List<LibraryDesignDto> dtos) throws IOException {
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<LibraryDesignDto> dtos) throws IOException {
     return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, designService, true);
   }
 

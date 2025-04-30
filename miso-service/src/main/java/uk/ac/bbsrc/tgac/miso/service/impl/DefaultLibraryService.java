@@ -28,11 +28,11 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
@@ -48,11 +48,11 @@ import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryIndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibrarySelectionService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibrarySpikeInService;
@@ -106,7 +106,7 @@ public class DefaultLibraryService implements LibraryService {
   @Autowired
   private LibrarySpikeInService librarySpikeInService;
   @Autowired
-  private IndexService indexService;
+  private LibraryIndexService indexService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -254,6 +254,8 @@ public class DefaultLibraryService implements LibraryService {
 
   @Override
   public long update(Library library) throws IOException {
+    // Detach to maintain separation between submitted and managed entities in-case submission was from
+    // another service
     hibernateUtilDao.detach(library);
     Library managed = get(library.getId());
     User changeUser = authorizationManager.getCurrentUser();
@@ -568,8 +570,8 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   private static void validateIndices(Library library, List<ValidationError> errors) {
-    Index index1 = library.getIndex1();
-    Index index2 = library.getIndex2();
+    LibraryIndex index1 = library.getIndex1();
+    LibraryIndex index2 = library.getIndex2();
     if (index1 != null) {
       if (index1.getPosition() != 1) {
         errors.add(new ValidationError("index1Id", "Invalid index position"));
@@ -685,7 +687,7 @@ public class DefaultLibraryService implements LibraryService {
     this.libraryDesignCodeService = libraryDesignCodeService;
   }
 
-  public void setIndexService(IndexService indexService) {
+  public void setIndexService(LibraryIndexService indexService) {
     this.indexService = indexService;
   }
 
@@ -776,7 +778,7 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   @Override
-  public List<Long> listIdsByRequisitionId(long requisitionId) throws IOException {
+  public List<Long> listPreparedIdsByRequisitionId(long requisitionId) throws IOException {
     return libraryDao.listIdsBySampleRequisitionId(requisitionId);
   }
 

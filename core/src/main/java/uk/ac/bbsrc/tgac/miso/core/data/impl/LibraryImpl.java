@@ -49,7 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
@@ -135,11 +135,11 @@ public class LibraryImpl extends AbstractBoxable implements Library {
 
   @ManyToOne
   @JoinColumn(name = "index1Id")
-  private Index index1;
+  private LibraryIndex index1;
 
   @ManyToOne
   @JoinColumn(name = "index2Id")
-  private Index index2;
+  private LibraryIndex index2;
 
   @OneToMany(targetEntity = LibraryQC.class, mappedBy = "library", cascade = CascadeType.ALL)
   private final Collection<LibraryQC> libraryQCs = new TreeSet<>();
@@ -353,22 +353,22 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   }
 
   @Override
-  public Index getIndex1() {
+  public LibraryIndex getIndex1() {
     return index1;
   }
 
   @Override
-  public void setIndex1(Index index1) {
+  public void setIndex1(LibraryIndex index1) {
     this.index1 = index1;
   }
 
   @Override
-  public Index getIndex2() {
+  public LibraryIndex getIndex2() {
     return index2;
   }
 
   @Override
-  public void setIndex2(Index index2) {
+  public void setIndex2(LibraryIndex index2) {
     this.index2 = index2;
   }
 

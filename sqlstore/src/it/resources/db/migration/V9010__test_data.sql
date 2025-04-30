@@ -35,6 +35,19 @@ INSERT INTO SequencingControlType(sequencingControlTypeId, alias) VALUES
 (1, 'Positive'),
 (2, 'Negative');
 
+INSERT INTO SampleIndexFamily(indexFamilyId, name) VALUES
+(1, "Fam One"),
+(2, "Fam Two");
+
+INSERT INTO SampleIndex(indexId, name, indexFamilyId) VALUES
+(1, "Index 1-001", 1),
+(2, "Index 1-002", 1),
+(3, "Index 1-003", 1),
+(4, "Index 1-004", 1),
+(5, "Index 2-001", 2),
+(6, "Index 2-002", 2),
+(7, "Index 2-003", 2);
+
 INSERT INTO Workstation(workstationId, alias) VALUES
 (1, 'Workstation 1'),
 (2, 'Workstation 2'),
@@ -94,7 +107,7 @@ INSERT INTO AttachmentCategory(categoryId, alias) VALUES
 (1, 'Category One'),
 (2, 'Category Two');
 
-INSERT INTO IndexFamily(indexFamilyId, platformType, name) VALUES
+INSERT INTO LibraryIndexFamily(indexFamilyId, platformType, name) VALUES
   (1, 'ILLUMINA', 'TruSeq Single Index'),
   (2, 'LS454', '454 Rapid Library'),
   (3, 'ILLUMINA', 'Nextera Dual Index'),
@@ -108,7 +121,7 @@ INSERT INTO IndexFamily(indexFamilyId, platformType, name) VALUES
   (11, 'ILLUMINA', 'SureSelect XT2'),
   (12, 'ILLUMINA', 'NEXTflex 6bp');
 
-INSERT INTO `Indices` (`indexId`, `name`, `sequence`, `indexFamilyId`)
+INSERT INTO LibraryIndex (`indexId`, `name`, `sequence`, `indexFamilyId`)
 VALUES
     (12,'Index 12','CTTGTA',1),
     (11,'Index 11','GGCTAC',1),
@@ -213,13 +226,13 @@ INSERT INTO InstrumentPosition(positionId, instrumentModelId, alias) VALUES
 (2, 16, 'B'),
 (3, 16, 'C');
 
-INSERT INTO `Instrument`(`instrumentId`, `name`, `instrumentModelId`, defaultPurposeId, upgradedInstrumentId, dateDecommissioned) VALUES
-(1, 'SN7001179', 16, 1, NULL, NULL),
-(2, 'h1180', 16, 1, NULL, NULL),
-(3, 'iScan_1', 30, 1, NULL, NULL),
-(4, 'miseq1', 1, 1, NULL, NULL),
-(5, 'qcer', 2, NULL, NULL, NULL),
-(6, 'old hiseq', 16, 1, 2, '2021-03-08 10:36:00');
+INSERT INTO `Instrument`(`instrumentId`, `name`, identificationBarcode, `instrumentModelId`, defaultPurposeId, upgradedInstrumentId, dateDecommissioned) VALUES
+(1, 'SN7001179', 'inst1111', 16, 1, NULL, NULL),
+(2, 'h1180', 'inst2222', 16, 1, NULL, NULL),
+(3, 'iScan_1', 'inst3333', 30, 1, NULL, NULL),
+(4, 'miseq1', 'inst4444', 1, 1, NULL, NULL),
+(5, 'qcer', 'inst5555', 2, NULL, NULL, NULL),
+(6, 'old hiseq', 'inst6666', 16, 1, 2, '2021-03-08 10:36:00');
 
 INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`, instrumentModelId) VALUES
 (2,'Bioanalyzer','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Library','nM', NULL),
@@ -483,10 +496,10 @@ INSERT INTO Requisition_SupplementalSample(requisitionId, sampleId) VALUES
 -- Tissue Processing - Slides
 INSERT INTO Sample(discriminator, sampleId, name, alias, project_projectId, sampleType,
   scientificNameId, lastModifier, lastModified, creator, created, sampleClassId, archived, parentId,
-  siblingNumber, isSynthetic, nonStandardAlias, initialSlides, slides) VALUES
+  siblingNumber, isSynthetic, nonStandardAlias, initialSlides, slides, indexId) VALUES
 ('Slide', 25, 'SAM25', 'TEST_0001_SLIDE_1', 1, 'GENOMIC',
   1, 1, '2024-10-16 12:39:00', 1, '2024-10-16 12:39:00', 5, FALSE, 17,
-  1, FALSE, FALSE, 3, 3);
+  1, FALSE, FALSE, 3, 3, 3);
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (25, 15, 17);
@@ -1105,3 +1118,7 @@ INSERT INTO Project_Contact (projectId, contactId, contactRoleId) VALUES
 (1, 1, 2),
 (2, 1, 3),
 (3, 2, 4);
+
+INSERT INTO ApiKey(keyId, userId, apiKey, apiSecret, creator, created) VALUES
+-- unencrypted key: LwTTBMu4QSOeTWp7Uo7Bva0Jm0+Zpnxb-jw24z317EwhjoqtswuROsj1DFXoD9WT6
+(1, 1, 'LwTTBMu4QSOeTWp7Uo7Bva0Jm0+Zpnxb', '{bcrypt}$2a$10$l2gtUtIdwV98avW6C7DYZOkhDdRKuiYADiOm33UkkdabaxjITvpDS', 1, '2025-03-11 15:10:00');

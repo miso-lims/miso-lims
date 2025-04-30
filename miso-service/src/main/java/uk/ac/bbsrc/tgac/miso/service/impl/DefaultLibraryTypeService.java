@@ -6,8 +6,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.transaction.support.TransactionTemplate;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -75,19 +75,23 @@ public class DefaultLibraryTypeService extends AbstractSaveService<LibraryType> 
   }
 
   @Override
-  protected void collectValidationErrors(LibraryType object, LibraryType beforeChange, List<ValidationError> errors) throws IOException {
+  protected void collectValidationErrors(LibraryType object, LibraryType beforeChange, List<ValidationError> errors)
+      throws IOException {
     if ((ValidationUtils.isSetAndChanged(LibraryType::getPlatformType, object, beforeChange)
         || ValidationUtils.isSetAndChanged(LibraryType::getDescription, object, beforeChange))
         && libraryTypeDao.getByPlatformAndDescription(object.getPlatformType(), object.getDescription()) != null) {
       errors.add(new ValidationError("description",
           "There is already a library type with this description for platform: " + object.getPlatformType().getKey()));
     }
-    long libUsage = libraryTypeDao.getUsageByLibraries(beforeChange);
-    long tempUsage = libraryTypeDao.getUsageByLibraryTemplates(beforeChange);
-    if ((libUsage > 0L || tempUsage > 0L) && ValidationUtils.isSetAndChanged(LibraryType::getPlatformType, object, beforeChange)) {
-      errors.add(new ValidationError("platform",
-          String.format("Cannot be changed because library type is already used by %d %s and %d library %s", libUsage,
-              Pluralizer.libraries(libUsage), tempUsage, Pluralizer.templates(tempUsage))));
+    if (beforeChange != null) {
+      long libUsage = libraryTypeDao.getUsageByLibraries(beforeChange);
+      long tempUsage = libraryTypeDao.getUsageByLibraryTemplates(beforeChange);
+      if ((libUsage > 0L || tempUsage > 0L)
+          && ValidationUtils.isSetAndChanged(LibraryType::getPlatformType, object, beforeChange)) {
+        errors.add(new ValidationError("platform",
+            String.format("Cannot be changed because library type is already used by %d %s and %d library %s", libUsage,
+                Pluralizer.libraries(libUsage), tempUsage, Pluralizer.templates(tempUsage))));
+      }
     }
   }
 

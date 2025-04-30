@@ -29,10 +29,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.dto.ContactDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.UserDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 
 @Controller
 @RequestMapping("/rest/users")
-public class UserRestController extends RestController {
+public class UserRestController extends AbstractRestController {
 
   @Autowired
   private UserService userService;

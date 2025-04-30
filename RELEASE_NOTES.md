@@ -7,6 +7,109 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.7.0] - 2025-04-24
+
+### Added
+
+* New sequencing parameter fields
+  * Movie Time for PacBio instruments
+  * Flows for Ultima instruments
+* Sample indices, which can be set at the tissue processing and stock levels (detailed sample). Note
+  that these options will only appear after you have defined sample index families
+
+### Changed
+
+* The previously existing index families and indices have been renamed to library index families and
+  library indices in several places to distinguish them from sample indices
+* The OICR naming scheme now supports Ultima libraries and library aliquots
+
+### Fixed
+
+* The initial assays assigned to a requisition will no longer be recorded in the changelog; later
+  assay changes will still be recorded
+* When moving samples or libraries between requisitions, the time and user logged were sometimes
+  incorrect
+* The Tissue Material, Origin, and Type fields were left blank on the RNA Library Preparation sample
+  download sheet
+
+
+## [3.6.0] - 2025-04-10
+
+### Changed
+
+* The MOH Extraction Tracker sample download sheet now includes the tissue material
+* Values displayed on the Run-Library Metrics page will now be truncated to one more decimal place than
+  the metric threshold
+* Several columns on the DNA and RNA Library Preparation sample download sheets
+* On sample download sheets, samples that are not in a box will now list "DISTRIBUTED," "EMPTY," or
+  "Unknown", as appropriate in place of the box alias
+* The Notes table on the Edit Sample and Edit Library pages now displays all notes from parent samples
+  along with any notes from the current item
+
+### Fixed
+
+* Additional spaces were sometimes being inserted when pasting values into bulk pages
+* The Edit Requisition page was not showing run-libraries related to requisitioned and supplemental
+  libraries
+* The Print Barcodes by Position action on the Edit Box page was not sorting the labels correctly when
+  choosing to sort by column
+* Pinery-MISO will now use the database server timezone
+
+
+## [3.5.0] - 2025-03-27
+
+### Added
+
+* Initial support for Ultima sequencing
+* REST API for integration with QC systems. For details, see the
+  [QC Software Integration](https://miso-lims.readthedocs.io/projects/docs/en/latest/user_manual/qc_integration/#rest-api)
+  section of the user manual
+* Target Cell Recovery and Loading Cell Concentration fields to the Single Cell subcategory of Tissue Processing sample classes
+
+### Changed
+
+* The Print Barcodes by Position action on the Edit Box page now allows printing by column or row
+* Renamed PacBio run page tables to better represent what their contents are.
+* Update minimum password length to 15 characters for JDBC authentication. This does not affect LDAP/AD authentication.
+
+### Fixed
+
+* Error when trying to add some samples to a distribution transfer
+* Items added to distribution transfers were not being removed from boxes and having their distributed
+  location recorded
+* The bulk Add/Edit QCs pages were displaying the wrong items after saving
+* Unexpected error creating new library types
+
+
+## [3.4.0] - 2025-02-28
+
+### Added
+
+* Archived column on the QC Types list
+
+### Changed
+
+* Extractions table on the Edit Requisition Page to Prepared Samples, which now displays all downstream samples (detailed sample)
+
+### Fixed
+
+* Instruments were allowed to have duplicate barcodes
+* QC types for the same target were allowed to have duplicate names. This was causing a bug when
+  adding QCs where the wrong options were given after selecting a duplicated QC type
+
+### Upgrade Notes
+
+* Updated Runscanner to 2.1.0
+
+
+## [3.3.0] - 2025-01-30
+
+### Added
+
+* Volume and concentration metrics when creating/editing tissue processing samples
+* Help text to clarify some of the freezer fields
+
+
 ## [3.2.0] - 2025-01-16
 
 ### Changed

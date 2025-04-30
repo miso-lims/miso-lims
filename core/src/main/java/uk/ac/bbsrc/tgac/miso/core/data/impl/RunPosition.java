@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition.RunPositionId;
 
 @Entity
@@ -90,6 +91,10 @@ public class RunPosition implements Serializable {
   @JoinColumn(name = "positionId")
   private InstrumentPosition position;
 
+  @ManyToOne
+  @JoinColumn(name = "sequencingParametersId")
+  private SequencingParameters sequencingParameters;
+
   public Run getRun() {
     return run;
   }
@@ -114,6 +119,14 @@ public class RunPosition implements Serializable {
     this.position = position;
   }
 
+  public SequencingParameters getSequencingParameters() {
+    return sequencingParameters;
+  }
+
+  public void setSequencingParameters(SequencingParameters sequencingParameters) {
+    this.sequencingParameters = sequencingParameters;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -121,6 +134,8 @@ public class RunPosition implements Serializable {
     result = prime * result + ((container == null) ? 0 : container.hashCode());
     result = prime * result + ((position == null) ? 0 : position.hashCode());
     result = prime * result + ((run == null) ? 0 : run.hashCode());
+    result = prime * result + ((sequencingParameters == null) ? 0 :
+        sequencingParameters.hashCode());
     return result;
   }
 
@@ -147,6 +162,11 @@ public class RunPosition implements Serializable {
       if (other.run != null)
         return false;
     } else if (!run.equals(other.run))
+      return false;
+    if (sequencingParameters == null) {
+      if (other.sequencingParameters != null)
+        return false;
+    } else if (!sequencingParameters.equals(other.sequencingParameters))
       return false;
     return true;
   }

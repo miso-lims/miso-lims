@@ -40,21 +40,25 @@ import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.PrinterService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelElement;
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PrinterDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/printers")
 
-public class PrinterRestController extends RestController {
+public class PrinterRestController extends AbstractRestController {
   public static class BoxPositionPrintRequest {
     private long boxId;
     private int copies;
     private Set<String> positions;
+    private String sortOrder;
 
     public long getBoxId() {
       return boxId;
@@ -68,6 +72,10 @@ public class PrinterRestController extends RestController {
       return positions;
     }
 
+    public String getSortOrder() {
+      return sortOrder;
+    }
+
     public void setBoxId(long boxId) {
       this.boxId = boxId;
     }
@@ -78,6 +86,10 @@ public class PrinterRestController extends RestController {
 
     public void setPositions(Set<String> positions) {
       this.positions = positions;
+    }
+
+    public void setSortOrder(String sortOrder) {
+      this.sortOrder = sortOrder;
     }
   }
 
@@ -239,10 +251,18 @@ public class PrinterRestController extends RestController {
       throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
     }
     Box box = boxService.get(request.getBoxId());
+    Comparator<Entry<String, BoxPosition>> comparator;
+    if ("column".equalsIgnoreCase(request.getSortOrder())) {
+      comparator = Comparator.comparing((Entry<String, BoxPosition> e) -> {
+        return BoxUtils.getColumnNumber(e.getKey());
+      }).thenComparing(e -> BoxUtils.getRowNumber(e.getKey()));
+    } else {
+      comparator = Comparator.comparing(Entry::getKey);
+    }
     return printer.printBarcode(user, request.getCopies(),
-        box.getBoxPositions().entrySet().stream()//
-            .filter(e -> request.getPositions().contains(e.getKey()))//
-            .sorted(Comparator.comparing(Entry::getKey))//
+        box.getBoxPositions().entrySet().stream()
+            .filter(e -> request.getPositions().contains(e.getKey()))
+            .sorted(comparator)
             .map(WhineyFunction.rethrow(this::loadBarcodable)));
   }
 

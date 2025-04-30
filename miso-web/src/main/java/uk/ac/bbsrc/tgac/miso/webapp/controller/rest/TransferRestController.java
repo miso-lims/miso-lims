@@ -46,11 +46,13 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.ListTransferViewDto;
 import uk.ac.bbsrc.tgac.miso.dto.TransferDto;
 import uk.ac.bbsrc.tgac.miso.dto.TransferNotificationDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
 @RequestMapping("/rest/transfers")
-public class TransferRestController extends RestController {
+public class TransferRestController extends AbstractRestController {
 
   @Autowired
   private TransferService transferService;

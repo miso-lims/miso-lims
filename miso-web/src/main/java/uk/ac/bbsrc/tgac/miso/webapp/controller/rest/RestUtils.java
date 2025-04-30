@@ -17,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.DeleterService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SaveService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 
 public class RestUtils {
 

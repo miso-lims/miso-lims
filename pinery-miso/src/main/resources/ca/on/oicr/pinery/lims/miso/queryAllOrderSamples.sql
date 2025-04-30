@@ -12,5 +12,5 @@ LEFT JOIN Pool_LibraryAliquot pe ON pe.poolId = p.poolId
 LEFT JOIN LibraryAliquot ld ON ld.aliquotId = pe.aliquotId 
 LEFT JOIN TargetedSequencing tr ON tr.targetedSequencingId = ld.targetedSequencingId 
 LEFT JOIN Library lib ON lib.libraryId = ld.libraryId 
-LEFT JOIN Indices bc1 ON bc1.indexId = lib.index1Id
-LEFT JOIN Indices bc2 ON bc2.indexId = lib.index2Id
+LEFT JOIN LibraryIndex bc1 ON bc1.indexId = lib.index1Id
+LEFT JOIN LibraryIndex bc2 ON bc2.indexId = lib.index2Id

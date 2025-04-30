@@ -9,39 +9,39 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 
 public class IndexCheckerTest {
 
   private static class TestLibrary implements IndexedLibrary {
 
-    private final Index index1;
-    private final Index index2;
+    private final LibraryIndex index1;
+    private final LibraryIndex index2;
 
-    public TestLibrary(Index index1, Index index2) {
+    public TestLibrary(LibraryIndex index1, LibraryIndex index2) {
       this.index1 = index1;
       this.index2 = index2;
     }
 
     @Override
-    public Index getIndex1() {
+    public LibraryIndex getIndex1() {
       return index1;
     }
 
     @Override
-    public void setIndex1(Index index1) {
+    public void setIndex1(LibraryIndex index1) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public Index getIndex2() {
+    public LibraryIndex getIndex2() {
       return index2;
     }
 
     @Override
-    public void setIndex2(Index index2) {
+    public void setIndex2(LibraryIndex index2) {
       throw new UnsupportedOperationException();
     }
 
@@ -190,13 +190,13 @@ public class IndexCheckerTest {
     assertTrue(warnings.contains(ERROR_2));
   }
 
-  public Index makeIndex(String sequence) {
+  public LibraryIndex makeIndex(String sequence) {
     return makeIndex(sequence, null);
   }
 
-  public Index makeIndex(String fakeSequence, String realSequences) {
-    Index index = new Index();
-    IndexFamily family = new IndexFamily();
+  public LibraryIndex makeIndex(String fakeSequence, String realSequences) {
+    LibraryIndex index = new LibraryIndex();
+    LibraryIndexFamily family = new LibraryIndexFamily();
     family.setFake(realSequences != null);
     index.setFamily(family);
     index.setName(fakeSequence + " name");

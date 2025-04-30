@@ -73,6 +73,11 @@ ListTarget.qctype = {
         iSortPriority: 0,
         bSortable: true,
       },
+      {
+        sTitle: "Archived",
+        mData: "archived",
+        mRender: ListUtils.render.archived,
+      },
     ];
   },
 };

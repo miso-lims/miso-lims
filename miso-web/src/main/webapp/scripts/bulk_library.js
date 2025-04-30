@@ -450,7 +450,7 @@ BulkTarget.library = (function ($) {
             if (template && template.indexFamilyId) {
               var indexFamily = Utils.array.findUniqueOrThrow(
                 Utils.array.idPredicate(template.indexFamilyId),
-                Constants.indexFamilies
+                Constants.libraryIndexFamilies
               );
               updateIndicesFromTemplate(rowIndex, template, indexFamily, newValue, api);
             }
@@ -631,21 +631,21 @@ BulkTarget.library = (function ($) {
               api,
               template,
               "indexFamilyId",
-              Constants.indexFamilies,
+              Constants.libraryIndexFamilies,
               "id",
               "name"
             );
             if (template && template.indexFamilyId) {
               var indexFamily = Utils.array.findUniqueOrThrow(
                 Utils.array.idPredicate(template.indexFamilyId),
-                Constants.indexFamilies
+                Constants.libraryIndexFamilies
               );
               var boxPos = api.getValue(rowIndex, "boxPosition");
               updateIndicesFromTemplate(rowIndex, template, indexFamily, boxPos, api);
             } else {
               // Note: can't use api.getValueObject as source won't be initialized yet during initialization onChange
               var indexFamilyName = api.getValue(rowIndex, "indexFamilyId");
-              var indexFamily = Constants.indexFamilies.find(
+              var indexFamily = Constants.libraryIndexFamilies.find(
                 Utils.array.namePredicate(indexFamilyName)
               );
               api.updateField(rowIndex, "index1Id", {
@@ -730,7 +730,7 @@ BulkTarget.library = (function ($) {
             });
             var indexFamilies = [];
             if (newValue) {
-              indexFamilies = Constants.indexFamilies
+              indexFamilies = Constants.libraryIndexFamilies
                 .filter(function (family) {
                   return (
                     family.platformType === selectedPlatform.name &&
@@ -802,7 +802,11 @@ BulkTarget.library = (function ($) {
           data: "indexFamilyId",
           getData: function (library) {
             if (library.indexFamilyId) {
-              return getPropertyForItemId(Constants.indexFamilies, library.indexFamilyId, "name");
+              return getPropertyForItemId(
+                Constants.libraryIndexFamilies,
+                library.indexFamilyId,
+                "name"
+              );
             } else if (config.pageMode === "edit" || api.isSaved()) {
               return "No indices";
             } else {
@@ -818,7 +822,7 @@ BulkTarget.library = (function ($) {
             var indexFamily = newValue
               ? Utils.array.findFirstOrNull(
                   Utils.array.namePredicate(newValue),
-                  Constants.indexFamilies
+                  Constants.libraryIndexFamilies
                 )
               : null;
             var index1Changes = null;
@@ -985,7 +989,7 @@ BulkTarget.library = (function ($) {
         }
         var indexFamily = Utils.array.findUniqueOrThrow(
           Utils.array.idPredicate(library.indexFamilyId),
-          Constants.indexFamilies
+          Constants.libraryIndexFamilies
         );
         return indexFamily.indices.filter(function (index) {
           return index.position === position;
@@ -1007,7 +1011,7 @@ BulkTarget.library = (function ($) {
         var indexFamilyName = api.getValue(rowIndex, "indexFamilyId");
         var indexFamily = Utils.array.findFirstOrNull(
           Utils.array.namePredicate(indexFamilyName),
-          Constants.indexFamilies
+          Constants.libraryIndexFamilies
         );
         if (indexFamily && indexFamily.uniqueDualIndex) {
           var index1 = indexFamily.indices.find(function (index) {
@@ -1035,7 +1039,9 @@ BulkTarget.library = (function ($) {
 
   function updateUdiSelection(rowIndex, api) {
     var indexFamilyName = api.getValue(rowIndex, "indexFamilyId");
-    var indexFamily = Constants.indexFamilies.find(Utils.array.namePredicate(indexFamilyName));
+    var indexFamily = Constants.libraryIndexFamilies.find(
+      Utils.array.namePredicate(indexFamilyName)
+    );
     if (!indexFamily) {
       allowUniqueDualIndexSelectionByRow[rowIndex] = true;
       return;

@@ -141,7 +141,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertTrue(codes.contains("MR (mRNA)"));
 
     Set<String> platforms = table.getDropdownOptions(LibColumns.PLATFORM, 0);
-    assertEquals(6, platforms.size()); // All members of PlatformType
+    assertEquals(7, platforms.size()); // All members of PlatformType
     assertTrue(platforms.contains("Illumina"));
     assertTrue(platforms.contains("PacBio"));
 

@@ -9,6 +9,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.NotesDataTable;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.NotesSection;
 
 public class LibraryPage extends FormPage<LibraryPage.Field> {
@@ -58,13 +59,13 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
   @FindBy(id = "save")
   private WebElement saveButton;
 
-  private final NotesSection<LibraryPage> notesSection;
+  private final NotesDataTable<LibraryPage> notesTable;
 
   public LibraryPage(WebDriver driver) {
     super(driver, "libraryForm");
     PageFactory.initElements(driver, this);
     waitWithTimeout().until(titleContains("Library "));
-    notesSection = new NotesSection<>(driver, LibraryPage::new);
+    notesTable = new NotesDataTable<>(driver, "list_note_wrapper", LibraryPage::new);
   }
 
   public static LibraryPage get(WebDriver driver, String baseUrl, long libraryId) {
@@ -79,8 +80,8 @@ public class LibraryPage extends FormPage<LibraryPage.Field> {
     return new LibraryPage(getDriver());
   }
 
-  public NotesSection<LibraryPage> getNotesSection() {
-    return notesSection;
+  public NotesDataTable<LibraryPage> getNotesSection() {
+    return notesTable;
   }
 
   public DataTable getChangeLogTable() {

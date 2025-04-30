@@ -36,6 +36,10 @@ public abstract class OicrBaseLibraryAliasGenerator<T, R> implements NameGenerat
   @Autowired
   private SiblingNumberGenerator siblingNumberGenerator;
 
+  protected SiblingNumberGenerator getSiblingNumberGenerator() {
+    return siblingNumberGenerator;
+  }
+
   public void setSiblingNumberGenerator(SiblingNumberGenerator siblingNumberGenerator) {
     this.siblingNumberGenerator = siblingNumberGenerator;
   }
@@ -55,9 +59,11 @@ public abstract class OicrBaseLibraryAliasGenerator<T, R> implements NameGenerat
         return generatePacBioLibraryAlias(detailedItem);
       case OXFORDNANOPORE:
         return generateOxfordNanoporeLibraryAlias(detailedItem);
+      case ULTIMA:
+        return generateUltimaLibraryAlias(detailedItem);
       default:
         throw new MisoNamingException(
-            "Alias generation is only available for Illumina, PacBio, and Oxford Nanopore Libraries");
+            "Alias generation is only available for Illumina, PacBio, Oxford Nanopore, and Ultima Libraries");
     }
   }
 
@@ -184,6 +190,13 @@ public abstract class OicrBaseLibraryAliasGenerator<T, R> implements NameGenerat
     sb.append(SEPARATOR).append(getDesignCode(item));
     sb.append(SEPARATOR);
     String partial = sb.toString();
+    int siblingNumber = siblingNumberGenerator.getNextSiblingNumber(LibraryImpl.class, partial);
+    return partial + siblingNumber;
+  }
+
+  private String generateUltimaLibraryAlias(R item) throws MisoNamingException, IOException {
+    // e.g. PROJ_0001_Pa_P_WG_1
+    String partial = getIlluminaSampleAliasPart(item) + SEPARATOR + getDesignCode(item) + SEPARATOR;
     int siblingNumber = siblingNumberGenerator.getNextSiblingNumber(LibraryImpl.class, partial);
     return partial + siblingNumber;
   }

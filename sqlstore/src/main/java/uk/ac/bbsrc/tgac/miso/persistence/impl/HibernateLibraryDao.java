@@ -20,8 +20,8 @@ import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.metamodel.SingularAttribute;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Index_;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex_;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode_;
@@ -377,10 +377,10 @@ public class HibernateLibraryDao extends HibernateSaveDao<Library>
     if (LimsUtils.isStringBlankOrNull(query)) {
       builder.addPredicate(builder.getCriteriaBuilder().isNull(builder.getRoot().get(LibraryImpl_.index1)));
     } else {
-      Join<LibraryImpl, Index> index1 = builder.getJoin(builder.getRoot(), LibraryImpl_.index1);
-      Join<LibraryImpl, Index> index2 = builder.getJoin(builder.getRoot(), LibraryImpl_.index2);
-      builder.addTextRestriction(Arrays.asList(index1.get(Index_.name), index1.get(Index_.sequence),
-          index2.get(Index_.name), index2.get(Index_.sequence)), query);
+      Join<LibraryImpl, LibraryIndex> index1 = builder.getJoin(builder.getRoot(), LibraryImpl_.index1);
+      Join<LibraryImpl, LibraryIndex> index2 = builder.getJoin(builder.getRoot(), LibraryImpl_.index2);
+      builder.addTextRestriction(Arrays.asList(index1.get(LibraryIndex_.name), index1.get(LibraryIndex_.sequence),
+          index2.get(LibraryIndex_.name), index2.get(LibraryIndex_.sequence)), query);
     }
   }
 

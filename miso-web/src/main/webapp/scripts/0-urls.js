@@ -27,6 +27,12 @@ Urls = (function () {
     regenerateBarcodes: adminRestBase + "/barcode/regen",
   };
 
+  // API Keys
+  var apiKeyRestBase = restBase + "/apikeys";
+  rest.apiKeys = {
+    create: apiKeyRestBase,
+  };
+
   // Arrays
   var arrayUiBase = "/array";
   ui.arrays = {
@@ -333,35 +339,6 @@ Urls = (function () {
     check: indexDistanceRestBase,
   };
 
-  // Index Families
-  var indexFamilyUiBase = "/indexfamily";
-  ui.indexFamilies = {
-    create: indexFamilyUiBase + "/new",
-    edit: idUrlFunction(indexFamilyUiBase),
-  };
-
-  var indexFamilyRestBase = restBase + "/indexfamilies";
-  rest.indexFamilies = {
-    create: indexFamilyRestBase,
-    update: idUrlFunction(indexFamilyRestBase),
-  };
-
-  // Indices
-  var indexUiBase = "/index";
-  ui.indices = {
-    bulkCreate: indexUiBase + "/bulk/new",
-    bulkEdit: indexUiBase + "/bulk/edit",
-  };
-
-  var indexRestBase = restBase + "/indices";
-  rest.indices = {
-    bulkSave: indexRestBase + "/bulk",
-    bulkSaveProgress: idUrlFunction(indexRestBase + "/bulk"),
-    datatable: indexRestBase + "/dt",
-    platformDatatable: idUrlFunction(indexRestBase + "/dt/platform"),
-    search: indexRestBase + "/search",
-  };
-
   // Instruments
   var instrumentUiBase = "/instrument";
   ui.instruments = {
@@ -536,6 +513,35 @@ Urls = (function () {
     bulkSaveProgress: idUrlFunction(libraryDesignCodeRestBase + "/bulk"),
   };
 
+  // Library Index Families
+  var libraryIndexFamilyUiBase = "/libraryindexfamily";
+  ui.libraryIndexFamilies = {
+    create: libraryIndexFamilyUiBase + "/new",
+    edit: idUrlFunction(libraryIndexFamilyUiBase),
+  };
+
+  var libraryIndexFamilyRestBase = restBase + "/libraryindexfamilies";
+  rest.libraryIndexFamilies = {
+    create: libraryIndexFamilyRestBase,
+    update: idUrlFunction(libraryIndexFamilyRestBase),
+  };
+
+  // Library Indices
+  var libraryIndexUiBase = "/libraryindex";
+  ui.libraryIndices = {
+    bulkCreate: libraryIndexUiBase + "/bulk/new",
+    bulkEdit: libraryIndexUiBase + "/bulk/edit",
+  };
+
+  var libraryIndexRestBase = restBase + "/libraryindices";
+  rest.libraryIndices = {
+    bulkSave: libraryIndexRestBase + "/bulk",
+    bulkSaveProgress: idUrlFunction(libraryIndexRestBase + "/bulk"),
+    datatable: libraryIndexRestBase + "/dt",
+    platformDatatable: idUrlFunction(libraryIndexRestBase + "/dt/platform"),
+    search: libraryIndexRestBase + "/search",
+  };
+
   // Library Selections
   var librarySelectionUiBase = "/libraryselection";
   ui.librarySelections = {
@@ -655,6 +661,7 @@ Urls = (function () {
     remove: function (entityType, entityId, noteId) {
       return noteRestBase + "/" + entityType + "/" + entityId + "/" + noteId;
     },
+    bulkDelete: noteRestBase + "/bulk-delete",
   };
 
   // Partition QC Types
@@ -937,6 +944,7 @@ Urls = (function () {
     requisitionSupplementalDatatable: idUrlFunction(
       sampleRestBase + "/dt/requisition-supplemental"
     ),
+    samplesPreparedDatatable: idUrlFunction(sampleRestBase + "/dt/samples-prepared"),
     findRelated: sampleRestBase + "/find-related",
   };
 
@@ -951,6 +959,32 @@ Urls = (function () {
   rest.sampleClasses = {
     create: sampleClassRestBase,
     update: idUrlFunction(sampleClassRestBase),
+  };
+
+  // Sample Index Families
+  var sampleIndexFamilyUiBase = "/sampleindexfamily";
+  ui.sampleIndexFamilies = {
+    create: sampleIndexFamilyUiBase + "/new",
+    edit: idUrlFunction(sampleIndexFamilyUiBase),
+  };
+
+  var sampleIndexFamilyRestBase = restBase + "/sampleindexfamilies";
+  rest.sampleIndexFamilies = {
+    create: sampleIndexFamilyRestBase,
+    update: idUrlFunction(sampleIndexFamilyRestBase),
+  };
+
+  // Sample Indices
+  var sampleIndexUiBase = "/sampleindex";
+  ui.sampleIndices = {
+    bulkCreate: sampleIndexUiBase + "/bulk/new",
+    bulkEdit: sampleIndexUiBase + "/bulk/edit",
+  };
+
+  var sampleIndexRestBase = restBase + "/sampleindices";
+  rest.sampleIndices = {
+    bulkSave: sampleIndexRestBase + "/bulk",
+    bulkSaveProgress: idUrlFunction(sampleIndexRestBase + "/bulk"),
   };
 
   // Sample Purposes

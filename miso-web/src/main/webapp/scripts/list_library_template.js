@@ -306,7 +306,7 @@ ListTarget.library_template = {
         mRender: function (data, type, full) {
           return (
             Utils.array.maybeGetProperty(
-              Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.indexFamilies),
+              Utils.array.findFirstOrNull(stringIdPredicate(data), Constants.libraryIndexFamilies),
               "name"
             ) || ""
           );

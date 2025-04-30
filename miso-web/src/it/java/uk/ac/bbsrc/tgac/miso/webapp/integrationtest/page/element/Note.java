@@ -22,6 +22,12 @@ public class Note {
     user = m.group(3);
   }
 
+  public Note(String text, String user, String dateString) {
+    this.text = text;
+    this.user = user;
+    this.date = LocalDate.parse(dateString);
+  }
+
   public LocalDate getDate() {
     return date;
   }

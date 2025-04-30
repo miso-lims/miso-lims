@@ -991,6 +991,58 @@ BulkTarget.sample = (function ($) {
           description: "When the sample was taken",
         },
         {
+          title: "Index Family",
+          type: "dropdown",
+          data: "indexFamilyId",
+          include:
+            ["Tissue Processing", "Stock"].includes(targetCategory) &&
+            Constants.sampleIndexFamilies &&
+            Constants.sampleIndexFamilies.length,
+          source: Constants.sampleIndexFamilies,
+          sortSource: Utils.sorting.standardSort("name"),
+          getItemLabel: Utils.array.getName,
+          getItemValue: Utils.array.getId,
+          onChange: function (rowIndex, newValue, api) {
+            var family = Utils.array.findFirstOrNull(
+              Utils.array.namePredicate(newValue),
+              Constants.sampleIndexFamilies
+            );
+            var changes = {
+              required: !!family,
+              disabled: !family,
+            };
+            if (family) {
+              changes.source = family.indices;
+            } else {
+              changes.source = [];
+              changes.value = null;
+            }
+            api.updateField(rowIndex, "indexId", changes);
+          },
+        },
+        {
+          title: "Index",
+          type: "dropdown",
+          data: "indexId",
+          include:
+            ["Tissue Processing", "Stock"].includes(targetCategory) &&
+            Constants.sampleIndexFamilies &&
+            Constants.sampleIndexFamilies.length,
+          source: function (sample, api) {
+            if (!sample.indexFamilyId) {
+              return [];
+            }
+            var indexFamily = Utils.array.findUniqueOrThrow(
+              Utils.array.idPredicate(sample.indexFamilyId),
+              Constants.sampleIndexFamilies
+            );
+            return indexFamily.indices;
+          },
+          sortSource: Utils.sorting.standardSort("name"),
+          getItemLabel: Utils.array.getName,
+          getItemValue: Utils.array.getId,
+        },
+        {
           title: "Initial Slides",
           type: "int",
           data: "initialSlides",
@@ -1095,6 +1147,27 @@ BulkTarget.sample = (function ($) {
           includeSaved: targetCategory === "Tissue Processing",
           precision: 14,
           scale: 10,
+          description: "Initial concentration of cells in the sample at the time of receipt",
+        },
+        {
+          title: "Target Cell Recovery",
+          type: "int",
+          data: "targetCellRecovery",
+          min: 0,
+          include: targetCategory === "Tissue Processing",
+          sampleSubcategory: ["Single Cell"],
+          includeSaved: targetCategory === "Tissue Processing",
+        },
+        {
+          title: "Loading Cell Conc.",
+          type: "decimal",
+          data: "loadingCellConcentration",
+          include: targetCategory === "Tissue Processing",
+          sampleSubcategory: ["Single Cell"],
+          includeSaved: targetCategory === "Tissue Processing",
+          precision: 14,
+          scale: 10,
+          description: "Concentration of cells prepared for loading into the instrument",
         },
         {
           title: "Digestion",
@@ -1141,11 +1214,14 @@ BulkTarget.sample = (function ($) {
       );
 
       if (
-        (!Constants.isDetailedSample || show["Stock"] || show["Aliquot"]) &&
+        (!Constants.isDetailedSample ||
+          show["Stock"] ||
+          show["Aliquot"] ||
+          show["Tissue Processing"]) &&
         !config.isLibraryReceipt
       ) {
         columns = columns.concat(BulkUtils.columns.volume(true, config));
-        if (Constants.isDetailedSample) {
+        if (Constants.isDetailedSample && targetCategory !== "Tissue Processing") {
           columns = columns.concat(BulkUtils.columns.parentUsed);
         }
         columns = columns.concat(BulkUtils.columns.concentration());

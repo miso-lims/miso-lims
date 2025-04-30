@@ -19,7 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.google.common.collect.Sets;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 
 @Controller
 public class IndexDistanceToolController {
@@ -78,14 +78,20 @@ public class IndexDistanceToolController {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
       IndexDistanceResponseDto other = (IndexDistanceResponseDto) obj;
       if (collisions == null) {
-        if (other.collisions != null) return false;
-      } else if (!collisions.equals(other.collisions)) return false;
-      if (shortestIndexLength != other.shortestIndexLength) return false;
+        if (other.collisions != null)
+          return false;
+      } else if (!collisions.equals(other.collisions))
+        return false;
+      if (shortestIndexLength != other.shortestIndexLength)
+        return false;
       return true;
     }
   }
@@ -118,14 +124,20 @@ public class IndexDistanceToolController {
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (obj == null) return false;
-      if (getClass() != obj.getClass()) return false;
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
       IndexDistanceWarningDto other = (IndexDistanceWarningDto) obj;
-      if (editDistance != other.editDistance) return false;
+      if (editDistance != other.editDistance)
+        return false;
       if (indices == null) {
-        if (other.indices != null) return false;
-      } else if (!indices.equals(other.indices)) return false;
+        if (other.indices != null)
+          return false;
+      } else if (!indices.equals(other.indices))
+        return false;
       return true;
     }
   }
@@ -139,14 +151,15 @@ public class IndexDistanceToolController {
   public @ResponseBody IndexDistanceResponseDto checkIndices(@RequestBody IndexDistanceRequestDto requestObject) {
     List<String> indices = requestObject.getIndices().stream()
         .map(String::trim)
-        .map(line -> line.replaceAll("\\W+", "")) // remove any spaces, commas, dashes, etc. used to separate dual index sequences
+        .map(line -> line.replaceAll("\\W+", "")) // remove any spaces, commas, dashes, etc. used to separate dual index
+                                                  // sequences
         .collect(Collectors.toList());
     int shortestIndexLength = getShortestIndexLength(indices); // compare against first index
     Set<IndexDistanceWarningDto> results = new HashSet<>();
 
     for (int i = 0; i < indices.size(); i++) {
-      for (int j = i+1; j < indices.size(); j++) {
-        int editDistance = Index.checkMismatches(truncate(indices.get(i), shortestIndexLength),
+      for (int j = i + 1; j < indices.size(); j++) {
+        int editDistance = LibraryIndex.checkMismatches(truncate(indices.get(i), shortestIndexLength),
             truncate(indices.get(j), shortestIndexLength));
         if (editDistance < requestObject.getMinimumDistance()) {
           results.add(new IndexDistanceWarningDto(indices.get(i), indices.get(j), editDistance));
@@ -162,7 +175,8 @@ public class IndexDistanceToolController {
     try {
       int shortestIndex = indices.stream().filter(Objects::nonNull)
           .mapToInt(String::length).min().getAsInt();
-      if (shortestIndex == 0) return 0;
+      if (shortestIndex == 0)
+        return 0;
       return shortestIndex;
     } catch (NoSuchElementException e) {
       return 0;

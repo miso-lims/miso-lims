@@ -21,11 +21,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Metric;
 import uk.ac.bbsrc.tgac.miso.core.service.MetricService;
 import uk.ac.bbsrc.tgac.miso.dto.MetricDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/metrics")
-public class MetricRestController extends RestController {
+public class MetricRestController extends AbstractRestController {
 
   private static final String TYPE_LABEL = "Metric";
 

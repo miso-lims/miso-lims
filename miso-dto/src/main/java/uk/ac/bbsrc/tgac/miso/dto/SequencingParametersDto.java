@@ -14,6 +14,8 @@ public class SequencingParametersDto {
   private String creationDate;
   private Long updatedById;
   private String lastUpdated;
+  private Integer movieTime;
+  private Integer flows;
 
   public Long getId() {
     return id;
@@ -110,5 +112,21 @@ public class SequencingParametersDto {
 
   public void setLastUpdated(String lastUpdated) {
     this.lastUpdated = lastUpdated;
+  }
+
+  public Integer getMovieTime() {
+    return movieTime;
+  }
+
+  public void setMovieTime(Integer movieTime) {
+    this.movieTime = movieTime;
+  }
+
+  public Integer getFlows() {
+    return flows;
+  }
+
+  public void setFlows(Integer flows) {
+    this.flows = flows;
   }
 }

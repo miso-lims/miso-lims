@@ -37,3 +37,65 @@ Using the "Item" dropdown for a row, you can select other items in the hierarchy
 
 After selecting an item, you can use the same controls to change its status and add an additional note if applicable.
 Remember to click "Apply" or "Save All" to save any changes.
+
+## REST API
+
+MISO's limited REST API allows integration of QC systems to set the QC status of runs and
+run-libraries. This API may be expanded for other purposes in the future.
+[Pinery](https://github.com/miso-lims/miso-lims/blob/develop/pinery-miso/README.md) will remain the
+main API for pulling data from MISO, however.
+
+### Authentication
+
+API keys are used to authenticate to the API, and can be managed by MISO administrators from the My
+Account page. To get there, click your username at the top right of the MISO interface. Under API
+Keys, you will see any keys that have already been created. There are options to add a new key or
+delete existing ones.
+
+When you add a new key, the confirmation dialog will show you the full key that was generated. Make
+sure you copy this down, as part of the key is encrypted for storage and there is no way to retrieve
+the full unencrypted key in the future. The unencrypted portion is displayed to help with
+identification.
+
+When you create a key, a user will be created to be linked to the key. This user will not be allowed
+to log into MISO, and you should not modify it to be allowed. The user is linked to changelogs, so
+we can track the changes caused by the API user.
+
+Deleting a key will not delete the associated user because the user still needs to be linked to the
+changelogs. Again, this user should never be allowed to log in though. Once the key is deleted, it
+can no longer be used, and authentication will fail if someone attempts to use it.
+
+### API
+
+The API key must be provided in an `X-API-KEY` header for all requests. Requests containing a body
+must also include the header `Content-Type: application/json`.
+
+#### Run QC
+
+Update run QC status:
+
+```
+POST /runs/{runId}/qc-status
+
+Body: {
+  qcPassed: boolean | null
+}
+```
+
+#### Run-Library QC
+
+```
+POST /run-libraries/qc-statuses
+
+Body: [
+  {
+    runId: long,
+    laneNumber: int,
+    aliquotId: long,
+    qcStatus: string,
+    qcNote: string | null
+  }
+]
+```
+
+`qcStatus` must match the description of an existing run-library QC status in MISO.

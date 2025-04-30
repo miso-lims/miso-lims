@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,7 +35,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -84,11 +83,13 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryBatchDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
+import uk.ac.bbsrc.tgac.miso.dto.NoteDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotRnaDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotSingleCellDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
@@ -107,7 +108,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 public class EditLibraryController {
   protected static final Logger log = LoggerFactory.getLogger(EditLibraryController.class);
 
-  private static final IndexFamily INDEX_FAMILY_NEEDS_PLATFORM = new IndexFamily();
+  private static final LibraryIndexFamily INDEX_FAMILY_NEEDS_PLATFORM = new LibraryIndexFamily();
 
   protected static final Comparator<LibraryAliquot> LIBRARY_ALIQUOT_COMPARATOR = (a, b) -> {
     int nameComparison = AlphanumericComparator.INSTANCE.compare(a.getName(), b.getName());
@@ -236,6 +237,7 @@ public class EditLibraryController {
     model.put("libraryTransfers", library.getTransferViews().stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList()));
+    model.put("notes", collectNotes(library));
 
     ObjectNode formConfig = mapper.createObjectNode();
     formConfig.put("detailedSample", isDetailedSampleEnabled());
@@ -246,6 +248,16 @@ public class EditLibraryController {
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editLibrary.jsp", model);
+  }
+
+  private static List<NoteDto> collectNotes(Library library) {
+    List<NoteDto> notes = new ArrayList<>();
+    library.getNotes().stream().map(note -> NoteDto.from(note, library)).forEach(notes::add);
+    for (Sample current = library.getSample(); current != null; current = current.getParent()) {
+      final Sample currentSample = current;
+      current.getNotes().stream().map(note -> NoteDto.from(note, currentSample)).forEach(notes::add);
+    }
+    return notes;
   }
 
   private boolean alwaysGenerateSampleAliases() {

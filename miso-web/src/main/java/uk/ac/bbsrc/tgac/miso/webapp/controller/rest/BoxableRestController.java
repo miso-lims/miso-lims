@@ -22,11 +22,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.BoxableDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 
 @Controller
 @RequestMapping("/rest/boxables")
 
-public class BoxableRestController extends RestController {
+public class BoxableRestController extends AbstractRestController {
   @Autowired
   private BoxService boxService;
 

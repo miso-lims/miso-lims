@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -66,52 +66,60 @@ public class IndexChecker {
   }
 
   public Set<String> getDuplicateIndicesSequences(Pool pool) {
-    if (pool == null) return Collections.emptySet();
+    if (pool == null)
+      return Collections.emptySet();
     Stream<ParentLibrary> libraries = pool.getPoolContents().stream()
         .map(element -> element.getAliquot().getParentLibrary());
     return getIndexSequencesWithTooFewMismatches(libraries, errorMismatches);
   }
 
   public Set<String> getNearDuplicateIndicesSequences(Pool pool) {
-    if (pool == null) return Collections.emptySet();
+    if (pool == null)
+      return Collections.emptySet();
     Stream<ParentLibrary> libraries = pool.getPoolContents().stream()
         .map(element -> element.getAliquot().getParentLibrary());
     return getIndexSequencesWithTooFewMismatches(libraries, warningMismatches);
   }
 
   public Set<String> getDuplicateIndicesSequences(ListPoolView pool) {
-    if (pool == null) return Collections.emptySet();
+    if (pool == null)
+      return Collections.emptySet();
     Stream<ListPoolViewElement> libraries = pool.getElements().stream();
     return getIndexSequencesWithTooFewMismatches(libraries, errorMismatches);
   }
 
   public Set<String> getNearDuplicateIndicesSequences(ListPoolView pool) {
-    if (pool == null) return Collections.emptySet();
+    if (pool == null)
+      return Collections.emptySet();
     Stream<ListPoolViewElement> libraries = pool.getElements().stream();
     return getIndexSequencesWithTooFewMismatches(libraries, warningMismatches);
   }
 
   public Set<String> getDuplicateIndicesSequences(PoolOrder order) {
-    if (order == null) return Collections.emptySet();
+    if (order == null)
+      return Collections.emptySet();
     Stream<Library> libraries = order.getOrderLibraryAliquots().stream()
         .map(orderAliquot -> orderAliquot.getAliquot().getLibrary());
     return getIndexSequencesWithTooFewMismatches(libraries, errorMismatches);
   }
 
   public Set<String> getNearDuplicateIndicesSequences(PoolOrder order) {
-    if (order == null) return Collections.emptySet();
+    if (order == null)
+      return Collections.emptySet();
     Stream<Library> libraries = order.getOrderLibraryAliquots().stream()
         .map(orderAliquot -> orderAliquot.getAliquot().getLibrary());
     return getIndexSequencesWithTooFewMismatches(libraries, warningMismatches);
   }
 
   public Set<String> getDuplicateIndicesSequences(Collection<? extends IndexedLibrary> libraries) {
-    if (libraries == null) return Collections.emptySet();
+    if (libraries == null)
+      return Collections.emptySet();
     return getIndexSequencesWithTooFewMismatches(libraries.stream(), errorMismatches);
   }
 
   public Set<String> getNearDuplicateIndicesSequences(Collection<? extends IndexedLibrary> libraries) {
-    if (libraries == null) return Collections.emptySet();
+    if (libraries == null)
+      return Collections.emptySet();
     return getIndexSequencesWithTooFewMismatches(libraries.stream(), warningMismatches);
   }
 
@@ -128,7 +136,7 @@ public class IndexChecker {
           nearMatchSequences.add(knownSequences.get(sequence));
         } else {
           for (Map.Entry<String, String> otherSequence : knownSequences.entrySet()) {
-            if (Index.checkMismatches(sequence, otherSequence.getKey()) <= mismatchesThreshold) {
+            if (LibraryIndex.checkMismatches(sequence, otherSequence.getKey()) <= mismatchesThreshold) {
               nearMatchSequences.add(name);
               nearMatchSequences.add(otherSequence.getValue());
             }
@@ -152,7 +160,7 @@ public class IndexChecker {
     }
   }
 
-  private static Set<String> getCombinedIndexSequences(Index index1, Index index2) {
+  private static Set<String> getCombinedIndexSequences(LibraryIndex index1, LibraryIndex index2) {
     if (index1 == null) {
       return Collections.singleton("");
     } else {
@@ -169,7 +177,7 @@ public class IndexChecker {
     }
   }
 
-  private static Set<String> getSequences(Index index) {
+  private static Set<String> getSequences(LibraryIndex index) {
     if (index.getFamily().hasFakeSequence()) {
       return index.getRealSequences();
     } else {

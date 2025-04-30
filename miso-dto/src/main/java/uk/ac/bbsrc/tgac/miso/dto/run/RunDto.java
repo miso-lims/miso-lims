@@ -9,13 +9,14 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes({ @JsonSubTypes.Type(value = RunDto.class, name = "Base"),
+@JsonSubTypes({@JsonSubTypes.Type(value = RunDto.class, name = "Base"),
     @JsonSubTypes.Type(value = IlluminaRunDto.class, name = "Illumina"),
     @JsonSubTypes.Type(value = IonTorrentRunDto.class, name = "IonTorrent"),
     @JsonSubTypes.Type(value = Ls454RunDto.class, name = "LS454"),
     @JsonSubTypes.Type(value = OxfordNanoporeRunDto.class, name = "OxfordNanopore"),
     @JsonSubTypes.Type(value = PacBioRunDto.class, name = "PacBio"),
-    @JsonSubTypes.Type(value = SolidRunDto.class, name = "Solid") })
+    @JsonSubTypes.Type(value = SolidRunDto.class, name = "Solid"),
+    @JsonSubTypes.Type(value = UltimaRunDto.class, name = "Ultima")})
 @JsonTypeName(value = "Base")
 public class RunDto {
   private Long id;

@@ -169,7 +169,7 @@ FormTarget.library = (function ($) {
                       }),
                     });
                     form.updateField("indexFamilyId", {
-                      source: Constants.indexFamilies.filter(function (item) {
+                      source: Constants.libraryIndexFamilies.filter(function (item) {
                         return item.platformType === platformType.name;
                       }),
                     });
@@ -292,7 +292,7 @@ FormTarget.library = (function ($) {
                   data: "indexFamilyId",
                   type: "dropdown",
                   nullLabel: "No indices",
-                  source: Constants.indexFamilies.filter(function (family) {
+                  source: Constants.libraryIndexFamilies.filter(function (family) {
                     return family.platformType === platformName;
                   }),
                   sortSource: Utils.sorting.standardSort("name"),
@@ -577,7 +577,7 @@ FormTarget.library = (function ($) {
         if (!indexFamilyId) return;
         var indexFamily = Utils.array.findUniqueOrThrow(
           Utils.array.idPredicate(indexFamilyId),
-          Constants.indexFamilies
+          Constants.libraryIndexFamilies
         );
         if (indexFamily.uniqueDualIndex) {
           if (!newValue) {
@@ -620,7 +620,7 @@ FormTarget.library = (function ($) {
     } else {
       var indexFamily = Utils.array.findUniqueOrThrow(
         Utils.array.idPredicate(indexFamilyId),
-        Constants.indexFamilies
+        Constants.libraryIndexFamilies
       );
       var index1 = Utils.array.findUniqueOrThrow(
         Utils.array.idPredicate(index1Id),
@@ -640,7 +640,7 @@ FormTarget.library = (function ($) {
     }
     var indexFamily = Utils.array.findUniqueOrThrow(function (family) {
       return family.id == indexFamilyId;
-    }, Constants.indexFamilies);
+    }, Constants.libraryIndexFamilies);
     return indexFamily.indices.filter(function (index) {
       return index.position === position;
     });

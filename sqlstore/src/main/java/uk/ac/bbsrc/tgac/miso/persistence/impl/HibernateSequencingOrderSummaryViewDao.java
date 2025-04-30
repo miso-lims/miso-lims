@@ -16,8 +16,8 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.metamodel.SingularAttribute;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Index_;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex_;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
@@ -241,10 +241,10 @@ public class HibernateSequencingOrderSummaryViewDao
     Join<SequencingOrderSummaryView, ListPoolView> pool =
         builder.getJoin(builder.getRoot(), SequencingOrderSummaryView_.pool);
     Join<ListPoolView, ListPoolViewElement> poolElement = builder.getJoin(pool, ListPoolView_.elements);
-    Join<ListPoolViewElement, Index> index1 = builder.getJoin(poolElement, ListPoolViewElement_.index1);
-    Join<ListPoolViewElement, Index> index2 = builder.getJoin(poolElement, ListPoolViewElement_.index2);
-    builder.addTextRestriction(Arrays.asList(index1.get(Index_.name), index1.get(Index_.sequence),
-        index2.get(Index_.name), index2.get(Index_.sequence)), query);
+    Join<ListPoolViewElement, LibraryIndex> index1 = builder.getJoin(poolElement, ListPoolViewElement_.index1);
+    Join<ListPoolViewElement, LibraryIndex> index2 = builder.getJoin(poolElement, ListPoolViewElement_.index2);
+    builder.addTextRestriction(Arrays.asList(index1.get(LibraryIndex_.name), index1.get(LibraryIndex_.sequence),
+        index2.get(LibraryIndex_.name), index2.get(LibraryIndex_.sequence)), query);
 
   }
 

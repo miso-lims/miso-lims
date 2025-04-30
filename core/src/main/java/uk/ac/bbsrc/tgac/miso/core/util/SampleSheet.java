@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -59,14 +59,14 @@ public enum SampleSheet {
         ListLibraryAliquotView aliquot,
         List<String> index,
         String userName) {
-      final Optional<Index> firstIndex = Optional.ofNullable(aliquot.getParentLibrary().getIndex1());
-      final Optional<Index> secondIndex = Optional.ofNullable(aliquot.getParentLibrary().getIndex2());
+      final Optional<LibraryIndex> firstIndex = Optional.ofNullable(aliquot.getParentLibrary().getIndex1());
+      final Optional<LibraryIndex> secondIndex = Optional.ofNullable(aliquot.getParentLibrary().getIndex2());
       return Stream.of(
           aliquot.getLibraryAlias() + (needsSuffix ? ("_" + String.join("_", index)) : ""), //
           aliquot.getLibraryName(), //
-          firstIndex.map(Index::getName).orElse(""), //
+          firstIndex.map(LibraryIndex::getName).orElse(""), //
           index.size() > 0 ? index.get(0) : "", //
-          secondIndex.map(Index::getName).orElse(""), //
+          secondIndex.map(LibraryIndex::getName).orElse(""), //
           index.size() > 1 ? index.get(1) : "");
     }
 
@@ -284,8 +284,8 @@ public enum SampleSheet {
           .of(makeColumns(false, model, partitionNumber, partitionBarcode, aliquot, Collections.emptyList(), userName)
               .collect(Collectors.joining(",")));
     }
-    Index index1 = aliquot.getParentLibrary().getIndex1();
-    Index index2 = aliquot.getParentLibrary().getIndex2();
+    LibraryIndex index1 = aliquot.getParentLibrary().getIndex1();
+    LibraryIndex index2 = aliquot.getParentLibrary().getIndex2();
     Set<String> sequence1s = getSequences(index1, model);
     List<List<String>> indices = null;
     if (index2 == null) {
@@ -305,7 +305,7 @@ public enum SampleSheet {
             .collect(Collectors.joining(",")));
   }
 
-  private Set<String> getSequences(Index index, InstrumentModel model) {
+  private Set<String> getSequences(LibraryIndex index, InstrumentModel model) {
     Set<String> sequences =
         index.getFamily().hasFakeSequence() ? index.getRealSequences() : Collections.singleton(index.getSequence());
     if (index.getPosition() == 2 && model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC) {

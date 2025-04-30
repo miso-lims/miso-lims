@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC_;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleQcStore;
 
 @Repository
@@ -30,7 +30,7 @@ public class HibernateSampleQcDao extends HibernateQcStore<SampleQC> implements 
 
   @Override
   public String getIdProperty() {
-    return SampleImpl_.SAMPLE_ID;
+    return SampleQC_.QC_ID;
   }
 
 }

@@ -61,7 +61,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 slugs.add("locationmap/list");
                 slugs.add("librarytemplates");
                 slugs.add("kitdescriptors");
-                slugs.add("indexfamily/list");
+                slugs.add("libraryindexfamily/list");
                 slugs.add("qctype/list");
                 slugs.add("attachmentcategories/list");
                 slugs.add("sampletype/list");
@@ -170,7 +170,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 slugs.add("librarytemplate/1");
                 slugs.add("kitdescriptor/new");
                 slugs.add("kitdescriptor/1");
-                slugs.add("indexfamily/1");
+                slugs.add("libraryindexfamily/1");
                 slugs.add("qctype/102");
                 slugs.add("instrumentmodel/1");
                 slugs.add("sampleclass/new");
@@ -235,7 +235,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 Set<String> moreSlugs = new HashSet<>();
                 moreSlugs.add("instrumentmodel/new");
                 moreSlugs.add("qctype/new");
-                moreSlugs.add("indexfamily/new");
+                moreSlugs.add("libraryindexfamily/new");
                 moreSlugs.add("instrument/new");
                 moreSlugs.add("admin/users");
                 moreSlugs.add("admin/groups");
@@ -301,7 +301,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                                 .put("boxuse/bulk/edit", unmodifiableMap("ids", "6,5"))
                                 .put("boxsize/bulk/edit", unmodifiableMap("ids", "1,2"))
                                 .put("containermodel/bulk/edit", unmodifiableMap("ids", "1,2"))
-                                .put("index/bulk/edit", unmodifiableMap("ids", "1,2,3,4"))
+                                .put("libraryindex/bulk/edit", unmodifiableMap("ids", "1,2,3,4"))
                                 .put("sampletype/bulk/edit", unmodifiableMap("ids", "1,2"))
                                 .put("sop/bulk/new", unmodifiableMap("quantity", "2"))
                                 .put("sop/bulk/edit", unmodifiableMap("ids", "1,2"))

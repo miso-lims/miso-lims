@@ -5,7 +5,6 @@
 ![Other UI Tests](https://github.com/miso-lims/miso-lims/actions/workflows/miso_web_other_it.yml/badge.svg)
 ![Pinery-MISO Integration Tests](https://github.com/miso-lims/miso-lims/actions/workflows/pinery_miso_it.yml/badge.svg)
 [![DOI](https://zenodo.org/badge/4726428.svg)](https://zenodo.org/badge/latestdoi/4726428)
-[![Gitter](https://badges.gitter.im/miso-lims/community.svg)](https://gitter.im/miso-lims/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Documentation Status](https://readthedocs.org/projects/miso-lims-docs/badge/?version=latest)](https://miso-lims.readthedocs.io/projects/docs/en/latest/?badge=latest)
 
 
@@ -120,9 +119,3 @@ To run your own MISO instance in the long term, download the
 
 Installation and configuration details can be found in the [MISO building and deploying guide](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/installation-guide/).
 
-## Contact and Community
-
-- [MISO Twitter](https://twitter.com/misolims) : for news and updates
-- [MISO Community Gitter](https://gitter.im/miso-lims/community) : for user group and developer questions and discussion
-- [MISO Users Gitter](https://gitter.im/miso-lims/users) : for user group questions and discussion
-- [MISO Developers Gitter](https://gitter.im/miso-lims/developers) : for developer questions and discussion

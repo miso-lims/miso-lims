@@ -40,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -685,7 +685,7 @@ public class LimsUtils {
   }
 
   public static int getLongestIndex(Collection<? extends IndexedLibrary> libraries,
-      Function<IndexedLibrary, Index> getIndex) {
+      Function<IndexedLibrary, LibraryIndex> getIndex) {
     return libraries.stream()
         .map(getIndex)
         .filter(Objects::nonNull)

@@ -1,27 +1,24 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.transaction.support.TransactionTemplate;
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.IndexFamily;
+
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.IndexService;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryIndexService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryTemplateService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -34,12 +31,13 @@ import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
-public class DefaultLibraryTemplateService extends AbstractSaveService<LibraryTemplate> implements LibraryTemplateService {
+public class DefaultLibraryTemplateService extends AbstractSaveService<LibraryTemplate>
+    implements LibraryTemplateService {
 
   @Autowired
   private LibraryTemplateStore libraryTemplateStore;
   @Autowired
-  private IndexService indexService;
+  private LibraryIndexService indexService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -107,7 +105,7 @@ public class DefaultLibraryTemplateService extends AbstractSaveService<LibraryTe
     });
   }
 
-  private void applyIndexChanges(Map<String, Index> toIndices, Map<String, Index> fromIndices) {
+  private void applyIndexChanges(Map<String, LibraryIndex> toIndices, Map<String, LibraryIndex> fromIndices) {
     for (Iterator<String> iterator = toIndices.keySet().iterator(); iterator.hasNext();) {
       if (!fromIndices.containsKey(iterator.next())) {
         iterator.remove();
@@ -126,11 +124,11 @@ public class DefaultLibraryTemplateService extends AbstractSaveService<LibraryTe
     loadIndices(template.getIndexTwos());
   }
 
-  private void loadIndices(Map<String, Index> indices) throws IOException {
-    Map<String, Index> loaded = new HashMap<>();
+  private void loadIndices(Map<String, LibraryIndex> indices) throws IOException {
+    Map<String, LibraryIndex> loaded = new HashMap<>();
     for (String boxPosition : indices.keySet()) {
-      Index index = indices.get(boxPosition);
-      Index managedIndex = indexService.get(index.getId());
+      LibraryIndex index = indices.get(boxPosition);
+      LibraryIndex managedIndex = indexService.get(index.getId());
       if (managedIndex == null) {
         throw new ValidationException(new ValidationError("No index found with ID: " + index.getId()));
       }
@@ -140,9 +138,10 @@ public class DefaultLibraryTemplateService extends AbstractSaveService<LibraryTe
   }
 
   @Override
-  protected void collectValidationErrors(LibraryTemplate template, LibraryTemplate beforeChange, List<ValidationError> errors) throws IOException {
+  protected void collectValidationErrors(LibraryTemplate template, LibraryTemplate beforeChange,
+      List<ValidationError> errors) throws IOException {
     if (ValidationUtils.isChanged(LibraryTemplate::getAlias, template, beforeChange)
-            && libraryTemplateStore.getByAlias(template.getAlias()) != null) {
+        && libraryTemplateStore.getByAlias(template.getAlias()) != null) {
       errors.add(ValidationError.forDuplicate("library template", "alias"));
     }
 
@@ -160,15 +159,17 @@ public class DefaultLibraryTemplateService extends AbstractSaveService<LibraryTe
     }
   }
 
-  private void validateIndices(IndexFamily family, Map<String, Index> indices, String position, List<ValidationError> errors) {
+  private void validateIndices(LibraryIndexFamily family, Map<String, LibraryIndex> indices, String position,
+      List<ValidationError> errors) {
     for (String boxPosition : indices.keySet()) {
       if (!BoxUtils.isValidBoxPosition(boxPosition)) {
         errors.add(new ValidationError("Invalid box position: " + boxPosition));
       }
     }
-    for (Index index : indices.values()) {
+    for (LibraryIndex index : indices.values()) {
       if (index.getFamily().getId() != family.getId()) {
-        errors.add(new ValidationError(String.format("Index %s must all belong to the selected index family", position)));
+        errors
+            .add(new ValidationError(String.format("Index %s must all belong to the selected index family", position)));
         break;
       }
     }
@@ -185,7 +186,8 @@ public class DefaultLibraryTemplateService extends AbstractSaveService<LibraryTe
   }
 
   @Override
-  public List<LibraryTemplate> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+  public List<LibraryTemplate> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir,
+      String sortCol,
       PaginationFilter... filter) throws IOException {
     authorizationManager.throwIfUnauthenticated();
     return libraryTemplateStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
