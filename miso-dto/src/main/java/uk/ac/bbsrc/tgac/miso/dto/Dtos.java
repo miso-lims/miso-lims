@@ -255,6 +255,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
+import uk.ac.bbsrc.tgac.miso.core.data.type.CompressionFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -3541,6 +3542,13 @@ public class Dtos {
 
   public static SpreadsheetFormatDto asDto(@Nonnull SpreadSheetFormat from) {
     SpreadsheetFormatDto dto = new SpreadsheetFormatDto();
+    dto.setName(from.name());
+    dto.setDescription(from.description());
+    return dto;
+  }
+
+  public static CompressionFormatDto asDto(@Nonnull CompressionFormat from) {
+    CompressionFormatDto dto = new CompressionFormatDto();
     dto.setName(from.name());
     dto.setDescription(from.description());
     return dto;

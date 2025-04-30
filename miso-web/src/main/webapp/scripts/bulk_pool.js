@@ -137,7 +137,9 @@ BulkTarget.pool = (function ($) {
         ),
         {
           name: "Create Samplesheet",
-          action: createSamplesheet,
+          action: function (pools) {
+            createSamplesheet(pools, config);
+          },
         },
         BulkUtils.actions.parents(
           Urls.rest.pools.parents,
@@ -319,7 +321,7 @@ BulkTarget.pool = (function ($) {
     },
   };
 
-  function createSamplesheet(pools) {
+  function createSamplesheet(pools, config) {
     var platformTypes = Utils.array.deduplicateString(
       pools.map(function (pool) {
         return pool.platformType;
@@ -349,10 +351,125 @@ BulkTarget.pool = (function ($) {
       ]);
       return;
     }
-    function showCreateDialog(modelId) {
+    function showCreateTwoDialog(modelId, partitionCount, experimentType) {
+      var dialogFields = [
+        {
+          property: "sequencingParameters",
+          label: "Sequencing Parameters",
+          required: true,
+          type: "select",
+          getLabel: Utils.array.getName,
+          values: Constants.sequencingParameters.filter(function (param) {
+            return param.instrumentModelId == modelId;
+          }),
+        },
+        {
+          property: "genomeFolder",
+          type: "text",
+          label: "Genome Folder",
+          value: config.genomeFolder,
+          required: true,
+        },
+        {
+          property: "customRead1Primer",
+          type: "text",
+          label: "Custom Read 1 Primer Well",
+          required: false,
+        },
+        {
+          property: "customIndexPrimer",
+          type: "text",
+          label: "Custom Index Primer Well",
+          required: false,
+        },
+        {
+          property: "customRead2Primer",
+          type: "text",
+          label: "Custom Read 2 Primer Well",
+          required: false,
+        },
+      ];
+
+      var instrument = instrumentModels.find(function (m) {
+        return m.id === modelId;
+      });
+      for (var i = 0; i < partitionCount; i++) {
+        dialogFields.push({
+          property: "pool_" + (i + 1),
+          label:
+            Utils.array.findUniqueOrThrow(function (pt) {
+              return pt.name === instrument.platformType;
+            }, Constants.platformTypes).partitionName +
+            " " +
+            (i + 1),
+          required: false,
+          type: "select",
+          getLabel: Utils.array.getAlias,
+          values: pools.concat([{ value: null, alias: "empty" }]),
+        });
+      }
+
+      if (experimentType.dragen) {
+        dialogFields.push(
+          {
+            property: "dragenVersion",
+            type: "text",
+            label: "DRAGEN Version",
+            value: config.dragenVersion,
+            required: true,
+          },
+          {
+            property: "fastqCompressionFormat",
+            label: "FastQ Compression Format",
+            required: true,
+            type: "select",
+            getLabel: function (type) {
+              return type.description;
+            },
+            values: config.compressionFormats,
+            value: config.compressionFormat,
+          },
+          {
+            property: "trimUMI",
+            type: "select",
+            label: "Trim UMI?",
+            values: ["true", "false"],
+            required: true,
+          }
+        );
+      }
+
       Utils.showDialog(
         "Create Samplesheet",
         "Download",
+        dialogFields,
+        function (result) {
+          var poolIds = [];
+          for (var i = 0; i < partitionCount; i++) {
+            poolIds.push(result["pool_" + (i + 1)]);
+          }
+          Utils.ajaxDownloadWithDialog(Urls.rest.pools.samplesheet, {
+            customRead1Primer: result.customRead1Primer,
+            customIndexPrimer: result.customIndexPrimer,
+            customRead2Primer: result.customRead2Primer,
+            dragenVersion: result.dragenVersion || null,
+            trimUMI: result.trimUMI || null,
+            fastqCompressionFormat: result.fastqCompressionFormat
+              ? result.fastqCompressionFormat.description
+              : null,
+            experimentType: experimentType.name,
+            genomeFolder: result.genomeFolder,
+            sequencingParametersId: result.sequencingParameters.id,
+            poolIds: poolIds.map(Utils.array.getId),
+          });
+        },
+        null
+      );
+    }
+    function showCreateDialog(modelId, partitionCount) {
+      Utils.showDialog(
+        "Create Samplesheet",
+        "Continue",
         [
           {
             property: "experimentType",
@@ -364,62 +481,29 @@ BulkTarget.pool = (function ($) {
             },
             values: Constants.illuminaExperimentTypes,
           },
-          {
-            property: "sequencingParameters",
-            label: "Sequencing Parameters",
-            required: true,
-            type: "select",
-            getLabel: Utils.array.getName,
-            values: Constants.sequencingParameters.filter(function (param) {
-              return param.instrumentModelId == modelId;
-            }),
-          },
-          {
-            property: "genomeFolder",
-            type: "text",
-            label: "Genome Folder",
-            value: Constants.genomeFolder,
-            required: true,
-          },
-          {
-            property: "customRead1Primer",
-            type: "text",
-            label: "Custom Read 1 Primer Well",
-            required: false,
-          },
-          {
-            property: "customIndexPrimer",
-            type: "text",
-            label: "Custom Index Primer Well",
-            required: false,
-          },
-          {
-            property: "customRead2Primer",
-            type: "text",
-            label: "Custom Read 2 Primer Well",
-            required: false,
-          },
-          {
-            property: "pools",
-            label: "Lanes Configuration",
-            required: true,
-            type: "order",
-            getLabel: Utils.array.getAlias,
-            values: pools,
-          },
         ],
         function (result) {
-          Utils.ajaxDownloadWithDialog(Urls.rest.pools.samplesheet, {
-            customRead1Primer: result.customRead1Primer,
-            customIndexPrimer: result.customIndexPrimer,
-            customRead2Primer: result.customRead2Primer,
-            experimentType: result.experimentType.name,
-            genomeFolder: result.genomeFolder,
-            sequencingParametersId: result.sequencingParameters.id,
-            poolIds: result.pools.map(Utils.array.getId),
-          });
+          showCreateTwoDialog(modelId, partitionCount, result.experimentType);
         },
         null
+      );
+    }
+    function showContainersDialog(modelId) {
+      Utils.showWizardDialog(
+        "Create Samplesheet",
+        Constants.containerModels
+          .filter(function (m) {
+            return m.instrumentModelIds.indexOf(modelId) !== -1 && !m.archived;
+          })
+          .sort(Utils.sorting.standardSort("alias"))
+          .map(function (model) {
+            return {
+              name: model.alias,
+              handler: function () {
+                showCreateDialog(modelId, model.partitionCount);
+              },
+            };
+          })
       );
     }
     Utils.showWizardDialog(
@@ -435,7 +519,7 @@ BulkTarget.pool = (function ($) {
           return {
             name: instrumentModel.alias,
             handler: function () {
-              showCreateDialog(instrumentModel.id);
+              showContainersDialog(instrumentModel.id);
             },
           };
         })

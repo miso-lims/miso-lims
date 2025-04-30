@@ -31,6 +31,7 @@ public class ParentLibrary implements IndexedLibrary, Serializable {
   private String alias;
   private String description;
   private boolean lowQuality;
+  private boolean umis;
 
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
@@ -117,6 +118,14 @@ public class ParentLibrary implements IndexedLibrary, Serializable {
   @Override
   public void setIndex2(LibraryIndex index2) {
     this.index2 = index2;
+  }
+
+  public boolean getUmis() {
+    return umis;
+  }
+
+  public void setUmis(boolean umis) {
+    this.umis = umis;
   }
 
   public DetailedQcStatus getDetailedQcStatus() {
