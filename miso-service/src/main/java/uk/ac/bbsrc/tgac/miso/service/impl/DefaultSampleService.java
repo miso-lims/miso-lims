@@ -838,6 +838,9 @@ public class DefaultSampleService implements SampleService {
       validateSubproject(detailed, beforeChange, errors);
       validateReferenceSlide(detailed, errors);
       validateGroupDescription(detailed, errors);
+      if (isIdentitySample(sample) && sample.getRequisition() != null) {
+        errors.add(new ValidationError("requisitionId", "Identity samples cannot be added to requisitions"));
+      }
       if (detailed.isSynthetic()) {
         if (detailed.getRequisition() != null) {
           errors.add(new ValidationError("requisitionId", "Ghost samples cannot be added to requisitions"));
