@@ -545,33 +545,34 @@ public class SampleRestController extends AbstractRestController {
         ali -> Dtos.asDto(ali, false));
   }
 
-  public static class FindRelatedRequest {
-    public List<Long> identityIds;
-    public long sampleClassId;
-    public long excludeRequisitionId;
+  public record FindRelatedRequest(List<Long> identityIds, long sampleClassId, long excludeRequisitionId,
+      boolean excludeSynthetic) {
   }
 
   @PostMapping("/find-related")
   public @ResponseBody ArrayNode findRelated(@RequestBody FindRelatedRequest request) throws IOException {
-    List<Sample> identities = sampleService.listByIdList(request.identityIds);
-    if (identities == null || identities.size() != request.identityIds.size()) {
+    List<Sample> identities = sampleService.listByIdList(request.identityIds());
+    if (identities == null || identities.size() != request.identityIds().size()) {
       throw new RestException("Invalid identity IDs", Status.BAD_REQUEST);
     } else if (identities.stream().anyMatch(sample -> !LimsUtils.isIdentitySample(sample))) {
       throw new RestException("Specified sample IDs are not all identities", Status.BAD_REQUEST);
     }
 
     List<DetailedSample> samples = identities.stream()
-        .flatMap(child -> searchChildren(request.sampleClassId, (DetailedSample) child))
+        .flatMap(child -> searchChildren(request.sampleClassId(), (DetailedSample) child))
         .toList();
     Set<Long> supplementalSampleIds = sampleService.list(0, 0, false, "id",
-        PaginationFilter.supplementalToRequisitionId(request.excludeRequisitionId))
+        PaginationFilter.supplementalToRequisitionId(request.excludeRequisitionId()))
         .stream()
         .map(Sample::getId)
         .collect(Collectors.toSet());
     ArrayNode results = mapper.createArrayNode();
     for (DetailedSample sample : samples) {
+      if (request.excludeSynthetic() && sample.isSynthetic()) {
+        continue;
+      }
       Requisition requisition = LimsUtils.getEffectiveRequisition(sample);
-      if ((requisition != null && requisition.getId() == request.excludeRequisitionId)
+      if ((requisition != null && requisition.getId() == request.excludeRequisitionId())
           || supplementalSampleIds.contains(sample.getId())) {
         // exclude samples already associated with the target requisition
         continue;

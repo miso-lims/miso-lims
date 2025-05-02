@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIdentitySample;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -366,8 +368,12 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   public void addSupplementalSamples(Requisition requisition, Collection<Sample> samples) throws IOException {
     List<Sample> managed = sampleService.listByIdList(samples.stream().map(Sample::getId).toList());
     for (Sample sample : managed) {
-      if (LimsUtils.isDetailedSample(sample) && ((DetailedSample) sample).isSynthetic()) {
-        throw new ValidationException("Ghost samples cannot be added as supplemental samples");
+      if (LimsUtils.isDetailedSample(sample)) {
+        if (isIdentitySample(sample)) {
+          throw new ValidationException("Identity samples cannot be added as supplemental samples");
+        } else if (((DetailedSample) sample).isSynthetic()) {
+          throw new ValidationException("Ghost samples cannot be added as supplemental samples");
+        }
       }
       RequisitionSupplementalSample supplemental = new RequisitionSupplementalSample(requisition.getId(), sample);
       requisitionDao.saveSupplementalSample(supplemental);

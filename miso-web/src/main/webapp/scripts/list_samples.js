@@ -127,6 +127,9 @@ ListTarget.sample = (function () {
                     Utils.showSomeNotFoundError(queryNames, data);
                     return;
                   }
+                  if (!validateSamples(data)) {
+                    return;
+                  }
                   samplesUpdateFunction(Urls.rest.requisitions.addSamples(config.requisitionId))(
                     data
                   );
@@ -429,9 +432,32 @@ ListTarget.sample = (function () {
           Utils.showSomeNotFoundError(queryNames, items);
           return;
         }
+        if (!validateSamples(items)) {
+          return;
+        }
         addSupplementalSamples(config, items.map(Utils.array.getId));
       }
     );
+  }
+
+  function validateSamples(samples) {
+    if (
+      samples.some(function (sample) {
+        return sample.synthetic;
+      })
+    ) {
+      Utils.showOkDialog("Error", ["Ghost samples cannot be added to a requisition"]);
+      return false;
+    }
+    if (
+      samples.some(function (sample) {
+        return sample.sampleCategory === "Identity";
+      })
+    ) {
+      Utils.showOkDialog("Error", ["Identity samples cannot be added to a requisition"]);
+      return false;
+    }
+    return true;
   }
 
   function addSupplementalSamples(config, sampleIds) {
@@ -517,13 +543,14 @@ ListTarget.sample = (function () {
         }),
         sampleClassId: sampleClass.id,
         excludeRequisitionId: config.requisitionId,
+        excludeSynthetic: true,
       },
       function (data) {
         if (data && data.length) {
           showFindRelatedChooseSamplesDialog(config, data);
         } else {
           Utils.showOkDialog("Add Supplemental Samples", [
-            "No matching samples found. Note that samples already associated with this requisition are omitted.",
+            "No matching samples found. Note that ghost samples and those already associated with this requisition are omitted.",
           ]);
         }
       }
