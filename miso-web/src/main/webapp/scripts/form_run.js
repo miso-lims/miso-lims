@@ -28,6 +28,9 @@ FormTarget.run = (function ($) {
       return Urls.ui.runs.edit(run.id);
     },
     getSections: function (config, object) {
+      var platformType = Utils.array.findUniqueOrThrow(function (pt) {
+        return pt.key === object.platformType;
+      }, Constants.platformTypes);
       return [
         {
           title: "Run Information",
@@ -93,6 +96,7 @@ FormTarget.run = (function ($) {
                 }),
                 getItemLabel: Utils.array.getName,
                 getItemValue: Utils.array.getId,
+                include: !platformType.containerLevelParameters,
                 required: true,
               },
               {

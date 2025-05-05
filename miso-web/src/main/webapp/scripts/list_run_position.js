@@ -28,8 +28,8 @@ ListTarget.run_position = {
     return actions;
   },
   createStaticActions: function (config, projectId) {
-    var platformType = Utils.array.findFirstOrNull(function (pt) {
-      return pt.name == config.platformType;
+    var platformType = Utils.array.findUniqueOrThrow(function (pt) {
+      return pt.name === config.platformType;
     }, Constants.platformTypes);
     var getPlatformPositions = function () {
       var instrumentModel = Utils.array.findUniqueOrThrow(
@@ -52,45 +52,59 @@ ListTarget.run_position = {
             ]);
             return;
           }
-          Utils.showDialog(
-            "Add " + platformType.containerName,
-            "Add",
-            [
-              {
-                type: "select",
-                label: "position",
-                property: "position",
-                values: getPlatformPositions(),
-                getLabel: function (value) {
-                  return value ? value : "n/a";
-                },
+          var fields = [
+            {
+              type: "select",
+              label: "position",
+              property: "position",
+              values: getPlatformPositions(),
+              getLabel: function (value) {
+                return value ? value : "n/a";
               },
-              {
-                type: "text",
-                label: "Serial Number",
-                property: "barcode",
-              },
-            ],
-            function (results) {
-              Utils.ajaxWithDialog(
-                "Adding " + platformType.containerName,
-                "POST",
-                Urls.rest.runs.addContainer(config.runId) +
-                  "?" +
-                  Utils.page.param({
-                    position: results.position,
-                    barcode: results.barcode,
-                  }),
-                null,
-                Utils.page.pageReload
-              );
-            }
-          );
+            },
+            {
+              type: "text",
+              label: "Serial Number",
+              property: "barcode",
+            },
+          ];
+          if (platformType.containerLevelParameters) {
+            fields.push({
+              type: "select",
+              label: "Sequencing Parameters",
+              property: "sequencingParameters",
+              values: Constants.sequencingParameters.filter(function (params) {
+                return params.instrumentModelId === config.instrumentModelId;
+              }),
+              getLabel: Utils.array.getName,
+              required: true,
+            });
+          }
+          Utils.showDialog("Add " + platformType.containerName, "Add", fields, function (results) {
+            Utils.ajaxWithDialog(
+              "Adding " + platformType.containerName,
+              "POST",
+              Urls.rest.runs.addContainer(config.runId) +
+                "?" +
+                Utils.page.param({
+                  position: results.position,
+                  barcode: results.barcode,
+                  sequencingParametersId: results.sequencingParameters
+                    ? results.sequencingParameters.id
+                    : null,
+                }),
+              null,
+              Utils.page.pageReload
+            );
+          });
         },
       },
     ];
   },
   createColumns: function (config, projectId) {
+    var platformType = Utils.array.findUniqueOrThrow(function (pt) {
+      return pt.name === config.platformType;
+    }, Constants.platformTypes);
     return [
       {
         sTitle: "Position",
@@ -99,6 +113,13 @@ ListTarget.run_position = {
         mRender: function (data, type, full) {
           return data || "n/a";
         },
+      },
+      {
+        sTitle: "Seq. Params.",
+        mData: "sequencingParametersId",
+        include: platformType.containerLevelParameters,
+        bSortable: false,
+        mRender: ListUtils.render.textFromId(Constants.sequencingParameters, "name"),
       },
       ListUtils.labelHyperlinkColumn(
         "ID",

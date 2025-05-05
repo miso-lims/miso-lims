@@ -28,37 +28,37 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
  * @since 0.0.2
  */
 public enum PlatformType {
-  ILLUMINA("Illumina", "Flow Cell", "Lane", "Lanes", "ILLUMINA") {
+  ILLUMINA("Illumina", "Flow Cell", "Lane", "Lanes", "ILLUMINA", false) {
     @Override
     public Run createRun() {
       return new IlluminaRun();
     }
   }, //
-  LS454("LS454", "Plate", "Lane", "Lanes", "LS454") {
+  LS454("LS454", "Plate", "Lane", "Lanes", "LS454", false) {
     @Override
     public Run createRun() {
       return new LS454Run();
     }
   }, //
-  SOLID("Solid", "Slide", "Lane", "Lanes", "ABI_SOLID") {
+  SOLID("Solid", "Slide", "Lane", "Lanes", "ABI_SOLID", false) {
     @Override
     public Run createRun() {
       return new SolidRun();
     }
   }, //
-  IONTORRENT("IonTorrent", "Chip", "Chip", "Chips", null) {
+  IONTORRENT("IonTorrent", "Chip", "Chip", "Chips", null, false) {
     @Override
     public Run createRun() {
       return new IonTorrentRun();
     }
   }, //
-  PACBIO("PacBio", "SMRT Cell", "SMRT Cell Contents", "SMRT Cells Contents", null) {
+  PACBIO("PacBio", "SMRT Cell", "SMRT Cell Contents", "SMRT Cell Contents", null, true) {
     @Override
     public Run createRun() {
       return new PacBioRun();
     }
   }, //
-  OXFORDNANOPORE("Oxford Nanopore", "Flow Cell", "Flow Cell", "Flow Cells", null) {
+  OXFORDNANOPORE("Oxford Nanopore", "Flow Cell", "Flow Cell", "Flow Cells", null, false) {
     @Override
     public Run createRun() {
       return new OxfordNanoporeRun();
@@ -69,7 +69,7 @@ public enum PlatformType {
       return new OxfordNanoporeContainer();
     }
   }, //
-  ULTIMA("Ultima", "Wafer", "Wafer Contents", "Wafer Contents", null) {
+  ULTIMA("Ultima", "Wafer", "Wafer Contents", "Wafer Contents", null, false) {
     @Override
     public Run createRun() {
       return new UltimaRun();
@@ -84,6 +84,7 @@ public enum PlatformType {
   private final String partitionName;
   private final String pluralPartitionName;
   private final String sraName;
+  private final boolean containerLevelParameters;
   /**
    * Field lookup
    */
@@ -99,12 +100,14 @@ public enum PlatformType {
    * 
    * @param key of type String
    */
-  PlatformType(String key, String containerName, String partitionName, String pluralPartitionName, String sraName) {
+  PlatformType(String key, String containerName, String partitionName, String pluralPartitionName, String sraName,
+      boolean containerLevelParameters) {
     this.key = key;
     this.containerName = containerName;
     this.partitionName = partitionName;
     this.pluralPartitionName = pluralPartitionName;
     this.sraName = sraName;
+    this.containerLevelParameters = containerLevelParameters;
   }
 
   /**
@@ -167,5 +170,9 @@ public enum PlatformType {
 
   public String getPluralPartitionName() {
     return pluralPartitionName;
+  }
+
+  public boolean hasContainerLevelParameters() {
+    return containerLevelParameters;
   }
 }

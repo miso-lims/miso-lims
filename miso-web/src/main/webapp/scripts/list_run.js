@@ -91,6 +91,12 @@ ListTarget.run = {
     }
   },
   createColumns: function (config, projectId) {
+    var platformType = null;
+    if (config.platformType) {
+      platformType = Utils.array.findUniqueOrThrow(function (pt) {
+        return pt.name === config.platformType;
+      }, Constants.platformTypes);
+    }
     return [
       ListUtils.idHyperlinkColumn("Name", Urls.ui.runs.edit, "id", Utils.array.getName, 1, true),
       ListUtils.labelHyperlinkColumn(
@@ -110,7 +116,7 @@ ListTarget.run = {
       {
         sTitle: "Seq. Params.",
         mData: "sequencingParametersName",
-        include: true,
+        include: !platformType || !platformType.containerLevelParameters,
         bSortable: false,
         mRender: function (data, type, full) {
           return data || "(None)";
