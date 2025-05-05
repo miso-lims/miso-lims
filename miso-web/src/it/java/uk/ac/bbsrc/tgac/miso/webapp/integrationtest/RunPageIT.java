@@ -50,7 +50,6 @@ public class RunPageIT extends AbstractIT {
     fields.put(Field.ALIAS, null);
     fields.put(Field.PLATFORM, "PacBio");
     fields.put(Field.SEQUENCER, "PacBio_SR_5001 - PacBio RS II");
-    fields.put(Field.SEQ_PARAMS, "SELECT");
     fields.put(Field.DESCRIPTION, null);
     fields.put(Field.FILE_PATH, null);
     fields.put(Field.STATUS, "Unknown");
@@ -61,7 +60,6 @@ public class RunPageIT extends AbstractIT {
     // enter run info
     Map<RunPage.Field, String> changes = Maps.newLinkedHashMap();
     changes.put(Field.ALIAS, "Test_PacBio_Run_Creation");
-    changes.put(Field.SEQ_PARAMS, "Custom (see notes)");
     changes.put(Field.DESCRIPTION, "test run creation");
     changes.put(Field.FILE_PATH, "/nowhere");
     changes.put(Field.STATUS, "Running");
@@ -167,7 +165,9 @@ public class RunPageIT extends AbstractIT {
 
     // copy unchanged
     fields.forEach((key, val) -> {
-      if (!changes.containsKey(key)) changes.put(key, val);
+      if (!changes.containsKey(key)) {
+        changes.put(key, val);
+      }
     });
     assertFieldValues("changes pre-save", changes, page);
 
@@ -216,8 +216,8 @@ public class RunPageIT extends AbstractIT {
     Run initial = (Run) getSession().get(Run.class, 5004L);
     assertEquals(1, initial.getSequencerPartitionContainers().size());
     initial.getSequencerPartitionContainers().get(0).getPartitions()
-      .forEach(partition -> assertNull(partition.getPool()));
-    
+        .forEach(partition -> assertNull(partition.getPool()));
+
     RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5004L);
     List<String> page1Pools = page1.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
     assertEquals(0, page1Pools.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
@@ -236,7 +236,8 @@ public class RunPageIT extends AbstractIT {
         assertNull(partition.getPool());
       } else {
         assertNotNull(partition.getPool());
-        assertEquals(LimsUtils.toNiceString(concentration), LimsUtils.toNiceString(partition.getLoadingConcentration()));
+        assertEquals(LimsUtils.toNiceString(concentration),
+            LimsUtils.toNiceString(partition.getLoadingConcentration()));
         assertEquals(ConcentrationUnit.NANOMOLAR, partition.getLoadingConcentrationUnits());
         partitionsSet++;
       }
@@ -482,8 +483,8 @@ public class RunPageIT extends AbstractIT {
     assertTrue(poolWarnings.size() >= 1);
 
     boolean containsWarning = false;
-    for (String poolWarning : poolWarnings){
-      if(poolWarning.contains(warning)){
+    for (String poolWarning : poolWarnings) {
+      if (poolWarning.contains(warning)) {
         containsWarning = true;
         break;
       }
@@ -498,13 +499,16 @@ public class RunPageIT extends AbstractIT {
     assertAttribute(Field.PLATFORM, expectedValues, run.getPlatformType().getKey());
     assertAttribute(Field.SEQUENCER, expectedValues,
         run.getSequencer().getName() + " - " + run.getSequencer().getInstrumentModel().getAlias());
-    assertAttribute(Field.SEQ_PARAMS, expectedValues, nullOrGet(run.getSequencingParameters(), SequencingParameters::getName));
+    assertAttribute(Field.SEQ_PARAMS, expectedValues,
+        nullOrGet(run.getSequencingParameters(), SequencingParameters::getName));
     assertAttribute(Field.DESCRIPTION, expectedValues, nullOrToString(run.getDescription()));
     assertAttribute(Field.FILE_PATH, expectedValues, run.getFilePath());
     assertAttribute(Field.STATUS, expectedValues, run.getHealth().getKey());
     assertAttribute(Field.START_DATE, expectedValues, formatDate(run.getStartDate()));
     assertAttribute(Field.COMPLETION_DATE, expectedValues, formatDate(run.getCompletionDate()));
-    if (run instanceof IlluminaRun) assertIlluminaRunAttributes(expectedValues, (IlluminaRun) run);
+    if (run instanceof IlluminaRun) {
+      assertIlluminaRunAttributes(expectedValues, (IlluminaRun) run);
+    }
   }
 
   private void assertIlluminaRunAttributes(Map<RunPage.Field, String> expectedValues, IlluminaRun run) {
