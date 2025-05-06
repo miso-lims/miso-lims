@@ -369,6 +369,7 @@ public class ConstantsController {
         dto.put("active", activePlatformTypes.contains(platformType));
         dto.put("partitionName", platformType.getPartitionName());
         dto.put("pluralPartitionName", platformType.getPluralPartitionName());
+        dto.put("containerLevelParameters", platformType.hasContainerLevelParameters());
       }
       ArrayNode sampleTypes = node.putArray("sampleTypes");
       for (SampleType sampleType : sampleTypeService.list()) {

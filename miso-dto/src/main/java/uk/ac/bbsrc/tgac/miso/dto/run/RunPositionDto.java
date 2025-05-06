@@ -14,6 +14,8 @@ public class RunPositionDto {
 
   private SequencingContainerModelDto containerModel;
 
+  private Long sequencingParametersId;
+
   private String lastModified;
 
   public Long getPositionId() {
@@ -54,6 +56,14 @@ public class RunPositionDto {
 
   public void setContainerModel(SequencingContainerModelDto containerModel) {
     this.containerModel = containerModel;
+  }
+
+  public Long getSequencingParametersId() {
+    return sequencingParametersId;
+  }
+
+  public void setSequencingParametersId(Long sequencingParametersId) {
+    this.sequencingParametersId = sequencingParametersId;
   }
 
   public String getLastModified() {

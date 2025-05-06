@@ -59,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContaine
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -236,6 +237,7 @@ public class DefaultRunService implements RunService {
   public long update(Run run) throws IOException {
     Run managed = get(run.getId());
     loadChildEntities(run);
+    validateChanges(managed, run);
     saveContainers(run);
     applyChanges(managed, run);
     return save(managed).getId();
@@ -314,20 +316,18 @@ public class DefaultRunService implements RunService {
    * @throws IOException
    */
   private void loadChildEntities(Run run) throws IOException {
-    if (run.getSequencingParameters() != null) {
-      run.setSequencingParameters(sequencingParametersService.get(run.getSequencingParameters().getId()));
-    }
-    run.setSequencer(instrumentService.get(run.getSequencer().getId()));
-    if (run.getSequencingKit() != null) {
-      run.setSequencingKit(kitDescriptorService.get(run.getSequencingKit().getId()));
-    }
-    if (run.getDataReviewer() != null) {
-      run.setDataReviewer(userService.get(run.getDataReviewer().getId()));
-    }
+    loadChildEntity(run::setSequencingParameters, run.getSequencingParameters(), sequencingParametersService,
+        "sequencingParametersId");
+    loadChildEntity(run::setSequencer, run.getSequencer(), instrumentService, "instrumentId");
+    loadChildEntity(run::setSequencingKit, run.getSequencingKit(), kitDescriptorService, "sequencingKitId");
+    loadChildEntity(run::setDataReviewer, run.getDataReviewer(), userService, "dataReviewer");
     if (run.getRunPositions() != null) {
       for (RunPosition position : run.getRunPositions()) {
         if (position.getContainer().isSaved()) {
           position.setContainer(containerService.get(position.getContainer().getId()));
+        }
+        if (position.getSequencingParameters() != null) {
+          position.setSequencingParameters(sequencingParametersService.get(position.getSequencingParameters().getId()));
         }
       }
     }
@@ -373,6 +373,7 @@ public class DefaultRunService implements RunService {
             String.format("Platform %s does not have a position %s", platform.getAlias(), position.getPosition())));
       }
     }
+    validateSequencingParameters(changed, platform.getPlatformType(), errors);
 
     if (changed.getSequencingKit() != null && changed.getSequencingKit().getKitType() != KitType.SEQUENCING) {
       errors.add(new ValidationError("sequencingKitId", "Must be a sequencing kit"));
@@ -418,8 +419,29 @@ public class DefaultRunService implements RunService {
     }
   }
 
+  private static void validateSequencingParameters(Run run, PlatformType platformType, List<ValidationError> errors) {
+    // Ensure sequencing parameters are not set at the wrong location. Parameters are required on the
+    // front-end, but not the back-end, as we want to accept runs from Run Scanner even if the
+    // parameters cannot be determined.
+    if (platformType.hasContainerLevelParameters()) {
+      if (run.getSequencingParameters() != null) {
+        errors.add(new ValidationError("sequencingParametersId",
+            "Sequencing parameters should not be set at the run level for %s runs"
+                .formatted(platformType.getKey())));
+      }
+    } else {
+      for (RunPosition runPosition : run.getRunPositions()) {
+        if (runPosition.getSequencingParameters() != null) {
+          errors.add(new ValidationError(
+              "Sequencing parameters should not be set at the %s level for %s runs"
+                  .formatted(platformType.getContainerName(), platformType.getKey())));
+          break;
+        }
+      }
+    }
+  }
+
   private void applyChanges(Run target, Run source) throws IOException {
-    validateChanges(target, source);
     target.setAlias(source.getAlias());
     target.setAccession(source.getAccession());
     target.setDescription(source.getDescription());
@@ -473,9 +495,11 @@ public class DefaultRunService implements RunService {
         newPos.setRun(target);
         newPos.setContainer(sourcePos.getContainer());
         newPos.setPosition(sourcePos.getPosition());
+        newPos.setSequencingParameters(sourcePos.getSequencingParameters());
         target.getRunPositions().add(newPos);
       } else {
         existingPos.setContainer(sourcePos.getContainer());
+        existingPos.setSequencingParameters(sourcePos.getSequencingParameters());
       }
     }
   }
@@ -766,24 +790,39 @@ public class DefaultRunService implements RunService {
   }
 
   private boolean updateSequencingParameters(final Run target, User user,
-      Predicate<SequencingParameters> filterParameters,
-      final Instrument sequencer) throws IOException {
-    // If the sequencing parameters haven't been updated by a human, see if we can find exactly one that
-    // matches.
-    if (!target.didSomeoneElseChangeColumn("sequencingParameters_parametersId", user)) {
-      List<SequencingParameters> possibleParameters =
-          sequencingParametersService.listByInstrumentModelId(sequencer.getInstrumentModel().getId()).stream()
-              .filter(parameters -> !parameters.getName().startsWith("Custom")).filter(filterParameters)
-              .collect(Collectors.toList());
-      if (possibleParameters.size() == 1) {
+      Predicate<SequencingParameters> filterParameters, final Instrument sequencer) throws IOException {
+    // See if we can find exactly one that matches
+    List<SequencingParameters> possibleParameters =
+        sequencingParametersService.listByInstrumentModelId(sequencer.getInstrumentModel().getId()).stream()
+            .filter(parameters -> !parameters.getName().startsWith("Custom"))
+            .filter(filterParameters)
+            .collect(Collectors.toList());
+    if (possibleParameters.size() != 1) {
+      return false;
+    }
+    SequencingParameters detectedParameters = possibleParameters.get(0);
+
+    if (target.getPlatformType().hasContainerLevelParameters()) {
+      boolean anyUpdated = false;
+      for (RunPosition pos : target.getRunPositions()) {
+        if (pos.getSequencingParameters() == null
+            || pos.getSequencingParameters().getId() != detectedParameters.getId()) {
+          pos.setSequencingParameters(detectedParameters);
+          anyUpdated = true;
+        }
+      }
+      return anyUpdated;
+    } else {
+      // Only update if the sequencing parameters haven't been updated by a human
+      if (!target.didSomeoneElseChangeColumn("sequencingParameters_parametersId", user)) {
         if (target.getSequencingParameters() == null
-            || possibleParameters.get(0).getId() != target.getSequencingParameters().getId()) {
-          target.setSequencingParameters(possibleParameters.get(0));
+            || detectedParameters.getId() != target.getSequencingParameters().getId()) {
+          target.setSequencingParameters(detectedParameters);
           return true;
         }
       }
+      return false;
     }
-    return false;
   }
 
   private boolean updateContainerFromNotification(final Run target, User user, SequencingContainerModel containerModel,

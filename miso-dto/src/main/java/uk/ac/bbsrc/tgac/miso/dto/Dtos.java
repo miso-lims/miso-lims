@@ -2329,6 +2329,7 @@ public class Dtos {
     setString(dto::setIdentificationBarcode,
         maybeGetProperty(from.getContainer(), SequencerPartitionContainer::getIdentificationBarcode));
     setObject(dto::setContainerModel, from.getContainer().getModel(), Dtos::asDto);
+    setId(dto::setSequencingParametersId, from.getSequencingParameters());
     setDateTimeString(dto::setLastModified,
         maybeGetProperty(from.getContainer(), SequencerPartitionContainer::getLastModified));
     return dto;

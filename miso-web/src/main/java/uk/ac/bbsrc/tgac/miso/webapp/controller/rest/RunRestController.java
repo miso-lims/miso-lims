@@ -49,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
@@ -58,7 +59,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContainerService;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.ListLibraryAliquotViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
@@ -67,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -199,13 +200,13 @@ public class RunRestController extends AbstractRestController {
   @Autowired
   private LibraryService libraryService;
   @Autowired
-  private LibraryAliquotService libraryAliquotService;
-  @Autowired
   private ListLibraryAliquotViewService listLibraryAliquotViewService;
   @Autowired
   private ExperimentService experimentService;
   @Autowired
   private RunPurposeService runPurposeService;
+  @Autowired
+  private SequencingParametersService sequencingParametersService;
   @Autowired
   private IndexChecker indexChecker;
   @Autowired
@@ -398,8 +399,10 @@ public class RunRestController extends AbstractRestController {
   public DataTablesResponseDto<RunDto> dataTableByPlatform(@PathVariable("platform") String platform,
       HttpServletRequest request)
       throws IOException {
-    PlatformType platformType = PlatformType.valueOf(platform);
-    if (platformType == null) {
+    PlatformType platformType = null;
+    try {
+      platformType = PlatformType.valueOf(platform);
+    } catch (IllegalArgumentException e) {
       throw new RestException("Invalid platform type.", Status.BAD_REQUEST);
     }
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.platformType(platformType));
@@ -414,8 +417,8 @@ public class RunRestController extends AbstractRestController {
 
   @PostMapping(value = "{runId}/add", produces = "application/json")
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
-  public void addContainerByBarcode(@PathVariable Long runId, @RequestParam("position") String position,
-      @RequestParam("barcode") String barcode) throws IOException {
+  public void addContainerByBarcode(@PathVariable Long runId, @RequestParam String position,
+      @RequestParam String barcode, @RequestParam(required = false) Long sequencingParametersId) throws IOException {
     Run run = runService.get(runId);
     Collection<SequencerPartitionContainer> containers = containerService
         .listByBarcode(barcode);
@@ -442,6 +445,13 @@ public class RunRestController extends AbstractRestController {
           .filter(pos -> pos.getAlias().equals(position))
           .findFirst().orElseThrow(() -> new ValidationException(
               String.format("Platform %s does not have a position %s", runPlatform.getAlias(), position))));
+    }
+    if (sequencingParametersId != null) {
+      SequencingParameters params = sequencingParametersService.get(sequencingParametersId);
+      if (params == null) {
+        throw new RestException("No sequencing parameters found with ID %d".formatted(sequencingParametersId));
+      }
+      runPos.setSequencingParameters(params);
     }
     run.getRunPositions().add(runPos);
     runService.update(run);
