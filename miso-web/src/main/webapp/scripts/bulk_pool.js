@@ -349,7 +349,7 @@ BulkTarget.pool = (function ($) {
       ]);
       return;
     }
-    function showCreateDialog(modelId) {
+    function showCreateDialog(modelId, partitionCount) {
       Utils.showDialog(
         "Create Samplesheet",
         "Download",
@@ -362,7 +362,7 @@ BulkTarget.pool = (function ($) {
             getLabel: function (type) {
               return type.description;
             },
-            values: Constants.illuminaExperimentTypes,
+            values: Constants.illuminaAllExperimentTypes,
           },
           {
             property: "sequencingParameters",
@@ -403,14 +403,22 @@ BulkTarget.pool = (function ($) {
             property: "pools",
             label: "Lanes Configuration",
             required: true,
-            type: "order",
+            type: "orderDropdowns",
             getLabel: Utils.array.getAlias,
-            //value: partitionCount,
+            value: partitionCount,
             values: pools,
           },
         ],
         function (result) {
-          Utils.ajaxDownloadWithDialog(Urls.rest.pools.samplesheet, {
+          var sampleSheet = Urls.rest.pools.samplesheet;
+
+          for (var index = 0; index < Constants.illuminaDragenExperimentTypes.length; index++) {
+            var item = Constants.illuminaDragenExperimentTypes[index];
+            if (item.name == result.experimentType.name) {
+              sampleSheet = Urls.rest.pools.dragenSamplesheet;
+            }
+          }
+          Utils.ajaxDownloadWithDialog(sampleSheet, {
             customRead1Primer: result.customRead1Primer,
             customIndexPrimer: result.customIndexPrimer,
             customRead2Primer: result.customRead2Primer,
@@ -454,7 +462,7 @@ BulkTarget.pool = (function ($) {
           return {
             name: instrumentModel.alias,
             handler: function () {
-              showCreateDialog(instrumentModel.id);
+              showContainersDialog(instrumentModel.id);
             },
           };
         })

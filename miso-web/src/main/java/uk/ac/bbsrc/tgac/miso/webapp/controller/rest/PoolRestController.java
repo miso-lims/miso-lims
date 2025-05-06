@@ -67,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderSummaryViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
+import uk.ac.bbsrc.tgac.miso.core.util.IlluminaDragenExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -183,9 +184,6 @@ public class PoolRestController extends AbstractRestController {
       this.genomeFolder = genomeFolder;
     }
 
-    public void setPoolIds(List<Long> poolIds) {
-      this.poolIds = poolIds;
-    }
 
     public void setSequencingParametersId(long sequencingParametersId) {
       this.sequencingParametersId = sequencingParametersId;
@@ -529,9 +527,7 @@ public class PoolRestController extends AbstractRestController {
     protected List<Pool> fetchByIds(List<Long> ids) throws IOException {
       return poolService.listByIdList(ids);
     }
-  })
-      .add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class,
-          this::getSamples))//
+  }).add(new RelationFinder.ParentSampleAdapter<>(SampleIdentity.CATEGORY_NAME, SampleIdentity.class, this::getSamples))//
       .add(new RelationFinder.ParentSampleAdapter<>(SampleTissue.CATEGORY_NAME, SampleTissue.class, this::getSamples))//
       .add(new RelationFinder.ParentSampleAdapter<>(SampleTissueProcessing.CATEGORY_NAME, SampleTissueProcessing.class,
           this::getSamples))//
@@ -549,8 +545,7 @@ public class PoolRestController extends AbstractRestController {
           return getSamples(model);
         }
 
-      })
-      .add(new RelationFinder.RelationAdapter<Pool, Library, LibraryDto>("Library") {
+      }).add(new RelationFinder.RelationAdapter<Pool, Library, LibraryDto>("Library") {
 
         @Override
         public LibraryDto asDto(Library model) {
@@ -562,8 +557,7 @@ public class PoolRestController extends AbstractRestController {
           return model.getPoolContents().stream()
               .map(WhineyFunction.rethrow(pd -> libraryService.get(pd.getAliquot().getLibraryId())));
         }
-      })
-      .add(new RelationFinder.RelationAdapter<Pool, LibraryAliquot, LibraryAliquotDto>("Library Aliquot") {
+      }).add(new RelationFinder.RelationAdapter<Pool, LibraryAliquot, LibraryAliquotDto>("Library Aliquot") {
 
         @Override
         public LibraryAliquotDto asDto(LibraryAliquot model) {
@@ -592,20 +586,19 @@ public class PoolRestController extends AbstractRestController {
       return poolService.listByIdList(ids);
     }
 
-  })
-      .add(new RelationFinder.RelationAdapter<Pool, Run, RunDto>("Run") {
+  }).add(new RelationFinder.RelationAdapter<Pool, Run, RunDto>("Run") {
 
-        @Override
-        public RunDto asDto(Run model) {
-          return Dtos.asDto(model);
-        }
+    @Override
+    public RunDto asDto(Run model) {
+      return Dtos.asDto(model);
+    }
 
-        @Override
-        public Stream<Run> find(Pool model, Consumer<String> emitError) throws IOException {
-          return runService.listByPoolId(model.getId()).stream();
-        }
+    @Override
+    public Stream<Run> find(Pool model, Consumer<String> emitError) throws IOException {
+      return runService.listByPoolId(model.getId()).stream();
+    }
 
-      });
+  });
 
   @PostMapping(value = "/children/{category}")
   @ResponseBody
@@ -622,8 +615,13 @@ public class PoolRestController extends AbstractRestController {
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     IlluminaExperiment experiment = IlluminaExperiment.valueOf(request.getExperimentType());
     SequencingParameters parameters = sequencingParametersService.get(request.getSequencingParametersId());
-    List<Pool> pools =
-        request.getPoolIds().stream().map(WhineyFunction.rethrow(poolService::get)).collect(Collectors.toList());
+    List<Pool> pools = new ArrayList<>();
+    for (Long poolId : request.getPoolIds()) {
+      if (poolId != null) {
+        Pool pool = poolService.get(poolId);
+        pools.add(pool);
+      }
+    }
     response.setHeader("Content-Disposition", String.format("attachment; filename=%s-%s.csv", experiment.name(),
         pools.stream().map(Pool::getAlias).collect(Collectors.joining("-"))));
     return new HttpEntity<>(experiment
@@ -632,6 +630,38 @@ public class PoolRestController extends AbstractRestController {
             request.getCustomRead2Primer(),
             pools)
         .getBytes(StandardCharsets.UTF_8));
+
+  }
+
+  @PostMapping(value = "/dragensamplesheet")
+  @ResponseBody
+  public HttpEntity<byte[]> dragensamplesheet(@RequestBody SampleSheetRequest request,
+      HttpServletRequest httpRequest,
+      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
+    IlluminaDragenExperiment experiment = IlluminaDragenExperiment.valueOf(request.getExperimentType());
+    SequencingParameters parameters = sequencingParametersService.get(request.getSequencingParametersId());
+
+    List<Pool> pools = new ArrayList<>();
+    List<Integer> lanes = new ArrayList<>();
+    var lane = 1;
+    for (Long poolId : request.getPoolIds()) {
+      if (poolId != null) {
+        lanes.add(lane);
+        Pool pool = poolService.get(poolId);
+        pools.add(pool);
+      }
+      lane += 1;
+    }
+    response.setHeader("Content-Disposition", String.format("attachment; filename=%s-%s.csv", experiment.name(),
+        pools.stream().map(Pool::getAlias).collect(Collectors.joining("-"))));
+    return new HttpEntity<>(experiment
+        .makeSampleSheet(request.getGenomeFolder(), parameters, request.getCustomRead1Primer(),
+            request.getCustomIndexPrimer(),
+            request.getCustomRead2Primer(),
+            pools,
+            lanes)
+        .getBytes(StandardCharsets.UTF_8));
+
   }
 
   @PostMapping("/bulk")
