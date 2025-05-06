@@ -451,7 +451,7 @@ var Utils = Utils || {
 
             input.appendChild(label);
             input.appendChild(select);
-            input.appendChild(document.createElement("BR")); //ensures each lane is on a new line
+            input.appendChild(document.createElement("BR")); //ensures each dropdown is on a new line
           }
           break;
         case "order":

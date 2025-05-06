@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
@@ -55,7 +56,7 @@ public enum IlluminaDragenExperiment {
     protected void applyData(Map<String, String> data) {}
   };
 
-  @Value("${miso.samplesheet.dragenVersion:#{4.3.13}}")
+  @Value("${miso.pools.samplesheet.dragenVersion:4.3.13}")
   private String dragenVersion;
 
   private static final DateTimeFormatter MDY = DateTimeFormatter.ofPattern("M/d/yyyy");
@@ -116,6 +117,7 @@ public enum IlluminaDragenExperiment {
     final Map<String, String> header = new LinkedHashMap<>();
     final Map<String, String> settings = new LinkedHashMap<>();
     final Map<String, String> data = new LinkedHashMap<>();
+    final List<List<String>> cloudData = new ArrayList<>();
 
     // Header
     header.put("FileFormatVersion", "2");
@@ -150,11 +152,16 @@ public enum IlluminaDragenExperiment {
     // Settings
     output.append("\n");
     applySettings(settings);
-    // settings.put("SoftwareVersion,", dragenVersion); // required
-    settings.put("OverrideCycles,",
+    if (dragenVersion != null) {
+      settings.put("SoftwareVersion", dragenVersion); // required
+    }
+    settings.put("OverrideCycles",
         "Y" + parameters.getReadLength() + ";I" + i7Length + ";I" + i5Length + ";Y" +
             parameters.getReadLength2());
     writeMap(settings, output);
+
+    cloudData.add(new ArrayList<>(
+        Arrays.asList("Lane", "Sample_ID", "ProjectName", "LibraryName", "LibraryPrepKitName", "IndexAdapterKitName")));
 
     // Data
     output.append("\n");
@@ -195,31 +202,40 @@ public enum IlluminaDragenExperiment {
         }
         int suffix = 0;
         for (final Pair<Pair<String, String>, Pair<String, String>> paddedIndices : outputIndicies) {
-          if (pools.size() > 1) {
-            output.append(lanes.get(lane));
+          List<String> tempCloudList = new ArrayList<>();
+          if (lanes.size() > 1) {
+            output.append(lanes.get(lane)); // Lane
+            tempCloudList.add(lanes.get(lane).toString()); // Lane
           }
-          output.append(",").append(element.getAliquot().getAlias());
+          output.append(",").append(element.getAliquot().getAlias()); // Sample ID
+          tempCloudList.add(element.getAliquot().getAlias()); // Sample ID
           if (outputIndicies.size() > 1) {
-            output.append("_").append(++suffix);
+            output.append("_").append(++suffix); // Sample ID suffix
           }
+          tempCloudList.add(element.getAliquot().getProjectCode()); // Project Name
+          tempCloudList.add(""); // LibraryName
+          tempCloudList.add(""); // LibraryPrep Kit
+          tempCloudList.add(paddedIndices.getKey().getKey()); // IndexAdapterKitName
           output
-              .append(",")//
-              .append(paddedIndices.getKey().getValue());
+              .append(",")
+              .append(paddedIndices.getKey().getValue()); // Index
           if (i5Length > 0) {
             output
-                .append(",")//
+                .append(",")
                 .append(parameters.getInstrumentModel().getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
                     ? SampleSheet.reverseComplement(paddedIndices.getValue().getValue())
-                    : paddedIndices.getValue().getValue());
+                    : paddedIndices.getValue().getValue()); // Index2
           }
           output.append("\n");
+          cloudData.add(tempCloudList);
         }
       }
     }
 
-    return output.toString();
+    output.append("\n[Cloud_Settings]\n");
+    writeList(cloudData, output);
 
-    // TODO Cloud Settings
+    return output.toString();
 
   }
 
@@ -258,12 +274,14 @@ public enum IlluminaDragenExperiment {
     }
   }
 
-  private void writeList(final List<String> input, final StringBuilder output) {
-    for (String entry : input) {
-      if (entry.contains(",")) {
-        output.append("\"").append(entry).append("\"");
-      } else {
-        output.append(entry);
+  private void writeList(final List<List<String>> input, final StringBuilder output) {
+    for (List<String> listInput : input) {
+      for (String entry : listInput) {
+        if (entry.contains(",")) {
+          output.append("\"").append(entry).append("\"").append(",");
+        } else {
+          output.append(entry).append(",");
+        }
       }
       output.append("\n");
     }

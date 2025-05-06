@@ -184,6 +184,9 @@ public class PoolRestController extends AbstractRestController {
       this.genomeFolder = genomeFolder;
     }
 
+    public void setPoolIds(List<Long> poolIds) {
+      this.poolIds = poolIds;
+    }
 
     public void setSequencingParametersId(long sequencingParametersId) {
       this.sequencingParametersId = sequencingParametersId;
