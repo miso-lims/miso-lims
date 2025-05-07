@@ -2,12 +2,12 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
@@ -78,15 +78,15 @@ public enum IlluminaDragenExperiment {
   }
 
   private Optional<LibraryIndex> extract(List<LibraryIndex> indices, int position) {
-    return indices.stream()//
-        .filter(i -> i.getPosition() == position)//
+    return indices.stream()
+        .filter(i -> i.getPosition() == position)
         .findFirst();
   }
 
   private Set<String> extractCollection(List<LibraryIndex> indices, int position) {
-    return indices.stream()//
-        .filter(i -> i.getPosition() == position)//
-        .map(i -> i.getRealSequences())//
+    return indices.stream()
+        .filter(i -> i.getPosition() == position)
+        .map(i -> i.getRealSequences())
         .findFirst().orElse(Collections.singleton(""));
   }
 
@@ -119,7 +119,7 @@ public enum IlluminaDragenExperiment {
     final Map<String, String> data = new LinkedHashMap<>();
     final List<List<String>> cloudData = new ArrayList<>();
 
-    // Header
+    // Header Section
     header.put("FileFormatVersion", "2");
 
     // TODO change / decide on runname convention
@@ -136,7 +136,7 @@ public enum IlluminaDragenExperiment {
     final int i7Length = getMaxLength(pools, 1);
     final int i5Length = getMaxLength(pools, 2);
 
-    // Reads
+    // Reads Section
     output.append("\n[Reads]\n");
     output.append("Read1Cycles,");
     output.append(parameters.getReadLength()).append("\n");
@@ -149,7 +149,7 @@ public enum IlluminaDragenExperiment {
       output.append("Index2Cycles," + i5Length).append("\n");
     }
 
-    // Settings
+    // Settings Section
     output.append("\n");
     applySettings(settings);
     if (dragenVersion != null) {
@@ -163,7 +163,7 @@ public enum IlluminaDragenExperiment {
     cloudData.add(new ArrayList<>(
         Arrays.asList("Lane", "Sample_ID", "ProjectName", "LibraryName", "LibraryPrepKitName", "IndexAdapterKitName")));
 
-    // Data
+    // Data Section
     output.append("\n");
     applyData(data);
     writeMap(data, output);
@@ -175,41 +175,55 @@ public enum IlluminaDragenExperiment {
       output.append(",Index2");
     }
     output.append("\n");
+
+    // Iterate over pools and their contents to generate sample sheet data
     for (int lane = 0; lane < pools.size(); lane++) {
+
       for (final PoolElement element : pools.get(lane).getPoolContents()) {
+
         ParentLibrary library = element.getAliquot().getParentLibrary();
+
+        // Collect non-null indices from the parent library
         final List<LibraryIndex> indices = Stream.of(library.getIndex1(), library.getIndex2())
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-        final List<Pair<Pair<String, String>, Pair<String, String>>> outputIndicies;
+        final List<Pair<Pair<String, String>, Pair<String, String>>> outputIndices;
+
+        // If no indices are found, create a default "No Index" entry
+        // Otherwise, build the indices using the extracted values
         if (indices.isEmpty()) {
-          outputIndicies = Collections.singletonList(
+          outputIndices = Collections.singletonList(
               new Pair<>(new Pair<>("No Index", String.join("", Collections.nCopies(i7Length, "N"))),
                   new Pair<>("No Index", String.join("", Collections.nCopies(i5Length, "N")))));
         } else if (indices.get(0).getFamily().hasFakeSequence()) {
           final Set<String> i5s = extractCollection(indices, 2);
-          outputIndicies = new ArrayList<>();
+          outputIndices = new ArrayList<>();
           for (final String i7 : extractCollection(indices, 1)) {
             for (final String i5 : i5s) {
-              outputIndicies.add(new Pair<>(new Pair<>(indices.get(0).getName(), i7), //
+              outputIndices.add(new Pair<>(new Pair<>(indices.get(0).getName(), i7), //
                   new Pair<>(indices.size() > 1 ? indices.get(1).getName() : "No Index", i5)));
             }
           }
         } else {
-          outputIndicies = Collections
+          outputIndices = Collections
               .singletonList(
                   new Pair<>(buildIndex(extract(indices, 1), i7Length), buildIndex(extract(indices, 2), i5Length)));
         }
         int suffix = 0;
-        for (final Pair<Pair<String, String>, Pair<String, String>> paddedIndices : outputIndicies) {
+
+        // Iterate over the generated output indices and add values to the data and cloud data sections
+        for (final Pair<Pair<String, String>, Pair<String, String>> paddedIndices : outputIndices) {
           List<String> tempCloudList = new ArrayList<>();
+
+          // Get the actual lane if any were skipped.
           if (lanes.size() > 1) {
             output.append(lanes.get(lane)); // Lane
             tempCloudList.add(lanes.get(lane).toString()); // Lane
           }
+
           output.append(",").append(element.getAliquot().getAlias()); // Sample ID
           tempCloudList.add(element.getAliquot().getAlias()); // Sample ID
-          if (outputIndicies.size() > 1) {
+          if (outputIndices.size() > 1) {
             output.append("_").append(++suffix); // Sample ID suffix
           }
           tempCloudList.add(element.getAliquot().getProjectCode()); // Project Name

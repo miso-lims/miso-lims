@@ -390,4 +390,4 @@ Warning label to display for near-duplicate indices. Defaults to "Near-Duplicate
 
 ### `miso.pools.samplesheet.dragenVersion`
 
-The version of Illumina Dragen to be used when exporting sample sheets
+The version of Illumina DRAGEN to be used when exporting sample sheets
