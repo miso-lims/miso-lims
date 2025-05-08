@@ -1,18 +1,21 @@
 package uk.ac.bbsrc.tgac.miso.webapp.service;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Semaphore;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +34,25 @@ import ca.on.oicr.gsi.runscanner.dto.ProgressiveRequestDto;
 import ca.on.oicr.gsi.runscanner.dto.ProgressiveResponseDto;
 import io.prometheus.metrics.core.metrics.Counter;
 import io.prometheus.metrics.core.metrics.Gauge;
-import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.SuperuserAuthentication;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.LatencyHistogram;
@@ -100,6 +114,13 @@ public class RunScannerClient {
   private RunService runService;
   @Autowired
   private UserService userService;
+  @Autowired
+  private InstrumentService instrumentService;
+  @Autowired
+  private SequencingParametersService sequencingParametersService;
+  @Autowired
+  private SequencingContainerModelService sequencingContainerModelService;
+
   private final ConcurrentMap<String, ProgressiveRequestDto> servers = new ConcurrentHashMap<>();
 
   private void processResults(List<NotificationDto> results) {
@@ -115,75 +136,12 @@ public class RunScannerClient {
       }
       for (NotificationDto dto : results) {
         try (AutoCloseable timer = saveTime.start()) {
-
-          // Determine whether the SequencingParameters are of the correct type
-          Predicate<SequencingParameters> isMatchingSequencingParameters;
-          switch (dto.getPlatformType()) {
-            case ILLUMINA:
-              isMatchingSequencingParameters = params -> {
-                IlluminaNotificationDto illuminaDto = (IlluminaNotificationDto) dto;
-                if (params.getInstrumentModel().getPlatformType() != PlatformType.ILLUMINA) {
-                  return false;
-                }
-                if (params.getChemistry() != Dtos.getMisoIlluminaChemistryFromRunscanner(illuminaDto.getChemistry())) {
-                  return false;
-                }
-                // If we are talking to an old Run Scanner that doens't provide read lengths, use the old logic
-                if (illuminaDto.getReadLengths() == null) {
-                  // The read length must match the first read length
-                  if (Math.abs(params.getReadLength() - illuminaDto.getReadLength()) < 2) {
-                    // if there is no second read length, then this must be single ended
-                    if (params.getReadLength2() == 0) {
-                      return !illuminaDto.isPairedEndRun();
-                    } else {
-                      // If there is, it must be paired and symmetric
-                      return illuminaDto.isPairedEndRun() && params.getReadLength() == params.getReadLength2();
-                    }
-                  } else {
-                    return false;
-                  }
-                }
-                // If we have real read lengths, check they match what we see from Run Scanner
-                if (illuminaDto.getReadLengths().size() == 0) {
-                  return false;
-                }
-                if (Math.abs(params.getReadLength() - illuminaDto.getReadLengths().get(0)) > 1) {
-                  return false;
-                }
-                // If no second read is provided, make sure none is required
-                if (illuminaDto.getReadLengths().size() == 1) {
-                  return params.getReadLength2() == 0;
-                }
-                // Otherwise, check the second read matches the right length
-                return Math.abs(params.getReadLength2() - illuminaDto.getReadLengths().get(1)) < 2;
-              };
-              break;
-            case OXFORDNANOPORE:
-              isMatchingSequencingParameters =
-                  params -> params.getInstrumentModel().getPlatformType() == PlatformType.OXFORDNANOPORE &&
-                      params.getRunType().equals(((OxfordNanoporeNotificationDto) dto).getRunType());
-              break;
-            default:
-              isMatchingSequencingParameters = params -> params.getInstrumentModel()
-                  .getPlatformType() == Dtos.getMisoPlatformTypeFromRunscanner(dto.getPlatformType());
-              break;
-          }
-
-          GetLaneContents laneContents = new GetLaneContents() {
-            /**
-             * Get getLaneContents implementation from DTO. Illumina DTOs have a unique implementation of
-             * getLaneContents.
-             */
-            @Override
-            public Optional<String> getLaneContents(int lane) {
-              return dto.getLaneContents(lane);
-            }
-          };
-
           Run notificationRun = Dtos.to(dto);
-          boolean isNew = runService.processNotification(notificationRun, dto.getLaneCount(), dto.getContainerModel(),
-              dto.getContainerSerialNumber(),
-              dto.getSequencerName(), isMatchingSequencingParameters, laneContents, dto.getSequencerPosition());
+          setSequencer(notificationRun, dto.getSequencerName());
+          setRunSequencingParameters(notificationRun, dto);
+          setContainer(notificationRun, dto);
+
+          boolean isNew = runService.processNotification(notificationRun);
           (isNew ? saveNew : saveUpdate).inc();
           saveCount.inc();
           badRuns.remove(dto.getRunAlias());
@@ -191,6 +149,9 @@ public class RunScannerClient {
           if (hasFallbackContainerModel(saved)) {
             if (isNew && dto.getContainerModel() != null) {
               fallbackContainerModelRuns.add(saved.getAlias());
+              log.info(
+                  "Could not find container model with model=%s and lanes=%d for run %s; used fallback container model instead."
+                      .formatted(dto.getContainerModel(), dto.getLaneCount(), dto.getRunAlias()));
             }
           } else {
             fallbackContainerModelRuns.remove(saved.getAlias());
@@ -222,6 +183,129 @@ public class RunScannerClient {
     } catch (IOException e) {
       log.error("Failed to save runs", e);
     }
+  }
+
+  private void setSequencer(Run run, String sequencerName) throws IOException {
+    Instrument sequencer = instrumentService.getByName(sequencerName);
+    if (sequencer == null) {
+      throw new IllegalArgumentException("No such sequencer: " + sequencerName);
+    }
+    run.setSequencer(sequencer);
+  }
+
+  private void setRunSequencingParameters(Run to, NotificationDto from) throws IOException {
+    InstrumentModel model = to.getSequencer().getInstrumentModel();
+    if (model.getPlatformType() == PlatformType.PACBIO) {
+      // Nothing to do - these are set on the RunPositions instead
+      return;
+    }
+
+    Stream<SequencingParameters> instrumentParams =
+        sequencingParametersService.listByInstrumentModelId(model.getId()).stream()
+            .filter(parameters -> !parameters.getName().startsWith("Custom"));
+    switch (model.getPlatformType()) {
+      case ILLUMINA:
+        setIlluminaSequencingParameters(to, (IlluminaNotificationDto) from, instrumentParams);
+        break;
+      case OXFORDNANOPORE:
+        OxfordNanoporeNotificationDto ontDto = (OxfordNanoporeNotificationDto) from;
+        List<SequencingParameters> matchingParams =
+            instrumentParams.filter(params -> params.getRunType().equals(ontDto.getRunType()))
+                .toList();
+        if (matchingParams.size() == 1) {
+          to.setSequencingParameters(matchingParams.get(0));
+        }
+        break;
+      default:
+        throw new NotImplementedException("Platform not supported: %s".formatted(to.getPlatformType()));
+    }
+  }
+
+  private void setIlluminaSequencingParameters(Run to, IlluminaNotificationDto from,
+      Stream<SequencingParameters> instrumentParams) {
+    IlluminaChemistry chemistry = Dtos.getMisoIlluminaChemistryFromRunscanner(from.getChemistry());
+    List<SequencingParameters> matchingParams = instrumentParams.filter(params -> {
+      if (params.getChemistry() != chemistry) {
+        return false;
+      }
+      // If we are talking to an old Run Scanner that doens't provide read lengths, use the old logic
+      if (from.getReadLengths() == null) {
+        // The read length must match the first read length
+        if (Math.abs(params.getReadLength() - from.getReadLength()) < 2) {
+          // if there is no second read length, then this must be single ended
+          if (params.getReadLength2() == 0) {
+            return !from.isPairedEndRun();
+          } else {
+            // If there is, it must be paired and symmetric
+            return from.isPairedEndRun() && params.getReadLength() == params.getReadLength2();
+          }
+        } else {
+          return false;
+        }
+      }
+      // If we have real read lengths, check they match what we see from Run Scanner
+      if (from.getReadLengths().size() == 0) {
+        return false;
+      }
+      if (Math.abs(params.getReadLength() - from.getReadLengths().get(0)) > 1) {
+        return false;
+      }
+      // If no second read is provided, make sure none is required
+      if (from.getReadLengths().size() == 1) {
+        return params.getReadLength2() == 0;
+      }
+      // Otherwise, check the second read matches the right length
+      return Math.abs(params.getReadLength2() - from.getReadLengths().get(1)) < 2;
+    }).toList();
+    if (matchingParams.size() == 1) {
+      to.setSequencingParameters(matchingParams.get(0));
+    }
+  }
+
+  private void setContainer(Run to, NotificationDto from) throws IOException {
+    if (from.getContainerModel() == null) {
+      // Only handling single container for now
+      return;
+    }
+    SequencingContainerModel model =
+        sequencingContainerModelService.find(to.getSequencer().getInstrumentModel(), from.getContainerModel(),
+            from.getLaneCount());
+    if (model == null) {
+      throw new IllegalArgumentException("Could not find container or fallback for parameters: model=%s, lanes=%d"
+          .formatted(from.getContainerModel(), from.getLaneCount()));
+    }
+    SequencerPartitionContainer container = model.getPlatformType().createContainer();
+    container.setModel(model);
+    container.setIdentificationBarcode(from.getContainerSerialNumber());
+    container.setPartitionLimit(from.getLaneCount());
+    container.setPartitions(IntStream.range(0, from.getLaneCount())
+        .mapToObj(i -> new PartitionImpl(container, i + 1))
+        .collect(Collectors.toList()));
+
+    InstrumentPosition position = null;
+    if (!isStringEmptyOrNull(from.getSequencerPosition())) {
+      position = to.getSequencer().getInstrumentModel().getPositions().stream()
+          .filter(pos -> from.getSequencerPosition().equals(pos.getAlias()))
+          .findFirst().orElseThrow(
+              () -> new IllegalArgumentException(
+                  String.format("Unknown position '%s' for platform '%s'", from.getSequencerPosition(),
+                      to.getSequencer().getInstrumentModel().getAlias())));
+    }
+
+    for (Partition partition : container.getPartitions()) {
+      from.getLaneContents(partition.getPartitionNumber()).ifPresent(barcode -> {
+        Pool pool = new PoolImpl();
+        pool.setIdentificationBarcode(barcode);
+        partition.setPool(pool);
+      });
+    }
+
+    RunPosition runPos = new RunPosition();
+    runPos.setRun(to);
+    runPos.setContainer(container);
+    runPos.setPosition(position);
+    to.getRunPositions().clear();
+    to.getRunPositions().add(runPos);
   }
 
   private static boolean hasFallbackContainerModel(Run run) {

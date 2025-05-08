@@ -8,8 +8,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +19,6 @@ import org.mockito.MockitoAnnotations;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
@@ -48,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
+import uk.ac.bbsrc.tgac.miso.persistence.HibernateUtilDao;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
 
 public class DefaultRunServiceTest {
@@ -56,6 +54,7 @@ public class DefaultRunServiceTest {
   private static final Date ORIGINAL_TIME = Date.from(LocalDateTime.of(2021, 11, 15, 0, 0).toInstant(ZoneOffset.UTC));
   private static final long RUN_ID = 1l;
   private static final String RUN_ALIAS = "RUN1_ALIAS";
+  private static final long SEQUENCER_ID = 1L;
   private static final String SEQUENCER_NAME = "SEQ1";
   private static final String CONTAINER_MODEL_BARCODE = "CONTAINER_MODEL";
   private static final String CONTAINER_SERIAL_NO = "CONTAINER";
@@ -80,6 +79,8 @@ public class DefaultRunServiceTest {
   private RunPartitionService runPartitionService;
   @Mock
   private AuthorizationManager authorizationManager;
+  @Mock
+  private HibernateUtilDao hibernateUtilDao;
 
   @InjectMocks
   private DefaultRunService sut;
@@ -91,6 +92,7 @@ public class DefaultRunServiceTest {
     Mockito.when(authorizationManager.getCurrentUser()).thenReturn(notificationUser);
     Mockito.when(userService.getByLoginName("notification")).thenReturn(notificationUser);
     Mockito.when(instrumentService.getByName(SEQUENCER_NAME)).thenReturn(makeSequencer());
+    Mockito.when(instrumentService.get(SEQUENCER_ID)).thenReturn(makeSequencer());
     Mockito.when(containerModelService.find(Mockito.any(), Mockito.eq(CONTAINER_MODEL_BARCODE), Mockito.eq(1)))
         .thenReturn(makeContainerModel());
     Mockito.when(runStore.getByAlias(RUN_ALIAS)).thenReturn(makeSavedRun());
@@ -114,11 +116,7 @@ public class DefaultRunServiceTest {
   @Test
   public void testProcessNotificationNoChange() throws Exception {
     Run notificationRun = makeRun();
-    Predicate<SequencingParameters> filterParameters = (params) -> false;
-    GetLaneContents getLaneContents = (lane) -> Optional.empty();
-    assertFalse(sut.processNotification(notificationRun, 1, CONTAINER_MODEL_BARCODE, CONTAINER_SERIAL_NO,
-        SEQUENCER_NAME, filterParameters,
-        getLaneContents, null));
+    assertFalse(sut.processNotification(notificationRun));
     Mockito.verify(runStore, Mockito.times(0)).create(Mockito.any());
     Mockito.verify(runStore, Mockito.times(0)).update(Mockito.any());
   }
@@ -128,12 +126,7 @@ public class DefaultRunServiceTest {
     Run notificationRun = makeRun();
     notificationRun.setHealth(HealthType.Running);
 
-    Predicate<SequencingParameters> filterParameters = (params) -> false;
-    GetLaneContents getLaneContents = (lane) -> Optional.empty();
-
-    assertFalse(sut.processNotification(notificationRun, 1, CONTAINER_MODEL_BARCODE, CONTAINER_SERIAL_NO,
-        SEQUENCER_NAME, filterParameters,
-        getLaneContents, null));
+    assertFalse(sut.processNotification(notificationRun));
     Mockito.verify(runStore, Mockito.times(0)).create(Mockito.any());
     Mockito.verify(runStore, Mockito.times(0)).update(Mockito.any());
   }
@@ -147,11 +140,6 @@ public class DefaultRunServiceTest {
     run.setCreationTime(ORIGINAL_TIME);
     run.setLastModifier(user);
     run.setLastModified(ORIGINAL_TIME);
-    run.setSequencer(makeSequencer());
-    RunPosition runPos = new RunPosition();
-    runPos.setContainer(makeContainer());
-    runPos.setRun(run);
-    run.getRunPositions().add(runPos);
     ChangeLog change = run.createChangeLog("updated health", "health", user);
     run.getChangeLog().add(change);
     return run;
@@ -164,6 +152,12 @@ public class DefaultRunServiceTest {
     run.setStartDate(ORIGINAL_DATE);
     run.setCompletionDate(ORIGINAL_DATE);
     run.setHealth(HealthType.Completed);
+
+    run.setSequencer(makeSequencer());
+    RunPosition runPos = new RunPosition();
+    runPos.setContainer(makeContainer());
+    runPos.setRun(run);
+    run.getRunPositions().add(runPos);
     return run;
   }
 
@@ -176,7 +170,7 @@ public class DefaultRunServiceTest {
 
   private static Instrument makeSequencer() {
     Instrument inst = new InstrumentImpl();
-    inst.setId(1L);
+    inst.setId(SEQUENCER_ID);
     inst.setName(SEQUENCER_NAME);
     inst.setInstrumentModel(makeInstrumentModel());
     return inst;
