@@ -9,6 +9,7 @@ multiple items. MISO allows you attach files to the following items.
 * Libraries
 * Pools
 * Runs
+* Array Runs
 * Service Records
 
 

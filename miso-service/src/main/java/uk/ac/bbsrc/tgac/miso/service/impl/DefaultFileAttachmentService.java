@@ -22,15 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
-import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
-import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
-import uk.ac.bbsrc.tgac.miso.core.service.RunService;
-import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.core.service.ServiceRecordService;
+import uk.ac.bbsrc.tgac.miso.core.service.*;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.persistence.AttachableStore;
 
@@ -77,6 +69,11 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   @Autowired
   public void setRunService(RunService runService) {
     entityProviders.put("run", runService);
+  }
+
+  @Autowired
+  public void setArrayRunService(ArrayRunService arrayRunService) {
+    entityProviders.put("arrayrun", arrayRunService);
   }
 
   @Autowired
