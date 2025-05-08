@@ -198,13 +198,9 @@ services:
       - type: bind
         source: "./V0792__drop-inconvenient-rows.sql"
         target: "/flyway/sql/V0792__drop-inconvenient-rows.sql"
-        volume:
-          nocopy: true
       - type: bind
         source: "./V9000__institution-custom.sql"
         target: "/flyway/sql/V9000__institution-custom.sql"
-        volume:
-           nocopy: true
 ...
 ```
 
@@ -229,8 +225,6 @@ services:
       - type: bind
         source: "./.docker/detailed_sample_config/miso.properties"
         target: "/usr/local/tomcat/conf/Catalina/localhost/miso.properties"
-        volume:
-          nocopy: true
 ...
 ```
 
@@ -356,13 +350,9 @@ services:
       - type: bind
         source: "./.docker/nginx/ssl.conf"
         target: "/etc/nginx/conf.d/default.conf"
-        volume:
-          nocopy: true
       - type: bind
         source: "./.docker/nginx/self-sign-cert.sh"
         target: "/self-sign-cert.sh"
-        volume:
-          nocopy: true
     links:
       - webapp
     depends_on:
@@ -545,13 +535,9 @@ services:
       - type: bind
         source: "./V0792__drop-inconvenient-rows.sql"
         target: "/flyway/sql/V0792__drop-inconvenient-rows.sql"
-        volume:
-          nocopy: true
       - type: bind
         source: "./V9000__institution-custom.sql"
         target: "/flyway/sql/V9000__institution-custom.sql"
-        volume:
-           nocopy: true
 
 
   webapp:
@@ -567,8 +553,6 @@ services:
       - type: bind
         source: "./miso.properties"
         target: "/usr/local/tomcat/conf/Catalina/localhost/miso.properties"
-        volume:
-          nocopy: true
       - type: bind
         source: "./files"
         target: "/storage/miso/files"
@@ -588,13 +572,9 @@ services:
       - type: bind
         source: "./nginx/ssl.conf"
         target: "/etc/nginx/conf.d/default.conf"
-        volume:
-          nocopy: true
       - type: bind
         source: "./nginx/self-sign-cert.sh"
         target: "/self-sign-cert.sh"
-        volume:
-          nocopy: true
     links:
       - webapp
     depends_on:
