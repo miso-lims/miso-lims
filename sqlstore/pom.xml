@@ -6,7 +6,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>3.8.0</version>
+    <version>3.8.1-SNAPSHOT</version>
   </parent>
   <artifactId>sqlstore</artifactId>
   <packaging>jar</packaging>
