@@ -18,7 +18,6 @@ import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -37,23 +36,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -72,7 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
@@ -83,7 +78,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.persistence.HibernateUtilDao;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
 
 @Transactional(rollbackFor = Exception.class)
@@ -132,8 +127,6 @@ public class DefaultRunService implements RunService {
   @Autowired
   private PoolService poolService;
   @Autowired
-  private SequencingContainerModelService containerModelService;
-  @Autowired
   private KitDescriptorService kitDescriptorService;
   @Autowired
   private RunPartitionService runPartitionService;
@@ -143,6 +136,8 @@ public class DefaultRunService implements RunService {
   private FileAttachmentService fileAttachmentService;
   @Autowired
   private SopService sopService;
+  @Autowired
+  private HibernateUtilDao hibernateUtilDao;
 
   @Override
   public Collection<Run> listByProjectId(long projectId) throws IOException {
@@ -628,10 +623,7 @@ public class DefaultRunService implements RunService {
   }
 
   @Override
-  public boolean processNotification(Run source, int laneCount, String containerModel, String containerSerialNumber,
-      String sequencerName,
-      Predicate<SequencingParameters> filterParameters, GetLaneContents getLaneContents, String positionName)
-      throws IOException, MisoNamingException {
+  public boolean processNotification(Run source) throws IOException, MisoNamingException {
     User user = userService.getByLoginName("notification");
     final Run target;
 
@@ -644,6 +636,8 @@ public class DefaultRunService implements RunService {
       isNew = true;
     } else {
       target = runFromDb;
+      // Detach to keep separate from the entity that will be updated if/when we call the update method
+      hibernateUtilDao.detach(target);
       if (source.getPlatformType() != target.getPlatformType()) {
         throw new IllegalStateException(
             "Run scanner detected a run from " + source.getPlatformType().name() + " and there is a save run from "
@@ -657,26 +651,7 @@ public class DefaultRunService implements RunService {
     isMutated |= updateMetricsFromNotification(source, target);
     isMutated |= updateField(source.getFilePath(), target.getFilePath(), target::setFilePath);
     isMutated |= updateField(source.getStartDate(), target.getStartDate(), target::setStartDate);
-
-    final Instrument sequencer = instrumentService.getByName(sequencerName);
-    if (sequencer == null) {
-      throw new IllegalArgumentException("No such sequencer: " + sequencerName);
-    }
-    target.setSequencer(sequencer);
-
-    SequencingContainerModel model =
-        containerModelService.find(sequencer.getInstrumentModel(), containerModel, laneCount);
-    if (model == null) {
-      throw new IllegalArgumentException(
-          "Could not find container or fallback for parameters: model=" + containerModel + ", lanes=" + laneCount);
-    }
-    if (model.isFallback() && isNew) {
-      log.info("Could not find container model with model=" + containerModel + " and lanes=" + laneCount
-          + " for run " + source.getAlias() + "; used fallback container model instead.");
-    }
-
-    isMutated |=
-        updateContainerFromNotification(target, user, model, containerSerialNumber, getLaneContents, positionName);
+    isMutated |= updateContainerFromNotification(target, source);
     isMutated |= updateHealthFromNotification(source, target, user);
     isMutated |= updateSequencingKitFromNotification(target, source.getSequencingKit());
     isMutated |= updateDataManglingPolicyFromNotification(target, source.getDataManglingPolicy(), user);
@@ -707,7 +682,7 @@ public class DefaultRunService implements RunService {
         throw new NotImplementedException();
     }
 
-    isMutated |= updateSequencingParameters(target, user, filterParameters, sequencer);
+    isMutated |= updateSequencingParameters(target, user, source.getSequencingParameters());
 
     if (isNew) {
       create(target);
@@ -789,25 +764,16 @@ public class DefaultRunService implements RunService {
     return isMutated;
   }
 
-  private boolean updateSequencingParameters(final Run target, User user,
-      Predicate<SequencingParameters> filterParameters, final Instrument sequencer) throws IOException {
-    // See if we can find exactly one that matches
-    List<SequencingParameters> possibleParameters =
-        sequencingParametersService.listByInstrumentModelId(sequencer.getInstrumentModel().getId()).stream()
-            .filter(parameters -> !parameters.getName().startsWith("Custom"))
-            .filter(filterParameters)
-            .collect(Collectors.toList());
-    if (possibleParameters.size() != 1) {
+  private boolean updateSequencingParameters(Run target, User user, SequencingParameters params) throws IOException {
+    if (params == null) {
       return false;
     }
-    SequencingParameters detectedParameters = possibleParameters.get(0);
-
-    if (target.getPlatformType().hasContainerLevelParameters()) {
+    if (target.getPlatformType().hasContainerLevelParameters()) { // TODO: don't move from run to runpos
       boolean anyUpdated = false;
       for (RunPosition pos : target.getRunPositions()) {
         if (pos.getSequencingParameters() == null
-            || pos.getSequencingParameters().getId() != detectedParameters.getId()) {
-          pos.setSequencingParameters(detectedParameters);
+            || pos.getSequencingParameters().getId() != params.getId()) {
+          pos.setSequencingParameters(params);
           anyUpdated = true;
         }
       }
@@ -816,8 +782,8 @@ public class DefaultRunService implements RunService {
       // Only update if the sequencing parameters haven't been updated by a human
       if (!target.didSomeoneElseChangeColumn("sequencingParameters_parametersId", user)) {
         if (target.getSequencingParameters() == null
-            || detectedParameters.getId() != target.getSequencingParameters().getId()) {
-          target.setSequencingParameters(detectedParameters);
+            || params.getId() != target.getSequencingParameters().getId()) {
+          target.setSequencingParameters(params);
           return true;
         }
       }
@@ -825,71 +791,90 @@ public class DefaultRunService implements RunService {
     }
   }
 
-  private boolean updateContainerFromNotification(final Run target, User user, SequencingContainerModel containerModel,
-      String containerSerialNumber, final GetLaneContents getLaneContents, String positionName) throws IOException {
-    if (LimsUtils.isStringBlankOrNull(containerSerialNumber)) {
-      return false;
-    }
-    final Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerSerialNumber);
-    int laneCount = containerModel.getPartitionCount();
-    InstrumentPosition position = null;
-    if (!isStringEmptyOrNull(positionName)) {
-      position = target.getSequencer().getInstrumentModel().getPositions().stream()
-          .filter(pos -> positionName.equals(pos.getAlias()))
-          .findFirst().orElseThrow(
-              () -> new IllegalArgumentException(String.format("Unknown position '%s' for platform '%s'", positionName,
-                  target.getSequencer().getInstrumentModel().getAlias())));
-    }
-    switch (containers.size()) {
-      case 0:
-        SequencerPartitionContainer newContainer = containerModel.getPlatformType().createContainer();
-        newContainer.setModel(containerModel);
-        newContainer.setCreator(user);
-        newContainer.setIdentificationBarcode(containerSerialNumber);
-        newContainer.setPartitionLimit(laneCount);
-        newContainer.setPartitions(IntStream.range(0, laneCount)
-            .mapToObj(i -> new PartitionImpl(newContainer, i + 1))
-            .collect(Collectors.toList()));
-        updatePartitionContents(getLaneContents, newContainer);
+  private boolean updateContainerFromNotification(Run target, Run source) throws IOException {
+    boolean isMutated = false;
+    for (RunPosition sourcePosition : source.getRunPositions()) {
+      if (sourcePosition.getContainer() == null) {
+        continue;
+      }
+      String serialNumber = sourcePosition.getContainer().getIdentificationBarcode();
+      Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(serialNumber);
+      switch (containers.size()) {
+        case 0:
+          RunPosition newRunPos = new RunPosition();
+          newRunPos.setRun(target);
+          newRunPos.setContainer(sourcePosition.getContainer());
+          newRunPos.setPosition(sourcePosition.getPosition());
+          newRunPos.setSequencingParameters(sourcePosition.getSequencingParameters());
+          target.getRunPositions().clear();
+          target.getRunPositions().add(newRunPos);
+          isMutated = true;
+          break;
+        case 1:
+          SequencerPartitionContainer sourceContainer = sourcePosition.getContainer();
+          SequencerPartitionContainer targetContainer = containers.iterator().next();
+          if (sourceContainer.getPartitions().size() != targetContainer.getPartitions().size()) {
+            throw new IllegalArgumentException(
+                String.format("The container %s has %d partitions, but %d were detected by the scanner.", serialNumber,
+                    targetContainer.getPartitions().size(), sourceContainer.getPartitions().size()));
+          }
 
-        RunPosition newRunPos = new RunPosition();
-        newRunPos.setRun(target);
-        newRunPos.setContainer(newContainer);
-        newRunPos.setPosition(position);
-        target.getRunPositions().clear();
-        target.getRunPositions().add(newRunPos);
-        return true;
-      case 1:
-        SequencerPartitionContainer container = containers.iterator().next();
-        boolean isMutated = false;
-        if (container.getPartitions().size() != laneCount) {
-          throw new IllegalArgumentException(
-              String.format("The container %s has %d partitions, but %d were detected by the scanner.",
-                  containerSerialNumber, container.getPartitions().size(), laneCount));
-        }
-        // only update container model from fallback to non-fallback
-        if (container.getModel().isFallback() && !containerModel.isFallback()
-            && container.getModel().getId() != containerModel.getId()) {
-          container.setModel(containerModel);
-          isMutated = true;
-        }
-        if (target.getSequencerPartitionContainers().stream().noneMatch(c -> c.getId() == container.getId())) {
-          target.addSequencerPartitionContainer(container, position);
-          updatePartitionContents(getLaneContents, container);
-          isMutated = true;
-        }
-        return isMutated;
-      default:
-        throw new IllegalArgumentException("Multiple containers with same identifier: " + containerSerialNumber);
+          // only update container model from fallback to non-fallback
+          if (targetContainer.getModel().isFallback() && !sourceContainer.getModel().isFallback()) {
+            targetContainer.setModel(sourceContainer.getModel());
+            isMutated = true;
+          }
+          for (Partition targetPartition : targetContainer.getPartitions()) {
+            Partition sourcePartition = sourceContainer.getPartitionAt(targetPartition.getPartitionNumber());
+            if (sourcePartition.getPool() != null && (targetPartition.getPool() == null || targetPartition.getPool()
+                .getIdentificationBarcode() != sourcePartition.getPool().getIdentificationBarcode())) {
+              Pool pool = poolService.getByBarcode(sourcePartition.getPool().getIdentificationBarcode());
+              // TODO: refactored as it was, but probably want to look up by alias as well as barcode
+              if (pool != null) {
+                targetPartition.setPool(pool);
+                isMutated = true;
+              }
+            }
+          }
+
+          RunPosition targetPosition = target.getRunPositions().stream()
+              .filter(pos -> pos.getContainer() != null && pos.getContainer().getId() == targetContainer.getId())
+              .findFirst().orElse(null);
+          if (targetPosition == null) {
+            targetPosition = target.addSequencerPartitionContainer(targetContainer, sourcePosition.getPosition());
+            isMutated = true;
+          } else {
+            validatePositionMatch(targetPosition, sourcePosition, targetContainer);
+          }
+
+          if ((targetPosition.getSequencingParameters() == null) != (sourcePosition.getSequencingParameters() == null)
+              || (sourcePosition.getSequencingParameters() != null
+                  && targetPosition.getSequencingParameters().getId() != sourcePosition.getSequencingParameters()
+                      .getId())) {
+            targetPosition.setSequencingParameters(sourcePosition.getSequencingParameters());
+            isMutated = true;
+          }
+          break;
+        default:
+          throw new IllegalArgumentException("Multiple containers with same identifier: " + serialNumber);
+      }
     }
+    return isMutated;
   }
 
-  private void updatePartitionContents(final GetLaneContents getLaneContents,
-      SequencerPartitionContainer newContainer) {
-    newContainer.getPartitions().stream().filter(partition -> partition.getPool() == null)
-        .forEach(partition -> getLaneContents.getLaneContents(partition.getPartitionNumber())
-            .filter(s -> !LimsUtils.isStringBlankOrNull(s))
-            .map(WhineyFunction.rethrow(poolService::getByBarcode)).ifPresent(partition::setPool));
+  private static void validatePositionMatch(RunPosition targetPosition, RunPosition sourcePosition,
+      SequencerPartitionContainer targetContainer) {
+    InstrumentPosition targetInstrumentPosition = targetPosition.getPosition();
+    InstrumentPosition sourceInstrumentPosition = sourcePosition.getPosition();
+    if ((targetInstrumentPosition == null) != (sourceInstrumentPosition == null)
+        || (targetInstrumentPosition != null && sourceInstrumentPosition != null
+            && targetInstrumentPosition.getId() != sourceInstrumentPosition.getId())) {
+      throw new IllegalArgumentException(
+          "Container %s is already in position %s, but the scanner detected it in position %s".formatted(
+              targetContainer.getIdentificationBarcode(),
+              targetPosition.getPosition() == null ? null : targetPosition.getPosition().getAlias(),
+              sourcePosition.getPosition() == null ? null : sourcePosition.getPosition().getAlias()));
+    }
   }
 
   private boolean updateHealthFromNotification(Run notification, final Run managed, User user) {

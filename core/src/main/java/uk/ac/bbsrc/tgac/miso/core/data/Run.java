@@ -175,12 +175,21 @@ public abstract class Run
     this.notes.add(note);
   }
 
-  public void addSequencerPartitionContainer(SequencerPartitionContainer f, InstrumentPosition position) {
+  /**
+   * Adds a new RunPosition to the run
+   * 
+   * @param container the container to attach to the position
+   * @param position the instrument position
+   * @return the new RunPosition that was added to the Run
+   */
+  public RunPosition addSequencerPartitionContainer(SequencerPartitionContainer container,
+      InstrumentPosition position) {
     RunPosition rp = new RunPosition();
     rp.setRun(this);
-    rp.setContainer(f);
+    rp.setContainer(container);
     rp.setPosition(position);
     getRunPositions().add(rp);
+    return rp;
   }
 
   @Override

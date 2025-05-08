@@ -3,11 +3,8 @@ package uk.ac.bbsrc.tgac.miso.core.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
 
-import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
@@ -52,8 +49,6 @@ public interface RunService extends DeleterService<Run>, SaveService<Run>, Pagin
    * @return true if the run is new, false if it already existed
    * @throws MisoNamingException
    */
-  boolean processNotification(Run run, int laneCount, String containerModel, String containerSerialNumber, String instrumentName,
-      Predicate<SequencingParameters> filterParameters, GetLaneContents laneContents, String positionName)
-      throws IOException, MisoNamingException;
+  boolean processNotification(Run run) throws IOException, MisoNamingException;
 
 }
