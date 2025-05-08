@@ -114,6 +114,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.PrintableField;
 import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
+import uk.ac.bbsrc.tgac.miso.core.util.IlluminaDragenExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
 import uk.ac.bbsrc.tgac.miso.dto.AssayDto;
@@ -398,6 +399,8 @@ public class ConstantsController {
         illuminaChemistry.add(chemistry.name());
       }
       addIlluminaExperimentTypes(node);
+      addIlluminaDragenExperimentTypes(node);
+      addIlluminaAllExperimentTypes(node);
       addHealthTypes(node);
       addIlluminaWorkflowTypes(node);
       addInstrumentTypes(node);
@@ -430,6 +433,29 @@ public class ConstantsController {
     ArrayNode illuminaExperimentTypes = node.putArray("illuminaExperimentTypes");
     for (IlluminaExperiment experiment : IlluminaExperiment.values()) {
       ObjectNode dto = illuminaExperimentTypes.addObject();
+      dto.put("name", experiment.name());
+      dto.put("description", experiment.getDescription());
+    }
+  }
+
+  private static void addIlluminaDragenExperimentTypes(ObjectNode node) {
+    ArrayNode illuminaDragenExperimentTypes = node.putArray("illuminaDragenExperimentTypes");
+    for (IlluminaDragenExperiment experiment : IlluminaDragenExperiment.values()) {
+      ObjectNode dto = illuminaDragenExperimentTypes.addObject();
+      dto.put("name", experiment.name());
+      dto.put("description", experiment.getDescription());
+    }
+  }
+
+  private static void addIlluminaAllExperimentTypes(ObjectNode node) {
+    ArrayNode illuminaAllExperimentTypes = node.putArray("illuminaAllExperimentTypes");
+    for (IlluminaDragenExperiment experiment : IlluminaDragenExperiment.values()) {
+      ObjectNode dto = illuminaAllExperimentTypes.addObject();
+      dto.put("name", experiment.name());
+      dto.put("description", experiment.getDescription());
+    }
+    for (IlluminaExperiment experiment : IlluminaExperiment.values()) {
+      ObjectNode dto = illuminaAllExperimentTypes.addObject();
       dto.put("name", experiment.name());
       dto.put("description", experiment.getDescription());
     }

@@ -719,6 +719,7 @@ Urls = (function () {
     spreadsheet: poolRestBase + "/spreadsheet",
     contentsSpreadsheet: poolRestBase + "/contents/spreadsheet",
     samplesheet: poolRestBase + "/samplesheet",
+    dragenSamplesheet: poolRestBase + "/dragensamplesheet",
     bulkSave: poolRestBase + "/bulk",
     bulkSaveProgress: idUrlFunction(poolRestBase + "/bulk"),
   };

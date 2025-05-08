@@ -411,6 +411,49 @@ var Utils = Utils || {
           input.appendChild(compareTypeControl);
           input.appendChild(valueControl);
           break;
+        case "orderDropdowns":
+          if (field.value <= 0 || field.values.length == 0) {
+            return;
+          }
+          input = document.createElement("DIV");
+          output[field.property] = new Array(field.value);
+
+          for (var i = 0; i < field.value; i++) {
+            var label = document.createElement("LABEL");
+            label.innerText = i + 1 + ": ";
+            label.className = "dropdown-label";
+
+            var select = document.createElement("SELECT");
+
+            // Add "empty" option as the default option
+            var emptyOption = document.createElement("OPTION");
+            emptyOption.text = "empty";
+            emptyOption.value = "";
+            select.appendChild(emptyOption);
+
+            field.values.forEach(function (value, index) {
+              var option = document.createElement("OPTION");
+              option.text = field.getLabel ? field.getLabel(value) : value;
+              option.value = index;
+              select.appendChild(option);
+            });
+
+            // Set initial value for each dropdown to "empty"
+            select.value = "";
+            output[field.property][i] = "empty";
+
+            select.onchange = (function (index) {
+              return function () {
+                output[field.property][index] =
+                  this.value === "" ? "empty" : field.values[parseInt(this.value)];
+              };
+            })(i);
+
+            input.appendChild(label);
+            input.appendChild(select);
+            input.appendChild(document.createElement("BR")); //ensures each dropdown is on a new line
+          }
+          break;
         case "order":
           input = document.createElement("DIV");
           input.className = "widget ui-corner-top ui-corner-bottom";
