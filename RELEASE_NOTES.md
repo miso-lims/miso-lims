@@ -7,6 +7,18 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.8.0] - 2025-05-08
+
+### Added
+
+* The ability to attach files to Array Runs
+
+### Changed
+
+* Identity samples can no longer be added to a requisition (detailed sample)
+* PacBio runs can now have different sequencing parameters for each SMRT cell
+
+
 ## [3.7.0] - 2025-04-24
 
 ### Added
