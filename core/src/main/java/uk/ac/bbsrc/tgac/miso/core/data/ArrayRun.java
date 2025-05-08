@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -17,17 +18,20 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ArrayRunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 
 @Entity
-public class ArrayRun implements Serializable, Aliasable, ChangeLoggable, Deletable {
+public class ArrayRun implements Serializable, Aliasable, Attachable, ChangeLoggable, Deletable {
 
   private static final long serialVersionUID = 1L;
 
@@ -59,6 +63,14 @@ public class ArrayRun implements Serializable, Aliasable, ChangeLoggable, Deleta
   private LocalDate startDate;
 
   private LocalDate completionDate;
+
+  @OneToMany(targetEntity = FileAttachment.class)
+  @JoinTable(name = "ArrayRun_Attachment", joinColumns = {@JoinColumn(name = "arrayRunId")}, inverseJoinColumns = {
+      @JoinColumn(name = "attachmentId")})
+  private List<FileAttachment> attachments;
+
+  @Transient
+  private List<FileAttachment> pendingAttachmentDeletions;
 
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
@@ -152,6 +164,31 @@ public class ArrayRun implements Serializable, Aliasable, ChangeLoggable, Deleta
 
   public void setCompletionDate(LocalDate completionDate) {
     this.completionDate = completionDate;
+  }
+
+  @Override
+  public List<FileAttachment> getAttachments() {
+    return attachments;
+  }
+
+  @Override
+  public void setAttachments(List<FileAttachment> attachments) {
+    this.attachments = attachments;
+  }
+
+  @Override
+  public String getAttachmentsTarget() {
+    return "arrayrun";
+  }
+
+  @Override
+  public List<FileAttachment> getPendingAttachmentDeletions() {
+    return pendingAttachmentDeletions;
+  }
+
+  @Override
+  public void setPendingAttachmentDeletions(List<FileAttachment> pendingAttachmentDeletions) {
+    this.pendingAttachmentDeletions = pendingAttachmentDeletions;
   }
 
   @Override

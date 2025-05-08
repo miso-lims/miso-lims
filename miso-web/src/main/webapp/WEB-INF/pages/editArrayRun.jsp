@@ -25,6 +25,10 @@ jQuery(document).ready(function() {
 });
 </script>
 
+<c:if test="${pageMode ne 'create'}">
+    <miso:attachments item="${arrayRun}"/>
+</c:if>
+
 <br/>
 <h1>Samples</h1>
 <table id="listingSamplesTable" class="display"></table>
