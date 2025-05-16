@@ -6,10 +6,13 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Semaphore;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -30,6 +33,8 @@ import com.eaglegenomics.simlims.core.User;
 import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.PacBioNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.PacBioNotificationDto.SMRTCellPosition;
 import ca.on.oicr.gsi.runscanner.dto.ProgressiveRequestDto;
 import ca.on.oicr.gsi.runscanner.dto.ProgressiveResponseDto;
 import io.prometheus.metrics.core.metrics.Counter;
@@ -44,12 +49,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.SuperuserAuthentication;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
@@ -120,6 +125,8 @@ public class RunScannerClient {
   private SequencingParametersService sequencingParametersService;
   @Autowired
   private SequencingContainerModelService sequencingContainerModelService;
+  @Autowired
+  private PoolService poolService;
 
   private final ConcurrentMap<String, ProgressiveRequestDto> servers = new ConcurrentHashMap<>();
 
@@ -139,7 +146,7 @@ public class RunScannerClient {
           Run notificationRun = Dtos.to(dto);
           setSequencer(notificationRun, dto.getSequencerName());
           setRunSequencingParameters(notificationRun, dto);
-          setContainer(notificationRun, dto);
+          setContainers(notificationRun, dto);
 
           boolean isNew = runService.processNotification(notificationRun);
           (isNew ? saveNew : saveUpdate).inc();
@@ -195,7 +202,7 @@ public class RunScannerClient {
 
   private void setRunSequencingParameters(Run to, NotificationDto from) throws IOException {
     InstrumentModel model = to.getSequencer().getInstrumentModel();
-    if (model.getPlatformType() == PlatformType.PACBIO) {
+    if (model.getPlatformType().hasContainerLevelParameters()) {
       // Nothing to do - these are set on the RunPositions instead
       return;
     }
@@ -262,50 +269,77 @@ public class RunScannerClient {
     }
   }
 
-  private void setContainer(Run to, NotificationDto from) throws IOException {
-    if (from.getContainerModel() == null) {
-      // Only handling single container for now
-      return;
+  private void setContainers(Run to, NotificationDto from) throws IOException {
+    if (from.getContainerModel() != null) {
+      addContainer(to, from.getContainerModel(), from.getLaneCount(), from.getContainerSerialNumber(),
+          from.getSequencerPosition(), from::getLaneContents);
+    } else if (to.getSequencer().getInstrumentModel().getPlatformType() == PlatformType.PACBIO) {
+      PacBioNotificationDto pacbioDto = (PacBioNotificationDto) from;
+      List<SequencingParameters> instrumentParams =
+          sequencingParametersService.listByInstrumentModelId(to.getSequencer().getInstrumentModel().getId()).stream()
+              .filter(parameters -> !parameters.getName().startsWith("Custom"))
+              .toList();
+      for (SMRTCellPosition pos : pacbioDto.getSequencerPositions()) {
+        RunPosition runPos = addContainer(to, pos.containerModel(), 1, pos.containerSerialNumber(), pos.position(),
+            lane -> Optional.ofNullable(pos.poolName()));
+        if (pos.movieLength() != null) {
+          Integer movieLengthInt = Double.valueOf(pos.movieLength()).intValue();
+          List<SequencingParameters> matchingParams = instrumentParams.stream()
+              .filter(params -> Objects.equals(params.getMovieTime(), movieLengthInt))
+              .toList();
+          if (matchingParams.size() == 1) {
+            runPos.setSequencingParameters(matchingParams.get(0));
+          }
+        }
+      }
     }
+  }
+
+  private RunPosition addContainer(Run to, String containerModel, int laneCount, String containerSerialNumber,
+      String sequencerPosition, Function<Integer, Optional<String>> getLaneContents) throws IOException {
     SequencingContainerModel model =
-        sequencingContainerModelService.find(to.getSequencer().getInstrumentModel(), from.getContainerModel(),
-            from.getLaneCount());
+        sequencingContainerModelService.find(to.getSequencer().getInstrumentModel(), containerModel, laneCount);
     if (model == null) {
       throw new IllegalArgumentException("Could not find container or fallback for parameters: model=%s, lanes=%d"
-          .formatted(from.getContainerModel(), from.getLaneCount()));
+          .formatted(containerModel, laneCount));
     }
     SequencerPartitionContainer container = model.getPlatformType().createContainer();
     container.setModel(model);
-    container.setIdentificationBarcode(from.getContainerSerialNumber());
-    container.setPartitionLimit(from.getLaneCount());
-    container.setPartitions(IntStream.range(0, from.getLaneCount())
+    container.setIdentificationBarcode(containerSerialNumber);
+    container.setPartitionLimit(laneCount);
+    container.setPartitions(IntStream.range(0, laneCount)
         .mapToObj(i -> new PartitionImpl(container, i + 1))
         .collect(Collectors.toList()));
 
     InstrumentPosition position = null;
-    if (!isStringEmptyOrNull(from.getSequencerPosition())) {
+    if (!isStringEmptyOrNull(sequencerPosition)) {
       position = to.getSequencer().getInstrumentModel().getPositions().stream()
-          .filter(pos -> from.getSequencerPosition().equals(pos.getAlias()))
+          .filter(pos -> sequencerPosition.equals(pos.getAlias()))
           .findFirst().orElseThrow(
               () -> new IllegalArgumentException(
-                  String.format("Unknown position '%s' for platform '%s'", from.getSequencerPosition(),
+                  String.format("Unknown position '%s' for platform '%s'", sequencerPosition,
                       to.getSequencer().getInstrumentModel().getAlias())));
     }
 
     for (Partition partition : container.getPartitions()) {
-      from.getLaneContents(partition.getPartitionNumber()).ifPresent(barcode -> {
-        Pool pool = new PoolImpl();
-        pool.setIdentificationBarcode(barcode);
-        partition.setPool(pool);
-      });
+      String poolString = getLaneContents.apply(partition.getPartitionNumber()).orElse(null);
+      if (poolString != null) {
+        Pool pool = poolService.getByBarcode(poolString);
+        if (pool == null) {
+          pool = poolService.getByAlias(poolString);
+        }
+        if (pool != null && pool.getPlatformType() == to.getSequencer().getInstrumentModel().getPlatformType()) {
+          partition.setPool(pool);
+        }
+      }
     }
 
     RunPosition runPos = new RunPosition();
     runPos.setRun(to);
     runPos.setContainer(container);
     runPos.setPosition(position);
-    to.getRunPositions().clear();
     to.getRunPositions().add(runPos);
+    return runPos;
   }
 
   private static boolean hasFallbackContainerModel(Run run) {
