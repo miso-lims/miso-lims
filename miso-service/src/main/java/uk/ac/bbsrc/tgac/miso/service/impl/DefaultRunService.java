@@ -43,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
@@ -367,6 +366,15 @@ public class DefaultRunService implements RunService {
         errors.add(new ValidationError(
             String.format("Platform %s does not have a position %s", platform.getAlias(), position.getPosition())));
       }
+      if (position.getContainer() != null) {
+        for (Partition partition : position.getContainer().getPartitions()) {
+          if (partition.getPool() != null && partition.getPool().getPlatformType() != changed.getSequencer()
+              .getInstrumentModel().getPlatformType()) {
+            errors.add(new ValidationError("Sequencer and pool platforms do not match"));
+            break;
+          }
+        }
+      }
     }
     validateSequencingParameters(changed, platform.getPlatformType(), errors);
 
@@ -633,6 +641,7 @@ public class DefaultRunService implements RunService {
     if (runFromDb == null) {
       target = source.getPlatformType().createRun();
       target.setAlias(source.getAlias());
+      target.setSequencer(source.getSequencer());
       isNew = true;
     } else {
       target = runFromDb;
@@ -765,30 +774,19 @@ public class DefaultRunService implements RunService {
   }
 
   private boolean updateSequencingParameters(Run target, User user, SequencingParameters params) throws IOException {
-    if (params == null) {
+    // container-level params are handled in updateContainerFromNotification
+    if (params == null || target.getPlatformType().hasContainerLevelParameters()) {
       return false;
     }
-    if (target.getPlatformType().hasContainerLevelParameters()) { // TODO: don't move from run to runpos
-      boolean anyUpdated = false;
-      for (RunPosition pos : target.getRunPositions()) {
-        if (pos.getSequencingParameters() == null
-            || pos.getSequencingParameters().getId() != params.getId()) {
-          pos.setSequencingParameters(params);
-          anyUpdated = true;
-        }
+    // Only update if the sequencing parameters haven't been updated by a human
+    if (!target.didSomeoneElseChangeColumn("sequencingParameters_parametersId", user)) {
+      if (target.getSequencingParameters() == null
+          || params.getId() != target.getSequencingParameters().getId()) {
+        target.setSequencingParameters(params);
+        return true;
       }
-      return anyUpdated;
-    } else {
-      // Only update if the sequencing parameters haven't been updated by a human
-      if (!target.didSomeoneElseChangeColumn("sequencingParameters_parametersId", user)) {
-        if (target.getSequencingParameters() == null
-            || params.getId() != target.getSequencingParameters().getId()) {
-          target.setSequencingParameters(params);
-          return true;
-        }
-      }
-      return false;
     }
+    return false;
   }
 
   private boolean updateContainerFromNotification(Run target, Run source) throws IOException {
@@ -806,7 +804,6 @@ public class DefaultRunService implements RunService {
           newRunPos.setContainer(sourcePosition.getContainer());
           newRunPos.setPosition(sourcePosition.getPosition());
           newRunPos.setSequencingParameters(sourcePosition.getSequencingParameters());
-          target.getRunPositions().clear();
           target.getRunPositions().add(newRunPos);
           isMutated = true;
           break;
@@ -826,14 +823,9 @@ public class DefaultRunService implements RunService {
           }
           for (Partition targetPartition : targetContainer.getPartitions()) {
             Partition sourcePartition = sourceContainer.getPartitionAt(targetPartition.getPartitionNumber());
-            if (sourcePartition.getPool() != null && (targetPartition.getPool() == null || targetPartition.getPool()
-                .getIdentificationBarcode() != sourcePartition.getPool().getIdentificationBarcode())) {
-              Pool pool = poolService.getByBarcode(sourcePartition.getPool().getIdentificationBarcode());
-              // TODO: refactored as it was, but probably want to look up by alias as well as barcode
-              if (pool != null) {
-                targetPartition.setPool(pool);
-                isMutated = true;
-              }
+            if (sourcePartition.getPool() != null && targetPartition.getPool() == null) {
+              targetPartition.setPool(sourcePartition.getPool());
+              isMutated = true;
             }
           }
 

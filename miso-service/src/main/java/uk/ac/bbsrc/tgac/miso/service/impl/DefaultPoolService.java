@@ -413,6 +413,11 @@ public class DefaultPoolService implements PoolService {
   }
 
   @Override
+  public Pool getByAlias(String alias) throws IOException {
+    return poolStore.getByAlias(alias);
+  }
+
+  @Override
   public List<Pool> listByIdList(List<Long> poolIds) throws IOException {
     return poolStore.listByIdList(poolIds);
   }
