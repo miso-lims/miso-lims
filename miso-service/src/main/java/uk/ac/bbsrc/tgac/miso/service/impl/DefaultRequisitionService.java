@@ -5,6 +5,8 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIdentitySample;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -425,6 +427,41 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
         item.setRequisition(existing);
       }
     }
+  }
+
+
+  // maybe change type, we're getting the children type (should be fine, we just want the IDs)
+  // pass in the sample ID and the requisition's ID --- this is the effective requisition for the
+  // children, if this approach doesn't work fix later
+  public List<Long> getSampleDescendantslList(long sampleId, long requisitonId) throws IOException {
+    // get kids
+    // for each kid, get it's kids recursively until no more kids down the chain
+    // add all to a single list
+    ArrayList<Long> familyTree = new ArrayList<Long>();
+    familyTree.add(sampleId);
+
+    Sample parent = sampleService.get(sampleId);
+    // ArrayList<Sample> kids = parent.get
+
+
+    // figure out what target categories
+    List<Sample> kids = sampleService.getChildren(Arrays.asList(sampleId), "", requisitonId);
+    // get all the kid categories
+
+
+    for (Sample kid : kids) {
+      familyTree.addAll(getSampleDescendantslList(kid.getId(), requisitonId)); // so recursively get the kids of those
+                                                                               // kids
+      // look at target sample category if that would eliminate the need for this recursion
+
+      // ADD A BASE CASE --- or check the getChildren method if it has a safeguard for trying to get a
+      // child of a lowest child
+    }
+
+
+
+    return familyTree;
+
   }
 
 }
