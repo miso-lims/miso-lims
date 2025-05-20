@@ -122,23 +122,16 @@ public class DefaultArrayRunService implements ArrayRunService {
     return arrayRunStore.update(managed);
   }
 
-  /*
-   * public ArrayRun getArrayRunBySampleId(long sampleId) throws IOException { // query db for an
-   * array run containing that sample // if array run present, return that // if not, check if sample
-   * has parent // if yes, recursively call this method with the parent id // if not, return null or
-   * something and make the receieved type an option or smth idk (figure this out)
-   * 
-   * 
-   * }
-   * 
-   * LOOK AT THE LIST BY SAMPLE ID METHOD - might be useful
-   * 
-   * /
-   * 
-   * 
-   * 
-   * /** Checks submitted data for validity, throwing a ValidationException containing all of the
-   * errors if invalid
+  @Override
+  public List<ArrayRun> listBySamplesIds(List<Long> sampleIds) throws IOException {
+    return arrayRunStore.listBySamplesIds(sampleIds);
+  }
+
+
+
+  /**
+   * Checks submitted data for validity, throwing a ValidationException containing all of the errors
+   * if invalid
    * 
    * @param arrayRun submitted Array Run to validate
    * 

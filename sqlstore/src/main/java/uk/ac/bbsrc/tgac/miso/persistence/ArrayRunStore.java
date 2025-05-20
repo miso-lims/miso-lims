@@ -14,4 +14,6 @@ public interface ArrayRunStore extends PaginatedDataSource<ArrayRun>, SaveDao<Ar
 
   public List<ArrayRun> listBySampleId(long sampleId) throws IOException;
 
+  public List<ArrayRun> listBySamplesIds(List<Long> sampleIds) throws IOException;
+
 }

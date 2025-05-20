@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response.Status;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Requisitionable;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
@@ -32,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.BulkSaveService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
@@ -41,6 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingBiFunction;
+import uk.ac.bbsrc.tgac.miso.dto.ArrayRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
@@ -68,6 +71,8 @@ public class RequisitionRestController extends AbstractRestController {
   private LibraryService libraryService;
   @Autowired
   private RunPartitionAliquotService runPartitionAliquotService;
+  @Autowired
+  private ArrayRunService arrayRunService;
   @Autowired
   private AsyncOperationManager asyncOperationManager;
 
@@ -295,14 +300,25 @@ public class RequisitionRestController extends AbstractRestController {
       String stopReason, List<Long> itemIds) {
   }
 
+
+  @GetMapping("{requisitionId}/arrayruns")
+  public @ResponseBody List<ArrayRunDto> listArrayRuns(@PathVariable long requisitionId, @RequestBody List<Long> ids)
+      throws IOException {
+    List<Long> allSamples = requisitionService.getSamplesDescendantslList(ids, requisitionId);
+    // this should have all the sample IDs and their children's IDs
+
+    // now use list by sample Id
+    // add method to array run store that takes in a collection of sample IDs and returns all the
+    // relevant array run IDs
+
+
+    List<ArrayRun> arrayRuns = arrayRunService.listBySamplesIds(allSamples);
+
+    return arrayRuns.stream().map(Dtos::asDto).collect(Collectors.toList());
+
+
+  }
   /*
-   * @GetMapping("{requisitionId}/arrayruns") public @ResponseBody List<ArrayRunDto>
-   * listArrayRuns(@PathVariable long requisitionId, @RequestBody List<Long> ids) throws IOException {
-   * List<Long> arrayRunIds =
-   * 
-   * 
-   * }
-   * 
    * need to write the service class to use this maybe here you could get samples, then call the
    * arrayservice that returns the arrayrun associated with that sample - if the sample has no array
    * run associated with it but it has a parent, then check the parent recursively - to make this

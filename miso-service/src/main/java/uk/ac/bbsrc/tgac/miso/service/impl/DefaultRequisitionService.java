@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -433,32 +432,33 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   // maybe change type, we're getting the children type (should be fine, we just want the IDs)
   // pass in the sample ID and the requisition's ID --- this is the effective requisition for the
   // children, if this approach doesn't work fix later
-  public List<Long> getSampleDescendantslList(long sampleId, long requisitonId) throws IOException {
+  // this can be simplified --- use getchildren
+  public List<Long> getSamplesDescendantslList(List<Long> sampleIDs, long requisitonId) throws IOException {
     // get kids
     // for each kid, get it's kids recursively until no more kids down the chain
     // add all to a single list
     ArrayList<Long> familyTree = new ArrayList<Long>();
-    familyTree.add(sampleId);
-
-    Sample parent = sampleService.get(sampleId);
-    // ArrayList<Sample> kids = parent.get
+    familyTree.addAll(sampleIDs);
 
 
-    // figure out what target categories
-    List<Sample> kids = sampleService.getChildren(Arrays.asList(sampleId), "", requisitonId);
-    // get all the kid categories
+    // what are the target sample categories/where are they listed
+    // ok the target sample categories are 1 of 5 in a list, so identity, tissue, tissue processing,
+    // stock, aliquot
+    // hopefully there is some decent exception handling and we get empty queries if we look for the
+    // tissue children of an aliquot
+
+    // note: afaik you can't have a child identity, so we aren't gonna query for it
+
+    List<Sample> tissues = sampleService.getChildren(sampleIDs, "Tissue", requisitonId);
+    List<Sample> stocks = sampleService.getChildren(sampleIDs, "Stock", requisitonId);
+    List<Sample> aliquots = sampleService.getChildren(sampleIDs, "Aliquot", requisitonId);
+    // use the getChildren method -- quite a lot of db querying has already been done for you
 
 
-    for (Sample kid : kids) {
-      familyTree.addAll(getSampleDescendantslList(kid.getId(), requisitonId)); // so recursively get the kids of those
-                                                                               // kids
-      // look at target sample category if that would eliminate the need for this recursion
-
-      // ADD A BASE CASE --- or check the getChildren method if it has a safeguard for trying to get a
-      // child of a lowest child
-    }
-
-
+    familyTree.addAll(tissues.stream().map(Sample::getId).collect(Collectors.toList())); // this should add all the
+                                                                                         // tissue sample IDs
+    familyTree.addAll(stocks.stream().map(Sample::getId).collect(Collectors.toList()));
+    familyTree.addAll(aliquots.stream().map(Sample::getId).collect(Collectors.toList()));
 
     return familyTree;
 

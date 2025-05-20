@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -60,6 +61,23 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
     builder.addPredicate(builder.getCriteriaBuilder().equal(sampleJoin.get(SampleImpl_.sampleId), sampleId));
     return builder.getResultList();
   }
+
+  @Override
+  public List<ArrayRun> listBySamplesIds(List<Long> sampleIds) throws IOException {
+    // this is a WIP implementation while I try and figure out how JPA and predicates work
+    // might be able to make this more efficient idk
+
+    List<ArrayRun> runs = new ArrayList<ArrayRun>();
+
+    for (long sample : sampleIds) {
+      runs.addAll(listBySampleId(sample));
+    }
+
+    return runs;
+
+  }
+
+
 
   @Override
   public String getFriendlyName() {
