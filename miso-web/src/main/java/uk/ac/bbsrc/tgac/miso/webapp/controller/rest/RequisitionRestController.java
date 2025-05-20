@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -75,6 +76,9 @@ public class RequisitionRestController extends AbstractRestController {
   private ArrayRunService arrayRunService;
   @Autowired
   private AsyncOperationManager asyncOperationManager;
+
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
 
   private final JQueryDataTableBackend<Requisition, RequisitionDto> jQueryBackend = new JQueryDataTableBackend<>() {
 
@@ -302,9 +306,28 @@ public class RequisitionRestController extends AbstractRestController {
 
 
   @GetMapping("{requisitionId}/arrayruns")
-  public @ResponseBody List<ArrayRunDto> listArrayRuns(@PathVariable long requisitionId, @RequestBody List<Long> ids)
+  public List<ArrayRunDto> listArrayRuns(@PathVariable long requisitionId)
       throws IOException {
-    List<Long> allSamples = requisitionService.getSamplesDescendantslList(ids, requisitionId);
+    // note: can we simply have the sample ids as a part of the request body? or do we need to find it
+    // somewhere here? the getSamples method in the controller takes in the sample IDs so I'm not sure
+    // how to approach this.
+
+
+    // TODO
+    // need to find a way to get the samples from just the requisition IDs
+
+
+    List<Long> allSamples = new ArrayList<Long>();
+    // this is only for detailed mode
+    if (detailedSample) {
+      // allSamples = requisitionService.getSamplesDescendantslList(ids, requisitionId);
+    } else {
+      // allSamples = ids; // I think this works, not entirely sure
+    }
+    // you could use ternary here but that feels like overkill
+
+
+
     // this should have all the sample IDs and their children's IDs
 
     // now use list by sample Id
@@ -313,6 +336,7 @@ public class RequisitionRestController extends AbstractRestController {
 
 
     List<ArrayRun> arrayRuns = arrayRunService.listBySamplesIds(allSamples);
+
 
     return arrayRuns.stream().map(Dtos::asDto).collect(Collectors.toList());
 

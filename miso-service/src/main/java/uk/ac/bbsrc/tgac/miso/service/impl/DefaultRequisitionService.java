@@ -434,31 +434,35 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   // children, if this approach doesn't work fix later
   // this can be simplified --- use getchildren
   public List<Long> getSamplesDescendantslList(List<Long> sampleIDs, long requisitonId) throws IOException {
+
+    // this is only used for detailed sample mode -- you don't need it otherwise
+
+
+    // REVIEW THIS
+    // this may need to be modified to only get the aliquots, and add the sample IDs only if they are
+    // aliquots as well
+
+
     // get kids
     // for each kid, get it's kids recursively until no more kids down the chain
     // add all to a single list
     ArrayList<Long> familyTree = new ArrayList<Long>();
-    familyTree.addAll(sampleIDs);
 
 
-    // what are the target sample categories/where are they listed
-    // ok the target sample categories are 1 of 5 in a list, so identity, tissue, tissue processing,
-    // stock, aliquot
-    // hopefully there is some decent exception handling and we get empty queries if we look for the
-    // tissue children of an aliquot
+    // adds any current samples that are aliquots
+    for (long id : sampleIDs) {
+      Sample currSample = sampleService.get(id);
+      if (currSample.getSampleType().equals("Aliquot"))
+        familyTree.add(id);
+    }
 
-    // note: afaik you can't have a child identity, so we aren't gonna query for it
-
-    List<Sample> tissues = sampleService.getChildren(sampleIDs, "Tissue", requisitonId);
-    List<Sample> stocks = sampleService.getChildren(sampleIDs, "Stock", requisitonId);
+    // gets the derived aliquots from the samples
     List<Sample> aliquots = sampleService.getChildren(sampleIDs, "Aliquot", requisitonId);
     // use the getChildren method -- quite a lot of db querying has already been done for you
 
 
-    familyTree.addAll(tissues.stream().map(Sample::getId).collect(Collectors.toList())); // this should add all the
-                                                                                         // tissue sample IDs
-    familyTree.addAll(stocks.stream().map(Sample::getId).collect(Collectors.toList()));
-    familyTree.addAll(aliquots.stream().map(Sample::getId).collect(Collectors.toList()));
+    familyTree.addAll(aliquots.stream().map(Sample::getId).collect(Collectors.toList())); // adds all the aliquots to
+                                                                                          // the family tree
 
     return familyTree;
 
