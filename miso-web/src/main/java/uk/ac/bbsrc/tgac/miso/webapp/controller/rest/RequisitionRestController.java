@@ -305,26 +305,34 @@ public class RequisitionRestController extends AbstractRestController {
   }
 
 
+
   @GetMapping("{requisitionId}/arrayruns")
-  public List<ArrayRunDto> listArrayRuns(@PathVariable long requisitionId)
+  public @ResponseBody List<ArrayRunDto> listArrayRuns(@PathVariable long requisitionId)
       throws IOException {
     // note: can we simply have the sample ids as a part of the request body? or do we need to find it
     // somewhere here? the getSamples method in the controller takes in the sample IDs so I'm not sure
     // how to approach this.
 
 
-    // TODO
-    // need to find a way to get the samples from just the requisition IDs
-
-
     List<Long> allSamples = new ArrayList<Long>();
-    // this is only for detailed mode
+
+    // requisitioned
+    List<Long> sampleIds = sampleService.list(0, 0, false, null, PaginationFilter.requisitionId(requisitionId)).stream()
+        .map(Sample::getId).collect(Collectors.toCollection(() -> new ArrayList<>()));
+
+    // supplemental
+    sampleIds.addAll(sampleService.list(0, 0, false, null, PaginationFilter.supplementalToRequisitionId(requisitionId))
+        .stream().map(Sample::getId).toList());
+
+
+
     if (detailedSample) {
-      // allSamples = requisitionService.getSamplesDescendantslList(ids, requisitionId);
+      allSamples = requisitionService.getSamplesDescendantslList(sampleIds, requisitionId); // if in detailed mode, get
+                                                                                            // the aliquot samples and
+                                                                                            // any aliquot descendants
     } else {
-      // allSamples = ids; // I think this works, not entirely sure
+      allSamples = sampleIds; // if not detailed mode, then just get the sample IDs
     }
-    // you could use ternary here but that feels like overkill
 
 
 
