@@ -4,10 +4,12 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Session;
+import org.hibernate.annotations.TimeZoneStorage;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,6 +132,19 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
     assertNotNull(runs);
     assertEquals(1, runs.size());
   }
+
+  @Test
+  public void testListBySamplesIds() throws Exception {
+
+    List<Long> sampleIDs = new ArrayList<Long>(Arrays.asList(82235L, 212501L, 82520L));
+
+    List<ArrayRun> runs = sut.listBySamplesIds(sampleIDs);
+    assertNotNull(runs);
+
+    assertEquals(4, runs.size());
+
+  }
+
 
   @Test
   public void testCount() throws Exception {

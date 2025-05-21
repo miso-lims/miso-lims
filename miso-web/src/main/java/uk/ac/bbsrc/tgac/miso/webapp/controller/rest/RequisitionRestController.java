@@ -309,9 +309,6 @@ public class RequisitionRestController extends AbstractRestController {
   @GetMapping("{requisitionId}/arrayruns")
   public @ResponseBody List<ArrayRunDto> listArrayRuns(@PathVariable long requisitionId)
       throws IOException {
-    // note: can we simply have the sample ids as a part of the request body? or do we need to find it
-    // somewhere here? the getSamples method in the controller takes in the sample IDs so I'm not sure
-    // how to approach this.
 
 
     List<Long> allSamples = new ArrayList<Long>();
@@ -327,20 +324,11 @@ public class RequisitionRestController extends AbstractRestController {
 
 
     if (detailedSample) {
-      allSamples = requisitionService.getSamplesDescendantslList(sampleIds, requisitionId); // if in detailed mode, get
-                                                                                            // the aliquot samples and
-                                                                                            // any aliquot descendants
+      allSamples = requisitionService.getSamplesDescendantslList(sampleIds, requisitionId);
+      // if in detailed mode, get the aliquot samples and any aliquot descendants
     } else {
       allSamples = sampleIds; // if not detailed mode, then just get the sample IDs
     }
-
-
-
-    // this should have all the sample IDs and their children's IDs
-
-    // now use list by sample Id
-    // add method to array run store that takes in a collection of sample IDs and returns all the
-    // relevant array run IDs
 
 
     List<ArrayRun> arrayRuns = arrayRunService.listBySamplesIds(allSamples);

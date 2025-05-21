@@ -64,9 +64,6 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
 
   @Override
   public List<ArrayRun> listBySamplesIds(List<Long> sampleIds) throws IOException {
-    // this is a WIP implementation while I try and figure out how JPA and predicates work
-    // might be able to make this more efficient idk
-
     List<ArrayRun> runs = new ArrayList<ArrayRun>();
 
     for (long sample : sampleIds) {

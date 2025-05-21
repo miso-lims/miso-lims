@@ -136,16 +136,24 @@
               <miso:list-section-ajax id="list_preparedsamples" name="Prepared Samples" target="sample" 
                 config="{requisitionId: ${requisition.id}, relation: 'indirect'}" />
             </c:if>
+            
             <miso:list-section-ajax id="list_preparedlibraries" name="Prepared Libraries" target="library"
               config="{ requisitionId: ${requisition.id}, relation: 'indirect' }" />
+            
             <miso:list-section id="list_runs" name="Runs" target="run" items="${runs}"
               config="{requisitionId: ${requisition.id}}" />
 
             <br />
+
             <h1>Run-Libraries</h1>
             <div id="list_runLibraries">
               <img src="/styles/images/ajax-loader.gif" class="fg-button" />
             </div>
+
+            <!-- not sure if this works -->
+            <miso:list-section-ajax id="list_arrayrun" name="Array Runs" target="arrayrun" 
+            config="{ requisitionId: ${requisition.id}, relation: 'indirect' }" />
+
 
             <miso:changelog item="${requisition}" />
           </c:otherwise>
