@@ -518,8 +518,15 @@ INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 -- Aliquots
 INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`, qcUser, qcDate, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`,
   `sampleClassId`, `archived`, `parentId`, `siblingNumber`, `preMigrationId`, isSynthetic, nonStandardAlias, samplePurposeId, discriminator) VALUES
+
 (19,NULL,'SAM19','aliquot1','SAM19::TEST_0001_ALIQUOT_1','Freezer1_1','GENOMIC',1,1,'2016-07-07','TEST_0001_ALIQUOT_1',1,1,NULL,1,1,'2016-07-07 13:31:21',1,'2016-07-07 13:31:21',
-  4,0,18,1,NULL,0, FALSE, 1, 'Aliquot');
+  4,0,18,2,NULL,0, FALSE, 1, 'Aliquot'),
+  
+  (26, NULL, 'SAM26','aliquot2','SAM26::TEST_0001_ALIQUOT_2', 'Freezer1_1', 'Genomic',1,1,'2020-03-12','TEST_0001_ALIQUOT_2',1,1,NULL,1,1,'2020-03-12 13:56:31',1,'2020-03-12 13:56:31',
+  4,0,18,2,NULL,0,FALSE,1,'Aliquot'),
+  
+  (27,NULL,'SAM27','aliquot3','SAM27:TEST_0001_ALIQUOT_3','Freezer1_1', 'Genomic',1,1,'2023-05-09','TEST_0001_ALIQUOT_3',1,1,NULL,1,1,'2023-05-09 10:12:27',1,'2023-05-09 10:12:27',
+  4,0,18,1,NULL,0,FALSE,1,'Aliquot');
 
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (19, 15, 17);
@@ -998,10 +1005,13 @@ INSERT INTO Array(arrayId, alias, arrayModelId, serialNumber, description, creat
 (1, 'Array_1', 1, '1234', 'test array', 1, '2018-01-26 17:11:00', 1, '2018-01-26 17:11:00');
 
 INSERT INTO ArrayPosition(arrayId, position, sampleId) VALUES
-(1, 'R01C01', 19);
+(1, 'R01C01', 19),
+(1, 'R02C01',26),
+(1, 'R03C01',27);
 
 INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate, creator, created, lastModifier, lastModified) VALUES
-(1, 'ArrayRun_1', 3, 1, 'Running', '2018-02-02', 1, '2018-02-02 15:40:00', 1, '2018-02-02 15:40:00');
+(1, 'ArrayRun_1', 3, 1, 'Running', '2018-02-02', 1, '2018-02-02 15:40:00', 1, '2018-02-02 15:40:00'),
+(2, 'ArrayRun_2',3,1, 'Running', '2022-06-23',1,'2022-06-23 16:30:00',1,'2022-06-23 16:13:00');
 
 INSERT INTO WorkflowProgress(workflowProgressId, workflowName, userId) VALUES
 (1, 'LOAD_SEQUENCER', 3),

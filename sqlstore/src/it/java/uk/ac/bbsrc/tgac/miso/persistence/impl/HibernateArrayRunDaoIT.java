@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -136,12 +137,13 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
   @Test
   public void testListBySamplesIds() throws Exception {
 
-    List<Long> sampleIDs = new ArrayList<Long>(Arrays.asList(82235L, 212501L, 82520L));
+    List<Long> sampleIDs = new ArrayList<Long>(Arrays.asList(19L, 26L, 27L)); // V910 test data has the data
+    // need to have user access to docker without sudo -- add user
 
     List<ArrayRun> runs = sut.listBySamplesIds(sampleIDs);
     assertNotNull(runs);
 
-    assertEquals(4, runs.size());
+    assertEquals(2, runs.size());
 
   }
 
