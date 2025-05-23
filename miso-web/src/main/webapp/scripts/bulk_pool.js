@@ -349,10 +349,110 @@ BulkTarget.pool = (function ($) {
       ]);
       return;
     }
-    function showCreateDialog(modelId, partitionCount) {
+    function showCreateTwoDialog(modelId, partitionCount, experimentType) {
+      var dialogFields = [
+        {
+          property: "sequencingParameters",
+          label: "Sequencing Parameters",
+          required: true,
+          type: "select",
+          getLabel: Utils.array.getName,
+          values: Constants.sequencingParameters.filter(function (param) {
+            return param.instrumentModelId == modelId;
+          }),
+        },
+        {
+          property: "genomeFolder",
+          type: "text",
+          label: "Genome Folder",
+          value: Constants.genomeFolder,
+          required: true,
+        },
+        {
+          property: "customRead1Primer",
+          type: "text",
+          label: "Custom Read 1 Primer Well",
+          required: false,
+        },
+        {
+          property: "customIndexPrimer",
+          type: "text",
+          label: "Custom Index Primer Well",
+          required: false,
+        },
+        {
+          property: "customRead2Primer",
+          type: "text",
+          label: "Custom Read 2 Primer Well",
+          required: false,
+        },
+        {
+          property: "pools",
+          label: "Lanes Configuration",
+          required: true,
+          type: "orderDropdowns",
+          getLabel: Utils.array.getAlias,
+          value: partitionCount,
+          values: pools,
+        },
+      ];
+
+      if (experimentType.isDragen) {
+        dialogFields.push(
+          {
+            property: "dragenVersion",
+            type: "text",
+            label: "Dragen Version",
+            value: Constants.dragenVersion,
+            required: true,
+          },
+          {
+            property: "fastqCompressionFormat",
+            label: "FastQ Compression Format",
+            required: true,
+            type: "select",
+            getLabel: function (type) {
+              return type.description;
+            },
+            values: Constants.compressionFormats,
+          },
+          {
+            property: "trimUMI",
+            type: "select",
+            label: "Trim UMI?",
+            values: ["True", "False"],
+            required: true,
+          }
+        );
+      }
+
       Utils.showDialog(
         "Create Samplesheet",
         "Download",
+        dialogFields,
+        function (result) {
+          Utils.ajaxDownloadWithDialog(Urls.rest.pools.samplesheet, {
+            customRead1Primer: result.customRead1Primer,
+            customIndexPrimer: result.customIndexPrimer,
+            customRead2Primer: result.customRead2Primer,
+            dragenVersion: result.dragenVersion || "",
+            trimUMI: result.trimUMI || "",
+            fastqCompressionFormat: result.fastqCompressionFormat
+              ? result.fastqCompressionFormat.description
+              : "",
+            experimentType: experimentType.name,
+            genomeFolder: result.genomeFolder,
+            sequencingParametersId: result.sequencingParameters.id,
+            poolIds: result.pools.map(Utils.array.getId),
+          });
+        },
+        null
+      );
+    }
+    function showCreateDialog(modelId, partitionCount) {
+      Utils.showDialog(
+        "Create Samplesheet",
+        "Continue",
         [
           {
             property: "experimentType",
@@ -362,71 +462,11 @@ BulkTarget.pool = (function ($) {
             getLabel: function (type) {
               return type.description;
             },
-            values: Constants.illuminaAllExperimentTypes,
-          },
-          {
-            property: "sequencingParameters",
-            label: "Sequencing Parameters",
-            required: true,
-            type: "select",
-            getLabel: Utils.array.getName,
-            values: Constants.sequencingParameters.filter(function (param) {
-              return param.instrumentModelId == modelId;
-            }),
-          },
-          {
-            property: "genomeFolder",
-            type: "text",
-            label: "Genome Folder",
-            value: Constants.genomeFolder,
-            required: true,
-          },
-          {
-            property: "customRead1Primer",
-            type: "text",
-            label: "Custom Read 1 Primer Well",
-            required: false,
-          },
-          {
-            property: "customIndexPrimer",
-            type: "text",
-            label: "Custom Index Primer Well",
-            required: false,
-          },
-          {
-            property: "customRead2Primer",
-            type: "text",
-            label: "Custom Read 2 Primer Well",
-            required: false,
-          },
-          {
-            property: "pools",
-            label: "Lanes Configuration",
-            required: true,
-            type: "orderDropdowns",
-            getLabel: Utils.array.getAlias,
-            value: partitionCount,
-            values: pools,
+            values: Constants.illuminaExperimentTypes,
           },
         ],
         function (result) {
-          var sampleSheet = Urls.rest.pools.samplesheet;
-
-          for (var index = 0; index < Constants.illuminaDragenExperimentTypes.length; index++) {
-            var item = Constants.illuminaDragenExperimentTypes[index];
-            if (item.name == result.experimentType.name) {
-              sampleSheet = Urls.rest.pools.dragenSamplesheet;
-            }
-          }
-          Utils.ajaxDownloadWithDialog(sampleSheet, {
-            customRead1Primer: result.customRead1Primer,
-            customIndexPrimer: result.customIndexPrimer,
-            customRead2Primer: result.customRead2Primer,
-            experimentType: result.experimentType.name,
-            genomeFolder: result.genomeFolder,
-            sequencingParametersId: result.sequencingParameters.id,
-            poolIds: result.pools.map(Utils.array.getId),
-          });
+          showCreateTwoDialog(modelId, partitionCount, result.experimentType);
         },
         null
       );

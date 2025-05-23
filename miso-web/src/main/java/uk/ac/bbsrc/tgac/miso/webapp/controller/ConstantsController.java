@@ -53,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.RunLibrarySpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
+import uk.ac.bbsrc.tgac.miso.core.data.type.CompressionFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -114,7 +115,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.PrintableField;
 import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
-import uk.ac.bbsrc.tgac.miso.core.util.IlluminaDragenExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
 import uk.ac.bbsrc.tgac.miso.dto.AssayDto;
@@ -238,6 +238,10 @@ public class ConstantsController {
   private Boolean detailedSample;
   @Value("${miso.genomeFolder:}")
   private String genomeFolder;
+  @Value("${miso.samplesheet.dragen.version:4.1.1}")
+  private String dragenVersion;
+  @Value("${miso.samplesheet.dragen.trimUMI:false}")
+  private String trimUMI;
   @Value("${miso.test.lockConstants:false}")
   private boolean locked;
   @Value("${miso.newOptionSopUrl:#{null}}")
@@ -349,6 +353,8 @@ public class ConstantsController {
       addJsonArray(mapper, node, "partitionQcTypes", partitionQcTypeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "referenceGenomes", referenceGenomeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
+      addJsonArray(mapper, node, "compressionFormats", Arrays.asList(CompressionFormat.values()), Dtos::asDto);
+
       addJsonArray(mapper, node, "sampleSpreadsheets", Arrays.asList(SampleSpreadSheets.values()), Dtos::asDto);
       addJsonArray(mapper, node, "librarySpreadsheets", Arrays.asList(LibrarySpreadSheets.values()), Dtos::asDto);
       addJsonArray(mapper, node, "libraryAliquotSpreadsheets", Arrays.asList(LibraryAliquotSpreadSheets.values()),
@@ -398,13 +404,12 @@ public class ConstantsController {
         illuminaChemistry.add(chemistry.name());
       }
       addIlluminaExperimentTypes(node);
-      addIlluminaDragenExperimentTypes(node);
-      addIlluminaAllExperimentTypes(node);
       addHealthTypes(node);
       addIlluminaWorkflowTypes(node);
       addInstrumentTypes(node);
       addDataManglingPolicies(node);
       addMetricCategories(node);
+      // addCompressionFormats(node);
       addThresholdTypes(node);
       addPermittedSamples(node);
 
@@ -419,6 +424,8 @@ public class ConstantsController {
       node.put("errorEditDistance", indexChecker.getErrorMismatches());
       node.put("warningEditDistance", indexChecker.getWarningMismatches());
       node.put("genomeFolder", genomeFolder);
+      node.put("dragenVersion", dragenVersion);
+      node.put("trimUMI", trimUMI);
 
       // Save the regenerated file in cache.
       constantsJs = "Constants = " + mapper.writeValueAsString(node) + ";";
@@ -434,29 +441,7 @@ public class ConstantsController {
       ObjectNode dto = illuminaExperimentTypes.addObject();
       dto.put("name", experiment.name());
       dto.put("description", experiment.getDescription());
-    }
-  }
-
-  private static void addIlluminaDragenExperimentTypes(ObjectNode node) {
-    ArrayNode illuminaDragenExperimentTypes = node.putArray("illuminaDragenExperimentTypes");
-    for (IlluminaDragenExperiment experiment : IlluminaDragenExperiment.values()) {
-      ObjectNode dto = illuminaDragenExperimentTypes.addObject();
-      dto.put("name", experiment.name());
-      dto.put("description", experiment.getDescription());
-    }
-  }
-
-  private static void addIlluminaAllExperimentTypes(ObjectNode node) {
-    ArrayNode illuminaAllExperimentTypes = node.putArray("illuminaAllExperimentTypes");
-    for (IlluminaDragenExperiment experiment : IlluminaDragenExperiment.values()) {
-      ObjectNode dto = illuminaAllExperimentTypes.addObject();
-      dto.put("name", experiment.name());
-      dto.put("description", experiment.getDescription());
-    }
-    for (IlluminaExperiment experiment : IlluminaExperiment.values()) {
-      ObjectNode dto = illuminaAllExperimentTypes.addObject();
-      dto.put("name", experiment.name());
-      dto.put("description", experiment.getDescription());
+      dto.put("isDragen", experiment.getIsDragen());
     }
   }
 
@@ -506,6 +491,14 @@ public class ConstantsController {
       dto.put("sortPriority", category.getSortPriority());
     }
   }
+
+  // private static void addCompressionFormats(ObjectNode node) {
+  // ArrayNode compressionFormats = node.putArray("metricCategories");
+  // for (CompressionFormat category : CompressionFormat.values()) {
+  // ObjectNode dto = compressionFormats.addObject();
+  // dto.put("label", category.getLabel());
+  // }
+  // }
 
   private static void addThresholdTypes(ObjectNode node) {
     ArrayNode thresholdTypes = node.putArray("thresholdTypes");

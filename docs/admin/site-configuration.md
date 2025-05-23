@@ -388,6 +388,21 @@ Maximum number of mismatches to consider a near-duplicate index warning. Default
 
 Warning label to display for near-duplicate indices. Defaults to "Near-Duplicate Indices" if unspecified.
 
+## Samplesheet Configurations
+
 ### `miso.pools.samplesheet.dragenVersion`
 
 The version of Illumina DRAGEN to be used when exporting sample sheets
+
+### `miso.pools.samplesheet.fastqCompressionFormat`
+
+The FastQ coompression format to be specified when exporting Illumina DRAGEN sample sheets.
+
+### `miso.pools.samplesheet.germlineAppVersion`
+
+The version of the Illumina DRAGEN Germline App to be used when exporting sample sheets.
+
+### `miso.pools.samplesheet.germlineKeepFastQ`
+
+Whether to keep FastQ files when exporting Illumina DRAGEN Germline sample sheets. Defaults to `false` if unspecified.
+

@@ -67,7 +67,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderSummaryViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
-import uk.ac.bbsrc.tgac.miso.core.util.IlluminaDragenExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -135,6 +134,10 @@ public class PoolRestController extends AbstractRestController {
     private String genomeFolder;
     private List<Long> poolIds;
     private long sequencingParametersId;
+    private String dragenVersion;
+    private String trimUMI;
+    private String fastqCompressionFormat;
+
 
     public String getCustomIndexPrimer() {
       return customIndexPrimer;
@@ -148,8 +151,16 @@ public class PoolRestController extends AbstractRestController {
       return customRead2Primer;
     }
 
+    public String getDragenVersion() {
+      return dragenVersion;
+    }
+
     public String getExperimentType() {
       return experimentType;
+    }
+
+    public String getFastQCompressionFormat() {
+      return fastqCompressionFormat;
     }
 
     public String getGenomeFolder() {
@@ -164,6 +175,10 @@ public class PoolRestController extends AbstractRestController {
       return sequencingParametersId;
     }
 
+    public String getTrimUMI() {
+      return trimUMI;
+    }
+
     public void setCustomIndexPrimer(String customIndexPrimer) {
       this.customIndexPrimer = customIndexPrimer;
     }
@@ -176,8 +191,16 @@ public class PoolRestController extends AbstractRestController {
       this.customRead2Primer = customRead2Primer;
     }
 
+    public void setDragenVersion(String dragenVersion) {
+      this.dragenVersion = dragenVersion;
+    }
+
     public void setExperimentType(String experimentType) {
       this.experimentType = experimentType;
+    }
+
+    public void setFastqCompressionFormat(String fastqCompressionFormat) {
+      this.fastqCompressionFormat = fastqCompressionFormat;
     }
 
     public void setGenomeFolder(String genomeFolder) {
@@ -192,6 +215,9 @@ public class PoolRestController extends AbstractRestController {
       this.sequencingParametersId = sequencingParametersId;
     }
 
+    public void setTrimUMI(String trimUMI) {
+      this.trimUMI = trimUMI;
+    }
   }
 
   private final JQueryDataTableBackend<ListPoolView, PoolDto> jQueryBackend = new JQueryDataTableBackend<>() {
@@ -618,31 +644,6 @@ public class PoolRestController extends AbstractRestController {
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     IlluminaExperiment experiment = IlluminaExperiment.valueOf(request.getExperimentType());
     SequencingParameters parameters = sequencingParametersService.get(request.getSequencingParametersId());
-    List<Pool> pools = new ArrayList<>();
-    for (Long poolId : request.getPoolIds()) {
-      if (poolId != null) {
-        Pool pool = poolService.get(poolId);
-        pools.add(pool);
-      }
-    }
-    response.setHeader("Content-Disposition", String.format("attachment; filename=%s-%s.csv", experiment.name(),
-        pools.stream().map(Pool::getAlias).collect(Collectors.joining("-"))));
-    return new HttpEntity<>(experiment
-        .makeSampleSheet(request.getGenomeFolder(), parameters, request.getCustomRead1Primer(),
-            request.getCustomIndexPrimer(),
-            request.getCustomRead2Primer(),
-            pools)
-        .getBytes(StandardCharsets.UTF_8));
-
-  }
-
-  @PostMapping(value = "/dragensamplesheet")
-  @ResponseBody
-  public HttpEntity<byte[]> dragensamplesheet(@RequestBody SampleSheetRequest request,
-      HttpServletRequest httpRequest,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    IlluminaDragenExperiment experiment = IlluminaDragenExperiment.valueOf(request.getExperimentType());
-    SequencingParameters parameters = sequencingParametersService.get(request.getSequencingParametersId());
 
     List<Pool> pools = new ArrayList<>();
     List<Integer> lanes = new ArrayList<>();
@@ -662,7 +663,10 @@ public class PoolRestController extends AbstractRestController {
             request.getCustomIndexPrimer(),
             request.getCustomRead2Primer(),
             pools,
-            lanes)
+            lanes,
+            request.getDragenVersion(),
+            request.getTrimUMI(),
+            request.getFastQCompressionFormat())
         .getBytes(StandardCharsets.UTF_8));
 
   }
