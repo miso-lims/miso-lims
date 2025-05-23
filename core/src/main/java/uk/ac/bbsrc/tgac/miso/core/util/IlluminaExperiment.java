@@ -309,9 +309,9 @@ public enum IlluminaExperiment {
   private static final DateTimeFormatter MDY = DateTimeFormatter.ofPattern("M/d/yyyy");
 
   private final String description;
-  private final Boolean isDragen;
+  private final boolean isDragen;
 
-  private IlluminaExperiment(String description, Boolean isDragen) {
+  private IlluminaExperiment(String description, boolean isDragen) {
     this.description = description;
     this.isDragen = isDragen;
   }
@@ -465,7 +465,7 @@ public enum IlluminaExperiment {
     return description;
   }
 
-  public Boolean getIsDragen() {
+  public boolean getIsDragen() {
     return isDragen;
   }
 
