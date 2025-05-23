@@ -117,7 +117,7 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
   public void testList() throws Exception {
     List<ArrayRun> runs = sut.list();
     assertNotNull(runs);
-    assertEquals(1, runs.size());
+    assertEquals(2, runs.size());
   }
 
   @Test
@@ -136,13 +136,9 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListBySamplesIds() throws Exception {
-
-    List<Long> sampleIDs = new ArrayList<Long>(Arrays.asList(19L, 26L, 27L)); // V910 test data has the data
-    // need to have user access to docker without sudo -- add user
-
+    List<Long> sampleIDs = new ArrayList<Long>(Arrays.asList(19L, 26L, 27L));
     List<ArrayRun> runs = sut.listBySamplesIds(sampleIDs);
     assertNotNull(runs);
-
     assertEquals(2, runs.size());
 
   }
@@ -150,7 +146,7 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
 
   @Test
   public void testCount() throws Exception {
-    assertEquals(1, sut.count());
+    assertEquals(2, sut.count());
   }
 
   @Test

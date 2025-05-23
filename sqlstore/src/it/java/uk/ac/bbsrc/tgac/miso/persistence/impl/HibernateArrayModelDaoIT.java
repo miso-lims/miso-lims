@@ -79,7 +79,7 @@ public class HibernateArrayModelDaoIT extends AbstractDAOTest {
   public void testGetUsage() throws IOException {
     ArrayModel arrayModel = (ArrayModel) currentSession().get(ArrayModel.class, 1L);
     assertEquals("Test BeadChip", arrayModel.getAlias());
-    assertEquals(1L, sut.getUsage(arrayModel));
+    assertEquals(2L, sut.getUsage(arrayModel));
   }
 
   @Test

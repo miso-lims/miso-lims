@@ -70,7 +70,7 @@ public class HibernateProjectDaoIT extends AbstractHibernateSaveDaoTest<Project,
 
   @Test
   public void testGetUsage() throws Exception {
-    testGetUsage(HibernateProjectDao::getUsage, 1L, 22L);
+    testGetUsage(HibernateProjectDao::getUsage, 1L, 24L);
   }
 
   @Test

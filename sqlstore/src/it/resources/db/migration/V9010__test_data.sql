@@ -1002,16 +1002,17 @@ INSERT INTO ArrayModel(arrayModelId, alias, arrayModelRows, arrayModelColumns) V
 (3, 'Test Model 3', 8, 1);
 
 INSERT INTO Array(arrayId, alias, arrayModelId, serialNumber, description, creator, created, lastModifier, lastModified) VALUES
-(1, 'Array_1', 1, '1234', 'test array', 1, '2018-01-26 17:11:00', 1, '2018-01-26 17:11:00');
+(1, 'Array_1', 1, '1234', 'test array', 1, '2018-01-26 17:11:00', 1, '2018-01-26 17:11:00'),
+(2, 'Array_2', 1, '2345', 'test array 2', 1, '2025-05-23 09:33:00', 1, '2025-05-23 09:33:00');
 
 INSERT INTO ArrayPosition(arrayId, position, sampleId) VALUES
 (1, 'R01C01', 19),
-(1, 'R02C01',26),
-(1, 'R03C01',27);
+(2, 'R02C01',26),
+(2, 'R03C01',27);
 
 INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate, creator, created, lastModifier, lastModified) VALUES
 (1, 'ArrayRun_1', 3, 1, 'Running', '2018-02-02', 1, '2018-02-02 15:40:00', 1, '2018-02-02 15:40:00'),
-(2, 'ArrayRun_2',3,1, 'Running', '2022-06-23',1,'2022-06-23 16:30:00',1,'2022-06-23 16:13:00');
+(2, 'ArrayRun_2',3,2, 'Running', '2022-06-23',1,'2022-06-23 16:30:00',1,'2022-06-23 16:13:00');
 
 INSERT INTO WorkflowProgress(workflowProgressId, workflowName, userId) VALUES
 (1, 'LOAD_SEQUENCER', 3),

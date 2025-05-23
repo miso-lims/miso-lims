@@ -45,7 +45,7 @@ public class HibernateSamplePurposeDaoIT
   @Test
   public void testGetUsage() throws Exception {
     SamplePurpose purpose1 = (SamplePurpose) currentSession().get(SamplePurposeImpl.class, 1L);
-    assertEquals(1, getTestSubject().getUsage(purpose1));
+    assertEquals(3, getTestSubject().getUsage(purpose1));
     SamplePurpose purpose2 = (SamplePurpose) currentSession().get(SamplePurposeImpl.class, 2L);
     assertEquals(0, getTestSubject().getUsage(purpose2));
   }

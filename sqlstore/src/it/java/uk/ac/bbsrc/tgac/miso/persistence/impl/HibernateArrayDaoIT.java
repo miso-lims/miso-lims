@@ -107,7 +107,7 @@ public class HibernateArrayDaoIT extends AbstractDAOTest {
   public void testList() throws Exception {
     List<Array> arrays = sut.list();
     assertNotNull(arrays);
-    assertEquals(1, arrays.size());
+    assertEquals(2, arrays.size());
   }
 
   @Test

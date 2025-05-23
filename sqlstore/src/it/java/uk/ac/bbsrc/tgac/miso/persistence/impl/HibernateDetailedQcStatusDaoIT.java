@@ -89,7 +89,7 @@ public class HibernateDetailedQcStatusDaoIT extends AbstractDAOTest {
     DetailedQcStatus status =
         (DetailedQcStatus) currentSession().get(DetailedQcStatusImpl.class, 1L);
     assertEquals("Passed", status.getDescription());
-    assertEquals(24L, sut.getUsageBySamples(status));
+    assertEquals(26L, sut.getUsageBySamples(status));
   }
 
   @Test
