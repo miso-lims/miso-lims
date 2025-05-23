@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.type;
 
 public enum CompressionFormat {
   GZIP("gzip", "zip") {},
-  OXFORDNANOPORE("DRAGEN ORA", "ora") {};
+  ORA("DRAGEN ORA", "ora") {};
 
   private final String description;
 

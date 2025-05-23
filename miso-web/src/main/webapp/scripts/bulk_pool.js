@@ -402,7 +402,7 @@ BulkTarget.pool = (function ($) {
           {
             property: "dragenVersion",
             type: "text",
-            label: "Dragen Version",
+            label: "DRAGEN Version",
             value: Constants.dragenVersion,
             required: true,
           },

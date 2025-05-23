@@ -409,7 +409,6 @@ public class ConstantsController {
       addInstrumentTypes(node);
       addDataManglingPolicies(node);
       addMetricCategories(node);
-      // addCompressionFormats(node);
       addThresholdTypes(node);
       addPermittedSamples(node);
 
@@ -491,14 +490,6 @@ public class ConstantsController {
       dto.put("sortPriority", category.getSortPriority());
     }
   }
-
-  // private static void addCompressionFormats(ObjectNode node) {
-  // ArrayNode compressionFormats = node.putArray("metricCategories");
-  // for (CompressionFormat category : CompressionFormat.values()) {
-  // ObjectNode dto = compressionFormats.addObject();
-  // dto.put("label", category.getLabel());
-  // }
-  // }
 
   private static void addThresholdTypes(ObjectNode node) {
     ArrayNode thresholdTypes = node.putArray("thresholdTypes");

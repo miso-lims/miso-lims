@@ -649,17 +649,6 @@ public enum IlluminaExperiment {
 
   }
 
-  private void escape(StringBuilder output, String input) {
-    if (input == null || input.isEmpty()) {
-      return;
-    }
-    if (input.contains("\"") || input.contains(",")) {
-      output.append("\"").append(input.replace("\"", "\"\"")).append("\"");
-    } else {
-      output.append(input);
-    }
-  }
-
   private String pad(int length, String sequence) {
     if (sequence.length() >= length) {
       return sequence;
