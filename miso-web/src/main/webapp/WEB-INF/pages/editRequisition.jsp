@@ -156,8 +156,6 @@
 
             <!-- use the requisition id in the create url function -->
              
-
-
             <miso:changelog item="${requisition}" />
           </c:otherwise>
         </c:choose>

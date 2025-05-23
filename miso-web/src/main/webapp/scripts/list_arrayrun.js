@@ -7,7 +7,7 @@ ListTarget.arrayrun = {
     if (projectId) {
       return Urls.rest.arrayRuns.projectDatatable(projectId);
     } else if (config.requisitionId) {
-      Urls.rest.arrayRuns.requisitionDatatable(config.requisitionId); // if the config field isn't there, add it later/fix it wherever it needs to be fixed
+      return Urls.rest.arrayRuns.requisitionDatatable(config.requisitionId) + "/arrayruns"; // if the config field isn't there, add it later/fix it wherever it needs to be fixed
     } else {
       return Urls.rest.arrayRuns.datatable;
     }

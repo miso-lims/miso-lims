@@ -305,8 +305,8 @@ public class RequisitionRestController extends AbstractRestController {
   }
 
 
-
-  @GetMapping("{requisitionId}/arrayruns")
+  // idk if the full URL is needed or something, and I think the produces part is fine but not sure
+  @GetMapping("/{requisitionId}/arrayruns") // produces = application/json
   public @ResponseBody List<ArrayRunDto> listArrayRuns(@PathVariable long requisitionId)
       throws IOException {
 
