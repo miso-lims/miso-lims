@@ -297,19 +297,6 @@ public class RequisitionRestController extends AbstractRestController {
       String stopReason, List<Long> itemIds) {
   }
 
-  /*
-   * need to write the service class to use this maybe here you could get samples, then call the
-   * arrayservice that returns the arrayrun associated with that sample - if the sample has no array
-   * run associated with it but it has a parent, then check the parent recursively - to make this
-   * controller method cleaner, do that recursive searching in the array run service method (also
-   * kinda feels like a bit of a mess to do it here ngl)
-   * 
-   * 
-   * following the structure of the above method, do the following - get the relevant array run IDs -
-   * get the list of the actual objects from those IDs - map to ArrayRunDtos at the end
-   * 
-   */
-
   @PostMapping("/paused")
   public @ResponseBody List<RequisitionDto> searchPaused(@RequestBody List<Long> requisitionIds) throws IOException {
     List<Requisition> requisitions = requisitionService.list(0, 0, false, "id", PaginationFilter.status("paused"),

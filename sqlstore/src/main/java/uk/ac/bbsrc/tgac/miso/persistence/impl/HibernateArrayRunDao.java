@@ -67,21 +67,8 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
     Root<ArrayRun> root = builder.getRoot();
     Join<ArrayRun, Array> arrayJoin = builder.getJoin(root, ArrayRun_.array);
     Join<Array, SampleImpl> sampleJoin = builder.getJoin(arrayJoin, Array_.samples);
-
-    // get this to compare to the list of sample IDs
     builder.addPredicate(sampleJoin.get(SampleImpl_.sampleId).in(sampleIds));
-    // this is essentially WHERE sampleID IN sampleIDs; or something
-
-
     return builder.getResultList();
-
-    // query all at once instead of one by one
-    // query for all the array runs that contain one or more of the sample IDs
-    // look at querybuilder and SQL in general a little more to make this more efficient
-    // doing it multiple times will save the time of joining the same tables repeatedly
-
-    // ok I think it's the same as listBySampleID but change the predicate to check multiple samples
-
   }
 
 

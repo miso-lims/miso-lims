@@ -140,7 +140,6 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
     List<ArrayRun> runs = sut.listBySamplesIds(sampleIDs);
     assertNotNull(runs);
     assertEquals(2, runs.size());
-
   }
 
 

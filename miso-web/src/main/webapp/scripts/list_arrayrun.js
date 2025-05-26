@@ -7,19 +7,10 @@ ListTarget.arrayrun = {
     if (projectId) {
       return Urls.rest.arrayRuns.projectDatatable(projectId);
     } else if (config.requisitionId) {
-      return Urls.rest.arrayRuns.requisitionDatatable(config.requisitionId); // if the config field isn't there, add it later/fix it wherever it needs to be fixed
+      return Urls.rest.arrayRuns.requisitionDatatable(config.requisitionId);
     } else {
       return Urls.rest.arrayRuns.datatable;
     }
-
-    // return projectId
-    //   ? Urls.rest.arrayRuns.projectDatatable(projectId)
-    //   : Urls.rest.arrayRuns.datatable;
-
-    // add one here for the requisitions page
-    // edit this to take in a string to specify project or requisition
-    // you could make it a boolean but that's less robust, an int would work though
-    // js has switch cases
   },
   createBulkActions: function (config, projectId) {
     return [
