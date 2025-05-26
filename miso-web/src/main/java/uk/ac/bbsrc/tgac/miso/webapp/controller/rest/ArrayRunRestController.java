@@ -106,14 +106,23 @@ public class ArrayRunRestController extends AbstractRestController {
         PaginationFilter.supplementalToRequisitionId(requisitionId))
         .stream().map(Sample::getId).toList());
 
-    if (detailedSample) {
-      allSamples = arrayRunService.getSamplesDescendantslList(sampleIds, requisitionId);
-      // if in detailed mode, get the aliquot samples and any aliquot descendants
-    } else {
-      allSamples = sampleIds; // if not detailed mode, then just get the sample IDs
-    }
+    // if (detailedSample) {
+    // allSamples = arrayRunService.getSamplesDescendantslList(sampleIds, requisitionId);
+    // // if in detailed mode, get the aliquot samples and any aliquot descendants
+    // } else {
+    // allSamples = sampleIds; // if not detailed mode, then just get the sample IDs
+    // }
+
+    allSamples = arrayRunService.getSamplesDescendantslList(sampleIds, requisitionId); // I'm just gonna try this --
+                                                                                       // would explain why we're
+                                                                                       // getting no array runs, as both
+                                                                                       // of the requisitioned samples
+                                                                                       // are
+
+    System.out.println("We have " + allSamples.size() + " number of samples to look at");
 
     List<ArrayRun> arrayRuns = arrayRunService.listBySamplesIds(allSamples);
+    System.out.println("there are " + arrayRuns.size() + " array runs that have these samples");
 
     DataTablesResponseDto<ArrayRunDto> dtResponse = new DataTablesResponseDto<>(); // this is done explicitly here, as
                                                                                    // we cannot use paginationFilter to

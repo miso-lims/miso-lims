@@ -150,11 +150,18 @@
               <img src="/styles/images/ajax-loader.gif" class="fg-button" />
             </div>
 
-            <!-- not sure if this works, it does follow the format though -->
-            <miso:list-section-ajax id="list_arrayruns" name="Array Runs" target="arrayrun" 
-            config="{ requisitionId: ${requisition.id} }" />
 
-            <!-- use the requisition id in the create url function -->
+            <div class="sectionDivider"
+              onclick="Utils.ui.toggleLeftInfo(jQuery('#array_runs_section_arrowclick'), 'array_runs_section');">
+              Array Runs
+              <div id="array_runs_section_arrowclick" class="toggleLeftDown"></div>
+            </div>
+
+            <div id="array_runs_section" class="expandable_section">
+              <miso:list-section-ajax id="list_arrayruns" name="Array Runs" target="arrayrun" 
+              config="{ requisitionId: ${requisition.id}, collapseId: 'array_runs_section'}" />
+            </div>
+            
              
             <miso:changelog item="${requisition}" />
           </c:otherwise>
