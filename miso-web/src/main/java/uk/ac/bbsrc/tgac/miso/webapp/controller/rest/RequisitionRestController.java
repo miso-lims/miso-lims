@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +25,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Requisitionable;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
@@ -34,7 +32,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
-import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.BulkSaveService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
@@ -44,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingBiFunction;
-import uk.ac.bbsrc.tgac.miso.dto.ArrayRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
@@ -73,12 +69,9 @@ public class RequisitionRestController extends AbstractRestController {
   @Autowired
   private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
-  private ArrayRunService arrayRunService;
-  @Autowired
   private AsyncOperationManager asyncOperationManager;
 
-  @Value("${miso.detailed.sample.enabled}")
-  private Boolean detailedSample;
+
 
   private final JQueryDataTableBackend<Requisition, RequisitionDto> jQueryBackend = new JQueryDataTableBackend<>() {
 
@@ -304,40 +297,6 @@ public class RequisitionRestController extends AbstractRestController {
       String stopReason, List<Long> itemIds) {
   }
 
-
-  // idk if the full URL is needed or something, and I think the produces part is fine but not sure
-  @GetMapping("/{requisitionId}/arrayruns") // produces = application/json
-  public @ResponseBody List<ArrayRunDto> listArrayRuns(@PathVariable long requisitionId)
-      throws IOException {
-
-
-    List<Long> allSamples = new ArrayList<Long>();
-
-    // requisitioned
-    List<Long> sampleIds = sampleService.list(0, 0, false, null, PaginationFilter.requisitionId(requisitionId)).stream()
-        .map(Sample::getId).collect(Collectors.toCollection(() -> new ArrayList<>()));
-
-    // supplemental
-    sampleIds.addAll(sampleService.list(0, 0, false, null, PaginationFilter.supplementalToRequisitionId(requisitionId))
-        .stream().map(Sample::getId).toList());
-
-
-
-    if (detailedSample) {
-      allSamples = requisitionService.getSamplesDescendantslList(sampleIds, requisitionId);
-      // if in detailed mode, get the aliquot samples and any aliquot descendants
-    } else {
-      allSamples = sampleIds; // if not detailed mode, then just get the sample IDs
-    }
-
-
-    List<ArrayRun> arrayRuns = arrayRunService.listBySamplesIds(allSamples);
-
-
-    return arrayRuns.stream().map(Dtos::asDto).collect(Collectors.toList());
-
-
-  }
   /*
    * need to write the service class to use this maybe here you could get samples, then call the
    * arrayservice that returns the arrayrun associated with that sample - if the sample has no array

@@ -15,4 +15,6 @@ public interface ArrayRunService
 
   public List<ArrayRun> listBySamplesIds(List<Long> sampleIds) throws IOException;
 
+  List<Long> getSamplesDescendantslList(List<Long> sampleIDs, long requisitonId) throws IOException;
+
 }

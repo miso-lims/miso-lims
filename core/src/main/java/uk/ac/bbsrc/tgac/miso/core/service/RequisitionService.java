@@ -30,8 +30,6 @@ public interface RequisitionService
 
   void removeSupplementalLibraries(Requisition requisition, Collection<Library> libraries) throws IOException;
 
-  List<Long> getSamplesDescendantslList(List<Long> sampleIDs, long requisitonId) throws IOException;
-
   /**
    * Loads the item's requisition, creating it if necessary, and populates it into the Requisitionable
    * object. Does nothing if the item does not have a requisition

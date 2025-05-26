@@ -5,7 +5,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIdentitySample;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -426,46 +425,6 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
         item.setRequisition(existing);
       }
     }
-  }
-
-
-  // maybe change type, we're getting the children type (should be fine, we just want the IDs)
-  // pass in the sample ID and the requisition's ID --- this is the effective requisition for the
-  // children, if this approach doesn't work fix later
-  // this can be simplified --- use getchildren
-  public List<Long> getSamplesDescendantslList(List<Long> sampleIDs, long requisitonId) throws IOException {
-
-    // this is only used for detailed sample mode -- you don't need it otherwise
-
-
-    // REVIEW THIS
-    // this may need to be modified to only get the aliquots, and add the sample IDs only if they are
-    // aliquots as well
-
-
-    // get kids
-    // for each kid, get it's kids recursively until no more kids down the chain
-    // add all to a single list
-    ArrayList<Long> familyTree = new ArrayList<Long>();
-
-
-    // adds any current samples that are aliquots
-    for (long id : sampleIDs) {
-      Sample currSample = sampleService.get(id);
-      if (currSample.getSampleType().equals("Aliquot"))
-        familyTree.add(id);
-    }
-
-    // gets the derived aliquots from the samples
-    List<Sample> aliquots = sampleService.getChildren(sampleIDs, "Aliquot", requisitonId);
-    // use the getChildren method -- quite a lot of db querying has already been done for you
-
-
-    familyTree.addAll(aliquots.stream().map(Sample::getId).collect(Collectors.toList())); // adds all the aliquots to
-                                                                                          // the family tree
-
-    return familyTree;
-
   }
 
 }

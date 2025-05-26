@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,11 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -44,6 +47,9 @@ public class DefaultArrayRunService implements ArrayRunService {
 
   @Autowired
   private InstrumentService instrumentService;
+
+  @Autowired
+  private SampleService sampleService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -234,6 +240,45 @@ public class DefaultArrayRunService implements ArrayRunService {
   @Override
   public void authorizeDeletion(ArrayRun object) throws IOException {
     authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  // maybe change type, we're getting the children type (should be fine, we just want the IDs)
+  // pass in the sample ID and the requisition's ID --- this is the effective requisition for the
+  // children, if this approach doesn't work fix later
+  // this can be simplified --- use getchildren
+  public List<Long> getSamplesDescendantslList(List<Long> sampleIDs, long requisitonId) throws IOException {
+
+    // this is only used for detailed sample mode -- you don't need it otherwise
+
+
+    // REVIEW THIS
+    // this may need to be modified to only get the aliquots, and add the sample IDs only if they are
+    // aliquots as well
+
+
+    // get kids
+    // for each kid, get it's kids recursively until no more kids down the chain
+    // add all to a single list
+    ArrayList<Long> familyTree = new ArrayList<Long>();
+
+
+    // adds any current samples that are aliquots
+    for (long id : sampleIDs) {
+      Sample currSample = sampleService.get(id);
+      if (currSample.getSampleType().equals("Aliquot"))
+        familyTree.add(id);
+    }
+
+    // gets the derived aliquots from the samples
+    List<Sample> aliquots = sampleService.getChildren(sampleIDs, "Aliquot", requisitonId);
+    // use the getChildren method -- quite a lot of db querying has already been done for you
+
+
+    familyTree.addAll(aliquots.stream().map(Sample::getId).collect(Collectors.toList())); // adds all the aliquots to
+                                                                                          // the family tree
+
+    return familyTree;
+
   }
 
 }

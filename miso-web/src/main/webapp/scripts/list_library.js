@@ -14,7 +14,6 @@ ListTarget.library = (function () {
       } else if (config.requisitionId) {
         switch (config.relation) {
           case "requisitioned":
-            console.log(Urls.rest.libraries.requisitionDatatable(config.requisitionId));
             return Urls.rest.libraries.requisitionDatatable(config.requisitionId);
           case "supplemental":
             return Urls.rest.libraries.requisitionSupplementalDatatable(config.requisitionId);
