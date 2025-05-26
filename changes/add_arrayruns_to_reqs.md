@@ -1,0 +1,1 @@
+Edit Requsition pages now display Array Runs that use one or more of the requisitioned or supplemental samples. The Array Run section is collapsed by default if there are none associated with that requisition's samples.
