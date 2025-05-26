@@ -84,4 +84,9 @@ ListTarget.arrayrun = {
       },
     ];
   },
+  onFirstLoad: function (data, config) {
+    if (config.collapseId && !data.length) {
+      Utils.ui.collapse("#" + config.collapseId, "#" + config.collapseId + "_arrowclick");
+    }
+  },
 };
