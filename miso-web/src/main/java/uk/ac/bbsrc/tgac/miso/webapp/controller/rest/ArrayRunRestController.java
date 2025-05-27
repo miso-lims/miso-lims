@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
@@ -88,38 +88,39 @@ public class ArrayRunRestController extends AbstractRestController {
       HttpServletRequest request)
       throws IOException {
 
-    List<Long> allSamples = new ArrayList<Long>();
+    List<Sample> samples = new ArrayList<Sample>();
 
     // requisitioned
-    List<Long> sampleIds = sampleService.list(0, 0, false, null,
-        PaginationFilter.requisitionId(requisitionId)).stream().map(Sample::getId)
-        .collect(Collectors.toCollection(() -> new ArrayList<>()));
-
+    samples = sampleService.list(0, 0, false, null, PaginationFilter.requisitionId(requisitionId));
     // supplemental
-    sampleIds.addAll(sampleService.list(0, 0, false, null,
-        PaginationFilter.supplementalToRequisitionId(requisitionId))
-        .stream().map(Sample::getId).toList());
+    samples.addAll(sampleService.list(0, 0, false, null, PaginationFilter.supplementalToRequisitionId(requisitionId)));
 
-    allSamples = arrayRunService.getSamplesDescendantslList(sampleIds, requisitionId);
+    List<Long> allSampleIds = samples.stream().map(Sample::getId).toList();
 
-    System.out.println("We have " + allSamples.size() + " number of samples to look at");
+    List<Long> familyTree = new ArrayList<Long>();
 
-    List<ArrayRun> arrayRuns = arrayRunService.listBySamplesIds(allSamples);
-    System.out.println("there are " + arrayRuns.size() + " array runs that have these samples");
+    if (detailedSample) {
+      familyTree =
+          samples.stream().filter(sam -> ((DetailedSample) sam).getSampleClass().getSampleCategory().equals("Aliquot"))
+              .map(Sample::getId).toList();
+      // familyTree =
+      // samples.stream().filter(sam -> sam.getSampleType().equals("Aliquot"))
+      // .map(Sample::getId).toList();
 
-    DataTablesResponseDto<ArrayRunDto> dtResponse = new DataTablesResponseDto<>();
-    // this is done explicitly here, as we cannot use paginationFilter to filter array run by
-    // requisition ID directly
+      // .getSampleType().equals("Aliquot")
+    } else {
 
-    dtResponse.setITotalRecords((long) arrayRuns.size());
-    dtResponse.setITotalDisplayRecords((long) arrayRuns.size());
-    dtResponse.setAaData(arrayRuns.stream().map(Dtos::asDto).collect(Collectors.toList()));
-    dtResponse.setSEcho(Long.valueOf(request.getParameter("sEcho")));
+      // doing familyTree = allSampleIds; wasn't working
+      familyTree = allSampleIds;
+    }
 
-    return dtResponse;
+    // gets the derived aliquots from the samples
+    List<Sample> aliquots = sampleService.getChildren(allSampleIds, "Aliquot", requisitionId);
+    familyTree.addAll(aliquots.stream().map(Sample::getId).toList());
 
-
-
+    List<ArrayRun> arrayRuns = arrayRunService.listBySamplesIds(familyTree);
+    return jQueryBackend.get(request, advancedSearchParser,
+        PaginationFilter.ids(arrayRuns.stream().map(ArrayRun::getId).toList()));
   }
 
 

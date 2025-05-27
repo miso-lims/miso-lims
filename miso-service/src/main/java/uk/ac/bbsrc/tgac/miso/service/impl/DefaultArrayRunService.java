@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
@@ -240,21 +238,5 @@ public class DefaultArrayRunService implements ArrayRunService {
   @Override
   public void authorizeDeletion(ArrayRun object) throws IOException {
     authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
-  }
-
-
-  public List<Long> getSamplesDescendantslList(List<Long> sampleIDs, long requisitonId) throws IOException {
-    ArrayList<Long> familyTree = new ArrayList<Long>();
-
-    // adds any current samples that are aliquots
-    for (long id : sampleIDs) {
-      Sample currSample = sampleService.get(id);
-      if (currSample.getSampleType().equals("Aliquot"))
-        familyTree.add(id);
-    }
-    // gets the derived aliquots from the samples
-    List<Sample> aliquots = sampleService.getChildren(sampleIDs, "Aliquot", requisitonId);
-    familyTree.addAll(aliquots.stream().map(Sample::getId).collect(Collectors.toList()));
-    return familyTree;
   }
 }
