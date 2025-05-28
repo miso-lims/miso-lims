@@ -135,9 +135,9 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testListBySamplesIds() throws Exception {
+  public void testListBySampleIds() throws Exception {
     List<Long> sampleIDs = new ArrayList<Long>(Arrays.asList(19L, 26L, 27L));
-    List<ArrayRun> runs = sut.listBySamplesIds(sampleIDs);
+    List<ArrayRun> runs = sut.listBySampleIds(sampleIDs);
     assertNotNull(runs);
     assertEquals(2, runs.size());
   }
