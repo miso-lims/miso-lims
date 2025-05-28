@@ -127,8 +127,8 @@ public class DefaultArrayRunService implements ArrayRunService {
   }
 
   @Override
-  public List<ArrayRun> listBySamplesIds(List<Long> sampleIds) throws IOException {
-    return arrayRunStore.listBySamplesIds(sampleIds);
+  public List<ArrayRun> listBySampleIds(List<Long> sampleIds) throws IOException {
+    return arrayRunStore.listBySampleIds(sampleIds);
   }
 
 

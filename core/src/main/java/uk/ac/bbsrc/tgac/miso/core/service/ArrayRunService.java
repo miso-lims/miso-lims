@@ -13,6 +13,6 @@ public interface ArrayRunService
 
   public List<ArrayRun> listBySampleId(long sampleId) throws IOException;
 
-  public List<ArrayRun> listBySamplesIds(List<Long> sampleIds) throws IOException;
+  public List<ArrayRun> listBySampleIds(List<Long> sampleIds) throws IOException;
 
 }

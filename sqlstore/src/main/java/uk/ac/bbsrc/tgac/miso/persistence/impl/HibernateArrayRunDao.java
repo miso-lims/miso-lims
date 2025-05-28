@@ -62,7 +62,7 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
   }
 
   @Override
-  public List<ArrayRun> listBySamplesIds(List<Long> sampleIds) throws IOException {
+  public List<ArrayRun> listBySampleIds(List<Long> sampleIds) throws IOException {
     QueryBuilder<ArrayRun, ArrayRun> builder = getQueryBuilder();
     Root<ArrayRun> root = builder.getRoot();
     Join<ArrayRun, Array> arrayJoin = builder.getJoin(root, ArrayRun_.array);

@@ -109,15 +109,14 @@ public class ArrayRunRestController extends AbstractRestController {
           familyTree.add(s.getId());
         }
       }
+      // gets the derived aliquots from the samples
+      List<Sample> aliquots = sampleService.getChildren(sampleIds, SampleAliquot.CATEGORY_NAME, requisitionId);
+      familyTree.addAll(aliquots.stream().map(Sample::getId).collect(Collectors.toList()));
     } else {
       familyTree.addAll(sampleIds);
     }
 
-    // gets the derived aliquots from the samples
-    List<Sample> aliquots = sampleService.getChildren(sampleIds, "Aliquot", requisitionId);
-    familyTree.addAll(aliquots.stream().map(Sample::getId).collect(Collectors.toList()));
-    List<ArrayRun> arrayRuns = arrayRunService.listBySamplesIds(familyTree);
-
+    List<ArrayRun> arrayRuns = arrayRunService.listBySampleIds(familyTree);
     return jQueryBackend.get(request, advancedSearchParser,
         PaginationFilter.ids(arrayRuns.stream().map(ArrayRun::getId).toList()));
   }
