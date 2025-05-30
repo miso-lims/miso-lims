@@ -39,7 +39,7 @@ public class HibernateQcNodeDaoIT extends AbstractDAOTest {
     assertEquals(1, children.size());
     assertEquals("SAM18", children.get(0).getName());
     children = children.get(0).getChildren();
-    assertEquals(1, children.size());
+    assertEquals(3, children.size());
     assertEquals("SAM19", children.get(0).getName());
     children = children.get(0).getChildren();
     assertEquals(1, children.size());

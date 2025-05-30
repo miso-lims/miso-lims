@@ -4,9 +4,13 @@ ListTarget.arrayrun = {
     return Urls.external.userManual("array_runs");
   },
   createUrl: function (config, projectId) {
-    return projectId
-      ? Urls.rest.arrayRuns.projectDatatable(projectId)
-      : Urls.rest.arrayRuns.datatable;
+    if (projectId) {
+      return Urls.rest.arrayRuns.projectDatatable(projectId);
+    } else if (config.requisitionId) {
+      return Urls.rest.arrayRuns.requisitionDatatable(config.requisitionId);
+    } else {
+      return Urls.rest.arrayRuns.datatable;
+    }
   },
   createBulkActions: function (config, projectId) {
     return [
@@ -70,5 +74,10 @@ ListTarget.arrayrun = {
         iSortPriority: 0,
       },
     ];
+  },
+  onFirstLoad: function (data, config) {
+    if (config.collapseId && !data.length) {
+      Utils.ui.collapse("#" + config.collapseId, "#" + config.collapseId + "_arrowclick");
+    }
   },
 };

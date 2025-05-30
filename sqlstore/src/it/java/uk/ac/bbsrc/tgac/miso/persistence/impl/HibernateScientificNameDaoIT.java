@@ -41,7 +41,7 @@ public class HibernateScientificNameDaoIT
 
   @Test
   public void testGetUsageBySamples() throws Exception {
-    testGetUsage(HibernateScientificNameDao::getUsageBySamples, 1L, 25L);
+    testGetUsage(HibernateScientificNameDao::getUsageBySamples, 1L, 27L);
   }
 
   @Test

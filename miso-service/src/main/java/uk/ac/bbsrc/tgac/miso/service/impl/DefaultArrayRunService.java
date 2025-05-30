@@ -18,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -44,6 +45,9 @@ public class DefaultArrayRunService implements ArrayRunService {
 
   @Autowired
   private InstrumentService instrumentService;
+
+  @Autowired
+  private SampleService sampleService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -122,12 +126,21 @@ public class DefaultArrayRunService implements ArrayRunService {
     return arrayRunStore.update(managed);
   }
 
+  @Override
+  public List<ArrayRun> listBySampleIds(List<Long> sampleIds) throws IOException {
+    return arrayRunStore.listBySampleIds(sampleIds);
+  }
+
+
+
   /**
    * Checks submitted data for validity, throwing a ValidationException containing all of the errors
    * if invalid
    * 
    * @param arrayRun submitted Array Run to validate
+   * 
    * @param beforeChange the already-persisted Array Run before changes
+   * 
    * @throws IOException
    */
   private void validateChange(ArrayRun arrayRun, ArrayRun beforeChange) throws IOException {
@@ -226,5 +239,4 @@ public class DefaultArrayRunService implements ArrayRunService {
   public void authorizeDeletion(ArrayRun object) throws IOException {
     authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
   }
-
 }

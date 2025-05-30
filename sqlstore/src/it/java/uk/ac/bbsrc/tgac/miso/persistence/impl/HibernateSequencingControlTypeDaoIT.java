@@ -75,7 +75,7 @@ public class HibernateSequencingControlTypeDaoIT extends AbstractDAOTest {
   @Test
   public void testGetUsage() throws Exception {
     SequencingControlType type = (SequencingControlType) currentSession().get(SequencingControlType.class, 1L);
-    assertEquals(1L, sut.getUsage(type));
+    assertEquals(3L, sut.getUsage(type));
   }
 
   @Test

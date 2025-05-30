@@ -136,17 +136,33 @@
               <miso:list-section-ajax id="list_preparedsamples" name="Prepared Samples" target="sample" 
                 config="{requisitionId: ${requisition.id}, relation: 'indirect'}" />
             </c:if>
+            
             <miso:list-section-ajax id="list_preparedlibraries" name="Prepared Libraries" target="library"
               config="{ requisitionId: ${requisition.id}, relation: 'indirect' }" />
+            
             <miso:list-section id="list_runs" name="Runs" target="run" items="${runs}"
               config="{requisitionId: ${requisition.id}}" />
 
             <br />
+
             <h1>Run-Libraries</h1>
             <div id="list_runLibraries">
               <img src="/styles/images/ajax-loader.gif" class="fg-button" />
             </div>
 
+
+            <div class="sectionDivider"
+              onclick="Utils.ui.toggleLeftInfo(jQuery('#array_runs_section_arrowclick'), 'array_runs_section');">
+              Array Runs
+              <div id="array_runs_section_arrowclick" class="toggleLeftDown"></div>
+            </div>
+
+            <div id="array_runs_section" class="expandable_section">
+              <miso:list-section-ajax id="list_arrayruns" name="Array Runs" target="arrayrun" 
+              config="{ requisitionId: ${requisition.id}, collapseId: 'array_runs_section'}" />
+            </div>
+            
+             
             <miso:changelog item="${requisition}" />
           </c:otherwise>
         </c:choose>

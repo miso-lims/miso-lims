@@ -71,6 +71,8 @@ public class RequisitionRestController extends AbstractRestController {
   @Autowired
   private AsyncOperationManager asyncOperationManager;
 
+
+
   private final JQueryDataTableBackend<Requisition, RequisitionDto> jQueryBackend = new JQueryDataTableBackend<>() {
 
     @Override
@@ -337,5 +339,7 @@ public class RequisitionRestController extends AbstractRestController {
   public @ResponseBody ObjectNode getRequisitionProgress(@PathVariable String uuid) throws Exception {
     return asyncOperationManager.getAsyncProgress(uuid, Requisition.class);
   }
+
+
 
 }

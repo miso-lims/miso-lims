@@ -101,7 +101,7 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
   @Test
   public void testGetUsageByArrayRuns() throws Exception {
     Instrument instrument = (Instrument) currentSession().get(InstrumentImpl.class, 3L);
-    assertEquals(1L, dao.getUsageByArrayRuns(instrument));
+    assertEquals(2L, dao.getUsageByArrayRuns(instrument));
   }
 
   @Test

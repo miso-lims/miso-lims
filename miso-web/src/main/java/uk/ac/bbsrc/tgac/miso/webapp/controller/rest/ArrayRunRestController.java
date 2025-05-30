@@ -3,8 +3,10 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +22,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -44,6 +50,12 @@ public class ArrayRunRestController extends AbstractRestController {
 
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
+
+  @Autowired
+  private SampleService sampleService;
+
+  @Value("${miso.detailed.sample.enabled}")
+  private Boolean detailedSample;
 
   private final JQueryDataTableBackend<ArrayRun, ArrayRunDto> jQueryBackend =
       new JQueryDataTableBackend<ArrayRun, ArrayRunDto>() {
@@ -72,6 +84,44 @@ public class ArrayRunRestController extends AbstractRestController {
       throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.project(id));
   }
+
+  @GetMapping(value = "/dt/requisition/{requisitionId}", produces = "application/json")
+  public @ResponseBody DataTablesResponseDto<ArrayRunDto> dataTableByRequisition(@PathVariable long requisitionId,
+      HttpServletRequest request)
+      throws IOException {
+
+    // requisitioned
+    List<Sample> samples = sampleService.list(0, 0, false, null,
+        PaginationFilter.requisitionId(requisitionId)).stream()
+        .collect(Collectors.toCollection(() -> new ArrayList<>()));
+
+    // supplemental
+    samples.addAll(sampleService.list(0, 0, false, null, PaginationFilter.supplementalToRequisitionId(requisitionId))
+        .stream().collect(Collectors.toList()));
+
+    List<Long> sampleIds = samples.stream().map(Sample::getId).collect(Collectors.toList());
+    List<Long> familyTree = new ArrayList<Long>();
+
+    // adds any current samples that are aliquots
+    if (detailedSample) {
+      for (Sample s : samples) {
+        if (((DetailedSample) s).getSampleClass().getSampleCategory().equals(SampleAliquot.CATEGORY_NAME)) {
+          familyTree.add(s.getId());
+        }
+      }
+      // gets the derived aliquots from the samples
+      List<Sample> aliquots = sampleService.getChildren(sampleIds, SampleAliquot.CATEGORY_NAME, requisitionId);
+      familyTree.addAll(aliquots.stream().map(Sample::getId).collect(Collectors.toList()));
+    } else {
+      familyTree.addAll(sampleIds);
+    }
+
+    List<ArrayRun> arrayRuns = arrayRunService.listBySampleIds(familyTree);
+    return jQueryBackend.get(request, advancedSearchParser,
+        PaginationFilter.ids(arrayRuns.stream().map(ArrayRun::getId).toList()));
+  }
+
+
 
   @PostMapping(produces = "application/json")
   @ResponseStatus(HttpStatus.CREATED)

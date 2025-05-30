@@ -62,6 +62,18 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
   }
 
   @Override
+  public List<ArrayRun> listBySampleIds(List<Long> sampleIds) throws IOException {
+    QueryBuilder<ArrayRun, ArrayRun> builder = getQueryBuilder();
+    Root<ArrayRun> root = builder.getRoot();
+    Join<ArrayRun, Array> arrayJoin = builder.getJoin(root, ArrayRun_.array);
+    Join<Array, SampleImpl> sampleJoin = builder.getJoin(arrayJoin, Array_.samples);
+    builder.addPredicate(sampleJoin.get(SampleImpl_.sampleId).in(sampleIds));
+    return builder.getResultList();
+  }
+
+
+
+  @Override
   public String getFriendlyName() {
     return "ArrayRun";
   }

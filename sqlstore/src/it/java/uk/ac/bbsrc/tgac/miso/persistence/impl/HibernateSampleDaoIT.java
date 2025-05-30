@@ -62,7 +62,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   @Test
   public void testListAll() throws IOException {
     Collection<Sample> samples = dao.list();
-    assertEquals(25, samples.size());
+    assertEquals(27, samples.size());
   }
 
   @Test
@@ -212,21 +212,21 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void getSamplesOffsetZeroWithTwoSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(0, 2, false, "id");
     assertEquals(2, samples.size());
-    assertEquals(25L, samples.get(0).getId());
+    assertEquals(27L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesOffsetThreeWithThreeSamplesPerPageTest() throws Exception {
     List<Sample> samples = dao.list(3, 3, false, "id");
     assertEquals(3, samples.size());
-    assertEquals(22L, samples.get(0).getId());
+    assertEquals(24L, samples.get(0).getId());
   }
 
   @Test
   public void getSamplesOffsetTwoWithTwoSamplesPerPageOrderLastModTest() throws Exception {
     List<Sample> samples = dao.list(2, 2, false, "lastModified");
     assertEquals(2, samples.size());
-    assertEquals(23L, samples.get(0).getId());
+    assertEquals(22L, samples.get(0).getId());
   }
 
   @Test

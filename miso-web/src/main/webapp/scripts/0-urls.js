@@ -78,6 +78,7 @@ Urls = (function () {
     update: idUrlFunction(arrayRunRestBase),
     datatable: arrayRunRestBase + "/dt",
     projectDatatable: idUrlFunction(arrayRunRestBase + "/dt/project"),
+    requisitionDatatable: idUrlFunction(arrayRunRestBase + "/dt/requisition"),
     arraySearch: arrayRunRestBase + "/array-search",
   };
 
