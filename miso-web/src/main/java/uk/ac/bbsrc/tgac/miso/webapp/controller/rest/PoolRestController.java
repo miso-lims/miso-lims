@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -126,6 +127,7 @@ public class PoolRestController extends AbstractRestController {
     }
   }
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class SampleSheetRequest {
     private String customIndexPrimer;
     private String customRead1Primer;
@@ -134,8 +136,11 @@ public class PoolRestController extends AbstractRestController {
     private String genomeFolder;
     private List<Long> poolIds;
     private long sequencingParametersId;
+
     private String dragenVersion;
+
     private String trimUMI;
+
     private String fastqCompressionFormat;
 
 

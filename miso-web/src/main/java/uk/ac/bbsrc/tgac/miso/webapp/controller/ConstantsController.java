@@ -53,7 +53,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.PoolSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.RunLibrarySpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
-import uk.ac.bbsrc.tgac.miso.core.data.type.CompressionFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -236,12 +235,6 @@ public class ConstantsController {
   private Boolean autoGenerateIdBarcodes;
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
-  @Value("${miso.genomeFolder:}")
-  private String genomeFolder;
-  @Value("${miso.samplesheet.dragen.version:4.1.1}")
-  private String dragenVersion;
-  @Value("${miso.samplesheet.dragen.trimUMI:false}")
-  private String trimUMI;
   @Value("${miso.test.lockConstants:false}")
   private boolean locked;
   @Value("${miso.newOptionSopUrl:#{null}}")
@@ -353,7 +346,6 @@ public class ConstantsController {
       addJsonArray(mapper, node, "partitionQcTypes", partitionQcTypeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "referenceGenomes", referenceGenomeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
-      addJsonArray(mapper, node, "compressionFormats", Arrays.asList(CompressionFormat.values()), Dtos::asDto);
 
       addJsonArray(mapper, node, "sampleSpreadsheets", Arrays.asList(SampleSpreadSheets.values()), Dtos::asDto);
       addJsonArray(mapper, node, "librarySpreadsheets", Arrays.asList(LibrarySpreadSheets.values()), Dtos::asDto);
@@ -422,9 +414,6 @@ public class ConstantsController {
       node.set("warningMessages", warningsNode);
       node.put("errorEditDistance", indexChecker.getErrorMismatches());
       node.put("warningEditDistance", indexChecker.getWarningMismatches());
-      node.put("genomeFolder", genomeFolder);
-      node.put("dragenVersion", dragenVersion);
-      node.put("trimUMI", trimUMI);
 
       // Save the regenerated file in cache.
       constantsJs = "Constants = " + mapper.writeValueAsString(node) + ";";
@@ -440,7 +429,7 @@ public class ConstantsController {
       ObjectNode dto = illuminaExperimentTypes.addObject();
       dto.put("name", experiment.name());
       dto.put("description", experiment.getDescription());
-      dto.put("isDragen", experiment.getIsDragen());
+      dto.put("dragen", experiment.isDragen());
     }
   }
 

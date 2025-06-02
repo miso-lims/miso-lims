@@ -59,18 +59,6 @@ public enum IlluminaExperiment {
       applyIlluminaData(dataColumns, headers, sampleIdsCol, laneCol, samplePlateCol, sampleWellCol, index1IdCol,
           index1Col, index2IdCol, index2Col, projectCol, genomeFolderCol, descriptionCol);
     }
-
-    @Override
-    protected void applyReads(Map<String, String> reads, Integer Read1Cycles, Integer Read2Cycles, Integer Index1Cycles,
-        Integer Index2Cycles) {
-      applyIlluminaReads(reads, Read1Cycles, Read2Cycles);
-    }
-
-    @Override
-    protected void applyCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-        List<String> sampleIdsCol, List<String> laneCol, List<String> index1Col,
-        List<String> projectCol, List<String> libraryCol, List<String> libraryPrepKitCol) {}
-
   },
   LIBRARY_QC("Library QC", false) {
 
@@ -109,18 +97,6 @@ public enum IlluminaExperiment {
       applyIlluminaData(dataColumns, headers, sampleIdsCol, laneCol, samplePlateCol, sampleWellCol, index1IdCol,
           index1Col, index2IdCol, index2Col, projectCol, genomeFolderCol, descriptionCol);
     }
-
-    @Override
-    protected void applyReads(Map<String, String> reads, Integer Read1Cycles, Integer Read2Cycles, Integer Index1Cycles,
-        Integer Index2Cycles) {
-      applyIlluminaReads(reads, Read1Cycles, Read2Cycles);
-    }
-
-    @Override
-    protected void applyCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-        List<String> sampleIdsCol, List<String> laneCol, List<String> index1Col,
-        List<String> projectCol, List<String> libraryCol, List<String> libraryPrepKitCol) {}
-
   },
   METAGENOMICS_16S("Metagenomics 16S rRNA", false) {
 
@@ -157,12 +133,6 @@ public enum IlluminaExperiment {
       data.put("\n[Data]", "");
       applyIlluminaData(dataColumns, headers, sampleIdsCol, laneCol, samplePlateCol, sampleWellCol, index1IdCol,
           index1Col, index2IdCol, index2Col, projectCol, genomeFolderCol, descriptionCol);
-    }
-
-    @Override
-    protected void applyReads(Map<String, String> reads, Integer Read1Cycles, Integer Read2Cycles, Integer Index1Cycles,
-        Integer Index2Cycles) {
-      applyIlluminaReads(reads, Read1Cycles, Read2Cycles);
     }
 
     @Override
@@ -206,17 +176,6 @@ public enum IlluminaExperiment {
       applyIlluminaData(dataColumns, headers, sampleIdsCol, laneCol, samplePlateCol, sampleWellCol, index1IdCol,
           index1Col, index2IdCol, index2Col, projectCol, genomeFolderCol, descriptionCol);
     }
-
-    @Override
-    protected void applyReads(Map<String, String> reads, Integer Read1Cycles, Integer Read2Cycles, Integer Index1Cycles,
-        Integer Index2Cycles) {
-      applyIlluminaReads(reads, Read1Cycles, Read2Cycles);
-    }
-
-    @Override
-    protected void applyCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-        List<String> sampleIdsCol, List<String> laneCol, List<String> index1Col,
-        List<String> projectCol, List<String> libraryCol, List<String> libraryPrepKitCol) {}
   },
   FASTQ_ONLY_TRUSEQ_NANO_DNA("FASTQ Only (TruSeq Nano DNA)", false) {
 
@@ -256,12 +215,6 @@ public enum IlluminaExperiment {
     }
 
     @Override
-    protected void applyReads(Map<String, String> reads, Integer Read1Cycles, Integer Read2Cycles, Integer Index1Cycles,
-        Integer Index2Cycles) {
-      applyIlluminaReads(reads, Read1Cycles, Read2Cycles);
-    }
-
-    @Override
     protected void applyCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
         List<String> sampleIdsCol, List<String> laneCol, List<String> index1Col,
         List<String> projectCol, List<String> libraryCol, List<String> libraryPrepKitCol) {}
@@ -274,8 +227,8 @@ public enum IlluminaExperiment {
 
     protected void applySettings(Map<String, String> settings, String read1Primer, String indexPrimer,
         String read2Primer, String overrideCycles, String dragenVersion, String trimUMI, String fastqCompression) {
-      settings.put("[BCLConvert_Settings]", "");
-      settings.put("FastqCompressionFormat", fastqCompression); // required
+      settings.put("\n[BCLConvert_Settings]", "");
+      settings.put("FastqCompressionFormat", fastqCompression);
       settings.put("TrimUMI", trimUMI);
       applyDragenSettings(settings, dragenVersion, overrideCycles);
     }
@@ -300,20 +253,22 @@ public enum IlluminaExperiment {
     protected void applyCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
         List<String> sampleIdsCol, List<String> laneCol, List<String> index1Col,
         List<String> projectCol, List<String> libraryCol, List<String> libraryPrepKitCol) {
-      applyDragenCloud(data, dataColumns, headers,
-          sampleIdsCol, laneCol, index1Col,
-          projectCol, libraryCol, libraryPrepKitCol);
+      data.put("\n[Cloud_Settings]", "");
+
+      Collections.addAll(headers, "Lane", "Sample_ID", "ProjectName", "LibraryName", "LibraryPrepKitName",
+          "IndexAdapterKitName");
+      Collections.addAll(dataColumns, laneCol, sampleIdsCol, projectCol, libraryCol, libraryPrepKitCol, index1Col);
     }
   };
 
   private static final DateTimeFormatter MDY = DateTimeFormatter.ofPattern("M/d/yyyy");
 
   private final String description;
-  private final boolean isDragen;
+  private final boolean dragen;
 
-  private IlluminaExperiment(String description, boolean isDragen) {
+  private IlluminaExperiment(String description, boolean dragen) {
     this.description = description;
-    this.isDragen = isDragen;
+    this.dragen = dragen;
   }
 
   protected abstract void applyHeader(Map<String, String> header, String experimentName, String instrument,
@@ -330,19 +285,17 @@ public enum IlluminaExperiment {
       List<String> genomeFolderCol, List<String> descriptionCol, List<String> libraryCol,
       List<String> libraryPrepKitCol);
 
-  protected abstract void applyReads(Map<String, String> reads, Integer Read1Cycles, Integer Read2Cycles,
-      Integer Index1Cycles, Integer Index2Cycles);
-
-  protected abstract void applyCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-      List<String> sampleIdsCol, List<String> laneCol, List<String> index1Col,
-      List<String> projectCol, List<String> libraryCol, List<String> libraryPrepKitCol);
-
-  public static void applyIlluminaReads(Map<String, String> reads, Integer read1, Integer read2) {
-    reads.put(String.valueOf(read1), "");
-    if (read2 != 0) {
-      reads.put(String.valueOf(read2), "");
+  protected void applyReads(Map<String, String> reads, Integer Read1Cycles, Integer Read2Cycles,
+      Integer Index1Cycles, Integer Index2Cycles) {
+    reads.put(String.valueOf(Read1Cycles), "");
+    if (Read2Cycles != 0) {
+      reads.put(String.valueOf(Read2Cycles), "");
     }
   }
+
+  protected void applyCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
+      List<String> sampleIdsCol, List<String> laneCol, List<String> index1Col,
+      List<String> projectCol, List<String> libraryCol, List<String> libraryPrepKitCol) {};
 
   protected void applyIlluminaHeader(Map<String, String> header, String experimentName, String instrument,
       String indexAdapters, String chemistry) {
@@ -433,16 +386,6 @@ public enum IlluminaExperiment {
     }
   }
 
-  protected void applyDragenCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-      List<String> sampleIdsCol, List<String> laneCol, List<String> index1Col,
-      List<String> projectCol, List<String> libraryCol, List<String> libraryPrepKitCol) {
-    data.put("\n[Cloud_Settings]", "");
-
-    Collections.addAll(headers, "Lane", "Sample_ID", "ProjectName", "LibraryName", "LibraryPrepKitName",
-        "IndexAdapterKitName");
-    Collections.addAll(dataColumns, laneCol, sampleIdsCol, projectCol, libraryCol, libraryPrepKitCol, index1Col);
-  }
-
   private Pair<String, String> buildIndex(Optional<LibraryIndex> index, int length) {
     return new Pair<>(index.map(LibraryIndex::getName).orElse("No Index"),
         pad(length, index.map(LibraryIndex::getSequence).orElse("")));
@@ -465,8 +408,8 @@ public enum IlluminaExperiment {
     return description;
   }
 
-  public boolean getIsDragen() {
-    return isDragen;
+  public boolean isDragen() {
+    return dragen;
   }
 
   private int getMaxLength(List<Pool> pools, int position) {
@@ -483,7 +426,8 @@ public enum IlluminaExperiment {
     }
   }
 
-  public final String makeSampleSheet(String genomeFolder, SequencingParameters parameters, String read1Primer,
+  public final String makeSampleSheet(String genomeFolder, SequencingParameters parameters,
+      String read1Primer,
       String indexPrimer,
       String read2Primer, List<Pool> pools, List<Integer> lanes,
       String dragenVersion,

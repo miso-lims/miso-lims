@@ -390,6 +390,18 @@ Warning label to display for near-duplicate indices. Defaults to "Near-Duplicate
 
 ## Samplesheet Configurations
 
-### `miso.pools.samplesheet.dragenVersion`
+### `miso.genomeFolder`
 
-The version of Illumina DRAGEN to be used when exporting samplesheets
+The genomeFolder to be used when exporting sample sheets
+
+### `miso.pools.samplesheet.dragenversion`
+
+The version of Illumina DRAGEN to be used when exporting sample sheets
+
+### `miso.pools.samplesheet.NovaSeqXSeries`
+
+The value that maps to the NovaSeqXSeries instrument
+
+### `miso.pools.samplesheet.compressionformat`
+
+The fastq compression format to be used when exporting Illumina DRAGEN sample sheets. Defaults to "gzip" if unspecified.

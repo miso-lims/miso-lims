@@ -137,7 +137,9 @@ BulkTarget.pool = (function ($) {
         ),
         {
           name: "Create Samplesheet",
-          action: createSamplesheet,
+          action: function (pools) {
+            createSamplesheet(pools, config);
+          },
         },
         BulkUtils.actions.parents(
           Urls.rest.pools.parents,
@@ -319,7 +321,7 @@ BulkTarget.pool = (function ($) {
     },
   };
 
-  function createSamplesheet(pools) {
+  function createSamplesheet(pools, config) {
     var platformTypes = Utils.array.deduplicateString(
       pools.map(function (pool) {
         return pool.platformType;
@@ -365,7 +367,7 @@ BulkTarget.pool = (function ($) {
           property: "genomeFolder",
           type: "text",
           label: "Genome Folder",
-          value: Constants.genomeFolder,
+          value: config.genomeFolder,
           required: true,
         },
         {
@@ -397,13 +399,13 @@ BulkTarget.pool = (function ($) {
         },
       ];
 
-      if (experimentType.isDragen) {
+      if (experimentType.dragen) {
         dialogFields.push(
           {
             property: "dragenVersion",
             type: "text",
             label: "DRAGEN Version",
-            value: Constants.dragenVersion,
+            value: config.dragenVersion,
             required: true,
           },
           {
@@ -414,7 +416,7 @@ BulkTarget.pool = (function ($) {
             getLabel: function (type) {
               return type.description;
             },
-            values: Constants.compressionFormats,
+            values: config.compressionFormats,
           },
           {
             property: "trimUMI",
@@ -435,11 +437,11 @@ BulkTarget.pool = (function ($) {
             customRead1Primer: result.customRead1Primer,
             customIndexPrimer: result.customIndexPrimer,
             customRead2Primer: result.customRead2Primer,
-            dragenVersion: result.dragenVersion || "",
-            trimUMI: result.trimUMI || "",
+            dragenVersion: result.dragenVersion || null,
+            trimUMI: result.trimUMI || null,
             fastqCompressionFormat: result.fastqCompressionFormat
               ? result.fastqCompressionFormat.description
-              : "",
+              : null,
             experimentType: experimentType.name,
             genomeFolder: result.genomeFolder,
             sequencingParametersId: result.sequencingParameters.id,
