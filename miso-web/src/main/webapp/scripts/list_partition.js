@@ -376,6 +376,15 @@ ListTarget.partition = {
   },
   createColumns: function (config, projectId) {
     return [
+      {
+        sTitle: "Position",
+        mData: "runPositionAlias",
+        mRender: function (data, type, full) {
+          return data || "n/a";
+        },
+        iSortPriority: 2,
+        bSortDirection: true,
+      },
       ListUtils.labelHyperlinkColumn(
         "Container",
         Urls.ui.containers.edit,
@@ -383,7 +392,7 @@ ListTarget.partition = {
           return partition.containerId;
         },
         "containerName",
-        2,
+        0,
         config.showContainer
       ),
       {

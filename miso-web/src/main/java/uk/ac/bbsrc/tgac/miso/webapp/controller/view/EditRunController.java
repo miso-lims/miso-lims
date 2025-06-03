@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
@@ -42,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunPartitionAliquotDto;
@@ -152,24 +152,7 @@ public class EditRunController {
     }
 
     model.put("runPositions", run.getRunPositions().stream().map(Dtos::asDto).collect(Collectors.toList()));
-    model.put("runPartitions",
-        run.getSequencerPartitionContainers().stream().flatMap(container -> container.getPartitions().stream())
-            .map(WhineyFunction.rethrow(partition -> {
-              PartitionDto dto = Dtos.asDto(partition, false, indexChecker);
-              RunPartition runPartition = runPartitionService.get(run, partition);
-              if (runPartition != null) {
-                if (runPartition.getQcType() != null) {
-                  dto.setQcType(runPartition.getQcType().getId());
-                  dto.setQcNotes(runPartition.getNotes());
-                }
-                if (runPartition.getPurpose() != null) {
-                  dto.setRunPurposeId(runPartition.getPurpose().getId());
-                }
-              } else {
-                dto.setQcNotes("");
-              }
-              return dto;
-            })).collect(Collectors.toList()));
+    model.put("runPartitions", getPartitionDtos(run));
     model.put("runAliquots", getRunAliquots(run));
     MisoWebUtils.addIssues(issueTrackerManager, () -> issueTrackerManager.searchIssues(run.getAlias()), model);
     model.put("run", run);
@@ -201,6 +184,33 @@ public class EditRunController {
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editRun.jsp", model);
+  }
+
+  private List<PartitionDto> getPartitionDtos(Run run) throws IOException {
+    List<PartitionDto> dtos = new ArrayList<>();
+    for (RunPosition runPos : run.getRunPositions()) {
+      if (runPos.getContainer() == null) {
+        continue;
+      }
+      for (Partition partition : runPos.getContainer().getPartitions()) {
+        PartitionDto dto = Dtos.asDto(partition, false, indexChecker);
+        dto.setRunPositionAlias(runPos.getPosition() == null ? null : runPos.getPosition().getAlias());
+        RunPartition runPartition = runPartitionService.get(run, partition);
+        if (runPartition != null) {
+          if (runPartition.getQcType() != null) {
+            dto.setQcType(runPartition.getQcType().getId());
+            dto.setQcNotes(runPartition.getNotes());
+          }
+          if (runPartition.getPurpose() != null) {
+            dto.setRunPurposeId(runPartition.getPurpose().getId());
+          }
+        } else {
+          dto.setQcNotes("");
+        }
+        dtos.add(dto);
+      }
+    }
+    return dtos;
   }
 
   private List<RunPartitionAliquotDto> getRunAliquots(Run run) throws IOException {
