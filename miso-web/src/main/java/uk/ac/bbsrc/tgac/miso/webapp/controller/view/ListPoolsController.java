@@ -68,9 +68,6 @@ public class ListPoolsController {
   @Value("${miso.samplesheet.dragenversion:}")
   private String dragenVersion;
 
-  @Value("${miso.samplesheet.NovaSeqXSeries:}")
-  private String novaSeqXSeriesMapping;
-
   @Value("${miso.samplesheet.compressionformat:gzip}")
   private String compressionFormat;
 
@@ -108,7 +105,6 @@ public class ListPoolsController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.put("dragenVersion", dragenVersion);
       config.put("genomeFolder", genomeFolder);
-      config.put("novaSeqXSeriesMapping", novaSeqXSeriesMapping);
       config.put("compressionFormat", compressionFormat);
       addJsonArray(mapper, config, "compressionFormats", Arrays.asList(CompressionFormat.values()), Dtos::asDto);
 

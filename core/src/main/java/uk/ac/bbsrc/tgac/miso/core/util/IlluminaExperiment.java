@@ -24,13 +24,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 
 public enum IlluminaExperiment {
+
   CLONE_CHECKING("Clone Checking", false) {
 
     @Override
     protected void applyHeader(
         Map<String, String> header, String experimentName, String instrument,
         String indexAdapters,
-        String chemistry) {
+        String chemistry, String novaSeqXSeriesMapping) {
       applyIlluminaHeader(header, experimentName, instrument, indexAdapters, chemistry);
       header.put("Workflow", "GenerateFASTQ");
       header.put("Application", "Clone Checking");
@@ -64,7 +65,7 @@ public enum IlluminaExperiment {
 
     @Override
     protected void applyHeader(Map<String, String> header, String experimentName, String instrument,
-        String indexAdapters, String chemistry) {
+        String indexAdapters, String chemistry, String novaSeqXSeriesMapping) {
       applyIlluminaHeader(header, experimentName, instrument, indexAdapters, chemistry);
       header.put("Workflow", "LibraryQC");
       header.put("Application", "Library QC");
@@ -104,7 +105,7 @@ public enum IlluminaExperiment {
     protected void applyHeader(
         Map<String, String> header, String experimentName, String instrument,
         String indexAdapters,
-        String chemistry) {
+        String chemistry, String novaSeqXSeriesMapping) {
       applyIlluminaHeader(header, experimentName, instrument, indexAdapters, chemistry);
       header.put("Workflow", "Metagenomics");
       header.put("Application", "Metagenomics 16S rRNA");
@@ -146,7 +147,7 @@ public enum IlluminaExperiment {
     protected void applyHeader(
         Map<String, String> header, String experimentName, String instrument,
         String indexAdapters,
-        String chemistry) {
+        String chemistry, String novaSeqXSeriesMapping) {
       applyIlluminaHeader(header, experimentName, instrument, indexAdapters, chemistry);
       header.put("Workflow", "GenerateFASTQ");
       header.put("Application", "FASTQ Only");
@@ -183,7 +184,7 @@ public enum IlluminaExperiment {
     protected void applyHeader(
         Map<String, String> header, String experimentName, String instrument,
         String indexAdapters,
-        String chemistry) {
+        String chemistry, String novaSeqXSeriesMapping) {
       applyIlluminaHeader(header, experimentName, instrument, indexAdapters, chemistry);
       header.put("Workflow", "GenerateFASTQ");
       header.put("Application", "FASTQ Only");
@@ -221,8 +222,8 @@ public enum IlluminaExperiment {
   },
   BCLCONVERT("BCL Convert", true) {
     protected void applyHeader(Map<String, String> header, String experimentName, String instrument,
-        String indexAdapters, String chemistry) {
-      applyDragenHeader(header, experimentName, instrument);
+        String indexAdapters, String chemistry, String novaSeqXSeriesMapping) {
+      applyDragenHeader(header, experimentName, instrument, novaSeqXSeriesMapping);
     }
 
     protected void applySettings(Map<String, String> settings, String read1Primer, String indexPrimer,
@@ -272,7 +273,7 @@ public enum IlluminaExperiment {
   }
 
   protected abstract void applyHeader(Map<String, String> header, String experimentName, String instrument,
-      String indexAdapters, String chemistry);
+      String indexAdapters, String chemistry, String novaSeqXSeriesMapping);
 
   protected abstract void applySettings(Map<String, String> settings, String read1Primer, String indexPrimer,
       String read2Primer, String overrideCycles, String dragenVersion, String trimUMI, String fastqCompression);
@@ -307,10 +308,11 @@ public enum IlluminaExperiment {
     header.put("Chemistry", chemistry);
   }
 
-  protected void applyDragenHeader(Map<String, String> header, String experimentName, String instrument) {
+  protected void applyDragenHeader(Map<String, String> header, String experimentName, String instrument,
+      String novaSeqXSeriesMapping) {
     header.put("FileFormatVersion", "2");
     header.put("RunName", experimentName + ZonedDateTime.now().format(MDY));
-    header.put("InstrumentPlatform", instrument.replace("Illumina NovaSeq X Plus",
+    header.put("InstrumentPlatform", instrument.replace(novaSeqXSeriesMapping,
         "NovaSeqXSeries"));
     header.put("IndexOrientation", "Forward");
   }
@@ -432,7 +434,8 @@ public enum IlluminaExperiment {
       String read2Primer, List<Pool> pools, List<Integer> lanes,
       String dragenVersion,
       String trimUMI,
-      String fastqCompressionFormat) {
+      String fastqCompressionFormat,
+      String novaSeqXSeriesMapping) {
     final Map<String, String> header = new LinkedHashMap<>();
     final Map<String, String> settings = new LinkedHashMap<>();
     final Map<String, String> reads = new LinkedHashMap<>();
@@ -466,7 +469,7 @@ public enum IlluminaExperiment {
         pools.stream().flatMap(pool -> pool.getPoolContents().stream())
             .map(element -> element.getAliquot().getParentLibrary().getIndex1()).filter(Objects::nonNull)
             .map(i -> i.getFamily().getName()).distinct().sorted().collect(Collectors.joining("/")),
-        chemistry);
+        chemistry, novaSeqXSeriesMapping);
 
     final int i7Length = getMaxLength(pools, 1);
     final int i5Length = getMaxLength(pools, 2);

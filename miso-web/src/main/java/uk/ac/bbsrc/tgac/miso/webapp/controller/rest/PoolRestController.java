@@ -132,16 +132,13 @@ public class PoolRestController extends AbstractRestController {
     private String customIndexPrimer;
     private String customRead1Primer;
     private String customRead2Primer;
+    private String dragenVersion;
     private String experimentType;
+    private String fastqCompressionFormat;
     private String genomeFolder;
     private List<Long> poolIds;
     private long sequencingParametersId;
-
-    private String dragenVersion;
-
     private String trimUMI;
-
-    private String fastqCompressionFormat;
 
 
     public String getCustomIndexPrimer() {
@@ -642,6 +639,9 @@ public class PoolRestController extends AbstractRestController {
     return childFinder.list(ids, category);
   }
 
+  @Value("${miso.pools.samplesheet.NovaSeqXSeries:NovaSeq x Plus}")
+  public String novaSeqXSeriesMapping;
+
   @PostMapping(value = "/samplesheet")
   @ResponseBody
   public HttpEntity<byte[]> samplesheet(@RequestBody SampleSheetRequest request,
@@ -671,7 +671,8 @@ public class PoolRestController extends AbstractRestController {
             lanes,
             request.getDragenVersion(),
             request.getTrimUMI(),
-            request.getFastQCompressionFormat())
+            request.getFastQCompressionFormat(),
+            novaSeqXSeriesMapping)
         .getBytes(StandardCharsets.UTF_8));
 
   }
