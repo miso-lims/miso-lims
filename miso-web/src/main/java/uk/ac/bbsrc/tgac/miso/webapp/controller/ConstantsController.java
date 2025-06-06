@@ -235,8 +235,6 @@ public class ConstantsController {
   private Boolean autoGenerateIdBarcodes;
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
-  @Value("${miso.genomeFolder:}")
-  private String genomeFolder;
   @Value("${miso.test.lockConstants:false}")
   private boolean locked;
   @Value("${miso.newOptionSopUrl:#{null}}")
@@ -348,6 +346,7 @@ public class ConstantsController {
       addJsonArray(mapper, node, "partitionQcTypes", partitionQcTypeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "referenceGenomes", referenceGenomeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "spreadsheetFormats", Arrays.asList(SpreadSheetFormat.values()), Dtos::asDto);
+
       addJsonArray(mapper, node, "sampleSpreadsheets", Arrays.asList(SampleSpreadSheets.values()), Dtos::asDto);
       addJsonArray(mapper, node, "librarySpreadsheets", Arrays.asList(LibrarySpreadSheets.values()), Dtos::asDto);
       addJsonArray(mapper, node, "libraryAliquotSpreadsheets", Arrays.asList(LibraryAliquotSpreadSheets.values()),
@@ -416,7 +415,6 @@ public class ConstantsController {
       node.set("warningMessages", warningsNode);
       node.put("errorEditDistance", indexChecker.getErrorMismatches());
       node.put("warningEditDistance", indexChecker.getWarningMismatches());
-      node.put("genomeFolder", genomeFolder);
 
       // Save the regenerated file in cache.
       constantsJs = "Constants = " + mapper.writeValueAsString(node) + ";";
@@ -432,6 +430,7 @@ public class ConstantsController {
       ObjectNode dto = illuminaExperimentTypes.addObject();
       dto.put("name", experiment.name());
       dto.put("description", experiment.getDescription());
+      dto.put("dragen", experiment.isDragen());
     }
   }
 
