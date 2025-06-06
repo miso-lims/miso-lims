@@ -5,6 +5,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 public class PartitionDto {
   private Long containerId;
   private String containerName;
+  private String runPositionAlias;
   private Long id;
   private String loadingConcentration;
   private ConcentrationUnit loadingConcentrationUnits;
@@ -20,6 +21,14 @@ public class PartitionDto {
 
   public String getContainerName() {
     return containerName;
+  }
+
+  public String getRunPositionAlias() {
+    return runPositionAlias;
+  }
+
+  public void setRunPositionAlias(String runPositionAlias) {
+    this.runPositionAlias = runPositionAlias;
   }
 
   public Long getId() {
