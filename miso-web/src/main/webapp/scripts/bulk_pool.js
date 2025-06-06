@@ -388,16 +388,18 @@ BulkTarget.pool = (function ($) {
           label: "Custom Read 2 Primer Well",
           required: false,
         },
-        {
-          property: "pools",
-          label: "Lanes Configuration",
-          required: true,
-          type: "orderDropdowns",
-          getLabel: Utils.array.getAlias,
-          value: partitionCount,
-          values: pools,
-        },
       ];
+
+      for (var i = 0; i < partitionCount; i++) {
+        dialogFields.push({
+          property: "pool_" + (i + 1),
+          label: "Pool " + (i + 1),
+          required: true,
+          type: "select",
+          getLabel: Utils.array.getAlias,
+          values: pools.concat([{ value: null, alias: "empty" }]),
+        });
+      }
 
       if (experimentType.dragen) {
         dialogFields.push(
@@ -417,6 +419,7 @@ BulkTarget.pool = (function ($) {
               return type.description;
             },
             values: config.compressionFormats,
+            value: config.compressionFormat,
           },
           {
             property: "trimUMI",
@@ -433,6 +436,10 @@ BulkTarget.pool = (function ($) {
         "Download",
         dialogFields,
         function (result) {
+          var poolIds = [];
+          for (var i = 0; i < partitionCount; i++) {
+            poolIds.push(result["pool_" + (i + 1)]);
+          }
           Utils.ajaxDownloadWithDialog(Urls.rest.pools.samplesheet, {
             customRead1Primer: result.customRead1Primer,
             customIndexPrimer: result.customIndexPrimer,
@@ -445,7 +452,7 @@ BulkTarget.pool = (function ($) {
             experimentType: experimentType.name,
             genomeFolder: result.genomeFolder,
             sequencingParametersId: result.sequencingParameters.id,
-            poolIds: result.pools.map(Utils.array.getId),
+            poolIds: poolIds.map(Utils.array.getId),
           });
         },
         null

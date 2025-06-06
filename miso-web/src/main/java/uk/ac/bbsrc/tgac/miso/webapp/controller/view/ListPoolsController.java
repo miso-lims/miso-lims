@@ -24,8 +24,6 @@ import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.addJsonArray;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.SortedMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -65,10 +63,10 @@ public class ListPoolsController {
   @Value("${miso.genomeFolder:}")
   private String genomeFolder;
 
-  @Value("${miso.samplesheet.dragenversion:}")
+  @Value("${miso.samplesheet.dragenVersion:}")
   private String dragenVersion;
 
-  @Value("${miso.samplesheet.compressionformat:gzip}")
+  @Value("${miso.samplesheet.compressionFormat:gzip}")
   private String compressionFormat;
 
   @ModelAttribute("title")
@@ -89,16 +87,6 @@ public class ListPoolsController {
     public <T> TabbedListPoolsPage(String targetType, String property, Stream<T> tabItems, Function<T, String> getName,
         Function<T, Object> getValue, ObjectMapper mapper) {
       super(targetType, property, tabItems, getName, getValue, mapper);
-    }
-
-    public <T> TabbedListPoolsPage(String targetType, String property, Stream<T> tabItems, Comparator<String> tabSorter,
-        Function<T, String> getName, Function<T, Object> getValue, ObjectMapper mapper) {
-      super(targetType, property, tabItems, tabSorter, getName, getValue, mapper);
-    }
-
-    public TabbedListPoolsPage(String targetType, String property, SortedMap<String, String> tabs,
-        ObjectMapper mapper) {
-      super(targetType, property, tabs, mapper);
     }
 
     @Override

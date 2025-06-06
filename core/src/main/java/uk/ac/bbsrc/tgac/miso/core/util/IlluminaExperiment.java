@@ -50,15 +50,9 @@ public enum IlluminaExperiment {
 
     @Override
     protected void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-        List<String> sampleIdsCol,
-        List<String> laneCol, List<String> samplePlateCol, List<String> sampleWellCol,
-        List<String> index1IdCol, List<String> index1Col, List<String> index2IdCol, List<String> index2Col,
-        List<String> projectCol,
-        List<String> genomeFolderCol, List<String> descriptionCol, List<String> libraryCol,
-        List<String> libraryPrepKitCol) {
+        DataSection dataSection) {
       data.put("\n[Data]", "");
-      applyIlluminaData(dataColumns, headers, sampleIdsCol, laneCol, samplePlateCol, sampleWellCol, index1IdCol,
-          index1Col, index2IdCol, index2Col, projectCol, genomeFolderCol, descriptionCol);
+      applyIlluminaData(dataColumns, headers, dataSection);
     }
   },
   LIBRARY_QC("Library QC", false) {
@@ -88,15 +82,9 @@ public enum IlluminaExperiment {
 
     @Override
     protected void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-        List<String> sampleIdsCol,
-        List<String> laneCol, List<String> samplePlateCol, List<String> sampleWellCol,
-        List<String> index1IdCol, List<String> index1Col, List<String> index2IdCol, List<String> index2Col,
-        List<String> projectCol,
-        List<String> genomeFolderCol, List<String> descriptionCol, List<String> libraryCol,
-        List<String> libraryPrepKitCol) {
+        DataSection dataSection) {
       data.put("\n[Data]", "");
-      applyIlluminaData(dataColumns, headers, sampleIdsCol, laneCol, samplePlateCol, sampleWellCol, index1IdCol,
-          index1Col, index2IdCol, index2Col, projectCol, genomeFolderCol, descriptionCol);
+      applyIlluminaData(dataColumns, headers, dataSection);
     }
   },
   METAGENOMICS_16S("Metagenomics 16S rRNA", false) {
@@ -125,21 +113,10 @@ public enum IlluminaExperiment {
 
     @Override
     protected void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-        List<String> sampleIdsCol,
-        List<String> laneCol, List<String> samplePlateCol, List<String> sampleWellCol,
-        List<String> index1IdCol, List<String> index1Col, List<String> index2IdCol, List<String> index2Col,
-        List<String> projectCol,
-        List<String> genomeFolderCol, List<String> descriptionCol, List<String> libraryCol,
-        List<String> libraryPrepKitCol) {
+        DataSection dataSection) {
       data.put("\n[Data]", "");
-      applyIlluminaData(dataColumns, headers, sampleIdsCol, laneCol, samplePlateCol, sampleWellCol, index1IdCol,
-          index1Col, index2IdCol, index2Col, projectCol, genomeFolderCol, descriptionCol);
+      applyIlluminaData(dataColumns, headers, dataSection);
     }
-
-    @Override
-    protected void applyCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-        List<String> sampleIdsCol, List<String> laneCol, List<String> index1Col,
-        List<String> projectCol, List<String> libraryCol, List<String> libraryPrepKitCol) {}
   },
   FASTQ_ONLY_NEXTERA_XT("FASTQ Only (Nextera XT)", false) {
 
@@ -167,15 +144,9 @@ public enum IlluminaExperiment {
 
     @Override
     protected void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-        List<String> sampleIdsCol,
-        List<String> laneCol, List<String> samplePlateCol, List<String> sampleWellCol,
-        List<String> index1IdCol, List<String> index1Col, List<String> index2IdCol, List<String> index2Col,
-        List<String> projectCol,
-        List<String> genomeFolderCol, List<String> descriptionCol, List<String> libraryCol,
-        List<String> libraryPrepKitCol) {
+        DataSection dataSection) {
       data.put("\n[Data]", "");
-      applyIlluminaData(dataColumns, headers, sampleIdsCol, laneCol, samplePlateCol, sampleWellCol, index1IdCol,
-          index1Col, index2IdCol, index2Col, projectCol, genomeFolderCol, descriptionCol);
+      applyIlluminaData(dataColumns, headers, dataSection);
     }
   },
   FASTQ_ONLY_TRUSEQ_NANO_DNA("FASTQ Only (TruSeq Nano DNA)", false) {
@@ -205,20 +176,11 @@ public enum IlluminaExperiment {
 
     @Override
     protected void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-        List<String> sampleIdsCol,
-        List<String> laneCol, List<String> samplePlateCol, List<String> sampleWellCol,
-        List<String> index1IdCol, List<String> index1Col, List<String> index2IdCol, List<String> index2Col,
-        List<String> projectCol, List<String> genomeFolderCol, List<String> descriptionCol, List<String> libraryCol,
-        List<String> libraryPrepKitCol) {
+        DataSection dataSection) {
       data.put("\n[Data]", "");
-      applyIlluminaData(dataColumns, headers, sampleIdsCol, laneCol, samplePlateCol, sampleWellCol, index1IdCol,
-          index1Col, index2IdCol, index2Col, projectCol, genomeFolderCol, descriptionCol);
+      applyIlluminaData(dataColumns, headers, dataSection);
     }
 
-    @Override
-    protected void applyCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-        List<String> sampleIdsCol, List<String> laneCol, List<String> index1Col,
-        List<String> projectCol, List<String> libraryCol, List<String> libraryPrepKitCol) {}
   },
   BCLCONVERT("BCL Convert", true) {
     protected void applyHeader(Map<String, String> header, String experimentName, String instrument,
@@ -235,14 +197,9 @@ public enum IlluminaExperiment {
     }
 
     protected void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-        List<String> sampleIdsCol,
-        List<String> laneCol, List<String> samplePlateCol, List<String> sampleWellCol,
-        List<String> index1IdCol, List<String> index1Col, List<String> index2IdCol, List<String> index2Col,
-        List<String> projectCol,
-        List<String> genomeFolderCol, List<String> descriptionCol, List<String> libraryCol,
-        List<String> libraryPrepKitCol) {
+        DataSection dataSection) {
       data.put("\n[BCLConvert_Data]", "");
-      applyDragenData(dataColumns, headers, sampleIdsCol, laneCol, index1Col, index2Col);
+      applyDragenData(dataColumns, headers, dataSection);
     }
 
     protected void applyReads(Map<String, String> reads, Integer Read1Cycles, Integer Read2Cycles,
@@ -252,13 +209,14 @@ public enum IlluminaExperiment {
     }
 
     protected void applyCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-        List<String> sampleIdsCol, List<String> laneCol, List<String> index1Col,
-        List<String> projectCol, List<String> libraryCol, List<String> libraryPrepKitCol) {
+        DataSection dataSection) {
       data.put("\n[Cloud_Settings]", "");
 
       Collections.addAll(headers, "Lane", "Sample_ID", "ProjectName", "LibraryName", "LibraryPrepKitName",
           "IndexAdapterKitName");
-      Collections.addAll(dataColumns, laneCol, sampleIdsCol, projectCol, libraryCol, libraryPrepKitCol, index1Col);
+      Collections.addAll(dataColumns, dataSection.getLaneCol(), dataSection.getSampleIdsCol(),
+          dataSection.getProjectCol(), dataSection.getLibraryCol(), dataSection.getLibraryPrepKitCol(),
+          dataSection.getIndex1Col());
     }
   };
 
@@ -279,12 +237,7 @@ public enum IlluminaExperiment {
       String read2Primer, String overrideCycles, String dragenVersion, String trimUMI, String fastqCompression);
 
   protected abstract void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-      List<String> sampleIdsCol,
-      List<String> laneCol, List<String> samplePlateCol, List<String> sampleWellCol,
-      List<String> index1IdCol, List<String> index1Col, List<String> index2IdCol, List<String> index2Col,
-      List<String> projectCol,
-      List<String> genomeFolderCol, List<String> descriptionCol, List<String> libraryCol,
-      List<String> libraryPrepKitCol);
+      DataSection dataSection);
 
   protected void applyReads(Map<String, String> reads, Integer Read1Cycles, Integer Read2Cycles,
       Integer Index1Cycles, Integer Index2Cycles) {
@@ -295,8 +248,7 @@ public enum IlluminaExperiment {
   }
 
   protected void applyCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
-      List<String> sampleIdsCol, List<String> laneCol, List<String> index1Col,
-      List<String> projectCol, List<String> libraryCol, List<String> libraryPrepKitCol) {};
+      DataSection dataSection) {};
 
   protected void applyIlluminaHeader(Map<String, String> header, String experimentName, String instrument,
       String indexAdapters, String chemistry) {
@@ -349,42 +301,32 @@ public enum IlluminaExperiment {
 
   }
 
-  protected void applyIlluminaData(List<List<String>> data, List<String> headers, List<String> sampleIdsCol,
-      List<String> laneCol, List<String> samplePlateCol, List<String> sampleWellCol,
-      List<String> index1IdCol, List<String> index1Col, List<String> index2IdCol, List<String> index2Col,
-      List<String> projectCol,
-      List<String> genomeFolderCol, List<String> descriptionCol) {
+  protected void applyIlluminaData(List<List<String>> data, List<String> headers, DataSection dataSection) {
 
     headers.add("Sample_ID");
-    data.add(sampleIdsCol);
-    if (laneCol.size() > 0) {
+    data.add(dataSection.getSampleIdsCol());
+    if (dataSection.getLaneCol().size() > 0) {
       headers.add("Lane");
-      data.add(laneCol);
+      data.add(dataSection.getLaneCol());
     }
     Collections.addAll(headers, "Sample_Plate", "Sample_Well", "I7_Index_ID", "index");
-    Collections.addAll(data, samplePlateCol, sampleWellCol, index1IdCol, index1Col);
-    if (index2IdCol.size() > 0 && index2Col.size() > 0) {
+    Collections.addAll(data, dataSection.getSamplePlateCol(), dataSection.getSampleWellCol(),
+        dataSection.getIndex1IdCol(), dataSection.getIndex1Col());
+    if (dataSection.getIndex2IdCol().size() > 0 && dataSection.getIndex2Col().size() > 0) {
       Collections.addAll(headers, "I5_Index_ID", "index2");
-      Collections.addAll(data, index2IdCol, index2Col);
+      Collections.addAll(data, dataSection.getIndex2IdCol(), dataSection.getIndex2Col());
     }
     Collections.addAll(headers, "GenomeFolder", "Sample_Project", "Description");
-    Collections.addAll(data, genomeFolderCol, projectCol, descriptionCol);
+    Collections.addAll(data, dataSection.getGenomeFolderCol(), dataSection.getProjectCol(),
+        dataSection.getDescriptionCol());
   }
 
-  protected void applyDragenData(List<List<String>> data, List<String> headers, List<String> sampleIdsCol,
-      List<String> laneCol, List<String> index1Col, List<String> index2Col) {
-
-    // DRAGEN expects na instead of empty entries
-    Collections.replaceAll(laneCol, "", "na");
-    Collections.replaceAll(sampleIdsCol, "", "na");
-    Collections.replaceAll(index1Col, "", "na");
-
+  protected void applyDragenData(List<List<String>> data, List<String> headers, DataSection dataSection) {
     Collections.addAll(headers, "Lane", "Sample_ID", "Index");
-    Collections.addAll(data, laneCol, sampleIdsCol, index1Col);
-    if (index2Col.size() > 0) {
+    Collections.addAll(data, dataSection.getLaneCol(), dataSection.getSampleIdsCol(), dataSection.getIndex1Col());
+    if (dataSection.index2Col.size() > 0) {
       Collections.addAll(headers, "Index2");
-      Collections.replaceAll(index2Col, "", "na");
-      Collections.addAll(data, index2Col);
+      Collections.addAll(data, dataSection.getIndex2Col());
     }
   }
 
@@ -427,6 +369,180 @@ public enum IlluminaExperiment {
       throw new IllegalArgumentException("Invalid index position: " + position);
     }
   }
+
+  public static class DataSection {
+    public List<String> sampleIdsCol = new ArrayList<>();
+    public List<String> laneCol = new ArrayList<>();
+    public List<String> samplePlateCol = new ArrayList<>();
+    public List<String> sampleWellCol = new ArrayList<>();
+    public List<String> index1IdCol = new ArrayList<>();
+    public List<String> index1Col = new ArrayList<>();
+    public List<String> index2IdCol = new ArrayList<>();
+    public List<String> index2Col = new ArrayList<>();
+    public List<String> projectCol = new ArrayList<>();
+    public List<String> genomeFolderCol = new ArrayList<>();
+    public List<String> descriptionCol = new ArrayList<>();
+    public List<String> libraryCol = new ArrayList<>();
+    public List<String> libraryPrepKitCol = new ArrayList<>();
+
+    public List<String> getDescriptionCol() {
+      return descriptionCol;
+    }
+
+    public void setDescriptionCol(List<String> descriptionCol) {
+      this.descriptionCol = descriptionCol;
+    }
+
+    public List<String> getGenomeFolderCol() {
+      return genomeFolderCol;
+    }
+
+    public void setGenomeFolderCol(List<String> genomeFolderCol) {
+      this.genomeFolderCol = genomeFolderCol;
+    }
+
+    public List<String> getIndex1Col() {
+      return index1Col;
+    }
+
+    public void setIndex1Col(List<String> index1Col) {
+      this.index1Col = index1Col;
+    }
+
+    public List<String> getIndex1IdCol() {
+      return index1IdCol;
+    }
+
+    public void setIndex1IdCol(List<String> index1IdCol) {
+      this.index1IdCol = index1IdCol;
+    }
+
+    public List<String> getIndex2Col() {
+      return index2Col;
+    }
+
+    public void setIndex2Col(List<String> index2Col) {
+      this.index2Col = index2Col;
+    }
+
+    public List<String> getIndex2IdCol() {
+      return index2IdCol;
+    }
+
+    public void setIndex2IdCol(List<String> index2IdCol) {
+      this.index2IdCol = index2IdCol;
+    }
+
+    public List<String> getLaneCol() {
+      return laneCol;
+    }
+
+    public void setLaneCol(List<String> laneCol) {
+      this.laneCol = laneCol;
+    }
+
+    public List<String> getLibraryCol() {
+      return libraryCol;
+    }
+
+    public void setLibraryCol(List<String> libraryCol) {
+      this.libraryCol = libraryCol;
+    }
+
+    public List<String> getLibraryPrepKitCol() {
+      return libraryPrepKitCol;
+    }
+
+    public void setLibraryPrepKitCol(List<String> libraryPrepKitCol) {
+      this.libraryPrepKitCol = libraryPrepKitCol;
+    }
+
+    public List<String> getProjectCol() {
+      return projectCol;
+    }
+
+    public void setProjectCol(List<String> projectCol) {
+      this.projectCol = projectCol;
+    }
+
+    public List<String> getSampleIdsCol() {
+      return sampleIdsCol;
+    }
+
+    public void setSampleIdsCol(List<String> sampleIdsCol) {
+      this.sampleIdsCol = sampleIdsCol;
+    }
+
+    public List<String> getSamplePlateCol() {
+      return samplePlateCol;
+    }
+
+    public void setSamplePlateCol(List<String> samplePlateCol) {
+      this.samplePlateCol = samplePlateCol;
+    }
+
+    public List<String> getSampleWellCol() {
+      return sampleWellCol;
+    }
+
+    public void setSampleWellCol(List<String> sampleWellCol) {
+      this.sampleWellCol = sampleWellCol;
+    }
+
+    // Helper methods to add a single element to each list
+    public void addDescription(String description) {
+      this.descriptionCol.add(description);
+    }
+
+    public void addGenomeFolder(String genomeFolder) {
+      this.genomeFolderCol.add(genomeFolder);
+    }
+
+    public void addIndex1(String index1) {
+      this.index1Col.add(index1);
+    }
+
+    public void addIndex1Id(String index1Id) {
+      this.index1IdCol.add(index1Id);
+    }
+
+    public void addIndex2(String index2) {
+      this.index2Col.add(index2);
+    }
+
+    public void addIndex2Id(String index2Id) {
+      this.index2IdCol.add(index2Id);
+    }
+
+    public void addLane(String lane) {
+      this.laneCol.add(lane);
+    }
+
+    public void addLibrary(String library) {
+      this.libraryCol.add(library);
+    }
+
+    public void addLibraryPrepKit(String libraryPrepKit) {
+      this.libraryPrepKitCol.add(libraryPrepKit);
+    }
+
+    public void addProject(String project) {
+      this.projectCol.add(project);
+    }
+
+    public void addSampleId(String sampleId) {
+      this.sampleIdsCol.add(sampleId);
+    }
+
+    public void addSamplePlate(String samplePlate) {
+      this.samplePlateCol.add(samplePlate);
+    }
+
+    public void addSampleWell(String sampleWell) {
+      this.sampleWellCol.add(sampleWell);
+    }
+  }
+
 
   public final String makeSampleSheet(String genomeFolder, SequencingParameters parameters,
       String read1Primer,
@@ -491,22 +607,11 @@ public enum IlluminaExperiment {
     writeMap(settings, output);
 
     // Data Section
-    // Store all info as separate lists b/c the order (but not content) of columns varies by samplesheet
     List<String> dataHeaders = new ArrayList<>();
     List<String> cloudHeaders = new ArrayList<>();
-    List<String> sampleIdsCol = new ArrayList<>();
-    List<String> laneCol = new ArrayList<>();
-    List<String> samplePlateCol = new ArrayList<>();
-    List<String> sampleWellCol = new ArrayList<>();
-    List<String> index1IdCol = new ArrayList<>();
-    List<String> index1Col = new ArrayList<>();
-    List<String> index2IdCol = new ArrayList<>();
-    List<String> index2Col = new ArrayList<>();
-    List<String> projectCol = new ArrayList<>();
-    List<String> genomeFolderCol = new ArrayList<>();
-    List<String> descriptionCol = new ArrayList<>();
-    List<String> libraryCol = new ArrayList<>();
-    List<String> libraryPrepKitCol = new ArrayList<>();
+    DataSection dataSection = new DataSection();
+
+    String emptyString = dragen ? "na" : "";
 
     // Iterate over pools and their contents to generate sample sheet data
     for (int lane = 0; lane < pools.size(); lane++) {
@@ -523,8 +628,8 @@ public enum IlluminaExperiment {
         // Otherwise, build the indices using the extracted values
         if (indices.isEmpty()) {
           outputIndicies = Collections.singletonList(
-              new Pair<>(new Pair<>("No Index", String.join("", Collections.nCopies(i7Length, "N"))),
-                  new Pair<>("No Index", String.join("", Collections.nCopies(i5Length, "N")))));
+              new Pair<>(new Pair<>("No Index", String.join(emptyString, Collections.nCopies(i7Length, "N"))),
+                  new Pair<>("No Index", String.join(emptyString, Collections.nCopies(i5Length, "N")))));
         } else if (indices.get(0).getFamily().hasFakeSequence()) {
           final Set<String> i5s = extractCollection(indices, 2);
           outputIndicies = new ArrayList<>();
@@ -544,44 +649,44 @@ public enum IlluminaExperiment {
         // Iterate over the generated output indices and add values to the data and cloud data sections
         for (final Pair<Pair<String, String>, Pair<String, String>> paddedIndices : outputIndicies) {
 
-          libraryCol.add(library.getName());
-          libraryPrepKitCol.add("");
-          samplePlateCol.add("");
-          sampleWellCol.add("");
+          dataSection.addLibrary(library.getName());
+          dataSection.addLibraryPrepKit(emptyString);
+          dataSection.addSamplePlate(emptyString);
+          dataSection.addSampleWell(emptyString);
 
           String sampleId = element.getAliquot().getAlias();
           if (outputIndicies.size() > 1) {
             sampleId = sampleId + "_" + suffix;
           }
-          sampleIdsCol.add(sampleId);
+          dataSection.addSampleId(sampleId);
 
-          if (pools.size() > 1) {
-            laneCol.add(String.valueOf(lanes.get(lane) + 1));
+          if (pools.size() > 1 || dragen) {
+            dataSection.addLane(String.valueOf(lanes.get(lane)));
           }
 
-          index1IdCol.add(paddedIndices.getKey().getKey()); // IndexAdapterKitName
-          index1Col.add(paddedIndices.getKey().getValue());
+          dataSection.addIndex1Id(paddedIndices.getKey().getKey()); // IndexAdapterKitName
+          dataSection.addIndex1(paddedIndices.getKey().getValue());
 
           if (i5Length > 0) {
-            index2IdCol.add(paddedIndices.getValue().getKey());
-            index2Col.add(parameters.getInstrumentModel().getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
-                ? SampleSheet.reverseComplement(paddedIndices.getValue().getValue())
-                : paddedIndices.getValue().getValue());
+            dataSection.addIndex2Id(paddedIndices.getValue().getKey());
+            dataSection
+                .addIndex2(parameters.getInstrumentModel().getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC
+                    ? SampleSheet.reverseComplement(paddedIndices.getValue().getValue())
+                    : paddedIndices.getValue().getValue());
           }
 
-          genomeFolderCol.add(genomeFolder);
-          projectCol.add(element.getAliquot().getProjectCode());
-          descriptionCol
-              .add(element.getAliquot().getAliquotBarcode() != null ? element.getAliquot().getAliquotBarcode() : "");
+          dataSection.addGenomeFolder(genomeFolder);
+          dataSection.addProject(element.getAliquot().getProjectCode());
+          dataSection.addDescription(
+              element.getAliquot().getAliquotBarcode() != null ? element.getAliquot().getAliquotBarcode()
+                  : emptyString);
 
         }
       }
     }
-    applyData(data, dataColumns, dataHeaders, sampleIdsCol, laneCol, samplePlateCol, sampleWellCol, index1IdCol,
-        index1Col,
-        index2IdCol, index2Col, projectCol, genomeFolderCol, descriptionCol, libraryCol, libraryPrepKitCol);
-    applyCloud(cloudData, cloudDataColumns, cloudHeaders, sampleIdsCol, laneCol, index1Col,
-        projectCol, libraryCol, libraryPrepKitCol);
+
+    applyData(data, dataColumns, dataHeaders, dataSection);
+    applyCloud(cloudData, cloudDataColumns, cloudHeaders, dataSection);
 
 
     writeMap(data, output);
@@ -590,7 +695,6 @@ public enum IlluminaExperiment {
     writeMap(cloudData, output);
     writeRows(cloudHeaders, output);
     writeListByColumns(cloudDataColumns, output);
-
 
     return output.toString();
 
@@ -649,5 +753,24 @@ public enum IlluminaExperiment {
       }
     }
   }
+
+  // // Take in a list of columns and append to output
+  // private void writeListByRecord(final DataSection dataSection, final StringBuilder output) {
+  // List<List<String>> columns = dataSection.dataColumns();
+  // if (!columns.isEmpty()) {
+  // for (int itemIndex = 0; itemIndex < columns.get(0).size(); itemIndex++) {
+  // for (int colIndex = 0; colIndex < columns.size(); colIndex++) {
+
+  // String entry = columns.get(colIndex).get(itemIndex);
+  // if (entry.contains(",")) {
+  // output.append("\"").append(entry).append("\"").append(",");
+  // } else {
+  // output.append(entry).append(",");
+  // }
+  // }
+  // output.append("\n");
+  // }
+  // }
+  // }
 
 }

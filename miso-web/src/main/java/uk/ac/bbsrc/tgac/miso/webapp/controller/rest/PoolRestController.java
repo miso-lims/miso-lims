@@ -639,7 +639,7 @@ public class PoolRestController extends AbstractRestController {
     return childFinder.list(ids, category);
   }
 
-  @Value("${miso.pools.samplesheet.NovaSeqXSeries:NovaSeq x Plus}")
+  @Value("${miso.pools.samplesheet.novaSeqXSeries:Illumina NovaSeq x Plus}")
   public String novaSeqXSeriesMapping;
 
   @PostMapping(value = "/samplesheet")
