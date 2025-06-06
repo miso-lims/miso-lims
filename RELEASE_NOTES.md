@@ -7,6 +7,19 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.9.0] - 2025-06-06
+
+### Added
+
+* Ability to save PacBio runs with multiple SMRT cells (e.g. Revio) retrieved from Run Scanner
+* Edit Requisition pages now display Array Runs that use one or more of the requisitioned or supplemental samples. The Array Run section is collapsed by default if there are none associated with that requisition's samples.
+
+### Changed
+
+* The partition contents table (named differently, depending on the platform) on the Edit Run page now
+  includes the instrument position
+
+
 ## [3.8.0] - 2025-05-08
 
 ### Added
