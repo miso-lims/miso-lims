@@ -21,6 +21,7 @@
     <property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
     <property name="jpaProperties">
       <props>
+        <prop key="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</prop>
         <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
       </props>
     </property>
