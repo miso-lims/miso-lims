@@ -963,7 +963,6 @@
             </executions>
           </plugin>
           <plugin>
-            <!-- try this groovy script, if it doesn't work then approach this differently -->
             <groupId>org.codehaus.gmaven</groupId>
             <artifactId>groovy-maven-plugin</artifactId>
             <executions>
@@ -1027,9 +1026,6 @@
               </placeholders>
             </configuration>
           </plugin>
-
-
-
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
@@ -1050,27 +1046,14 @@
                 <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
                 <mysql.port>3306</mysql.port>
-                
               </systemPropertyVariables>
               <skipTests>${skipCTs}</skipTests>
               <useSystemClassLoader>false</useSystemClassLoader>
-              <!-- don't think there's anything to exclude explicitly but not sure -->
-
-              <!-- figure out what the test listener is for -->
-              <!-- <properties>
-                <property>
-                  <name>listener</name>
-                  <value>uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestListener</value>
-                </property>
-              </properties> -->
               <includes>
                 <include>**/*CT.java</include>
               </includes>
             </configuration>
           </plugin>
-          <!-- we are not using failsafe as it only works for integration tests -->
-
-
         </plugins>
       </build>
     </profile>
