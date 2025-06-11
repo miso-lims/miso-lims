@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.webapp.controllertest;
+package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import org.junit.Test;
 
@@ -7,10 +7,11 @@ import org.springframework.context.ApplicationContext;
 
 import static org.junit.Assert.*;
 
-public class InitializationCT extends AbstractCT {
+public class InitializationST extends AbstractST {
 
   @Autowired
   private ApplicationContext applicationContext;
+
 
   @Test
   public void contextLoads() {

@@ -12,7 +12,7 @@
   <name>MISO MVC</name>
   <properties>
     <skipITs>true</skipITs>
-    <skipCTs>true</skipCTs>
+    <skipSTs>true</skipSTs>
     <cargoInitGoal>start</cargoInitGoal>
     <mysql.db>lims</mysql.db>
     <mysql.rootpw>abc123</mysql.rootpw>
@@ -308,6 +308,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
+        <version>2.6</version>
         <executions>
           <execution>
             <id>copy-resources</id>
@@ -917,10 +918,10 @@
       </build>
     </profile>
     <profile>
-      <id>controller-testing</id>
+      <id>spring-test</id>
       <activation>
         <property>
-          <name>skipCTs</name>
+          <name>skipSTs</name>
           <value>false</value>
         </property>
       </activation>
@@ -930,14 +931,12 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>build-helper-maven-plugin</artifactId>
             <executions>
-
               <execution>
-                <id>add-ct-sources</id>
+                <id>add-st-sources</id>
                 <phase>generate-test-sources</phase>
                 <goals>
                   <goal>add-test-source</goal>
                 </goals>
-
                 <configuration>
                   <sources>
                     <source>src/spring-test/java</source>
@@ -945,7 +944,7 @@
                 </configuration>
               </execution>
               <execution>
-                <id>add-ct-resources</id>
+                <id>add-st-resources</id>
                 <phase>generate-test-resources</phase>
                 <goals>
                   <goal>add-test-resource</goal>
@@ -984,14 +983,14 @@
             <executions>
               <execution>
                 <id>start</id>
-                <phase>pre-controller-test</phase>
+                <phase>process-test-resources</phase>
                 <goals>
                   <goal>start</goal>
                 </goals>
               </execution>
               <execution>
                 <id>stop</id>
-                <phase>post-controller-test</phase>
+                <phase>post-spring-test</phase>
                 <goals>
                   <goal>stop</goal>
                 </goals>
@@ -1004,8 +1003,8 @@
             <artifactId>flyway-maven-plugin</artifactId>
             <executions>
               <execution>
-                <id>controller-test-db</id>
-                <phase>pre-controller-test</phase>
+                <id>spring-test-db</id>
+                <phase>process-test-resources</phase>
                 <goals>
                   <goal>clean</goal>
                   <goal>migrate</goal>
@@ -1020,7 +1019,7 @@
                 <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
                 <location>filesystem:target/test-classes/db/migration</location>
               </locations>
-              <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
+              <!-- <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix> -->
               <placeholders>
                 <filesDir>/storage/miso/files/</filesDir>
               </placeholders>
@@ -1031,7 +1030,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <executions>
               <execution>
-                <id>controller-tests</id>
+                <id>spring-tests</id>
                 <goals>
                   <goal>test</goal>
 
@@ -1045,12 +1044,11 @@
                 <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</miso.it.mysql.url>
                 <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
-                <mysql.port>3306</mysql.port>
               </systemPropertyVariables>
-              <skipTests>${skipCTs}</skipTests>
+              <skipTests>${skipSTs}</skipTests>
               <useSystemClassLoader>false</useSystemClassLoader>
               <includes>
-                <include>**/*CT.java</include>
+                <include>**/*ST.java</include>
               </includes>
             </configuration>
           </plugin>
