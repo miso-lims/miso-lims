@@ -962,6 +962,30 @@
             </executions>
           </plugin>
           <plugin>
+            <!-- copy Flyway migrations from sqlstore -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-sqlstore-scripts</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+                      <artifactId>sqlstore</artifactId>
+                      <outputDirectory>target/test-classes/sqlstore</outputDirectory>
+                      <includes>db/**</includes>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <groupId>org.codehaus.gmaven</groupId>
             <artifactId>groovy-maven-plugin</artifactId>
             <executions>
@@ -990,7 +1014,7 @@
               </execution>
               <execution>
                 <id>stop</id>
-                <phase>post-spring-test</phase>
+                <phase>post-integration-test</phase>
                 <goals>
                   <goal>stop</goal>
                 </goals>
@@ -1025,30 +1049,6 @@
               </placeholders>
             </configuration>
           </plugin>
-          <plugin>
-            <!-- copy Flyway migrations from sqlstore -->
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>copy-sqlstore-scripts</id>
-                <phase>generate-test-resources</phase>
-                <goals>
-                  <goal>unpack</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-                      <artifactId>sqlstore</artifactId>
-                      <outputDirectory>target/test-classes/sqlstore</outputDirectory>
-                      <includes>db/**</includes>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
@@ -1068,15 +1068,9 @@
                 <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>
-              <skipTests>${skipSTs}</skipTests>
-              <trimStackTrace>false</trimStackTrace>
-              <!-- add the includes here if it doesn't work as intended -->
-              <properties>
-                <property>
-                  <name>listener</name>
-                  <value>uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestListener</value>
-                </property>
-              </properties>
+              <skipITs>${skipSTs}</skipITs>
+              <trimStackTrace>false</trimStackTrace>  
+              <includes><include>**/*ST.java</include></includes>
             </configuration>
           </plugin>
         </plugins>
