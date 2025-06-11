@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.9.1] - 2025-06-11
+
+### Fixed
+
+* Run metrics not updating after initial save
+
+
 ## [3.9.0] - 2025-06-06
 
 ### Added
