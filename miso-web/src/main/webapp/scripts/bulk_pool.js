@@ -390,11 +390,19 @@ BulkTarget.pool = (function ($) {
         },
       ];
 
+      var instrument = instrumentModels.find(function (m) {
+        return m.id === modelId;
+      });
       for (var i = 0; i < partitionCount; i++) {
         dialogFields.push({
           property: "pool_" + (i + 1),
-          label: "Pool " + (i + 1),
-          required: true,
+          label:
+            Utils.array.findUniqueOrThrow(function (pt) {
+              return pt.name === instrument.platformType;
+            }, Constants.platformTypes).partitionName +
+            " " +
+            (i + 1),
+          required: false,
           type: "select",
           getLabel: Utils.array.getAlias,
           values: pools.concat([{ value: null, alias: "empty" }]),
