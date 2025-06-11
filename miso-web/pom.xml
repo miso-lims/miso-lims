@@ -983,7 +983,7 @@
             <executions>
               <execution>
                 <id>start</id>
-                <phase>process-test-resources</phase>
+                <phase>pre-integration-test</phase>
                 <goals>
                   <goal>start</goal>
                 </goals>
@@ -1004,7 +1004,7 @@
             <executions>
               <execution>
                 <id>spring-test-db</id>
-                <phase>process-test-resources</phase>
+                <phase>pre-integration-test</phase>
                 <goals>
                   <goal>clean</goal>
                   <goal>migrate</goal>
@@ -1019,37 +1019,64 @@
                 <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
                 <location>filesystem:target/test-classes/db/migration</location>
               </locations>
-              <!-- <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix> -->
+              <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
               <placeholders>
                 <filesDir>/storage/miso/files/</filesDir>
               </placeholders>
             </configuration>
           </plugin>
           <plugin>
+            <!-- copy Flyway migrations from sqlstore -->
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
+            <artifactId>maven-dependency-plugin</artifactId>
             <executions>
               <execution>
-                <id>spring-tests</id>
+                <id>copy-sqlstore-scripts</id>
+                <phase>generate-test-resources</phase>
                 <goals>
-                  <goal>test</goal>
-
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+                      <artifactId>sqlstore</artifactId>
+                      <outputDirectory>target/test-classes/sqlstore</outputDirectory>
+                      <includes>db/**</includes>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
                 </goals>
               </execution>
             </executions>
-
             <configuration>
               <systemPropertyVariables>
-                <!-- Make URLs available for tests  -->
+                <!-- Make URLs available for tests -->
+                <miso.it.baseUrl>http://localhost:${miso.it.tomcat.servlet.port}/</miso.it.baseUrl>
                 <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</miso.it.mysql.url>
                 <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>
               <skipTests>${skipSTs}</skipTests>
-              <useSystemClassLoader>false</useSystemClassLoader>
-              <includes>
-                <include>**/*ST.java</include>
-              </includes>
+              <trimStackTrace>false</trimStackTrace>
+              <!-- add the includes here if it doesn't work as intended -->
+              <properties>
+                <property>
+                  <name>listener</name>
+                  <value>uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestListener</value>
+                </property>
+              </properties>
             </configuration>
           </plugin>
         </plugins>
