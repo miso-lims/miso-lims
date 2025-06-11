@@ -19,6 +19,10 @@ Starting with version 1.29.0, the format of this file is based on
 * The partition contents table (named differently, depending on the platform) on the Edit Run page now
   includes the instrument position
 
+### Known Issues
+
+* Run metrics not updating after initial save
+
 
 ## [3.8.0] - 2025-05-08
 
