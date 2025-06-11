@@ -1043,7 +1043,7 @@
                 <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
                 <location>filesystem:target/test-classes/db/migration</location>
               </locations>
-              <!-- <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix> -->
+              <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
               <placeholders>
                 <filesDir>/storage/miso/files/</filesDir>
               </placeholders>
@@ -1058,6 +1058,16 @@
                   <goal>integration-test</goal>
                   <goal>verify</goal>
                 </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+                      <artifactId>sqlstore</artifactId>
+                      <outputDirectory>target/test-classes/sqlstore</outputDirectory>
+                      <includes>db/**</includes>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
               </execution>
             </executions>
             <configuration>
