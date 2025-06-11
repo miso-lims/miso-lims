@@ -477,6 +477,10 @@ public class DefaultRunService implements RunService {
     } else if (isOxfordNanoporeRun(target)) {
       applyOxfordNanoporeChanges((OxfordNanoporeRun) target, (OxfordNanoporeRun) source);
     }
+    // Source metrics will only be set when coming from Run Scanner
+    if (source.getMetrics() != null) {
+      target.setMetrics(source.getMetrics());
+    }
   }
 
   private void applyContainerChanges(Run target, Run source) throws IOException {
