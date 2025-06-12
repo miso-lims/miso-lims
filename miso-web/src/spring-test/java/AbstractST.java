@@ -96,14 +96,19 @@ public abstract class AbstractST {
     // reset test data for each test
     Resource clearData = new FileSystemResource(getScript(CLEAR_DATA_SCRIPT));
 <<<<<<< HEAD
+<<<<<<< HEAD
     Resource testData = new FileSystemResource(getScript(DETAILED_SCRIPT));
 =======
     Resource testData = new FileSystemResource(getScript(isDetailedSampleMode() ? DETAILED_SCRIPT : PLAIN_SCRIPT));
 >>>>>>> e36728ea0 (tentative changes)
+=======
+    Resource testData = new FileSystemResource(getScript(DETAILED_SCRIPT));
+>>>>>>> 20b2e78ba (assume always detailed sample mode)
     ResourceDatabasePopulator populator = new ResourceDatabasePopulator(clearData, testData);
     populator.execute(dataSource);
   }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 
@@ -112,6 +117,8 @@ public abstract class AbstractST {
   }
 
 >>>>>>> e36728ea0 (tentative changes)
+=======
+>>>>>>> 20b2e78ba (assume always detailed sample mode)
   private File getScript(String filename) {
     File script = new File(SCRIPT_DIR + filename);
     if (!script.exists()) {
