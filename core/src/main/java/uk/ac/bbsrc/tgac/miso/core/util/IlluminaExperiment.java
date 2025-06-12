@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -192,7 +193,9 @@ public enum IlluminaExperiment {
         String read2Primer, String overrideCycles, String dragenVersion, String trimUMI, String fastqCompression) {
       settings.put("\n[BCLConvert_Settings]", "");
       settings.put("FastqCompressionFormat", fastqCompression);
-      settings.put("TrimUMI", trimUMI);
+      // TODO: Can only be shown if a UMI is present for at least 1 sample (according to OverrideCycles
+      // setting). Not sure how best to enable.
+      // settings.put("TrimUMI", trimUMI);
       applyDragenSettings(settings, dragenVersion, overrideCycles);
     }
 
@@ -208,25 +211,24 @@ public enum IlluminaExperiment {
       applyIlluminaReadsIndexes(reads, Read1Cycles, Read2Cycles, Index1Cycles, Index2Cycles);
     }
 
-    protected void applyCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
+    protected void applyCloud(Map<String, String> data, Set<List<String>> dataColumns, List<String> headers,
         List<SamplesheetSample> samples) {
       data.put("\n[Cloud_Settings]", "");
-
-      Collections.addAll(headers, "Lane", "Sample_ID", "ProjectName", "LibraryName", "LibraryPrepKitName",
-          "IndexAdapterKitName");
+      data.put("GeneratedVersion", "1.16.0.202410292136");
+      data.put("\n[Cloud_Data]", "");
+      Collections.addAll(headers, "Sample_ID", "ProjectName", "LibraryName");
       for (SamplesheetSample sample : samples) {
         List<String> currRow = new ArrayList<>();
-
-
-        Collections.addAll(currRow, String.valueOf(sample.lane), sample.sampleId,
-            sample.project, sample.library, sample.libraryPrepKit,
-            sample.index1());
+        Collections.addAll(currRow, sample.sampleId,
+            sample.project, sample.library);
         dataColumns.add(currRow);
       }
     }
   };
 
   private static final DateTimeFormatter MDY = DateTimeFormatter.ofPattern("M/d/yyyy");
+  private static final DateTimeFormatter MDY_HMS = DateTimeFormatter.ofPattern("yyyyddMMHHmmss");
+
 
   private final String description;
   private final boolean dragen;
@@ -253,7 +255,7 @@ public enum IlluminaExperiment {
     }
   }
 
-  protected void applyCloud(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
+  protected void applyCloud(Map<String, String> data, Set<List<String>> dataColumns, List<String> headers,
       List<SamplesheetSample> dataSection) {};
 
   protected void applyIlluminaHeader(Map<String, String> header, String experimentName, String instrument,
@@ -269,7 +271,7 @@ public enum IlluminaExperiment {
   protected void applyDragenHeader(Map<String, String> header, String experimentName, String instrument,
       String novaSeqXSeriesMapping) {
     header.put("FileFormatVersion", "2");
-    header.put("RunName", experimentName + ZonedDateTime.now().format(MDY));
+    header.put("RunName", ZonedDateTime.now().format(MDY_HMS));
     header.put("InstrumentPlatform", instrument.replace(novaSeqXSeriesMapping,
         "NovaSeqXSeries"));
     header.put("IndexOrientation", "Forward");
@@ -436,7 +438,7 @@ public enum IlluminaExperiment {
     final Map<String, String> data = new LinkedHashMap<>();
     final List<List<String>> dataColumns = new ArrayList<>();
     final Map<String, String> cloudData = new LinkedHashMap<>();
-    final List<List<String>> cloudDataColumns = new ArrayList<>();
+    final Set<List<String>> cloudDataColumns = new HashSet<>(); // Doesn't contain lane info so needs to be deduplicated
     final List<SamplesheetSample> allSamples = new ArrayList<>();
     final StringBuilder output = new StringBuilder();
 
@@ -576,7 +578,7 @@ public enum IlluminaExperiment {
     writeRows(dataColumns, output, nullReplacement);
     writeMap(cloudData, output);
     writeRow(cloudHeaders, output, nullReplacement);
-    writeRows(cloudDataColumns, output, nullReplacement);
+    writeRows(new ArrayList<>(cloudDataColumns), output, nullReplacement);
 
     return output.toString();
 

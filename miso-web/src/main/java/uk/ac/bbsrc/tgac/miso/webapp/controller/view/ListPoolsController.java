@@ -63,10 +63,10 @@ public class ListPoolsController {
   @Value("${miso.genomeFolder:}")
   private String genomeFolder;
 
-  @Value("${miso.samplesheet.dragenVersion:}")
+  @Value("${miso.pools.samplesheet.dragenVersion:}")
   private String dragenVersion;
 
-  @Value("${miso.samplesheet.compressionFormat:gzip}")
+  @Value("${miso.pools.samplesheet.compressionFormat:gzip}")
   private String compressionFormat;
 
   @ModelAttribute("title")

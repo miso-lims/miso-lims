@@ -433,7 +433,7 @@ BulkTarget.pool = (function ($) {
             property: "trimUMI",
             type: "select",
             label: "Trim UMI?",
-            values: ["True", "False"],
+            values: ["true", "false"],
             required: true,
           }
         );
