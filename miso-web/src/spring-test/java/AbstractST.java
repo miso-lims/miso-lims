@@ -19,7 +19,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
-
 @RunWith(SpringRunner.class)
 @ContextConfiguration("/it-context.xml")
 @PropertySource("/tomcat-config/miso.it.properties")
@@ -28,11 +27,8 @@ public abstract class AbstractST {
 
   private static final String SCRIPT_DIR = System.getProperty("basedir") + "/src/it/resources/db/migration/";
 
-
   private static final String CLEAR_DATA_SCRIPT = "clear_test_data.sql";
-  private static final String PLAIN_SCRIPT = "plainSample_integration_test_data.sql";
   private static final String DETAILED_SCRIPT = "integration_test_data.sql";
-
 
   private static Boolean constantsComplete = false;
 
@@ -41,7 +37,6 @@ public abstract class AbstractST {
 
   @Autowired
   private DataSource dataSource;
-
 
   @Before
   public final void setupAbstractTest() {
@@ -60,6 +55,5 @@ public abstract class AbstractST {
     }
     return script;
   }
-
 
 }
