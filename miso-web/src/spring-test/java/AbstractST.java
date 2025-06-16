@@ -1,10 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+
 import java.io.File;
 
 import javax.sql.DataSource;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +19,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -31,6 +37,13 @@ public abstract class AbstractST {
   private static final String DETAILED_SCRIPT = "integration_test_data.sql";
 
   private static Boolean constantsComplete = false;
+
+
+  @Autowired
+  private WebApplicationContext wac;
+
+  private MockMvc mockMvc;
+
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -67,6 +80,20 @@ public abstract class AbstractST {
       throw new IllegalStateException("Script not found: " + filename);
     }
     return script;
+  }
+
+  @Before
+  public void setup() {
+    this.mockMvc = webAppContextSetup(this.wac).build();
+  }
+
+  @Test
+  public void initialization() {
+    assertNotNull(wac);
+  }
+
+  protected MockMvc getMockMvc() {
+    return mockMvc;
   }
 
 }
