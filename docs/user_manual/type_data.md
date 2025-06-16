@@ -57,12 +57,15 @@ only be deleted if it is not used by any existing projects.
 
 ## Deliverables
 
-A deliverable is the product that will be transferred to the client. This is set at the project level, and can be 
-changed on both the Create Project and Edit Project page.
+A deliverable is the product that will be transferred to the client. This is set at the project
+level, and can be changed on both the Create Project and Edit Project page.
 
-Only MISO administrators are able to create, edit and delete deliverables using the standard interface. A deliverable
-is only deletable if it is not being used by any projects.
+Only MISO administrators are able to create, edit and delete deliverables using the standard
+interface. A deliverable can only be deleted if it is not being used by any projects.
 
+Deliverables may be divided into categories. MISO administrators can create, edit, and delete
+deliverable categories using the standard interface. A deliverable category can only be deleted if
+there are no deliverables linked to it.
 
 
 ## Sample Types

@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DeliverableCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
@@ -454,6 +455,11 @@ public class DeleteIT extends AbstractIT {
   @Test
   public void testDeleteDeliverable() {
     testAdminDelete(ListTarget.DELIVERABLES, null, "To Delete", Columns.NAME, Deliverable.class, 3L);
+  }
+
+  @Test
+  public void testDeleteDeliverableCategory() {
+    testAdminDelete(ListTarget.DELIVERABLE_CATEGORIES, null, "To Delete", Columns.NAME, DeliverableCategory.class, 3L);
   }
 
   @Test

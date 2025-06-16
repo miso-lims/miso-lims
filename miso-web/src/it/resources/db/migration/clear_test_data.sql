@@ -9,6 +9,8 @@ DELETE FROM Submission;
 DELETE FROM ExperimentChangeLog;
 DELETE FROM Experiment_Run_Partition;
 DELETE FROM Experiment;
+DELETE FROM Deliverable;
+DELETE FROM DeliverableCategory;
 DELETE FROM DetailedLibraryTemplate;
 DELETE FROM LibraryTemplate;
 DELETE FROM LibraryTemplate_Index1;

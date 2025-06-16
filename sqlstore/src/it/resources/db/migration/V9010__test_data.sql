@@ -271,10 +271,14 @@ INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`, defaultScientificNa
 (2, 'Human hg19', 1),
 (3, 'Human hg18 random', NULL);
 
-INSERT INTO Deliverable(deliverableId, name) VALUES
-(1, 'deliverable1'),
-(2, 'deliverable2'),
-(3, 'deliverable3');
+INSERT INTO DeliverableCategory (categoryId, name) VALUES
+(1, 'category1'),
+(2, 'category2');
+
+INSERT INTO Deliverable(deliverableId, name, categoryId) VALUES
+(1, 'deliverable1', 1),
+(2, 'deliverable2', 1),
+(3, 'deliverable3', 2);
 
 INSERT INTO ContactRole(contactRoleId, name) VALUES
 (2, 'role1'),
