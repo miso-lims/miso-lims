@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,33 +12,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DeliverableCategory;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.DeliverableCategoryService;
-import uk.ac.bbsrc.tgac.miso.core.service.DeliverableService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.dto.DeliverableCategoryDto;
-import uk.ac.bbsrc.tgac.miso.dto.DeliverableDto;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
-@RequestMapping("/deliverable")
-public class DeliverableController extends AbstractTypeDataController<Deliverable, DeliverableDto> {
+@RequestMapping("/deliverablecategory")
+public class DeliverableCategoryController
+    extends AbstractTypeDataController<DeliverableCategory, DeliverableCategoryDto> {
 
-  @Autowired
-  private DeliverableService deliverableService;
   @Autowired
   private DeliverableCategoryService deliverableCategoryService;
   @Autowired
   private AuthorizationManager authorizationManager;
 
-  public DeliverableController() {
-    super("Deliverables", "deliverable", "deliverable");
+  public DeliverableCategoryController() {
+    super("Deliverable Categories", "deliverablecategory", "deliverablecategory");
   }
 
   @Override
@@ -48,23 +38,23 @@ public class DeliverableController extends AbstractTypeDataController<Deliverabl
   }
 
   @Override
-  protected ProviderService<Deliverable> getService() {
-    return deliverableService;
+  protected ProviderService<DeliverableCategory> getService() {
+    return deliverableCategoryService;
   }
 
   @Override
-  protected DeliverableDto makeDto() {
-    return new DeliverableDto();
+  protected DeliverableCategoryDto toDto(DeliverableCategory object) {
+    return DeliverableCategoryDto.from(object);
   }
 
   @Override
-  protected DeliverableDto toDto(Deliverable object) {
-    return Dtos.asDto(object);
+  protected DeliverableCategoryDto makeDto() {
+    return new DeliverableCategoryDto();
   }
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
-    return listStatic(deliverableService.list(), model);
+    return listStatic(deliverableCategoryService.list(), model);
   }
 
   @GetMapping("/bulk/new")
@@ -77,9 +67,4 @@ public class DeliverableController extends AbstractTypeDataController<Deliverabl
     return bulkEdit(formData, model);
   }
 
-  @Override
-  protected void addHotConfig(ObjectNode config, ObjectMapper mapper) throws IOException {
-    List<DeliverableCategory> categories = deliverableCategoryService.list();
-    MisoWebUtils.addJsonArray(mapper, config, "categories", categories, DeliverableCategoryDto::from);
-  }
 }

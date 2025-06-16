@@ -112,6 +112,18 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
     return currentSession().createQuery(query).getResultList();
   }
 
+  protected List<T> listByIdList(SingularAttribute<T, Long> idProperty, Collection<Long> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<T> query = builder.createQuery(getResultClass());
+    Root<? extends T> root = query.from(getEntityClass());
+    query.select(root).where(root.get(idProperty).in(ids));
+    return currentSession().createQuery(query).getResultList();
+  }
+
   protected <U> long getUsageBy(Class<U> user, SingularAttribute<U, T> property, T value) {
     CriteriaBuilder builder = currentSession().getCriteriaBuilder();
     CriteriaQuery<Long> query = builder.createQuery(Long.class);

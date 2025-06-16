@@ -48,6 +48,10 @@ ListTarget.deliverable = (function ($) {
           mData: "name",
         },
         {
+          sTitle: "Category",
+          mData: "categoryName",
+        },
+        {
           sTitle: "Analysis Review Required",
           mData: "analysisReviewRequired",
           mRender: ListUtils.render.booleanChecks,

@@ -171,6 +171,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String CONTAINERS = "containers";
     public static final String CONTAINER_MODELS = "containermodel/list";
     public static final String DELIVERABLES = "deliverable/list";
+    public static final String DELIVERABLE_CATEGORIES = "deliverablecategory/list";
     public static final String DETAILED_QC_STATUS = "detailedqcstatus/list";
     public static final String EXPERIMENTS = "experiments";
     public static final String GROUPS = "admin/groups";

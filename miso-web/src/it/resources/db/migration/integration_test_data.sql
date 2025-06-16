@@ -1283,10 +1283,15 @@ INSERT INTO Submission(submissionId, title, alias, creationDate) VALUES
 INSERT INTO Submission_Experiment(submission_submissionId, experiments_experimentId) VALUES
 (1, 1);
 
-INSERT INTO Deliverable(deliverableId, name) VALUES
-(1, 'deliverable1'),
-(2, 'deliverable2'),
-(3, 'To Delete');
+INSERT INTO DeliverableCategory (categoryId, name) VALUES
+(1, "Data Release"),
+(2, "Clinical Report"),
+(3, "To Delete");
+
+INSERT INTO Deliverable(deliverableId, name, categoryId) VALUES
+(1, 'deliverable1', 1),
+(2, 'deliverable2', 2),
+(3, 'To Delete', 1);
 
 INSERT INTO ContactRole(contactRoleId, name) VALUES
 (2, 'role1'),

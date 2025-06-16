@@ -48,7 +48,7 @@ public class DeliverableRestController extends AbstractRestController {
   }
 
   @GetMapping("/bulk/{uuid}")
-  public @ResponseBody ObjectNode getProrgress(@PathVariable String uuid) throws Exception {
+  public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
     return asyncOperationManager.getAsyncProgress(uuid, Deliverable.class, deliverableService, Dtos::asDto);
   }
 

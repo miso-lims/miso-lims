@@ -136,6 +136,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deletion;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DeliverableCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryTemplate;
@@ -4558,6 +4559,8 @@ public class Dtos {
     DeliverableDto to = new DeliverableDto();
     setLong(to::setId, from.getId(), true);
     setString(to::setName, from.getName());
+    setId(to::setCategoryId, from.getCategory());
+    setString(to::setCategoryName, maybeGetProperty(from.getCategory(), DeliverableCategory::getName));
     setBoolean(to::setAnalysisReviewRequired, from.isAnalysisReviewRequired(), false);
     return to;
   }
@@ -4566,6 +4569,7 @@ public class Dtos {
     Deliverable to = new Deliverable();
     setLong(to::setId, from.getId(), false);
     setString(to::setName, from.getName());
+    setObject(to::setCategory, DeliverableCategory::new, from.getCategoryId());
     setBoolean(to::setAnalysisReviewRequired, from.isAnalysisReviewRequired(), false);
     return to;
   }
