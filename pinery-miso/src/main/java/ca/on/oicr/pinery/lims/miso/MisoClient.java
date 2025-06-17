@@ -43,6 +43,7 @@ import ca.on.oicr.pinery.api.AttributeName;
 import ca.on.oicr.pinery.api.Box;
 import ca.on.oicr.pinery.api.Change;
 import ca.on.oicr.pinery.api.ChangeLog;
+import ca.on.oicr.pinery.api.Deliverable;
 import ca.on.oicr.pinery.api.Instrument;
 import ca.on.oicr.pinery.api.InstrumentModel;
 import ca.on.oicr.pinery.api.Lims;
@@ -68,6 +69,7 @@ import ca.on.oicr.pinery.lims.DefaultAssayTest;
 import ca.on.oicr.pinery.lims.DefaultAttribute;
 import ca.on.oicr.pinery.lims.DefaultAttributeName;
 import ca.on.oicr.pinery.lims.DefaultChangeLog;
+import ca.on.oicr.pinery.lims.DefaultDeliverable;
 import ca.on.oicr.pinery.lims.DefaultInstrument;
 import ca.on.oicr.pinery.lims.DefaultInstrumentModel;
 import ca.on.oicr.pinery.lims.DefaultOrder;
@@ -246,11 +248,11 @@ public class MisoClient implements Lims {
       if (project.getDeliverables() == null) {
         project.setDeliverables(new HashSet<>());
       }
-      project.getDeliverables().add(rs.getString("deliverable"));
-
-      if (rs.getBoolean("analysisReviewRequired")) {
-        project.setAnalysisReviewRequired(true);
-      }
+      Deliverable deliverable = new DefaultDeliverable();
+      deliverable.setName(rs.getString("name"));
+      deliverable.setCategory(rs.getString("category"));
+      deliverable.setAnalysisReviewRequired(rs.getBoolean("analysisReviewRequired"));
+      project.getDeliverables().add(deliverable);
     });
     return projects;
   }
@@ -1483,8 +1485,6 @@ public class MisoClient implements Lims {
 
       p.setContactName(rs.getString("contactName"));
       p.setContactEmail(rs.getString("contactEmail"));
-      // set analysis review required false here. updated later when populating deliverables
-      p.setAnalysisReviewRequired(false);
       return p;
     }
 
