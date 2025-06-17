@@ -50,10 +50,10 @@ public enum IlluminaExperiment {
     }
 
     @Override
-    protected void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
+    protected void applyData(Map<String, String> data, List<List<String>> dataRows, List<String> headers,
         List<SamplesheetSample> samples) {
       data.put("\n[Data]", "");
-      applyIlluminaData(dataColumns, headers, samples);
+      applyIlluminaData(dataRows, headers, samples);
     }
   },
   LIBRARY_QC("Library QC", false) {
@@ -82,10 +82,10 @@ public enum IlluminaExperiment {
     }
 
     @Override
-    protected void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
+    protected void applyData(Map<String, String> data, List<List<String>> dataRows, List<String> headers,
         List<SamplesheetSample> samples) {
       data.put("\n[Data]", "");
-      applyIlluminaData(dataColumns, headers, samples);
+      applyIlluminaData(dataRows, headers, samples);
     }
   },
   METAGENOMICS_16S("Metagenomics 16S rRNA", false) {
@@ -113,10 +113,10 @@ public enum IlluminaExperiment {
     }
 
     @Override
-    protected void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
+    protected void applyData(Map<String, String> data, List<List<String>> dataRows, List<String> headers,
         List<SamplesheetSample> samples) {
       data.put("\n[Data]", "");
-      applyIlluminaData(dataColumns, headers, samples);
+      applyIlluminaData(dataRows, headers, samples);
     }
   },
   FASTQ_ONLY_NEXTERA_XT("FASTQ Only (Nextera XT)", false) {
@@ -144,10 +144,10 @@ public enum IlluminaExperiment {
     }
 
     @Override
-    protected void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
+    protected void applyData(Map<String, String> data, List<List<String>> dataRows, List<String> headers,
         List<SamplesheetSample> samples) {
       data.put("\n[Data]", "");
-      applyIlluminaData(dataColumns, headers, samples);
+      applyIlluminaData(dataRows, headers, samples);
     }
   },
   FASTQ_ONLY_TRUSEQ_NANO_DNA("FASTQ Only (TruSeq Nano DNA)", false) {
@@ -176,10 +176,10 @@ public enum IlluminaExperiment {
     }
 
     @Override
-    protected void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
+    protected void applyData(Map<String, String> data, List<List<String>> dataRows, List<String> headers,
         List<SamplesheetSample> samples) {
       data.put("\n[Data]", "");
-      applyIlluminaData(dataColumns, headers, samples);
+      applyIlluminaData(dataRows, headers, samples);
     }
 
   },
@@ -199,10 +199,10 @@ public enum IlluminaExperiment {
       applyDragenSettings(settings, dragenVersion, overrideCycles);
     }
 
-    protected void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
+    protected void applyData(Map<String, String> data, List<List<String>> dataRows, List<String> headers,
         List<SamplesheetSample> samples) {
       data.put("\n[BCLConvert_Data]", "");
-      applyDragenData(dataColumns, headers, samples);
+      applyDragenData(dataRows, headers, samples);
     }
 
     protected void applyReads(Map<String, String> reads, Integer Read1Cycles, Integer Read2Cycles,
@@ -211,7 +211,7 @@ public enum IlluminaExperiment {
       applyIlluminaReadsIndexes(reads, Read1Cycles, Read2Cycles, Index1Cycles, Index2Cycles);
     }
 
-    protected void applyCloud(Map<String, String> data, Set<List<String>> dataColumns, List<String> headers,
+    protected void applyCloud(Map<String, String> data, Set<List<String>> dataRows, List<String> headers,
         List<SamplesheetSample> samples) {
       data.put("\n[Cloud_Settings]", "");
       data.put("GeneratedVersion", "1.16.0.202410292136");
@@ -221,7 +221,7 @@ public enum IlluminaExperiment {
         List<String> currRow = new ArrayList<>();
         Collections.addAll(currRow, sample.sampleId,
             sample.project, sample.library);
-        dataColumns.add(currRow);
+        dataRows.add(currRow);
       }
     }
   };
@@ -244,7 +244,7 @@ public enum IlluminaExperiment {
   protected abstract void applySettings(Map<String, String> settings, String read1Primer, String indexPrimer,
       String read2Primer, String overrideCycles, String dragenVersion, String trimUMI, String fastqCompression);
 
-  protected abstract void applyData(Map<String, String> data, List<List<String>> dataColumns, List<String> headers,
+  protected abstract void applyData(Map<String, String> data, List<List<String>> dataRows, List<String> headers,
       List<SamplesheetSample> dataSection);
 
   protected void applyReads(Map<String, String> reads, Integer Read1Cycles, Integer Read2Cycles,
@@ -255,7 +255,7 @@ public enum IlluminaExperiment {
     }
   }
 
-  protected void applyCloud(Map<String, String> data, Set<List<String>> dataColumns, List<String> headers,
+  protected void applyCloud(Map<String, String> data, Set<List<String>> dataRows, List<String> headers,
       List<SamplesheetSample> dataSection) {};
 
   protected void applyIlluminaHeader(Map<String, String> header, String experimentName, String instrument,
@@ -436,9 +436,9 @@ public enum IlluminaExperiment {
     final Map<String, String> settings = new LinkedHashMap<>();
     final Map<String, String> reads = new LinkedHashMap<>();
     final Map<String, String> data = new LinkedHashMap<>();
-    final List<List<String>> dataColumns = new ArrayList<>();
+    final List<List<String>> dataRows = new ArrayList<>();
     final Map<String, String> cloudData = new LinkedHashMap<>();
-    final Set<List<String>> cloudDataColumns = new HashSet<>(); // Doesn't contain lane info so needs to be deduplicated
+    final Set<List<String>> cloudDataRows = new HashSet<>(); // Doesn't contain lane info so needs to be deduplicated
     final List<SamplesheetSample> allSamples = new ArrayList<>();
     final StringBuilder output = new StringBuilder();
 
@@ -503,6 +503,7 @@ public enum IlluminaExperiment {
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
         final List<Pair<Pair<String, String>, Pair<String, String>>> outputIndicies;
+
 
         // If no indices are found, create a default "No Index" entry
         // Otherwise, build the indices using the extracted values
@@ -570,15 +571,15 @@ public enum IlluminaExperiment {
       }
     }
 
-    applyData(data, dataColumns, dataHeaders, allSamples);
-    applyCloud(cloudData, cloudDataColumns, cloudHeaders, allSamples);
+    applyData(data, dataRows, dataHeaders, allSamples);
+    applyCloud(cloudData, cloudDataRows, cloudHeaders, allSamples);
 
     writeMap(data, output);
     writeRow(dataHeaders, output, nullReplacement);
-    writeRows(dataColumns, output, nullReplacement);
+    writeRows(dataRows, output, nullReplacement);
     writeMap(cloudData, output);
     writeRow(cloudHeaders, output, nullReplacement);
-    writeRows(new ArrayList<>(cloudDataColumns), output, nullReplacement);
+    writeRows(new ArrayList<>(cloudDataRows), output, nullReplacement);
 
     return output.toString();
 
