@@ -563,7 +563,7 @@ public enum IlluminaExperiment {
               genomeFolder, // Genome Folder
               element.getAliquot().getAliquotBarcode() != null ? element.getAliquot().getAliquotBarcode()
                   : null, // Description
-              library.getName(), // Library
+              element.getAliquot().getName(), // Library
               null // Library Prep Kit
           ));
 
