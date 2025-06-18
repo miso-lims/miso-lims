@@ -6,6 +6,8 @@
                       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
                       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
   default-autowire="byName">
+  <!-- hardcoded the path temporarily for testing -->
+  <context:property-placeholder location="file:/etc/tomcat/conf/Catalina/localhost/miso.properties" />
 
   <bean id="jspViewResolver"
     class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -19,8 +21,9 @@
     class="org.springframework.web.multipart.support.StandardServletMultipartResolver">
   </bean>
 
+  <!-- hardcoded temporarily for testing -->
   <bean id="misoFileManager" class="uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager">
-    <property name="fileStorageDirectory" value="${miso.fileStorageDirectory}" />
+    <property name="fileStorageDirectory" value="/storage/miso/files" />
   </bean>
 
   <!-- further naming scheme config happens in MisoAppListener -->

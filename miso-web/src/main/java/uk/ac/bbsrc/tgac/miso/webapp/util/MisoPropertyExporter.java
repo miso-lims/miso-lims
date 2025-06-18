@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -46,25 +43,31 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.util.CollectionUtils;
 
 /**
- * A handy class that exposes property placeholders discovered at webapp init time by a PropertyPlaceholderConfigurer.
+ * A handy class that exposes property placeholders discovered at webapp init time by a
+ * PropertyPlaceholderConfigurer.
  * <p/>
- * This class accepts a list of available property files referenced in the Spring configs via a property list, or alternatively you can
- * supply a single MISO miso.properties file that contains the base MISO storage directory (where other property files are housed). These
- * additional properties files will be discovered at runtime, imported into the base properties, and used by Spring to do its magic.
+ * This class accepts a list of available property files referenced in the Spring configs via a
+ * property list, or alternatively you can supply a single MISO miso.properties file that contains
+ * the base MISO storage directory (where other property files are housed). These additional
+ * properties files will be discovered at runtime, imported into the base properties, and used by
+ * Spring to do its magic.
  * <p/>
- * As an aside, usually these properties are not available to beans, but this class exposes them via getResolvedProperties()
+ * As an aside, usually these properties are not available to beans, but this class exposes them via
+ * getResolvedProperties()
  * 
  * @author Rob Davey
  * @date 01-Sep-2010
  * @since 0.0.2
  */
+// @PropertySource("/miso-web/src/main/resources/miso.properties")
 public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
   private static final Logger log = LoggerFactory.getLogger(MisoPropertyExporter.class);
 
   private Map<String, String> resolvedProperties;
 
   @Override
-  protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties misoProps) throws BeansException {
+  protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties misoProps)
+      throws BeansException {
 
     String baseStoragePath = misoProps.getProperty("miso.baseDirectory");
     if (baseStoragePath != null) {
@@ -73,7 +76,8 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
         baseStoragePath += "/";
       }
 
-      // set a system property to the base directory so that other systems can be configured based on this path
+      // set a system property to the base directory so that other systems can be configured based on this
+      // path
       System.setProperty("miso.baseDirectory", baseStoragePath);
 
       Map<String, String> propchecks = MisoWebUtils.checkCorePropertiesFiles(baseStoragePath);

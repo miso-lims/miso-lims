@@ -954,7 +954,8 @@
                     <resource>
                       <filtering>true</filtering>
                       <!-- uses the same resources as the integration tests -->
-                      <directory>src/it/resources</directory>
+                      <!-- may need some addtional config, so get it from here -->
+                      <directory>src/main/webapp/WEB-INF</directory>
                     </resource>
                   </resources>
                 </configuration>
