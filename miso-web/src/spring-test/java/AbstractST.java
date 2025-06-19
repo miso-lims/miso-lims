@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -26,13 +27,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ProjectRestController;
 
-// @TestPropertySource("/tomcat-config/miso.it.properties")
 @RunWith(SpringRunner.class)
-@ContextConfiguration("classpath:/st-context.xml")
+@ContextConfiguration("/st-context.xml")
 @WebAppConfiguration
+@PropertySource("/tomcat-config/miso.it.properties")
 public abstract class AbstractST {
-  // base directory for property source is miso-web/src/it/resources, forget where this was set
-
   private static final Logger log = LoggerFactory.getLogger(AbstractST.class);
 
   private static final String SCRIPT_DIR = System.getProperty("basedir") + "/src/it/resources/db/migration/";

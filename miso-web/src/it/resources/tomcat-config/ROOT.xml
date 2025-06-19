@@ -1,3 +1,5 @@
 <Context>
-  <Parameter name="miso.propertiesFile" value="file:${project.build.directory}/tomcat10/conf/Catalina/localhost/miso.it.properties" override="false"/>
+<!-- temp path change -->
+<!-- if doesn't work, try the project path directly to the miso.it.properties here -->
+  <Parameter name="miso.propertiesFile" "classpath:/tomcat-config/miso.it.properties" override="true"/>
 </Context>

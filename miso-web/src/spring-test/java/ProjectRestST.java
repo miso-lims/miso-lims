@@ -25,14 +25,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import org.springframework.web.servlet.View;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ProjectRestController;
 
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.test.context.ContextConfiguration;
-
 import static org.junit.Assert.*;
 
 import org.springframework.test.web.servlet.MockMvc;
 
-// might need webappconfig annotation here
 public class ProjectRestST extends AbstractST {
 
   @Test
