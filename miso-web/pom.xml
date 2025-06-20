@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>miso</artifactId>
@@ -18,8 +19,10 @@
     <mysql.rootpw>abc123</mysql.rootpw>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
-    <db.params> autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER&amp;cacheDefaultTimeZone=false</db.params>
-    <db.params.jndi> autoReconnect=true&amp;amp;characterEncoding=UTF-8&amp;amp;allowPublicKeyRetrieval=true&amp;amp;sslMode=DISABLED&amp;amp;connectionTimeZone=SERVER&amp;amp;cacheDefaultTimeZone=false</db.params.jndi>
+    <db.params>
+      autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER&amp;cacheDefaultTimeZone=false</db.params>
+    <db.params.jndi>
+      autoReconnect=true&amp;amp;characterEncoding=UTF-8&amp;amp;allowPublicKeyRetrieval=true&amp;amp;sslMode=DISABLED&amp;amp;connectionTimeZone=SERVER&amp;amp;cacheDefaultTimeZone=false</db.params.jndi>
 
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
@@ -955,7 +958,7 @@
                       <filtering>true</filtering>
                       <!-- uses the same resources as the integration tests -->
                       <!-- may need some addtional config, so get it from here -->
-                      <directory>src/main/webapp/WEB-INF</directory>
+                      <directory>src/it/resources</directory>
                     </resource>
                   </resources>
                 </configuration>
@@ -1050,7 +1053,7 @@
               </placeholders>
             </configuration>
           </plugin>
-         <plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <executions>
@@ -1070,8 +1073,10 @@
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
               </systemPropertyVariables>
               <skipITs>${skipSTs}</skipITs>
-              <trimStackTrace>false</trimStackTrace>  
-              <includes><include>**/*ST.java</include></includes>
+              <trimStackTrace>false</trimStackTrace>
+              <includes>
+                <include>**/*ST.java</include>
+              </includes>
             </configuration>
           </plugin>
         </plugins>
