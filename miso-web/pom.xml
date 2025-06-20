@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>miso</artifactId>
@@ -19,10 +18,8 @@
     <mysql.rootpw>abc123</mysql.rootpw>
     <mysql.user>tgaclims</mysql.user>
     <mysql.pw>tgaclims</mysql.pw>
-    <db.params>
-      autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER&amp;cacheDefaultTimeZone=false</db.params>
-    <db.params.jndi>
-      autoReconnect=true&amp;amp;characterEncoding=UTF-8&amp;amp;allowPublicKeyRetrieval=true&amp;amp;sslMode=DISABLED&amp;amp;connectionTimeZone=SERVER&amp;amp;cacheDefaultTimeZone=false</db.params.jndi>
+    <db.params> autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER&amp;cacheDefaultTimeZone=false</db.params>
+    <db.params.jndi> autoReconnect=true&amp;amp;characterEncoding=UTF-8&amp;amp;allowPublicKeyRetrieval=true&amp;amp;sslMode=DISABLED&amp;amp;connectionTimeZone=SERVER&amp;amp;cacheDefaultTimeZone=false</db.params.jndi>
 
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
@@ -271,6 +268,18 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.jayway.jsonpath</groupId>
+      <artifactId>json-path</artifactId>
+      <version>2.9.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <version>3.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -1071,6 +1080,7 @@
                 <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</miso.it.mysql.url>
                 <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
+                <security.method>jdbc</security.method>
               </systemPropertyVariables>
               <skipITs>${skipSTs}</skipITs>
               <trimStackTrace>false</trimStackTrace>
