@@ -25,7 +25,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ProjectRestController;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration("/st-context.xml")
@@ -40,12 +39,6 @@ public abstract class AbstractST {
   private static final String DETAILED_SCRIPT = "integration_test_data.sql";
 
   private static Boolean constantsComplete = false;
-
-
-  @Autowired
-  ProjectRestController pr; // attempt to replicate the no such bean issue (will let me know if the packages are getting
-                            // scanned or not)
-
 
   @Autowired
   protected WebApplicationContext wac;

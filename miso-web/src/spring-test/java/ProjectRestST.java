@@ -20,6 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.hamcrest.Matchers.*;
+
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import org.springframework.web.servlet.View;
@@ -31,31 +33,31 @@ import org.springframework.test.web.servlet.MockMvc;
 
 public class ProjectRestST extends AbstractST {
 
+  private String controllerBase = "/rest/projects";
+
   @Test
   public void testGetById() throws Exception {
 
     // remember that the mockmvc is configured to always be ok (change later for exception testing if
     // need be)
 
-    getMockMvc().perform(get("/rest/projects/1")
+    getMockMvc().perform(get(controllerBase + "/1")
         .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andDo(print());
-
-    // MvcResult testProj = this.mockMvc.perform(get("/rest/projects/1")).getResponse();;
-
-    // Project testProj = mmockMvc.perform(get("/rest/projects/1")).;
-
-    // assertNotNull(testProj);
-    // // assertTrue(testProj.getName().equals("PRO1"));
-    // // assertTrue(testProj.getDescription().equals("Test project"));
-    // // assertTrue(testProj.getCreationTime().equals(Date("2015-08-27 15:40:15")));
-    // // assertTrue(testProj.getTitle().equals("TEST1"));
-    // // assertTrue(testProj.getCode().equals("TEST1"));
-    // // assertTrue(testProj.getLastModified().equals(testProj))
+        .andExpect(jsonPath("$.title").value("Project One"))
+        .andExpect(jsonPath("$.name").value("PRO1"))
+        .andExpect(jsonPath("$.code").value("PONE"))
+        .andExpect(jsonPath("$.creationDate").value("2017-06-26"));// .andDo(print()).andReturn(); // for testing
   }
 
+  @Test
+  public void testGetBySearch() throws Exception {
+    getMockMvc().perform(get(controllerBase + "/search").param("q", "PRO").accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.*", hasSize(17)));
 
+  }
 
 }
