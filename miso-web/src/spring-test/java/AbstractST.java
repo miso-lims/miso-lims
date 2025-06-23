@@ -4,12 +4,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.sql.DataSource;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration("/st-context.xml")
@@ -52,8 +55,18 @@ public abstract class AbstractST {
   @Autowired
   private DataSource dataSource;
 
+  @Mock
+  @Autowired
+  private AuthorizationManager authorizationManager;
+
+
+  // @Autowired
+  // private UserService userService;
+
   @Before
-  public final void setupAbstractTest() {
+  public final void setupAbstractTest() throws IOException {
+    // MockitoAnnotations.initMocks(this);
+
 
     // reset test data for each test
     Resource clearData = new FileSystemResource(getScript(CLEAR_DATA_SCRIPT));
@@ -61,6 +74,20 @@ public abstract class AbstractST {
     ResourceDatabasePopulator populator = new ResourceDatabasePopulator(clearData, testData);
     populator.execute(dataSource);
   }
+
+  // private void setUser(boolean isAdmin, Group... groups) throws IOException {
+  // User user = userService.get(1L); // getting a real user may fix the issue
+
+  // Mockito.when(authorizationManager.getCurrentUser()).thenReturn(user);
+  // Mockito.when(authorizationManager.isAdminUser()).thenReturn(isAdmin);
+  // // Mockito.when(user.isAdmin()).thenReturn(isAdmin); // this might fix the issue
+  // Mockito.when(authorizationManager.isGroupMember(Mockito.any())).thenReturn(false);
+  // if (groups.length > 0) {
+  // for (Group group : groups) {
+  // Mockito.when(authorizationManager.isGroupMember(group)).thenReturn(true);
+  // }
+  // }
+  // }
 
   private File getScript(String filename) {
     File script = new File(SCRIPT_DIR + filename);
