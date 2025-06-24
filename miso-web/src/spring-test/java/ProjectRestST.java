@@ -109,7 +109,6 @@ public class ProjectRestST extends AbstractST {
         .andExpect(status().isOk()).andDo(print());
 
 
-    // use get request to verify that the put worked (testGetById is thus a higher priority test here)
     getMockMvc()
         .perform(get(controllerBase + "/search").param("q", "new test project").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -127,11 +126,12 @@ public class ProjectRestST extends AbstractST {
     System.out.println(projJson);
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-    ProjectImpl proj = mapper.readValue(projJson, ProjectImpl.class);
 
+    Project proj = mapper.readValue(projJson, ProjectImpl.class);
+    proj.setName("changed testing project");
     ProjectDto dto = Dtos.asDto(proj, true);
 
-    dto.setName("changed testing project");
+
 
     // ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
     String requestJson = mapper.writeValueAsString(dto);

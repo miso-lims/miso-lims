@@ -1,5 +1,3 @@
 <Context>
-<!-- temp path change -->
-<!-- if doesn't work, try the project path directly to the miso.it.properties here -->
   <Parameter name="miso.propertiesFile" "classpath:/tomcat-config/miso.it.properties" override="true"/>
 </Context>

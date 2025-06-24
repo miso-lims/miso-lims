@@ -70,16 +70,13 @@
     <property name="transactionManager" ref="transactionManager" />
   </bean>
 
-  <bean id="jspViewResolver"
-    class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+  <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
     <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
   </bean>
 
-  <bean id="authorizationManager"
-    class="uk.ac.bbsrc.tgac.miso.service.security.DefaultAuthorizationManager" />
+  <bean id="authorizationManager" class="uk.ac.bbsrc.tgac.miso.service.security.DefaultAuthorizationManager" />
 
-  <bean id="multipartResolver"
-    class="org.springframework.web.multipart.support.StandardServletMultipartResolver">
+  <bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver">
   </bean>
 
   <bean id="misoFileManager" class="uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager">
@@ -87,7 +84,19 @@
   </bean>
 
   <!-- further naming scheme config happens in MisoAppListener -->
-  <bean id="namingSchemeResolverService" name="namingSchemeResolverService"
-    class="uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService" />
+  <bean id="namingSchemeResolverService" name="namingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService" />
+
+
+  <!-- maybe add properties to this -->
+  <bean id="servletContext" class="org.springframework.mock.web.MockServletContext">
+    <property name="initParameters">
+      <map>
+        <entry key="contextConfigLocation" value="classpath:st-context.xml"/>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="wac" class="org.springframework.web.context.support.XmlWebApplicationContext"/>
+
 
 </beans>

@@ -19,6 +19,9 @@ public class ValidationException extends RuntimeException {
   public ValidationException(List<ValidationError> errors) {
     super("Validation failed");
     this.errors = errors;
+    for (ValidationError err : errors) { // TEMPORARY FOR TESTING
+      throw new RuntimeException(err.getMessage(), getCause());
+    }
   }
 
   /**

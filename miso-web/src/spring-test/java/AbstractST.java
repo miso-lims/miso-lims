@@ -19,18 +19,23 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.servlet.ServletContextEvent;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.webapp.context.MisoAppListener;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration("/st-context.xml")
+@ContextConfiguration(locations = {"/st-context.xml"},
+    loader = org.springframework.test.context.support.GenericXmlContextLoader.class)
 @WebAppConfiguration
 @PropertySource("/tomcat-config/miso.it.properties")
 public abstract class AbstractST {
@@ -44,7 +49,7 @@ public abstract class AbstractST {
   private static Boolean constantsComplete = false;
 
   @Autowired
-  protected WebApplicationContext wac;
+  protected XmlWebApplicationContext wac;
 
   private MockMvc mockMvc;
 
@@ -66,6 +71,17 @@ public abstract class AbstractST {
   @Before
   public final void setupAbstractTest() throws IOException {
     // MockitoAnnotations.initMocks(this);
+
+    MockServletContext mockServletContext = new MockServletContext();
+    // wac.setServletContext(mockServletContext);
+
+
+    mockServletContext.setAttribute(
+        WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, wac);
+
+
+    new MisoAppListener().contextInitialized(
+        new ServletContextEvent(mockServletContext));
 
 
     // reset test data for each test
