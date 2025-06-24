@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 public class ValidationException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
-  
+
   private final List<ValidationError> errors;
 
   /**
@@ -52,7 +52,8 @@ public class ValidationException extends RuntimeException {
 
   public Map<String, String> getErrorsByField() {
     return errors.stream()
-        .collect(Collectors.toMap(ValidationError::getProperty, ValidationError::getMessage, (msg1, msg2) -> msg1 + "\n" + msg2));
+        .collect(Collectors.toMap(ValidationError::getProperty, ValidationError::getMessage,
+            (msg1, msg2) -> msg1 + "\n" + msg2));
   }
 
 }
