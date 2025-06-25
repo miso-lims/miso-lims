@@ -15,6 +15,8 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.context.support.XmlWebApplicationContext;
@@ -56,15 +58,21 @@ import org.springframework.web.multipart.support.StandardServletMultipartResolve
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
+import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
+
 import jakarta.persistence.EntityManagerFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDeletionDao;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSecurityDao;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultUserService;
 import uk.ac.bbsrc.tgac.miso.service.security.DefaultAuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
 @Configuration
 @EnableTransactionManagement
 @PropertySource(value = {"classpath:/tomcat-config/miso.it.properties"})
+@WebAppConfiguration("src/it/resources")
 public class STConfig {
 
   @Bean
@@ -169,6 +177,33 @@ public class STConfig {
   public DefaultAuthorizationManager authorizationManager() {
     return new DefaultAuthorizationManager();
   }
+
+  @Bean
+  public DefaultUserService userService() {
+    return new DefaultUserService();
+  }
+
+  @Bean
+  public HibernateSecurityDao securityStore() {
+    return new HibernateSecurityDao();
+  }
+
+  @Bean
+  public HibernateDeletionDao deletionStore() {
+    return new HibernateDeletionDao();
+  }
+
+
+  @Bean
+  public LocalSecurityManager securityManager() {
+    return new LocalSecurityManager();
+  }
+
+  @Bean
+  public BCryptPasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
 
   @Bean
   public MisoFilesManager misoFilesManager() {

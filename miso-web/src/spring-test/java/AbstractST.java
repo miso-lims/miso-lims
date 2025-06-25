@@ -35,9 +35,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.context.MisoAppListener;
 
 
 // loader = org.springframework.test.context.support.GenericXmlContextLoader.class)
-// @WebAppConfiguration
+@WebAppConfiguration("src/it/resources")
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {STConfig.class})
+@ContextConfiguration(classes = STConfig.class)
 public abstract class AbstractST {
   private static final Logger log = LoggerFactory.getLogger(AbstractST.class);
 
@@ -48,8 +48,8 @@ public abstract class AbstractST {
 
   private static Boolean constantsComplete = false;
 
-  @Autowired
-  private MockServletContext servletContext;
+  // @Autowired
+  // private MockServletContext servletContext;
 
   @Autowired
   protected XmlWebApplicationContext wac;
@@ -63,9 +63,9 @@ public abstract class AbstractST {
   @Autowired
   private DataSource dataSource;
 
-  @Mock
-  @Autowired
-  private AuthorizationManager authorizationManager;
+  // @Mock
+  // @Autowired
+  // private AuthorizationManager authorizationManager;
 
 
   // @Autowired
@@ -79,12 +79,12 @@ public abstract class AbstractST {
     // wac.setServletContext(mockServletContext);
 
 
-    servletContext.setAttribute(
-        WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, wac);
+    // servletContext.setAttribute(
+    // WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, wac);
 
 
-    new MisoAppListener().contextInitialized(
-        new ServletContextEvent(servletContext));
+    // new MisoAppListener().contextInitialized(
+    // new ServletContextEvent(servletContext));
 
 
     // reset test data for each test
