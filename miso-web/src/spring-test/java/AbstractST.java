@@ -33,11 +33,11 @@ import jakarta.servlet.ServletContextEvent;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.context.MisoAppListener;
 
+
+// loader = org.springframework.test.context.support.GenericXmlContextLoader.class)
+// @WebAppConfiguration
 @RunWith(SpringRunner.class)
-@ContextConfiguration(locations = {"/st-context.xml"},
-    loader = org.springframework.test.context.support.GenericXmlContextLoader.class)
-@WebAppConfiguration
-@PropertySource("/tomcat-config/miso.it.properties")
+@ContextConfiguration(classes = {STConfig.class})
 public abstract class AbstractST {
   private static final Logger log = LoggerFactory.getLogger(AbstractST.class);
 
@@ -47,6 +47,9 @@ public abstract class AbstractST {
   private static final String DETAILED_SCRIPT = "integration_test_data.sql";
 
   private static Boolean constantsComplete = false;
+
+  @Autowired
+  private MockServletContext servletContext;
 
   @Autowired
   protected XmlWebApplicationContext wac;
@@ -72,16 +75,16 @@ public abstract class AbstractST {
   public final void setupAbstractTest() throws IOException {
     // MockitoAnnotations.initMocks(this);
 
-    MockServletContext mockServletContext = new MockServletContext();
+    // MockServletContext mockServletContext = new MockServletContext();
     // wac.setServletContext(mockServletContext);
 
 
-    mockServletContext.setAttribute(
+    servletContext.setAttribute(
         WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, wac);
 
 
     new MisoAppListener().contextInitialized(
-        new ServletContextEvent(mockServletContext));
+        new ServletContextEvent(servletContext));
 
 
     // reset test data for each test
