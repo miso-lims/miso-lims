@@ -71,7 +71,7 @@ public abstract class AbstractST {
     // reset test data for each test
     Resource clearData = new FileSystemResource(getScript(CLEAR_DATA_SCRIPT));
     Resource testData = new FileSystemResource(getScript(DETAILED_SCRIPT));
->>>>>>> 20b2e78ba (assume always detailed sample mode)
+
     ResourceDatabasePopulator populator = new ResourceDatabasePopulator(clearData, testData);
     populator.execute(dataSource);
   }
