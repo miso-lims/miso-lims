@@ -14,9 +14,9 @@ import javax.management.MalformedObjectNameException;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import io.prometheus.jmx.JmxCollector;
 import io.prometheus.metrics.instrumentation.jvm.JvmMetrics;
@@ -33,10 +33,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
- * The custom MISO context listener class. On webapp context init, we can do
- * some startup checks,
- * e.g. checking the existence of required directories/files for sane app
- * startup
+ * The custom MISO context listener class. On webapp context init, we can do some startup checks,
+ * e.g. checking the existence of required directories/files for sane app startup
  * 
  * @author Rob Davey
  * @since 0.0.2
@@ -60,7 +58,7 @@ public class MisoAppListener implements ServletContextListener {
     JvmMetrics.builder().register();
 
     ServletContext application = event.getServletContext();
-    XmlWebApplicationContext context = (XmlWebApplicationContext) WebApplicationContextUtils
+    WebApplicationContext context = WebApplicationContextUtils
         .getRequiredWebApplicationContext(application);
 
     // resolve property file configuration placeholders
@@ -110,10 +108,10 @@ public class MisoAppListener implements ServletContextListener {
     }
   }
 
-  private void initializeNamingSchemes(XmlWebApplicationContext context, Map<String, String> misoProperties) {
+  private void initializeNamingSchemes(WebApplicationContext context, Map<String, String> misoProperties) {
     // set up naming schemes
     NamingSchemeResolverService resolver = (NamingSchemeResolverService) context.getBean("namingSchemeResolverService");
-    NamingSchemeHolder schemeHolder = context.getBeanFactory().getBean(NamingSchemeHolder.class);
+    NamingSchemeHolder schemeHolder = context.getBean(NamingSchemeHolder.class);
 
     schemeHolder.setPrimary(getConfiguredNamingScheme("miso.naming", misoProperties, resolver));
     if (schemeHolder.getPrimary() == null) {

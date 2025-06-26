@@ -19,6 +19,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -27,7 +28,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.servlet.ServletContextEvent;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.webapp.context.MisoAppListener;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration("/st-context.xml")
@@ -66,7 +69,9 @@ public abstract class AbstractST {
   @Before
   public final void setupAbstractTest() throws IOException {
     // MockitoAnnotations.initMocks(this);
-
+    MockServletContext ctx = new MockServletContext();
+    ctx.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, wac);
+    new MisoAppListener().contextInitialized(new ServletContextEvent(ctx));
 
     // reset test data for each test
     Resource clearData = new FileSystemResource(getScript(CLEAR_DATA_SCRIPT));
