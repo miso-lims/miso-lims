@@ -287,12 +287,6 @@
       <version>3.0</version>
       <scope>test</scope>
     </dependency>
-    <!-- adding this cause it might help -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>2.0.17</version>
-    </dependency>
   </dependencies>
   <build>
     <finalName>ROOT</finalName>
@@ -1098,14 +1092,6 @@
               <includes>
                 <include>**/*ST.java</include>
               </includes>
-              <!-- might work -->
-              <!-- <properties>
-                <db.host>localhost</db.host>
-                <db.name>miso</db.name>
-                <db.port>3306</db.port>
-                <db.user>admin</db.user>
-                <db.pass>admin</db.pass>
-              </properties> -->
               <!-- <properties>
                 <property>
                   <name>listener</name>

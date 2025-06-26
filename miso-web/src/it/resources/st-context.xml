@@ -19,14 +19,13 @@
   <context:component-scan annotation-config="true" base-package="com.eaglegenomics.simlims" />
   <context:component-scan annotation-config="true" base-package="uk.ac.bbsrc.tgac.miso" />
 
-  <context:property-placeholder location="classpath:/tomcat-config/miso.it.properties" ignore-unresolvable="true"/>
-
-  <!-- <bean id="propertyConfigurer" class="uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter">
+  <context:property-placeholder location="classpath:/tomcat-config/miso.it.properties" />
+  <bean id="propertyConfigurer" class="uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter">
     <property name="location" value="classpath:/tomcat-config/miso.it.properties" />
-  </bean> -->
+  </bean>
 
 
-  <!-- <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+  <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
     <property name="dataSource" ref="dataSource" />
     <property name="packagesToScan">
       <list>
@@ -42,62 +41,62 @@
         <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
       </props>
     </property>
-  </bean> -->
+  </bean>
 
-  <!-- <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+  <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
     <property name="showSql" value="false" />
     <property name="generateDdl" value="false" />
-  </bean> -->
+  </bean>
 
-  <!-- <bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+  <bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
   <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
 
   <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <property name="url" value="${miso.it.mysql.url}" />
     <property name="username" value="${miso.it.mysql.user}" />
     <property name="password" value="${miso.it.mysql.pw}" />
-  </bean> -->
+  </bean>
 
-  <!-- <bean name="interfaceTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+  <bean name="interfaceTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
     <property name="dataSource" ref="dataSource" />
-  </bean> -->
+  </bean>
 
-  <!-- <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+  <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
     <property name="entityManagerFactory" ref="entityManagerFactory" />
     <property name="dataSource" ref="dataSource" />
-  </bean> -->
+  </bean>
 
-  <!-- <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+  <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
     <property name="transactionManager" ref="transactionManager" />
-  </bean> -->
+  </bean>
 
-  <!-- <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+  <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
     <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
-  </bean> -->
+  </bean>
 
-  <!-- <bean id="authorizationManager" class="uk.ac.bbsrc.tgac.miso.service.security.DefaultAuthorizationManager" /> -->
+  <bean id="authorizationManager" class="uk.ac.bbsrc.tgac.miso.service.security.DefaultAuthorizationManager" />
 
-  <!-- <bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver">
-  </bean> -->
+  <bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver">
+  </bean>
 
-  <!-- <bean id="misoFileManager" class="uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager">
+  <bean id="misoFileManager" class="uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager">
     <property name="fileStorageDirectory" value="/storage/miso/files" />
-  </bean> -->
+  </bean>
 
   <!-- further naming scheme config happens in MisoAppListener -->
-  <!-- <bean id="namingSchemeResolverService" name="namingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService" /> -->
+  <bean id="namingSchemeResolverService" name="namingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.resolvers.StaticMappedNamingSchemeResolverService" />
 
 
   <!-- maybe add properties to this -->
-  <!-- <bean id="servletContext" class="org.springframework.mock.web.MockServletContext"> -->
+  <bean id="servletContext" class="org.springframework.mock.web.MockServletContext">
+    <property name="initParameters">
+      <map>
+        <entry key="contextConfigLocation" value="classpath:st-context.xml"/>
+      </map>
+    </property>
+  </bean>
 
-  
-  <!-- </bean> -->
-  <!--  <property name="contextPath" value="/"/> -->
-
-  <!-- <bean id="wac" class="org.springframework.web.context.support.XmlWebApplicationContext">
-    <property name="servletContext" ref="servletContext"/>
-  </bean> -->
+  <bean id="wac" class="org.springframework.web.context.support.XmlWebApplicationContext"/>
 
 
 </beans>

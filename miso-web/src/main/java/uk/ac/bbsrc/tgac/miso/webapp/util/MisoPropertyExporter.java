@@ -59,6 +59,7 @@ import org.springframework.util.CollectionUtils;
  * @date 01-Sep-2010
  * @since 0.0.2
  */
+// @PropertySource("/miso-web/src/main/resources/miso.properties")
 public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
   private static final Logger log = LoggerFactory.getLogger(MisoPropertyExporter.class);
 

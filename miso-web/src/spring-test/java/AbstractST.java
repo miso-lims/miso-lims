@@ -33,11 +33,19 @@ import jakarta.servlet.ServletContextEvent;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.context.MisoAppListener;
 
+<<<<<<< HEAD
 
 // loader = org.springframework.test.context.support.GenericXmlContextLoader.class)
 @WebAppConfiguration("src/it/resources")
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = STConfig.class)
+=======
+@RunWith(SpringRunner.class)
+@ContextConfiguration(locations = {"/st-context.xml"},
+    loader = org.springframework.test.context.support.GenericXmlContextLoader.class)
+@WebAppConfiguration
+@PropertySource("/tomcat-config/miso.it.properties")
+>>>>>>> parent of d95f96138 (migrated spring test config from xml to java config)
 public abstract class AbstractST {
   private static final Logger log = LoggerFactory.getLogger(AbstractST.class);
 
@@ -48,9 +56,12 @@ public abstract class AbstractST {
 
   private static Boolean constantsComplete = false;
 
+<<<<<<< HEAD
   // @Autowired
   // private MockServletContext servletContext;
 
+=======
+>>>>>>> parent of d95f96138 (migrated spring test config from xml to java config)
   @Autowired
   protected XmlWebApplicationContext wac;
 
@@ -75,16 +86,25 @@ public abstract class AbstractST {
   public final void setupAbstractTest() throws IOException {
     // MockitoAnnotations.initMocks(this);
 
-    // MockServletContext mockServletContext = new MockServletContext();
+    MockServletContext mockServletContext = new MockServletContext();
     // wac.setServletContext(mockServletContext);
 
 
+<<<<<<< HEAD
     // servletContext.setAttribute(
     // WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, wac);
 
 
     // new MisoAppListener().contextInitialized(
     // new ServletContextEvent(servletContext));
+=======
+    mockServletContext.setAttribute(
+        WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, wac);
+
+
+    new MisoAppListener().contextInitialized(
+        new ServletContextEvent(mockServletContext));
+>>>>>>> parent of d95f96138 (migrated spring test config from xml to java config)
 
 
     // reset test data for each test
