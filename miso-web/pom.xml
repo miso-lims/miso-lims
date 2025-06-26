@@ -1076,16 +1076,6 @@
                   <goal>integration-test</goal>
                   <goal>verify</goal>
                 </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-                      <artifactId>sqlstore</artifactId>
-                      <outputDirectory>target/test-classes/sqlstore</outputDirectory>
-                      <includes>db/**</includes>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
               </execution>
             </executions>
             <configuration>

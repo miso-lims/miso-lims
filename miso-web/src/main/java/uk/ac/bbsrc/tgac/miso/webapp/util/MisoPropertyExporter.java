@@ -54,12 +54,7 @@ import org.springframework.util.CollectionUtils;
  * <p/>
  * As an aside, usually these properties are not available to beans, but this class exposes them via
  * getResolvedProperties()
- * 
- * @author Rob Davey
- * @date 01-Sep-2010
- * @since 0.0.2
  */
-// @PropertySource("/miso-web/src/main/resources/miso.properties")
 public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
   private static final Logger log = LoggerFactory.getLogger(MisoPropertyExporter.class);
 
