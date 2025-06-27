@@ -19,6 +19,8 @@ DELETE FROM BoxPosition;
 DELETE FROM BoxSize;
 DELETE FROM BoxUse;
 DELETE FROM Deletion;
+DELETE FROM Deliverable;
+DELETE FROM DeliverableCategory;
 DELETE FROM DetailedLibraryTemplate;
 DELETE FROM DetailedQcStatus;
 DELETE FROM Experiment;

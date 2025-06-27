@@ -1349,6 +1349,19 @@ Urls = (function () {
     bulkSaveProgress: idUrlFunction(deliverableRestBase + "/bulk"),
   };
 
+  // Deliverable categories
+  var deliverableCategoryUiBase = "/deliverablecategory";
+  ui.deliverableCategories = {
+    bulkCreate: deliverableCategoryUiBase + "/bulk/new",
+    bulkEdit: deliverableCategoryUiBase + "/bulk/edit",
+  };
+
+  var deliverableCategoryRestBase = restBase + "/deliverablecategories";
+  rest.deliverableCategories = {
+    bulkSave: deliverableCategoryRestBase + "/bulk",
+    bulkSaveProgress: idUrlFunction(deliverableCategoryRestBase + "/bulk"),
+  };
+
   // Contact Roles
   var contactRoleUiBase = "/contactrole";
   ui.contactRoles = {

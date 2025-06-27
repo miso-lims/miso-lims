@@ -30,6 +30,10 @@ public class Pluralizer {
     return pluralize(count, "container", "containers");
   }
 
+  public static String deliverables(long count) {
+    return pluralize(count, "deliverable", "deliverables");
+  }
+
   public static String experiments(long count) {
     return pluralize(count, "experiment", "experiments");
   }

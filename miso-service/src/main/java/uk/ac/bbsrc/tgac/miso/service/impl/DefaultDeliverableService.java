@@ -10,6 +10,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.DeliverableCategoryService;
 import uk.ac.bbsrc.tgac.miso.core.service.DeliverableService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -25,6 +26,8 @@ public class DefaultDeliverableService extends AbstractSaveService<Deliverable> 
 
   @Autowired
   private DeliverableDao deliverableDao;
+  @Autowired
+  private DeliverableCategoryService deliverableCategoryService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -63,8 +66,14 @@ public class DefaultDeliverableService extends AbstractSaveService<Deliverable> 
   }
 
   @Override
+  protected void loadChildEntities(Deliverable object) throws IOException {
+    loadChildEntity(object.getCategory(), object::setCategory, deliverableCategoryService);
+  }
+
+  @Override
   protected void applyChanges(Deliverable to, Deliverable from) throws IOException {
     to.setName(from.getName());
+    to.setCategory(from.getCategory());
     to.setAnalysisReviewRequired(from.isAnalysisReviewRequired());
   }
 

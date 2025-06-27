@@ -75,6 +75,7 @@
       <a href="<c:url value="/boxuse/list"/>">Box Uses</a>
       <a href="<c:url value="/contactrole/list"/>">Contact Roles</a>
       <a href="<c:url value="/deliverable/list"/>">Deliverables</a>
+      <a href="<c:url value="/deliverablecategory/list"/>">Deliverable Categories</a>
       <a href="<c:url value="/detailedqcstatus/list"/>">Detailed QC Statuses</a>
       <a href="<c:url value="/instrumentmodel/list"/>">Instrument Models</a>
       <a href="<c:url value="/kitdescriptors"/>">Kits</a>

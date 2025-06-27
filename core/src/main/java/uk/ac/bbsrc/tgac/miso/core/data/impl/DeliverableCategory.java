@@ -2,47 +2,39 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
-public class Deliverable implements Deletable, Serializable {
+public class DeliverableCategory implements Deletable, Serializable {
+
   private static final long serialVersionUID = 1L;
 
   private static final long UNSAVED_ID = 0L;
 
   @Id
-  @Column(name = "deliverableId")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long deliverableId = UNSAVED_ID;
+  private long categoryId = UNSAVED_ID;
 
   private String name;
-  private boolean analysisReviewRequired = true;
-
-  @ManyToOne
-  @JoinColumn(name = "categoryId")
-  private DeliverableCategory category;
 
   @Override
   public long getId() {
-    return deliverableId;
+    return categoryId;
   }
 
   @Override
   public void setId(long id) {
-    this.deliverableId = id;
+    this.categoryId = id;
   }
 
   @Override
   public boolean isSaved() {
-    return getId() != UNSAVED_ID;
+    return categoryId != UNSAVED_ID;
   }
 
   public String getName() {
@@ -53,25 +45,9 @@ public class Deliverable implements Deletable, Serializable {
     this.name = name;
   }
 
-  public boolean isAnalysisReviewRequired() {
-    return analysisReviewRequired;
-  }
-
-  public void setAnalysisReviewRequired(boolean analysisReviewRequired) {
-    this.analysisReviewRequired = analysisReviewRequired;
-  }
-
-  public DeliverableCategory getCategory() {
-    return category;
-  }
-
-  public void setCategory(DeliverableCategory category) {
-    this.category = category;
-  }
-
   @Override
   public String getDeleteType() {
-    return "Deliverable";
+    return "Deliverable Category";
   }
 
   @Override
@@ -81,13 +57,13 @@ public class Deliverable implements Deletable, Serializable {
 
   @Override
   public int hashCode() {
-    return LimsUtils.hashCodeByIdFirst(this, name, category);
+    return LimsUtils.hashCodeByIdFirst(this, name);
   }
 
   @Override
   public boolean equals(Object obj) {
     return LimsUtils.equalsByIdFirst(this, obj,
-        Deliverable::getName,
-        Deliverable::getCategory);
+        DeliverableCategory::getName);
   }
+
 }

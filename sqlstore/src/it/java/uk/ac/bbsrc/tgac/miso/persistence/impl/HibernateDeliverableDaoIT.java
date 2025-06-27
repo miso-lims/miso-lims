@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DeliverableCategory;
 
 
 public class HibernateDeliverableDaoIT extends AbstractHibernateSaveDaoTest<Deliverable, HibernateDeliverableDao> {
@@ -27,6 +28,10 @@ public class HibernateDeliverableDaoIT extends AbstractHibernateSaveDaoTest<Deli
   public Deliverable getCreateItem() {
     Deliverable deliverable = new Deliverable();
     deliverable.setName("New Deliverable");
+
+    DeliverableCategory category = (DeliverableCategory) currentSession().get(DeliverableCategory.class, 1L);
+    deliverable.setCategory(category);
+
     return deliverable;
   }
 

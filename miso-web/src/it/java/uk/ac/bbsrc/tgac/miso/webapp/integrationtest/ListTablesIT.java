@@ -1031,12 +1031,23 @@ public class ListTablesIT extends AbstractIT {
   @Test
   public void testListDeliverablesSetup() throws Exception {
     testPageSetup(ListTarget.DELIVERABLES,
-        Sets.newHashSet(Columns.NAME, Columns.ANALYSIS_REVIEW_REQUIRED));
+        Sets.newHashSet(Columns.NAME, Columns.CATEGORY, Columns.ANALYSIS_REVIEW_REQUIRED));
   }
 
   @Test
   public void testListDeliverablesColumnSort() throws Exception {
     testColumnsSort(ListTarget.DELIVERABLES);
+  }
+
+  @Test
+  public void testListDeliverableCategoriesSetup() throws Exception {
+    testPageSetup(ListTarget.DELIVERABLE_CATEGORIES,
+        Sets.newHashSet(Columns.NAME));
+  }
+
+  @Test
+  public void testListDeliverableCategoriesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.DELIVERABLE_CATEGORIES);
   }
 
   @Test
