@@ -26,16 +26,25 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import org.springframework.test.context.TestExecutionListeners.MergeMode;
+import org.springframework.test.context.TestExecutionListeners;
+
+import org.hibernate.Session;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.ServletContextEvent;
+import jakarta.transaction.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.context.MisoAppListener;
+import uk.ac.bbsrc.tgac.miso.core.service.UserService;
+
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration("/st-context.xml")
 @WebAppConfiguration
 @PropertySource("/tomcat-config/miso.it.properties")
+@TestExecutionListeners(
+    value = SpringTestExecutionListener.class, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public abstract class AbstractST {
   private static final Logger log = LoggerFactory.getLogger(AbstractST.class);
 
@@ -63,15 +72,9 @@ public abstract class AbstractST {
   private AuthorizationManager authorizationManager;
 
 
-  // @Autowired
-  // private UserService userService;
 
   @Before
   public final void setupAbstractTest() throws IOException {
-    // MockitoAnnotations.initMocks(this);
-    MockServletContext ctx = new MockServletContext();
-    ctx.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, wac);
-    new MisoAppListener().contextInitialized(new ServletContextEvent(ctx));
 
     // reset test data for each test
     Resource clearData = new FileSystemResource(getScript(CLEAR_DATA_SCRIPT));
@@ -95,12 +98,22 @@ public abstract class AbstractST {
   // }
   // }
 
+  public Session currentSession() {
+    return entityManager.unwrap(Session.class);
+  }
+
   private File getScript(String filename) {
     File script = new File(SCRIPT_DIR + filename);
     if (!script.exists()) {
       throw new IllegalStateException("Script not found: " + filename);
     }
     return script;
+  }
+
+  @Transactional
+  protected void clearSession() {
+    currentSession().flush();
+    currentSession().clear();
   }
 
   @Before
