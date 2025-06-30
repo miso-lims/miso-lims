@@ -7,6 +7,18 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.10.0] - 2025-06-30
+
+### Added
+
+* Deliverable categories to classify deliverables. A default category of "Data Release" has been added
+  to any existing deliverables, but may be changed
+
+### Changed
+
+* Pinery project deliverables representation
+
+
 ## [3.9.1] - 2025-06-11
 
 ### Fixed

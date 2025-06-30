@@ -1,3 +1,4 @@
+-- deliverable_categories
 CREATE TABLE DeliverableCategory (
   categoryId bigint NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
@@ -14,3 +15,4 @@ ALTER TABLE Deliverable
 
 ALTER TABLE Deliverable
   ALTER COLUMN categoryId DROP DEFAULT;
+

@@ -1,1 +1,0 @@
-Pinery project deliverables representation
