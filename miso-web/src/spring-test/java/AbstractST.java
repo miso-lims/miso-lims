@@ -28,6 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import org.springframework.test.context.TestExecutionListeners.MergeMode;
 import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import org.hibernate.Session;
 import jakarta.persistence.EntityManager;
@@ -84,20 +85,6 @@ public abstract class AbstractST {
     populator.execute(dataSource);
   }
 
-  // private void setUser(boolean isAdmin, Group... groups) throws IOException {
-  // User user = userService.get(1L); // getting a real user may fix the issue
-
-  // Mockito.when(authorizationManager.getCurrentUser()).thenReturn(user);
-  // Mockito.when(authorizationManager.isAdminUser()).thenReturn(isAdmin);
-  // // Mockito.when(user.isAdmin()).thenReturn(isAdmin); // this might fix the issue
-  // Mockito.when(authorizationManager.isGroupMember(Mockito.any())).thenReturn(false);
-  // if (groups.length > 0) {
-  // for (Group group : groups) {
-  // Mockito.when(authorizationManager.isGroupMember(group)).thenReturn(true);
-  // }
-  // }
-  // }
-
   public Session currentSession() {
     return entityManager.unwrap(Session.class);
   }
@@ -108,12 +95,6 @@ public abstract class AbstractST {
       throw new IllegalStateException("Script not found: " + filename);
     }
     return script;
-  }
-
-  @Transactional
-  protected void clearSession() {
-    currentSession().flush();
-    currentSession().clear();
   }
 
   @Before

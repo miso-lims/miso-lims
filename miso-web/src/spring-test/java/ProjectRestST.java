@@ -8,6 +8,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.*;
 import org.springframework.test.context.web.WebAppConfiguration;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import javax.ws.rs.core.MediaType;
@@ -98,9 +99,10 @@ public class ProjectRestST extends AbstractST {
 
 
   @Test
-  @Transactional
+  @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
   public void testCreate() throws Exception {
 
+    // project impl is needed here to set the reference genome
     Project project = new ProjectImpl();
     Pipeline pipeline = (Pipeline) currentSession().get(Pipeline.class, 1L);
     project.setTitle("test title");
@@ -110,91 +112,51 @@ public class ProjectRestST extends AbstractST {
     referenceGenome.setId(1L);
     referenceGenome.setAlias("hg19");
     project.setReferenceGenome(referenceGenome);
-
-    User user = new UserImpl();
-    user.setId(1L);
-    user.setPassword("Horsebatterychainkey!"); // random password to accomodate password reqs
-    user.setActive(true);
-    user.setAdmin(true);
-    user.setFullName("testing user");
-    user.setInternal(true);
-    user.setLoginName("tester");
-
-    userService.create(user); // puts it in the db
-
-    clearSession();
-
-
-    project.setCreator(user);
     project.setCreationTime(new Date());
-    project.setLastModifier(user);
     project.setLastModified(new Date());
-
+    project.setName("testproj");
     project.setCode("TESTCODE");
-    // project.setId(0L); // unsaved ID
-    project.setId(8L); // unused ID
-    // project.isSaved();
-    // project.isSaved();
-    // project.setSaved(false);
-
-
-    assertNotNull(project.getCreator()); // this passes
+    project.setId(0L); // unsaved ID
 
     ProjectDto dto = Dtos.asDto(project, false);
 
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-    String requestJson = ow.writeValueAsString(dto);
-
-    getMockMvc().perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(requestJson))
-        .andDo(print())
-        .andExpect(status().isOk()).andDo(print());
-
-    clearSession();
-
-    // use get request to verify that the put worked (testGetById is thus a higher priority test here)
-    getMockMvc().perform(get(controllerBase + "/search").param("q", "TEST").accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$").exists())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-
-  }
-
-  @Test
-  public void testUpdate() throws Exception {
-    MvcResult result = getMockMvc().perform(get(controllerBase + "/1")).andReturn();
-
-
-    String projJson = result.getResponse().getContentAsString();
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-    ProjectImpl proj = mapper.readValue(projJson, ProjectImpl.class);
-
-    ProjectDto dto = Dtos.asDto(proj, true);
-
-    dto.setName("changed testing project");
-
-    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-    String requestJson = ow.writeValueAsString(dto);
-
-
-    getMockMvc().perform(put(controllerBase + "/1").contentType(MediaType.APPLICATION_JSON).content(requestJson))
+    getMockMvc().perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(jsonMaker(dto)))
         .andExpect(status().isOk());
 
-    getMockMvc()
-        .perform(
-            get(controllerBase + "/search").param("q", "changed testing project").accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.*", hasSize(1)));
+    assertNotNull(currentSession().get(ProjectImpl.class, 200002)); // test proper creation
 
   }
 
 
+  private String jsonMaker(ProjectDto dto) throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+    String requestJson = ow.writeValueAsString(dto);
+    return requestJson;
+  }
+
   @Test
-  @WithMockUser(username = "admin", roles = {"ADMIN", "INTERNAL"})
+  @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
+  public void testUpdate() throws Exception {
+
+    Project proj = currentSession().get(ProjectImpl.class, 1);
+    proj.setTitle("changed testing project");
+    ProjectDto dto = Dtos.asDto(proj, true);
+
+    getMockMvc().perform(put(controllerBase + "/1").contentType(MediaType.APPLICATION_JSON).content(jsonMaker(dto)))
+        .andExpect(status().isOk());
+
+
+    ProjectImpl updatedProj = currentSession().get(ProjectImpl.class, 1);
+    assertNotNull(updatedProj);
+    assertEquals("Update didn't go through","changed testing project", updatedProj.getTitle());
+  }
+
+
+  @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
   public void testBulkDelete() throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(1L, 2L, 3L, 4L, 5L, 6L, 7L));
     ObjectMapper mapper = new ObjectMapper();
