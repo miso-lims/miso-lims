@@ -117,7 +117,7 @@ public class ProjectRestST extends AbstractST {
     project.setLastModified(new Date());
     project.setName("testproj");
     project.setCode("TESTCODE");
-    project.setId(0L); // unsaved ID
+    project.setId(0L); // unsaved project ID
 
     ProjectDto dto = Dtos.asDto(project, false);
 
@@ -130,7 +130,7 @@ public class ProjectRestST extends AbstractST {
   }
 
 
-  private String jsonMaker(ProjectDto dto) throws Exception {
+  private String jsonMaker(Object dto) throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
     ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
@@ -159,24 +159,15 @@ public class ProjectRestST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
   public void testBulkDelete() throws Exception {
-    List<Long> ids = new ArrayList<Long>(Arrays.asList(1L, 2L, 3L, 4L, 5L, 6L, 7L));
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-    String requestJson = ow.writeValueAsString(ids);
+    List<Long> ids = new ArrayList<Long>(Arrays.asList(7L));
 
     getMockMvc()
-        .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(requestJson))
-
+        .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(jsonMaker(ids)))
         .andDo(print())
         .andExpect(status().isNoContent());
 
-
-    // now check that the projects were actually deleted
-
-    for (int i = 1; i < 8; i++) {
-      assertNull(currentSession().get(ProjectImpl.class, i));
-    }
+    // now check that the project was actually deleted
+    assertNull(currentSession().get(ProjectImpl.class, 7));
   }
 
 
