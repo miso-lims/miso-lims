@@ -60,16 +60,11 @@ public class ProjectRestST extends AbstractST {
 
   private String controllerBase = "/rest/projects";
 
-
   @Autowired
   private UserService userService;
 
   @Test
   public void testGetById() throws Exception {
-
-    // remember that the mockmvc is configured to always be ok (change later for exception testing if
-    // need be)
-
     getMockMvc().perform(get(controllerBase + "/1")
         .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -78,7 +73,7 @@ public class ProjectRestST extends AbstractST {
         .andExpect(jsonPath("$.title").value("Project One"))
         .andExpect(jsonPath("$.name").value("PRO1"))
         .andExpect(jsonPath("$.code").value("PONE"))
-        .andExpect(jsonPath("$.creationDate").value("2017-06-26"));// .andDo(print()).andReturn(); // for testing
+        .andExpect(jsonPath("$.creationDate").value("2017-06-26"));
   }
 
   @Test
@@ -98,9 +93,8 @@ public class ProjectRestST extends AbstractST {
         .andExpect(jsonPath("$").exists());
   }
 
-
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
+  @WithMockUser(username = "admin", password = "admin", roles = { "ADMIN", "INTERNAL" })
   public void testCreate() throws Exception {
 
     // project impl is needed here to set the reference genome
@@ -121,14 +115,12 @@ public class ProjectRestST extends AbstractST {
 
     ProjectDto dto = Dtos.asDto(project, false);
 
-
     getMockMvc().perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(jsonMaker(dto)))
         .andExpect(status().isOk());
 
-    assertNotNull(currentSession().get(ProjectImpl.class, 200002)); // test proper creation
+    assertNotNull(currentSession().get(ProjectImpl.class, 200002)); // test that project was successfully created
 
   }
-
 
   private String jsonMaker(Object dto) throws Exception {
     ObjectMapper mapper = new ObjectMapper();
@@ -139,7 +131,7 @@ public class ProjectRestST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
+  @WithMockUser(username = "admin", password = "admin", roles = { "ADMIN", "INTERNAL" })
   public void testUpdate() throws Exception {
 
     Project proj = currentSession().get(ProjectImpl.class, 1);
@@ -149,15 +141,13 @@ public class ProjectRestST extends AbstractST {
     getMockMvc().perform(put(controllerBase + "/1").contentType(MediaType.APPLICATION_JSON).content(jsonMaker(dto)))
         .andExpect(status().isOk());
 
-
     ProjectImpl updatedProj = currentSession().get(ProjectImpl.class, 1);
     assertNotNull(updatedProj);
     assertEquals("Update didn't go through", "changed testing project", updatedProj.getTitle());
   }
 
-
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
+  @WithMockUser(username = "admin", password = "admin", roles = { "ADMIN", "INTERNAL" })
   public void testBulkDelete() throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(7L));
 
@@ -169,7 +159,6 @@ public class ProjectRestST extends AbstractST {
     // now check that the project was actually deleted
     assertNull(currentSession().get(ProjectImpl.class, 7));
   }
-
 
   @Test
   public void testGetLibraryAliquots() throws Exception {
