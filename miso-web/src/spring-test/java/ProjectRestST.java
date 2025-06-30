@@ -9,6 +9,7 @@ import org.springframework.web.servlet.*;
 import org.springframework.test.context.web.WebAppConfiguration;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import javax.ws.rs.core.MediaType;
@@ -151,7 +152,7 @@ public class ProjectRestST extends AbstractST {
 
     ProjectImpl updatedProj = currentSession().get(ProjectImpl.class, 1);
     assertNotNull(updatedProj);
-    assertEquals("Update didn't go through","changed testing project", updatedProj.getTitle());
+    assertEquals("Update didn't go through", "changed testing project", updatedProj.getTitle());
   }
 
 
@@ -166,22 +167,28 @@ public class ProjectRestST extends AbstractST {
 
     getMockMvc()
         .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(requestJson))
+
         .andDo(print())
         .andExpect(status().isNoContent());
 
 
-    // now check that the project actually were deleted
-    getMockMvc().perform(get(controllerBase + "/search").param("q", "PRO").accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.*", hasSize(10))); // 10 = number of projects in test script post deleting projects 1-7
+    // now check that the projects were actually deleted
 
+    for (int i = 1; i < 8; i++) {
+      assertNull(currentSession().get(ProjectImpl.class, i));
+    }
   }
 
 
   @Test
   public void testGetLibraryAliquots() throws Exception {
-    getMockMvc().perform(get(controllerBase + "/dt").accept(MediaType.APPLICATION_JSON)).andDo(print())
+    getMockMvc().perform(get(controllerBase + "/dt").accept(MediaType.APPLICATION_JSON)
+        .param("iDisplayStart", "0")
+        .param("iDisplayLength", "25")
+        .param("mDataProp_0", "id")
+        .param("sSortDir_0", "asc")
+        .param("iSortCol_0", "3")
+        .param("sEcho", "1"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$").exists());
