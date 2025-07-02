@@ -125,13 +125,13 @@ public abstract class AbstractST {
     return mockMvc;
   }
 
-  protected ResultActions dtResponse(String controllerBase) throws Exception {
+  protected ResultActions performDtRequest(String controllerBase, int displayLength, String dataProp, int sortCol) throws Exception {
     return getMockMvc().perform(get(controllerBase + "/dt").accept(MediaType.APPLICATION_JSON)
         .param("iDisplayStart", "0")
-        .param("iDisplayLength", "25")
-        .param("mDataProp_0", "id")
+        .param("iDisplayLength", Integer.toString(displayLength))
+        .param("mDataProp_0", dataProp)
         .param("sSortDir_0", "asc")
-        .param("iSortCol_0", "3")
+        .param("iSortCol_0", Integer.toString(sortCol))
         .param("sEcho", "1"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))

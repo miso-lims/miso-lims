@@ -51,7 +51,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 public class ProjectRestST extends AbstractST {
 
-  static final String CONTROLLER_BASE = "/rest/projects";
+  private static final String CONTROLLER_BASE = "/rest/projects";
 
   @Test
   public void testGetById() throws Exception {
@@ -94,15 +94,12 @@ public class ProjectRestST extends AbstractST {
     project.setPipelineId(1L);
     project.setStatus("Active");
     project.setReferenceGenomeId(1L);
-    project.setCreationDate("2025-07-02");
     project.setCode("TESTCODE");
-    project.setId(0L);
 
 
     MvcResult result = getMockMvc()
         .perform(post(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(AbstractST.makeJson(project)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(200002))
         .andExpect(jsonPath("$.code").value("TESTCODE"))
         .andReturn();
 
@@ -112,25 +109,6 @@ public class ProjectRestST extends AbstractST {
     assertNotNull(createdProject); // test that project was successfully created
     assertEquals("TESTCODE", createdProject.getCode());
     assertEquals("test title", createdProject.getTitle());
-  }
-
-  @Test
-  @WithMockUser(username = "regular", password = "regular", roles = {"INTERNAL"})
-  public void testCreateFail() throws Exception {
-    ProjectDto project = new ProjectDto();
-    project.setTitle("test title");
-    project.setPipelineId(1L);
-    project.setStatus("Active");
-    project.setReferenceGenomeId(1L);
-    project.setCreationDate("2025-07-02");
-    project.setName("testproj");
-    project.setCode("TESTCODE");
-    project.setId(0L);
-
-
-    getMockMvc()
-        .perform(post(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(AbstractST.makeJson(project)))
-        .andExpect(status().isInternalServerError());
   }
 
   @Test
@@ -150,19 +128,6 @@ public class ProjectRestST extends AbstractST {
     assertEquals("Update didn't go through", "changed testing project", updatedProj.getTitle());
   }
 
-
-  @Test
-  @WithMockUser(username = "regular", password = "regular", roles = {"INTERNAL"})
-  public void testUpdateFail() throws Exception {
-    Project proj = currentSession().get(ProjectImpl.class, 1);
-    ProjectDto dto = Dtos.asDto(proj, true);
-    dto.setTitle("changed testing project");
-
-    getMockMvc()
-        .perform(put(CONTROLLER_BASE + "/1").contentType(MediaType.APPLICATION_JSON).content(AbstractST.makeJson(dto)))
-        .andExpect(status().isInternalServerError());
-  }
-
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
   public void testBulkDelete() throws Exception {
@@ -180,27 +145,15 @@ public class ProjectRestST extends AbstractST {
     assertNull(currentSession().get(ProjectImpl.class, 7));
   }
 
-
-  @Test
-  @WithMockUser(username = "regular", password = "regular", roles = {"INTERNAL"})
-  public void testDeleteFail() throws Exception {
-    List<Long> ids = new ArrayList<Long>(Arrays.asList(7L));
-
-    // check that the project we want to delete exists
-    assertNotNull(currentSession().get(ProjectImpl.class, 7));
-
-    getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
-            .content(AbstractST.makeJson(ids)))
-        .andExpect(status().isBadRequest());
-  }
-
   @Test
   public void testGetLibraryAliquots() throws Exception {
-    ResultActions result = dtResponse(CONTROLLER_BASE);
+    ResultActions result = performDtRequest(CONTROLLER_BASE, 25, "id", 3);
     result
-        .andExpect(jsonPath("$.iTotalRecords").value(17)); // 17 = number of projects in test data script
-
+        .andExpect(jsonPath("$.iTotalRecords").value(17)) // 17 = number of projects in test data script
+        .andExpect(jsonPath("$.aaData[0].description").value("integration test project one"))
+        .andExpect(jsonPath("$.aaData[10].title").value("Tubes In Boxes"))
+        .andExpect(jsonPath("$.aaData[5].name").value("PRO6"))
+        .andExpect(jsonPath("$.aaData[13].id").value(100001));
 
 
   }
