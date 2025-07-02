@@ -39,7 +39,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ProjectRestController;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import java.util.Date;
@@ -59,9 +58,6 @@ import org.springframework.test.web.servlet.MockMvc;
 public class ProjectRestST extends AbstractST {
 
   private String controllerBase = "/rest/projects";
-
-  @Autowired
-  private UserService userService;
 
   @Test
   public void testGetById() throws Exception {
@@ -94,7 +90,7 @@ public class ProjectRestST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = { "ADMIN", "INTERNAL" })
+  @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
   public void testCreate() throws Exception {
 
     // project impl is needed here to set the reference genome
@@ -131,7 +127,7 @@ public class ProjectRestST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = { "ADMIN", "INTERNAL" })
+  @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
   public void testUpdate() throws Exception {
 
     Project proj = currentSession().get(ProjectImpl.class, 1);
@@ -147,7 +143,7 @@ public class ProjectRestST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = { "ADMIN", "INTERNAL" })
+  @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
   public void testBulkDelete() throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(7L));
 
