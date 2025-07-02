@@ -29,6 +29,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.test.context.TestExecutionListeners.MergeMode;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MvcResult;
 
 import org.hibernate.Session;
 import jakarta.persistence.EntityManager;
@@ -39,13 +40,24 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.context.MisoAppListener;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 
+import java.util.Date;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import org.springframework.test.web.servlet.ResultActions;
+import javax.ws.rs.core.MediaType;
+import com.jayway.jsonpath.JsonPath;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration("/st-context.xml")
 @WebAppConfiguration
 @PropertySource("/tomcat-config/miso.it.properties")
-@TestExecutionListeners(
-    value = SpringTestExecutionListener.class, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
+@TestExecutionListeners(value = SpringTestExecutionListener.class,
+    mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public abstract class AbstractST {
   private static final Logger log = LoggerFactory.getLogger(AbstractST.class);
 
@@ -61,7 +73,6 @@ public abstract class AbstractST {
 
   private MockMvc mockMvc;
 
-
   @PersistenceContext
   private EntityManager entityManager;
 
@@ -72,8 +83,6 @@ public abstract class AbstractST {
   @Autowired
   private AuthorizationManager authorizationManager;
 
-
-
   @Before
   public final void setupAbstractTest() throws IOException {
 
@@ -83,6 +92,8 @@ public abstract class AbstractST {
 
     ResourceDatabasePopulator populator = new ResourceDatabasePopulator(clearData, testData);
     populator.execute(dataSource);
+
+    this.mockMvc = webAppContextSetup(this.wac).build();
   }
 
   public Session currentSession() {
@@ -97,9 +108,12 @@ public abstract class AbstractST {
     return script;
   }
 
-  @Before
-  public void setup() {
-    this.mockMvc = webAppContextSetup(this.wac).build();
+  public static String makeJson(Object obj) throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+    String requestJson = ow.writeValueAsString(obj);
+    return requestJson;
   }
 
   @Test
@@ -110,5 +124,20 @@ public abstract class AbstractST {
   protected MockMvc getMockMvc() {
     return mockMvc;
   }
+
+  protected ResultActions dtResponse(String controllerBase) throws Exception {
+    return getMockMvc().perform(get(controllerBase + "/dt").accept(MediaType.APPLICATION_JSON)
+        .param("iDisplayStart", "0")
+        .param("iDisplayLength", "25")
+        .param("mDataProp_0", "id")
+        .param("sSortDir_0", "asc")
+        .param("iSortCol_0", "3")
+        .param("sEcho", "1"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$").exists());
+  }
+
+
 
 }

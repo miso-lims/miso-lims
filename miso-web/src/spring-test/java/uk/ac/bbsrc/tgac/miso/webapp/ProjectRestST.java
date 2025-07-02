@@ -24,9 +24,6 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import static org.hamcrest.Matchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
 import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -36,17 +33,14 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
 import org.springframework.web.servlet.View;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ProjectRestController;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.springframework.security.test.context.support.WithMockUser;
 
-import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
-import java.util.Date;
+import org.springframework.security.test.context.support.WithMockUser;
+import com.jayway.jsonpath.JsonPath;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import jakarta.transaction.Transactional;
-
+import java.util.Date;
 import static org.junit.Assert.*;
 
 import java.util.List;
@@ -57,11 +51,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 public class ProjectRestST extends AbstractST {
 
-  private String controllerBase = "/rest/projects";
+  static final String CONTROLLER_BASE = "/rest/projects";
 
   @Test
   public void testGetById() throws Exception {
-    getMockMvc().perform(get(controllerBase + "/1")
+    getMockMvc().perform(get(CONTROLLER_BASE + "/1")
         .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").exists())
@@ -74,56 +68,69 @@ public class ProjectRestST extends AbstractST {
 
   @Test
   public void testGetBySearch() throws Exception {
-    getMockMvc().perform(get(controllerBase + "/search").param("q", "PRO").accept(MediaType.APPLICATION_JSON))
+    getMockMvc().perform(get(CONTROLLER_BASE + "/search").param("q", "PRO1").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").exists())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.*", hasSize(17))); // 17 = number of projects in test script
+        .andExpect(jsonPath("$.*", hasSize(4)));
 
   }
 
   @Test
   public void testGetAttachments() throws Exception {
-    getMockMvc().perform(get(controllerBase + "/1/files").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+    getMockMvc().perform(get(CONTROLLER_BASE + "/1/files").accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").exists());
+        .andExpect(jsonPath("$").exists())
+        .andExpect(jsonPath("$").isEmpty()); // assert no attachments
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
   public void testCreate() throws Exception {
 
-    // project impl is needed here to set the reference genome
-    Project project = new ProjectImpl();
-    Pipeline pipeline = (Pipeline) currentSession().get(Pipeline.class, 1L);
+    ProjectDto project = new ProjectDto();
     project.setTitle("test title");
-    project.setPipeline(pipeline);
-    project.setStatus(StatusType.ACTIVE);
-    ReferenceGenome referenceGenome = new ReferenceGenomeImpl();
-    referenceGenome.setId(1L);
-    referenceGenome.setAlias("hg19");
-    project.setReferenceGenome(referenceGenome);
-    project.setCreationTime(new Date());
-    project.setLastModified(new Date());
-    project.setName("testproj");
+    project.setPipelineId(1L);
+    project.setStatus("Active");
+    project.setReferenceGenomeId(1L);
+    project.setCreationDate("2025-07-02");
     project.setCode("TESTCODE");
-    project.setId(0L); // unsaved project ID
+    project.setId(0L);
 
-    ProjectDto dto = Dtos.asDto(project, false);
 
-    getMockMvc().perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(jsonMaker(dto)))
-        .andExpect(status().isOk());
+    MvcResult result = getMockMvc()
+        .perform(post(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(AbstractST.makeJson(project)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(200002))
+        .andExpect(jsonPath("$.code").value("TESTCODE"))
+        .andReturn();
 
-    assertNotNull(currentSession().get(ProjectImpl.class, 200002)); // test that project was successfully created
+    Integer id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
 
+    Project createdProject = currentSession().get(ProjectImpl.class, id);
+    assertNotNull(createdProject); // test that project was successfully created
+    assertEquals("TESTCODE", createdProject.getCode());
+    assertEquals("test title", createdProject.getTitle());
   }
 
-  private String jsonMaker(Object dto) throws Exception {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-    String requestJson = ow.writeValueAsString(dto);
-    return requestJson;
+  @Test
+  @WithMockUser(username = "regular", password = "regular", roles = {"INTERNAL"})
+  public void testCreateFail() throws Exception {
+    ProjectDto project = new ProjectDto();
+    project.setTitle("test title");
+    project.setPipelineId(1L);
+    project.setStatus("Active");
+    project.setReferenceGenomeId(1L);
+    project.setCreationDate("2025-07-02");
+    project.setName("testproj");
+    project.setCode("TESTCODE");
+    project.setId(0L);
+
+
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(AbstractST.makeJson(project)))
+        .andExpect(status().isInternalServerError());
   }
 
   @Test
@@ -131,10 +138,11 @@ public class ProjectRestST extends AbstractST {
   public void testUpdate() throws Exception {
 
     Project proj = currentSession().get(ProjectImpl.class, 1);
-    proj.setTitle("changed testing project");
     ProjectDto dto = Dtos.asDto(proj, true);
+    dto.setTitle("changed testing project");
 
-    getMockMvc().perform(put(controllerBase + "/1").contentType(MediaType.APPLICATION_JSON).content(jsonMaker(dto)))
+    getMockMvc()
+        .perform(put(CONTROLLER_BASE + "/1").contentType(MediaType.APPLICATION_JSON).content(AbstractST.makeJson(dto)))
         .andExpect(status().isOk());
 
     ProjectImpl updatedProj = currentSession().get(ProjectImpl.class, 1);
@@ -142,32 +150,58 @@ public class ProjectRestST extends AbstractST {
     assertEquals("Update didn't go through", "changed testing project", updatedProj.getTitle());
   }
 
+
+  @Test
+  @WithMockUser(username = "regular", password = "regular", roles = {"INTERNAL"})
+  public void testUpdateFail() throws Exception {
+    Project proj = currentSession().get(ProjectImpl.class, 1);
+    ProjectDto dto = Dtos.asDto(proj, true);
+    dto.setTitle("changed testing project");
+
+    getMockMvc()
+        .perform(put(CONTROLLER_BASE + "/1").contentType(MediaType.APPLICATION_JSON).content(AbstractST.makeJson(dto)))
+        .andExpect(status().isInternalServerError());
+  }
+
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
   public void testBulkDelete() throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(7L));
 
+    // check that the project we want to delete exists
+    assertNotNull(currentSession().get(ProjectImpl.class, 7));
+
     getMockMvc()
-        .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(jsonMaker(ids)))
-        .andDo(print())
+        .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
+            .content(AbstractST.makeJson(ids)))
         .andExpect(status().isNoContent());
 
     // now check that the project was actually deleted
     assertNull(currentSession().get(ProjectImpl.class, 7));
   }
 
+
+  @Test
+  @WithMockUser(username = "regular", password = "regular", roles = {"INTERNAL"})
+  public void testDeleteFail() throws Exception {
+    List<Long> ids = new ArrayList<Long>(Arrays.asList(7L));
+
+    // check that the project we want to delete exists
+    assertNotNull(currentSession().get(ProjectImpl.class, 7));
+
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
+            .content(AbstractST.makeJson(ids)))
+        .andExpect(status().isBadRequest());
+  }
+
   @Test
   public void testGetLibraryAliquots() throws Exception {
-    getMockMvc().perform(get(controllerBase + "/dt").accept(MediaType.APPLICATION_JSON)
-        .param("iDisplayStart", "0")
-        .param("iDisplayLength", "25")
-        .param("mDataProp_0", "id")
-        .param("sSortDir_0", "asc")
-        .param("iSortCol_0", "3")
-        .param("sEcho", "1"))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").exists());
+    ResultActions result = dtResponse(CONTROLLER_BASE);
+    result
+        .andExpect(jsonPath("$.iTotalRecords").value(17)); // 17 = number of projects in test data script
+
+
 
   }
 }

@@ -969,6 +969,7 @@
                 <configuration>
                   <resources>
                     <resource>
+                      <!-- uses the same resources as the integration tests -->
                       <filtering>true</filtering>
                       <directory>src/it/resources</directory>
                     </resource>
