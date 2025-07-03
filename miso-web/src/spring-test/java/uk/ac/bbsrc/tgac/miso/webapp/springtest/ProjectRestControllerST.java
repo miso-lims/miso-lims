@@ -49,7 +49,7 @@ import java.util.ArrayList;
 
 import org.springframework.test.web.servlet.MockMvc;
 
-public class ProjectRestST extends AbstractST {
+public class ProjectRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/projects";
 
@@ -86,7 +86,7 @@ public class ProjectRestST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
+  @WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
   public void testCreate() throws Exception {
 
     ProjectDto project = new ProjectDto();
@@ -112,7 +112,7 @@ public class ProjectRestST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
+  @WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
   public void testUpdate() throws Exception {
 
     Project proj = currentSession().get(ProjectImpl.class, 1);
@@ -129,7 +129,7 @@ public class ProjectRestST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "INTERNAL"})
+  @WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
   public void testBulkDelete() throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(7L));
 
@@ -144,6 +144,22 @@ public class ProjectRestST extends AbstractST {
     // now check that the project was actually deleted
     assertNull(currentSession().get(ProjectImpl.class, 7));
   }
+
+  @Test
+  @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
+  public void testDeleteFail() throws Exception {
+    List<Long> ids = new ArrayList<Long>(Arrays.asList(7L));
+
+    // check that the project we want to delete exists
+    assertNotNull(currentSession().get(ProjectImpl.class, 7));
+
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
+            .content(AbstractST.makeJson(ids)))
+        .andExpect(status().isUnauthorized());
+    // this user is not an admin or the project creator, so delete should be unauthorized
+  }
+
 
   @Test
   public void testGetLibraryAliquots() throws Exception {
