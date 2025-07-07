@@ -62,7 +62,7 @@ BulkTarget.sop = (function () {
           type: "text",
           data: "url",
           required: true,
-          maxLength: 255,
+          maxLength: 500,
           regex: Utils.validation.uriRegex,
         },
         BulkUtils.columns.archived(),
