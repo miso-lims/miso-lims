@@ -27,5 +27,5 @@ jobs:
       - run: mvn --batch-mode clean install -DskipTests
       - run: |
           mvn clean verify -pl miso-web -DskipUTs=true -DskipSTs=false \
-          -Dit.test='Bulk*' -Ddocker.username="${DOCKER_USERNAME}" \
+          -Ddocker.username="${DOCKER_USERNAME}" \
           -Ddocker.password="${DOCKER_PASSWORD}"
