@@ -1,0 +1,1 @@
+reads missing the second index for some sample sheets

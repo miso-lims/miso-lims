@@ -2,16 +2,8 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -205,7 +197,7 @@ public enum IlluminaExperiment {
       applyDragenData(dataRows, headers, samples);
     }
 
-    protected void applyReads(Map<String, String> reads, Integer Read1Cycles, Integer Read2Cycles,
+    protected void applyReads(List<Pair<String, String>> reads, Integer Read1Cycles, Integer Read2Cycles,
         Integer Index1Cycles,
         Integer Index2Cycles) {
       applyIlluminaReadsIndexes(reads, Read1Cycles, Read2Cycles, Index1Cycles, Index2Cycles);
@@ -247,11 +239,11 @@ public enum IlluminaExperiment {
   protected abstract void applyData(Map<String, String> data, List<List<String>> dataRows, List<String> headers,
       List<SamplesheetSample> dataSection);
 
-  protected void applyReads(Map<String, String> reads, Integer Read1Cycles, Integer Read2Cycles,
+  protected void applyReads(List<Pair<String, String>> reads, Integer Read1Cycles, Integer Read2Cycles,
       Integer Index1Cycles, Integer Index2Cycles) {
-    reads.put(String.valueOf(Read1Cycles), "");
+    reads.add(new Pair<>(String.valueOf(Read1Cycles), ""));
     if (Read2Cycles != 0) {
-      reads.put(String.valueOf(Read2Cycles), "");
+      reads.add(new Pair<>(String.valueOf(Read2Cycles), ""));
     }
   }
 
@@ -296,15 +288,15 @@ public enum IlluminaExperiment {
     settings.put("OverrideCycles", overrideCycles);
   }
 
-  public static void applyIlluminaReadsIndexes(Map<String, String> reads, Integer read1, Integer read2, Integer index1,
+  public static void applyIlluminaReadsIndexes(List<Pair<String, String>> reads, Integer read1, Integer read2, Integer index1,
       Integer index2) {
-    reads.put("Read1Cycles", String.valueOf(read1));
+    reads.add(new Pair<>("Read1Cycles", String.valueOf(read1)));
     if (read2 != 0) {
-      reads.put("Read2Cycles", String.valueOf(read2));
+      reads.add(new Pair<>("Read2Cycles", String.valueOf(read2)));
     }
-    reads.put("Index1Cycles", String.valueOf(index1));
+    reads.add(new Pair<>("Index1Cycles", String.valueOf(index1)));
     if (index2 != 0) {
-      reads.put("Index2Cycles", String.valueOf(index2));
+      reads.add(new Pair<>("Index2Cycles", String.valueOf(index2)));
     }
 
   }
@@ -434,7 +426,7 @@ public enum IlluminaExperiment {
       String novaSeqXSeriesMapping) {
     final Map<String, String> header = new LinkedHashMap<>();
     final Map<String, String> settings = new LinkedHashMap<>();
-    final Map<String, String> reads = new LinkedHashMap<>();
+    final List<Pair<String, String>> reads = new ArrayList<>(); //Can contain duplicate lines key/value pairs)
     final Map<String, String> data = new LinkedHashMap<>();
     final List<List<String>> dataRows = new ArrayList<>();
     final Map<String, String> cloudData = new LinkedHashMap<>();
@@ -481,7 +473,7 @@ public enum IlluminaExperiment {
     final int read1Length = parameters.getReadLength();
     final int read2Length = parameters.getReadLength2();
     applyReads(reads, read1Length, read2Length, i7Length, i5Length);
-    writeMap(reads, output);
+    writeList(reads, output);
 
 
     // Get info for Data Section
@@ -608,6 +600,18 @@ public enum IlluminaExperiment {
 
   private void writeMap(final Map<String, String> input, final StringBuilder output) {
     for (Entry<String, String> entry : input.entrySet()) {
+      output.append(entry.getKey()).append(",");
+      if (entry.getValue().contains(",")) {
+        output.append("\"").append(entry.getValue()).append("\"");
+      } else {
+        output.append(entry.getValue());
+      }
+      output.append("\n");
+    }
+  }
+
+  private void writeList(final List<Pair<String, String>> input, final StringBuilder output) {
+    for (Pair<String, String> entry : input) {
       output.append(entry.getKey()).append(",");
       if (entry.getValue().contains(",")) {
         output.append("\"").append(entry.getValue()).append("\"");
