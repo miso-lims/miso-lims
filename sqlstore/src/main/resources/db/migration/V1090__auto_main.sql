@@ -28,7 +28,7 @@ CREATE TABLE Sop (
   alias varchar(100) NOT NULL,
   version varchar(50) NOT NULL,
   category varchar(20) NOT NULL,
-  url varchar(500) NOT NULL,
+  url varchar(255) NOT NULL,
   archived BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (sopId),
   CONSTRAINT uk_sop_version UNIQUE (category, alias, version)
