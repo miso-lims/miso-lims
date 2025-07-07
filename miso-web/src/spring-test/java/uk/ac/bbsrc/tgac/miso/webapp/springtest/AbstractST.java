@@ -1,0 +1,143 @@
+package uk.ac.bbsrc.tgac.miso.webapp.springtest;
+
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.sql.DataSource;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.mock.web.MockServletContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+
+import org.springframework.test.context.TestExecutionListeners.MergeMode;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MvcResult;
+
+import org.hibernate.Session;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.transaction.Transactional;
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.webapp.context.MisoAppListener;
+import uk.ac.bbsrc.tgac.miso.core.service.UserService;
+
+import java.util.Date;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import org.springframework.test.web.servlet.ResultActions;
+import javax.ws.rs.core.MediaType;
+import com.jayway.jsonpath.JsonPath;
+
+@RunWith(SpringRunner.class)
+@ContextConfiguration("/st-context.xml")
+@WebAppConfiguration
+@PropertySource("/tomcat-config/miso.it.properties")
+@TestExecutionListeners(value = SpringTestExecutionListener.class,
+    mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
+public abstract class AbstractST {
+  private static final Logger log = LoggerFactory.getLogger(AbstractST.class);
+
+  private static final String SCRIPT_DIR = System.getProperty("basedir") + "/src/it/resources/db/migration/";
+
+  private static final String CLEAR_DATA_SCRIPT = "clear_test_data.sql";
+  private static final String DETAILED_SCRIPT = "integration_test_data.sql";
+
+  private static Boolean constantsComplete = false;
+
+  @Autowired
+  protected WebApplicationContext wac;
+
+  private MockMvc mockMvc;
+
+  @PersistenceContext
+  private EntityManager entityManager;
+
+  @Autowired
+  private DataSource dataSource;
+
+  @Mock
+  @Autowired
+  private AuthorizationManager authorizationManager;
+
+  @Before
+  public final void setupAbstractTest() throws IOException {
+
+    // reset test data for each test
+    Resource clearData = new FileSystemResource(getScript(CLEAR_DATA_SCRIPT));
+    Resource testData = new FileSystemResource(getScript(DETAILED_SCRIPT));
+
+    ResourceDatabasePopulator populator = new ResourceDatabasePopulator(clearData, testData);
+    populator.execute(dataSource);
+
+    this.mockMvc = webAppContextSetup(this.wac).build();
+  }
+
+  public Session currentSession() {
+    return entityManager.unwrap(Session.class);
+  }
+
+  private File getScript(String filename) {
+    File script = new File(SCRIPT_DIR + filename);
+    if (!script.exists()) {
+      throw new IllegalStateException("Script not found: " + filename);
+    }
+    return script;
+  }
+
+  public static String makeJson(Object obj) throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+    String requestJson = ow.writeValueAsString(obj);
+    return requestJson;
+  }
+
+  @Test
+  public void initialization() {
+    assertNotNull(wac);
+  }
+
+  protected MockMvc getMockMvc() {
+    return mockMvc;
+  }
+
+  protected ResultActions performDtRequest(String controllerBase, int displayLength, String dataProp, int sortCol) throws Exception {
+    return getMockMvc().perform(get(controllerBase + "/dt").accept(MediaType.APPLICATION_JSON)
+        .param("iDisplayStart", "0")
+        .param("iDisplayLength", Integer.toString(displayLength))
+        .param("mDataProp_0", dataProp)
+        .param("sSortDir_0", "asc")
+        .param("iSortCol_0", Integer.toString(sortCol))
+        .param("sEcho", "1"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$").exists());
+  }
+
+
+
+}

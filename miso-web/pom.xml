@@ -226,6 +226,11 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
       <exclusions>
         <exclusion>
@@ -268,6 +273,18 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.jayway.jsonpath</groupId>
+      <artifactId>json-path</artifactId>
+      <version>2.9.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <version>3.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -952,8 +969,8 @@
                 <configuration>
                   <resources>
                     <resource>
-                      <filtering>true</filtering>
                       <!-- uses the same resources as the integration tests -->
+                      <filtering>true</filtering>
                       <directory>src/it/resources</directory>
                     </resource>
                   </resources>
@@ -1049,7 +1066,7 @@
               </placeholders>
             </configuration>
           </plugin>
-         <plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <executions>
@@ -1067,10 +1084,13 @@
                 <miso.it.mysql.url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</miso.it.mysql.url>
                 <miso.it.mysql.user>${mysql.user}</miso.it.mysql.user>
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
+                <security.method>jdbc</security.method>
               </systemPropertyVariables>
               <skipITs>${skipSTs}</skipITs>
-              <trimStackTrace>false</trimStackTrace>  
-              <includes><include>**/*ST.java</include></includes>
+              <trimStackTrace>false</trimStackTrace>
+              <includes>
+                <include>**/*ST.java</include>
+              </includes>
             </configuration>
           </plugin>
         </plugins>
