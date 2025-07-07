@@ -26,6 +26,6 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - run: mvn --batch-mode clean install -DskipTests
       - run: |
-          mvn --batch-mode verify -pl miso-web -DskipUTs=true -DskipSTs=false \
+          mvn clean verify -pl miso-web -DskipUTs=true -DskipSTs=false \
           -Dit.test='Bulk*' -Ddocker.username="${DOCKER_USERNAME}" \
           -Ddocker.password="${DOCKER_PASSWORD}"
