@@ -1087,7 +1087,7 @@
                 <security.method>jdbc</security.method>
               </systemPropertyVariables>
               <skipITs>${skipSTs}</skipITs>
-              <trimStackTrace>false</trimStackTrace>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>              
               <includes>
                 <include>**/*ST.java</include>
               </includes>
