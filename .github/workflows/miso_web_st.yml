@@ -1,0 +1,31 @@
+name: Spring Controller Tests
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_USERNAME: dcooke
+      DOCKER_PASSWORD: ${{ secrets.docker_password }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - run: mvn --batch-mode clean install -DskipTests
+      - run: |
+          mvn clean verify -pl miso-web -DskipUTs=true -DskipSTs=false \
+          -Ddocker.username="${DOCKER_USERNAME}" \
+          -Ddocker.password="${DOCKER_PASSWORD}"
