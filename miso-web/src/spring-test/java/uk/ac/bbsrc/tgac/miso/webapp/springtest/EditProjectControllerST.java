@@ -82,7 +82,7 @@ public class EditProjectControllerST extends AbstractST {
     Project proj = currentSession().get(ProjectImpl.class, 1);
 
 
-    getMockMvc().perform(get(controllerBase + "/code/PONE")
+    getMockMvc().perform(get(CONTROLLER_BASE + "/code/PONE")
         .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(model().attribute("title", "Project 1"))
