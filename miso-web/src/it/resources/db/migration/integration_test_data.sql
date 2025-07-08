@@ -1301,5 +1301,15 @@ INSERT INTO ContactRole(contactRoleId, name) VALUES
 INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, width, height, layout) VALUES
 (1, 'Printer', 'BRADY', 'BRADY_FTP', '{"host:"127.0.0.1","pin":"0000"}', TRUE, 25, 25, '[{"element":"text", "contents":{"use":"ALIAS"}}]');
 
+INSERT INTO ApiKey(keyId, userId, apiKey, apiSecret, creator, created) VALUES
+(2, 1, "asdf", "ghjk", 1, "2025-07-08")
+ON DUPLICATE KEY UPDATE 
+  userId = 1,
+  apiKey = "asdf",
+  apiSecret = "ghjk",
+  creator = 1,
+  created = "2025-07-08";
+
+
 -- Keep this at bottom - checked to verify that script has completed and constants all loaded
 INSERT INTO AttachmentCategory(categoryId, alias) VALUES (4, 'last entry');
