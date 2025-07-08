@@ -71,9 +71,6 @@ public class LabRestControllerST extends AbstractST {
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
     String response = pollingResponse(id);
 
-    System.out.println(
-        getMockMvc().perform(get(CONTROLLER_BASE + "/bulk/" + id)).andReturn().getResponse().getContentAsString());
-
     Integer id1 = JsonPath.read(response, "$.data[0].id");
     Integer id2 = JsonPath.read(response, "$.data[1].id");
 
@@ -153,14 +150,14 @@ public class LabRestControllerST extends AbstractST {
   public void testDeleteFail() throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(3L));
 
-    // check that the project we want to delete exists
+    // check that the lab we want to delete exists
     assertNotNull(currentSession().get(LabImpl.class, 3));
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
             .content(AbstractST.makeJson(ids)))
         .andExpect(status().isUnauthorized());
-    // this user is not an admin or the project creator, so delete should be unauthorized
+    // this user is not an admin or the lab creator, so delete should be unauthorized
   }
 
 
