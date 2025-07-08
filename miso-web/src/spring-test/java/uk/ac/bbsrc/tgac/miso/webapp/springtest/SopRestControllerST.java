@@ -79,7 +79,7 @@ public class SopRestControllerST extends AbstractST {
         .andReturn();
 
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    String response = pollingResponse(id, CONTROLLER_BASE, "/bulk/");
+    String response = pollingResponse(CONTROLLER_BASE + "/bulk/" + id);
 
     Integer id1 = JsonPath.read(response, "$.data[0].id");
     Integer id2 = JsonPath.read(response, "$.data[1].id");
@@ -108,7 +108,7 @@ public class SopRestControllerST extends AbstractST {
         .andReturn();
 
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    String response = pollingResponse(id, CONTROLLER_BASE, "/bulk/");
+    String response = pollingResponse(CONTROLLER_BASE + "/bulk/" + id);
     String status = JsonPath.read(response, "$.status");
     assertEquals("failed", status); // request should fail without admin permissions
   }
@@ -135,7 +135,7 @@ public class SopRestControllerST extends AbstractST {
     String status = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.status");
 
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    pollingResponse(id, CONTROLLER_BASE, "/bulk/");
+    pollingResponse(CONTROLLER_BASE + "/bulk/" + id);
 
     Sop updatedSampleSop = currentSession().get(Sop.class, 1);
     Sop updatedLibrarySop = currentSession().get(Sop.class, 3);
