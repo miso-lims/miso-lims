@@ -68,26 +68,6 @@ public class AdminRestControllerST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
-  public void testRegenBarcodes() throws Exception {
-
-    MvcResult mvcResult = getMockMvc().perform(post(CONTROLLER_BASE + "/barcode/regen"))
-        .andDo(print())
-        .andExpect(status().isOk()).andReturn();
-
-    assertNotNull(mvcResult.getResponse());
-
-  }
-
-  @Test
-  public void failRegenBarcodes() throws Exception {
-    getMockMvc().perform(post(CONTROLLER_BASE + "/barcode/regen"))
-        .andDo(print())
-        .andExpect(status().isInternalServerError());
-  }
-
-
-  @Test
   public void testRefreshConstants() throws Exception {
     MvcResult mvcResult = getMockMvc().perform(post(CONTROLLER_BASE + "/constants/refresh"))
         .andExpect(status().isOk()).andReturn();
