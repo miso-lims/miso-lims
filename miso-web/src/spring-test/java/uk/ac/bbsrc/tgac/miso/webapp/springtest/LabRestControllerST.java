@@ -51,7 +51,6 @@ public class LabRestControllerST extends AbstractST {
   private static final String CONTROLLER_BASE = "/rest/labs";
 
   @Test
-  @WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
   public void testBulkCreateAsync() throws Exception {
     LabDto lone = new LabDto();
     lone.setAlias("lab1");
@@ -69,7 +68,7 @@ public class LabRestControllerST extends AbstractST {
         .andReturn();
 
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    String response = pollingResponse(id);
+    String response = pollingResponse(id, CONTROLLER_BASE, "/bulk/");
 
     Integer id1 = JsonPath.read(response, "$.data[0].id");
     Integer id2 = JsonPath.read(response, "$.data[1].id");
@@ -103,7 +102,7 @@ public class LabRestControllerST extends AbstractST {
     String status = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.status");
 
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    pollingResponse(id);
+    pollingResponse(id, CONTROLLER_BASE, "/bulk/");
 
     // now check if the updates went through
     LabImpl updatedBioBank = currentSession().get(LabImpl.class, 1);
@@ -113,20 +112,6 @@ public class LabRestControllerST extends AbstractST {
     assertNotNull(updatedPathology);
     assertEquals("| Biobank not updated. |", "bioBank", updatedBioBank.getAlias());
     assertEquals("| Pathology not updated | ", "pathology", updatedPathology.getAlias());
-  }
-
-
-  private String pollingResponse(String id) throws Exception {
-    String response =
-        getMockMvc().perform(get(CONTROLLER_BASE + "/bulk/" + id)).andReturn().getResponse().getContentAsString();
-    String status = JsonPath.read(response, "$.status");
-    while (status.equals("running")) {
-      response =
-          getMockMvc().perform(get(CONTROLLER_BASE + "/bulk/" + id)).andReturn().getResponse().getContentAsString();
-      status = JsonPath.read(response, "$.status");
-      Thread.sleep(1000);
-    }
-    return response;
   }
 
   @Test

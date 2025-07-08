@@ -86,7 +86,6 @@ public class ProjectRestControllerST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
   public void testCreate() throws Exception {
 
     ProjectDto project = new ProjectDto();
@@ -112,7 +111,6 @@ public class ProjectRestControllerST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
   public void testUpdate() throws Exception {
 
     Project proj = currentSession().get(ProjectImpl.class, 1);
@@ -129,7 +127,6 @@ public class ProjectRestControllerST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
   public void testBulkDelete() throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(7L));
 
@@ -163,7 +160,7 @@ public class ProjectRestControllerST extends AbstractST {
 
   @Test
   public void testGetLibraryAliquots() throws Exception {
-    ResultActions result = performDtRequest(CONTROLLER_BASE, 25, "id", 3);
+    ResultActions result = performDtRequest(CONTROLLER_BASE + "/dt", 25, "id", 3);
     result
         .andExpect(jsonPath("$.iTotalRecords").value(17)) // 17 = number of projects in test data script
         .andExpect(jsonPath("$.aaData[0].description").value("integration test project one"))

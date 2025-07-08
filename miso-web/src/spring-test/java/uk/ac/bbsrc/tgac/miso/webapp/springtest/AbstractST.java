@@ -58,6 +58,7 @@ import com.jayway.jsonpath.JsonPath;
 @PropertySource("/tomcat-config/miso.it.properties")
 @TestExecutionListeners(value = SpringTestExecutionListener.class,
     mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
+@WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
 public abstract class AbstractST {
   private static final Logger log = LoggerFactory.getLogger(AbstractST.class);
 
@@ -125,8 +126,22 @@ public abstract class AbstractST {
     return mockMvc;
   }
 
-  protected ResultActions performDtRequest(String controllerBase, int displayLength, String dataProp, int sortCol) throws Exception {
-    return getMockMvc().perform(get(controllerBase + "/dt").accept(MediaType.APPLICATION_JSON)
+  protected String pollingResponse(String id, String CONTROLLER_BASE, String url) throws Exception {
+    String response =
+        getMockMvc().perform(get(CONTROLLER_BASE + url + id)).andReturn().getResponse().getContentAsString();
+    String status = JsonPath.read(response, "$.status");
+    while (status.equals("running")) {
+      response =
+          getMockMvc().perform(get(CONTROLLER_BASE + url + id)).andReturn().getResponse().getContentAsString();
+      status = JsonPath.read(response, "$.status");
+      Thread.sleep(1000);
+    }
+    return response;
+  }
+
+  protected ResultActions performDtRequest(String url, int displayLength, String dataProp, int sortCol)
+      throws Exception {
+    return getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON)
         .param("iDisplayStart", "0")
         .param("iDisplayLength", Integer.toString(displayLength))
         .param("mDataProp_0", dataProp)
