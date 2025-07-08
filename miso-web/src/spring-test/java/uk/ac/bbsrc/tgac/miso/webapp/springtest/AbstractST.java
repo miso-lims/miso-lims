@@ -126,13 +126,13 @@ public abstract class AbstractST {
     return mockMvc;
   }
 
-  protected String pollingResponse(String id, String CONTROLLER_BASE, String url) throws Exception {
+  protected String pollingResponse(String id, String controllerBase, String url) throws Exception {
     String response =
-        getMockMvc().perform(get(CONTROLLER_BASE + url + id)).andReturn().getResponse().getContentAsString();
+        getMockMvc().perform(get(controllerBase + url + id)).andReturn().getResponse().getContentAsString();
     String status = JsonPath.read(response, "$.status");
     while (status.equals("running")) {
       response =
-          getMockMvc().perform(get(CONTROLLER_BASE + url + id)).andReturn().getResponse().getContentAsString();
+          getMockMvc().perform(get(controllerBase + url + id)).andReturn().getResponse().getContentAsString();
       status = JsonPath.read(response, "$.status");
       Thread.sleep(1000);
     }
