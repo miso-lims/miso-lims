@@ -97,7 +97,7 @@ public class ProjectRestControllerST extends AbstractST {
 
 
     MvcResult result = getMockMvc()
-        .perform(post(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(AbstractST.makeJson(project)))
+        .perform(post(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(project)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.code").value("TESTCODE"))
         .andReturn();
@@ -118,7 +118,7 @@ public class ProjectRestControllerST extends AbstractST {
     dto.setTitle("changed testing project");
 
     getMockMvc()
-        .perform(put(CONTROLLER_BASE + "/1").contentType(MediaType.APPLICATION_JSON).content(AbstractST.makeJson(dto)))
+        .perform(put(CONTROLLER_BASE + "/1").contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
         .andExpect(status().isOk());
 
     ProjectImpl updatedProj = currentSession().get(ProjectImpl.class, 1);
@@ -135,7 +135,7 @@ public class ProjectRestControllerST extends AbstractST {
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
-            .content(AbstractST.makeJson(ids)))
+            .content(makeJson(ids)))
         .andExpect(status().isNoContent());
 
     // now check that the project was actually deleted
@@ -152,7 +152,7 @@ public class ProjectRestControllerST extends AbstractST {
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
-            .content(AbstractST.makeJson(ids)))
+            .content(makeJson(ids)))
         .andExpect(status().isUnauthorized());
     // this user is not an admin or the project creator, so delete should be unauthorized
   }

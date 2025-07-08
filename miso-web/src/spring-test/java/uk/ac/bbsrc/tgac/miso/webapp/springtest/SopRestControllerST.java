@@ -170,7 +170,7 @@ public class SopRestControllerST extends AbstractST {
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
-            .content(AbstractST.makeJson(ids)))
+            .content(makeJson(ids)))
         .andExpect(status().isUnauthorized());
   }
 
