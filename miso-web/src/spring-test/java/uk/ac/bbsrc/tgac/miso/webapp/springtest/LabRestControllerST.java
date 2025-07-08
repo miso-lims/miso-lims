@@ -155,7 +155,7 @@ public class LabRestControllerST extends AbstractST {
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
-            .content(AbstractST.makeJson(ids)))
+            .content(makeJson(ids)))
         .andExpect(status().isUnauthorized());
     // this user is not an admin or the lab creator, so delete should be unauthorized
   }
