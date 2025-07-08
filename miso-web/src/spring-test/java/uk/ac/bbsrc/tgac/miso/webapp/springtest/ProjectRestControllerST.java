@@ -86,7 +86,6 @@ public class ProjectRestControllerST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
   public void testCreate() throws Exception {
 
     ProjectDto project = new ProjectDto();
@@ -98,7 +97,7 @@ public class ProjectRestControllerST extends AbstractST {
 
 
     MvcResult result = getMockMvc()
-        .perform(post(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(AbstractST.makeJson(project)))
+        .perform(post(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(project)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.code").value("TESTCODE"))
         .andReturn();
@@ -112,7 +111,6 @@ public class ProjectRestControllerST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
   public void testUpdate() throws Exception {
 
     Project proj = currentSession().get(ProjectImpl.class, 1);
@@ -120,7 +118,7 @@ public class ProjectRestControllerST extends AbstractST {
     dto.setTitle("changed testing project");
 
     getMockMvc()
-        .perform(put(CONTROLLER_BASE + "/1").contentType(MediaType.APPLICATION_JSON).content(AbstractST.makeJson(dto)))
+        .perform(put(CONTROLLER_BASE + "/1").contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
         .andExpect(status().isOk());
 
     ProjectImpl updatedProj = currentSession().get(ProjectImpl.class, 1);
@@ -129,7 +127,6 @@ public class ProjectRestControllerST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
   public void testBulkDelete() throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(7L));
 
@@ -138,7 +135,7 @@ public class ProjectRestControllerST extends AbstractST {
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
-            .content(AbstractST.makeJson(ids)))
+            .content(makeJson(ids)))
         .andExpect(status().isNoContent());
 
     // now check that the project was actually deleted
@@ -155,7 +152,7 @@ public class ProjectRestControllerST extends AbstractST {
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
-            .content(AbstractST.makeJson(ids)))
+            .content(makeJson(ids)))
         .andExpect(status().isUnauthorized());
     // this user is not an admin or the project creator, so delete should be unauthorized
   }
@@ -163,7 +160,7 @@ public class ProjectRestControllerST extends AbstractST {
 
   @Test
   public void testGetLibraryAliquots() throws Exception {
-    ResultActions result = performDtRequest(CONTROLLER_BASE, 25, "id", 3);
+    ResultActions result = performDtRequest(CONTROLLER_BASE + "/dt", 25, "id", 3);
     result
         .andExpect(jsonPath("$.iTotalRecords").value(17)) // 17 = number of projects in test data script
         .andExpect(jsonPath("$.aaData[0].description").value("integration test project one"))
