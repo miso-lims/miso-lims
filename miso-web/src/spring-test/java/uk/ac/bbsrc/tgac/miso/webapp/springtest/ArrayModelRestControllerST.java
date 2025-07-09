@@ -85,11 +85,11 @@ public class ArrayModelRestControllerST extends AbstractST {
     List<ArrayModel> arrayModels =
         (List<ArrayModel>) abstractTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, new int[] {1, 2});
 
-    assertEquals( "beady", arrayModels.get(0).getAlias());
-    assertEquals( "not used", arrayModels.get(1).getAlias());
+    assertEquals("beady", arrayModels.get(0).getAlias());
+    assertEquals("not used", arrayModels.get(1).getAlias());
   }
 
-  @Test  //(expected = AuthorizationException.class)
+  @Test // (expected = AuthorizationException.class)
   public void testBulkCreateFail() throws Exception {
     ArrayModelDto arrone = new ArrayModelDto();
     arrone.setAlias("array model one");
@@ -106,7 +106,7 @@ public class ArrayModelRestControllerST extends AbstractST {
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
-  public void testDeleteLab() throws Exception {
+  public void testDeleteArrayModel() throws Exception {
     abstractTestDelete(controllerClass, 2, CONTROLLER_BASE);
   }
 
