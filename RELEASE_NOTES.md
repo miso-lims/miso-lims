@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.10.1] - 2025-07-09
+
+### Fixed
+
+* reads missing the second index for some sample sheets
+
+
 ## [3.10.0] - 2025-06-30
 
 ### Added
