@@ -55,13 +55,14 @@ public class ApiKeyRestControllerST extends AbstractST {
   public void testCreate() throws Exception {
     // must be admin to create an api key
     CreateApiKeyRequest request = new CreateApiKeyRequest("testname");
-    MvcResult mvcResult =
-        getMockMvc().perform(post(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(request)))
-            .andExpect(status().isOk())
-            .andDo(print())
-            .andReturn();
-
-    assertNotNull(mvcResult.getResponse());
+    getMockMvc().perform(post(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(request)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").exists())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.user.active").value(false))
+        .andExpect(jsonPath("$.user.loginName").value("testname"))
+        .andExpect(jsonPath("$.creatorName").value("admin"))
+        .andDo(print());
   }
 
   @Test
