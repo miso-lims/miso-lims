@@ -3,9 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 import org.junit.Test;
 
 import org.springframework.web.servlet.*;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import javax.ws.rs.core.MediaType;
@@ -49,6 +47,7 @@ import java.util.Date;
 public class LabRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/labs";
+  private static final Class<LabImpl> controllerClass = LabImpl.class;
 
   @Test
   public void testBulkCreateAsync() throws Exception {
@@ -62,19 +61,7 @@ public class LabRestControllerST extends AbstractST {
     dtos.add(lone);
     dtos.add(ltwo);
 
-    MvcResult mvcResult = getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
-        .andExpect(status().isAccepted())
-        .andReturn();
-
-    String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    String response = pollingResponse(CONTROLLER_BASE + "/bulk/" + id);
-
-    Integer id1 = JsonPath.read(response, "$.data[0].id");
-    Integer id2 = JsonPath.read(response, "$.data[1].id");
-
-    assertNotNull(currentSession().get(LabImpl.class, id1));
-    assertNotNull(currentSession().get(LabImpl.class, id2));
+    abstractTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, dtos);
   }
 
 
@@ -84,8 +71,8 @@ public class LabRestControllerST extends AbstractST {
   public void testBulkUpdateAsync() throws Exception {
     // admin permissions are not required to update, however only the creator can update a lab, which in
     // this case happens to be the admin user
-    LabDto bioBank = Dtos.asDto(currentSession().get(LabImpl.class, 1));
-    LabDto pathology = Dtos.asDto(currentSession().get(LabImpl.class, 2));
+    LabDto bioBank = Dtos.asDto(currentSession().get(controllerClass, 1));
+    LabDto pathology = Dtos.asDto(currentSession().get(controllerClass, 2));
 
     bioBank.setAlias("bioBank");
     pathology.setAlias("pathology");
@@ -94,55 +81,24 @@ public class LabRestControllerST extends AbstractST {
     dtos.add(bioBank);
     dtos.add(pathology);
 
-    MvcResult mvcResult = getMockMvc()
-        .perform(put(CONTROLLER_BASE + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
-        .andExpect(status().isAccepted())
-        .andReturn();
+    List<LabImpl> labs =
+        (List<LabImpl>) abstractTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, new int[] {1, 2});
 
-    String status = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.status");
-
-    String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    pollingResponse(CONTROLLER_BASE + "/bulk/" + id);
-
-    // now check if the updates went through
-    LabImpl updatedBioBank = currentSession().get(LabImpl.class, 1);
-    LabImpl updatedPathology = currentSession().get(LabImpl.class, 2);
-
-    assertNotNull(updatedBioBank);
-    assertNotNull(updatedPathology);
-    assertEquals("| Biobank not updated. |", "bioBank", updatedBioBank.getAlias());
-    assertEquals("| Pathology not updated | ", "pathology", updatedPathology.getAlias());
+    assertEquals("| Biobank not updated. |", "bioBank", labs.get(0).getAlias());
+    assertEquals("| Pathology not updated | ", "pathology", labs.get(1).getAlias());
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteLab() throws Exception {
-    List<Long> ids = new ArrayList<Long>(Arrays.asList(3L)); // lab 3 is the designated deletable lab in the test data
-
-    assertNotNull(currentSession().get(LabImpl.class, 3)); // first check that it exists
-
-    getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)))
-        .andExpect(status().isNoContent());
-
-    // now check that the lab was actually deleted
-    assertNull(currentSession().get(LabImpl.class, 3));
+    abstractTestDelete(controllerClass, 3, CONTROLLER_BASE);
   }
 
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    List<Long> ids = new ArrayList<Long>(Arrays.asList(3L));
-
-    // check that the lab we want to delete exists
-    assertNotNull(currentSession().get(LabImpl.class, 3));
-
-    getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
-            .content(makeJson(ids)))
-        .andExpect(status().isUnauthorized());
-    // this user is not an admin or the lab creator, so delete should be unauthorized
+    abstractTestDeleteFail(controllerClass, 3, CONTROLLER_BASE);
   }
 
 

@@ -49,6 +49,7 @@ import java.util.Date;
 public class SopRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/sops";
+  private static final Class<Sop> controllerClass = Sop.class;
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
@@ -71,21 +72,8 @@ public class SopRestControllerST extends AbstractST {
     List<SopDto> dtos = new ArrayList<SopDto>();
     dtos.add(sone);
     dtos.add(stwo);
-
-
-    MvcResult mvcResult = getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
-        .andExpect(status().isAccepted())
-        .andReturn();
-
-    String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    String response = pollingResponse(CONTROLLER_BASE + "/bulk/" + id);
-
-    Integer id1 = JsonPath.read(response, "$.data[0].id");
-    Integer id2 = JsonPath.read(response, "$.data[1].id");
-
-    assertNotNull(currentSession().get(Sop.class, id1));
-    assertNotNull(currentSession().get(Sop.class, id2));
+    
+    abstractTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, dtos);
   }
 
   @Test
@@ -99,18 +87,18 @@ public class SopRestControllerST extends AbstractST {
     sone.setUrl("http://sops.test.com/test_sop_1");
     sone.setArchived(false);
 
+    SopDto stwo = new SopDto();
+    stwo.setAlias("sop two");
+    stwo.setVersion("1.0");
+    stwo.setCategory("SAMPLE");
+    stwo.setUrl("http://sops.test.com/test_sop_2");
+    stwo.setArchived(false);
+
     List<SopDto> dtos = new ArrayList<SopDto>();
     dtos.add(sone);
+    dtos.add(stwo);
 
-    MvcResult mvcResult = getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
-        .andExpect(status().isAccepted())
-        .andReturn();
-
-    String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    String response = pollingResponse(CONTROLLER_BASE + "/bulk/" + id);
-    String status = JsonPath.read(response, "$.status");
-    assertEquals("failed", status); // request should fail without admin permissions
+    abstractBulkCreateAsyncFail(CONTROLLER_BASE, controllerClass, dtos);
   }
 
   @Test
@@ -127,51 +115,20 @@ public class SopRestControllerST extends AbstractST {
     dtos.add(sampleSop);
     dtos.add(librarySop);
 
-    MvcResult mvcResult = getMockMvc()
-        .perform(put(CONTROLLER_BASE + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
-        .andExpect(status().isAccepted())
-        .andReturn();
-
-    String status = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.status");
-
-    String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    pollingResponse(CONTROLLER_BASE + "/bulk/" + id);
-
-    Sop updatedSampleSop = currentSession().get(Sop.class, 1);
-    Sop updatedLibrarySop = currentSession().get(Sop.class, 3);
-
-    assertNotNull(updatedSampleSop);
-    assertNotNull(updatedLibrarySop);
-
-    assertEquals("Sop not updated", "sampler", updatedSampleSop.getAlias());
-    assertEquals("Sop not updated", "libraryer", updatedLibrarySop.getAlias());
+    List<Sop> sops = (List<Sop>) abstractTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, new int[] {1, 3});
+    assertEquals("Sop not updated", "sampler", sops.get(0).getAlias());
+    assertEquals("Sop not updated", "libraryer", sops.get(1).getAlias());
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteSop() throws Exception {
-    List<Long> ids = new ArrayList<Long>(Arrays.asList(5L));
-
-    assertNotNull(currentSession().get(Sop.class, 5));
-
-    getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)))
-        .andExpect(status().isNoContent());
-
-    assertNull(currentSession().get(Sop.class, 5));
+     abstractTestDelete(controllerClass, 5, CONTROLLER_BASE);
   }
-
 
   @Test
   public void testDeleteFail() throws Exception {
-    List<Long> ids = new ArrayList<Long>(Arrays.asList(5L));
-
-    assertNotNull(currentSession().get(Sop.class, 5));
-
-    getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
-            .content(makeJson(ids)))
-        .andExpect(status().isUnauthorized());
+    abstractTestDeleteFail(controllerClass, 5, CONTROLLER_BASE);
   }
 
   @Test
@@ -203,6 +160,4 @@ public class SopRestControllerST extends AbstractST {
         .andExpect(jsonPath("$.aaData[0].id").value(6));
 
   }
-
-
 }

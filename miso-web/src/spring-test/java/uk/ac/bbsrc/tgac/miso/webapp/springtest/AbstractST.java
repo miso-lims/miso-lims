@@ -40,6 +40,10 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.context.MisoAppListener;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 
+import static org.junit.Assert.*;
+import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -51,6 +55,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import org.springframework.test.web.servlet.ResultActions;
 import javax.ws.rs.core.MediaType;
 import com.jayway.jsonpath.JsonPath;
+
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration("/st-context.xml")
@@ -109,7 +114,15 @@ public abstract class AbstractST {
     return script;
   }
 
-  public static String makeJson(Object obj) throws Exception {
+  public String makeJson(Object obj) throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+    String requestJson = ow.writeValueAsString(obj);
+    return requestJson;
+  }
+
+  public String makeJson(List<?> obj) throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
     ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
@@ -138,6 +151,93 @@ public abstract class AbstractST {
     }
     return response;
   }
+
+  protected <T> void abstractTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
+      throws Exception {
+
+
+    MvcResult mvcResult = getMockMvc()
+        .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
+        .andExpect(status().isAccepted())
+        .andReturn();
+
+    String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
+    String response = pollingResponse(controllerBase + "/bulk/" + id);
+
+    Integer id1 = JsonPath.read(response, "$.data[0].id");
+    Integer id2 = JsonPath.read(response, "$.data[1].id");
+
+    assertNotNull(currentSession().get(createType, id1));
+    assertNotNull(currentSession().get(createType, id2));
+
+  }
+
+  protected <T> void abstractBulkCreateAsyncFail(String controllerBase, Class<T> createType, List<?> dtos)
+      throws Exception {
+    // tests failure for async create endpoints where admin permissions are required
+    
+    MvcResult mvcResult = getMockMvc()
+          .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
+          .andExpect(status().isAccepted())
+          .andDo(print())
+          .andReturn();
+    String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
+    String response = pollingResponse(controllerBase + "/bulk/" + id);
+    String status = JsonPath.read(response, "$.status");
+    assertEquals("failed", status); // request should fail without admin permissions
+}
+
+  protected <T> List<T> abstractTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<?> dtos,
+      int[] ids)
+      throws Exception {
+
+    MvcResult mvcResult = getMockMvc()
+        .perform(put(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
+        .andExpect(status().isAccepted())
+        .andReturn();
+
+    String status = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.status");
+
+    String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
+    pollingResponse(controllerBase + "/bulk/" + id);
+
+
+    // now check if the updates went through
+    T obj1 = currentSession().get(updateType, ids[0]);
+    T obj2 = currentSession().get(updateType, ids[1]);
+
+    assertNotNull(obj1);
+    assertNotNull(obj2);
+
+    return Arrays.asList(obj1, obj2);
+
+  }
+
+  protected <T> void abstractTestDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
+    List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
+
+    assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
+
+    getMockMvc()
+        .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)))
+        .andExpect(status().isNoContent());
+
+    // now check that the lab was actually deleted
+    assertNull(currentSession().get(deleteType, id));
+  }
+
+  protected <T> void abstractTestDeleteFail(Class<T> deleteType, int id, String controllerBase) throws Exception {
+    List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
+
+    assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
+
+    getMockMvc()
+        .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)))
+        .andExpect(status().isUnauthorized());
+    // this user doesn't have permissions to delete things
+  }
+
+
 
   protected ResultActions performDtRequest(String url, int displayLength, String dataProp, int sortCol)
       throws Exception {
