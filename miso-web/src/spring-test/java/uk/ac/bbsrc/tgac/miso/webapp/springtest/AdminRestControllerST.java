@@ -54,8 +54,7 @@ public class AdminRestControllerST extends AbstractST {
 
     MvcResult mvcResult =
         getMockMvc().perform(post(CONTROLLER_BASE + "/cache/clear")).andExpect(status().isOk()).andReturn();
-    // check if cache is cleared somehow
-    // I guess response body
+    // check that the response is consistent with what should be returned if the cache is cleared
 
     assertEquals("true", mvcResult.getResponse().getContentAsString());
   }
@@ -64,7 +63,7 @@ public class AdminRestControllerST extends AbstractST {
   public void failClearCache() throws Exception {
     getMockMvc().perform(post(CONTROLLER_BASE + "/cache/clear"))
         .andDo(print())
-        .andExpect(status().isInternalServerError());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
