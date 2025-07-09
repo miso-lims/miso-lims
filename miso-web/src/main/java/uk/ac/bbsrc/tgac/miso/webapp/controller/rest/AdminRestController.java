@@ -120,9 +120,7 @@ public class AdminRestController extends DefaultRestController {
   @ResponseStatus(HttpStatus.OK)
   public boolean clearCache() {
     try {
-      if (!authorizationManager.isAdminUser()) {
-        throw new RestException("Only admins can reset the cache.");
-      }
+      authorizationManager.throwIfNonAdmin();
     } catch (IOException e) {
       throw new RestException("Could not determine if user is admin.", e);
     }
