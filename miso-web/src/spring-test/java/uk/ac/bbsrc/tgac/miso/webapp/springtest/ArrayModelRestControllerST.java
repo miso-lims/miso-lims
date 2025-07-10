@@ -40,6 +40,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.Date;
@@ -83,7 +84,7 @@ public class ArrayModelRestControllerST extends AbstractST {
     dtos.add(unused);
 
     List<ArrayModel> arrayModels =
-        (List<ArrayModel>) abstractTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, new int[] {1, 2});
+        (List<ArrayModel>) abstractTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
 
     assertEquals("beady", arrayModels.get(0).getAlias());
     assertEquals("not used", arrayModels.get(1).getAlias());

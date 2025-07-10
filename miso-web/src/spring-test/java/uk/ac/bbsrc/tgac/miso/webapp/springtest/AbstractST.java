@@ -43,6 +43,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import static org.junit.Assert.*;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Collections;
+
+
 import java.util.ArrayList;
 import java.util.Date;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -89,6 +92,10 @@ public abstract class AbstractST {
   @Autowired
   private AuthorizationManager authorizationManager;
 
+
+  private ObjectMapper mapper;
+  private ObjectWriter ow;
+
   @Before
   public final void setupAbstractTest() throws IOException {
 
@@ -100,6 +107,10 @@ public abstract class AbstractST {
     populator.execute(dataSource);
 
     this.mockMvc = webAppContextSetup(this.wac).build();
+
+    mapper = new ObjectMapper();
+    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+    ow = mapper.writer().withDefaultPrettyPrinter();
   }
 
   public Session currentSession() {
@@ -115,20 +126,14 @@ public abstract class AbstractST {
   }
 
   public String makeJson(Object obj) throws Exception {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
     String requestJson = ow.writeValueAsString(obj);
     return requestJson;
   }
 
-  public String makeJson(List<?> obj) throws Exception {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-    String requestJson = ow.writeValueAsString(obj);
-    return requestJson;
-  }
+  // public String makeJson(List<?> obj) throws Exception {
+  // String requestJson = ow.writeValueAsString(obj);
+  // return requestJson;
+  // }
 
   @Test
   public void initialization() {
@@ -155,63 +160,68 @@ public abstract class AbstractST {
   protected <T> void abstractTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
 
+    String response = pollingResponserHelper("post", dtos, controllerBase)[0];
 
-    MvcResult mvcResult = getMockMvc()
-        .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
-        .andExpect(status().isAccepted())
-        .andReturn();
-
-    String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    String response = pollingResponse(controllerBase + "/bulk/" + id);
-
-    Integer id1 = JsonPath.read(response, "$.data[0].id");
-    Integer id2 = JsonPath.read(response, "$.data[1].id");
-
-    assertNotNull(currentSession().get(createType, id1));
-    assertNotNull(currentSession().get(createType, id2));
-
+    for (int i = 0; i < dtos.size(); i++) {
+      Integer id = JsonPath.read(response, "$.data[" + i + "].id");
+      assertNotNull(currentSession().get(createType, id));
+    }
   }
 
   protected <T> void abstractBulkCreateAsyncFail(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
     // tests failure for async create endpoints where admin permissions are required
-    
-    MvcResult mvcResult = getMockMvc()
-          .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
-          .andExpect(status().isAccepted())
-          .andDo(print())
-          .andReturn();
+    String status = pollingResponserHelper("post", dtos, controllerBase)[1];
+    assertEquals("failed", status); // request should fail without admin permissions
+  }
+
+  protected <T> List<T> abstractTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<?> dtos,
+      List<Integer> ids)
+      throws Exception {
+    pollingResponserHelper("put", dtos, controllerBase);
+
+    // now check if the updates went through
+    List<T> objects = new ArrayList<T>();
+    for (int id : ids) {
+      T obj = currentSession().get(updateType, id);
+      assertNotNull(obj);
+      objects.add(obj);
+    }
+    return objects;
+  }
+
+  private String[] pollingResponserHelper(String requestType, List<?> dtos, String controllerBase) throws Exception {
+    // helper method for async requests
+    MvcResult mvcResult;
+    switch (requestType) {
+      case "post":
+        mvcResult = getMockMvc()
+            .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
+            .andExpect(status().isAccepted())
+            .andReturn();
+        break;
+
+      case "put":
+        mvcResult = getMockMvc()
+            .perform(put(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
+            .andExpect(status().isAccepted())
+            .andReturn();
+
+        break;
+      default:
+        mvcResult = getMockMvc()
+            .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
+            .andExpect(status().isAccepted())
+            .andReturn();
+        break;
+    }
+
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
     String response = pollingResponse(controllerBase + "/bulk/" + id);
     String status = JsonPath.read(response, "$.status");
-    assertEquals("failed", status); // request should fail without admin permissions
-}
-
-  protected <T> List<T> abstractTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<?> dtos,
-      int[] ids)
-      throws Exception {
-
-    MvcResult mvcResult = getMockMvc()
-        .perform(put(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
-        .andExpect(status().isAccepted())
-        .andReturn();
-
-    String status = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.status");
-
-    String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    pollingResponse(controllerBase + "/bulk/" + id);
-
-
-    // now check if the updates went through
-    T obj1 = currentSession().get(updateType, ids[0]);
-    T obj2 = currentSession().get(updateType, ids[1]);
-
-    assertNotNull(obj1);
-    assertNotNull(obj2);
-
-    return Arrays.asList(obj1, obj2);
-
+    return new String[] {response, status}; // lets the caller choose what they want to use
   }
+
 
   protected <T> void abstractTestDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));

@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.security.test.context.support.WithMockUser;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
+import java.util.Collections;
 
 import static org.junit.Assert.*;
 
@@ -72,7 +73,7 @@ public class SopRestControllerST extends AbstractST {
     List<SopDto> dtos = new ArrayList<SopDto>();
     dtos.add(sone);
     dtos.add(stwo);
-    
+
     abstractTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, dtos);
   }
 
@@ -115,7 +116,8 @@ public class SopRestControllerST extends AbstractST {
     dtos.add(sampleSop);
     dtos.add(librarySop);
 
-    List<Sop> sops = (List<Sop>) abstractTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, new int[] {1, 3});
+    List<Sop> sops =
+        (List<Sop>) abstractTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 3));
     assertEquals("Sop not updated", "sampler", sops.get(0).getAlias());
     assertEquals("Sop not updated", "libraryer", sops.get(1).getAlias());
   }
@@ -123,7 +125,7 @@ public class SopRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteSop() throws Exception {
-     abstractTestDelete(controllerClass, 5, CONTROLLER_BASE);
+    abstractTestDelete(controllerClass, 5, CONTROLLER_BASE);
   }
 
   @Test
