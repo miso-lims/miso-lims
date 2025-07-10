@@ -52,6 +52,8 @@ public class LabRestControllerST extends AbstractST {
 
   @Test
   public void testBulkCreateAsync() throws Exception {
+    // since there is no permission restrictions on creating labs (i.e. don't need to be admin to create
+    // one), there is no create failure test for labs
     LabDto lone = new LabDto();
     lone.setAlias("lab1");
 

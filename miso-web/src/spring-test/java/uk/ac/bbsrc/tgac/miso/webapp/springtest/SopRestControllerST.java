@@ -52,54 +52,40 @@ public class SopRestControllerST extends AbstractST {
   private static final String CONTROLLER_BASE = "/rest/sops";
   private static final Class<Sop> controllerClass = Sop.class;
 
+  private List<SopDto> makeCreateDtos() {
+
+    SopDto sone = new SopDto();
+    sone.setAlias("sop one");
+    sone.setVersion("1.0");
+    sone.setCategory("SAMPLE");
+    sone.setUrl("http://sops.test.com/test_sop_1");
+    sone.setArchived(false);
+
+    SopDto stwo = new SopDto();
+    stwo.setAlias("sop two");
+    stwo.setVersion("1.0");
+    stwo.setCategory("SAMPLE");
+    stwo.setUrl("http://sops.test.com/test_sop_2");
+    stwo.setArchived(false);
+
+    List<SopDto> dtos = new ArrayList<SopDto>();
+    dtos.add(sone);
+    dtos.add(stwo);
+
+    return dtos;
+  }
+
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
 
-    SopDto sone = new SopDto();
-    sone.setAlias("sop one");
-    sone.setVersion("1.0");
-    sone.setCategory("SAMPLE");
-    sone.setUrl("http://sops.test.com/test_sop_1");
-    sone.setArchived(false);
-
-    SopDto stwo = new SopDto();
-    stwo.setAlias("sop two");
-    stwo.setVersion("1.0");
-    stwo.setCategory("SAMPLE");
-    stwo.setUrl("http://sops.test.com/test_sop_2");
-    stwo.setArchived(false);
-
-    List<SopDto> dtos = new ArrayList<SopDto>();
-    dtos.add(sone);
-    dtos.add(stwo);
-
-    abstractTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, dtos);
+    abstractTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
   }
 
   @Test
   public void testBulkCreateFail() throws Exception {
-    // SOP creation is for admin only
-
-    SopDto sone = new SopDto();
-    sone.setAlias("sop one");
-    sone.setVersion("1.0");
-    sone.setCategory("SAMPLE");
-    sone.setUrl("http://sops.test.com/test_sop_1");
-    sone.setArchived(false);
-
-    SopDto stwo = new SopDto();
-    stwo.setAlias("sop two");
-    stwo.setVersion("1.0");
-    stwo.setCategory("SAMPLE");
-    stwo.setUrl("http://sops.test.com/test_sop_2");
-    stwo.setArchived(false);
-
-    List<SopDto> dtos = new ArrayList<SopDto>();
-    dtos.add(sone);
-    dtos.add(stwo);
-
-    abstractBulkCreateAsyncFail(CONTROLLER_BASE, controllerClass, dtos);
+    // SOP creation is for admin only, so this test is expecting failure due to insufficent permission
+    abstractBulkCreateAsyncFail(CONTROLLER_BASE, controllerClass, makeCreateDtos());
   }
 
   @Test

@@ -52,9 +52,7 @@ public class ArrayModelRestControllerST extends AbstractST {
   private static final Class<ArrayModel> controllerClass = ArrayModel.class;
 
 
-  @Test
-  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
-  public void testBulkCreateAsync() throws Exception {
+  private List<ArrayModelDto> makeCreateDtos() {
     ArrayModelDto arrone = new ArrayModelDto();
     arrone.setAlias("array model one");
 
@@ -65,7 +63,13 @@ public class ArrayModelRestControllerST extends AbstractST {
     dtos.add(arrone);
     dtos.add(arrtwo);
 
-    abstractTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, dtos);
+    return dtos;
+  }
+
+  @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
+  public void testBulkCreateAsync() throws Exception {
+    abstractTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
   }
 
   @Test
@@ -90,19 +94,13 @@ public class ArrayModelRestControllerST extends AbstractST {
     assertEquals("not used", arrayModels.get(1).getAlias());
   }
 
-  @Test // (expected = AuthorizationException.class)
+  @Test
   public void testBulkCreateFail() throws Exception {
-    ArrayModelDto arrone = new ArrayModelDto();
-    arrone.setAlias("array model one");
+    // array models can only be created by an admin user, so this test expected failure due to
+    // insufficient permissions
 
-    ArrayModelDto arrtwo = new ArrayModelDto();
-    arrtwo.setAlias("array model two");
+    abstractTestBulkCreateAsyncFail(CONTROLLER_BASE, controllerClass, makeCreateDtos());
 
-    List<ArrayModelDto> dtos = new ArrayList<ArrayModelDto>();
-    dtos.add(arrone);
-    dtos.add(arrtwo);
-
-    abstractBulkCreateAsyncFail(CONTROLLER_BASE, controllerClass, dtos);
   }
 
   @Test

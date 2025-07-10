@@ -130,11 +130,6 @@ public abstract class AbstractST {
     return requestJson;
   }
 
-  // public String makeJson(List<?> obj) throws Exception {
-  // String requestJson = ow.writeValueAsString(obj);
-  // return requestJson;
-  // }
-
   @Test
   public void initialization() {
     assertNotNull(wac);
