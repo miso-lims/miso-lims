@@ -99,7 +99,7 @@ public class ArrayModelRestControllerST extends AbstractST {
     // array models can only be created by an admin user, so this test expected failure due to
     // insufficient permissions
 
-    abstractTestBulkCreateAsyncFail(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    abstractBulkCreateAsyncFail(CONTROLLER_BASE, controllerClass, makeCreateDtos());
 
   }
 
