@@ -44,7 +44,7 @@ BulkTarget.libraryindex = (function ($) {
           title: "Name",
           data: "name",
           type: "text",
-          maxLength: 24,
+          maxLength: 50,
           required: true,
         },
         {
