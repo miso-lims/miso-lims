@@ -1,0 +1,2 @@
+ALTER TABLE LibraryIndex
+  MODIFY COLUMN name VARCHAR(50);
