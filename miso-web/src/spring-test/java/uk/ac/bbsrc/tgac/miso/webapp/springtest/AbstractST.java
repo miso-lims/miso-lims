@@ -8,6 +8,8 @@ import java.io.IOException;
 
 import javax.sql.DataSource;
 
+import static org.hamcrest.Matchers.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -242,10 +244,60 @@ public abstract class AbstractST {
     // this user doesn't have permissions to delete things
   }
 
+  protected <T, D> T abstractSave(String controllerBase, D dto, Class<T> controllerClass, int status) throws Exception {
 
+    MvcResult result = getMockMvc()
+        .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
+        .andExpect(status().is(status)) // either created (201) or OK (200) dependening on the controller
+        .andExpect(jsonPath("$").exists())
+        .andReturn();
+
+    Integer id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+
+    assertNotNull(currentSession().get(controllerClass, id));
+    return currentSession().get(controllerClass, id);
+  }
+
+  protected <T, D> T abstractUpdate(String controllerBase, D dto, int id, Class<T> updateType) throws Exception {
+    getMockMvc()
+        .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
+        .andExpect(status().isOk());
+
+    assertNotNull(currentSession().get(updateType, id));
+    return currentSession().get(updateType, id);
+  }
+
+  protected void abstractSearch(String url, String searchTerm, int expectedSize) throws Exception {
+    getMockMvc().perform(get(url).param("q", searchTerm).accept(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").exists())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.*", hasSize(expectedSize)));
+  }
 
   protected ResultActions performDtRequest(String url, int displayLength, String dataProp, int sortCol)
       throws Exception {
+    return getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON)
+        .param("iDisplayStart", "0")
+        .param("iDisplayLength", Integer.toString(displayLength))
+        .param("mDataProp_0", dataProp)
+        .param("sSortDir_0", "asc")
+        .param("iSortCol_0", Integer.toString(sortCol))
+        .param("sEcho", "1"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$").exists());
+  }
+
+  // version of the dt response method with default values, because java doesn't support default
+  // method param values
+  protected ResultActions performDtRequest(String url)
+      throws Exception {
+
+    int displayLength = 25;
+    String dataProp = "id";
+    int sortCol = 3;
     return getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON)
         .param("iDisplayStart", "0")
         .param("iDisplayLength", Integer.toString(displayLength))
