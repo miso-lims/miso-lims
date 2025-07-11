@@ -244,7 +244,8 @@ public abstract class AbstractST {
     // this user doesn't have permissions to delete things
   }
 
-  protected <T, D> T abstractSave(String controllerBase, D dto, Class<T> controllerClass, int status) throws Exception {
+  protected <T, D> T abstractCreateAndReturnEntity(String controllerBase, D dto, Class<T> controllerClass, int status)
+      throws Exception {
 
     MvcResult result = getMockMvc()
         .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
@@ -258,16 +259,18 @@ public abstract class AbstractST {
     return currentSession().get(controllerClass, id);
   }
 
-  protected <T, D> T abstractUpdate(String controllerBase, D dto, int id, Class<T> updateType) throws Exception {
+  protected <T, D> T abstractUpdateAndReturnEntity(String controllerBase, D dto, int id, Class<T> controllerClass)
+      throws Exception {
     getMockMvc()
         .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
         .andExpect(status().isOk());
 
-    assertNotNull(currentSession().get(updateType, id));
-    return currentSession().get(updateType, id);
+    assertNotNull(currentSession().get(controllerClass, id));
+    return currentSession().get(controllerClass, id);
   }
 
-  protected void abstractSearch(String url, String searchTerm, int expectedSize) throws Exception {
+  protected void abstractSearchByTermWithExpectedNumResults(String url, String searchTerm, int expectedSize)
+      throws Exception {
     getMockMvc().perform(get(url).param("q", searchTerm).accept(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
