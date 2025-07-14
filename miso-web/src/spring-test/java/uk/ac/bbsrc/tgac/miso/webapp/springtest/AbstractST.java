@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
 
-
 import java.util.ArrayList;
 import java.util.Date;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,14 +60,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import javax.ws.rs.core.MediaType;
 import com.jayway.jsonpath.JsonPath;
 
-
 @RunWith(SpringRunner.class)
 @ContextConfiguration("/st-context.xml")
 @WebAppConfiguration
 @PropertySource("/tomcat-config/miso.it.properties")
-@TestExecutionListeners(value = SpringTestExecutionListener.class,
-    mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
-@WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
+@TestExecutionListeners(value = SpringTestExecutionListener.class, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
+@WithMockUser(username = "user", password = "user", roles = { "INTERNAL" })
 public abstract class AbstractST {
   private static final Logger log = LoggerFactory.getLogger(AbstractST.class);
 
@@ -93,7 +90,6 @@ public abstract class AbstractST {
   @Mock
   @Autowired
   private AuthorizationManager authorizationManager;
-
 
   private ObjectMapper mapper;
   private ObjectWriter ow;
@@ -142,12 +138,10 @@ public abstract class AbstractST {
   }
 
   protected String pollingResponse(String url) throws Exception {
-    String response =
-        getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
+    String response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
     String status = JsonPath.read(response, "$.status");
     while (status.equals("running")) {
-      response =
-          getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
+      response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
       status = JsonPath.read(response, "$.status");
       Thread.sleep(1000);
     }
@@ -216,9 +210,8 @@ public abstract class AbstractST {
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
     String response = pollingResponse(controllerBase + "/bulk/" + id);
     String status = JsonPath.read(response, "$.status");
-    return new String[] {response, status}; // lets the caller choose what they want to use
+    return new String[] { response, status }; // lets the caller choose what they want to use
   }
-
 
   protected <T> void baseTestDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
@@ -293,10 +286,11 @@ public abstract class AbstractST {
         .andExpect(jsonPath("$").exists());
   }
 
-  // version of the dt response method with default values, because java doesn't support default
+  // version of the dt response method with default values, because java doesn't
+  // support default
   // method param values
   protected ResultActions performDtRequest(String url)
       throws Exception {
-    returnperformDtRequest(url, 25, "id", 3);
+    return performDtRequest(url, 25, "id", 3);
   }
 }
