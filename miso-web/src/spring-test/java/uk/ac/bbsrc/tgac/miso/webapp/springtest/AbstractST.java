@@ -154,7 +154,7 @@ public abstract class AbstractST {
     return response;
   }
 
-  protected <T> void abstractTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
+  protected <T> void baseTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
 
     String response = pollingResponserHelper("post", dtos, controllerBase)[0];
@@ -165,14 +165,14 @@ public abstract class AbstractST {
     }
   }
 
-  protected <T> void abstractBulkCreateAsyncFail(String controllerBase, Class<T> createType, List<?> dtos)
+  protected <T> void baseBulkCreateAsyncFail(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
     // tests failure for async create endpoints where admin permissions are required
     String status = pollingResponserHelper("post", dtos, controllerBase)[1];
     assertEquals("failed", status); // request should fail without admin permissions
   }
 
-  protected <T> List<T> abstractTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<?> dtos,
+  protected <T> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<?> dtos,
       List<Integer> ids)
       throws Exception {
     pollingResponserHelper("put", dtos, controllerBase);
@@ -220,7 +220,7 @@ public abstract class AbstractST {
   }
 
 
-  protected <T> void abstractTestDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
+  protected <T> void baseTestDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
 
     assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
@@ -233,7 +233,7 @@ public abstract class AbstractST {
     assertNull(currentSession().get(deleteType, id));
   }
 
-  protected <T> void abstractTestDeleteFail(Class<T> deleteType, int id, String controllerBase) throws Exception {
+  protected <T> void baseTestDeleteFail(Class<T> deleteType, int id, String controllerBase) throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
 
     assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
@@ -244,7 +244,7 @@ public abstract class AbstractST {
     // this user doesn't have permissions to delete things
   }
 
-  protected <T, D> T abstractCreateAndReturnEntity(String controllerBase, D dto, Class<T> controllerClass, int status)
+  protected <T, D> T baseCreateAndReturnEntity(String controllerBase, D dto, Class<T> controllerClass, int status)
       throws Exception {
 
     MvcResult result = getMockMvc()
@@ -259,7 +259,7 @@ public abstract class AbstractST {
     return currentSession().get(controllerClass, id);
   }
 
-  protected <T, D> T abstractUpdateAndReturnEntity(String controllerBase, D dto, int id, Class<T> controllerClass)
+  protected <T, D> T baseUpdateAndReturnEntity(String controllerBase, D dto, int id, Class<T> controllerClass)
       throws Exception {
     getMockMvc()
         .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
@@ -269,7 +269,7 @@ public abstract class AbstractST {
     return currentSession().get(controllerClass, id);
   }
 
-  protected void abstractSearchByTermWithExpectedNumResults(String url, String searchTerm, int expectedSize)
+  protected void baseSearchByTermWithExpectedNumResults(String url, String searchTerm, int expectedSize)
       throws Exception {
     getMockMvc().perform(get(url).param("q", searchTerm).accept(MediaType.APPLICATION_JSON))
         .andDo(print())
@@ -297,22 +297,6 @@ public abstract class AbstractST {
   // method param values
   protected ResultActions performDtRequest(String url)
       throws Exception {
-
-    int displayLength = 25;
-    String dataProp = "id";
-    int sortCol = 3;
-    return getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON)
-        .param("iDisplayStart", "0")
-        .param("iDisplayLength", Integer.toString(displayLength))
-        .param("mDataProp_0", dataProp)
-        .param("sSortDir_0", "asc")
-        .param("iSortCol_0", Integer.toString(sortCol))
-        .param("sEcho", "1"))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").exists());
+    returnperformDtRequest(url, 25, "id", 3);
   }
-
-
-
 }

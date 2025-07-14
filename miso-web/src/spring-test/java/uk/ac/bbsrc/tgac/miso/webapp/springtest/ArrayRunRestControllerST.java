@@ -97,7 +97,7 @@ public class ArrayRunRestControllerST extends AbstractST {
     arr.setAlias("tester");
     arr.setStartDate("2025-07-11");
 
-    ArrayRun newArr = abstractCreateAndReturnEntity(CONTROLLER_BASE, arr, controllerClass, 201);
+    ArrayRun newArr = baseCreateAndReturnEntity(CONTROLLER_BASE, arr, controllerClass, 201);
     assertEquals("tester", newArr.getAlias());
   }
 
@@ -106,27 +106,27 @@ public class ArrayRunRestControllerST extends AbstractST {
     ArrayRun arr = currentSession().get(controllerClass, 1);
 
     arr.setAlias("modified");
-    ArrayRun updatedArr = abstractUpdateAndReturnEntity(CONTROLLER_BASE, Dtos.asDto(arr), 1, controllerClass);
+    ArrayRun updatedArr = baseUpdateAndReturnEntity(CONTROLLER_BASE, Dtos.asDto(arr), 1, controllerClass);
     assertEquals("modified", updatedArr.getAlias());
   }
 
   @Test
   public void testFindArrays() throws Exception {
-    abstractSearchByTermWithExpectedNumResults(CONTROLLER_BASE + "/array-search", "1234", 1);
+    baseSearchByTermWithExpectedNumResults(CONTROLLER_BASE + "/array-search", "1234", 1);
   }
 
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDelete() throws Exception {
-    abstractTestDelete(controllerClass, 2, CONTROLLER_BASE);
+    baseTestDelete(controllerClass, 2, CONTROLLER_BASE);
   }
 
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    abstractTestDeleteFail(controllerClass, 2, CONTROLLER_BASE);
+    baseTestDeleteFail(controllerClass, 2, CONTROLLER_BASE);
   }
 
 }
