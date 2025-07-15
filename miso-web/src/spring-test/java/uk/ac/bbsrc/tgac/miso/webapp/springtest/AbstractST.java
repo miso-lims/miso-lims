@@ -64,8 +64,9 @@ import com.jayway.jsonpath.JsonPath;
 @ContextConfiguration("/st-context.xml")
 @WebAppConfiguration
 @PropertySource("/tomcat-config/miso.it.properties")
-@TestExecutionListeners(value = SpringTestExecutionListener.class, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
-@WithMockUser(username = "user", password = "user", roles = { "INTERNAL" })
+@TestExecutionListeners(value = SpringTestExecutionListener.class,
+    mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
+@WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
 public abstract class AbstractST {
   private static final Logger log = LoggerFactory.getLogger(AbstractST.class);
 
@@ -210,7 +211,7 @@ public abstract class AbstractST {
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
     String response = pollingResponse(controllerBase + "/bulk/" + id);
     String status = JsonPath.read(response, "$.status");
-    return new String[] { response, status }; // lets the caller choose what they want to use
+    return new String[] {response, status}; // lets the caller choose what they want to use
   }
 
   protected <T> void baseTestDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
@@ -265,7 +266,6 @@ public abstract class AbstractST {
   protected void baseSearchByTermWithExpectedNumResults(String url, String searchTerm, int expectedSize)
       throws Exception {
     getMockMvc().perform(get(url).param("q", searchTerm).accept(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").exists())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
