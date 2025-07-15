@@ -253,6 +253,14 @@ public abstract class AbstractST {
     return currentSession().get(controllerClass, id);
   }
 
+  protected <T, D> void baseCreateFail(String controllerBase, D dto, Class<T> controllerClass)
+      throws Exception {
+    getMockMvc()
+        .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
+        .andExpect(status().isUnauthorized());
+  }
+
+
   protected <T, D> T baseUpdateAndReturnEntity(String controllerBase, D dto, int id, Class<T> controllerClass)
       throws Exception {
     getMockMvc()
@@ -261,6 +269,12 @@ public abstract class AbstractST {
 
     assertNotNull(currentSession().get(controllerClass, id));
     return currentSession().get(controllerClass, id);
+  }
+
+  protected <T, D> void baseUpdateFail(String controllerBase, D dto, int id, Class<T> updateType) throws Exception {
+    getMockMvc()
+        .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
+        .andExpect(status().isUnauthorized());
   }
 
   protected void baseSearchByTermWithExpectedNumResults(String url, String searchTerm, int expectedSize)
