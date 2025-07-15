@@ -1183,7 +1183,9 @@ INSERT INTO ArrayPosition(arrayId, position, sampleId) VALUES
 (2, 'R01C01', 8);
 
 INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate, creator, created, lastModifier, lastModified) VALUES
-(1, 'ArrayRun_1', 3, 1, 'Running', '2018-02-02', 3, '2018-02-02 15:40:00', 3, '2018-02-02 15:40:00');
+(1, 'ArrayRun_1', 4, 1, 'Running', '2018-02-02', 3, '2018-02-02 15:40:00', 3, '2018-02-02 15:40:00'),
+(2, 'to_delete', 4, 1, 'Running', '2025-07-10', 3, "2025-07-10", 3, "2025-07-10"),
+(3, 'ArrayRun_3', 4, 1, 'Running', '2018-02-02', 3, '2018-02-02 15:40:00', 3, '2018-02-02 15:40:00');
 
 INSERT INTO QCType(qcTypeId, name, description, qcTarget, units, archived, precisionAfterDecimal, correspondingField, autoUpdateField) VALUES
 (101, 'test edit qc', '', 'Sample', 'test units', FALSE, 2, 'NONE', FALSE),
