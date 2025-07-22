@@ -330,7 +330,7 @@ BulkTarget.libraryaliquot = (function ($) {
       columns = columns.concat(BulkUtils.columns.parentUsed);
 
       columns.push(
-        BulkUtils.columns.creationDate(true, true, "library aliquot"),
+        BulkUtils.columns.creationDate(true, true, true, "library aliquot"),
         {
           title: "Kit",
           type: "dropdown",
