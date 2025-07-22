@@ -975,7 +975,7 @@ INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, lastModifier, creator,
 (2, 1, 1, 'BOX2', 'Boxxy', 1, 1, '2018-08-30 15:15:00', '2018-08-30 15:15:00'),
 (500, 1, 1, 'BOX500', 'Tubes In Boxes Test', 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00'),
 (501, 1, 1, 'BOX501', 'Second box for Tubes in Boxes test', 3, 3, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
-(502, 1, 1, 'BOX502', 'Editable box', 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
+(502, 1, 2, 'BOX502', 'Editable box', 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
 (100001, 1, 1, 'BOX100001', 'Bulk Boxables Test', 1, 1, '2017-12-19 15:04:00', '2017-12-19 15:04:00');
 
 INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
