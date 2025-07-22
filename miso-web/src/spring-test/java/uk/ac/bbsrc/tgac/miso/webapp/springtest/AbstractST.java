@@ -187,6 +187,13 @@ public abstract class AbstractST {
     return objects;
   }
 
+  protected <T> void testBulkUpdateAsyncUnauthorized(String controllerBase, Class<T> createType, List<?> dtos)
+      throws Exception {
+    // tests failure for async update endpoints where admin permissions are required
+    String status = pollingResponserHelper("put", dtos, controllerBase)[1];
+    assertEquals("failed", status); // request should fail without admin permissions
+  }
+
   private String[] pollingResponserHelper(String requestType, List<?> dtos, String controllerBase) throws Exception {
     // helper method for async requests
     MvcResult mvcResult;
