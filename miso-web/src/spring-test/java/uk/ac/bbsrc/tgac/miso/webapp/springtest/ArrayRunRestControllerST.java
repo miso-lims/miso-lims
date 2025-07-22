@@ -75,8 +75,6 @@ public class ArrayRunRestControllerST extends AbstractST {
 
   @Test
   public void testSave() throws Exception {
-    // "health" is a non-nullable field that does not have a setter in the dto, so I need to use the
-    // actual ArrayRun type
 
     ArrayRunDto arr = new ArrayRunDto();
     arr.setStatus("Running");
