@@ -462,7 +462,9 @@ public class EditSampleController {
         dto.setGroupId(sample.getGroupId());
         dto.setGroupDescription(sample.getGroupDescription());
         dto.setBox(newBox);
-        if (SampleStock.CATEGORY_NAME.equals(targetCategory)
+        if (SampleTissue.CATEGORY_NAME.equals(targetCategory) && LimsUtils.isTissueSample(sample)) {
+          ((SampleTissueDto) dto).setTimepoint(((SampleTissue) item).getTimepoint());
+        } else if (SampleStock.CATEGORY_NAME.equals(targetCategory)
             || (SampleTissueProcessing.CATEGORY_NAME.equals(targetCategory))) {
           setRelatedSlideDtos(sample, dto);
         }
