@@ -49,7 +49,6 @@ import java.util.Date;
 public class AttachmentRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/attachments";
-  // private static final Class<AttachmentCategory> controllerClass = .class;
 
   @Test
   public void testLinkFile() throws Exception {
@@ -60,16 +59,13 @@ public class AttachmentRestControllerST extends AbstractST {
 
     // assert that the attachment exists and is attached to Sample 1
 
-    // I think this is linking an attachment from one entity to another (possibly different entity)
+    // this is linking an attachment from one entity to another (possibly different entity)
     getMockMvc().perform(post(CONTROLLER_BASE + "/sample/2")
         .param("fromEntityType", "sample")
         .param("fromEntityId", "1")
         .param("attachmentId", "1"))
-        .andDo(print())
         .andExpect(status().isNoContent());
 
-    // how to test that it went through?
-    // this might work
     Sample saved = currentSession().get(SampleImpl.class, 2);
     assertTrue(saved.getAttachments().stream().anyMatch(x -> x.getId() == 1));
   }
@@ -81,12 +77,9 @@ public class AttachmentRestControllerST extends AbstractST {
         .param("fromEntityId", "1")
         .param("attachmentId", "1")
         .param("entityIds", "2,3"))
-        .andDo(print())
         .andExpect(status().isNoContent());
 
 
-    // how to test?
-    // this might work
     Sample savedtwo = currentSession().get(SampleImpl.class, 2);
     Sample savedthree = currentSession().get(SampleImpl.class, 3);
 
@@ -96,10 +89,17 @@ public class AttachmentRestControllerST extends AbstractST {
   }
 
   @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteAttachment() throws Exception {
+
     getMockMvc().perform(delete(CONTROLLER_BASE + "/sample/1/1"))
-        .andDo(print())
         .andExpect(status().isNoContent());
     assertFalse(currentSession().get(SampleImpl.class, 1).getAttachments().stream().anyMatch(x -> x.getId() == 1));
+  }
+
+  @Test
+  public void testDeleteAttachmentFail() throws Exception {
+    getMockMvc().perform(delete(CONTROLLER_BASE + "/sample/1/1"))
+        .andExpect(status().isUnauthorized());
   }
 }

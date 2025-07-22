@@ -1310,6 +1310,23 @@ ON DUPLICATE KEY UPDATE
   creator = 1,
   created = "2025-07-08";
 
+INSERT INTO Attachment(attachmentId, filename, path, creator, created, categoryId) VALUES
+(1, 'File1', '/sample/1/12345', 1, '2021-02-22 14:40:00', 1),
+(2, 'File2', '/sample/2/12346', 1, '2021-02-22 14:40:00', 1),
+(3, 'Orphaned', '/sample/2/12347', 1, '2021-02-22 14:40:00', 1)
+ON DUPLICATE KEY UPDATE
+    filename = VALUES(filename),
+    path = VALUES(path),
+    creator = VALUES(creator),
+    created = VALUES(created),
+    categoryId = VALUES(categoryId);
+
+INSERT INTO Sample_Attachment(sampleId, attachmentId) VALUES
+(1, 1),
+(2, 2)
+ON DUPLICATE KEY UPDATE
+  sampleid = VALUES(sampleId),
+  attachmentId = VALUES(attachmentId);
 
 -- Keep this at bottom - checked to verify that script has completed and constants all loaded
 INSERT INTO AttachmentCategory(categoryId, alias) VALUES (4, 'last entry');
