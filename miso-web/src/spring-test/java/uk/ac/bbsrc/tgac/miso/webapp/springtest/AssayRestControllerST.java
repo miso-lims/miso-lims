@@ -56,7 +56,7 @@ public class AssayRestControllerST extends AbstractST {
     assay.setAlias("tester");
     assay.setVersion("1.0");
 
-    Assay newAssay = baseCreateAndReturnEntity(CONTROLLER_BASE, assay, controllerClass, 201);
+    Assay newAssay = baseTestCreate(CONTROLLER_BASE, assay, controllerClass, 201);
     assertEquals("tester", newAssay.getAlias());
   }
 
@@ -67,7 +67,7 @@ public class AssayRestControllerST extends AbstractST {
     assay.setAlias("tester");
     assay.setVersion("1.0");
 
-    baseCreateFail(CONTROLLER_BASE, assay, controllerClass);
+    testCreateUnauthorized(CONTROLLER_BASE, assay, controllerClass);
   }
 
   @Test
@@ -77,7 +77,7 @@ public class AssayRestControllerST extends AbstractST {
     Assay assay = currentSession().get(controllerClass, 1);
 
     assay.setAlias("modified");
-    Assay updatedAssay = baseUpdateAndReturnEntity(CONTROLLER_BASE, Dtos.asDto(assay), 1, controllerClass);
+    Assay updatedAssay = baseTestUpdate(CONTROLLER_BASE, Dtos.asDto(assay), 1, controllerClass);
     assertEquals("modified", updatedAssay.getAlias());
   }
 
@@ -86,18 +86,18 @@ public class AssayRestControllerST extends AbstractST {
     Assay assay = currentSession().get(controllerClass, 1);
 
     assay.setAlias("modified");
-    baseUpdateFail(CONTROLLER_BASE, Dtos.asDto(assay), 1, controllerClass);
+    testUpdateUnauthorized(CONTROLLER_BASE, Dtos.asDto(assay), 1, controllerClass);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDelete() throws Exception {
-    baseTestDelete(controllerClass, 4, CONTROLLER_BASE);
+    testBulkDelete(controllerClass, 4, CONTROLLER_BASE);
   }
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    baseTestDeleteFail(controllerClass, 4, CONTROLLER_BASE);
+    testDeleteUnauthorized(controllerClass, 4, CONTROLLER_BASE);
   }
 }

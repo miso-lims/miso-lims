@@ -94,14 +94,14 @@ public class LabRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteLab() throws Exception {
-    baseTestDelete(controllerClass, 3, CONTROLLER_BASE);
+    testBulkDelete(controllerClass, 3, CONTROLLER_BASE);
   }
 
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    baseTestDeleteFail(controllerClass, 3, CONTROLLER_BASE);
+    testDeleteUnauthorized(controllerClass, 3, CONTROLLER_BASE);
   }
 
 

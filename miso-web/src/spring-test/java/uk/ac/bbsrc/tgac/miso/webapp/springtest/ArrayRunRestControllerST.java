@@ -56,34 +56,21 @@ public class ArrayRunRestControllerST extends AbstractST {
 
   @Test
   public void testDtResponse() throws Exception {
-    performDtRequest(CONTROLLER_BASE + "/dt")
-        .andExpect(jsonPath("$.iTotalRecords").value(3))
-        .andExpect(jsonPath("$.aaData[0].alias").value("ArrayRun_1"))
-        .andExpect(jsonPath("$.aaData[0].status").value("Running"))
-        .andExpect(jsonPath("$.aaData[1].alias").value("to_delete"))
-        .andExpect(jsonPath("$.aaData[2].instrumentName").value("iScan1"));
+    checkDtIds(performDtRequest(CONTROLLER_BASE + "/dt")
+        .andExpect(jsonPath("$.iTotalRecords").value(3)), Arrays.asList(1, 2, 3));
   }
 
   @Test
   public void testDtByProj() throws Exception {
     // project 3 has the sample that is shared by the test array runs
-    performDtRequest(CONTROLLER_BASE + "/dt/project/3")
-        .andExpect(jsonPath("$.iTotalRecords").value(3))
-        .andExpect(jsonPath("$.aaData[0].alias").value("ArrayRun_1"))
-        .andExpect(jsonPath("$.aaData[0].status").value("Running"))
-        .andExpect(jsonPath("$.aaData[1].alias").value("to_delete"))
-        .andExpect(jsonPath("$.aaData[2].instrumentName").value("iScan1"));
+    checkDtIds(performDtRequest(CONTROLLER_BASE + "/dt/project/3")
+        .andExpect(jsonPath("$.iTotalRecords").value(3)), Arrays.asList(1, 2, 3));
   }
 
   @Test
   public void testDtByReq() throws Exception {
-    performDtRequest(CONTROLLER_BASE + "/dt/requisition/1")
-        // all test array runs are a part of requisition 1
-        .andExpect(jsonPath("$.iTotalRecords").value(3))
-        .andExpect(jsonPath("$.aaData[0].alias").value("ArrayRun_1"))
-        .andExpect(jsonPath("$.aaData[0].status").value("Running"))
-        .andExpect(jsonPath("$.aaData[1].alias").value("to_delete"))
-        .andExpect(jsonPath("$.aaData[2].instrumentName").value("iScan1"));
+    checkDtIds(performDtRequest(CONTROLLER_BASE + "/dt/requisition/1")
+        .andExpect(jsonPath("$.iTotalRecords").value(3)), Arrays.asList(1, 2, 3));
   }
 
   @Test
@@ -97,7 +84,7 @@ public class ArrayRunRestControllerST extends AbstractST {
     arr.setAlias("tester");
     arr.setStartDate("2025-07-11");
 
-    ArrayRun newArr = baseCreateAndReturnEntity(CONTROLLER_BASE, arr, controllerClass, 201);
+    ArrayRun newArr = baseTestCreate(CONTROLLER_BASE, arr, controllerClass, 201);
     assertEquals("tester", newArr.getAlias());
   }
 
@@ -106,27 +93,27 @@ public class ArrayRunRestControllerST extends AbstractST {
     ArrayRun arr = currentSession().get(controllerClass, 1);
 
     arr.setAlias("modified");
-    ArrayRun updatedArr = baseUpdateAndReturnEntity(CONTROLLER_BASE, Dtos.asDto(arr), 1, controllerClass);
+    ArrayRun updatedArr = baseTestUpdate(CONTROLLER_BASE, Dtos.asDto(arr), 1, controllerClass);
     assertEquals("modified", updatedArr.getAlias());
   }
 
   @Test
   public void testFindArrays() throws Exception {
-    baseSearchByTermWithExpectedNumResults(CONTROLLER_BASE + "/array-search", "1234", 1);
+    baseSearchByTerm(CONTROLLER_BASE + "/array-search", "1234", 1, Arrays.asList(1));
   }
 
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDelete() throws Exception {
-    baseTestDelete(controllerClass, 2, CONTROLLER_BASE);
+    testBulkDelete(controllerClass, 2, CONTROLLER_BASE);
   }
 
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    baseTestDeleteFail(controllerClass, 2, CONTROLLER_BASE);
+    testDeleteUnauthorized(controllerClass, 2, CONTROLLER_BASE);
   }
 
 }

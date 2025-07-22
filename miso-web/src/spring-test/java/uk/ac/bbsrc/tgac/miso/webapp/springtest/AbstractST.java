@@ -149,18 +149,22 @@ public abstract class AbstractST {
     return response;
   }
 
-  protected <T> void baseTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
+  protected <T> List<T> baseTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
 
     String response = pollingResponserHelper("post", dtos, controllerBase)[0];
-
+    List<T> objects = new ArrayList<T>();
     for (int i = 0; i < dtos.size(); i++) {
       Integer id = JsonPath.read(response, "$.data[" + i + "].id");
-      assertNotNull(currentSession().get(createType, id));
+      T obj = currentSession().get(createType, id);
+      assertNotNull(obj);
+      objects.add(obj);
     }
+
+    return objects;
   }
 
-  protected <T> void baseBulkCreateAsyncFail(String controllerBase, Class<T> createType, List<?> dtos)
+  protected <T> void testBulkCreateAsyncUnauthorized(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
     // tests failure for async create endpoints where admin permissions are required
     String status = pollingResponserHelper("post", dtos, controllerBase)[1];
@@ -214,7 +218,7 @@ public abstract class AbstractST {
     return new String[] {response, status}; // lets the caller choose what they want to use
   }
 
-  protected <T> void baseTestDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
+  protected <T> void testBulkDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
 
     assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
@@ -227,7 +231,7 @@ public abstract class AbstractST {
     assertNull(currentSession().get(deleteType, id));
   }
 
-  protected <T> void baseTestDeleteFail(Class<T> deleteType, int id, String controllerBase) throws Exception {
+  protected <T> void testDeleteUnauthorized(Class<T> deleteType, int id, String controllerBase) throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
 
     assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
@@ -238,7 +242,7 @@ public abstract class AbstractST {
     // this user doesn't have permissions to delete things
   }
 
-  protected <T, D> T baseCreateAndReturnEntity(String controllerBase, D dto, Class<T> controllerClass, int status)
+  protected <T, D> T baseTestCreate(String controllerBase, D dto, Class<T> controllerClass, int status)
       throws Exception {
 
     MvcResult result = getMockMvc()
@@ -249,11 +253,12 @@ public abstract class AbstractST {
 
     Integer id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
 
-    assertNotNull(currentSession().get(controllerClass, id));
-    return currentSession().get(controllerClass, id);
+    T obj = currentSession().get(controllerClass, id);
+    assertNotNull(obj);
+    return obj;
   }
 
-  protected <T, D> void baseCreateFail(String controllerBase, D dto, Class<T> controllerClass)
+  protected <T, D> void testCreateUnauthorized(String controllerBase, D dto, Class<T> controllerClass)
       throws Exception {
     getMockMvc()
         .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
@@ -261,7 +266,7 @@ public abstract class AbstractST {
   }
 
 
-  protected <T, D> T baseUpdateAndReturnEntity(String controllerBase, D dto, int id, Class<T> controllerClass)
+  protected <T, D> T baseTestUpdate(String controllerBase, D dto, int id, Class<T> controllerClass)
       throws Exception {
     getMockMvc()
         .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
@@ -271,19 +276,25 @@ public abstract class AbstractST {
     return currentSession().get(controllerClass, id);
   }
 
-  protected <T, D> void baseUpdateFail(String controllerBase, D dto, int id, Class<T> updateType) throws Exception {
+  protected <T, D> void testUpdateUnauthorized(String controllerBase, D dto, int id, Class<T> updateType)
+      throws Exception {
     getMockMvc()
         .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
         .andExpect(status().isUnauthorized());
   }
 
-  protected void baseSearchByTermWithExpectedNumResults(String url, String searchTerm, int expectedSize)
+  protected void baseSearchByTerm(String url, String searchTerm, int expectedSize, List<Integer> ids)
       throws Exception {
-    getMockMvc().perform(get(url).param("q", searchTerm).accept(MediaType.APPLICATION_JSON))
+    String response = getMockMvc().perform(get(url).param("q", searchTerm).accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").exists())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.*", hasSize(expectedSize)));
+        .andExpect(jsonPath("$.*", hasSize(expectedSize)))
+        .andReturn().getResponse().getContentAsString();
+
+    for (int i = 0; i < ids.size(); i++) { // checks that the ids found are the right ones
+      assertTrue(ids.contains(JsonPath.read(response, "$[" + i + "].id")));
+    }
   }
 
   protected ResultActions performDtRequest(String url, int displayLength, String dataProp, int sortCol)
@@ -298,13 +309,20 @@ public abstract class AbstractST {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$").exists());
+
+    // returns a result actions if more testing is desired
   }
 
-  // version of the dt response method with default values, because java doesn't
-  // support default
-  // method param values
   protected ResultActions performDtRequest(String url)
       throws Exception {
     return performDtRequest(url, 25, "id", 3);
+  }
+
+  protected ResultActions checkDtIds(ResultActions r, List<Integer> ids) throws Exception {
+    String response = r.andReturn().getResponse().getContentAsString();
+    for (int i = 0; i < ids.size(); i++) { // checks that the ids found are the right ones
+      assertTrue(ids.contains(JsonPath.read(response, "$.aaData[" + i + "].id")));
+    }
+    return r;
   }
 }

@@ -85,7 +85,7 @@ public class SopRestControllerST extends AbstractST {
   @Test
   public void testBulkCreateFail() throws Exception {
     // SOP creation is for admin only, so this test is expecting failure due to insufficent permission
-    baseBulkCreateAsyncFail(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
   }
 
   @Test
@@ -111,41 +111,23 @@ public class SopRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteSop() throws Exception {
-    baseTestDelete(controllerClass, 5, CONTROLLER_BASE);
+    testBulkDelete(controllerClass, 5, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    baseTestDeleteFail(controllerClass, 5, CONTROLLER_BASE);
+    testDeleteUnauthorized(controllerClass, 5, CONTROLLER_BASE);
   }
 
   @Test
   public void testDataTableByCategory() throws Exception {
-    ResultActions sampleResult = performDtRequest(CONTROLLER_BASE + "/dt/category/SAMPLE", 25, "id", 3);
-    sampleResult
-        .andExpect(jsonPath("$.iTotalRecords").value(2))
-        .andExpect(jsonPath("$.aaData[0].alias").value("Sample SOP 1"))
-        .andExpect(jsonPath("$.aaData[1].alias").value("Sample SOP 2"))
-        .andExpect(jsonPath("$.aaData[0].archived").value(false))
-        .andExpect(jsonPath("$.aaData[1].version").value("1.0"));
+    checkDtIds(performDtRequest(CONTROLLER_BASE + "/dt/category/SAMPLE")
+        .andExpect(jsonPath("$.iTotalRecords").value(2)), Arrays.asList(1, 2));
 
+    checkDtIds(performDtRequest(CONTROLLER_BASE + "/dt/category/LIBRARY")
+        .andExpect(jsonPath("$.iTotalRecords").value(3)), Arrays.asList(3, 4, 5));
 
-    ResultActions libraryResult = performDtRequest(CONTROLLER_BASE + "/dt/category/LIBRARY", 25, "id", 3);
-    libraryResult
-        .andExpect(jsonPath("$.iTotalRecords").value(3))
-        .andExpect(jsonPath("$.aaData[0].alias").value("Library SOP 1"))
-        .andExpect(jsonPath("$.aaData[1].alias").value("Library SOP 1"))
-        .andExpect(jsonPath("$.aaData[2].archived").value(true))
-        .andExpect(jsonPath("$.aaData[1].version").value("2.0"))
-        .andExpect(jsonPath("$.aaData[2].alias").value("SOP to delete"));
-
-    ResultActions runResult = performDtRequest(CONTROLLER_BASE + "/dt/category/RUN", 25, "id", 3);
-    runResult
-        .andExpect(jsonPath("$.iTotalRecords").value(1))
-        .andExpect(jsonPath("$.aaData[0].alias").value("Run SOP 1"))
-        .andExpect(jsonPath("$.aaData[0].version").value("1.0"))
-        .andExpect(jsonPath("$.aaData[0].archived").value(false))
-        .andExpect(jsonPath("$.aaData[0].id").value(6));
-
+    checkDtIds(performDtRequest(CONTROLLER_BASE + "/dt/category/RUN")
+        .andExpect(jsonPath("$.iTotalRecords").value(1)), Arrays.asList(6));
   }
 }

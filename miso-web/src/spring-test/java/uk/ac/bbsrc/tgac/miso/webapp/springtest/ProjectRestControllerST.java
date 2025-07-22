@@ -160,13 +160,10 @@ public class ProjectRestControllerST extends AbstractST {
 
   @Test
   public void testGetLibraryAliquots() throws Exception {
-    ResultActions result = performDtRequest(CONTROLLER_BASE + "/dt", 25, "id", 3);
-    result
-        .andExpect(jsonPath("$.iTotalRecords").value(17)) // 17 = number of projects in test data script
-        .andExpect(jsonPath("$.aaData[0].description").value("integration test project one"))
-        .andExpect(jsonPath("$.aaData[10].title").value("Tubes In Boxes"))
-        .andExpect(jsonPath("$.aaData[5].name").value("PRO6"))
-        .andExpect(jsonPath("$.aaData[13].id").value(100001));
+    checkDtIds(performDtRequest(CONTROLLER_BASE + "/dt")
+        .andExpect(jsonPath("$.iTotalRecords").value(17)),
+        Arrays.asList(1, 2, 3, 4, 5, 6, 7,
+            100001, 110001, 120001, 200001, 200, 300, 400, 500, 4440, 2200));
 
 
   }
