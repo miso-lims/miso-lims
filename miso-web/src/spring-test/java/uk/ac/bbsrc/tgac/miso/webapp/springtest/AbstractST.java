@@ -27,12 +27,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.util.LinkedMultiValueMap;
 
 import org.springframework.test.context.TestExecutionListeners.MergeMode;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
-
+import org.springframework.util.MultiValueMap;
 import org.hibernate.Session;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -283,9 +284,15 @@ public abstract class AbstractST {
         .andExpect(status().isUnauthorized());
   }
 
-  protected void baseSearchByTerm(String url, String searchTerm, int expectedSize, List<Integer> ids)
+  protected MultiValueMap searchTerm(String term) {
+    MultiValueMap<String, String> map = new LinkedMultiValueMap();
+    map.add("q", term);
+    return map;
+  }
+
+  protected void baseSearchByTerm(String url, MultiValueMap params, int expectedSize, List<Integer> ids)
       throws Exception {
-    String response = getMockMvc().perform(get(url).param("q", searchTerm).accept(MediaType.APPLICATION_JSON))
+    String response = getMockMvc().perform(get(url).params(params).accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").exists())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -318,11 +325,28 @@ public abstract class AbstractST {
     return performDtRequest(url, 25, "id", 3);
   }
 
-  protected ResultActions checkDtIds(ResultActions r, List<Integer> ids) throws Exception {
+  // checks ids for datatable endpoints and "list all" endpoints
+  protected ResultActions checkIds(ResultActions r, List<Integer> ids, boolean dt) throws Exception {
     String response = r.andReturn().getResponse().getContentAsString();
+    String dtPath = "";
+    if (dt)
+      dtPath = ".aaData";
+
     for (int i = 0; i < ids.size(); i++) { // checks that the ids found are the right ones
-      assertTrue(ids.contains(JsonPath.read(response, "$.aaData[" + i + "].id")));
+      assertTrue(ids.contains(JsonPath.read(response, "$" + dtPath + "[" + i + "].id")));
     }
     return r;
+  }
+
+  protected ResultActions baseTestGetById(String controllerBase, int id) throws Exception {
+
+    ResultActions result =
+        getMockMvc().perform(get(controllerBase + "/" + Integer.toString(id)).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").exists())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.id").value(id));
+
+    return result;
   }
 }

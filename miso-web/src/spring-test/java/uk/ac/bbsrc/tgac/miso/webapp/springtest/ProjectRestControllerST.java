@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.collections.map.MultiValueMap;
 import org.checkerframework.checker.units.qual.Temperature;
 import org.junit.Before;
 
@@ -52,15 +53,13 @@ import org.springframework.test.web.servlet.MockMvc;
 public class ProjectRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/projects";
+  private static final Class<ProjectImpl> controllerClass = ProjectImpl.class;
+
 
   @Test
   public void testGetById() throws Exception {
-    getMockMvc().perform(get(CONTROLLER_BASE + "/1")
-        .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$").exists())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.title").value("Project One"))
+
+    baseTestGetById(CONTROLLER_BASE, 1).andExpect(jsonPath("$.title").value("Project One"))
         .andExpect(jsonPath("$.name").value("PRO1"))
         .andExpect(jsonPath("$.code").value("PONE"))
         .andExpect(jsonPath("$.creationDate").value("2017-06-26"));
@@ -68,12 +67,7 @@ public class ProjectRestControllerST extends AbstractST {
 
   @Test
   public void testGetBySearch() throws Exception {
-    getMockMvc().perform(get(CONTROLLER_BASE + "/search").param("q", "PRO1").accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$").exists())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.*", hasSize(4)));
-
+    baseSearchByTerm(CONTROLLER_BASE + "/search", searchTerm("PRO1"), 4, Arrays.asList(1, 100001, 110001, 120001));
   }
 
   @Test
@@ -96,16 +90,7 @@ public class ProjectRestControllerST extends AbstractST {
     project.setCode("TESTCODE");
 
 
-    MvcResult result = getMockMvc()
-        .perform(post(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(project)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.code").value("TESTCODE"))
-        .andReturn();
-
-    Integer id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
-
-    Project createdProject = currentSession().get(ProjectImpl.class, id);
-    assertNotNull(createdProject); // test that project was successfully created
+    Project createdProject = baseTestCreate(CONTROLLER_BASE, project, controllerClass, 200);
     assertEquals("TESTCODE", createdProject.getCode());
     assertEquals("test title", createdProject.getTitle());
   }
@@ -117,53 +102,30 @@ public class ProjectRestControllerST extends AbstractST {
     ProjectDto dto = Dtos.asDto(proj, true);
     dto.setTitle("changed testing project");
 
-    getMockMvc()
-        .perform(put(CONTROLLER_BASE + "/1").contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
-        .andExpect(status().isOk());
-
-    ProjectImpl updatedProj = currentSession().get(ProjectImpl.class, 1);
-    assertNotNull(updatedProj);
+    ProjectImpl updatedProj = baseTestUpdate(CONTROLLER_BASE, dto, 1, controllerClass);
     assertEquals("Update didn't go through", "changed testing project", updatedProj.getTitle());
   }
 
   @Test
-  public void testBulkDelete() throws Exception {
-    List<Long> ids = new ArrayList<Long>(Arrays.asList(7L));
-
-    // check that the project we want to delete exists
-    assertNotNull(currentSession().get(ProjectImpl.class, 7));
-
-    getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
-            .content(makeJson(ids)))
-        .andExpect(status().isNoContent());
-
-    // now check that the project was actually deleted
-    assertNull(currentSession().get(ProjectImpl.class, 7));
+  public void testDelete() throws Exception {
+    testBulkDelete(controllerClass, 7, CONTROLLER_BASE);
   }
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    List<Long> ids = new ArrayList<Long>(Arrays.asList(7L));
-
-    // check that the project we want to delete exists
-    assertNotNull(currentSession().get(ProjectImpl.class, 7));
-
-    getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
-            .content(makeJson(ids)))
-        .andExpect(status().isUnauthorized());
-    // this user is not an admin or the project creator, so delete should be unauthorized
+    // must be admin to delete project
+    testDeleteUnauthorized(controllerClass, 7, CONTROLLER_BASE);
   }
 
 
   @Test
   public void testGetLibraryAliquots() throws Exception {
-    checkDtIds(performDtRequest(CONTROLLER_BASE + "/dt")
+    checkIds(performDtRequest(CONTROLLER_BASE + "/dt")
         .andExpect(jsonPath("$.iTotalRecords").value(17)),
         Arrays.asList(1, 2, 3, 4, 5, 6, 7,
-            100001, 110001, 120001, 200001, 200, 300, 400, 500, 4440, 2200));
+            100001, 110001, 120001, 200001, 200, 300, 400, 500, 4440, 2200),
+        true);
 
 
   }

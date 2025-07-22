@@ -56,21 +56,21 @@ public class ArrayRunRestControllerST extends AbstractST {
 
   @Test
   public void testDtResponse() throws Exception {
-    checkDtIds(performDtRequest(CONTROLLER_BASE + "/dt")
-        .andExpect(jsonPath("$.iTotalRecords").value(3)), Arrays.asList(1, 2, 3));
+    checkIds(performDtRequest(CONTROLLER_BASE + "/dt")
+        .andExpect(jsonPath("$.iTotalRecords").value(3)), Arrays.asList(1, 2, 3), true);
   }
 
   @Test
   public void testDtByProj() throws Exception {
     // project 3 has the sample that is shared by the test array runs
-    checkDtIds(performDtRequest(CONTROLLER_BASE + "/dt/project/3")
-        .andExpect(jsonPath("$.iTotalRecords").value(3)), Arrays.asList(1, 2, 3));
+    checkIds(performDtRequest(CONTROLLER_BASE + "/dt/project/3")
+        .andExpect(jsonPath("$.iTotalRecords").value(3)), Arrays.asList(1, 2, 3), true);
   }
 
   @Test
   public void testDtByReq() throws Exception {
-    checkDtIds(performDtRequest(CONTROLLER_BASE + "/dt/requisition/1")
-        .andExpect(jsonPath("$.iTotalRecords").value(3)), Arrays.asList(1, 2, 3));
+    checkIds(performDtRequest(CONTROLLER_BASE + "/dt/requisition/1")
+        .andExpect(jsonPath("$.iTotalRecords").value(3)), Arrays.asList(1, 2, 3), true);
   }
 
   @Test
@@ -97,7 +97,7 @@ public class ArrayRunRestControllerST extends AbstractST {
 
   @Test
   public void testFindArrays() throws Exception {
-    baseSearchByTerm(CONTROLLER_BASE + "/array-search", "1234", 1, Arrays.asList(1));
+    baseSearchByTerm(CONTROLLER_BASE + "/array-search", searchTerm("1234"), 1, Arrays.asList(1));
   }
 
 
