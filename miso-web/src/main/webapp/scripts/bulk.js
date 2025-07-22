@@ -656,13 +656,14 @@ BulkUtils = (function ($) {
         return columns;
       },
 
-      creationDate: function (include, initialize, targetName) {
+      creationDate: function (include, required, initialize, targetName) {
         return {
           title: "Creation Date",
           type: "date",
           data: "creationDate",
           description: "The date that the " + targetName + " was created in lab",
           include: include,
+          required: required,
           initial: initialize ? Utils.getCurrentDate() : null,
         };
       },

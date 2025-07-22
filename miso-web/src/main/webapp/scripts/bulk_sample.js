@@ -887,6 +887,7 @@ BulkTarget.sample = (function ($) {
       columns.push(
         BulkUtils.columns.creationDate(
           Constants.isDetailedSample && !config.isLibraryReceipt,
+          false,
           config.pageMode == "propagate",
           "sample"
         ),

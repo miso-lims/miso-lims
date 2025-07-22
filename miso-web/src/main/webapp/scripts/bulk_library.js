@@ -461,6 +461,7 @@ BulkTarget.library = (function ($) {
       columns.push(
         BulkUtils.columns.creationDate(
           !config.isLibraryReceipt,
+          false,
           config.pageMode == "propagate",
           "library"
         )
