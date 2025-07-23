@@ -64,7 +64,7 @@ public class LabRestControllerST extends AbstractST {
     dtos.add(lone);
     dtos.add(ltwo);
 
-    abstractTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, dtos);
+    baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, dtos);
   }
 
 
@@ -85,7 +85,7 @@ public class LabRestControllerST extends AbstractST {
     dtos.add(pathology);
 
     List<LabImpl> labs =
-        (List<LabImpl>) abstractTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
+        (List<LabImpl>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
 
     assertEquals("| Biobank not updated. |", "bioBank", labs.get(0).getAlias());
     assertEquals("| Pathology not updated | ", "pathology", labs.get(1).getAlias());
@@ -94,14 +94,14 @@ public class LabRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteLab() throws Exception {
-    abstractTestDelete(controllerClass, 3, CONTROLLER_BASE);
+    baseTestDelete(controllerClass, 3, CONTROLLER_BASE);
   }
 
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    abstractTestDeleteFail(controllerClass, 3, CONTROLLER_BASE);
+    baseTestDeleteFail(controllerClass, 3, CONTROLLER_BASE);
   }
 
 

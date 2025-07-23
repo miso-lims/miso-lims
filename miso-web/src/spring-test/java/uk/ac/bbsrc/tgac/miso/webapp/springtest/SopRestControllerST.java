@@ -79,13 +79,13 @@ public class SopRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
 
-    abstractTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
   }
 
   @Test
   public void testBulkCreateFail() throws Exception {
     // SOP creation is for admin only, so this test is expecting failure due to insufficent permission
-    abstractBulkCreateAsyncFail(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    baseBulkCreateAsyncFail(CONTROLLER_BASE, controllerClass, makeCreateDtos());
   }
 
   @Test
@@ -103,7 +103,7 @@ public class SopRestControllerST extends AbstractST {
     dtos.add(librarySop);
 
     List<Sop> sops =
-        (List<Sop>) abstractTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 3));
+        (List<Sop>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 3));
     assertEquals("Sop not updated", "sampler", sops.get(0).getAlias());
     assertEquals("Sop not updated", "libraryer", sops.get(1).getAlias());
   }
@@ -111,12 +111,12 @@ public class SopRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteSop() throws Exception {
-    abstractTestDelete(controllerClass, 5, CONTROLLER_BASE);
+    baseTestDelete(controllerClass, 5, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    abstractTestDeleteFail(controllerClass, 5, CONTROLLER_BASE);
+    baseTestDeleteFail(controllerClass, 5, CONTROLLER_BASE);
   }
 
   @Test

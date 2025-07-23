@@ -69,7 +69,7 @@ public class ArrayModelRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
-    abstractTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
   }
 
   @Test
@@ -88,7 +88,7 @@ public class ArrayModelRestControllerST extends AbstractST {
     dtos.add(unused);
 
     List<ArrayModel> arrayModels =
-        (List<ArrayModel>) abstractTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
+        (List<ArrayModel>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
 
     assertEquals("beady", arrayModels.get(0).getAlias());
     assertEquals("not used", arrayModels.get(1).getAlias());
@@ -99,21 +99,21 @@ public class ArrayModelRestControllerST extends AbstractST {
     // array models can only be created by an admin user, so this test expected failure due to
     // insufficient permissions
 
-    abstractBulkCreateAsyncFail(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    baseBulkCreateAsyncFail(CONTROLLER_BASE, controllerClass, makeCreateDtos());
 
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteArrayModel() throws Exception {
-    abstractTestDelete(controllerClass, 2, CONTROLLER_BASE);
+    baseTestDelete(controllerClass, 2, CONTROLLER_BASE);
   }
 
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    abstractTestDeleteFail(controllerClass, 2, CONTROLLER_BASE);
+    baseTestDeleteFail(controllerClass, 2, CONTROLLER_BASE);
   }
 
 

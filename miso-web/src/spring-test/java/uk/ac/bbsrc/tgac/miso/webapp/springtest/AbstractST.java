@@ -8,6 +8,8 @@ import java.io.IOException;
 
 import javax.sql.DataSource;
 
+import static org.hamcrest.Matchers.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +47,6 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
 
-
 import java.util.ArrayList;
 import java.util.Date;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,7 +59,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import org.springframework.test.web.servlet.ResultActions;
 import javax.ws.rs.core.MediaType;
 import com.jayway.jsonpath.JsonPath;
-
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration("/st-context.xml")
@@ -91,7 +91,6 @@ public abstract class AbstractST {
   @Mock
   @Autowired
   private AuthorizationManager authorizationManager;
-
 
   private ObjectMapper mapper;
   private ObjectWriter ow;
@@ -140,19 +139,17 @@ public abstract class AbstractST {
   }
 
   protected String pollingResponse(String url) throws Exception {
-    String response =
-        getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
+    String response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
     String status = JsonPath.read(response, "$.status");
     while (status.equals("running")) {
-      response =
-          getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
+      response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
       status = JsonPath.read(response, "$.status");
       Thread.sleep(1000);
     }
     return response;
   }
 
-  protected <T> void abstractTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
+  protected <T> void baseTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
 
     String response = pollingResponserHelper("post", dtos, controllerBase)[0];
@@ -163,14 +160,14 @@ public abstract class AbstractST {
     }
   }
 
-  protected <T> void abstractBulkCreateAsyncFail(String controllerBase, Class<T> createType, List<?> dtos)
+  protected <T> void baseBulkCreateAsyncFail(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
     // tests failure for async create endpoints where admin permissions are required
     String status = pollingResponserHelper("post", dtos, controllerBase)[1];
     assertEquals("failed", status); // request should fail without admin permissions
   }
 
-  protected <T> List<T> abstractTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<?> dtos,
+  protected <T> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<?> dtos,
       List<Integer> ids)
       throws Exception {
     pollingResponserHelper("put", dtos, controllerBase);
@@ -217,8 +214,7 @@ public abstract class AbstractST {
     return new String[] {response, status}; // lets the caller choose what they want to use
   }
 
-
-  protected <T> void abstractTestDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
+  protected <T> void baseTestDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
 
     assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
@@ -231,7 +227,7 @@ public abstract class AbstractST {
     assertNull(currentSession().get(deleteType, id));
   }
 
-  protected <T> void abstractTestDeleteFail(Class<T> deleteType, int id, String controllerBase) throws Exception {
+  protected <T> void baseTestDeleteFail(Class<T> deleteType, int id, String controllerBase) throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
 
     assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
@@ -242,7 +238,39 @@ public abstract class AbstractST {
     // this user doesn't have permissions to delete things
   }
 
+  protected <T, D> T baseCreateAndReturnEntity(String controllerBase, D dto, Class<T> controllerClass, int status)
+      throws Exception {
 
+    MvcResult result = getMockMvc()
+        .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
+        .andExpect(status().is(status)) // either created (201) or OK (200) dependening on the controller
+        .andExpect(jsonPath("$").exists())
+        .andReturn();
+
+    Integer id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+
+    assertNotNull(currentSession().get(controllerClass, id));
+    return currentSession().get(controllerClass, id);
+  }
+
+  protected <T, D> T baseUpdateAndReturnEntity(String controllerBase, D dto, int id, Class<T> controllerClass)
+      throws Exception {
+    getMockMvc()
+        .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
+        .andExpect(status().isOk());
+
+    assertNotNull(currentSession().get(controllerClass, id));
+    return currentSession().get(controllerClass, id);
+  }
+
+  protected void baseSearchByTermWithExpectedNumResults(String url, String searchTerm, int expectedSize)
+      throws Exception {
+    getMockMvc().perform(get(url).param("q", searchTerm).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").exists())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.*", hasSize(expectedSize)));
+  }
 
   protected ResultActions performDtRequest(String url, int displayLength, String dataProp, int sortCol)
       throws Exception {
@@ -258,6 +286,11 @@ public abstract class AbstractST {
         .andExpect(jsonPath("$").exists());
   }
 
-
-
+  // version of the dt response method with default values, because java doesn't
+  // support default
+  // method param values
+  protected ResultActions performDtRequest(String url)
+      throws Exception {
+    return performDtRequest(url, 25, "id", 3);
+  }
 }
