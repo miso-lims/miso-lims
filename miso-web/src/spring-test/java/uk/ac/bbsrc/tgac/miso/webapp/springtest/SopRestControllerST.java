@@ -121,13 +121,10 @@ public class SopRestControllerST extends AbstractST {
 
   @Test
   public void testDataTableByCategory() throws Exception {
-    checkIds(performDtRequest(CONTROLLER_BASE + "/dt/category/SAMPLE")
-        .andExpect(jsonPath("$.iTotalRecords").value(2)), Arrays.asList(1, 2), true);
+    testDtRequest(CONTROLLER_BASE + "/dt/category/SAMPLE", Arrays.asList(1, 2), true);
 
-    checkIds(performDtRequest(CONTROLLER_BASE + "/dt/category/LIBRARY")
-        .andExpect(jsonPath("$.iTotalRecords").value(3)), Arrays.asList(3, 4, 5), true);
+    testDtRequest(CONTROLLER_BASE + "/dt/category/LIBRARY", Arrays.asList(3, 4, 5), true);
 
-    checkIds(performDtRequest(CONTROLLER_BASE + "/dt/category/RUN")
-        .andExpect(jsonPath("$.iTotalRecords").value(1)), Arrays.asList(6), true);
+    testDtRequest(CONTROLLER_BASE + "/dt/category/RUN", Arrays.asList(6), true);
   }
 }

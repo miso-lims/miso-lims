@@ -297,13 +297,13 @@ public abstract class AbstractST {
     return map;
   }
 
-  protected void baseSearchByTerm(String url, MultiValueMap params, int expectedSize, List<Integer> ids)
+  protected void baseSearchByTerm(String url, MultiValueMap params, List<Integer> ids)
       throws Exception {
     String response = getMockMvc().perform(get(url).params(params).accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").exists())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.*", hasSize(expectedSize)))
+        .andExpect(jsonPath("$.*", hasSize(ids.size())))
         .andReturn().getResponse().getContentAsString();
 
     for (int i = 0; i < ids.size(); i++) { // checks that the ids found are the right ones
@@ -311,9 +311,10 @@ public abstract class AbstractST {
     }
   }
 
-  protected ResultActions performDtRequest(String url, int displayLength, String dataProp, int sortCol)
+  protected ResultActions testDtRequest(String url, int displayLength, String dataProp, int sortCol, List<Integer> ids,
+      boolean dt)
       throws Exception {
-    return getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON)
+    ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON)
         .param("iDisplayStart", "0")
         .param("iDisplayLength", Integer.toString(displayLength))
         .param("mDataProp_0", dataProp)
@@ -322,19 +323,10 @@ public abstract class AbstractST {
         .param("sEcho", "1"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").exists());
+        .andExpect(jsonPath("$").exists())
+        .andExpect(jsonPath("$.iTotalRecords").value(ids.size()));
 
-    // returns a result actions if more testing is desired
-  }
-
-  protected ResultActions performDtRequest(String url)
-      throws Exception {
-    return performDtRequest(url, 25, "id", 3);
-  }
-
-  // checks ids for datatable endpoints and "list all" endpoints
-  protected ResultActions checkIds(ResultActions r, List<Integer> ids, boolean dt) throws Exception {
-    String response = r.andReturn().getResponse().getContentAsString();
+    String response = ac.andReturn().getResponse().getContentAsString();
     String dtPath = "";
     if (dt)
       dtPath = ".aaData";
@@ -342,8 +334,28 @@ public abstract class AbstractST {
     for (int i = 0; i < ids.size(); i++) { // checks that the ids found are the right ones
       assertTrue(ids.contains(JsonPath.read(response, "$" + dtPath + "[" + i + "].id")));
     }
-    return r;
+    return ac;
+    // returns a result actions if more testing is desired
   }
+
+  protected ResultActions testDtRequest(String url, List<Integer> ids, boolean dt)
+      throws Exception {
+    return testDtRequest(url, 25, "id", 3, ids, dt);
+  }
+
+  // // checks ids for datatable endpoints and "list all" endpoints
+  // protected ResultActions checkIds(ResultActions r, List<Integer> ids, boolean dt) throws Exception
+  // {
+  // String response = r.andReturn().getResponse().getContentAsString();
+  // String dtPath = "";
+  // if (dt)
+  // dtPath = ".aaData";
+
+  // for (int i = 0; i < ids.size(); i++) { // checks that the ids found are the right ones
+  // assertTrue(ids.contains(JsonPath.read(response, "$" + dtPath + "[" + i + "].id")));
+  // }
+  // return r;
+  // }
 
   protected ResultActions baseTestGetById(String controllerBase, int id) throws Exception {
 

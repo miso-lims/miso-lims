@@ -67,7 +67,7 @@ public class ProjectRestControllerST extends AbstractST {
 
   @Test
   public void testGetBySearch() throws Exception {
-    baseSearchByTerm(CONTROLLER_BASE + "/search", searchTerm("PRO1"), 4, Arrays.asList(1, 100001, 110001, 120001));
+    baseSearchByTerm(CONTROLLER_BASE + "/search", searchTerm("PRO1"), Arrays.asList(1, 100001, 110001, 120001));
   }
 
   @Test
@@ -121,10 +121,8 @@ public class ProjectRestControllerST extends AbstractST {
 
   @Test
   public void testGetLibraryAliquots() throws Exception {
-    checkIds(performDtRequest(CONTROLLER_BASE + "/dt")
-        .andExpect(jsonPath("$.iTotalRecords").value(17)),
-        Arrays.asList(1, 2, 3, 4, 5, 6, 7,
-            100001, 110001, 120001, 200001, 200, 300, 400, 500, 4440, 2200),
+    testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1, 2, 3, 4, 5, 6, 7,
+        100001, 110001, 120001, 200001, 200, 300, 400, 500, 4440, 2200),
         true);
 
 
