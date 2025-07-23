@@ -345,13 +345,22 @@ public abstract class AbstractST {
 
     for (int i = 0; i < expectedIds.size(); i++) { // checks that the ids found are the right ones
       Integer returned = JsonPath.read(response, "$" + dtPath + "[" + i + "].id");
-      assertTrue(expectedIds.contains(returned));
+      assertTrue(expectedIds.contains(returned)); // should be an expected ID
+      assertFalse(returnedIds.contains(returned)); // shouldn't have already been returned (duplicate check)
 
-      expectedIds.set(expectedIds.indexOf(returned), -1);
-      // Arrays.asList is primarily used to make the expected ids list, but it returns a fixed size array
-      // to work around this, this line sets that id to an invalid id, so if a duplicate is found, the
-      // method will throw on the assertion in the previous line
+      returnedIds.add(returned);
     }
+    try {
+      // this should throw
+      JsonPath.read(response, "$" + dtPath + "[" + expectedIds.size() + "].id");
+      // this accounts for the edge case of a non-datatable id-checking having more returned ids than
+      // expected ids
+      // also accounts for duplicates that are higher in index then the length of the expected ids list
+
+      assertTrue(false); // if the line above does not throw, this will trigger
+    } catch (Exception e) {
+    }
+
   }
 
   protected ResultActions testDtRequest(String url, List<Integer> ids, boolean dt)
