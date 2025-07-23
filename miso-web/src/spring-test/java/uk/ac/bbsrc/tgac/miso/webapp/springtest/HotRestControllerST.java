@@ -42,6 +42,9 @@ import java.util.ArrayList;
 
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.Date;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 
 public class HotRestControllerST extends AbstractST {
@@ -49,7 +52,7 @@ public class HotRestControllerST extends AbstractST {
   private static final String CONTROLLER_BASE = "/rest/hot";
 
   @Test
-  public void testDownloadSpreadsheet() throws Exception{
+  public void testDownloadSpreadsheet() throws Exception {
     SpreadsheetDataDto sheet = new SpreadsheetDataDto();
 
     ArrayList<String> headers = new ArrayList<String>(Arrays.asList("1", "2", "3", "4", "5"));
@@ -60,29 +63,56 @@ public class HotRestControllerST extends AbstractST {
     sheet.setHeaders(headers);
     sheet.setRows(rows);
 
-    getMockMvc().perform(post(CONTROLLER_BASE + "/spreadsheet").param("format", "CSV").content(makeJson(sheet)).contentType(MediaType.APPLICATION_JSON))
-      .andExpect(status().isOk())
-      .andExpect(content().contentType("text/csv"))
-      .andExpect(header().longValue("Content-Length", 83));
+    MockHttpServletResponse response = getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/spreadsheet").param("format", "CSV").content(makeJson(sheet))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType("text/csv"))
+        .andExpect(header().longValue("Content-Length", 83)).andReturn().getResponse();
+
+    String filename = response.getHeader("Content-Disposition").split("=")[1];
+    List<List<String>> records = new ArrayList<>();
+    try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+      String line;
+      int row = 0;
+      while ((line = br.readLine()) != null) {
+        String[] values = line.split(",");
+        records.add(Arrays.asList(values));
+        switch (row) {
+          case 0:
+            assertEquals(values[0], "1");
+            break;
+
+          case 1:
+            assertEquals(values[0], "one");
+            break;
+
+          case 2:
+            assertEquals(values[0], "un");
+            break;
+        }
+      }
+    } catch (Exception e) {
+    }
   }
 
   @Test
   public void testImportSpreadsheet() throws Exception {
     String csvContent = "id,name,email,age\n" +
-                           "1,John Doe,john@email.com,25\n" +
-                           "2,Jane Smith,jane@email.com,30\n" +
-                           "3,Bob Johnson,bob@email.com,35\n" +
-                           "4,Alice Brown,alice@email.com,28";
+        "1,John Doe,john@email.com,25\n" +
+        "2,Jane Smith,jane@email.com,30\n" +
+        "3,Bob Johnson,bob@email.com,35\n" +
+        "4,Alice Brown,alice@email.com,28";
 
     MockMultipartFile file = new MockMultipartFile("file", "sheet.csv", "text/csv", csvContent.getBytes());
 
     getMockMvc().perform(multipart(CONTROLLER_BASE + "/import").file(file))
-    .andExpect(status().isOk())
-    .andExpect(jsonPath("$.*", hasSize(4)))
-    .andExpect(jsonPath("$[0].heading").value("id"))
-    .andExpect(jsonPath("$[1].heading").value("name"))
-    .andExpect(jsonPath("$[0].data.*", hasSize(4)))
-    .andExpect(jsonPath("$[1].data[0]").value("John Doe"));
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.*", hasSize(4)))
+        .andExpect(jsonPath("$[0].heading").value("id"))
+        .andExpect(jsonPath("$[1].heading").value("name"))
+        .andExpect(jsonPath("$[0].data.*", hasSize(4)))
+        .andExpect(jsonPath("$[1].data[0]").value("John Doe"));
   }
 
 }
