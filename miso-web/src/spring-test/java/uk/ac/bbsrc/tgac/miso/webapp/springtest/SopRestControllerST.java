@@ -122,10 +122,10 @@ public class SopRestControllerST extends AbstractST {
 
   @Test
   public void testDataTableByCategory() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/category/SAMPLE", Arrays.asList(1, 2), true);
+    testDtRequest(CONTROLLER_BASE + "/dt/category/SAMPLE", Arrays.asList(1, 2));
 
-    testDtRequest(CONTROLLER_BASE + "/dt/category/LIBRARY", Arrays.asList(3, 4, 5), true);
+    testDtRequest(CONTROLLER_BASE + "/dt/category/LIBRARY", Arrays.asList(3, 4, 5));
 
-    testDtRequest(CONTROLLER_BASE + "/dt/category/RUN", Arrays.asList(6), true);
+    testDtRequest(CONTROLLER_BASE + "/dt/category/RUN", Arrays.asList(6));
   }
 }

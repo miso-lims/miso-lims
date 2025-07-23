@@ -154,7 +154,7 @@ public abstract class AbstractST {
   protected <T> List<T> baseTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
 
-    String response = pollingResponserHelper("post", dtos, controllerBase)[0];
+    String response = pollingResponserHelper("post", dtos, controllerBase);
     List<T> objects = new ArrayList<T>();
     for (int i = 0; i < dtos.size(); i++) {
       Integer id = JsonPath.read(response, "$.data[" + i + "].id");
@@ -170,8 +170,9 @@ public abstract class AbstractST {
   protected <T> void testBulkCreateAsyncUnauthorized(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
     // tests failure for async create endpoints where admin permissions are required
-    String status = pollingResponserHelper("post", dtos, controllerBase)[1];
-    assertEquals("failed", status); // request should fail without admin permissions
+    String response = pollingResponserHelper("post", dtos, controllerBase);
+    assertEquals("An unexpected error has occurred", JsonPath.read(response, "$.detail"));
+    // request should fail without admin permissions
   }
 
   protected <T> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<?> dtos,
@@ -192,11 +193,12 @@ public abstract class AbstractST {
   protected <T> void testBulkUpdateAsyncUnauthorized(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
     // tests failure for async update endpoints where admin permissions are required
-    String status = pollingResponserHelper("put", dtos, controllerBase)[1];
-    assertEquals("failed", status); // request should fail without admin permissions
+    String response = pollingResponserHelper("put", dtos, controllerBase);
+    assertEquals("An unexpected error has occurred", JsonPath.read(response, "$.detail"));
+    // request should fail without admin permissions }
   }
 
-  private String[] pollingResponserHelper(String requestType, List<?> dtos, String controllerBase) throws Exception {
+  private String pollingResponserHelper(String requestType, List<?> dtos, String controllerBase) throws Exception {
     // helper method for async requests
     MvcResult mvcResult;
     switch (requestType) {
@@ -224,8 +226,7 @@ public abstract class AbstractST {
 
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
     String response = pollingResponse(controllerBase + "/bulk/" + id);
-    String status = JsonPath.read(response, "$.status");
-    return new String[] {response, status}; // lets the caller choose what they want to use
+    return response;
   }
 
 
@@ -294,7 +295,7 @@ public abstract class AbstractST {
         .andExpect(status().isUnauthorized());
   }
 
-  protected MultiValueMap searchTerm(String term) {
+  private static MultiValueMap searchTerm(String term) {
     MultiValueMap<String, String> map = new LinkedMultiValueMap();
     map.add("q", term);
     return map;
@@ -312,8 +313,11 @@ public abstract class AbstractST {
     checkIds(ids, false, response);
   }
 
-  protected ResultActions testDtRequest(String url, int displayLength, String dataProp, int sortCol, List<Integer> ids,
-      boolean dt)
+  protected void baseSearchByTerm(String url, String searchTerm, List<Integer> ids) throws Exception {
+    baseSearchByTerm(url, searchTerm(searchTerm), ids);
+  }
+
+  protected ResultActions testDtRequest(String url, int displayLength, String dataProp, int sortCol, List<Integer> ids)
       throws Exception {
     ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON)
         .param("iDisplayStart", "0")
@@ -324,13 +328,11 @@ public abstract class AbstractST {
         .param("sEcho", "1"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").exists());
+        .andExpect(jsonPath("$").exists())
+        .andExpect(jsonPath("$.iTotalRecords").value(ids.size()));
 
-    if (dt) { // relevant for datatable tests, not for list-all tests or otherwise
-      ac = ac.andExpect(jsonPath("$.iTotalRecords").value(ids.size()));
-    }
     String response = ac.andReturn().getResponse().getContentAsString();
-    checkIds(ids, dt, response);
+    checkIds(ids, true, response);
 
     return ac;
     // returns a result actions if more testing is desired
@@ -363,9 +365,9 @@ public abstract class AbstractST {
 
   }
 
-  protected ResultActions testDtRequest(String url, List<Integer> ids, boolean dt)
+  protected ResultActions testDtRequest(String url, List<Integer> ids)
       throws Exception {
-    return testDtRequest(url, 25, "id", 3, ids, dt);
+    return testDtRequest(url, 25, "id", 3, ids);
   }
 
   protected ResultActions baseTestGetById(String controllerBase, int id) throws Exception {

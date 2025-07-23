@@ -56,20 +56,20 @@ public class ArrayRunRestControllerST extends AbstractST {
 
   @Test
   public void testDtResponse() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1, 2, 3), true);
+    testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1, 2, 3));
 
   }
 
   @Test
   public void testDtByProj() throws Exception {
     // project 3 has the sample that is shared by the test array runs
-    testDtRequest(CONTROLLER_BASE + "/dt/project/3", Arrays.asList(1, 2, 3), true);
+    testDtRequest(CONTROLLER_BASE + "/dt/project/3", Arrays.asList(1, 2, 3));
 
   }
 
   @Test
   public void testDtByReq() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/requisition/1", Arrays.asList(1, 2, 3), true);
+    testDtRequest(CONTROLLER_BASE + "/dt/requisition/1", Arrays.asList(1, 2, 3));
 
   }
 
@@ -99,7 +99,7 @@ public class ArrayRunRestControllerST extends AbstractST {
 
   @Test
   public void testFindArrays() throws Exception {
-    baseSearchByTerm(CONTROLLER_BASE + "/array-search", searchTerm("1234"), Arrays.asList(1));
+    baseSearchByTerm(CONTROLLER_BASE + "/array-search", "1234", Arrays.asList(1));
 
   }
 
