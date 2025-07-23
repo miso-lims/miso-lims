@@ -57,6 +57,15 @@
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
     </dependency>
+    <!-- <dependency>
+      <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+      <artifactId>integration-tools</artifactId>
+      <version>4.0.0</version>
+    </dependency> -->
+        <dependency>
+      <groupId>ca.on.oicr.gsi</groupId>
+      <artifactId>visionmate</artifactId>
+    </dependency>
     <dependency>
       <!-- Required for file uploads -->
       <groupId>commons-io</groupId>

@@ -51,13 +51,26 @@ import java.util.Date;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import uk.ac.bbsrc.tgac.miso.webapp.springtest.utils.visionmateSrc.ca.on.oicr.gsi.visionmate.*;
-import uk.ac.bbsrc.tgac.miso.webapp.springtest.utils.visionmateSrc.ca.on.oicr.gsi.visionmate.mockServer.*;
+
+
+import uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScan;
+import uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScanner;
+import ca.on.oicr.gsi.visionmate.*;
+import ca.on.oicr.gsi.visionmate.mockServer.*;
+
+// import uk.ac.bbsrc.tgac.miso.webapp.springtest.utils.visionmateSrc.ca.on.oicr.gsi.visionmate.*;
+// import
+// uk.ac.bbsrc.tgac.miso.webapp.springtest.utils.visionmateSrc.ca.on.oicr.gsi.visionmate.mockServer.*;
 import java.io.IOException;
 
 
 
 public class BoxRestControllerST extends AbstractST {
+
+
+  private static VisionMateScanner scanner;
+  private static MockScannerServer server;
+
 
   private static final String CONTROLLER_BASE = "/rest/boxes";
   private static final Class<BoxImpl> controllerClass = BoxImpl.class;
@@ -68,7 +81,7 @@ public class BoxRestControllerST extends AbstractST {
   public void testDatatable() throws Exception {
     checkIds(performDtRequest(CONTROLLER_BASE + "/dt")
         .andExpect(jsonPath("$.iTotalRecords").value(6)),
-        Arrays.asList(1,2,500, 501,502,100001),
+        Arrays.asList(1, 2, 500, 501, 502, 100001),
         true);
   }
 
@@ -88,9 +101,10 @@ public class BoxRestControllerST extends AbstractST {
 
     // currently getting "Invalid URL" --- not setting it right
 
-    //just gonna try it without the param
+    // just gonna try it without the param
     getMockMvc()
-        .perform(put(CONTROLLER_BASE + "/1/position/C04").param("entity", "SAMPLE:1").contentType(MediaType.APPLICATION_JSON))
+        .perform(put(CONTROLLER_BASE + "/1/position/C04").param("entity", "SAMPLE:1")
+            .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     BoxImpl updatedBox = currentSession().get(controllerClass, 1);
@@ -135,7 +149,8 @@ public class BoxRestControllerST extends AbstractST {
     req.setSheet("TRACKING_LIST");
 
 
-    MockHttpServletResponse response = getMockMvc().perform(post(CONTROLLER_BASE + "/spreadsheet").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
+    MockHttpServletResponse response = getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/spreadsheet").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType("text/csv")).andReturn().getResponse();
 
@@ -151,23 +166,26 @@ public class BoxRestControllerST extends AbstractST {
           case 0:
             assertEquals(values[0], "Name");
             break;
-          
+
           case 1:
             assertEquals(values[0], "BOX1");
             break;
-          
+
           case 2:
             assertEquals(values[0], "BOX2");
             break;
         }
       }
+    } catch (Exception e) {
     }
-    catch(Exception e) {}
   }
 
 
   @Test
   public void testPrepareBoxScanner() throws Exception {
+
+    scanner.prepareScan(8, 12);
+
 
     ScannerPreparationRequest req = new ScannerPreparationRequest();
     req.setColumns(12);
@@ -175,22 +193,17 @@ public class BoxRestControllerST extends AbstractST {
     req.setScannerName("Lab 1 Scanner"); // I think this will work but idk, this seems like the localhost scanner
     // ask for help later if needed
     // DP5MIRAGE_SCANNER
-    getMockMvc().perform(post(CONTROLLER_BASE + "/prepare-scan").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
-    .andDo(print())
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/prepare-scan").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
         .andExpect(status().isNoContent());
   }
 
   @BeforeClass
   public static void setupScanner() throws Exception {
-      MockScannerServer server = new MockScannerServer();
-    new Thread(server).start();
-    
-    VisionMateClient client = new VisionMateClient("127.0.0.1", 8000);
-    try {
-      client.connect();
-    } catch (IOException e) {
-      throw new IllegalStateException("Failed to connect");
-    }
+    int port = 8000;
+    server = new MockScannerServer(port);
+    scanner = new VisionMateScanner("10.11.6.1", port);
   }
 
 
@@ -200,10 +213,13 @@ public class BoxRestControllerST extends AbstractST {
 
     // Invalid scanner specified
     // WHAT ARE THE VALID BOX SCANNER NAMES
+    scanner.getScan();
+
 
     ScanRequest req = new ScanRequest();
     req.setScannerName("Lab 1 Scanner");
-    getMockMvc().perform(post(CONTROLLER_BASE + "/1/scan").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/1/scan").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk());
   }
@@ -223,7 +239,9 @@ public class BoxRestControllerST extends AbstractST {
     List<String> positions = new ArrayList<String>();
     positions.add("A07");
     positions.add("B05");
-    getMockMvc().perform(post(CONTROLLER_BASE + "/1/bulk-remove").content(makeJson(positions)).contentType(MediaType.APPLICATION_JSON))
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/1/bulk-remove").content(makeJson(positions))
+            .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     BoxImpl box = currentSession().get(controllerClass, 1);
@@ -248,7 +266,9 @@ public class BoxRestControllerST extends AbstractST {
     List<String> positions = new ArrayList<String>();
     positions.add("A07");
     positions.add("B05");
-    getMockMvc().perform(post(CONTROLLER_BASE + "/1/bulk-discard").content(makeJson(positions)).contentType(MediaType.APPLICATION_JSON))
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/1/bulk-discard").content(makeJson(positions))
+            .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     BoxImpl box = currentSession().get(controllerClass, 1);
@@ -265,7 +285,7 @@ public class BoxRestControllerST extends AbstractST {
   @Test
   public void testDiscardAll() throws Exception {
     getMockMvc().perform(post(CONTROLLER_BASE + "/1/discard-all"))
-    .andExpect(status().isNoContent());
+        .andExpect(status().isNoContent());
     BoxImpl box = currentSession().get(controllerClass, 1);
     assertTrue(box.getFreeCount() == 96); // all 8 x 12 spots are empty
     // checking if each individual item was marked as discarded is not needed, as the other discard
@@ -286,7 +306,9 @@ public class BoxRestControllerST extends AbstractST {
     items.add(item1);
     items.add(item2);
 
-    getMockMvc().perform(post(CONTROLLER_BASE + "/1/bulk-update").content(makeJson(items)).contentType(MediaType.APPLICATION_JSON))
+    getMockMvc()
+        .perform(
+            post(CONTROLLER_BASE + "/1/bulk-update").content(makeJson(items)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     BoxImpl updatedBox = currentSession().get(controllerClass, 1);
@@ -294,10 +316,11 @@ public class BoxRestControllerST extends AbstractST {
     assertFalse(updatedBox.isFreePosition("C06"));
 
   }
+
   @Test
   public void testSetBoxLocation() throws Exception {
     getMockMvc().perform(post(CONTROLLER_BASE + "/1/setlocation").param("storageId", "7"))
-    .andExpect(status().isAccepted());
+        .andExpect(status().isAccepted());
 
     BoxImpl box = currentSession().get(controllerClass, 1);
     assertEquals("Loose Storage", box.getStorageLocation().getLocationUnit().getDisplayName());
@@ -317,21 +340,23 @@ public class BoxRestControllerST extends AbstractST {
     BoxUse use = currentSession().get(BoxUse.class, 1);
     box.setUse(use);
 
-    List<BoxDto> dtos =  Dtos.asBoxDtosWithPositions(Arrays.asList(box));
+    List<BoxDto> dtos = Dtos.asBoxDtosWithPositions(Arrays.asList(box));
     BoxImpl updatedBox = baseTestUpdate(CONTROLLER_BASE, dtos.get(0), 1, controllerClass);
     assertEquals("changed", updatedBox.getAlias());
   }
 
   @Test
   public void testRecreateBoxFromPrefix() throws Exception {
-    getMockMvc().perform(post(CONTROLLER_BASE + "/1/positions/fill-by-pattern").param("prefix", "PRO").param("suffix", "standard"))
-    .andExpect(status().isNoContent());
+    getMockMvc()
+        .perform(
+            post(CONTROLLER_BASE + "/1/positions/fill-by-pattern").param("prefix", "PRO").param("suffix", "standard"))
+        .andExpect(status().isNoContent());
   }
 
   @Test
   public void createFragmentAnalyserSheet() throws Exception {
     getMockMvc().perform(get(CONTROLLER_BASE + "/1/fragmentAnalyser"))
-    .andExpect(status().isOk());
+        .andExpect(status().isOk());
   }
 
 
