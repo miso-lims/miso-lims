@@ -101,12 +101,14 @@ public class ArrayModelRestControllerST extends AbstractST {
 
     testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
 
+
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteArrayModel() throws Exception {
     testBulkDelete(controllerClass, 2, CONTROLLER_BASE);
+
   }
 
 
@@ -114,6 +116,7 @@ public class ArrayModelRestControllerST extends AbstractST {
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
     testDeleteUnauthorized(controllerClass, 2, CONTROLLER_BASE);
+
   }
 
 

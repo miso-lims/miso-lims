@@ -117,6 +117,7 @@ public class SopRestControllerST extends AbstractST {
   @Test
   public void testDeleteFail() throws Exception {
     testDeleteUnauthorized(controllerClass, 5, CONTROLLER_BASE);
+
   }
 
   @Test

@@ -150,6 +150,7 @@ public abstract class AbstractST {
     return response;
   }
 
+
   protected <T> List<T> baseTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
 
@@ -164,6 +165,7 @@ public abstract class AbstractST {
 
     return objects;
   }
+
 
   protected <T> void testBulkCreateAsyncUnauthorized(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
@@ -225,6 +227,7 @@ public abstract class AbstractST {
     String status = JsonPath.read(response, "$.status");
     return new String[] {response, status}; // lets the caller choose what they want to use
   }
+
 
   protected <T> void testBulkDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
@@ -309,6 +312,7 @@ public abstract class AbstractST {
     for (int i = 0; i < ids.size(); i++) { // checks that the ids found are the right ones
       assertTrue(ids.contains(JsonPath.read(response, "$[" + i + "].id")));
     }
+
   }
 
   protected ResultActions testDtRequest(String url, int displayLength, String dataProp, int sortCol, List<Integer> ids,
@@ -342,20 +346,6 @@ public abstract class AbstractST {
       throws Exception {
     return testDtRequest(url, 25, "id", 3, ids, dt);
   }
-
-  // // checks ids for datatable endpoints and "list all" endpoints
-  // protected ResultActions checkIds(ResultActions r, List<Integer> ids, boolean dt) throws Exception
-  // {
-  // String response = r.andReturn().getResponse().getContentAsString();
-  // String dtPath = "";
-  // if (dt)
-  // dtPath = ".aaData";
-
-  // for (int i = 0; i < ids.size(); i++) { // checks that the ids found are the right ones
-  // assertTrue(ids.contains(JsonPath.read(response, "$" + dtPath + "[" + i + "].id")));
-  // }
-  // return r;
-  // }
 
   protected ResultActions baseTestGetById(String controllerBase, int id) throws Exception {
 
