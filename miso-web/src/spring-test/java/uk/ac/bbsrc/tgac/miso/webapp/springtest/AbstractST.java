@@ -309,10 +309,7 @@ public abstract class AbstractST {
         .andExpect(jsonPath("$.*", hasSize(ids.size())))
         .andReturn().getResponse().getContentAsString();
 
-    for (int i = 0; i < ids.size(); i++) { // checks that the ids found are the right ones
-      assertTrue(ids.contains(JsonPath.read(response, "$[" + i + "].id")));
-    }
-
+    checkIds(ids, false, response);
   }
 
   protected ResultActions testDtRequest(String url, int displayLength, String dataProp, int sortCol, List<Integer> ids,
@@ -327,19 +324,34 @@ public abstract class AbstractST {
         .param("sEcho", "1"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").exists())
-        .andExpect(jsonPath("$.iTotalRecords").value(ids.size()));
+        .andExpect(jsonPath("$").exists());
 
-    String response = ac.andReturn().getResponse().getContentAsString();
-    String dtPath = "";
-    if (dt)
-      dtPath = ".aaData";
-
-    for (int i = 0; i < ids.size(); i++) { // checks that the ids found are the right ones
-      assertTrue(ids.contains(JsonPath.read(response, "$" + dtPath + "[" + i + "].id")));
+    if (dt) { // relevant for datatable tests, not for list-all tests or otherwise
+      ac = ac.andExpect(jsonPath("$.iTotalRecords").value(ids.size()));
     }
+    String response = ac.andReturn().getResponse().getContentAsString();
+    checkIds(ids, dt, response);
+
     return ac;
     // returns a result actions if more testing is desired
+  }
+
+  private void checkIds(List<Integer> expectedIds, boolean isDt, String response) throws Exception {
+    List<Integer> returnedIds = new ArrayList<Integer>();
+
+    String dtPath = "";
+    if (isDt)
+      dtPath = ".aaData";
+
+    for (int i = 0; i < expectedIds.size(); i++) { // checks that the ids found are the right ones
+      Integer returned = JsonPath.read(response, "$" + dtPath + "[" + i + "].id");
+      assertTrue(expectedIds.contains(returned));
+
+      expectedIds.set(expectedIds.indexOf(returned), -1);
+      // Arrays.asList is primarily used to make the expected ids list, but it returns a fixed size array
+      // to work around this, this line sets that id to an invalid id, so if a duplicate is found, the
+      // method will throw on the assertion in the previous line
+    }
   }
 
   protected ResultActions testDtRequest(String url, List<Integer> ids, boolean dt)
