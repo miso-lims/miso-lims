@@ -61,7 +61,6 @@ public class AttachmentRestControllerST extends AbstractST {
     assertFalse(to.getAttachments().stream().anyMatch(x -> x.getId() == 1));
 
 
-    // assert that the attachment exists and is attached to Sample 1
     // this is linking an attachment from one entity to another (possibly different entity)
     getMockMvc().perform(post(CONTROLLER_BASE + "/sample/2")
         .param("fromEntityType", "sample")
@@ -102,7 +101,7 @@ public class AttachmentRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteAttachment() throws Exception {
-
+    assertTrue(currentSession().get(SampleImpl.class, 1).getAttachments().stream().anyMatch(x -> x.getId() == 1));
     getMockMvc().perform(delete(CONTROLLER_BASE + "/sample/1/1"))
         .andExpect(status().isNoContent());
     assertFalse(currentSession().get(SampleImpl.class, 1).getAttachments().stream().anyMatch(x -> x.getId() == 1));
