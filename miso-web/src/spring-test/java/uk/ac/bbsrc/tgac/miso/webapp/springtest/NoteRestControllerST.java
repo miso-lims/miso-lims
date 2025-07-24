@@ -69,8 +69,8 @@ public class NoteRestControllerST extends AbstractST {
         .andExpect(status().isNoContent());
 
     SampleImpl sam = currentSession().get(SampleImpl.class, 1);
-    assertTrue(sam.getNotes().size() == 1);
-    assertEquals(sam.getNotes().iterator().next().getText(), req.getText());
+    assertEquals(1, sam.getNotes().size());
+    assertEquals(req.getText(), sam.getNotes().iterator().next().getText());
 
   }
 
@@ -83,7 +83,9 @@ public class NoteRestControllerST extends AbstractST {
 
     lib = currentSession().get(LibraryImpl.class, 110005);
     int sizeAfter = lib.getNotes().size();
-    assertTrue(sizeBefore == sizeAfter + 1);
+    assertEquals(sizeBefore - 1, sizeAfter);
+    assertFalse(lib.getNotes().stream().anyMatch(x -> x.getId() == 1));
+
   }
 
   @Test
@@ -91,8 +93,8 @@ public class NoteRestControllerST extends AbstractST {
     BulkDeleteRequest req = new BulkDeleteRequest("Library", 110005L, Arrays.asList(1L, 3L));
 
     LibraryImpl lib = currentSession().get(LibraryImpl.class, 110005);
-    assertFalse(lib.getNotes().isEmpty());
-
+    assertTrue(lib.getNotes().stream().anyMatch(x -> x.getId() == 1));
+    assertTrue(lib.getNotes().stream().anyMatch(x -> x.getId() == 3));
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/bulk-delete").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
