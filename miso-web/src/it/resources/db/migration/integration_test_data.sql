@@ -1162,10 +1162,13 @@ INSERT INTO Run_Partition (runId, partitionId, purposeId, lastModifier) VALUES
 
 INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES
   (1, '2017-08-22', 1, 'LIB110005 existing note', 3),
-  (2, '2017-08-25', 1, 'IPO120001 existing note', 3);
+  (2, '2017-08-25', 1, 'IPO120001 existing note', 3),
+  (3, '2025-07-24', 1, 'LIB110005 existing note two', 3);
 
 INSERT INTO Library_Note(library_libraryId, notes_noteId) VALUES
-  (110005, 1);
+  (110005, 1),
+  (110005, 3);
+
 
 INSERT INTO Pool_Note(pool_poolId, notes_noteId) VALUES
   (120001, 2);
