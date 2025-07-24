@@ -55,10 +55,10 @@ public class HotRestControllerST extends AbstractST {
   public void testDownloadSpreadsheet() throws Exception {
     SpreadsheetDataDto sheet = new SpreadsheetDataDto();
 
-    ArrayList<String> headers = new ArrayList<String>(Arrays.asList("1", "2", "3", "4", "5"));
-    ArrayList<String> firstrow = new ArrayList<String>(Arrays.asList("one", "two", "three", "four", "five"));
-    ArrayList<String> secondrow = new ArrayList<String>(Arrays.asList("un", "deux", "trois", "quatre", "cinq"));
-    List<List<String>> rows = new ArrayList<List<String>>(Arrays.asList(firstrow, secondrow));
+    List<String> headers = Arrays.asList("1", "2", "3", "4", "5");
+    List<String> firstrow = Arrays.asList("one", "two", "three", "four", "five");
+    List<String> secondrow = Arrays.asList("un", "deux", "trois", "quatre", "cinq");
+    List<List<String>> rows = Arrays.asList(firstrow, secondrow);
 
     sheet.setHeaders(headers);
     sheet.setRows(rows);
@@ -78,21 +78,20 @@ public class HotRestControllerST extends AbstractST {
       while ((line = br.readLine()) != null) {
         String[] values = line.split(",");
         records.add(Arrays.asList(values));
-        switch (row) {
-          case 0:
-            assertEquals(values[0], "1");
-            break;
-
-          case 1:
-            assertEquals(values[0], "one");
-            break;
-
-          case 2:
-            assertEquals(values[0], "un");
-            break;
+        if (row == 0) {
+          checkArray(values, headers);
+        } else {
+          checkArray(values, rows.get(row - 1));
         }
+        row++;
       }
     } catch (Exception e) {
+    }
+  }
+
+  private void checkArray(String[] values, List<String> expected) {
+    for (int i = 0; i < expected.size(); i++) {
+      assertEquals(values[i], expected.get(i));
     }
   }
 
@@ -100,9 +99,7 @@ public class HotRestControllerST extends AbstractST {
   public void testImportSpreadsheet() throws Exception {
     String csvContent = "id,name,email,age\n" +
         "1,John Doe,john@email.com,25\n" +
-        "2,Jane Smith,jane@email.com,30\n" +
-        "3,Bob Johnson,bob@email.com,35\n" +
-        "4,Alice Brown,alice@email.com,28";
+        "2,Jane Smith,jane@email.com,30\n";
 
     MockMultipartFile file = new MockMultipartFile("file", "sheet.csv", "text/csv", csvContent.getBytes());
 
@@ -111,8 +108,9 @@ public class HotRestControllerST extends AbstractST {
         .andExpect(jsonPath("$.*", hasSize(4)))
         .andExpect(jsonPath("$[0].heading").value("id"))
         .andExpect(jsonPath("$[1].heading").value("name"))
-        .andExpect(jsonPath("$[0].data.*", hasSize(4)))
-        .andExpect(jsonPath("$[1].data[0]").value("John Doe"));
+        .andExpect(jsonPath("$[0].data.*", hasSize(2)))
+        .andExpect(jsonPath("$[1].data[0]").value("John Doe"))
+        .andExpect(jsonPath("$[1].data[1]").value("Jane Smith"));
   }
 
 }
