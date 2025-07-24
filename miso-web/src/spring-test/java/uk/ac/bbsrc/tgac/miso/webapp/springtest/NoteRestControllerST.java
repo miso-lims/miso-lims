@@ -57,7 +57,6 @@ import java.util.Date;
 public class NoteRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/notes";
-  private static final Class<Note> controllerClass = Note.class;
 
   @Test
   public void testAddNote() throws Exception {
@@ -95,6 +94,7 @@ public class NoteRestControllerST extends AbstractST {
     LibraryImpl lib = currentSession().get(LibraryImpl.class, 110005);
     assertTrue(lib.getNotes().stream().anyMatch(x -> x.getId() == 1));
     assertTrue(lib.getNotes().stream().anyMatch(x -> x.getId() == 3));
+    assertEquals(2, lib.getNotes().size());
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/bulk-delete").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
