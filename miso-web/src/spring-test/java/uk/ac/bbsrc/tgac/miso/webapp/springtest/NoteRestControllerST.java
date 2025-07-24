@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import org.junit.Test;
-
 import org.springframework.web.servlet.*;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -76,21 +76,29 @@ public class NoteRestControllerST extends AbstractST {
 
   @Test
   public void testDeleteNote() throws Exception {
+    LibraryImpl lib = currentSession().get(LibraryImpl.class, 110005);
+    int sizeBefore = lib.getNotes().size();
+
     getMockMvc().perform(delete(CONTROLLER_BASE + "/Library/110005/1")).andExpect(status().isNoContent());
 
-    LibraryImpl lib = currentSession().get(LibraryImpl.class, 110005);
-    assertTrue(lib.getNotes().size() == 1);
+    lib = currentSession().get(LibraryImpl.class, 110005);
+    int sizeAfter = lib.getNotes().size();
+    assertTrue(sizeBefore == sizeAfter + 1);
   }
 
   @Test
   public void testBulkDeleteNote() throws Exception {
     BulkDeleteRequest req = new BulkDeleteRequest("Library", 110005L, Arrays.asList(1L, 3L));
 
+    LibraryImpl lib = currentSession().get(LibraryImpl.class, 110005);
+    assertFalse(lib.getNotes().isEmpty());
+
+
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/bulk-delete").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
 
-    LibraryImpl lib = currentSession().get(LibraryImpl.class, 1);
+    lib = currentSession().get(LibraryImpl.class, 110005);
     assertTrue(lib.getNotes().isEmpty());
   }
 
