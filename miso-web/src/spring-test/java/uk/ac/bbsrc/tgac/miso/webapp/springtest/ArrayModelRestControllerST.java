@@ -99,21 +99,24 @@ public class ArrayModelRestControllerST extends AbstractST {
     // array models can only be created by an admin user, so this test expected failure due to
     // insufficient permissions
 
-    baseBulkCreateAsyncFail(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+
 
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteArrayModel() throws Exception {
-    baseTestDelete(controllerClass, 2, CONTROLLER_BASE);
+    testBulkDelete(controllerClass, 2, CONTROLLER_BASE);
+
   }
 
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    baseTestDeleteFail(controllerClass, 2, CONTROLLER_BASE);
+    testDeleteUnauthorized(controllerClass, 2, CONTROLLER_BASE);
+
   }
 
 
