@@ -345,22 +345,10 @@ public abstract class AbstractST {
     if (isDt)
       dtPath = ".aaData";
 
-    for (int i = 0; i < expectedIds.size(); i++) { // checks that the ids found are the right ones
-      Integer returned = JsonPath.read(response, "$" + dtPath + "[" + i + "].id");
-      assertTrue(expectedIds.contains(returned)); // should be an expected ID
-      assertFalse(returnedIds.contains(returned)); // shouldn't have already been returned (duplicate check)
-
-      returnedIds.add(returned);
-    }
-    try {
-      // this should throw
-      JsonPath.read(response, "$" + dtPath + "[" + expectedIds.size() + "].id");
-      // this accounts for the edge case of a non-datatable id-checking having more returned ids than
-      // expected ids
-      // also accounts for duplicates that are higher in index then the length of the expected ids list
-
-      assertTrue(false); // if the line above does not throw, this will trigger
-    } catch (Exception e) {
+    List<Integer> resultIds = JsonPath.read(response, "$" + dtPath + "[*].id");
+    assertEquals(expectedIds.size(), resultIds.size());
+    for (Integer expectedId : expectedIds) {
+      assertTrue(resultIds.contains(expectedId));
     }
 
   }
