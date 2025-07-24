@@ -57,8 +57,11 @@ public class AttachmentRestControllerST extends AbstractST {
     FileAttachment file = from.getAttachments().get(0);
     assertEquals(1, file.getId());
 
-    // assert that the attachment exists and is attached to Sample 1
+    Sample to = currentSession().get(SampleImpl.class, 2);
+    assertFalse(to.getAttachments().stream().anyMatch(x -> x.getId() == 1));
 
+
+    // assert that the attachment exists and is attached to Sample 1
     // this is linking an attachment from one entity to another (possibly different entity)
     getMockMvc().perform(post(CONTROLLER_BASE + "/sample/2")
         .param("fromEntityType", "sample")
@@ -66,12 +69,20 @@ public class AttachmentRestControllerST extends AbstractST {
         .param("attachmentId", "1"))
         .andExpect(status().isNoContent());
 
-    Sample saved = currentSession().get(SampleImpl.class, 2);
+    Sample saved = currentSession().get(SampleImpl.class, 2); // need to refetch sample 2 to see the update
     assertTrue(saved.getAttachments().stream().anyMatch(x -> x.getId() == 1));
   }
 
   @Test
   public void testBulkLinkFile() throws Exception {
+    Sample sam2 = currentSession().get(SampleImpl.class, 2);
+    Sample sam3 = currentSession().get(SampleImpl.class, 3);
+
+
+    assertFalse(sam2.getAttachments().stream().anyMatch(x -> x.getId() == 1));
+    assertFalse(sam3.getAttachments().stream().anyMatch(x -> x.getId() == 1));
+
+
     getMockMvc().perform(post(CONTROLLER_BASE + "/sample/shared")
         .param("fromEntityType", "sample")
         .param("fromEntityId", "1")
@@ -79,7 +90,7 @@ public class AttachmentRestControllerST extends AbstractST {
         .param("entityIds", "2,3"))
         .andExpect(status().isNoContent());
 
-
+    // need to refetch samples 2 and 3 to see the updates
     Sample savedtwo = currentSession().get(SampleImpl.class, 2);
     Sample savedthree = currentSession().get(SampleImpl.class, 3);
 
