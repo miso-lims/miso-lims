@@ -74,6 +74,10 @@ public class ContactRestControllerST extends AbstractST {
     List<Contact> contacts = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
     assertEquals("contact 1", contacts.get(0).getName());
     assertEquals("contact 2", contacts.get(1).getName());
+    assertEquals("testingemail@gmail.com", contacts.get(0).getEmail());
+    assertEquals("testingemailtwo@gmail.com", contacts.get(1).getEmail());
+
+
   }
 
   @Test
