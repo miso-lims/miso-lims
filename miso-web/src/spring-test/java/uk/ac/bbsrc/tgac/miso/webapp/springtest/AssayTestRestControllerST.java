@@ -63,14 +63,14 @@ public class AssayTestRestControllerST extends AbstractST {
 
 
     AssayTest atest2 = new AssayTest();
-    atest2.setLibraryQualificationMethod(AssayTest.LibraryQualificationMethod.LOW_DEPTH_SEQUENCING);
-    atest2.setPermittedSamples(AssayTest.PermittedSamples.ALL);
+    atest2.setLibraryQualificationMethod(AssayTest.LibraryQualificationMethod.NONE);
+    atest2.setPermittedSamples(AssayTest.PermittedSamples.REQUISITIONED);
 
-    AssayTestDto test2 = AssayTestDto.from(atest1);
+    AssayTestDto test2 = AssayTestDto.from(atest2);
     test2.setAlias("second");
-    test2.setTissueTypeId(1L);
-    test2.setExtractionClassId(11L);
-    test2.setLibraryDesignCodeId(2L);
+    test2.setTissueTypeId(2L);
+    test2.setExtractionClassId(12L);
+    test2.setLibraryDesignCodeId(3L);
 
 
     List<AssayTestDto> dtos = new ArrayList<AssayTestDto>();
@@ -84,8 +84,22 @@ public class AssayTestRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
     List<AssayTest> tests = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+
     assertEquals("first", tests.get(0).getAlias());
+    assertEquals(1L, tests.get(0).getTissueType().getId());
+    assertEquals(11L, tests.get(0).getExtractionClass().getId());
+    assertEquals(2L, tests.get(0).getLibraryDesignCode().getId());
+    assertEquals(AssayTest.LibraryQualificationMethod.LOW_DEPTH_SEQUENCING,
+        tests.get(0).getLibraryQualificationMethod());
+    assertEquals(AssayTest.PermittedSamples.ALL, tests.get(0).getPermittedSamples());
+
     assertEquals("second", tests.get(1).getAlias());
+    assertEquals(2L, tests.get(1).getTissueType().getId());
+    assertEquals(12L, tests.get(1).getExtractionClass().getId());
+    assertEquals(3L, tests.get(1).getLibraryDesignCode().getId());
+    assertEquals(AssayTest.LibraryQualificationMethod.NONE,
+        tests.get(1).getLibraryQualificationMethod());
+    assertEquals(AssayTest.PermittedSamples.REQUISITIONED, tests.get(1).getPermittedSamples());
   }
 
   @Test
@@ -96,8 +110,7 @@ public class AssayTestRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
-    // admin perms not needed, admin is just the one that made these objects
-    // check this later to make sure that it's true
+    // admin perms needed to update
     AssayTestDto one = AssayTestDto.from(currentSession().get(controllerClass, 1));
     AssayTestDto two = AssayTestDto.from(currentSession().get(controllerClass, 2));
 
@@ -109,10 +122,25 @@ public class AssayTestRestControllerST extends AbstractST {
     dtos.add(two);
 
     List<AssayTest> assayTests =
-        (List<AssayTest>)  baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
+        (List<AssayTest>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
 
     assertEquals("one", assayTests.get(0).getAlias());
     assertEquals("two", assayTests.get(1).getAlias());
+  }
+
+  @Test
+  public void testBulkUpdateAsyncFail() throws Exception {
+    AssayTestDto one = AssayTestDto.from(currentSession().get(controllerClass, 1));
+    AssayTestDto two = AssayTestDto.from(currentSession().get(controllerClass, 2));
+
+    one.setAlias("one");
+    two.setAlias("two");
+
+    List<AssayTestDto> dtos = new ArrayList<AssayTestDto>();
+    dtos.add(one);
+    dtos.add(two);
+
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, dtos);
   }
 
   @Test
