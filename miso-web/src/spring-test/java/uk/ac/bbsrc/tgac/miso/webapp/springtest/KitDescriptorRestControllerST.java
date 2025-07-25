@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import static org.junit.Assert.*;
 import java.util.Collections;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.LinkedMultiValueMap;
 
 
 import java.util.List;
@@ -59,8 +60,7 @@ public class KitDescriptorRestControllerST extends AbstractST {
 
   @Test
   public void testDatatable() throws Exception {
-    checkIds(performDtRequest(CONTROLLER_BASE + "/dt")
-        .andExpect(jsonPath("$.iTotalRecords").value(4)), Arrays.asList(1,2,3,4), true);
+    testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1,2,3,4));
   }
 
   @Test
@@ -74,13 +74,13 @@ public class KitDescriptorRestControllerST extends AbstractST {
 
   @Test
   public void testListAll() throws Exception {
-    checkIds(getMockMvc().perform(get(CONTROLLER_BASE)), Arrays.asList(1,2,3,4), false);
+    testListAll(CONTROLLER_BASE, Arrays.asList(1,2,3,4));
   }
 
   @Test
   public void testDatatableByType() throws Exception {
-    checkIds(performDtRequest(CONTROLLER_BASE + "/dt/type/CLUSTERING")
-        .andExpect(jsonPath("$.iTotalRecords").value(1)), Arrays.asList(3), true);
+    testDtRequest(CONTROLLER_BASE + "/dt/type/CLUSTERING", Arrays.asList(3));
+
   }
 
   @Test
@@ -113,9 +113,10 @@ public class KitDescriptorRestControllerST extends AbstractST {
 
   @Test
   public void testSearch() throws Exception {
-    MultiValueMap params = searchTerm("Test Kit Two");
+    MultiValueMap params = new LinkedMultiValueMap();
+    params.add("q", "Test Kit Two");
     params.add("kitType", "Library");
-    baseSearchByTerm(CONTROLLER_BASE + "/search", params, 1, Arrays.asList(2));
+    baseSearchByTerm(CONTROLLER_BASE + "/search", params, Arrays.asList(2));
   }
 
   private KitDescriptorDto makeCreateDto() throws Exception {

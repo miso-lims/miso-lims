@@ -352,6 +352,11 @@ public abstract class AbstractST {
     baseSearchByTerm(url, searchTerm(searchTerm), ids);
   }
 
+  protected void testListAll(String url, List<Integer> ids) throws Exception {
+    String response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
+    checkIds(ids, false, response);
+  }
+
   protected ResultActions testDtRequest(String url, int displayLength, String dataProp, int sortCol, List<Integer> ids)
       throws Exception {
     ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON)
