@@ -52,7 +52,7 @@ import java.util.Date;
 public class LibrarySpikeInRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/libraryspikeins";
-  private static final Class<LibrarySpikeIn> controllerClass = LibrarySpikeIn.class;
+  private static final Class<LibrarySpikeIn> entityClass = LibrarySpikeIn.class;
 
   private List<LibrarySpikeInDto> makeCreateDtos() {
 
@@ -73,16 +73,16 @@ public class LibrarySpikeInRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
     List<LibrarySpikeIn> librarySpikeIns =
-        baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
-    assertEquals(librarySpikeIns.get(0).getAlias(), "one");
-    assertEquals(librarySpikeIns.get(1).getAlias(), "two");
+        baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
+    assertEquals("one", librarySpikeIns.get(0).getAlias());
+    assertEquals("two", librarySpikeIns.get(1).getAlias());
   }
 
   @Test
   public void testBulkCreateFail() throws Exception {
     // LibrarySpikeIn creation is for admin only, so this test is expecting failure due to
     // insufficent permission
-    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
   }
 
   @Test
@@ -100,8 +100,11 @@ public class LibrarySpikeInRestControllerST extends AbstractST {
 
 
     List<LibrarySpikeIn> librarySpikeIns =
-        (List<LibrarySpikeIn>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos,
+        (List<LibrarySpikeIn>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
             Arrays.asList(1, 3));
+
+    assertEquals(1L, librarySpikeIns.get(0).getId());
+    assertEquals(3L, librarySpikeIns.get(1).getId());
     assertEquals("one", librarySpikeIns.get(0).getAlias());
     assertEquals("three", librarySpikeIns.get(1).getAlias());
   }
@@ -118,17 +121,17 @@ public class LibrarySpikeInRestControllerST extends AbstractST {
     dtos.add(one);
     dtos.add(three);
 
-    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, dtos);
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteLibrarySpikeIn() throws Exception {
-    testBulkDelete(controllerClass, 3, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 3, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 3, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 3, CONTROLLER_BASE);
   }
 }
