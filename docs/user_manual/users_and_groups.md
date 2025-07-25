@@ -58,9 +58,7 @@ both the "New Password" and the "Confirm New Password" box. The same password mu
 
 
 
-### User Permissions
-
-There are two types of user permissions in MISO - roles, and resource-level permissions.
+### User Roles
 
 Roles control what a user is allowed to do within MISO. If your site is configured to use the MISO database for user
 accounts (see [Logging In](../site_configuration/#logging-in)), MISO administrators can set user roles on the Create
@@ -72,22 +70,6 @@ The roles in MISO are:
 * Internal: A user belonging to the organization. This role grants access to the majority of MISO.
 * Admin: A MISO administrator who has more control over MISO and the items stored within it. Administrators have access
   to everything in MISO.
-
-Resource-level permissions are set on individual items - most commonly on projects. These items are owned by the user
-who created them. The resource's owner, as well as any MISO administrator, is able to modify the resource-level
-permissions for the item. You can choose to allow access by all internal users, or you can select specific users
-and/or groups who are allowed to read and/or modify (write to) the resource. These permissions apply to to related
-items as well - a sample will usually have the same permissions as its project.
-
-Resource-level permissions apply to the following items.
-
-* Projects
-* Experiments
-* Studies
-* Samples
-* Libraries
-* Pools
-* Sequencer Runs
 
 
 
@@ -107,10 +89,11 @@ click the "Delete" button in the toolbar at the top of the list. For many items 
 have created and modified the item are tracked. It will not be possible to delete any user who has created or edited
 any of these items. Instead, you may wish to disable the user (see above).
 
+
+
 ## Groups
 
-Groups are collections of users. Instead of assigning resource-level permissions to specific users, it may be more
-convenient to assign the permissions to a group, and then control access by adding and removing users from the group.
+Groups are collections of users.
 
 
 

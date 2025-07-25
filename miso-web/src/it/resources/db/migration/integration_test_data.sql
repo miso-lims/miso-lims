@@ -1162,10 +1162,13 @@ INSERT INTO Run_Partition (runId, partitionId, purposeId, lastModifier) VALUES
 
 INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES
   (1, '2017-08-22', 1, 'LIB110005 existing note', 3),
-  (2, '2017-08-25', 1, 'IPO120001 existing note', 3);
+  (2, '2017-08-25', 1, 'IPO120001 existing note', 3),
+  (3, '2025-07-24', 1, 'LIB110005 existing note two', 3);
 
 INSERT INTO Library_Note(library_libraryId, notes_noteId) VALUES
-  (110005, 1);
+  (110005, 1),
+  (110005, 3);
+
 
 INSERT INTO Pool_Note(pool_poolId, notes_noteId) VALUES
   (120001, 2);
@@ -1308,14 +1311,16 @@ INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, wi
 (1, 'Printer', 'BRADY', 'BRADY_FTP', '{"host:"127.0.0.1","pin":"0000"}', TRUE, 25, 25, '[{"element":"text", "contents":{"use":"ALIAS"}}]');
 
 INSERT INTO ApiKey(keyId, userId, apiKey, apiSecret, creator, created) VALUES
-(2, 1, "asdf", "ghjk", 1, "2025-07-08")
-ON DUPLICATE KEY UPDATE 
-  userId = 1,
-  apiKey = "asdf",
-  apiSecret = "ghjk",
-  creator = 1,
-  created = "2025-07-08";
+(2, 1, "asdf", "ghjk", 1, "2025-07-08");
 
+INSERT INTO Attachment(attachmentId, filename, path, creator, created, categoryId) VALUES
+(1, 'File1', '/sample/1/12345', 1, '2021-02-22 14:40:00', 1),
+(2, 'File2', '/sample/2/12346', 1, '2021-02-22 14:40:00', 1),
+(3, 'Orphaned', '/sample/2/12347', 1, '2021-02-22 14:40:00', 1);
+
+INSERT INTO Sample_Attachment(sampleId, attachmentId) VALUES
+(1, 1),
+(2, 2);
 
 -- Keep this at bottom - checked to verify that script has completed and constants all loaded
 INSERT INTO AttachmentCategory(categoryId, alias) VALUES (4, 'last entry');
