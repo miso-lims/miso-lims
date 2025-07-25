@@ -51,7 +51,7 @@ import java.util.Date;
 public class PipelineRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/pipelines";
-  private static final Class<Pipeline> controllerClass = Pipeline.class;
+  private static final Class<Pipeline> entityClass = Pipeline.class;
 
   private List<PipelineDto> makeCreateDtos() {
 
@@ -70,9 +70,9 @@ public class PipelineRestControllerST extends AbstractST {
 
   @Test
   public void testBulkCreateAsync() throws Exception {
-    List<Pipeline> codes = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
-    assertEquals(codes.get(0).getAlias(), "one");
-    assertEquals(codes.get(1).getAlias(), "two");
+    List<Pipeline> codes = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
+    assertEquals("one", codes.get(0).getAlias());
+    assertEquals("two", codes.get(1).getAlias());
   }
 
   @Test
@@ -88,7 +88,10 @@ public class PipelineRestControllerST extends AbstractST {
     dtos.add(p2);
 
     List<Pipeline> Pipelines =
-        (List<Pipeline>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
+        (List<Pipeline>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, Arrays.asList(1, 2));
+    
+    assertEquals(1L, Pipelines.get(0).getId());
+    assertEquals(2L, Pipelines.get(1).getId());
     assertEquals("p1", Pipelines.get(0).getAlias());
     assertEquals("p2", Pipelines.get(1).getAlias());
   }
@@ -96,11 +99,11 @@ public class PipelineRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeletePipeline() throws Exception {
-    testBulkDelete(controllerClass, 3, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 3, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 3, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 3, CONTROLLER_BASE);
   }
 }
