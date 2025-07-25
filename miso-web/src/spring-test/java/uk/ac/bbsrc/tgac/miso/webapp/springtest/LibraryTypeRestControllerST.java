@@ -52,7 +52,7 @@ import java.util.Date;
 public class LibraryTypeRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/librarytypes";
-  private static final Class<LibraryType> controllerClass = LibraryType.class;
+  private static final Class<LibraryType> entityClass = LibraryType.class;
 
   private List<LibraryTypeDto> makeCreateDtos() {
 
@@ -78,24 +78,24 @@ public class LibraryTypeRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
-    List<LibraryType> libins = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
-    assertEquals(libins.get(0).getAbbreviation(), "ON");
-    assertEquals(libins.get(1).getAbbreviation(), "TW");
+    List<LibraryType> libins = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
+    assertEquals("ON", libins.get(0).getAbbreviation());
+    assertEquals("TW", libins.get(1).getAbbreviation());
   }
 
   @Test
   public void testBulkCreateFail() throws Exception {
     // LibraryType creation is for admin only, so this test is expecting failure due to
     // insufficent permission
-    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // only admin can update these
-    LibraryTypeDto one = Dtos.asDto(currentSession().get(LibraryType.class, 1));
-    LibraryTypeDto two = Dtos.asDto(currentSession().get(LibraryType.class, 2));
+    LibraryTypeDto one = Dtos.asDto(currentSession().get(entityType, 1));
+    LibraryTypeDto two = Dtos.asDto(currentSession().get(entityType, 2));
     one.setAbbreviation("ON");
     two.setAbbreviation("TW");
 
@@ -105,7 +105,10 @@ public class LibraryTypeRestControllerST extends AbstractST {
 
 
     List<LibraryType> libraryTypes =
-        (List<LibraryType>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
+        (List<LibraryType>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, Arrays.asList(1, 2));
+    
+    assertEquals(1L, libraryTypes.get(0).getId());
+    assertEquals(2L, libraryTypes.get(1).getId());
     assertEquals("ON", libraryTypes.get(0).getAbbreviation());
     assertEquals("TW", libraryTypes.get(1).getAbbreviation());
   }
@@ -113,25 +116,25 @@ public class LibraryTypeRestControllerST extends AbstractST {
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
     // only admin can update these
-    LibraryTypeDto one = Dtos.asDto(currentSession().get(LibraryType.class, 1));
-    LibraryTypeDto two = Dtos.asDto(currentSession().get(LibraryType.class, 2));
+    LibraryTypeDto one = Dtos.asDto(currentSession().get(entityType, 1));
+    LibraryTypeDto two = Dtos.asDto(currentSession().get(entityType, 2));
     one.setAbbreviation("ON");
     two.setAbbreviation("TW");
 
     List<LibraryTypeDto> dtos = new ArrayList<LibraryTypeDto>();
     dtos.add(one);
     dtos.add(two);
-    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, dtos);
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteLibraryType() throws Exception {
-    testBulkDelete(controllerClass, 28, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 28, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 28, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 28, CONTROLLER_BASE);
   }
 }
