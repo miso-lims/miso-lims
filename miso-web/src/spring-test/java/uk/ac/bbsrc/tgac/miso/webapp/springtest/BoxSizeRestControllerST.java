@@ -46,7 +46,7 @@ import java.util.Date;
 public class BoxSizeRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/boxsizes";
-  private static final Class<BoxSize> controllerClass = BoxSize.class;
+  private static final Class<BoxSize> entityClass = BoxSize.class;
 
 
   private List<BoxSizeDto> makeCreateDtos() {
@@ -55,14 +55,12 @@ public class BoxSizeRestControllerST extends AbstractST {
     dto1.setRows(5);
     dto1.setScannable(false);
     dto1.setBoxType("STORAGE");
-    dto1.setLabel("test 1");
 
     BoxSizeDto dto2 = new BoxSizeDto();
     dto2.setColumns(6);
     dto2.setRows(6);
     dto2.setScannable(false);
     dto2.setBoxType("PLATE");
-    dto2.setLabel("test 2");
 
     List<BoxSizeDto> dtos = new ArrayList<BoxSizeDto>();
     dtos.add(dto1);
@@ -73,26 +71,33 @@ public class BoxSizeRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
-    List<BoxSize> sizes = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
-    assertTrue(sizes.get(0).getRows().equals(5));
-    assertTrue(sizes.get(1).getRows().equals(6));
+    List<BoxSize> sizes = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
+    assertEquals(5, sizes.get(0).getRows().intValue());
+    assertEquals(5, sizes.get(0).getColumns().intValue());
+    assertEquals("STORAGE", sizes.get(0).getBoxType().toString());
+    assertEquals(false, sizes.get(0).getScannable());
 
+
+    assertEquals(6, sizes.get(1).getRows().intValue());
+    assertEquals(6, sizes.get(1).getColumns().intValue());
+    assertEquals("PLATE", sizes.get(1).getBoxType().toString());
+    assertEquals(false, sizes.get(1).getScannable());
   }
 
   @Test
   public void testBulkCreateFail() throws Exception {
     // box size creation is for admin only, so this test is expecting failure due to insufficent
     // permission
-    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
-    BoxSizeDto size2 = Dtos.asDto(currentSession().get(controllerClass, 2));
-    BoxSizeDto size3 = Dtos.asDto(currentSession().get(controllerClass, 3));
+    BoxSizeDto size2 = Dtos.asDto(currentSession().get(entityClass, 2));
+    BoxSizeDto size3 = Dtos.asDto(currentSession().get(entityClass, 3));
 
-    size2.setRows(17);
+    size2.setRows(15);
     size3.setRows(17);
 
     List<BoxSizeDto> dtos = new ArrayList<BoxSizeDto>();
@@ -100,24 +105,39 @@ public class BoxSizeRestControllerST extends AbstractST {
     dtos.add(size3);
 
     List<BoxSize> sizes =
-        (List<BoxSize>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(2, 3));
+        (List<BoxSize>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, Arrays.asList(2, 3));
 
-    assertTrue(sizes.get(0).getRows().equals(17));
-    assertTrue(sizes.get(1).getRows().equals(17));
+    assertEquals(2L, sizes.get(0).getId());
+    assertEquals(3L, sizes.get(1).getId());
+    assertEquals(15, sizes.get(0).getRows().intValue());
+    assertEquals(17, sizes.get(1).getRows().intValue());
+  }
 
+  @Test
+  public void testBulkUpdateAsyncFail() throws Exception {
+    BoxSizeDto size2 = Dtos.asDto(currentSession().get(entityClass, 2));
+    BoxSizeDto size3 = Dtos.asDto(currentSession().get(entityClass, 3));
+
+    size2.setRows(15);
+    size3.setRows(17);
+
+    List<BoxSizeDto> dtos = new ArrayList<BoxSizeDto>();
+    dtos.add(size2);
+    dtos.add(size3);
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
   }
 
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteArray() throws Exception {
-    testBulkDelete(controllerClass, 3, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 3, CONTROLLER_BASE);
   }
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 3, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 3, CONTROLLER_BASE);
   }
 
 
