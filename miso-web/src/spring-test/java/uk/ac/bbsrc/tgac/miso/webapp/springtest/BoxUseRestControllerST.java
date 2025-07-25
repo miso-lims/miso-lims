@@ -46,7 +46,7 @@ import java.util.Date;
 public class BoxUseRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/boxuses";
-  private static final Class<BoxUse> controllerClass = BoxUse.class;
+  private static final Class<BoxUse> entityClass = BoxUse.class;
 
 
   private List<BoxUseDto> makeCreateDtos() {
@@ -65,7 +65,7 @@ public class BoxUseRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
-    List<BoxUse> uses = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    List<BoxUse> uses = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
     assertEquals("use 1", uses.get(0).getAlias());
     assertEquals("use 2", uses.get(1).getAlias());
   }
@@ -74,14 +74,14 @@ public class BoxUseRestControllerST extends AbstractST {
   public void testBulkCreateFail() throws Exception {
     // box use creation is for admin only, so this test is expecting failure due to insufficent
     // permission
-    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
-    BoxUseDto dna = Dtos.asDto(currentSession().get(controllerClass, 1));
-    BoxUseDto rna = Dtos.asDto(currentSession().get(controllerClass, 2));
+    BoxUseDto dna = Dtos.asDto(currentSession().get(entityClass, 1));
+    BoxUseDto rna = Dtos.asDto(currentSession().get(entityClass, 2));
 
     dna.setAlias("deoxy");
     rna.setAlias("non-deoxy");
@@ -91,23 +91,40 @@ public class BoxUseRestControllerST extends AbstractST {
     dtos.add(rna);
 
     List<BoxUse> uses =
-        (List<BoxUse>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
+        (List<BoxUse>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, Arrays.asList(1, 2));
 
+    assertEquals(1L, uses.get(0).getId());
+    assertEquals(2L, uses.get(1).getId());
     assertEquals("deoxy", uses.get(0).getAlias());
     assertEquals("non-deoxy", uses.get(1).getAlias());
+  }
+
+  @Test
+  public void testBulkUpdateFail() throws Exception {
+    BoxUseDto dna = Dtos.asDto(currentSession().get(entityClass, 1));
+    BoxUseDto rna = Dtos.asDto(currentSession().get(entityClass, 2));
+
+    dna.setAlias("deoxy");
+    rna.setAlias("non-deoxy");
+
+    List<BoxUseDto> dtos = new ArrayList<BoxUseDto>();
+    dtos.add(dna);
+    dtos.add(rna);
+
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
   }
 
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteArray() throws Exception {
-    testBulkDelete(controllerClass, 6, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 6, CONTROLLER_BASE);
   }
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 6, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 6, CONTROLLER_BASE);
   }
 
 
