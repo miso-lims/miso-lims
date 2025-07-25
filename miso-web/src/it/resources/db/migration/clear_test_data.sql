@@ -144,4 +144,5 @@ DELETE FROM ApiKey;
 DELETE FROM Attachment;
 DELETE FROM Sample_Attachment;
 DELETE FROM Contact;
+DELETE FROM MetricSubcategory;
 SET FOREIGN_KEY_CHECKS=1;
