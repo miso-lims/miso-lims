@@ -56,12 +56,15 @@ public class GroupRestControllerST extends AbstractST {
     List<Long> ids = new ArrayList<Long>();
     ids.add(1L);
     ids.add(4L);
+    int initial = currentSession().get(controllerClass, 2).getUsers().size();
+
 
     getMockMvc().perform(post(CONTROLLER_BASE + "/2/users").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
       .andExpect(status().isOk());
 
     Group expanded = currentSession().get(controllerClass, 2);
-    assertEquals(expanded.getUsers().size(), 3);    
+    assertEquals(3, expanded.getUsers().size());
+    assertEquals(2, expanded.getUsers().size() - initial);
   }
 
   @Test
