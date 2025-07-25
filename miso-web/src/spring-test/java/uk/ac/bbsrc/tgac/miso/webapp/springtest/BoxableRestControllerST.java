@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import javax.ws.rs.core.MediaType;
 
+import org.apache.logging.log4j.core.util.Integers;
 import org.checkerframework.checker.units.qual.Temperature;
 import org.junit.Before;
 
@@ -54,19 +55,34 @@ public class BoxableRestControllerST extends AbstractST {
   public void testQueryByBox() throws Exception {
     // queries for a specific box and returns the contents
 
-    List<String> boxableNames = new ArrayList<String>();
-    boxableNames.add("BOX1");
+    List<String> boxNames = new ArrayList<String>();
+    boxNames.add("BOX1");
+    List<Integer> ids = Arrays.asList(205, 206, 204, 2, 3, 4, 7, 8, 1, 1, 1);
+    List<String> entityTypes = Arrays.asList("SAMPLE", "SAMPLE", "SAMPLE", "SAMPLE", "SAMPLE", "SAMPLE", "SAMPLE",
+        "SAMPLE", "LIBRARY", "LIBRARY_ALIQUOT", "POOL");
 
-    getMockMvc().perform(post(CONTROLLER_BASE + "/query-by-box").contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)
-        .content(makeJson(boxableNames)))
+    ResultActions ac = getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/query-by-box").contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(makeJson(boxNames)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.*", hasSize(11)))
-        .andExpect(jsonPath("$[0].alias").value("SORT_0001_nn_n_1-1_D_2"))
-        .andExpect(jsonPath("$[0].entityType").value("SAMPLE"))
-        .andExpect(jsonPath("$[1].id").value(206))
-        .andExpect(jsonPath("$[1].name").value("SAM206"))
-        .andExpect(jsonPath("$[10].entityType").value("POOL"))
-        .andExpect(jsonPath("$[10].boxPosition").value("First Box - C03"));
+        .andDo(print())
+        .andExpect(jsonPath("$.*", hasSize(11)));
+
+    for (int i = 0; i < ids.size(); i++) {
+      ac = ac.andExpect(jsonPath("$[" + i + "].id").value(ids.get(i)));
+      ac = ac.andExpect(jsonPath("$[" + i + "].entityType").value(entityTypes.get(i)));
+
+    }
+  }
+
+  public void testQueryDoesntExist() throws Exception {
+    List<String> boxNames = Arrays.asList("fake");
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/query-by-box").contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(makeJson(boxNames)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.*", hasSize(0)));
   }
 }
