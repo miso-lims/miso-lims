@@ -66,7 +66,6 @@ public class BoxableRestControllerST extends AbstractST {
             .accept(MediaType.APPLICATION_JSON)
             .content(makeJson(boxNames)))
         .andExpect(status().isOk())
-        .andDo(print())
         .andExpect(jsonPath("$.*", hasSize(11)));
 
     for (int i = 0; i < ids.size(); i++) {
