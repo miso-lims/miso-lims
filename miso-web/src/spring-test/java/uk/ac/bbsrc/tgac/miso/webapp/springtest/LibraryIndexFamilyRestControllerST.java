@@ -52,7 +52,7 @@ import java.util.Date;
 public class LibraryIndexFamilyRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/libraryindexfamilies";
-  private static final Class<LibraryIndexFamily> controllerClass = LibraryIndexFamily.class;
+  private static final Class<LibraryIndexFamily> entityClass = LibraryIndexFamily.class;
 
   private LibraryIndexFamilyDto makeCreateDto() {
 
@@ -71,15 +71,15 @@ public class LibraryIndexFamilyRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testCreate() throws Exception {
-    LibraryIndexFamily fam = baseTestCreate(CONTROLLER_BASE, makeCreateDto(), controllerClass, 200);
-    assertEquals(fam.getName(), "one");
+    LibraryIndexFamily fam = baseTestCreate(CONTROLLER_BASE, makeCreateDto(), entityClass, 200);
+    assertEquals("one", fam.getName());
   }
 
   @Test
   public void testCreateFail() throws Exception {
     // LibraryIndexFamily creation is for admin only, so this test is expecting failure due to
     // insufficent permission
-    testCreateUnauthorized(CONTROLLER_BASE, makeCreateDto(), controllerClass);
+    testCreateUnauthorized(CONTROLLER_BASE, makeCreateDto(), entityClass);
   }
 
   @Test
@@ -89,7 +89,7 @@ public class LibraryIndexFamilyRestControllerST extends AbstractST {
     LibraryIndexFamilyDto single = Dtos.asDto(currentSession().get(LibraryIndexFamily.class, 1));
     single.setName("single");
 
-    LibraryIndexFamily updated = baseTestUpdate(CONTROLLER_BASE, single, 1, controllerClass);
+    LibraryIndexFamily updated = baseTestUpdate(CONTROLLER_BASE, single, 1, entityClass);
     assertEquals("single", updated.getName());
   }
 
@@ -99,17 +99,17 @@ public class LibraryIndexFamilyRestControllerST extends AbstractST {
     LibraryIndexFamilyDto single = Dtos.asDto(currentSession().get(LibraryIndexFamily.class, 1));
     single.setName("single");
 
-    testUpdateUnauthorized(CONTROLLER_BASE, single, 1, controllerClass);
+    testUpdateUnauthorized(CONTROLLER_BASE, single, 1, entityClass);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteLibraryIndexFamily() throws Exception {
-    testBulkDelete(controllerClass, 4, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 4, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 4, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 4, CONTROLLER_BASE);
   }
 }
