@@ -35,10 +35,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.MultiValueMap;
 import org.hibernate.Session;
+import org.hibernate.engine.jdbc.env.spi.IdentifierCaseStrategy;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.transaction.Transactional;
+import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.webapp.context.MisoAppListener;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
@@ -75,6 +78,13 @@ public abstract class AbstractST {
 
   private static final String CLEAR_DATA_SCRIPT = "clear_test_data.sql";
   private static final String DETAILED_SCRIPT = "integration_test_data.sql";
+
+  private static final boolean DEBUG_MODE;
+
+  static {
+    DEBUG_MODE = Boolean.parseBoolean(System.getProperty("debug", "false"));
+    // this allows debug mode to be turned on via command line args, i.e. -Ddebug=true
+  }
 
   private static Boolean constantsComplete = false;
 
@@ -185,6 +195,9 @@ public abstract class AbstractST {
     for (int id : ids) {
       T obj = currentSession().get(updateType, id);
       assertNotNull(obj);
+      // asserts the id to ensure the order of object ids is the same order as the list of ids given
+      // this removes the need for id checking in update
+      assertEquals((long) id, ((Identifiable) obj).getId());
       objects.add(obj);
     }
     return objects;
@@ -201,26 +214,32 @@ public abstract class AbstractST {
   private String pollingResponserHelper(String requestType, List<?> dtos, String controllerBase) throws Exception {
     // helper method for async requests
     MvcResult mvcResult;
+    ResultActions ac;
     switch (requestType) {
       case "post":
-        mvcResult = getMockMvc()
-            .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
-            .andExpect(status().isAccepted())
-            .andReturn();
+        ac = getMockMvc()
+            .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
+        if (DEBUG_MODE)
+          ac.andDo(print());
+
+        mvcResult = ac.andExpect(status().isAccepted()).andReturn();
         break;
 
       case "put":
-        mvcResult = getMockMvc()
-            .perform(put(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
-            .andExpect(status().isAccepted())
-            .andReturn();
+        ac = getMockMvc()
+            .perform(put(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
+        if (DEBUG_MODE)
+          ac.andDo(print());
 
+        mvcResult = ac.andExpect(status().isAccepted()).andReturn();
         break;
       default:
-        mvcResult = getMockMvc()
-            .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)))
-            .andExpect(status().isAccepted())
-            .andReturn();
+        ac = getMockMvc()
+            .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
+        if (DEBUG_MODE)
+          ac.andDo(print());
+
+        mvcResult = ac.andExpect(status().isAccepted()).andReturn();
         break;
     }
 
@@ -235,9 +254,13 @@ public abstract class AbstractST {
 
     assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
 
-    getMockMvc()
-        .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)))
-        .andExpect(status().isNoContent());
+    ResultActions ac = getMockMvc()
+        .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)));
+
+    if (DEBUG_MODE)
+      ac.andDo(print());
+
+    ac.andExpect(status().isNoContent());
 
     // now check that the lab was actually deleted
     assertNull(currentSession().get(deleteType, id));
@@ -248,21 +271,28 @@ public abstract class AbstractST {
 
     assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
 
-    getMockMvc()
-        .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)))
-        .andExpect(status().isUnauthorized());
+    ResultActions ac = getMockMvc()
+        .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)));
+
+    if (DEBUG_MODE)
+      ac.andDo(print());
+
+    ac.andExpect(status().isUnauthorized());
     // this user doesn't have permissions to delete things
   }
 
   protected <T, D> T baseTestCreate(String controllerBase, D dto, Class<T> controllerClass, int status)
       throws Exception {
 
-    MvcResult result = getMockMvc()
-        .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
-        .andExpect(status().is(status)) // either created (201) or OK (200) dependening on the controller
+    ResultActions ac = getMockMvc()
+        .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
+
+    if (DEBUG_MODE)
+      ac.andDo(print());
+
+    MvcResult result = ac.andExpect(status().is(status))
         .andExpect(jsonPath("$").exists())
         .andReturn();
-
     Integer id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
 
     T obj = currentSession().get(controllerClass, id);
@@ -272,17 +302,23 @@ public abstract class AbstractST {
 
   protected <T, D> void testCreateUnauthorized(String controllerBase, D dto, Class<T> controllerClass)
       throws Exception {
-    getMockMvc()
-        .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
-        .andExpect(status().isUnauthorized());
+    ResultActions ac = getMockMvc()
+        .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
+
+    if (DEBUG_MODE)
+      ac.andDo(print());
+    ac.andExpect(status().isUnauthorized());
   }
 
 
   protected <T, D> T baseTestUpdate(String controllerBase, D dto, int id, Class<T> controllerClass)
       throws Exception {
-    getMockMvc()
-        .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
-        .andExpect(status().isOk());
+    ResultActions ac = getMockMvc()
+        .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
+    if (DEBUG_MODE)
+      ac.andDo(print());
+
+    ac.andExpect(status().isOk());
 
     assertNotNull(currentSession().get(controllerClass, id));
     return currentSession().get(controllerClass, id);
@@ -290,9 +326,11 @@ public abstract class AbstractST {
 
   protected <T, D> void testUpdateUnauthorized(String controllerBase, D dto, int id, Class<T> updateType)
       throws Exception {
-    getMockMvc()
-        .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
-        .andExpect(status().isUnauthorized());
+    ResultActions ac = getMockMvc()
+        .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
+    if (DEBUG_MODE)
+      ac.andDo(print());
+    ac.andExpect(status().isUnauthorized());
   }
 
   private static MultiValueMap searchTerm(String term) {
@@ -303,8 +341,11 @@ public abstract class AbstractST {
 
   protected void baseSearchByTerm(String url, MultiValueMap params, List<Integer> ids)
       throws Exception {
-    String response = getMockMvc().perform(get(url).params(params).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
+    ResultActions ac = getMockMvc().perform(get(url).params(params).accept(MediaType.APPLICATION_JSON));
+    if (DEBUG_MODE)
+      ac.andDo(print());
+
+    String response = ac.andExpect(status().isOk())
         .andExpect(jsonPath("$").exists())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.*", hasSize(ids.size())))
@@ -325,8 +366,11 @@ public abstract class AbstractST {
         .param("mDataProp_0", dataProp)
         .param("sSortDir_0", "asc")
         .param("iSortCol_0", Integer.toString(sortCol))
-        .param("sEcho", "1"))
-        .andExpect(status().isOk())
+        .param("sEcho", "1"));
+    if (DEBUG_MODE)
+      ac.andDo(print());
+
+    ac.andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$").exists())
         .andExpect(jsonPath("$.iTotalRecords").value(ids.size()));
@@ -361,11 +405,14 @@ public abstract class AbstractST {
   protected ResultActions baseTestGetById(String controllerBase, int id) throws Exception {
 
     ResultActions result =
-        getMockMvc().perform(get(controllerBase + "/" + Integer.toString(id)).accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$").exists())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.id").value(id));
+        getMockMvc().perform(get(controllerBase + "/" + Integer.toString(id)).accept(MediaType.APPLICATION_JSON));
+    if (DEBUG_MODE)
+      result.andDo(print());
+
+    result.andExpect(status().isOk())
+        .andExpect(jsonPath("$").exists())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.id").value(id));
 
     return result;
   }

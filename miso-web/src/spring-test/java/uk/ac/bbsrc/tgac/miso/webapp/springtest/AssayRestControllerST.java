@@ -74,19 +74,19 @@ public class AssayRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testUpdate() throws Exception {
     // must be admin to change an assay
-    Assay assay = currentSession().get(controllerClass, 1);
+    AssayDto assay = AssayDto.from(currentSession().get(controllerClass, 1));
 
     assay.setAlias("modified");
-    Assay updatedAssay = baseTestUpdate(CONTROLLER_BASE, Dtos.asDto(assay), 1, controllerClass);
+    Assay updatedAssay = baseTestUpdate(CONTROLLER_BASE, assay, 1, controllerClass);
     assertEquals("modified", updatedAssay.getAlias());
   }
 
   @Test
   public void testUpdateFail() throws Exception {
-    Assay assay = currentSession().get(controllerClass, 1);
+    AssayDto assay = AssayDto.from(currentSession().get(controllerClass, 1));
 
     assay.setAlias("modified");
-    testUpdateUnauthorized(CONTROLLER_BASE, Dtos.asDto(assay), 1, controllerClass);
+    testUpdateUnauthorized(CONTROLLER_BASE, assay, 1, controllerClass);
   }
 
   @Test
