@@ -56,7 +56,7 @@ import java.time.LocalDate;
 public class ExperimentRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/experiments";
-  private static final Class<Experiment> controllerClass = Experiment.class;
+  private static final Class<Experiment> entityClass = Experiment.class;
 
 
   @Test
@@ -68,7 +68,11 @@ public class ExperimentRestControllerST extends AbstractST {
         .perform(post(CONTROLLER_BASE + "/2/addkit").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
-    assertEquals(currentSession().get(controllerClass, 2).getKits().size(), 1);
+    Experiment added = currentSession().get(entityClass, 2);
+    assertEquals(1, added.getKits().size());
+    assertEquals(kit.getId(), added.getKits().iterator().next().getId());
+    assertEquals(kit.getName(), added.getKits().iterator().next().getName());
+    // just checking that the right kit was added to the experiment
   }
 
   @Test
@@ -76,7 +80,7 @@ public class ExperimentRestControllerST extends AbstractST {
     getMockMvc().perform(post(CONTROLLER_BASE + "/2/add").param("runId", "1").param("partitionId", "11"))
         .andExpect(status().isOk());
 
-    Experiment exp2 = currentSession().get(controllerClass, 2);
+    Experiment exp2 = currentSession().get(entityClass, 2);
     assertEquals(exp2.getRunPartitions().get(0).getRun(), currentSession().get(Run.class, 1));
   }
 
@@ -105,37 +109,46 @@ public class ExperimentRestControllerST extends AbstractST {
   @Test
   public void testCreate() throws Exception {
     ExperimentDto dto = new ExperimentDto();
-    dto.setName("test experiment");
     dto.setTitle("title");
     dto.setInstrumentModel(Dtos.asDto(currentSession().get(InstrumentModel.class, 2)));
     dto.setLibrary(Dtos.asDto(currentSession().get(LibraryImpl.class, 1), false));
     dto.setPartitions(new ArrayList<RunPartitionDto>());
     dto.setStudy(Dtos.asDto(currentSession().get(StudyImpl.class, 3)));
-    Experiment exp = baseTestCreate(CONTROLLER_BASE, dto, controllerClass, 200);
+    Experiment exp = baseTestCreate(CONTROLLER_BASE, dto, entityClass, 200);
 
-    assertEquals("title", exp.getTitle());
+    assertEquals(dto.getTitle(), exp.getTitle());
+    assertEquals(dto.getInstrumentModel().getId(), exp.getInstrumentModel().getId());
+    assertEquals((long) dto.getLibrary().getId(), exp.getLibrary().getId());
+    assertTrue(exp.getRunPartitions().isEmpty());
+    assertEquals((long) dto.getStudy().getId(), exp.getStudy().getId());
+
   }
 
   @Test
   public void testUpdate() throws Exception {
-    Experiment exp = currentSession().get(controllerClass, 3);
+    Experiment exp = currentSession().get(entityClass, 3);
 
     exp.setTitle("updated");
 
-    Experiment updated = baseTestUpdate(CONTROLLER_BASE, Dtos.asDto(exp), 3, controllerClass);
-    assertEquals("updated", exp.getTitle());
+    Experiment updated = baseTestUpdate(CONTROLLER_BASE, Dtos.asDto(exp), 3, entityClass);
+    assertEquals("updated", exp.getTitle()); // the only thing that has been modified is the title
+    assertEquals(exp.getAlias(), updated.getAlias());
+    assertEquals(exp.getTitle(), updated.getTitle());
+    assertEquals(exp.getChangeLog(), updated.getChangeLog());
+    assertEquals(exp.getAccession(), updated.getAccession());
+    assertEquals(exp.getDescription(), updated.getDescription());
   }
 
 
   @Test
   public void testDelete() throws Exception {
     // must be creator or admin to delete experiment
-    testBulkDelete(controllerClass, 3, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 3, CONTROLLER_BASE);
   }
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 3, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 3, CONTROLLER_BASE);
   }
 }
