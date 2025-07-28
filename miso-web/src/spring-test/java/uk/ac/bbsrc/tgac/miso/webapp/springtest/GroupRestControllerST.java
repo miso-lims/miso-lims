@@ -120,7 +120,8 @@ public class GroupRestControllerST extends AbstractST {
 
 
     Group newGroup = baseTestCreate(CONTROLLER_BASE, group, entityClass, 200);
-    assertEquals("new group", newGroup.getName());
+    assertEquals(group.getName(), newGroup.getName());
+    assertEquals(group.getDescription(), newGroup.getDescription());
   }
 
   @Test
@@ -139,19 +140,19 @@ public class GroupRestControllerST extends AbstractST {
     // must be admin to change an Group
 
 
-    Group group = currentSession().get(entityClass, 1);
+    GroupDto group = Dtos.asDto(currentSession().get(entityClass, 1));
 
     group.setName("modified");
-    Group updatedGroup = baseTestUpdate(CONTROLLER_BASE, Dtos.asDto(group), 1, entityClass);
+    Group updatedGroup = baseTestUpdate(CONTROLLER_BASE, group, 1, entityClass);
     assertEquals("modified", updatedGroup.getName());
   }
 
   @Test
   public void testUpdateFail() throws Exception {
-    Group group = currentSession().get(entityClass, 1);
+    GroupDto group = Dtos.asDto(currentSession().get(entityClass, 1));
 
     group.setName("modified");
-    testUpdateUnauthorized(CONTROLLER_BASE, Dtos.asDto(group), 1, entityClass);
+    testUpdateUnauthorized(CONTROLLER_BASE, group, 1, entityClass);
   }
 
   @Test
