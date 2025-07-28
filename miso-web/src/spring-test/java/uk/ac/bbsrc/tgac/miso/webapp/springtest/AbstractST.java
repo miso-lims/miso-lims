@@ -263,6 +263,9 @@ public abstract class AbstractST {
     for (Long id : ids) {
       T obj = currentSession().get(updateType, id);
       assertNotNull(obj);
+      // asserts the id to ensure the order of object ids is the same order as the list of ids given
+      // this removes the need for id checking in update
+      assertEquals((long) id, ((Identifiable) obj).getId());
       objects.add(obj);
     }
     return objects;
