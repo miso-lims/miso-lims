@@ -507,6 +507,11 @@ INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
 (3, 'Min Clusters (PF)', 'LIBRARY_QUALIFICATION', 'GT', 'K/lane'),
 (4, 'To Delete', 'FULL_DEPTH_SEQUENCING', 'BOOLEAN', NULL);
 
+
+INSERT INTO Deletion(deletionId, targetType, targetId, description, userId, changeTime) VALUES
+(1, 'Sample', 1700, 'last sample', 3, '2025-07-18 09:35:00');
+
+
 INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) VALUES
 (1, 1, NULL, NULL),
 (1, 2, 10, NULL),
