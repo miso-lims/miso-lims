@@ -34,9 +34,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.MultiValueMap;
 import org.hibernate.Session;
+import org.hibernate.engine.jdbc.env.spi.IdentifierCaseStrategy;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.transaction.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
@@ -197,6 +200,9 @@ public abstract class AbstractST {
     for (Long id : ids) {
       T obj = currentSession().get(updateType, id);
       assertNotNull(obj);
+      // asserts the id to ensure the order of object ids is the same order as the list of ids given
+      // this removes the need for id checking in update
+      assertEquals((long) id, ((Identifiable) obj).getId());
       objects.add(obj);
     }
     return objects;
