@@ -47,7 +47,7 @@ import java.util.Date;
 public class DetailedQcStatusRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/detailedqcstatuses";
-  private static final Class<DetailedQcStatusImpl> controllerClass = DetailedQcStatusImpl.class;
+  private static final Class<DetailedQcStatusImpl> entityClass = DetailedQcStatusImpl.class;
 
   private List<DetailedQcStatusDto> makeCreateDtos() {
     DetailedQcStatusDto stat1 = new DetailedQcStatusDto();
@@ -72,22 +72,29 @@ public class DetailedQcStatusRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
     // must be admin to update
-    List<DetailedQcStatusImpl> statuses = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    List<DetailedQcStatusImpl> statuses = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
     assertEquals("status 1", statuses.get(0).getDescription());
+    assertEquals(false, statuses.get(0).getArchived());
+    assertEquals(true, statuses.get(0).getNoteRequired());
+    assertEquals(true, statuses.get(0).getStatus());
+
     assertEquals("status 2", statuses.get(1).getDescription());
+    assertEquals(false, statuses.get(1).getArchived());
+    assertEquals(false, statuses.get(1).getNoteRequired());
+    assertEquals(false, statuses.get(1).getStatus());
   }
 
   @Test
   public void testBulkCreateFail() throws Exception {
-    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // must be admin to update
-    DetailedQcStatusImpl str = currentSession().get(controllerClass, 5);
-    DetailedQcStatusImpl diagnosis = currentSession().get(controllerClass, 6);
+    DetailedQcStatusImpl str = currentSession().get(entityClass, 5);
+    DetailedQcStatusImpl diagnosis = currentSession().get(entityClass, 6);
     str.setDescription("STR");
     diagnosis.setDescription("diagnosis");
 
@@ -98,17 +105,19 @@ public class DetailedQcStatusRestControllerST extends AbstractST {
 
 
     List<DetailedQcStatusImpl> detailedQcStatuses =
-        (List<DetailedQcStatusImpl>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos,
+        (List<DetailedQcStatusImpl>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
             Arrays.asList(5, 6));
 
+    assertEquals(5L, detailedQcStatuses.get(0).getId());
+    assertEquals(6L, detailedQcStatuses.get(1).getId());
     assertEquals("STR", detailedQcStatuses.get(0).getDescription());
     assertEquals("diagnosis", detailedQcStatuses.get(1).getDescription());
   }
 
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
-    DetailedQcStatusImpl str = currentSession().get(controllerClass, 5);
-    DetailedQcStatusImpl diagnosis = currentSession().get(controllerClass, 6);
+    DetailedQcStatusImpl str = currentSession().get(entityClass, 5);
+    DetailedQcStatusImpl diagnosis = currentSession().get(entityClass, 6);
     str.setDescription("STR");
     diagnosis.setDescription("diagnosis");
 
@@ -116,17 +125,17 @@ public class DetailedQcStatusRestControllerST extends AbstractST {
     dtos.add(Dtos.asDto(str));
     dtos.add(Dtos.asDto(diagnosis));
 
-    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, dtos);
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDelete() throws Exception {
-    testBulkDelete(controllerClass, 10, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 10, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 10, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 10, CONTROLLER_BASE);
   }
 }
