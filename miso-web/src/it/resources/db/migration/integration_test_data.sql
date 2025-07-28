@@ -1298,6 +1298,10 @@ INSERT INTO Deliverable(deliverableId, name, categoryId) VALUES
 (2, 'deliverable2', 2),
 (3, 'To Delete', 1);
 
+INSERT INTO Contact(contactId, name, email) VALUES
+(1, 'Someone', 'someone@example.com'),
+(2, 'Everyone', 'everyone@example.com');
+
 INSERT INTO ContactRole(contactRoleId, name) VALUES
 (2, 'role1'),
 (3, 'role2'),
