@@ -46,7 +46,7 @@ import java.util.Date;
 public class GroupRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/groups";
-  private static final Class<Group> controllerClass = Group.class;
+  private static final Class<Group> entityClass = Group.class;
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
@@ -56,15 +56,16 @@ public class GroupRestControllerST extends AbstractST {
     List<Long> ids = new ArrayList<Long>();
     ids.add(1L);
     ids.add(4L);
-    int initial = currentSession().get(controllerClass, 2).getUsers().size();
+    int initial = currentSession().get(entityClass, 2).getUsers().size();
 
 
-    getMockMvc().perform(post(CONTROLLER_BASE + "/2/users").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
-      .andExpect(status().isOk());
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/2/users").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
 
-    Group expanded = currentSession().get(controllerClass, 2);
+    Group expanded = currentSession().get(entityClass, 2);
     assertEquals(3, expanded.getUsers().size());
-    assertEquals(2, expanded.getUsers().size() - initial);
+    assertEquals(ids.size(), expanded.getUsers().size() - initial);
   }
 
   @Test
@@ -73,8 +74,9 @@ public class GroupRestControllerST extends AbstractST {
     ids.add(1L);
     ids.add(4L);
 
-    getMockMvc().perform(post(CONTROLLER_BASE + "/2/users").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
-      .andExpect(status().isUnauthorized());
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/2/users").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnauthorized());
 
   }
 
@@ -86,11 +88,13 @@ public class GroupRestControllerST extends AbstractST {
     ids.add(3L);
     ids.add(1L);
 
-    getMockMvc().perform(post(CONTROLLER_BASE + "/1/users/remove").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
-      .andExpect(status().isOk());
+    getMockMvc()
+        .perform(
+            post(CONTROLLER_BASE + "/1/users/remove").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
 
-    Group expanded = currentSession().get(controllerClass, 1);
-    assertEquals(0, expanded.getUsers().size());
+    Group shrunk = currentSession().get(entityClass, 1);
+    assertEquals(0, shrunk.getUsers().size());
   }
 
   @Test
@@ -99,8 +103,10 @@ public class GroupRestControllerST extends AbstractST {
     ids.add(3L);
     ids.add(1L);
 
-    getMockMvc().perform(post(CONTROLLER_BASE + "/1/users/remove").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
-      .andExpect(status().isUnauthorized());
+    getMockMvc()
+        .perform(
+            post(CONTROLLER_BASE + "/1/users/remove").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -110,20 +116,20 @@ public class GroupRestControllerST extends AbstractST {
     GroupDto group = new GroupDto();
     group.setName("new group");
     group.setDescription("a new group");
-    
-    
-    Group newGroup = baseTestCreate(CONTROLLER_BASE, group, controllerClass, 200);
+
+
+    Group newGroup = baseTestCreate(CONTROLLER_BASE, group, entityClass, 200);
     assertEquals("new group", newGroup.getName());
   }
 
   @Test
   public void testCreateFail() throws Exception {
-     // must be admin to create a group
+    // must be admin to create a group
     GroupDto group = new GroupDto();
     group.setName("new group");
     group.setDescription("a new group");
-    
-    testCreateUnauthorized(CONTROLLER_BASE, group, controllerClass);
+
+    testCreateUnauthorized(CONTROLLER_BASE, group, entityClass);
   }
 
   @Test
@@ -132,30 +138,30 @@ public class GroupRestControllerST extends AbstractST {
     // must be admin to change an Group
 
 
-    Group group = currentSession().get(controllerClass, 1);
+    Group group = currentSession().get(entityClass, 1);
 
     group.setName("modified");
-    Group updatedGroup = baseTestUpdate(CONTROLLER_BASE, Dtos.asDto(group), 1, controllerClass);
+    Group updatedGroup = baseTestUpdate(CONTROLLER_BASE, Dtos.asDto(group), 1, entityClass);
     assertEquals("modified", updatedGroup.getName());
   }
 
   @Test
   public void testUpdateFail() throws Exception {
-    Group group = currentSession().get(controllerClass, 1);
+    Group group = currentSession().get(entityClass, 1);
 
     group.setName("modified");
-    testUpdateUnauthorized(CONTROLLER_BASE, Dtos.asDto(group), 1, controllerClass);
+    testUpdateUnauthorized(CONTROLLER_BASE, Dtos.asDto(group), 1, entityClass);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDelete() throws Exception {
-    testBulkDelete(controllerClass, 3, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 3, CONTROLLER_BASE);
   }
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 3, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 3, CONTROLLER_BASE);
   }
 }
