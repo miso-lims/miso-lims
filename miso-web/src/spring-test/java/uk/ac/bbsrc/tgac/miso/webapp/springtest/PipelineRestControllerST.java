@@ -87,13 +87,13 @@ public class PipelineRestControllerST extends AbstractST {
     dtos.add(p1);
     dtos.add(p2);
 
-    List<Pipeline> Pipelines =
+    List<Pipeline> pipelines =
         (List<Pipeline>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, Arrays.asList(1, 2));
-    
-    assertEquals(1L, Pipelines.get(0).getId());
-    assertEquals(2L, Pipelines.get(1).getId());
-    assertEquals("p1", Pipelines.get(0).getAlias());
-    assertEquals("p2", Pipelines.get(1).getAlias());
+
+    assertEquals(1L, pipelines.get(0).getId());
+    assertEquals(2L, pipelines.get(1).getId());
+    assertEquals("p1", pipelines.get(0).getAlias());
+    assertEquals("p2", pipelines.get(1).getAlias());
   }
 
   @Test
