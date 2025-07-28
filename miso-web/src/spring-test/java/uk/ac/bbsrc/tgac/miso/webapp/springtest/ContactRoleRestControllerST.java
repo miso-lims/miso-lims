@@ -75,7 +75,6 @@ public class ContactRoleRestControllerST extends AbstractST {
     // insufficient permissions
 
     testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
-
   }
 
   @Test
@@ -98,7 +97,6 @@ public class ContactRoleRestControllerST extends AbstractST {
 
     assertEquals(2L, contactRoles.get(0).getId());
     assertEquals(3L, contactRoles.get(1).getId());
-
     assertEquals("con2", contactRoles.get(0).getName());
     assertEquals("con3", contactRoles.get(1).getName());
   }
@@ -126,12 +124,10 @@ public class ContactRoleRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDelete() throws Exception {
     testBulkDelete(entityClass, 4, CONTROLLER_BASE);
-
   }
 
   @Test
   public void testDeleteFail() throws Exception {
     testDeleteUnauthorized(entityClass, 4, CONTROLLER_BASE);
-
   }
 }
