@@ -46,7 +46,7 @@ import java.util.Date;
 public class DeliverableCategoryRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/deliverablecategories";
-  private static final Class<DeliverableCategory> controllerClass = DeliverableCategory.class;
+  private static final Class<DeliverableCategory> entityClass = DeliverableCategory.class;
 
   private List<DeliverableCategoryDto> makeCreateDtos() {
     DeliverableCategoryDto del1 = new DeliverableCategoryDto();
@@ -62,17 +62,24 @@ public class DeliverableCategoryRestControllerST extends AbstractST {
   }
 
   @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
-    List<DeliverableCategory> delcats = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    List<DeliverableCategory> delcats = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
     assertEquals("delcat1", delcats.get(0).getName());
     assertEquals("delcat2", delcats.get(1).getName());
   }
 
+  @Test
+  public void testCreateUnauthorized() throws Exception {
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
+  }
+
 
   @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
-    DeliverableCategory release = currentSession().get(controllerClass, 1);
-    DeliverableCategory report = currentSession().get(controllerClass, 2);
+    DeliverableCategory release = currentSession().get(entityClass, 1);
+    DeliverableCategory report = currentSession().get(entityClass, 2);
     release.setName("release");
     report.setName("report");
 
@@ -82,21 +89,37 @@ public class DeliverableCategoryRestControllerST extends AbstractST {
 
 
     List<DeliverableCategory> deliverableCategorys =
-        (List<DeliverableCategory>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos,
+        (List<DeliverableCategory>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
             Arrays.asList(1, 2));
 
+    assertEquals(1L, deliverableCategorys.get(0).getId());
+    assertEquals(2L, deliverableCategorys.get(1).getId());
     assertEquals("release", deliverableCategorys.get(0).getName());
     assertEquals("report", deliverableCategorys.get(1).getName());
   }
 
   @Test
+  public void testUpdateUnauthorized() throws Exception {
+    DeliverableCategory release = currentSession().get(entityClass, 1);
+    DeliverableCategory report = currentSession().get(entityClass, 2);
+    release.setName("release");
+    report.setName("report");
+
+    List<DeliverableCategoryDto> dtos = new ArrayList<DeliverableCategoryDto>();
+    dtos.add(DeliverableCategoryDto.from(release));
+    dtos.add(DeliverableCategoryDto.from(report));
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
+
+  }
+
+  @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDelete() throws Exception {
-    testBulkDelete(controllerClass, 3, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 3, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 3, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 3, CONTROLLER_BASE);
   }
 }

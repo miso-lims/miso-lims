@@ -78,6 +78,16 @@ public class DefaultDeliverableCategoryService extends AbstractSaveService<Deliv
   }
 
   @Override
+  protected void authorizeCreate(DeliverableCategory object) throws IOException {
+    authorizationManager.throwIfNonAdmin();;
+  }
+
+  @Override
+  protected void authorizeUpdate(DeliverableCategory object) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+  }
+
+  @Override
   public ValidationResult validateDeletion(DeliverableCategory object) throws IOException {
     ValidationResult result = new ValidationResult();
     long usage = deliverableCategoryDao.getUsage(object);
