@@ -320,7 +320,11 @@ public abstract class AbstractST {
 
     ac.andExpect(status().isOk());
 
-    assertNotNull(currentSession().get(controllerClass, id));
+    T obj = currentSession().get(controllerClass, id);
+
+    assertNotNull(obj);
+    assertEquals(id, (int) ((Identifiable) obj).getId());
+
     return currentSession().get(controllerClass, id);
   }
 
