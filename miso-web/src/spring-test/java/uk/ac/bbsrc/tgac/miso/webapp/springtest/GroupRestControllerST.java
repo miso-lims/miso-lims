@@ -87,13 +87,14 @@ public class GroupRestControllerST extends AbstractST {
     List<Long> ids = new ArrayList<Long>();
     ids.add(3L);
     ids.add(1L);
-
+    Group shrunk = currentSession().get(entityClass, 1);
+    assertTrue(shrunk.getUsers().size() > 0);
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/1/users/remove").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
-    Group shrunk = currentSession().get(entityClass, 1);
+    shrunk = currentSession().get(entityClass, 1);
     assertEquals(0, shrunk.getUsers().size());
   }
 
