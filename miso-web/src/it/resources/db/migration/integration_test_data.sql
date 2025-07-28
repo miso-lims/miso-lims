@@ -509,7 +509,7 @@ INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
 
 
 INSERT INTO Deletion(deletionId, targetType, targetId, description, userId, changeTime) VALUES
-(1700, 'Sample', 1, 'last sample', 3, '2025-07-18 09:35:00');
+(1, 'Sample', 1700, 'last sample', 3, '2025-07-18 09:35:00');
 
 
 INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) VALUES
