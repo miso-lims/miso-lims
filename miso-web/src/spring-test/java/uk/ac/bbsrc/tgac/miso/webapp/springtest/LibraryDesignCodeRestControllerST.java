@@ -51,7 +51,7 @@ import java.util.Date;
 public class LibraryDesignCodeRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/librarydesigncodes";
-  private static final Class<LibraryDesignCode> controllerClass = LibraryDesignCode.class;
+  private static final Class<LibraryDesignCode> entityClass = LibraryDesignCode.class;
 
   private List<LibraryDesignCodeDto> makeCreateDtos() {
 
@@ -76,7 +76,7 @@ public class LibraryDesignCodeRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
-    List<LibraryDesignCode> codes = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    List<LibraryDesignCode> codes = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
     assertEquals(codes.get(0).getCode(), "AB");
     assertEquals(codes.get(1).getCode(), "CD");
   }
@@ -85,7 +85,7 @@ public class LibraryDesignCodeRestControllerST extends AbstractST {
   public void testBulkCreateFail() throws Exception {
     // LibraryDesignCode creation is for admin only, so this test is expecting failure due to
     // insufficent permission
-    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
   }
 
   @Test
@@ -102,7 +102,10 @@ public class LibraryDesignCodeRestControllerST extends AbstractST {
     dtos.add(bt);
 
     List<LibraryDesignCode> libraryDesignCodes =
-        (List<LibraryDesignCode>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 3));
+        (List<LibraryDesignCode>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, Arrays.asList(1, 3));
+
+    assertEquals(1L, libraryDesignCodes.get(0).getId());
+    assertEquals(3L, libraryDesignCodes.get(1).getId());
     assertEquals("BT", libraryDesignCodes.get(0).getCode());
     assertEquals("D6", libraryDesignCodes.get(1).getCode());
   }
@@ -119,17 +122,17 @@ public class LibraryDesignCodeRestControllerST extends AbstractST {
     dtos.add(d6);
     dtos.add(bt);
 
-    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, dtos);
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteLibraryDesignCode() throws Exception {
-    testBulkDelete(controllerClass, 18, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 18, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 18, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 18, CONTROLLER_BASE);
   }
 }
