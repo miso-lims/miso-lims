@@ -417,7 +417,7 @@ public class PoolRestController extends AbstractRestController {
     }
   }
 
-  @GetMapping(value = "platform/{platform}", produces = "application/json")
+  @GetMapping(value = "/platform/{platform}", produces = "application/json")
   @ResponseBody
   public List<PoolDto> getPoolsByPlatform(@PathVariable("platform") String platform, HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
@@ -431,7 +431,7 @@ public class PoolRestController extends AbstractRestController {
     }
   }
 
-  @GetMapping(value = "dt/platform/{platform}", produces = "application/json")
+  @GetMapping(value = "/dt/platform/{platform}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<PoolDto> getDTPoolsByPlatform(@PathVariable("platform") String platform,
       HttpServletRequest request)
@@ -443,7 +443,7 @@ public class PoolRestController extends AbstractRestController {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.platformType(platformType));
   }
 
-  @GetMapping(value = "dt/project/{id}", produces = "application/json")
+  @GetMapping(value = "/dt/project/{id}", produces = "application/json")
   @ResponseBody
   public DataTablesResponseDto<PoolDto> getDTPoolsByProject(@PathVariable("id") Long id, HttpServletRequest request)
       throws IOException {
