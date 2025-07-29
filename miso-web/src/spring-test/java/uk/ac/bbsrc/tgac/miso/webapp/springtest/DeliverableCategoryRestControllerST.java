@@ -78,14 +78,14 @@ public class DeliverableCategoryRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
-    DeliverableCategory release = currentSession().get(entityClass, 1);
-    DeliverableCategory report = currentSession().get(entityClass, 2);
+    DeliverableCategoryDto release = DeliverableCategoryDto.from(currentSession().get(entityClass, 1));
+    DeliverableCategoryDto report = DeliverableCategoryDto.from(currentSession().get(entityClass, 2));
     release.setName("release");
     report.setName("report");
 
     List<DeliverableCategoryDto> dtos = new ArrayList<DeliverableCategoryDto>();
-    dtos.add(DeliverableCategoryDto.from(release));
-    dtos.add(DeliverableCategoryDto.from(report));
+    dtos.add(release);
+    dtos.add(report);
 
 
     List<DeliverableCategory> deliverableCategorys =
@@ -100,14 +100,14 @@ public class DeliverableCategoryRestControllerST extends AbstractST {
 
   @Test
   public void testUpdateUnauthorized() throws Exception {
-    DeliverableCategory release = currentSession().get(entityClass, 1);
-    DeliverableCategory report = currentSession().get(entityClass, 2);
+    DeliverableCategoryDto release = DeliverableCategoryDto.from(currentSession().get(entityClass, 1));
+    DeliverableCategoryDto report = DeliverableCategoryDto.from(currentSession().get(entityClass, 2));
     release.setName("release");
     report.setName("report");
 
     List<DeliverableCategoryDto> dtos = new ArrayList<DeliverableCategoryDto>();
-    dtos.add(DeliverableCategoryDto.from(release));
-    dtos.add(DeliverableCategoryDto.from(report));
+    dtos.add(release);
+    dtos.add(report);
     testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
 
   }
