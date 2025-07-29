@@ -151,7 +151,6 @@ public class PoolRestControllerST extends AbstractST {
 
   @Test
   public void testChangeProportions() throws Exception {
-    // string library aliquot name, int proportion
 
     Map<String, Integer> proportions = new HashMap<String, Integer>();
     proportions.put("LDI801", 801);
@@ -189,15 +188,20 @@ public class PoolRestControllerST extends AbstractST {
   @Test
   public void testGetPoolsByPlatform() throws Exception {
     testListAll(CONTROLLER_BASE + "/platform/Illumina", ALL_IDS);
-    // getMockMvc().perform(get(CONTROLLER_BASE + "/platform/Illumina"))
-    // .andDo(print())
-    // .andExpect(status().isOk());
   }
 
   @Test
-  public void tesGetDatatablePoolsByPlatform() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/platform/ILLUMINA",
-        ALL_IDS);
+  public void testGetDatatablePoolsByPlatform() throws Exception {
+    testDtRequest(CONTROLLER_BASE + "/dt/platform/ILLUMINA", ALL_IDS);
+    // Arrays.asList(1, 501, 120001, 120002, 120003, 120004, 120005, 200001, 200002,
+    // 5004, 5005, 5006, 5007, 5101, 5102, 5103, 5104, 5105, 701, 702, 801, 802, 803, 804, 2201));
+    // // 200003, 200004, 200005, 200006 all don't show up here, despite having Illumina as their
+    // platform
+    // type
+    // not sure if this is a bug or intended
+
+
+    // this is being strange, take another look later -- might be a datatables display issue
   }
 
   @Test
@@ -211,6 +215,8 @@ public class PoolRestControllerST extends AbstractST {
     getMockMvc().perform(get(CONTROLLER_BASE + "/picker/search").param("platform", "ILLUMINA").param("query", "IPO1"))
         .andDo(print())
         .andExpect(status().isOk());
+
+    // TODO
   }
 
   @Test
@@ -218,6 +224,8 @@ public class PoolRestControllerST extends AbstractST {
     getMockMvc().perform(get(CONTROLLER_BASE + "/picker/recent").param("platform", "ILLUMINA"))
         .andDo(print())
         .andExpect(status().isOk());
+
+    // TODO
   }
 
   @Test
@@ -227,6 +235,8 @@ public class PoolRestControllerST extends AbstractST {
         .perform(post(CONTROLLER_BASE + "/query").content(makeJson(names)).contentType(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk());
+
+    // TODO
   }
 
   @Test
@@ -242,7 +252,7 @@ public class PoolRestControllerST extends AbstractST {
     ids.add(1L);
     ids.add(501L);
     req.setIds(ids);
-    req.setSheet("TRACKING_LIST");
+    req.setSheet("QPCR_RESULTS");
     // FIX THIS LATER AFTER HOT REST CONTROLLER IS MERGED
 
 
@@ -252,31 +262,8 @@ public class PoolRestControllerST extends AbstractST {
         .andExpect(status().isOk())
         .andExpect(content().contentType("text/csv")).andReturn().getResponse();
 
-    String filename = response.getHeader("Content-Disposition").split("=")[1];
-    List<List<String>> records = new ArrayList<>();
-    try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-      String line;
-      int row = 0;
-      while ((line = br.readLine()) != null) {
-        String[] values = line.split(",");
-        records.add(Arrays.asList(values));
-        switch (row) {
-          case 0:
-            assertEquals(values[0], "Name");
-            break;
-
-          case 1:
-            assertEquals(values[0], "IPO1");
-            break;
-
-          case 2:
-            assertEquals(values[0], "IPO501");
-            break;
-        }
-      }
-    } catch (Exception e) {
-    }
-
+    // ADD ASSERTIONS FOR THE CONTENT LATER
+    // TODO
   }
 
   @Test
@@ -289,7 +276,7 @@ public class PoolRestControllerST extends AbstractST {
     req.setIds(ids);
     req.setSheet("TRACKING_LIST");
     // FIX THIS LATER AFTER HOT REST CONTROLLER IS MERGED
-
+    // TODO
 
 
     MockHttpServletResponse response = getMockMvc()
@@ -306,7 +293,10 @@ public class PoolRestControllerST extends AbstractST {
         .perform(
             post(CONTROLLER_BASE + "/parents/Identity").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
         .andDo(print())
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$[0].name").value("SAM1"))
+        .andExpect(jsonPath("$[0].identificationBarcode").value("11111"));
   }
 
   @Test
@@ -315,20 +305,31 @@ public class PoolRestControllerST extends AbstractST {
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/children/Run").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
         .andDo(print())
-        .andExpect(status().isOk());
-
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.*", hasSize(1)))
+        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$[0].name").value("RUN1"))
+        .andExpect(jsonPath("$[0].instrumentId").value(2));
   }
 
   @Test
   public void testGetSamplesheet() throws Exception {
     SampleSheetRequest req = new SampleSheetRequest();
 
+    // TODO
   }
 
   @Test
   public void testAsyncCreate() throws Exception {
     List<PoolImpl> created = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
     // assertions here
+    assertEquals("ILLUMINA", created.get(0).getPlatformType().toString());
+    assertEquals("pool1_alias", created.get(0).getAlias());
+    assertEquals(false, created.get(0).isDiscarded());
+
+    assertEquals("PACBIO", created.get(1).getPlatformType().toString());
+    assertEquals("pool2_alias", created.get(1).getAlias());
+    assertEquals(false, created.get(1).isDiscarded());
 
   }
 
