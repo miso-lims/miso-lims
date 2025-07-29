@@ -69,29 +69,24 @@ public class HotRestControllerST extends AbstractST {
         .andExpect(status().isOk())
         .andExpect(content().contentType("text/csv"))
         .andExpect(header().longValue("Content-Length", 83)).andReturn().getResponse();
+    String[][] records = new String[headers.size()][rows.size() + 1];
+    String[] rawRows = response.getContentAsString().split("\r");
 
-    String filename = response.getHeader("Content-Disposition").split("=")[1];
-    List<List<String>> records = new ArrayList<>();
-    try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-      String line;
-      int row = 0;
-      while ((line = br.readLine()) != null) {
-        String[] values = line.split(",");
-        records.add(Arrays.asList(values));
-        if (row == 0) {
-          checkArray(values, headers);
-        } else {
-          checkArray(values, rows.get(row - 1));
-        }
-        row++;
-      }
-    } catch (Exception e) {
+    for (int i = 0; i < rawRows.length; i++) {
+      String s = rawRows[i].replaceAll("\\r", "");
+      s = s.replaceAll("\\n", "");
+      s = s.replaceAll("\"", "");
+      records[i] = s.split(",");
+    }
+    checkArray(records[0], headers);
+    for (int i = 0; i < rows.size(); i++) {
+      checkArray(records[i + 1], rows.get(i));
     }
   }
 
   private void checkArray(String[] values, List<String> expected) {
     for (int i = 0; i < expected.size(); i++) {
-      assertEquals(values[i], expected.get(i));
+      assertEquals(expected.get(i), values[i]);
     }
   }
 
