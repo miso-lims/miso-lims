@@ -59,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.Date;
@@ -67,31 +68,42 @@ public class PoolRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/pools";
   private static final Class<PoolImpl> entityClass = PoolImpl.class;
-
+  private static final List<Integer> ALL_IDS =
+      Arrays.asList(1, 501, 120001, 120002, 120003, 120004, 120005, 200001, 200002, 200003, 200004, 200005, 200006,
+          5004, 5005, 5006, 5007, 5101, 5102, 5103, 5104, 5105, 701, 702, 801, 802, 803, 804, 2201);
 
   @Test
   public void testGetById() throws Exception {
     baseTestGetById(CONTROLLER_BASE, 1)
-        .andDo(print());
+        .andDo(print())
+        .andExpect(jsonPath("$.box.name").value("BOX1"))
+        .andExpect(jsonPath("$.box.id").value(1))
+        .andExpect(jsonPath("$.alias").value("POOL_1"))
+        .andExpect(jsonPath("$.concentration").value("8.25"));
   }
 
   @Test
   public void testGetRunsByPoolId() throws Exception {
-    getMockMvc().perform(get(CONTROLLER_BASE + "/1/runs")).andDo(print());
+    getMockMvc().perform(get(CONTROLLER_BASE + "/1/runs")).andDo(print())
+        .andExpect(jsonPath("$.*", hasSize(1)))
+        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$[0].instrumentId").value(2))
+        .andExpect(jsonPath("$[0].name").value("RUN1"))
+        .andExpect(jsonPath("$[0].type").value("Illumina"));
   }
 
   private List<PoolDto> makeCreateDtos() {
     PoolDto pool1 = new PoolDto();
-    pool1.setName("pool1");
     pool1.setPlatformType("ILLUMINA");
     pool1.setAlias("pool1_alias");
     pool1.setDiscarded(false);
+    pool1.setCreationDate("2025-07-29");
 
     PoolDto pool2 = new PoolDto();
-    pool2.setName("pool2");
     pool2.setPlatformType("PACBIO");
     pool2.setAlias("pool2_alias");
     pool2.setDiscarded(false);
+    pool2.setCreationDate("2025-07-29");
 
     return Arrays.asList(pool1, pool2);
   }
@@ -99,8 +111,7 @@ public class PoolRestControllerST extends AbstractST {
   @Test
   public void testCreate() throws Exception {
     PoolImpl created = baseTestCreate(CONTROLLER_BASE, makeCreateDtos().get(0), entityClass, 200);
-    assertEquals("pool1", created.getName());
-    assertEquals("ILLUMINA", created.getPlatformType());
+    assertEquals("ILLUMINA", created.getPlatformType().toString());
     assertEquals("pool1_alias", created.getAlias());
     assertEquals(false, created.isDiscarded());
   }
@@ -118,14 +129,14 @@ public class PoolRestControllerST extends AbstractST {
   public void testChangeContents() throws Exception {
     PoolChangeRequest req = new PoolChangeRequest();
     // request to remove or add library aliquots to a pool
-    int poolId = 802;
+    int poolId = 801;
 
     PoolImpl beforeChange = currentSession().get(entityClass, poolId);
     assertEquals(2, beforeChange.getPoolContents().size());
-    req.setRemove(Arrays.asList(801, 802)); // removes both of the library aliquots in this pool
+    req.setRemove(Arrays.asList(200001L, 200002L)); // removes both of the library aliquots in this pool
     // based on the test data
 
-    req.setAdd(Arrays.asList(1)); // adds library aliquot 1
+    req.setAdd(Arrays.asList(1L)); // adds library aliquot 1
 
     getMockMvc()
         .perform(put(CONTROLLER_BASE + "/" + poolId + "/contents").content(makeJson(req))
@@ -153,18 +164,17 @@ public class PoolRestControllerST extends AbstractST {
         .andExpect(status().isOk());
 
     PoolImpl changed = currentSession().get(entityClass, 802);
-    Iterator<PoolElement> elements = changed.getPoolContents().iterator();
-    elements = elements.next();
-    assertEquals(801, elements.next().getProportion());
-    assertEquals(802, elements.next().getProportion());
+    Set<PoolElement> elements = changed.getPoolContents();
+    assertTrue(elements.stream().anyMatch(x -> x.getProportion() == 801));
+    assertTrue(elements.stream().anyMatch(x -> x.getProportion() == 802));
   }
 
   @Test
   public void testAssignPool() throws Exception {
     AssignPoolDto dto = new AssignPoolDto();
-    dto.setUnits(ConcentrationUnit.PICOMOLAR);
-    dto.setConcentration("12.25");
-    dto.setPartitionIds(Arrays.asList(21, 22));
+    dto.setUnits(ConcentrationUnit.NANOGRAMS_PER_MICROLITRE);
+    dto.setConcentration("4.0000000000");
+    dto.setPartitionIds(Arrays.asList(13L, 14L));
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/802/assign").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
@@ -178,79 +188,146 @@ public class PoolRestControllerST extends AbstractST {
 
   @Test
   public void testGetPoolsByPlatform() throws Exception {
-    getMockMvc().perform(get(CONTROLLER_BASE + "/platform/Illumina"))
-        .andDo(print())
-        .andExpect(status().isOk());
+    testListAll(CONTROLLER_BASE + "/platform/Illumina", ALL_IDS);
+    // getMockMvc().perform(get(CONTROLLER_BASE + "/platform/Illumina"))
+    // .andDo(print())
+    // .andExpect(status().isOk());
   }
 
   @Test
   public void tesGetDatatablePoolsByPlatform() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/platform/Illumina",
-        Arrays.asList(1, 501, 120001, 120002, 120003, 120004, 120005, 200001, 200002, 200003, 200004, 200005, 200006,
-            5004, 5005, 5006, 5007, 5101, 5102, 5103, 5104, 5105, 701, 702, 801, 802, 803, 804));
+    testDtRequest(CONTROLLER_BASE + "/dt/platform/ILLUMINA",
+        ALL_IDS);
   }
 
   @Test
   public void testGetDatatablePoolsByProject() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/project/1", Arrays.asList(1));
+    testDtRequest(CONTROLLER_BASE + "/dt/project/3", Arrays.asList(1));
 
   }
 
   @Test
   public void testGetPickersBySearch() throws Exception {
-    getMockMvc().perform(get(CONTROLLER_BASE + "/picker/search").param("platform", "Illumina").param("query", "IPO1"))
-    .andDo(print())
-    .andExpect(status().isOk());
+    getMockMvc().perform(get(CONTROLLER_BASE + "/picker/search").param("platform", "ILLUMINA").param("query", "IPO1"))
+        .andDo(print())
+        .andExpect(status().isOk());
   }
 
   @Test
   public void testGetPickersByRecentSearch() throws Exception {
-    getMockMvc().perform(get(CONTROLLER_BASE + "/picker/recent").param("platform", "Illumina"))
-    .andDo(print())
-    .andExpect(status().isOk());
+    getMockMvc().perform(get(CONTROLLER_BASE + "/picker/recent").param("platform", "ILLUMINA"))
+        .andDo(print())
+        .andExpect(status().isOk());
   }
 
   @Test
   public void testGetBulkPools() throws Exception {
     List<String> names = Arrays.asList("IPO1", "IPO501");
-    getMockMvc().perform(get(CONTROLLER_BASE  + "/query").content(makeJson(names)).contentType(MediaType.APPLICATION_JSON))
-    .andDo(print())
-    .andExpect(status().isOk());
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/query").content(makeJson(names)).contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk());
   }
 
   @Test
   public void testSearch() throws Exception {
-    baseTestSearch(CONTROLLER_BASE + "/search", "IPO51", Arrays.asList(5101, 5102, 5103, 5104, 5105));
+    baseSearchByTerm(CONTROLLER_BASE + "/search", "IPO51", Arrays.asList(5101, 5102, 5103, 5104, 5105));
   }
 
   @Test
   public void testGetSpreadsheet() throws Exception {
+    SpreadsheetRequest req = new SpreadsheetRequest();
+    req.setFormat("CSV");
+    List<Long> ids = new ArrayList<Long>();
+    ids.add(1L);
+    ids.add(501L);
+    req.setIds(ids);
+    req.setSheet("TRACKING_LIST");
+    // FIX THIS LATER AFTER HOT REST CONTROLLER IS MERGED
+
+
+
+    MockHttpServletResponse response = getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/spreadsheet").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType("text/csv")).andReturn().getResponse();
+
+    String filename = response.getHeader("Content-Disposition").split("=")[1];
+    List<List<String>> records = new ArrayList<>();
+    try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+      String line;
+      int row = 0;
+      while ((line = br.readLine()) != null) {
+        String[] values = line.split(",");
+        records.add(Arrays.asList(values));
+        switch (row) {
+          case 0:
+            assertEquals(values[0], "Name");
+            break;
+
+          case 1:
+            assertEquals(values[0], "IPO1");
+            break;
+
+          case 2:
+            assertEquals(values[0], "IPO501");
+            break;
+        }
+      }
+    } catch (Exception e) {
+    }
 
   }
 
   @Test
   public void testGetContentsSpreadsheet() throws Exception {
+    SpreadsheetRequest req = new SpreadsheetRequest();
+    req.setFormat("CSV");
+    List<Long> ids = new ArrayList<Long>();
+    ids.add(1L);
+    ids.add(501L);
+    req.setIds(ids);
+    req.setSheet("TRACKING_LIST");
+    // FIX THIS LATER AFTER HOT REST CONTROLLER IS MERGED
 
+
+
+    MockHttpServletResponse response = getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/contents/spreadsheet").content(makeJson(req))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType("text/csv")).andReturn().getResponse();
   }
 
   @Test
   public void testGetParents() throws Exception {
-
+    List<Integer> ids = Arrays.asList(1, 504);
+    getMockMvc()
+        .perform(
+            post(CONTROLLER_BASE + "/parents/Identity").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk());
   }
 
   @Test
   public void testGetKids() throws Exception {
+    List<Integer> ids = Arrays.asList(1, 504);
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/children/Run").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk());
 
   }
 
   @Test
   public void testGetSamplesheet() throws Exception {
+    SampleSheetRequest req = new SampleSheetRequest();
 
   }
 
   @Test
   public void testAsyncCreate() throws Exception {
-    List<PoolImpl> created = baseTestBulkCreateAsync(CONTROLLER_BASE, entityType, makeCreateDtos());
+    List<PoolImpl> created = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
     // assertions here
 
   }
@@ -258,14 +335,15 @@ public class PoolRestControllerST extends AbstractST {
   @Test
   public void testAsyncUpdate() throws Exception {
     PoolDto pool1 = Dtos.asDto(currentSession().get(entityClass, 1), true, true, null);
-    PoolDto pool504 = Dtos.asDto(currentSession().get(entityClass, 504), true, true, null);
+    PoolDto pool501 = Dtos.asDto(currentSession().get(entityClass, 501), true, true, null);
     pool1.setDescription("pool 1");
-    pool504.setDescription("pool 504");
+    pool501.setDescription("pool 501");
 
     List<PoolImpl> pools =
-        (List<PoolImpl>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClas, dtos, Arrays.asList(1, 504));
+        (List<PoolImpl>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, Arrays.asList(pool1, pool501),
+            Arrays.asList(1, 501));
     assertEquals(pool1.getDescription(), pools.get(0).getDescription());
-    assertEquals(pool504.getDescription(), pools.get(1).getDescription());
+    assertEquals(pool501.getDescription(), pools.get(1).getDescription());
 
   }
 

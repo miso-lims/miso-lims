@@ -262,7 +262,7 @@ public class PoolRestController extends AbstractRestController {
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
 
-  @GetMapping(value = "{poolId}", produces = "application/json")
+  @GetMapping(value = "/{poolId}", produces = "application/json")
   public @ResponseBody PoolDto getPoolById(@PathVariable long poolId) throws IOException {
     return RestUtils.getObject("Pool", poolId, poolService, this::makePoolDto);
   }
@@ -275,7 +275,7 @@ public class PoolRestController extends AbstractRestController {
     return Dtos.asDto(pool, false, false, indexChecker);
   }
 
-  @GetMapping(value = "{poolId}/runs", produces = "application/json")
+  @GetMapping(value = "/{poolId}/runs", produces = "application/json")
   public @ResponseBody List<RunDto> getRunsByPoolId(@PathVariable Long poolId) throws IOException {
     Collection<Run> rr = runService.listByPoolId(poolId);
     return Dtos.asRunDtos(rr);
