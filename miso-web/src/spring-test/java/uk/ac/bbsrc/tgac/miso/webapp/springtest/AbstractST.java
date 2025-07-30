@@ -21,7 +21,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -35,24 +34,18 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.MultiValueMap;
 import org.hibernate.Session;
-import org.hibernate.engine.jdbc.env.spi.IdentifierCaseStrategy;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.servlet.ServletContextEvent;
-import jakarta.transaction.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.webapp.context.MisoAppListener;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 
 import static org.junit.Assert.*;
 import java.util.List;
 import java.util.Arrays;
-import java.util.Collections;
 
 import java.util.ArrayList;
-import java.util.Date;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -82,8 +75,8 @@ public abstract class AbstractST {
   private static final boolean DEBUG_MODE;
 
   static {
-    DEBUG_MODE = Boolean.parseBoolean(System.getProperty("debug", "false"));
-    // this allows debug mode to be turned on via command line args, i.e. -Ddebug=true
+    DEBUG_MODE = Boolean.parseBoolean(System.getProperty("st.debug", "false"));
+    // this allows debug mode to be turned on via command line args, i.e. -Dst.debug=true
   }
 
   private static Boolean constantsComplete = false;
@@ -99,9 +92,6 @@ public abstract class AbstractST {
   @Autowired
   private DataSource dataSource;
 
-  @Mock
-  @Autowired
-  private AuthorizationManager authorizationManager;
 
   private ObjectMapper mapper;
   private ObjectWriter ow;
@@ -219,29 +209,20 @@ public abstract class AbstractST {
       case "post":
         ac = getMockMvc()
             .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
-        if (DEBUG_MODE)
-          ac.andDo(print());
-
-        mvcResult = ac.andExpect(status().isAccepted()).andReturn();
         break;
 
       case "put":
         ac = getMockMvc()
             .perform(put(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
-        if (DEBUG_MODE)
-          ac.andDo(print());
-
-        mvcResult = ac.andExpect(status().isAccepted()).andReturn();
         break;
+
       default:
-        ac = getMockMvc()
-            .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
-        if (DEBUG_MODE)
-          ac.andDo(print());
-
-        mvcResult = ac.andExpect(status().isAccepted()).andReturn();
-        break;
+        throw new RuntimeException("invalid async method specified");
     }
+    if (DEBUG_MODE)
+      ac.andDo(print());
+
+    mvcResult = ac.andExpect(status().isAccepted()).andReturn();
 
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
     String response = pollingResponse(controllerBase + "/bulk/" + id);
@@ -325,7 +306,7 @@ public abstract class AbstractST {
     assertNotNull(obj);
     assertEquals(id, (int) ((Identifiable) obj).getId());
 
-    return currentSession().get(controllerClass, id);
+    return obj;
   }
 
   protected <T, D> void testUpdateUnauthorized(String controllerBase, D dto, int id, Class<T> updateType)
