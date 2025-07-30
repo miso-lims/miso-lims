@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 import javax.print.attribute.standard.Media;
 import javax.ws.rs.core.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-
 import org.checkerframework.checker.units.qual.Temperature;
 import org.junit.Before;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDeletionDao;
@@ -19,6 +18,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.beans.factory.annotation.Value;
+
+
+
 import com.jayway.jsonpath.JsonPath;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -61,6 +66,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.Date;
 
@@ -71,6 +77,9 @@ public class PoolRestControllerST extends AbstractST {
   private static final List<Integer> ALL_IDS =
       Arrays.asList(1, 501, 120001, 120002, 120003, 120004, 120005, 200001, 200002, 200003, 200004, 200005, 200006,
           5004, 5005, 5006, 5007, 5101, 5102, 5103, 5104, 5105, 701, 702, 801, 802, 803, 804, 2201);
+
+  @Value("${miso.pools.samplesheet.dragenVersion}")
+  private String dragenVersion;
 
   @Test
   public void testGetById() throws Exception {
@@ -84,7 +93,8 @@ public class PoolRestControllerST extends AbstractST {
 
   @Test
   public void testGetRunsByPoolId() throws Exception {
-    getMockMvc().perform(get(CONTROLLER_BASE + "/1/runs")).andDo(print())
+    getMockMvc().perform(get(CONTROLLER_BASE + "/1/runs"))
+        .andDo(print())
         .andExpect(jsonPath("$.*", hasSize(1)))
         .andExpect(jsonPath("$[0].id").value(1))
         .andExpect(jsonPath("$[0].instrumentId").value(2))
@@ -187,21 +197,12 @@ public class PoolRestControllerST extends AbstractST {
 
   @Test
   public void testGetPoolsByPlatform() throws Exception {
-    testListAll(CONTROLLER_BASE + "/platform/Illumina", ALL_IDS);
+    testListAll(CONTROLLER_BASE + "/platform/Illumina", ALL_IDS, false);
   }
 
   @Test
   public void testGetDatatablePoolsByPlatform() throws Exception {
     testDtRequest(CONTROLLER_BASE + "/dt/platform/ILLUMINA", ALL_IDS);
-    // Arrays.asList(1, 501, 120001, 120002, 120003, 120004, 120005, 200001, 200002,
-    // 5004, 5005, 5006, 5007, 5101, 5102, 5103, 5104, 5105, 701, 702, 801, 802, 803, 804, 2201));
-    // // 200003, 200004, 200005, 200006 all don't show up here, despite having Illumina as their
-    // platform
-    // type
-    // not sure if this is a bug or intended
-
-
-    // this is being strange, take another look later -- might be a datatables display issue
   }
 
   @Test
@@ -212,20 +213,28 @@ public class PoolRestControllerST extends AbstractST {
 
   @Test
   public void testGetPickersBySearch() throws Exception {
-    getMockMvc().perform(get(CONTROLLER_BASE + "/picker/search").param("platform", "ILLUMINA").param("query", "IPO1"))
-        .andDo(print())
-        .andExpect(status().isOk());
+    MultiValueMap<String, String> params = new LinkedMultiValueMap();
+    params.add("platform", "ILLUMINA");
+    params.add("query", "IPO51");
+    testListAll(CONTROLLER_BASE + "/picker/search", Arrays.asList(5101, 5102, 5103, 5104, 5105), params, true);
 
-    // TODO
   }
 
   @Test
   public void testGetPickersByRecentSearch() throws Exception {
-    getMockMvc().perform(get(CONTROLLER_BASE + "/picker/recent").param("platform", "ILLUMINA"))
-        .andDo(print())
-        .andExpect(status().isOk());
+    MultiValueMap<String, String> params = new LinkedMultiValueMap();
+    params.add("platform", "ILLUMINA");
+    testListAll(CONTROLLER_BASE + "/picker/recent",
+        Arrays.asList(120001, 801, 120002, 120003, 802, 803, 804, 5004, 5101, 5005, 5102, 5006, 5103,
+            5007, 5104, 5105, 501, 2201, 701, 702),
+        params, true);
+    // should only be 20 pools
+    // this pool list was obtained from the request response
 
-    // TODO
+    // getMockMvc().perform(get(CONTROLLER_BASE + "/picker/recent").param("platform", "ILLUMINA"))
+    // .andDo(print())
+    // .andExpect(status().isOk());
+
   }
 
   @Test
@@ -234,9 +243,12 @@ public class PoolRestControllerST extends AbstractST {
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/query").content(makeJson(names)).contentType(MediaType.APPLICATION_JSON))
         .andDo(print())
-        .andExpect(status().isOk());
-
-    // TODO
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.*", hasSize(2)))
+        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$[0].alias").value("POOL_1"))
+        .andExpect(jsonPath("$[1].id").value(501))
+        .andExpect(jsonPath("$[1].alias").value("TIB_Pool"));
   }
 
   @Test
@@ -253,17 +265,12 @@ public class PoolRestControllerST extends AbstractST {
     ids.add(501L);
     req.setIds(ids);
     req.setSheet("QPCR_RESULTS");
-    // FIX THIS LATER AFTER HOT REST CONTROLLER IS MERGED
 
+    List<String> headers = Arrays.asList("Name", "Alias", "Barcode", "Latest qPCR QC");
+    List<List<String>> rows = Arrays.asList(Arrays.asList("IPO1", "POOL_1", "12341"),
+        Arrays.asList("IPO501", "TIB_Pool", "TIB_Pool"));
+    testSpreadsheetContents(CONTROLLER_BASE + "/spreadsheet", req, rows, headers);
 
-
-    MockHttpServletResponse response = getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/spreadsheet").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType("text/csv")).andReturn().getResponse();
-
-    // ADD ASSERTIONS FOR THE CONTENT LATER
-    // TODO
   }
 
   @Test
@@ -272,18 +279,22 @@ public class PoolRestControllerST extends AbstractST {
     req.setFormat("CSV");
     List<Long> ids = new ArrayList<Long>();
     ids.add(1L);
-    ids.add(501L);
     req.setIds(ids);
     req.setSheet("TRACKING_LIST");
-    // FIX THIS LATER AFTER HOT REST CONTROLLER IS MERGED
-    // TODO
+
+    List<String> headers = Arrays.asList("Name", "Alias", "Tissue Origin", "Tissue Type", "Barcode", "Library Name",
+        "Library Alias", "Library Barcode", "Library Type", "Library Design", "Index(es)", "i7 Index", "i5 Index",
+        "Targeted Sequencing", "Sample Name", "Sample Alias", "Sample Barcode", "Identity Name", "Identity Alias",
+        "External Identifier", "Secondary Identifier", "Group ID", "Location");
 
 
-    MockHttpServletResponse response = getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/contents/spreadsheet").content(makeJson(req))
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType("text/csv")).andReturn().getResponse();
+    List<List<String>> rows = Arrays.asList(Arrays.asList("LDI1", "TEST_0001_Bn_R_PE_300_WG", "Bn", "R", "12321",
+        "LIB1", "TEST_0001_Bn_R_PE_300_WG",
+        "11211", "Paired End", "WG", "", "", "", "", "SAM8", "TEST_0001_Bn_R_nn_1-1_D_1", "88888", "SAM1", "TEST_0001",
+        "TEST_external_1", "tube 1", "7357", "First Box - B02"));
+
+
+    testSpreadsheetContents(CONTROLLER_BASE + "/contents/spreadsheet", req, rows, headers);
   }
 
   @Test
@@ -315,8 +326,34 @@ public class PoolRestControllerST extends AbstractST {
   @Test
   public void testGetSamplesheet() throws Exception {
     SampleSheetRequest req = new SampleSheetRequest();
+    req.setPoolIds(Arrays.asList(1L, 501L));
+    req.setExperimentType("CLONE_CHECKING");
+    req.setSequencingParametersId(2L);
+    req.setDragenVersion(dragenVersion);
 
+    String response = getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/samplesheet").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+    System.out.println("\n\n\n RESPONSE HAS " + response.lines().count() + " LINES\n\n\n");
     // TODO
+
+    /*
+     * 
+     * [Header] Index Adapters, IEMFileVersion,5 Experiment Name,POOL_1/TIB_Pool Date,7/30/2025
+     * Instrument Type,HiSeq 2500 Chemistry,Default Workflow,GenerateFASTQ Application,Clone Checking
+     * Assay,Nextera XT
+     * 
+     * [Reads] 151, 151,
+     * 
+     * [Settings], Adapter,CTGTCTCTTATACACATCT
+     * 
+     * [Data], Sample_ID,Lane,Sample_Plate,Sample_Well,I7_Index_ID,index,GenomeFolder,Sample_Project,
+     * Description, TEST_0001_Bn_R_PE_300_WG,1,,,No Index,,,TEST,12321, TIB_0001_nn_n_PE_404_WG,2,,,No
+     * Index,,,TIB,TIB_Dil,
+     * 
+     */
   }
 
   @Test
