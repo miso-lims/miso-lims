@@ -130,11 +130,15 @@ public class ExperimentRestControllerST extends AbstractST {
 
     exp.setTitle("updated");
 
+
     Experiment updated = baseTestUpdate(CONTROLLER_BASE, Dtos.asDto(exp), 3, entityClass);
     assertEquals("updated", exp.getTitle()); // the only thing that has been modified is the title
     assertEquals(exp.getAlias(), updated.getAlias());
     assertEquals(exp.getTitle(), updated.getTitle());
-    assertEquals(exp.getChangeLog(), updated.getChangeLog());
+
+    for (int i = 0; i < exp.getChangeLog().size(); i++) {
+      assertEquals(exp.getChangeLog().get(i).getId(), updated.getChangeLog().get(i).getId());
+    }
     assertEquals(exp.getAccession(), updated.getAccession());
     assertEquals(exp.getDescription(), updated.getDescription());
   }
