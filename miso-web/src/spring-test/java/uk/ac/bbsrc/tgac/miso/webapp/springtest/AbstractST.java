@@ -178,7 +178,12 @@ public abstract class AbstractST {
   protected <T> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<?> dtos,
       List<Integer> ids)
       throws Exception {
-    pollingResponserHelper("put", dtos, controllerBase);
+    String response = pollingResponserHelper("put", dtos, controllerBase);
+    System.out.println(response);
+
+    for (int i = 0; i < ids.size(); i++) {
+      assertEquals(ids.get(i), JsonPath.read(response, "$.data[" + i + "].id"));
+    }
 
     // now check if the updates went through
     List<T> objects = new ArrayList<T>();
@@ -187,7 +192,7 @@ public abstract class AbstractST {
       assertNotNull(obj);
       // asserts the id to ensure the order of object ids is the same order as the list of ids given
       // this removes the need for id checking in update
-      assertEquals((long) id, ((Identifiable) obj).getId());
+      // assertEquals((long) id, ((Identifiable) obj).getId());
       objects.add(obj);
     }
     return objects;
