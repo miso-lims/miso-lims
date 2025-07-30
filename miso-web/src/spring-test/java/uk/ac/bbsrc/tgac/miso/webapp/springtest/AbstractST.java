@@ -54,7 +54,7 @@ import java.util.ArrayList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.PoolRestController.SampleSheetRequest;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -458,7 +458,7 @@ public abstract class AbstractST {
     if (DEBUG_MODE)
       res.andDo(print());
 
-    MockHttpServletResponse response = res.andReturn().getResponse();
+    MockHttpServletResponse response = res.andReturn().getResponse();   
     String[][] records = new String[headers.size()][rows.size() + 1];
     String[] rawRows = response.getContentAsString().split("\r");
 
@@ -474,7 +474,8 @@ public abstract class AbstractST {
     }
   }
 
-  private void checkArray(String[] values, List<String> expected) {
+
+  protected void checkArray(String[] values, List<String> expected) {
     for (int i = 0; i < expected.size(); i++) {
       assertEquals(expected.get(i), values[i]);
     }

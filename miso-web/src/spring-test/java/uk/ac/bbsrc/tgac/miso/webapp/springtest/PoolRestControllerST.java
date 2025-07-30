@@ -22,8 +22,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.beans.factory.annotation.Value;
 
-
-
 import com.jayway.jsonpath.JsonPath;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -66,7 +64,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.Date;
 
@@ -74,9 +71,9 @@ public class PoolRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/pools";
   private static final Class<PoolImpl> entityClass = PoolImpl.class;
-  private static final List<Integer> ALL_IDS =
-      Arrays.asList(1, 501, 120001, 120002, 120003, 120004, 120005, 200001, 200002, 200003, 200004, 200005, 200006,
-          5004, 5005, 5006, 5007, 5101, 5102, 5103, 5104, 5105, 701, 702, 801, 802, 803, 804, 2201);
+  private static final List<Integer> ALL_IDS = Arrays.asList(1, 501, 120001, 120002, 120003, 120004, 120005, 200001,
+      200002, 200003, 200004, 200005, 200006,
+      5004, 5005, 5006, 5007, 5101, 5102, 5103, 5104, 5105, 701, 702, 801, 802, 803, 804, 2201);
 
   @Value("${miso.pools.samplesheet.dragenVersion}")
   private String dragenVersion;
@@ -84,7 +81,6 @@ public class PoolRestControllerST extends AbstractST {
   @Test
   public void testGetById() throws Exception {
     baseTestGetById(CONTROLLER_BASE, 1)
-        .andDo(print())
         .andExpect(jsonPath("$.box.name").value("BOX1"))
         .andExpect(jsonPath("$.box.id").value(1))
         .andExpect(jsonPath("$.alias").value("POOL_1"))
@@ -94,7 +90,6 @@ public class PoolRestControllerST extends AbstractST {
   @Test
   public void testGetRunsByPoolId() throws Exception {
     getMockMvc().perform(get(CONTROLLER_BASE + "/1/runs"))
-        .andDo(print())
         .andExpect(jsonPath("$.*", hasSize(1)))
         .andExpect(jsonPath("$[0].id").value(1))
         .andExpect(jsonPath("$[0].instrumentId").value(2))
@@ -151,7 +146,6 @@ public class PoolRestControllerST extends AbstractST {
     getMockMvc()
         .perform(put(CONTROLLER_BASE + "/" + poolId + "/contents").content(makeJson(req))
             .contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk());
 
     PoolImpl changed = currentSession().get(entityClass, poolId);
@@ -169,7 +163,6 @@ public class PoolRestControllerST extends AbstractST {
     getMockMvc()
         .perform(put(CONTROLLER_BASE + "/802/proportions").content(makeJson(proportions))
             .contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk());
 
     PoolImpl changed = currentSession().get(entityClass, 802);
@@ -187,7 +180,6 @@ public class PoolRestControllerST extends AbstractST {
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/802/assign").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isNoContent());
 
     PoolImpl updated = currentSession().get(entityClass, 802);
@@ -231,7 +223,8 @@ public class PoolRestControllerST extends AbstractST {
     // should only be 20 pools
     // this pool list was obtained from the request response
 
-    // getMockMvc().perform(get(CONTROLLER_BASE + "/picker/recent").param("platform", "ILLUMINA"))
+    // getMockMvc().perform(get(CONTROLLER_BASE +
+    // "/picker/recent").param("platform", "ILLUMINA"))
     // .andDo(print())
     // .andExpect(status().isOk());
 
@@ -242,7 +235,6 @@ public class PoolRestControllerST extends AbstractST {
     List<String> names = Arrays.asList("IPO1", "IPO501");
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/query").content(makeJson(names)).contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.*", hasSize(2)))
         .andExpect(jsonPath("$[0].id").value(1))
@@ -287,12 +279,10 @@ public class PoolRestControllerST extends AbstractST {
         "Targeted Sequencing", "Sample Name", "Sample Alias", "Sample Barcode", "Identity Name", "Identity Alias",
         "External Identifier", "Secondary Identifier", "Group ID", "Location");
 
-
     List<List<String>> rows = Arrays.asList(Arrays.asList("LDI1", "TEST_0001_Bn_R_PE_300_WG", "Bn", "R", "12321",
         "LIB1", "TEST_0001_Bn_R_PE_300_WG",
         "11211", "Paired End", "WG", "", "", "", "", "SAM8", "TEST_0001_Bn_R_nn_1-1_D_1", "88888", "SAM1", "TEST_0001",
         "TEST_external_1", "tube 1", "7357", "First Box - B02"));
-
 
     testSpreadsheetContents(CONTROLLER_BASE + "/contents/spreadsheet", req, rows, headers);
   }
@@ -303,7 +293,6 @@ public class PoolRestControllerST extends AbstractST {
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/parents/Identity").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].id").value(1))
         .andExpect(jsonPath("$[0].name").value("SAM1"))
@@ -315,7 +304,6 @@ public class PoolRestControllerST extends AbstractST {
     List<Integer> ids = Arrays.asList(1, 504);
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/children/Run").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.*", hasSize(1)))
         .andExpect(jsonPath("$[0].id").value(1))
@@ -330,30 +318,35 @@ public class PoolRestControllerST extends AbstractST {
     req.setExperimentType("CLONE_CHECKING");
     req.setSequencingParametersId(2L);
     req.setDragenVersion(dragenVersion);
+    List<String> headers = Arrays.asList("Sample_ID", "Lane", "Sample_Plate", "Sample_Well", "I7_Index_ID", "index",
+        "GenomeFolder", "Sample_Project", "Description");
+    List<List<String>> rows = Arrays.asList(
+        Arrays.asList("TEST_0001_Bn_R_PE_300_WG", "1", "", "", "No Index", "", "", "TEST", "12321"),
+        Arrays.asList("TIB_0001_nn_n_PE_404_WG", "2", "", "", "No Index", "", "", "TIB", "TIB_Dil"));
 
     String response = getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/samplesheet").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        .perform(post(CONTROLLER_BASE + "/samplesheet").content(makeJson(req))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andReturn().getResponse().getContentAsString();
 
-    System.out.println("\n\n\n RESPONSE HAS " + response.lines().count() + " LINES\n\n\n");
-    // TODO
+    response = response.split("\\[Data\\],")[1];
 
-    /*
-     * 
-     * [Header] Index Adapters, IEMFileVersion,5 Experiment Name,POOL_1/TIB_Pool Date,7/30/2025
-     * Instrument Type,HiSeq 2500 Chemistry,Default Workflow,GenerateFASTQ Application,Clone Checking
-     * Assay,Nextera XT
-     * 
-     * [Reads] 151, 151,
-     * 
-     * [Settings], Adapter,CTGTCTCTTATACACATCT
-     * 
-     * [Data], Sample_ID,Lane,Sample_Plate,Sample_Well,I7_Index_ID,index,GenomeFolder,Sample_Project,
-     * Description, TEST_0001_Bn_R_PE_300_WG,1,,,No Index,,,TEST,12321, TIB_0001_nn_n_PE_404_WG,2,,,No
-     * Index,,,TIB,TIB_Dil,
-     * 
-     */
+    String[][] records = new String[headers.size()][rows.size() + 1];
+    String[] rawRows = response.split("\n");
+
+
+    for (int i = 0; i < rawRows.length; i++) {
+      String s = rawRows[i].replaceAll("\\r", "");
+      s = s.replaceAll("\\n", "");
+      s = s.replaceAll("\"", "");
+      records[i] = s.split(",");
+
+    }
+    checkArray(records[1], headers);
+    for (int i = 1; i < rows.size(); i++) {
+      checkArray(records[i + 1], rows.get(i - 1));
+    }
   }
 
   @Test
@@ -377,9 +370,9 @@ public class PoolRestControllerST extends AbstractST {
     pool1.setDescription("pool 1");
     pool501.setDescription("pool 501");
 
-    List<PoolImpl> pools =
-        (List<PoolImpl>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, Arrays.asList(pool1, pool501),
-            Arrays.asList(1, 501));
+    List<PoolImpl> pools = (List<PoolImpl>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
+        Arrays.asList(pool1, pool501),
+        Arrays.asList(1, 501));
     assertEquals(pool1.getDescription(), pools.get(0).getDescription());
     assertEquals(pool501.getDescription(), pools.get(1).getDescription());
 
