@@ -1242,8 +1242,9 @@ INSERT INTO QCType(qcTypeId, name, description, qcTarget, units, archived, preci
 INSERT INTO QcControl(controlId, qcTypeId, alias) VALUES
 (1, 110, 'standard control');
 
-INSERT INTO SampleQC(sample_sampleId, creator, date, type, results, created, lastModified) VALUES
-(2201, 1, '2018-07-10', 101, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
+INSERT INTO SampleQC(qcId, sample_sampleId, creator, date, type, results, created, lastModified) VALUES
+(1, 2201, 1, '2018-07-10', 101, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00'),
+(2, 4447, 3, '2025-07-10', 102, 8.9, '2025-07-10 14:29:00', '2025-07-10 14:29:00');
 
 INSERT INTO WorksetCategory(categoryId, alias) VALUES
 (1, 'Category A'),
