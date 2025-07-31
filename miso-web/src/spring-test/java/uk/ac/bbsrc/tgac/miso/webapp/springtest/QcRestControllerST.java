@@ -41,12 +41,15 @@ public class QcRestControllerST extends AbstractST {
     dto1.setDate("2025-07-30");
     dto1.setQcTypeId(101L);
     dto1.setResults("5.4");
+    dto1.setQcTarget("Sample");
+    
 
     QcDto dto2 = new QcDto();
     dto2.setEntityId(2L);
     dto2.setDate("2025-05-05");
     dto2.setQcTypeId(102L);
     dto2.setResults("9.8");
+    dto2.setQcTarget("Sample");
 
     return Arrays.asList(dto1, dto2);
   }
@@ -64,7 +67,11 @@ public class QcRestControllerST extends AbstractST {
     QcDto dto2 = Dtos.asDto(currentSession().get(entityClass, 2));
 
     dto1.setDescription("updated one");
+    dto1.setQcTarget("Sample");
     dto2.setDescription("updated two");
+    dto2.setQcTarget("Sample");
+    
+    // setting QC target is required for the request to go through properly
 
     List<SampleQC> qcs =
         (List<SampleQC>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, Arrays.asList(dto1, dto2),
@@ -77,7 +84,12 @@ public class QcRestControllerST extends AbstractST {
   @Test
   public void testDelete() throws Exception {
     // only admin or owner can delete
-    testBulkDelete(entityClass, 2, CONTROLLER_BASE);
+    assertNotNull(currentSession().get(entityClass, 2));
+
+    getMockMvc().perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Sample").content(makeJson(Arrays.asList(2L)))
+    .contentType(MediaType.APPLICATION_JSON))
+     .andExpect(status().isNoContent());
+    assertNull(currentSession().get(entityClass, 2));
   }
 
 
