@@ -90,7 +90,7 @@ public class DeliverableCategoryRestControllerST extends AbstractST {
 
     List<DeliverableCategory> deliverableCategorys =
         (List<DeliverableCategory>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
-            Arrays.asList(1, 2));
+            DeliverableCategoryDto::getId);
 
     assertEquals(1L, deliverableCategorys.get(0).getId());
     assertEquals(2L, deliverableCategorys.get(1).getId());

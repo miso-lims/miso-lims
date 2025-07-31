@@ -188,7 +188,9 @@ public abstract class AbstractST {
     // check order of returned IDs
     List<Long> ids = dtos.stream().map(getId).toList();
     for (int i = 0; i < ids.size(); i++) {
-      assertEquals(ids.get(i).longValue(), Integer.toUnsignedLong(JsonPath.read(response, "$.data[" + i + "].id")));
+      assertEquals(ids.get(i).longValue(), ((Integer) JsonPath.read(response, "$.data[" + i + "].id")).longValue());
+      // the Integer cast is required, otherwise .longValue cannot be called
+      // since the ids are always Integers as received from the JSON response, this is a safe cast
     }
 
     List<T> objects = new ArrayList<T>();
