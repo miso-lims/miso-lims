@@ -46,14 +46,19 @@ public class QcStatusRestControllerST extends AbstractST {
 
     dto2.setQcStatusId(2L);
     dto2.setQcNote("note 2");
+    getMockMvc()
+        .perform(put(CONTROLLER_BASE + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(Arrays.asList(dto1,dto2))))
+        .andExpect(status().isNoContent());
 
-    List<SampleQcNode> qcsStatuses = (List<SampleQcNode>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
-        Arrays.asList(dto1, dto2), Arrays.asList(1, 2));
+    
+    List<SampleQcNode> qcStatuses = Arrays.asList(currentSession().get(entityClass, 1), currentSession().get(entityClass, 2));
 
-    assertEquals(dto1.getQcStatusId(), qcsStatuses.get(0).getQcStatusId());
-    assertEquals(dto2.getQcStatusId(), qcsStatuses.get(1).getQcStatusId());
-    assertEquals(dto1.getQcNote(), qcsStatuses.get(0).getQcNote());
-    assertEquals(dto2.getQcNote(), qcsStatuses.get(1).getQcNote());
+    assertNotNull(qcStatuses.get(0));
+    assertNotNull(qcStatuses.get(1));
+    assertEquals(dto1.getQcStatusId(), qcStatuses.get(0).getQcStatusId());
+    assertEquals(dto2.getQcStatusId(), qcStatuses.get(1).getQcStatusId());
+    assertEquals(dto1.getQcNote(), qcStatuses.get(0).getQcNote());
+    assertEquals(dto2.getQcNote(), qcStatuses.get(1).getQcNote());
   }
 
   @Test
