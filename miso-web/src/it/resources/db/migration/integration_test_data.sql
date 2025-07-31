@@ -507,6 +507,11 @@ INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
 (3, 'Min Clusters (PF)', 'LIBRARY_QUALIFICATION', 'GT', 'K/lane'),
 (4, 'To Delete', 'FULL_DEPTH_SEQUENCING', 'BOOLEAN', NULL);
 
+
+INSERT INTO Deletion(deletionId, targetType, targetId, description, userId, changeTime) VALUES
+(1, 'Sample', 1700, 'last sample', 3, '2025-07-18 09:35:00');
+
+
 INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) VALUES
 (1, 1, NULL, NULL),
 (1, 2, 10, NULL),
@@ -970,13 +975,13 @@ INSERT INTO PoolOrder_LibraryAliquot (poolOrderId, aliquotId, proportion) VALUES
 (2, 802, 1),
 (3, 1001, 1);
 
-INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, lastModifier, creator, created, lastModified) VALUES
-(1, 1, 1, 'BOX1', 'First Box', 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01'),
-(2, 1, 1, 'BOX2', 'Boxxy', 1, 1, '2018-08-30 15:15:00', '2018-08-30 15:15:00'),
-(500, 1, 1, 'BOX500', 'Tubes In Boxes Test', 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00'),
-(501, 1, 1, 'BOX501', 'Second box for Tubes in Boxes test', 3, 3, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
-(502, 1, 1, 'BOX502', 'Editable box', 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
-(100001, 1, 1, 'BOX100001', 'Bulk Boxables Test', 1, 1, '2017-12-19 15:04:00', '2017-12-19 15:04:00');
+INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, lastModifier, creator, created, lastModified, identificationBarcode) VALUES
+(1, 1, 1, 'BOX1', 'First Box', 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01', '19841'),
+(2, 1, 1, 'BOX2', 'Boxxy', 1, 1, '2018-08-30 15:15:00', '2018-08-30 15:15:00', NULL),
+(500, 1, 1, 'BOX500', 'Tubes In Boxes Test', 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00', NULL),
+(501, 1, 1, 'BOX501', 'Second box for Tubes in Boxes test', 3, 3, '2017-08-16 16:40:00', '2017-08-16 16:40:00', NULL),
+(502, 1, 1, 'BOX502', 'Editable box', 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00', NULL),
+(100001, 1, 1, 'BOX100001', 'Bulk Boxables Test', 1, 1, '2017-12-19 15:04:00', '2017-12-19 15:04:00', NULL);
 
 INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (1, 1,   'LIBRARY',  'A01'),
