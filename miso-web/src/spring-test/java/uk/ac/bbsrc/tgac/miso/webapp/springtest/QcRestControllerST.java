@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.springframework.web.servlet.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import org.springframework.test.web.servlet.ResultActions;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
-
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcDto;
 import static org.hamcrest.Matchers.*;
@@ -42,7 +43,7 @@ public class QcRestControllerST extends AbstractST {
     dto1.setQcTypeId(101L);
     dto1.setResults("5.4");
     dto1.setQcTarget("Sample");
-    
+
 
     QcDto dto2 = new QcDto();
     dto2.setEntityId(2L);
@@ -57,8 +58,18 @@ public class QcRestControllerST extends AbstractST {
   @Test
   public void testBulkCreateAsync() throws Exception {
     List<SampleQC> qcs = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
+    assertEquals(1L, qcs.get(0).getEntity().getId());
+    assertEquals("2025-07-30", qcs.get(0).getDate().toString());
     assertEquals(101L, qcs.get(0).getType().getId());
+    assertEquals(5.4, qcs.get(0).getResults().doubleValue(), 0.0);
+    assertEquals(QcTarget.Sample, qcs.get(0).getType().getQcTarget());
+
+    assertEquals(2L, qcs.get(1).getEntity().getId());
+    assertEquals("2025-05-05", qcs.get(1).getDate().toString());
     assertEquals(102L, qcs.get(1).getType().getId());
+    assertEquals(9.8, qcs.get(1).getResults().doubleValue(), 0.0);
+    assertEquals(QcTarget.Sample, qcs.get(1).getType().getQcTarget());
+
   }
 
   @Test
@@ -70,7 +81,7 @@ public class QcRestControllerST extends AbstractST {
     dto1.setQcTarget("Sample");
     dto2.setDescription("updated two");
     dto2.setQcTarget("Sample");
-    
+
     // setting QC target is required for the request to go through properly
 
     List<SampleQC> qcs =
@@ -86,10 +97,23 @@ public class QcRestControllerST extends AbstractST {
     // only admin or owner can delete
     assertNotNull(currentSession().get(entityClass, 2));
 
-    getMockMvc().perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Sample").content(makeJson(Arrays.asList(2L)))
-    .contentType(MediaType.APPLICATION_JSON))
-     .andExpect(status().isNoContent());
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Sample").content(makeJson(Arrays.asList(2L)))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNoContent());
     assertNull(currentSession().get(entityClass, 2));
+  }
+
+
+  @Test
+  public void testDeleteFail() throws Exception {
+    // only admin or owner can delete
+    assertNotNull(currentSession().get(entityClass, 1));
+
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Sample").content(makeJson(Arrays.asList(1L)))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnauthorized());
   }
 
 
