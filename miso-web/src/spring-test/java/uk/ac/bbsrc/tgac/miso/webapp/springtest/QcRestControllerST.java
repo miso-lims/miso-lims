@@ -104,6 +104,7 @@ public class QcRestControllerST extends AbstractST {
     QcDto dto = Dtos.asDto(currentSession().get(entityClass, 1));
 
     dto.setDescription("updated one");
+    dto.setQcTarget("Sample");
     SampleQC updated = baseTestUpdate(CONTROLLER_BASE, dto, 1, entityClass);
     assertEquals(dto.getDescription(), updated.getDescription());
   }
