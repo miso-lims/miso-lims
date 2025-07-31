@@ -88,7 +88,7 @@ public class ArrayModelRestControllerST extends AbstractST {
     dtos.add(unused);
 
     List<ArrayModel> arrayModels =
-        (List<ArrayModel>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
+        (List<ArrayModel>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, ArrayModelDto::getId);
 
     assertEquals("beady", arrayModels.get(0).getAlias());
     assertEquals("not used", arrayModels.get(1).getAlias());

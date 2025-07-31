@@ -44,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import static org.junit.Assert.*;
 import java.util.List;
 import java.util.Arrays;
+import java.util.function.Function;
 
 import java.util.ArrayList;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -175,24 +176,23 @@ public abstract class AbstractST {
     // request should fail without admin permissions
   }
 
-  protected <T> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<?> dtos,
-      List<Integer> ids)
+  protected <T, D> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<D> dtos,
+      Function<D, Long> getId)
       throws Exception {
     String response = pollingResponserHelper("put", dtos, controllerBase);
     System.out.println(response);
 
+    // check order of returned IDs
+    List<Long> ids = dtos.stream().map(getId).toList();
     for (int i = 0; i < ids.size(); i++) {
-      assertEquals(ids.get(i), JsonPath.read(response, "$.data[" + i + "].id"));
+      assertTrue("expected: " + ids.get(i) + "\nactual: " + JsonPath.read(response, "$.data[" + i + "].id"),
+          (int) (long) ids.get(i) == (int) JsonPath.read(response, "$.data[" + i + "].id"));
     }
 
-    // now check if the updates went through
     List<T> objects = new ArrayList<T>();
-    for (int id : ids) {
-      T obj = currentSession().get(updateType, id);
+    for (long id : ids) {
+      T obj = currentSession().get(updateType, (int) id);
       assertNotNull(obj);
-      // asserts the id to ensure the order of object ids is the same order as the list of ids given
-      // this removes the need for id checking in update
-      // assertEquals((long) id, ((Identifiable) obj).getId());
       objects.add(obj);
     }
     return objects;

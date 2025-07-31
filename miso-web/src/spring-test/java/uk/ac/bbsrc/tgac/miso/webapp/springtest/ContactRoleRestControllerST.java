@@ -93,7 +93,7 @@ public class ContactRoleRestControllerST extends AbstractST {
 
     List<ContactRole> contactRoles =
         (List<ContactRole>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
-            Arrays.asList(2, 3));
+            ContactRoleDto::getId);
 
     assertEquals(2L, contactRoles.get(0).getId());
     assertEquals(3L, contactRoles.get(1).getId());

@@ -82,7 +82,7 @@ public class AttachmentCategoryRestControllerST extends AbstractST {
 
     List<AttachmentCategory> cats =
         (List<AttachmentCategory>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos,
-            Arrays.asList(1, 2));
+            AttachmentCategoryDto::getId);
 
     assertEquals("form", cats.get(0).getAlias());
     assertEquals("tape", cats.get(1).getAlias());
