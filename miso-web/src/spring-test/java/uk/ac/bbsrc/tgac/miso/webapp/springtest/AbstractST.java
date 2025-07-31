@@ -176,22 +176,24 @@ public abstract class AbstractST {
     // request should fail without admin permissions
   }
 
+  /**
+   * Sends a request to an async update endpoint and returns the resulting updated object. Note that
+   * the DTOs must be provided in order of ID.
+   */
   protected <T, D> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<D> dtos,
       Function<D, Long> getId)
       throws Exception {
     String response = pollingResponserHelper("put", dtos, controllerBase);
-    System.out.println(response);
 
     // check order of returned IDs
     List<Long> ids = dtos.stream().map(getId).toList();
     for (int i = 0; i < ids.size(); i++) {
-      assertTrue("expected: " + ids.get(i) + "\nactual: " + JsonPath.read(response, "$.data[" + i + "].id"),
-          (int) (long) ids.get(i) == (int) JsonPath.read(response, "$.data[" + i + "].id"));
+      assertEquals(ids.get(i).longValue(), Integer.toUnsignedLong(JsonPath.read(response, "$.data[" + i + "].id")));
     }
 
     List<T> objects = new ArrayList<T>();
     for (long id : ids) {
-      T obj = currentSession().get(updateType, (int) id);
+      T obj = currentSession().get(updateType, id);
       assertNotNull(obj);
       objects.add(obj);
     }
