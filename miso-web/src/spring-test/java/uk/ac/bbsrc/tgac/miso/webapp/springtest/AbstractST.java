@@ -93,7 +93,7 @@ public abstract class AbstractST {
   @Autowired
   private AuthorizationManager authorizationManager;
 
-  private ObjectMapper mapper;
+  protected ObjectMapper mapper;
   private ObjectWriter ow;
 
   @Before
