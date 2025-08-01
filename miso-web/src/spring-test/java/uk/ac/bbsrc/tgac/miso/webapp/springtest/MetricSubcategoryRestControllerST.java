@@ -102,7 +102,8 @@ public class MetricSubcategoryRestControllerST extends AbstractST {
     dtos.add(m2);
 
     List<MetricSubcategory> metricSubcategorys =
-        (List<MetricSubcategory>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, MetricDto::getId);
+        (List<MetricSubcategory>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos,
+            MetricSubcategoryDto::getId);
     assertEquals("m1", metricSubcategorys.get(0).getAlias());
     assertEquals("m2", metricSubcategorys.get(1).getAlias());
   }
