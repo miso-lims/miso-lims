@@ -102,7 +102,7 @@ public class LibraryDesignCodeRestControllerST extends AbstractST {
     dtos.add(bt);
 
     List<LibraryDesignCode> libraryDesignCodes =
-        (List<LibraryDesignCode>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, Arrays.asList(1, 3));
+        (List<LibraryDesignCode>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, LibraryDesignCodeDto::getId);
 
     assertEquals(1L, libraryDesignCodes.get(0).getId());
     assertEquals(3L, libraryDesignCodes.get(1).getId());
