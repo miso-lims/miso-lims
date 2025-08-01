@@ -88,7 +88,7 @@ public class PipelineRestControllerST extends AbstractST {
     dtos.add(p2);
 
     List<Pipeline> pipelines =
-        (List<Pipeline>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, Arrays.asList(1, 2));
+        (List<Pipeline>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, PipelineDto::getId);
 
     assertEquals(1L, pipelines.get(0).getId());
     assertEquals(2L, pipelines.get(1).getId());
