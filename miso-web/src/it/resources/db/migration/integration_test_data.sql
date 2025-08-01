@@ -1313,8 +1313,8 @@ INSERT INTO ContactRole(contactRoleId, name) VALUES
 (4, 'To Delete');
 
 INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, width, height, layout) VALUES
-(1, 'Printer', 'BRADY', 'BRADY_FTP', '{"host:"127.0.0.1","pin":"0000"}', TRUE, 25, 25, '[{"element":"text", "contents":{"use":"ALIAS"}}]'),
-(2, 'PrinterTwo', 'ZEBRA_24DPMM', 'LINE_PRINTER', '{"host:"127.0.0.1","pin":"0000"}', false, 50, 50, '[{"element":"text", "contents":{"use":"ALIAS"}}]');
+(1, 'Printer', 'BRADY', 'BRADY_FTP', '{"host":"127.0.0.1","pin":"0000"}', TRUE, 25, 25, '[{"element":"text", "contents":{"use":"ALIAS"}}]'),
+(2, 'PrinterTwo', 'ZEBRA_24DPMM', 'LINE_PRINTER', '{"host":"127.0.0.1","pin":"0000"}', false, 50, 50, '[{"element":"text", "contents":{"use":"ALIAS"}}]');
 
 INSERT INTO ApiKey(keyId, userId, apiKey, apiSecret, creator, created) VALUES
 (2, 1, "asdf", "ghjk", 1, "2025-07-08");

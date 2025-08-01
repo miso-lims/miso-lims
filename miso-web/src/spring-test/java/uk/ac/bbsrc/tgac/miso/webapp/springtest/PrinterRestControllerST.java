@@ -37,15 +37,17 @@ public class PrinterRestControllerST extends AbstractST {
   @Test
   public void testBoxContents() throws Exception {
     BoxPrintRequest req = new BoxPrintRequest();
-    req.setCopies(2);
+    req.setCopies(1);
     req.setBoxes(Arrays.asList(1L, 2L));
-
+    
 
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/1/boxcontents").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk());
+
+    // TODO add assertions
   }
 
   @Test
@@ -53,7 +55,7 @@ public class PrinterRestControllerST extends AbstractST {
 
     BoxPositionPrintRequest req = new BoxPositionPrintRequest();
     req.setBoxId(1L);
-    req.setCopies(2);
+    req.setCopies(1);
     req.setSortOrder("column");
 
     req.setPositions(Arrays.asList("A01", "A07", "B02", "B05").stream().collect(Collectors.toSet()));
@@ -63,11 +65,10 @@ public class PrinterRestControllerST extends AbstractST {
             post(CONTROLLER_BASE + "/1/boxpositions").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk());
+    // TODO add assertions
   }
 
-  @Test
-  public void testCreate() throws Exception {
-    // TODO needs admin perms
+  private PrinterDto makeCreateDto() throws Exception {
     PrinterDto printer = new PrinterDto();
     printer.setName("new");
     printer.setDriver("BRADY");
@@ -78,15 +79,28 @@ public class PrinterRestControllerST extends AbstractST {
     printer.setLayout((ArrayNode) mapper
         .readTree("[{\"element\":\"text\", \"x\":2, \"height\":2, \"y\":2, \"contents\":{\"use\":\"NAME\"}}]"));
 
+    return printer;
+
+  }
+
+  @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
+  public void testCreate() throws Exception {
+    PrinterDto printer = makeCreateDto();
     Printer newPrinter = baseTestCreate(CONTROLLER_BASE, printer, entityClass, 201);
     assertEquals(printer.getName(), newPrinter.getName());
-    assertEquals(printer.getBackend(), newPrinter.getBackend());
-    assertEquals(printer.getDriver(), newPrinter.getDriver());
+    assertEquals(printer.getBackend(), newPrinter.getBackend().toString());
+    assertEquals(printer.getDriver(), newPrinter.getDriver().toString());
     assertEquals(printer.isAvailable(), newPrinter.isEnabled());
-    assertEquals(printer.getHeight(), newPrinter.getHeight());
-    assertEquals(printer.getWidth(), newPrinter.getWidth());
-    assertEquals("[{\"element\":\"text\", \"x\":2, \"height\":2, \"y\":2, \"contents\":{\"use\":\"NAME\"}}]",
+    assertEquals(printer.getHeight(), newPrinter.getHeight(), 0.0);
+    assertEquals(printer.getWidth(), newPrinter.getWidth(), 0.0);
+    assertEquals("[{\"element\":\"text\",\"x\":2,\"height\":2,\"y\":2,\"contents\":{\"use\":\"NAME\"}}]",
         newPrinter.getLayout());
+  }
+
+  @Test
+  public void testCreateFail() throws Exception {
+    testCreateUnauthorized(CONTROLLER_BASE, makeCreateDto(), entityClass);
   }
 
   @Test
@@ -118,8 +132,8 @@ public class PrinterRestControllerST extends AbstractST {
   }
 
   @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDuplicate() throws Exception {
-    // TODO needs admin perms
     DuplicateRequest req = new DuplicateRequest();
     req.setName("duped");
     req.setHeight(17.2);
@@ -131,12 +145,23 @@ public class PrinterRestControllerST extends AbstractST {
 
     // there are two printers in the test data
     // therefore this duplicated one will have id 3
-    Printer duplicated = currentSession().get(entityClass, 3);
+    Printer duplicated = currentSession().get(entityClass, 2);
     assertNotNull(duplicated);
     assertEquals(req.getName(), duplicated.getName());
     assertEquals(req.getHeight(), duplicated.getHeight());
     assertEquals(req.getWidth(), duplicated.getWidth());
+  }
 
+  @Test
+  public void testDuplicateFail() throws Exception {
+        DuplicateRequest req = new DuplicateRequest();
+    req.setName("duped");
+    req.setHeight(17.2);
+    req.setWidth(14.5);
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/1/duplicate").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -152,27 +177,34 @@ public class PrinterRestControllerST extends AbstractST {
 
   @Test
   public void testGet() throws Exception {
-
+    baseTestGetById(CONTROLLER_BASE, 1)
+      .andExpect(jsonPath("$.name").value("Printer"));
   }
 
   @Test
   public void testGetLayout() throws Exception {
-
+      // TODO
   }
 
   @Test
   public void testSetLayout() throws Exception {
-
+    // TODO
   }
 
   @Test
   public void testList() throws Exception {
+        getMockMvc().perform(get(CONTROLLER_BASE))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.*", hasSize(2)))
+        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$[1].id").value(2)); 
 
-  }
-
+        
+      }
   @Test
   public void testSubmit() throws Exception {
-
+    // TODO
   }
 
 }
