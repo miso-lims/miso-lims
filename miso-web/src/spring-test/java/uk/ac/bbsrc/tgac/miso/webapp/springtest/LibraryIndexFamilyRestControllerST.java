@@ -94,7 +94,7 @@ public class LibraryIndexFamilyRestControllerST extends AbstractST {
   }
 
   @Test
-  public void testBulkUpdateAsyncFail() throws Exception {
+  public void testBulkUpdateFail() throws Exception {
     // only admin can update these
     LibraryIndexFamilyDto single = Dtos.asDto(currentSession().get(LibraryIndexFamily.class, 1));
     single.setName("single");
