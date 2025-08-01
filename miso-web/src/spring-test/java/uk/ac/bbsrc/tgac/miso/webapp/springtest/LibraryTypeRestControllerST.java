@@ -94,8 +94,8 @@ public class LibraryTypeRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // only admin can update these
-    LibraryTypeDto one = Dtos.asDto(currentSession().get(entityType, 1));
-    LibraryTypeDto two = Dtos.asDto(currentSession().get(entityType, 2));
+    LibraryTypeDto one = Dtos.asDto(currentSession().get(entityClass, 1));
+    LibraryTypeDto two = Dtos.asDto(currentSession().get(entityClass, 2));
     one.setAbbreviation("ON");
     two.setAbbreviation("TW");
 
@@ -105,8 +105,8 @@ public class LibraryTypeRestControllerST extends AbstractST {
 
 
     List<LibraryType> libraryTypes =
-        (List<LibraryType>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, Arrays.asList(1, 2));
-    
+        (List<LibraryType>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, LibraryTypeDto::getId);
+
     assertEquals(1L, libraryTypes.get(0).getId());
     assertEquals(2L, libraryTypes.get(1).getId());
     assertEquals("ON", libraryTypes.get(0).getAbbreviation());
@@ -116,8 +116,8 @@ public class LibraryTypeRestControllerST extends AbstractST {
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
     // only admin can update these
-    LibraryTypeDto one = Dtos.asDto(currentSession().get(entityType, 1));
-    LibraryTypeDto two = Dtos.asDto(currentSession().get(entityType, 2));
+    LibraryTypeDto one = Dtos.asDto(currentSession().get(entityClass, 1));
+    LibraryTypeDto two = Dtos.asDto(currentSession().get(entityClass, 2));
     one.setAbbreviation("ON");
     two.setAbbreviation("TW");
 
