@@ -103,7 +103,7 @@ public class LibrarySelectionRestControllerST extends AbstractST {
 
     List<LibrarySelectionType> librarySelectionTypes =
         (List<LibrarySelectionType>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos,
-            Arrays.asList(1, 3));
+            LibrarySelectionTypeDto::getId);
     assertEquals("one", librarySelectionTypes.get(0).getName());
     assertEquals("three", librarySelectionTypes.get(1).getName());
   }
