@@ -103,7 +103,7 @@ public class LibraryStrategyRestControllerST extends AbstractST {
 
     List<LibraryStrategyType> libraryStrategyTypes =
         (List<LibraryStrategyType>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos,
-            Arrays.asList(1, 3));
+            LibraryStrategyTypeDto::getId);
     assertEquals("one", libraryStrategyTypes.get(0).getName());
     assertEquals("three", libraryStrategyTypes.get(1).getName());
   }
