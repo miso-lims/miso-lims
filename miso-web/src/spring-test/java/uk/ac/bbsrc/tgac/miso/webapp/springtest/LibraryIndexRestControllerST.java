@@ -54,7 +54,7 @@ import java.util.Date;
 public class LibraryIndexRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/libraryindices";
-  private static final Class<LibraryIndex> controllerClass = LibraryIndex.class;
+  private static final Class<LibraryIndex> entityClass = LibraryIndex.class;
 
   private List<LibraryIndexDto> makeCreateDtos() {
 
@@ -81,16 +81,16 @@ public class LibraryIndexRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
-    List<LibraryIndex> libins = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
-    assertEquals(libins.get(0).getName(), "one");
-    assertEquals(libins.get(1).getName(), "two");
+    List<LibraryIndex> libins = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
+    assertEquals("one", libins.get(0).getName());
+    assertEquals("two", libins.get(1).getName());
   }
 
   @Test
   public void testBulkCreateFail() throws Exception {
     // LibraryIndex creation is for admin only, so this test is expecting failure due to
     // insufficent permission
-    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
   }
 
   @Test
@@ -108,7 +108,7 @@ public class LibraryIndexRestControllerST extends AbstractST {
 
 
     List<LibraryIndex> libraryIndexes =
-        (List<LibraryIndex>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, LibraryIndexDto::getId);
+        (List<LibraryIndex>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, LibraryIndexDto::getId);
     assertEquals("one", libraryIndexes.get(0).getName());
     assertEquals("three", libraryIndexes.get(1).getName());
   }
@@ -125,18 +125,18 @@ public class LibraryIndexRestControllerST extends AbstractST {
     dtos.add(one);
     dtos.add(three);
 
-    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, dtos);
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteLibraryIndex() throws Exception {
-    testBulkDelete(controllerClass, 18, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 18, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 18, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 18, CONTROLLER_BASE);
   }
 
 
