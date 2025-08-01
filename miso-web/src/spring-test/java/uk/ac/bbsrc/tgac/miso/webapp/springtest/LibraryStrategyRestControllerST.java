@@ -52,7 +52,7 @@ import java.util.Date;
 public class LibraryStrategyRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/librarystrategies";
-  private static final Class<LibraryStrategyType> controllerClass = LibraryStrategyType.class;
+  private static final Class<LibraryStrategyType> entityClass = LibraryStrategyType.class;
 
   private List<LibraryStrategyTypeDto> makeCreateDtos() {
 
@@ -75,7 +75,7 @@ public class LibraryStrategyRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
     List<LibraryStrategyType> libraryStrategyTypes =
-        baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+        baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
     assertEquals(libraryStrategyTypes.get(0).getName(), "one");
     assertEquals(libraryStrategyTypes.get(1).getName(), "two");
   }
@@ -84,7 +84,7 @@ public class LibraryStrategyRestControllerST extends AbstractST {
   public void testBulkCreateFail() throws Exception {
     // LibraryStrategyType creation is for admin only, so this test is expecting failure due to
     // insufficent permission
-    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
   }
 
   @Test
@@ -102,7 +102,7 @@ public class LibraryStrategyRestControllerST extends AbstractST {
 
 
     List<LibraryStrategyType> libraryStrategyTypes =
-        (List<LibraryStrategyType>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos,
+        (List<LibraryStrategyType>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
             LibraryStrategyTypeDto::getId);
     assertEquals("one", libraryStrategyTypes.get(0).getName());
     assertEquals("three", libraryStrategyTypes.get(1).getName());
@@ -120,17 +120,17 @@ public class LibraryStrategyRestControllerST extends AbstractST {
     dtos.add(one);
     dtos.add(three);
 
-    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, dtos);
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteLibraryStrategyType() throws Exception {
-    testBulkDelete(controllerClass, 11, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 11, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 11, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 11, CONTROLLER_BASE);
   }
 }
