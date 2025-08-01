@@ -101,7 +101,7 @@ public class LibrarySpikeInRestControllerST extends AbstractST {
 
     List<LibrarySpikeIn> librarySpikeIns =
         (List<LibrarySpikeIn>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
-            Arrays.asList(1, 3));
+            LibrarySpikeInDto::getId);
 
     assertEquals(1L, librarySpikeIns.get(0).getId());
     assertEquals(3L, librarySpikeIns.get(1).getId());
