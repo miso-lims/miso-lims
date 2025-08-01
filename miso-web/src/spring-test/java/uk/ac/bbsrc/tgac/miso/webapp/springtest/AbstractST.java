@@ -194,7 +194,7 @@ public abstract class AbstractST {
     }
 
     List<T> objects = new ArrayList<T>();
-    for (long id : ids) {
+    for (Long id : ids) {
       T obj = currentSession().get(updateType, id);
       assertNotNull(obj);
       objects.add(obj);
