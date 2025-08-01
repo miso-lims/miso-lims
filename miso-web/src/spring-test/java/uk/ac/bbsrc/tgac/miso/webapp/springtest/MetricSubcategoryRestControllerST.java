@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 
 import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.dto.MetricDto;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.MetricSubcategory;
 import uk.ac.bbsrc.tgac.miso.dto.MetricSubcategoryDto;
 
@@ -101,7 +102,7 @@ public class MetricSubcategoryRestControllerST extends AbstractST {
     dtos.add(m2);
 
     List<MetricSubcategory> metricSubcategorys =
-        (List<MetricSubcategory>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
+        (List<MetricSubcategory>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, MetricDto::getId);
     assertEquals("m1", metricSubcategorys.get(0).getAlias());
     assertEquals("m2", metricSubcategorys.get(1).getAlias());
   }
