@@ -105,7 +105,7 @@ public class BoxSizeRestControllerST extends AbstractST {
     dtos.add(size3);
 
     List<BoxSize> sizes =
-        (List<BoxSize>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, Arrays.asList(2, 3));
+        (List<BoxSize>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, BoxSizeDto::getId);
 
     assertEquals(2L, sizes.get(0).getId());
     assertEquals(3L, sizes.get(1).getId());

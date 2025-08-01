@@ -103,7 +103,7 @@ public class SopRestControllerST extends AbstractST {
     dtos.add(librarySop);
 
     List<Sop> sops =
-        (List<Sop>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 3));
+        (List<Sop>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, SopDto::getId);
     assertEquals("Sop not updated", "sampler", sops.get(0).getAlias());
     assertEquals("Sop not updated", "libraryer", sops.get(1).getAlias());
   }

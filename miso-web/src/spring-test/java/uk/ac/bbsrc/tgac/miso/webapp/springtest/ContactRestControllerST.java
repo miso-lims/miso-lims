@@ -82,18 +82,18 @@ public class ContactRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateAsync() throws Exception {
-    Contact con1 = currentSession().get(entityClass, 1);
-    Contact con2 = currentSession().get(entityClass, 2);
+    ContactDto con1 = Dtos.asDto(currentSession().get(entityClass, 1));
+    ContactDto con2 = Dtos.asDto(currentSession().get(entityClass, 2));
 
     con1.setName("con1");
     con2.setName("con2");
     List<ContactDto> dtos = new ArrayList<ContactDto>();
-    dtos.add(Dtos.asDto(con1));
-    dtos.add(Dtos.asDto(con2));
+    dtos.add(con1);
+    dtos.add(con2);
 
     List<Contact> contacts =
         (List<Contact>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
-            Arrays.asList(1, 2));
+            ContactDto::getId);
 
     assertEquals(1L, contacts.get(0).getId());
     assertEquals(2L, contacts.get(1).getId());

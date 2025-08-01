@@ -81,7 +81,7 @@ public class DeliverableRestControllerST extends AbstractST {
 
     List<Deliverable> deliverables =
         (List<Deliverable>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
-            Arrays.asList(1, 2));
+            DeliverableDto::getId);
 
     assertEquals(1L, deliverables.get(0).getId());
     assertEquals(2L, deliverables.get(1).getId());

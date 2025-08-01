@@ -91,7 +91,7 @@ public class BoxUseRestControllerST extends AbstractST {
     dtos.add(rna);
 
     List<BoxUse> uses =
-        (List<BoxUse>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, Arrays.asList(1, 2));
+        (List<BoxUse>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, BoxUseDto::getId);
 
     assertEquals(1L, uses.get(0).getId());
     assertEquals(2L, uses.get(1).getId());

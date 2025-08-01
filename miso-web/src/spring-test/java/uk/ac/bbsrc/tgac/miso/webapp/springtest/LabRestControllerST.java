@@ -85,7 +85,7 @@ public class LabRestControllerST extends AbstractST {
     dtos.add(pathology);
 
     List<LabImpl> labs =
-        (List<LabImpl>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
+        (List<LabImpl>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, LabDto::getId);
 
     assertEquals("| Biobank not updated. |", "bioBank", labs.get(0).getAlias());
     assertEquals("| Pathology not updated | ", "pathology", labs.get(1).getAlias());
