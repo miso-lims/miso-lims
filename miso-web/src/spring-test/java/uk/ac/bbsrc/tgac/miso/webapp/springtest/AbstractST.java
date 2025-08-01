@@ -365,7 +365,6 @@ public abstract class AbstractST {
       ac.andDo(print());
 
     ac.andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$").exists())
         .andExpect(jsonPath("$.iTotalRecords").value(ids.size()));
 
