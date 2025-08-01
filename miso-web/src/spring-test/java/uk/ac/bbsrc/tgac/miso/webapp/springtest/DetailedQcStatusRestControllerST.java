@@ -106,7 +106,7 @@ public class DetailedQcStatusRestControllerST extends AbstractST {
 
     List<DetailedQcStatusImpl> detailedQcStatuses =
         (List<DetailedQcStatusImpl>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
-            Arrays.asList(5, 6));
+            DetailedQcStatusDto::getId);
 
     assertEquals(5L, detailedQcStatuses.get(0).getId());
     assertEquals(6L, detailedQcStatuses.get(1).getId());
