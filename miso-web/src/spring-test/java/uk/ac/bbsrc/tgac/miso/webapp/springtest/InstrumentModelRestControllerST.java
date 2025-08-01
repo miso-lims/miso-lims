@@ -52,11 +52,11 @@ public class InstrumentModelRestControllerST extends AbstractST {
 
   @Test
   public void testDatatable() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1,2,3,4,5))
-      .andExpect(jsonPath("$.aaData[0].alias").value("Illumina HiSeq 2500"))
-      .andExpect(jsonPath("$.aaData[0].instrumentType").value("SEQUENCER"))
-      .andExpect(jsonPath("$.aaData[0].containerModels[0].alias").value("Generic 8-Lane Illumina Flow Cell"))
-      .andExpect(jsonPath("$.aaData[0].dataManglingPolicy").value("NONE"));
+    testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1, 2, 3, 4, 5))
+        .andExpect(jsonPath("$.aaData[0].alias").value("Illumina HiSeq 2500"))
+        .andExpect(jsonPath("$.aaData[0].instrumentType").value("SEQUENCER"))
+        .andExpect(jsonPath("$.aaData[0].containerModels[0].alias").value("Generic 4-Lane Illumina Flow Cell"))
+        .andExpect(jsonPath("$.aaData[0].dataManglingPolicy").value("NONE"));
   }
 
   private InstrumentModelDto makeCreateDto() throws Exception {
