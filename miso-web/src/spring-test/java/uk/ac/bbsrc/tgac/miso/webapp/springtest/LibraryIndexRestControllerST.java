@@ -108,7 +108,7 @@ public class LibraryIndexRestControllerST extends AbstractST {
 
 
     List<LibraryIndex> libraryIndexes =
-        (List<LibraryIndex>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 3));
+        (List<LibraryIndex>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, LibraryIndexDto::getId);
     assertEquals("one", libraryIndexes.get(0).getName());
     assertEquals("three", libraryIndexes.get(1).getName());
   }
