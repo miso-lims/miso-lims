@@ -105,7 +105,7 @@ public class LibraryDesignRestControllerST extends AbstractST {
     dtos.add(t2);
 
     List<LibraryDesign> libraryDesigns =
-        (List<LibraryDesign>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(2, 3));
+        (List<LibraryDesign>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, LibraryDesignDto::getId);
     assertEquals("this", libraryDesigns.get(0).getName());
     assertEquals("this2", libraryDesigns.get(1).getName());
   }
