@@ -372,7 +372,7 @@ public class PoolRestControllerST extends AbstractST {
 
     List<PoolImpl> pools = (List<PoolImpl>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
         Arrays.asList(pool1, pool501),
-        Arrays.asList(1, 501));
+        PoolDto::getId);
     assertEquals(pool1.getDescription(), pools.get(0).getDescription());
     assertEquals(pool501.getDescription(), pools.get(1).getDescription());
 
