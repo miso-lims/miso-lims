@@ -52,7 +52,7 @@ import java.util.Date;
 public class MetricSubcategoryRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/metricsubcategories";
-  private static final Class<MetricSubcategory> controllerClass = MetricSubcategory.class;
+  private static final Class<MetricSubcategory> entityClass = MetricSubcategory.class;
 
   private List<MetricSubcategoryDto> makeCreateDtos() {
 
@@ -75,7 +75,7 @@ public class MetricSubcategoryRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
-    List<MetricSubcategory> codes = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    List<MetricSubcategory> codes = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
     assertEquals(codes.get(0).getAlias(), "one");
     assertEquals(codes.get(1).getAlias(), "two");
   }
@@ -84,7 +84,7 @@ public class MetricSubcategoryRestControllerST extends AbstractST {
   public void testBulkCreateFail() throws Exception {
     // MetricSubcategory creation is for admin only, so this test is expecting failure due to
     // insufficent permission
-    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
   }
 
   @Test
@@ -102,7 +102,7 @@ public class MetricSubcategoryRestControllerST extends AbstractST {
     dtos.add(m2);
 
     List<MetricSubcategory> metricSubcategorys =
-        (List<MetricSubcategory>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos,
+        (List<MetricSubcategory>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
             MetricSubcategoryDto::getId);
     assertEquals("m1", metricSubcategorys.get(0).getAlias());
     assertEquals("m2", metricSubcategorys.get(1).getAlias());
@@ -120,17 +120,17 @@ public class MetricSubcategoryRestControllerST extends AbstractST {
     dtos.add(m1);
     dtos.add(m2);
 
-    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, dtos);
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteMetricSubcategory() throws Exception {
-    testBulkDelete(controllerClass, 4, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 4, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 4, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 4, CONTROLLER_BASE);
   }
 }
