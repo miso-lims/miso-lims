@@ -20,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcDto;
 import static org.hamcrest.Matchers.*;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.junit.Assert.*;
 import org.springframework.test.web.servlet.MockMvc;
@@ -93,15 +94,16 @@ public class QcRestControllerST extends AbstractST {
   }
 
   @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDelete() throws Exception {
     // only admin or owner can delete
-    assertNotNull(currentSession().get(entityClass, 2));
+    assertNotNull(currentSession().get(entityClass, 1));
 
     getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Sample").content(makeJson(Arrays.asList(2L)))
+        .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Sample").content(makeJson(Arrays.asList(1L)))
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
-    assertNull(currentSession().get(entityClass, 2));
+    assertNull(currentSession().get(entityClass, 1));
   }
 
 
