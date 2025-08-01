@@ -105,7 +105,8 @@ public class PartitionQcTypeRestControllerST extends AbstractST {
     dtos.add(pqt2);
 
     List<PartitionQCType> partitionQcTypes =
-        (List<PartitionQCType>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, Arrays.asList(1, 2));
+        (List<PartitionQCType>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos,
+            PartitionQCTypeDto::getId);
     assertEquals("pqt1", partitionQcTypes.get(0).getDescription());
     assertEquals("pqt2", partitionQcTypes.get(1).getDescription());
   }
