@@ -36,7 +36,7 @@ public class QcStatusRestControllerST extends AbstractST {
 
 
   @Test
-  public void testBulkUpdateAsync() throws Exception {
+  public void testBulkUpdate() throws Exception {
     QcNodeDto dto1 = Dtos.asDto(currentSession().get(entityClass, 1));
     QcNodeDto dto2 = Dtos.asDto(currentSession().get(entityClass, 2));
 
@@ -47,11 +47,13 @@ public class QcStatusRestControllerST extends AbstractST {
     dto2.setQcStatusId(2L);
     dto2.setQcNote("note 2");
     getMockMvc()
-        .perform(put(CONTROLLER_BASE + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(Arrays.asList(dto1,dto2))))
+        .perform(put(CONTROLLER_BASE + "/bulk").contentType(MediaType.APPLICATION_JSON)
+            .content(makeJson(Arrays.asList(dto1, dto2))))
         .andExpect(status().isNoContent());
 
-    
-    List<SampleQcNode> qcStatuses = Arrays.asList(currentSession().get(entityClass, 1), currentSession().get(entityClass, 2));
+
+    List<SampleQcNode> qcStatuses =
+        Arrays.asList(currentSession().get(entityClass, 1), currentSession().get(entityClass, 2));
 
     assertNotNull(qcStatuses.get(0));
     assertNotNull(qcStatuses.get(1));
