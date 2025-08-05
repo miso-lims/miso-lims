@@ -1,26 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import org.junit.Test;
-import org.springframework.web.servlet.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.ws.rs.core.MediaType;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RunPurposeDto;
-import static org.hamcrest.Matchers.*;
 import org.springframework.security.test.context.support.WithMockUser;
-
 import static org.junit.Assert.*;
-import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Arrays;
+import java.util.List;
 
 public class RunPurposeRestControllerST extends AbstractST {
 
