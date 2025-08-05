@@ -20,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.dto.InstrumentDto;
 import uk.ac.bbsrc.tgac.miso.dto.ServiceRecordDto;
 import org.springframework.security.test.context.support.WithMockUser;
 import java.util.Arrays;
+import java.util.Set;
 
 
 public class InstrumentRestControllerST extends AbstractST {
@@ -82,8 +83,10 @@ public class InstrumentRestControllerST extends AbstractST {
         .perform(
             post(CONTROLLER_BASE + "/1/servicerecords").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
-    assertTrue(currentSession().get(entityClass, 1).getServiceRecords().size() == 1);
-    ServiceRecord rec = currentSession().get(entityClass, 1).getServiceRecords().iterator().next();
+
+    Set<ServiceRecord> records = currentSession().get(entityClass, 1).getServiceRecords();    
+    assertTrue(records.size() == 1);
+    ServiceRecord rec = records.iterator().next();
     assertEquals(dto.getTitle(), rec.getTitle());
     assertEquals(dto.getServiceDate(), rec.getServiceDate().toString());
     assertEquals(dto.getServicedBy(), rec.getServicedByName());
