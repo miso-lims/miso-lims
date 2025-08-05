@@ -12,15 +12,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import org.springframework.test.web.servlet.ResultActions;
 import com.jayway.jsonpath.JsonPath;
-
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
 
 import static org.hamcrest.Matchers.*;
-
+import org.springframework.test.web.servlet.MvcResult;
 
 import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
@@ -56,6 +57,7 @@ public class RequisitionRestControllerST extends AbstractST {
         .andExpect(status().isOk());
 
     // idk what this does
+    // TODO
   }
 
   @Test
@@ -117,43 +119,101 @@ public class RequisitionRestControllerST extends AbstractST {
 
   @Test
   public void testAddSupplementalSamples() throws Exception {
+    // supplemental samples cannot be identities or ghost samples
 
+    long reqId = 1L;
+    long entityId = 5L;
+    assertFalse(isContained(reqId, entityId, SampleImpl.class, SampleImpl::getRequisition));
+
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/" + reqId + "/supplementalsamples").content(makeJson(Arrays.asList(entityId)))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isNoContent());
+
+    assertTrue(isContained(1, 5, SampleImpl.class, SampleImpl::getRequisition));
+    // didn't get added
   }
 
   @Test
   public void testRemoveSupplementalSamples() throws Exception {
+    long reqId = 1L;
+    long entityId = 2L;
+    assertTrue(isContained(reqId, entityId, SampleImpl.class, SampleImpl::getRequisition));
+    // not contained for some reason idk
 
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/" + reqId + "/supplementalsamples/remove")
+            .content(makeJson(Arrays.asList(entityId)))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isNoContent());
+
+    assertFalse(isContained(1, 2, SampleImpl.class, SampleImpl::getRequisition));
+    // wasn't removed
   }
 
   @Test
   public void testAddLibraries() throws Exception {
-
+    testAddAsync(2L, CONTROLLER_BASE + "/2/libraries", Arrays.asList(1L), LibraryImpl.class,
+        CONTROLLER_BASE + "/librariesupdate",
+        LibraryImpl::getRequisition);
   }
 
   @Test
   public void testRemoveLibraries() throws Exception {
-
+    testRemoveAsync(1L, CONTROLLER_BASE + "/1/libraries/remove", Arrays.asList(1L), LibraryImpl.class,
+        CONTROLLER_BASE + "/librariesupdate",
+        LibraryImpl::getRequisition);
   }
 
   @Test
   public void testMoveLibraries() throws Exception {
+    // TODO
 
   }
 
   @Test
   public void testAddSupplementalLibraries() throws Exception {
+    long reqId = 1L;
+    long entityId = 205L;
+
+    assertFalse(isContained(reqId, entityId, LibraryImpl.class, LibraryImpl::getRequisition));
+
+    getMockMvc()
+        .perform(
+            post(CONTROLLER_BASE + "/" + reqId + "/supplementallibraries").content(makeJson(Arrays.asList(entityId)))
+                .contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isNoContent());
+
+    assertTrue(isContained(1, 205, LibraryImpl.class, LibraryImpl::getRequisition));
+    // didn't get added
 
   }
 
   @Test
   public void testRemoveSupplementalLibraries() throws Exception {
+    long reqId = 2L;
+    long entityId = 206L;
+    assertTrue(isContained(reqId, entityId, LibraryImpl.class, LibraryImpl::getRequisition));
+
+
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/" + reqId + "/supplementallibraries/remove")
+            .content(makeJson(Arrays.asList(entityId)))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isNoContent());
+
+    assertFalse(isContained(2, 206, LibraryImpl.class, LibraryImpl::getRequisition));
+    // wasn't removed
 
   }
 
   @Test
   public void testSearch() throws Exception {
     baseSearchByTerm(CONTROLLER_BASE + "/search", "Req One", Arrays.asList(1));
-
   }
 
   @Test
@@ -169,18 +229,48 @@ public class RequisitionRestControllerST extends AbstractST {
 
   @Test
   public void testSearchPaused() throws Exception {
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/paused").content(makeJson(Arrays.asList(1L, 2L)))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk());
+    // TODO how to pause a req
+
+
 
   }
 
   @Test
   public void testBulkResume() throws Exception {
+    List<Long> reqs = Arrays.asList(1L, 2L);
+    String resumeDate = "2025-05-05";
+    BulkResumeRequest req = new BulkResumeRequest();
+    req.setRequisitionIds(reqs);
+    req.setResumeDate(resumeDate);
 
+    // pause them
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/paused").content(makeJson(reqs))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk());
+
+
+    ResultActions ac = getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/bulk-resume").contentType(MediaType.APPLICATION_JSON).content(makeJson(req)))
+        .andDo(print());
+
+    MvcResult mvcResult = ac.andExpect(status().isAccepted()).andReturn();
+
+    String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
+    String response = pollingResponse(CONTROLLER_BASE + "/bulk/" + id);
+    System.out.println(response);
+
+    for (Long entityId : reqs) {
+      Requisition resumed = currentSession().get(entityClass, entityId);
+      RequisitionPause pause = resumed.getPauses().get(resumed.getPauses().size() - 1); // get most recent pause
+      assertEquals(resumeDate, pause.getEndDate().toString());
+    }
   }
-
-  @Test
-  public void testGetRequisitionProgress() throws Exception {
-
-  }
-
 
 }
