@@ -3,52 +3,27 @@ package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 import org.junit.Test;
 
 import org.springframework.web.servlet.*;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
-
 import javax.ws.rs.core.MediaType;
-
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
 import com.jayway.jsonpath.JsonPath;
-
-import jakarta.transaction.Transactional;
-
 import static org.hamcrest.Matchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryIndexDto;
 
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.View;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.security.test.context.support.WithMockUser;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
-import java.util.Collections;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.LibraryIndexRestController.IndexSearchRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.LibraryIndexRestController.IndexSearchResult;
 
 import static org.junit.Assert.*;
-
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
 
 
 public class LibraryIndexRestControllerST extends AbstractST {
@@ -66,7 +41,7 @@ public class LibraryIndexRestControllerST extends AbstractST {
     one.setSequence("TTTTTT");
 
     LibraryIndexDto two = new LibraryIndexDto();
-    two.setFamily(Dtos.asDto(currentSession().get(LibraryIndexFamily.class, 1)));
+    two.setFamily(Dtos.asDto(currentSession().get(LibraryIndexFamily.class, 2)));
     two.setName("two");
     two.setPosition(2);
     two.setSequence("GGGGGG");
@@ -83,7 +58,15 @@ public class LibraryIndexRestControllerST extends AbstractST {
   public void testBulkCreateAsync() throws Exception {
     List<LibraryIndex> libins = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
     assertEquals("one", libins.get(0).getName());
+    assertEquals(1, libins.get(0).getPosition());
+    assertEquals(1L, libins.get(0).getFamily().getId());
+    assertEquals("TTTTTT", libins.get(0).getSequence());
+
     assertEquals("two", libins.get(1).getName());
+    assertEquals(2, libins.get(1).getPosition());
+    assertEquals(2L, libins.get(1).getFamily().getId());
+    assertEquals("GGGGGG", libins.get(1).getSequence());
+
   }
 
   @Test
