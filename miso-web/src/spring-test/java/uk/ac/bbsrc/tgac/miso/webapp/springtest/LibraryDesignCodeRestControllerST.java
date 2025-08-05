@@ -1,52 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import org.junit.Test;
-
-import org.springframework.web.servlet.*;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
-
-import javax.ws.rs.core.MediaType;
-
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
-import com.jayway.jsonpath.JsonPath;
-
-import jakarta.transaction.Transactional;
-
-import static org.hamcrest.Matchers.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDesignCodeDto;
-
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.View;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.security.test.context.support.WithMockUser;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
-import java.util.Collections;
 
 import static org.junit.Assert.*;
-
 import java.util.List;
-import java.util.Arrays;
 import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
-
 
 public class LibraryDesignCodeRestControllerST extends AbstractST {
 
@@ -77,8 +39,14 @@ public class LibraryDesignCodeRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
     List<LibraryDesignCode> codes = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
-    assertEquals(codes.get(0).getCode(), "AB");
-    assertEquals(codes.get(1).getCode(), "CD");
+    assertEquals("AB", codes.get(0).getCode());
+    assertEquals(false, codes.get(0).isTargetedSequencingRequired());
+    assertEquals("one", codes.get(0).getDescription());
+
+    assertEquals("CD", codes.get(1).getCode());
+    assertEquals(false, codes.get(1).isTargetedSequencingRequired());
+    assertEquals("two", codes.get(1).getDescription());
+
   }
 
   @Test
@@ -98,11 +66,12 @@ public class LibraryDesignCodeRestControllerST extends AbstractST {
     d6.setCode("D6");
 
     List<LibraryDesignCodeDto> dtos = new ArrayList<LibraryDesignCodeDto>();
-    dtos.add(d6);
     dtos.add(bt);
+    dtos.add(d6);
 
     List<LibraryDesignCode> libraryDesignCodes =
-        (List<LibraryDesignCode>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, LibraryDesignCodeDto::getId);
+        (List<LibraryDesignCode>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
+            LibraryDesignCodeDto::getId);
 
     assertEquals(1L, libraryDesignCodes.get(0).getId());
     assertEquals(3L, libraryDesignCodes.get(1).getId());
