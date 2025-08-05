@@ -2,53 +2,20 @@ package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import org.junit.Test;
 
-import org.springframework.web.servlet.*;
-
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
-
-import javax.ws.rs.core.MediaType;
-
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
-import com.jayway.jsonpath.JsonPath;
-
-import static org.hamcrest.Matchers.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import org.springframework.test.web.servlet.MvcResult;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
 import uk.ac.bbsrc.tgac.miso.dto.AssayTestDto;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest.PermittedSamples;
-
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.View;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.security.test.context.support.WithMockUser;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import static org.junit.Assert.*;
-import java.util.Collections;
-
 import java.util.List;
-import java.util.Arrays;
 import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
 
 
 public class AssayTestRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/assaytests";
-  private static final Class<AssayTest> controllerClass = AssayTest.class;
+  private static final Class<AssayTest> entityClass = AssayTest.class;
 
   private List<AssayTestDto> makeCreateDtos() {
     AssayTest atest1 = new AssayTest();
@@ -83,7 +50,7 @@ public class AssayTestRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
-    List<AssayTest> tests = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    List<AssayTest> tests = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
 
     assertEquals("first", tests.get(0).getAlias());
     assertEquals(1L, tests.get(0).getTissueType().getId());
@@ -104,15 +71,15 @@ public class AssayTestRestControllerST extends AbstractST {
 
   @Test
   public void testBulkCreateFail() throws Exception {
-    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // admin perms needed to update
-    AssayTestDto one = AssayTestDto.from(currentSession().get(controllerClass, 1));
-    AssayTestDto two = AssayTestDto.from(currentSession().get(controllerClass, 2));
+    AssayTestDto one = AssayTestDto.from(currentSession().get(entityClass, 1));
+    AssayTestDto two = AssayTestDto.from(currentSession().get(entityClass, 2));
 
     one.setAlias("one");
     two.setAlias("two");
@@ -122,7 +89,7 @@ public class AssayTestRestControllerST extends AbstractST {
     dtos.add(two);
 
     List<AssayTest> assayTests =
-        (List<AssayTest>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, AssayTestDto::getId);
+        (List<AssayTest>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, AssayTestDto::getId);
 
     assertEquals("one", assayTests.get(0).getAlias());
     assertEquals("two", assayTests.get(1).getAlias());
@@ -130,8 +97,8 @@ public class AssayTestRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
-    AssayTestDto one = AssayTestDto.from(currentSession().get(controllerClass, 1));
-    AssayTestDto two = AssayTestDto.from(currentSession().get(controllerClass, 2));
+    AssayTestDto one = AssayTestDto.from(currentSession().get(entityClass, 1));
+    AssayTestDto two = AssayTestDto.from(currentSession().get(entityClass, 2));
 
     one.setAlias("one");
     two.setAlias("two");
@@ -140,19 +107,19 @@ public class AssayTestRestControllerST extends AbstractST {
     dtos.add(one);
     dtos.add(two);
 
-    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, dtos);
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteAssayTest() throws Exception {
-    testBulkDelete(controllerClass, 4, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 4, CONTROLLER_BASE);
   }
 
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 4, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 4, CONTROLLER_BASE);
   }
 }
