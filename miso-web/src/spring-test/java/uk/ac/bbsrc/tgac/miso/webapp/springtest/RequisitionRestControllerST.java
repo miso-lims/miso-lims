@@ -122,7 +122,7 @@ public class RequisitionRestControllerST extends AbstractST {
     // supplemental samples cannot be identities or ghost samples
 
     long reqId = 1L;
-    long entityId = 5L;
+    long entityId = 4L;
     assertFalse(isContained(reqId, entityId, SampleImpl.class, SampleImpl::getRequisition));
 
     getMockMvc()
@@ -130,15 +130,17 @@ public class RequisitionRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isNoContent());
-
-    assertTrue(isContained(1, 5, SampleImpl.class, SampleImpl::getRequisition));
+    // SampleImpl sam = currentSession().get(SampleImpl.class, entityId);
+    // System.out.println("\n\nSAM REQUISITION AFTER ADDITION: " + sam.getRequisition().getId() +
+    // "\n\n");
+    assertTrue(isContained(reqId, entityId, SampleImpl.class, SampleImpl::getRequisition));
     // didn't get added
   }
 
   @Test
   public void testRemoveSupplementalSamples() throws Exception {
-    long reqId = 1L;
-    long entityId = 2L;
+    long reqId = 2L;
+    long entityId = 502L;
     assertTrue(isContained(reqId, entityId, SampleImpl.class, SampleImpl::getRequisition));
     // not contained for some reason idk
 
@@ -149,7 +151,9 @@ public class RequisitionRestControllerST extends AbstractST {
         .andDo(print())
         .andExpect(status().isNoContent());
 
-    assertFalse(isContained(1, 2, SampleImpl.class, SampleImpl::getRequisition));
+    // SampleImpl sam = currentSession().get(SampleImpl.class, entityId);
+    // System.out.println("\n\nSAM REQUISITION AFTER REMOVAL: " + sam.getRequisition() + "\n\n");
+    assertFalse(isContained(reqId, entityId, SampleImpl.class, SampleImpl::getRequisition));
     // wasn't removed
   }
 
@@ -176,7 +180,7 @@ public class RequisitionRestControllerST extends AbstractST {
   @Test
   public void testAddSupplementalLibraries() throws Exception {
     long reqId = 1L;
-    long entityId = 205L;
+    long entityId = 304L;
 
     assertFalse(isContained(reqId, entityId, LibraryImpl.class, LibraryImpl::getRequisition));
 
@@ -187,7 +191,11 @@ public class RequisitionRestControllerST extends AbstractST {
         .andDo(print())
         .andExpect(status().isNoContent());
 
-    assertTrue(isContained(1, 205, LibraryImpl.class, LibraryImpl::getRequisition));
+    // LibraryImpl lib = currentSession().get(LibraryImpl.class, entityId);
+    // System.out.println("\n\nLIB REQUISITION AFTER ADDITION: " + lib.getRequisition().getId() +
+    // "\n\n");
+
+    assertTrue(isContained(reqId, entityId, LibraryImpl.class, LibraryImpl::getRequisition));
     // didn't get added
 
   }
@@ -195,7 +203,7 @@ public class RequisitionRestControllerST extends AbstractST {
   @Test
   public void testRemoveSupplementalLibraries() throws Exception {
     long reqId = 2L;
-    long entityId = 206L;
+    long entityId = 205L;
     assertTrue(isContained(reqId, entityId, LibraryImpl.class, LibraryImpl::getRequisition));
 
 
@@ -206,7 +214,10 @@ public class RequisitionRestControllerST extends AbstractST {
         .andDo(print())
         .andExpect(status().isNoContent());
 
-    assertFalse(isContained(2, 206, LibraryImpl.class, LibraryImpl::getRequisition));
+    // LibraryImpl lib = currentSession().get(LibraryImpl.class, entityId);
+    // System.out.println("\n\nLIB REQUISITION AFTER REMOVAL: " + lib.getRequisition() + "\n\n");
+
+    assertFalse(isContained(reqId, entityId, LibraryImpl.class, LibraryImpl::getRequisition));
     // wasn't removed
 
   }
