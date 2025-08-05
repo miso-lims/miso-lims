@@ -2,56 +2,19 @@ package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import org.junit.Test;
 
-import org.springframework.web.servlet.*;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+import org.springframework.security.test.context.support.WithMockUser;
+import static org.junit.Assert.*;
+import java.util.List;
+import java.util.ArrayList;
 
-import javax.ws.rs.core.MediaType;
-
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
-import com.jayway.jsonpath.JsonPath;
-
-import jakarta.transaction.Transactional;
-
-import static org.hamcrest.Matchers.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionQCTypeDto;
 
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.View;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.springframework.security.test.context.support.WithMockUser;
-
-import java.util.Collections;
-
-import static org.junit.Assert.*;
-
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
-
-
 public class PartitionQcTypeRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/partitionqctypes";
-  private static final Class<PartitionQCType> controllerClass = PartitionQCType.class;
+  private static final Class<PartitionQCType> entityClass = PartitionQCType.class;
 
   private List<PartitionQCTypeDto> makeCreateDtos() {
 
@@ -66,8 +29,8 @@ public class PartitionQcTypeRestControllerST extends AbstractST {
     PartitionQCTypeDto two = new PartitionQCTypeDto();
     two.setDescription("two");
     two.setNoteRequired(false);
-    two.setOrderFulfilled(false);
-    two.setAnalysisSkipped(false);
+    two.setOrderFulfilled(true);
+    two.setAnalysisSkipped(true);
 
     dtos.add(one);
     dtos.add(two);
@@ -78,16 +41,23 @@ public class PartitionQcTypeRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
-    List<PartitionQCType> qcTypes = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
-    assertEquals(qcTypes.get(0).getDescription(), "one");
-    assertEquals(qcTypes.get(1).getDescription(), "two");
+    List<PartitionQCType> qcTypes = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
+    assertEquals("one", qcTypes.get(0).getDescription());
+    assertEquals(false, qcTypes.get(0).isNoteRequired());
+    assertEquals(false, qcTypes.get(0).isOrderFulfilled());
+    assertEquals(false, qcTypes.get(0).isAnalysisSkipped());
+
+    assertEquals("two", qcTypes.get(1).getDescription());
+    assertEquals(false, qcTypes.get(1).isNoteRequired());
+    assertEquals(true, qcTypes.get(1).isOrderFulfilled());
+    assertEquals(true, qcTypes.get(1).isAnalysisSkipped());
   }
 
   @Test
   public void testBulkCreateFail() throws Exception {
     // PartitionQcType creation is for admin only, so this test is expecting failure due to
     // insufficent permission
-    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
   }
 
   @Test
@@ -105,7 +75,7 @@ public class PartitionQcTypeRestControllerST extends AbstractST {
     dtos.add(pqt2);
 
     List<PartitionQCType> partitionQcTypes =
-        (List<PartitionQCType>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos,
+        (List<PartitionQCType>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
             PartitionQCTypeDto::getId);
     assertEquals("pqt1", partitionQcTypes.get(0).getDescription());
     assertEquals("pqt2", partitionQcTypes.get(1).getDescription());
@@ -124,17 +94,17 @@ public class PartitionQcTypeRestControllerST extends AbstractST {
     dtos.add(pqt1);
     dtos.add(pqt2);
 
-    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, dtos);
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeletePartitionQCType() throws Exception {
-    testBulkDelete(controllerClass, 4, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 4, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 4, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 4, CONTROLLER_BASE);
   }
 }
