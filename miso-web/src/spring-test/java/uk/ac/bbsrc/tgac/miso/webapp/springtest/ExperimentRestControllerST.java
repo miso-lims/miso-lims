@@ -6,23 +6,20 @@ import org.springframework.web.servlet.*;
 
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
+
+import org.springframework.security.test.context.support.WithMockUser;
+import static org.junit.Assert.*;
+import java.util.List;
+import java.util.ArrayList;
+
 import javax.ws.rs.core.MediaType;
-
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
 import com.jayway.jsonpath.JsonPath;
 
 import static org.hamcrest.Matchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
@@ -36,21 +33,6 @@ import uk.ac.bbsrc.tgac.miso.dto.KitConsumableDto;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto.RunPartitionDto;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.View;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.springframework.security.test.context.support.WithMockUser;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
-import static org.junit.Assert.*;
-import java.util.Collections;
-
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
-import java.time.LocalDate;
 
 
 public class ExperimentRestControllerST extends AbstractST {
@@ -128,10 +110,11 @@ public class ExperimentRestControllerST extends AbstractST {
   public void testUpdate() throws Exception {
     Experiment exp = currentSession().get(entityClass, 3);
 
-    exp.setTitle("updated");
+    ExperimentDto dto = Dtos.asDto(exp);
+    dto.setTitle("updated");
 
 
-    Experiment updated = baseTestUpdate(CONTROLLER_BASE, Dtos.asDto(exp), 3, entityClass);
+    Experiment updated = baseTestUpdate(CONTROLLER_BASE, dto, 3, entityClass);
     assertEquals("updated", exp.getTitle()); // the only thing that has been modified is the title
     assertEquals(exp.getAlias(), updated.getAlias());
     assertEquals(exp.getTitle(), updated.getTitle());
