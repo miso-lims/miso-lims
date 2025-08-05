@@ -148,4 +148,5 @@ DELETE FROM Contact;
 DELETE FROM MetricSubcategory;
 DELETE FROM Requisition_SupplementalSample;
 DELETE FROM Requisition_SupplementalLibrary;
+DELETE FROM RequisitionPause;
 SET FOREIGN_KEY_CHECKS=1;

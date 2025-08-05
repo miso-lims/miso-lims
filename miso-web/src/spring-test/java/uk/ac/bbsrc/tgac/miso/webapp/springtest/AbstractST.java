@@ -94,7 +94,7 @@ public abstract class AbstractST {
   private MockMvc mockMvc;
 
   @PersistenceContext
-  private EntityManager entityManager;
+  protected EntityManager entityManager;
 
   @Autowired
   private DataSource dataSource;

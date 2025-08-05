@@ -553,6 +553,9 @@ INSERT INTO Requisition_Assay(requisitionId, assayId) VALUES
 (1, 1),
 (2, 3);
 
+INSERT INTO RequisitionPause(pauseId, requisitionId, startDate, endDate, reason) VALUES
+(1,1,"2020-03-19", NULL, "unknown"),
+(2,2, "2024-05-09", NULL, "broken");
 
 
 -- Identities
@@ -602,7 +605,7 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
   1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL),
 (502, 500, 'SAM502', 'TIB_0001_nn_n_1-1', NULL, 'TIB_SamTissue', 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-08-15 13:45:00', 1, '2017-08-15 13:45:00',
   FALSE, FALSE, 23, 501, NULL, NULL, NULL, 1, NULL, 1, '2017-08-15', 0, 'Tissue',
-  1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL, 2),
+  1, 1, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL),
 (4442, 4440, 'SAM4442', 'PROP_0001_nn_n_1-1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-10-26 14:40:00', 1, '2017-10-26 14:40:00',
   FALSE, FALSE, 23, 4441, 1, NULL, NULL, NULL, NULL, NULL, NULL, 0, 'Tissue',
   4, 14, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL),
@@ -763,7 +766,7 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
     'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
   (205, 'LIB205', 'SORT_0001_nn_n_PE_205_WG', NULL, 'description', 205, 'ILLUMINA', 1, 3, 1, '2017-08-09',
     1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, 2),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
   (206, 'LIB206', 'SORT_0001_nn_n_PE_206_WG', NULL, 'description', 206, 'ILLUMINA', 1, 3, 1, '2017-08-09',
     1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
     'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, 2),
