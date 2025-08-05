@@ -2,56 +2,21 @@ package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import org.junit.Test;
 
-import org.springframework.web.servlet.*;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+import org.springframework.security.test.context.support.WithMockUser;
+import static org.junit.Assert.*;
+import java.util.List;
+import java.util.ArrayList;
 
-import javax.ws.rs.core.MediaType;
-
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
-import com.jayway.jsonpath.JsonPath;
-
-import jakarta.transaction.Transactional;
-
-import static org.hamcrest.Matchers.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDesignDto;
 
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.View;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.springframework.security.test.context.support.WithMockUser;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
-import java.util.Collections;
-
-import static org.junit.Assert.*;
-
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
 
 
 public class LibraryDesignRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/librarydesigns";
-  private static final Class<LibraryDesign> controllerClass = LibraryDesign.class;
+  private static final Class<LibraryDesign> entityClass = LibraryDesign.class;
 
   private List<LibraryDesignDto> makeCreateDtos() {
 
@@ -65,10 +30,10 @@ public class LibraryDesignRestControllerST extends AbstractST {
 
     LibraryDesignDto two = new LibraryDesignDto();
     two.setName("2");
-    two.setSampleClassId(1L);
-    two.setStrategyId(1L);
-    two.setSelectionId(1L);
-    two.setDesignCodeId(1L);
+    two.setSampleClassId(23L);
+    two.setStrategyId(2L);
+    two.setSelectionId(2L);
+    two.setDesignCodeId(2L);
 
     dtos.add(one);
     dtos.add(two);
@@ -79,16 +44,26 @@ public class LibraryDesignRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
-    List<LibraryDesign> codes = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
-    assertEquals(codes.get(0).getName(), "1");
-    assertEquals(codes.get(1).getName(), "2");
+    List<LibraryDesign> codes = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
+    assertEquals("1", codes.get(0).getName());
+    assertEquals(1L, codes.get(0).getSampleClass().getId());
+    assertEquals(1L, codes.get(0).getLibraryStrategyType().getId());
+    assertEquals(1L, codes.get(0).getLibrarySelectionType().getId());
+    assertEquals(1L, codes.get(0).getLibraryDesignCode().getId());
+
+    assertEquals("2", codes.get(1).getName());
+    assertEquals(23L, codes.get(1).getSampleClass().getId());
+    assertEquals(2L, codes.get(1).getLibraryStrategyType().getId());
+    assertEquals(2L, codes.get(1).getLibrarySelectionType().getId());
+    assertEquals(2L, codes.get(1).getLibraryDesignCode().getId());
+
   }
 
   @Test
   public void testBulkCreateFail() throws Exception {
     // LibraryDesign creation is for admin only, so this test is expecting failure due to
     // insufficent permission
-    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
   }
 
   @Test
@@ -105,7 +80,7 @@ public class LibraryDesignRestControllerST extends AbstractST {
     dtos.add(t2);
 
     List<LibraryDesign> libraryDesigns =
-        (List<LibraryDesign>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, LibraryDesignDto::getId);
+        (List<LibraryDesign>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, LibraryDesignDto::getId);
     assertEquals("this", libraryDesigns.get(0).getName());
     assertEquals("this2", libraryDesigns.get(1).getName());
   }
@@ -122,17 +97,17 @@ public class LibraryDesignRestControllerST extends AbstractST {
     dtos.add(t);
     dtos.add(t2);
 
-    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, dtos);
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteLibraryDesign() throws Exception {
-    testBulkDelete(controllerClass, 20, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 20, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 20, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 20, CONTROLLER_BASE);
   }
 }
