@@ -1,3 +1,0 @@
-[submodule "runscanner-illumina/interop"]
-	path = runscanner-illumina/interop
-	url = https://github.com/Illumina/interop.git

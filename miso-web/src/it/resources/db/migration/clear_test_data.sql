@@ -141,4 +141,8 @@ DELETE FROM WorksetStage;
 DELETE FROM Deliverable;
 DELETE FROM ContactRole;
 DELETE FROM SequencingContainerModel;
+DELETE FROM ApiKey;
+DELETE FROM Attachment;
+DELETE FROM Sample_Attachment;
+DELETE FROM Contact;
 SET FOREIGN_KEY_CHECKS=1;

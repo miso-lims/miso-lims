@@ -28,7 +28,7 @@
         <tr>
           <td></td>
           <td align="left">
-            <small><input type='checkbox' name='_spring_security_remember_me'/> Stay logged in</small>
+            <small><label><input type='checkbox' name='_spring_security_remember_me'/> Stay logged in</label></small>
           </td>
         </tr>
         <tr>

@@ -89,10 +89,10 @@ public class ArrayRunRestControllerST extends AbstractST {
 
   @Test
   public void testUpdate() throws Exception {
-    ArrayRun arr = currentSession().get(controllerClass, 1);
+    ArrayRunDto arr = Dtos.asDto(currentSession().get(controllerClass, 1));
 
     arr.setAlias("modified");
-    ArrayRun updatedArr = baseTestUpdate(CONTROLLER_BASE, Dtos.asDto(arr), 1, controllerClass);
+    ArrayRun updatedArr = baseTestUpdate(CONTROLLER_BASE, arr, 1, controllerClass);
 
     assertEquals("modified", updatedArr.getAlias());
   }

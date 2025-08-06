@@ -24,10 +24,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 
 import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.core.data.Lab;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LabImpl;
-import uk.ac.bbsrc.tgac.miso.dto.LabDto;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.AttachmentCategory;
+import uk.ac.bbsrc.tgac.miso.dto.AttachmentCategoryDto;
 
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.View;
@@ -45,50 +43,49 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Date;
 
 
-public class LabRestControllerST extends AbstractST {
+public class AttachmentCategoryRestControllerST extends AbstractST {
 
-  private static final String CONTROLLER_BASE = "/rest/labs";
-  private static final Class<LabImpl> controllerClass = LabImpl.class;
+  private static final String CONTROLLER_BASE = "/rest/attachmentcategories";
+  private static final Class<AttachmentCategory> controllerClass = AttachmentCategory.class;
+
 
   @Test
   public void testBulkCreateAsync() throws Exception {
-    // since there is no permission restrictions on creating labs (i.e. don't need to be admin to create
-    // one), there is no create failure test for labs
-    LabDto lone = new LabDto();
-    lone.setAlias("lab1");
+    // since there is no permission restrictions on creating attachment categories (i.e. don't need to
+    // be admin to create
+    // one), there is no create failure test for them
+    AttachmentCategoryDto one = new AttachmentCategoryDto();
+    one.setAlias("one");
+    AttachmentCategoryDto two = new AttachmentCategoryDto();
+    two.setAlias("two");
 
-    LabDto ltwo = new LabDto();
-    ltwo.setAlias("lab2");
+    List<AttachmentCategoryDto> dtos = new ArrayList<AttachmentCategoryDto>();
+    dtos.add(one);
+    dtos.add(two);
 
-    List<LabDto> dtos = new ArrayList<LabDto>();
-    dtos.add(lone);
-    dtos.add(ltwo);
-
-    baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, dtos);
+    List<AttachmentCategory> cat = baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, dtos);
+    assertEquals(one.getAlias(), cat.get(0).getAlias());
+    assertEquals(two.getAlias(), cat.get(1).getAlias());
   }
 
-
-
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
-    // admin permissions are not required to update, however only the creator can update a lab, which in
-    // this case happens to be the admin user
-    LabDto bioBank = Dtos.asDto(currentSession().get(controllerClass, 1));
-    LabDto pathology = Dtos.asDto(currentSession().get(controllerClass, 2));
+    AttachmentCategoryDto one = Dtos.asDto(currentSession().get(controllerClass, 1));
+    AttachmentCategoryDto two = Dtos.asDto(currentSession().get(controllerClass, 2));
 
-    bioBank.setAlias("bioBank");
-    pathology.setAlias("pathology");
+    one.setAlias("form");
+    two.setAlias("tape");
 
-    List<LabDto> dtos = new ArrayList<LabDto>();
-    dtos.add(bioBank);
-    dtos.add(pathology);
+    List<AttachmentCategoryDto> dtos = new ArrayList<AttachmentCategoryDto>();
+    dtos.add(one);
+    dtos.add(two);
 
-    List<LabImpl> labs =
-        (List<LabImpl>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, LabDto::getId);
+    List<AttachmentCategory> cats =
+        (List<AttachmentCategory>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos,
+            AttachmentCategoryDto::getId);
 
-    assertEquals("| Biobank not updated. |", "bioBank", labs.get(0).getAlias());
-    assertEquals("| Pathology not updated | ", "pathology", labs.get(1).getAlias());
+    assertEquals("form", cats.get(0).getAlias());
+    assertEquals("tape", cats.get(1).getAlias());
   }
 
   @Test
@@ -97,12 +94,9 @@ public class LabRestControllerST extends AbstractST {
     testBulkDelete(controllerClass, 3, CONTROLLER_BASE);
   }
 
-
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
     testDeleteUnauthorized(controllerClass, 3, CONTROLLER_BASE);
   }
-
-
 }

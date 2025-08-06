@@ -437,12 +437,12 @@ INSERT INTO SequencingContainerModel_InstrumentModel (instrumentModelId, sequenc
 (3, 18),
 (3, 19);
 
-INSERT INTO Instrument (instrumentId, name, instrumentModelId, defaultPurposeId) VALUES
-  (1, 'T2000', 1, 1),
-  (2, 'TMS1', 2, 1),
-  (3, 'TPB2', 3, 1),
-  (4, 'iScan1', 4, NULL),
-  (5, 'Deletable', 4, NULL);
+INSERT INTO Instrument (instrumentId, name, instrumentModelId, defaultPurposeId, workstationId) VALUES
+  (1, 'T2000', 1, 1, 1),
+  (2, 'TMS1', 2, 1, NULL),
+  (3, 'TPB2', 3, 1, NULL),
+  (4, 'iScan1', 4, NULL, NULL),
+  (5, 'Deletable', 4, NULL, NULL);
   
 INSERT INTO Instrument (instrumentId, name, instrumentModelId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId, defaultPurposeId) VALUES
   (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, 1),
@@ -506,6 +506,11 @@ INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
 (2, 'WG Library Yield', 'LIBRARY_PREP', 'GE', 'ng/μL'),
 (3, 'Min Clusters (PF)', 'LIBRARY_QUALIFICATION', 'GT', 'K/lane'),
 (4, 'To Delete', 'FULL_DEPTH_SEQUENCING', 'BOOLEAN', NULL);
+
+
+INSERT INTO Deletion(deletionId, targetType, targetId, description, userId, changeTime) VALUES
+(1, 'Sample', 1700, 'last sample', 3, '2025-07-18 09:35:00');
+
 
 INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) VALUES
 (1, 1, NULL, NULL),
@@ -970,13 +975,13 @@ INSERT INTO PoolOrder_LibraryAliquot (poolOrderId, aliquotId, proportion) VALUES
 (2, 802, 1),
 (3, 1001, 1);
 
-INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, lastModifier, creator, created, lastModified) VALUES
-(1, 1, 1, 'BOX1', 'First Box', 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01'),
-(2, 1, 1, 'BOX2', 'Boxxy', 1, 1, '2018-08-30 15:15:00', '2018-08-30 15:15:00'),
-(500, 1, 1, 'BOX500', 'Tubes In Boxes Test', 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00'),
-(501, 1, 1, 'BOX501', 'Second box for Tubes in Boxes test', 3, 3, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
-(502, 1, 1, 'BOX502', 'Editable box', 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00'),
-(100001, 1, 1, 'BOX100001', 'Bulk Boxables Test', 1, 1, '2017-12-19 15:04:00', '2017-12-19 15:04:00');
+INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, lastModifier, creator, created, lastModified, identificationBarcode) VALUES
+(1, 1, 1, 'BOX1', 'First Box', 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01', '19841'),
+(2, 1, 1, 'BOX2', 'Boxxy', 1, 1, '2018-08-30 15:15:00', '2018-08-30 15:15:00', NULL),
+(500, 1, 1, 'BOX500', 'Tubes In Boxes Test', 1, 1, '2017-08-15 13:55:00', '2017-08-15 13:55:00', NULL),
+(501, 1, 1, 'BOX501', 'Second box for Tubes in Boxes test', 3, 3, '2017-08-16 16:40:00', '2017-08-16 16:40:00', NULL),
+(502, 1, 1, 'BOX502', 'Editable box', 1, 1, '2017-08-16 16:40:00', '2017-08-16 16:40:00', NULL),
+(100001, 1, 1, 'BOX100001', 'Bulk Boxables Test', 1, 1, '2017-12-19 15:04:00', '2017-12-19 15:04:00', NULL);
 
 INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (1, 1,   'LIBRARY',  'A01'),
@@ -1162,10 +1167,13 @@ INSERT INTO Run_Partition (runId, partitionId, purposeId, lastModifier) VALUES
 
 INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES
   (1, '2017-08-22', 1, 'LIB110005 existing note', 3),
-  (2, '2017-08-25', 1, 'IPO120001 existing note', 3);
+  (2, '2017-08-25', 1, 'IPO120001 existing note', 3),
+  (3, '2025-07-24', 1, 'LIB110005 existing note two', 3);
 
 INSERT INTO Library_Note(library_libraryId, notes_noteId) VALUES
-  (110005, 1);
+  (110005, 1),
+  (110005, 3);
+
 
 INSERT INTO Pool_Note(pool_poolId, notes_noteId) VALUES
   (120001, 2);
@@ -1295,6 +1303,10 @@ INSERT INTO Deliverable(deliverableId, name, categoryId) VALUES
 (2, 'deliverable2', 2),
 (3, 'To Delete', 1);
 
+INSERT INTO Contact(contactId, name, email) VALUES
+(1, 'Someone', 'someone@example.com'),
+(2, 'Everyone', 'everyone@example.com');
+
 INSERT INTO ContactRole(contactRoleId, name) VALUES
 (2, 'role1'),
 (3, 'role2'),
@@ -1304,14 +1316,16 @@ INSERT INTO Printer(printerId, name, driver, backend, configuration, enabled, wi
 (1, 'Printer', 'BRADY', 'BRADY_FTP', '{"host:"127.0.0.1","pin":"0000"}', TRUE, 25, 25, '[{"element":"text", "contents":{"use":"ALIAS"}}]');
 
 INSERT INTO ApiKey(keyId, userId, apiKey, apiSecret, creator, created) VALUES
-(2, 1, "asdf", "ghjk", 1, "2025-07-08")
-ON DUPLICATE KEY UPDATE 
-  userId = 1,
-  apiKey = "asdf",
-  apiSecret = "ghjk",
-  creator = 1,
-  created = "2025-07-08";
+(2, 1, "asdf", "ghjk", 1, "2025-07-08");
 
+INSERT INTO Attachment(attachmentId, filename, path, creator, created, categoryId) VALUES
+(1, 'File1', '/sample/1/12345', 1, '2021-02-22 14:40:00', 1),
+(2, 'File2', '/sample/2/12346', 1, '2021-02-22 14:40:00', 1),
+(3, 'Orphaned', '/sample/2/12347', 1, '2021-02-22 14:40:00', 1);
+
+INSERT INTO Sample_Attachment(sampleId, attachmentId) VALUES
+(1, 1),
+(2, 2);
 
 -- Keep this at bottom - checked to verify that script has completed and constants all loaded
 INSERT INTO AttachmentCategory(categoryId, alias) VALUES (4, 'last entry');

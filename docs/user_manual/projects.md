@@ -41,25 +41,6 @@ sequencing options depend on the library kit used on the library. If the default
 compatible with the library kit, it will not be selected automatically, nor will it be available for selection.
 
 
-### Permissions
-
-The "Permissions" section of the Create Project page contains several options for controlling who has access to the
-project. These permissions will also affect the project's samples, studies, and other related items.
-
-The project's owner is the person who should have full control over the project. They will be granted full read/write
-access to the project and all related items regardless of the other permissions set on the project.
-
-If the checkbox beside "Allow all internal users access?" is checked, then all users with the Internal role will also
-be given full read/write access to the project and all related items.
-
-Next, there are four lists which allow you to choose which MISO users and/or groups have read and/or write access.
-Checking a checkbox next to a user of group in one of these lists grants the specified permission to the user or group
-selected.
-
-See [User Permissions](../users_and_groups/#user-permissions) for more information about user roles and resource-level
-permissions.
-
-
 
 ## Edit Project Page
 

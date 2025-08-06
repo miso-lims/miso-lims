@@ -7,6 +7,20 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.11.0] - 2025-07-31
+
+### Changed
+
+* Make "Stay logged in" text clickable on login page
+* When propagating from tissue to tissue, the timepoint field will default to matching the parent
+  tissue's timepoint
+
+### Fixed
+
+* Library aliquot creation date is required, but did not have proper validation, leading to an
+  "unexpected error" message if not provided
+
+
 ## [3.10.1] - 2025-07-09
 
 ### Fixed
