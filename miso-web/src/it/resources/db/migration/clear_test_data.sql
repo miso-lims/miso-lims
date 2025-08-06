@@ -140,4 +140,5 @@ DELETE FROM WorksetCategory;
 DELETE FROM WorksetStage;
 DELETE FROM Deliverable;
 DELETE FROM ContactRole;
+DELETE FROM SequencingContainerModel;
 SET FOREIGN_KEY_CHECKS=1;
