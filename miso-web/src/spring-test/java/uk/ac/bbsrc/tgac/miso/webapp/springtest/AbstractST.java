@@ -650,4 +650,27 @@ public abstract class AbstractST {
   protected static long readLong(String resultJson, String path) {
     return readInteger(resultJson, path).longValue();
   }
+
+  /**
+   * Reads an Integer from a JSON response given a path
+   * 
+   * @param resultJson JSON response
+   * @param path JSON path to long
+   * @return Read Integer
+   */
+  protected static Integer readInteger(String resultJson, String path) {
+    return JsonPath.read(resultJson, path);
+  }
+
+
+  /**
+   * Reads a long from a JSON response given a path
+   * 
+   * @param resultJson JSON response
+   * @param path JSON path to long
+   * @return Read long
+   */
+  protected static long readLong(String resultJson, String path) {
+    return readInteger(resultJson, path).longValue();
+  }
 }
