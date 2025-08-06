@@ -481,9 +481,16 @@ public abstract class AbstractST {
     }
   }
 
-  /**
-   * Tests model static list endpoints.
-   */
+  // tests the properties of a single object returned as JSON
+  private void testJsonObjectProperties(String response, HashMap<String, String> properties) throws Exception {
+    for (Map.Entry<String, String> entry : properties.entrySet()) {
+      String key = entry.getKey();
+      String expectedValue = entry.getValue();
+      assertEquals(expectedValue, JsonPath.read(response, "$." + key).toString());
+    }
+  }
+
+  // tests model static list endpoints
   protected void testModelList(String url, String listAttribute, List<List<String>> properties)
       throws Exception {
     ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
@@ -527,5 +534,27 @@ public abstract class AbstractST {
 
     String response = ac.andReturn().getModelAndView().getModel().get(listAttribute).toString();
     assertEquals(numCreated, ((List<Object>) JsonPath.read(response, "$.*")).size());
+  }
+
+  protected void testModelFormSetup(String url, int id, String objectAttribute, List<String> properties)
+      throws Exception {
+    ResultActions ac = getMockMvc().perform(get(url)
+        .accept(MediaType.APPLICATION_JSON));
+
+    if (DEBUG_MODE)
+      ac = ac.andDo(print());
+
+    String response = ac.andExpect(status().isOk())
+        .andExpect(model().attributeExists(objectAttribute))
+        .andReturn().getModelAndView().getModel().get(objectAttribute).toString();
+
+    testJsonObjectProperties(response, propMapMaker(properties));
+  }
+
+  protected void baseTestNewModel(String url, String title) throws Exception {
+    getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andDo(print())
+        .andExpect(model().attribute("title", title));
   }
 }
