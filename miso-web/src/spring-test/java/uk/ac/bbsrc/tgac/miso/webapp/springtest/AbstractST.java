@@ -27,6 +27,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.util.LinkedMultiValueMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.test.context.TestExecutionListeners.MergeMode;
 import org.springframework.test.context.TestExecutionListeners;
@@ -409,5 +411,81 @@ public abstract class AbstractST {
         .andExpect(jsonPath("$.id").value(id));
 
     return result;
+  }
+
+
+  // simple utility method to make maps out of property lists
+  // form (key, value, key, value, ...)
+  private HashMap<String, String> propMapMaker(List<String> props) throws Exception {
+    HashMap<String, String> properties = new HashMap<String, String>();
+    for (int i = 0; i < props.size() / 2; i += 2) {
+      properties.put(props.get(i), props.get(i + 1));
+    }
+    return properties;
+  }
+
+  // makes a list of maps
+  // lets you make maps for specific properties for several objects
+  private List<HashMap<String, String>> multiPropMapMaker(List<List<String>> props) throws Exception {
+    List<HashMap<String, String>> properties = new ArrayList<HashMap<String, String>>();
+    for (List<String> lis : props) {
+      properties.add(propMapMaker(lis));
+    }
+    return properties;
+  }
+
+  // tests the properties of objectes in a JSON array
+  private void testJsonArrayProperties(String response, List<HashMap<String, String>> properties) throws Exception {
+    assertEquals(properties.size(), ((List<Object>) JsonPath.read(response, "$.*")).size());
+    for (int i = 0; i < properties.size(); i++) {
+      HashMap<String, String> currMap = properties.get(i);
+      for (Map.Entry<String, String> entry : currMap.entrySet()) {
+        String key = entry.getKey();
+        String expectedValue = entry.getValue();
+        assertEquals(expectedValue, JsonPath.read(response, "$[" + i + "]." + key).toString());
+      }
+    }
+  }
+
+  // tests model static list endpoints
+  protected void testModelList(String url, String listAttribute, List<List<String>> properties)
+      throws Exception {
+    ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
+    if (DEBUG_MODE)
+      ac = ac.andDo(print());
+
+    String response = ac.andExpect(status().isOk())
+        .andExpect(model().attributeExists(listAttribute))
+        .andReturn().getModelAndView().getModel().get(listAttribute).toString();
+
+    testJsonArrayProperties(response, multiPropMapMaker(properties));
+  }
+
+  // tests model bulk edit endpoints
+  protected void testModelBulkEdit(String url, String ids, String listAttribute, List<List<String>> properties)
+      throws Exception {
+    ResultActions ac = getMockMvc().perform(post(url).param("ids", ids).accept(MediaType.APPLICATION_JSON));
+    if (DEBUG_MODE)
+      ac = ac.andDo(print());
+
+    String response = ac.andExpect(status().isOk())
+        .andExpect(model().attributeExists(listAttribute))
+        .andReturn().getModelAndView().getModel().get(listAttribute).toString();
+
+    testJsonArrayProperties(response, multiPropMapMaker(properties));
+  }
+
+
+  // test model bulk create endpoints
+  protected void testModelBulkCreate(String url, int numCreated, String listAttribute) throws Exception {
+    ResultActions ac = getMockMvc().perform(get(url)
+        .accept(MediaType.APPLICATION_JSON).param("quantity", Integer.toString(numCreated)));
+    if (DEBUG_MODE)
+      ac = ac.andDo(print());
+
+    ac = ac.andExpect(status().isOk());
+
+    String response = ac.andReturn().getModelAndView().getModel().get(listAttribute).toString();
+    assertEquals(numCreated, ((List<Object>) JsonPath.read(response, "$.*")).size());
   }
 }
