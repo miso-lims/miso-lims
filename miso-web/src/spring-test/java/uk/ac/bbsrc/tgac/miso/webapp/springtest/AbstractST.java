@@ -316,7 +316,7 @@ public abstract class AbstractST {
     return pollingResponserHelper(requestType, dtos, baseUrl + "/bulk", baseUrl + "/bulk", 202);
   }
 
- /**
+  /**
    * Tests the deletion of a single entity e.g. endpoints with a @PostMapping(value = "/bulk-delete")
    * mapping
    * 
