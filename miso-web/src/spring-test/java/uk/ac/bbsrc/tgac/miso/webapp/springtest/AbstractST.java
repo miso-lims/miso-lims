@@ -94,7 +94,7 @@ public abstract class AbstractST {
   private MockMvc mockMvc;
 
   @PersistenceContext
-  protected EntityManager entityManager;
+  private EntityManager entityManager;
 
   @Autowired
   private DataSource dataSource;
@@ -148,7 +148,6 @@ public abstract class AbstractST {
 
   private String pollingResponse(String url) throws Exception {
     String response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
-    System.out.println(response);
     String status = JsonPath.read(response, "$.status");
     while (status.equals("running")) {
       response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
@@ -170,7 +169,7 @@ public abstract class AbstractST {
   protected <T> List<T> baseTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
 
-    String response = pollingResponserHelper("post", dtos, controllerBase + "/bulk", controllerBase + "/bulk");
+    String response = pollingResponserHelper("post", dtos, controllerBase + "/bulk");
     List<T> objects = new ArrayList<T>();
     for (int i = 0; i < dtos.size(); i++) {
       Integer id = JsonPath.read(response, "$.data[" + i + "].id");
@@ -215,7 +214,7 @@ public abstract class AbstractST {
   protected <T, D> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<D> dtos,
       Function<D, Long> getId)
       throws Exception {
-    String response = pollingResponserHelper("put", dtos, controllerBase + "/bulk", controllerBase + "/bulk");
+    String response = pollingResponserHelper("put", dtos, controllerBase + "/bulk");
 
     // check order of returned IDs
     List<Long> ids = dtos.stream().map(getId).toList();
@@ -252,7 +251,8 @@ public abstract class AbstractST {
     // request should fail without admin permissions
   }
 
-  private String pollingResponserHelper(String requestType, List<?> objs, String url, String pollResponse)
+  protected String pollingResponserHelper(String requestType, List<?> dtos, String url, String pollingResponseUrlPrefix,
+      int expectedResponseCode)
       throws Exception {
     // helper method for async requests
     MvcResult mvcResult;
@@ -260,12 +260,12 @@ public abstract class AbstractST {
     switch (requestType) {
       case "post":
         ac = getMockMvc()
-            .perform(post(url).contentType(MediaType.APPLICATION_JSON).content(makeJson(objs)));
+            .perform(post(url).contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
         break;
 
       case "put":
         ac = getMockMvc()
-            .perform(put(url).contentType(MediaType.APPLICATION_JSON).content(makeJson(objs)));
+            .perform(put(url).contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
         break;
 
       default:
@@ -274,20 +274,20 @@ public abstract class AbstractST {
     if (DEBUG_MODE)
       ac.andDo(print());
 
-    mvcResult = ac.andExpect(status().is(isOneOf(200, 204))).andReturn();
+    mvcResult = ac.andExpect(status().is(expectedResponseCode)).andReturn();
 
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    String response = pollingResponse(pollResponse + "/" + id);
+    String response = pollingResponse(pollingResponseUrlPrefix + "/" + id);
     return response;
   }
 
-  /**
-   * Tests the deletion of a single entity
-   * 
-   * @param deleteType Target entity type
-   * @param id Target entity ID
-   * @param controllerBase Controller URL prefix
-   */
+  // overloaded method for cases where the polling response URL is the same as the url
+  // this also assume that the expected response code is 202, or HTTP ACCEPTED, as is standard for
+  // nearly all of the async endpoints
+  private String pollingResponserHelper(String requestType, List<?> dtos, String url) throws Exception {
+    return pollingResponserHelper(requestType, dtos, url, url, 202);
+  }
+
   protected <T> void testBulkDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
 

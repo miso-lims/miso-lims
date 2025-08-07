@@ -9,10 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import org.springframework.test.web.servlet.ResultActions;
 import com.jayway.jsonpath.JsonPath;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
 
 import static org.hamcrest.Matchers.*;
 import org.springframework.test.web.servlet.MvcResult;
+import java.util.stream.Stream;
 
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
@@ -20,44 +20,96 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalLibrary.RequisitionSupplementalLibraryId;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample.RequisitionSupplementalSampleId;
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
 import org.springframework.security.test.context.support.WithMockUser;
 import static org.junit.Assert.*;
-import java.util.Collections;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RequisitionRestController.*;
 import java.util.List;
 import java.util.function.Function;
 import java.util.Arrays;
-import java.util.ArrayList;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateRequisitionDao;
-
-import org.springframework.test.web.servlet.MockMvc;
-
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
 
 
 public class RequisitionRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/requisitions";
   private static final Class<Requisition> entityClass = Requisition.class;
-  private static final HibernateRequisitionDao dao = new HibernateRequisitionDao();
 
+  // template test for requsition sample and library testing
+  protected <D> void testAddAsync(long requisitionId, String url, List<Long> entityIds, Class<D> entityType,
+      String pollUrl, Function<D, Identifiable> getRequisition)
+      throws Exception {
+
+    for (Long entityId : entityIds) {
+      assertFalse(isContained(requisitionId, entityId, entityType, getRequisition));
+      // not already in that req
+    }
+
+    String response = pollingResponserHelper("post", entityIds, url, pollUrl, 200);
+    for (Long entityId : entityIds) {
+      assertTrue(isContained(requisitionId, entityId, entityType, getRequisition));
+      // asserts the objects were indeed added
+    }
+  }
+
+  // template test for requsition sample and library testing
+  private <D> void testRemoveAsync(long requisitionId, String url, List<Long> entityIds, Class<D> entityType,
+      String pollUrl, Function<D, Identifiable> getRequisition)
+      throws Exception {
+
+    for (Long entityId : entityIds) {
+      assertTrue(isContained(requisitionId, entityId, entityType, getRequisition));
+      // currently associated with that req
+    }
+
+    String response = pollingResponserHelper("post", entityIds, url, pollUrl, 200);
+    for (Long entityId : entityIds) {
+      assertFalse(isContained(requisitionId, entityId, entityType, getRequisition));
+      // asserts the objects were indeed removed from that requisition
+      // as a result that entity should not have any requisition so a list of the
+      // requisitions should be empty
+    }
+  }
+
+  // template test for requsition sample and library testing
+  private <T> boolean isContained(long requisitionId, long entityId, Class<T> entityType,
+      Function<T, Identifiable> getRequisition) {
+    List<Identifiable> parent =
+        Stream.of(entityType.cast(currentSession().get(entityType, entityId))).map(getRequisition)
+            .filter(s -> s != null)
+            .toList();
+    boolean isNotContained = true; // true by default
+    if (!parent.isEmpty()) { // if the entity has a parent
+      if (parent.get(0).getId() == requisitionId) { // if the parent ids match
+        isNotContained = false;
+      } else {
+        // for debugging
+        System.out.println(
+            "ACTUAL REQUISITION OF " + entityType.toGenericString() + " " + entityId + " IS " + parent.get(0).getId()
+                + ", NOT " + requisitionId);
+      }
+    }
+    return !isNotContained;
+  }
 
   @Test
   public void testDatatable() throws Exception {
     testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1, 2));
   }
 
-  private <T> void testMove(int id, String type, MoveItemsRequest req, Class<T> targetType,
-      Function<T, Identifiable> getReq) throws Exception {
+  private <T> void testMove(int id, String type, MoveItemsRequest request, Class<T> targetType,
+      Function<T, Identifiable> getRequisition) throws Exception {
     getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/" + id + "/" + type + "/move").content(makeJson(req))
+        .perform(post(CONTROLLER_BASE + "/" + id + "/" + type + "/move").content(makeJson(request))
             .contentType(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk());
 
 
-    assertTrue(isContained(req.requisitionId(), req.itemIds().get(0), targetType, getReq));
+    assertTrue(isContained(request.requisitionId(), request.itemIds().get(0), targetType, getRequisition));
     // ensures that the move has been made
 
   }
@@ -122,13 +174,18 @@ public class RequisitionRestControllerST extends AbstractST {
   @Test
   public void testAddSupplementalSamples() throws Exception {
     // supplemental samples cannot be identities or ghost samples
-    dao.setEntityManager(entityManager);
 
-    long reqId = 1L;
-    long targetId = 4L;
-    Class<SampleImpl> targetClass = SampleImpl.class;
-    assertNull(dao.getSupplementalSample(currentSession().get(entityClass, reqId),
-        currentSession().get(targetClass, targetId)));
+    Long reqId = 1L;
+    Long targetId = 4L;
+    RequisitionSupplementalSampleId id = new RequisitionSupplementalSampleId();
+    id.setRequisitionId(reqId);
+    id.setSample(currentSession().get(SampleImpl.class, targetId));
+    Class<RequisitionSupplementalSample> targetClass = RequisitionSupplementalSample.class;
+
+
+    // the sample should not be a part of any requisition as a supplemental sample at this point
+    assertNull(currentSession().get(targetClass, id));
+
 
 
     getMockMvc()
@@ -136,22 +193,29 @@ public class RequisitionRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
 
+    RequisitionSupplementalSample sample = currentSession().get(targetClass, id);
+    assertNotNull(sample);
+    assertEquals(reqId, sample.getRequisitionId());
 
-    assertNotNull(dao.getSupplementalSample(currentSession().get(entityClass, reqId),
-        currentSession().get(targetClass, targetId)));
+
 
   }
 
   @Test
   public void testRemoveSupplementalSamples() throws Exception {
-    long reqId = 2L;
-    long targetId = 502L;
-    Class<SampleImpl> targetClass = SampleImpl.class;
-    dao.setEntityManager(entityManager);
+    Long reqId = 2L;
+    Long targetId = 502L;
 
-    assertNotNull(dao.getSupplementalSample(currentSession().get(entityClass, reqId),
-        currentSession().get(targetClass, targetId)));
+    Class<RequisitionSupplementalSample> targetClass = RequisitionSupplementalSample.class;
 
+    RequisitionSupplementalSampleId id = new RequisitionSupplementalSampleId();
+    id.setRequisitionId(reqId);
+    id.setSample(currentSession().get(SampleImpl.class, targetId));
+
+
+    RequisitionSupplementalSample sample = currentSession().get(targetClass, id);
+    assertNotNull(sample);
+    assertEquals(reqId, sample.getRequisitionId());
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/" + reqId + "/supplementalsamples/remove")
@@ -159,9 +223,7 @@ public class RequisitionRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
 
-    assertNull(dao.getSupplementalSample(currentSession().get(entityClass, reqId),
-        currentSession().get(targetClass, targetId)));
-
+    assertNull(currentSession().get(targetClass, id));
   }
 
   @Test
@@ -186,13 +248,16 @@ public class RequisitionRestControllerST extends AbstractST {
 
   @Test
   public void testAddSupplementalLibraries() throws Exception {
-    long reqId = 1L;
-    long targetId = 304L;
-    Class<LibraryImpl> targetClass = LibraryImpl.class;
-    dao.setEntityManager(entityManager);
+    Long reqId = 1L;
+    Long targetId = 304L;
+    Class<RequisitionSupplementalLibrary> targetClass = RequisitionSupplementalLibrary.class;
 
-    assertNull(dao.getSupplementalLibrary(currentSession().get(entityClass, reqId),
-        currentSession().get(targetClass, targetId)));
+    RequisitionSupplementalLibraryId id = new RequisitionSupplementalLibraryId();
+    id.setRequisitionId(reqId);
+    id.setLibrary(currentSession().get(LibraryImpl.class, targetId));
+
+
+    assertNull(currentSession().get(targetClass, id));
 
     getMockMvc()
         .perform(
@@ -200,21 +265,28 @@ public class RequisitionRestControllerST extends AbstractST {
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
 
-    Requisition req = currentSession().get(entityClass, reqId);
 
-    assertNotNull(dao.getSupplementalLibrary(currentSession().get(entityClass, reqId),
-        currentSession().get(targetClass, targetId)));
+
+    RequisitionSupplementalLibrary lib = currentSession().get(targetClass, id);
+    assertNotNull(lib);
+    assertEquals(reqId, lib.getRequisitionId());
   }
 
   @Test
   public void testRemoveSupplementalLibraries() throws Exception {
-    long reqId = 2L;
-    long targetId = 205L;
-    Class<LibraryImpl> targetClass = LibraryImpl.class;
-    dao.setEntityManager(entityManager);
+    Long reqId = 2L;
+    Long targetId = 205L;
+    Class<RequisitionSupplementalLibrary> targetClass = RequisitionSupplementalLibrary.class;
 
-    assertNotNull(dao.getSupplementalLibrary(currentSession().get(entityClass, reqId),
-        currentSession().get(targetClass, targetId)));
+
+    RequisitionSupplementalLibraryId id = new RequisitionSupplementalLibraryId();
+    id.setRequisitionId(reqId);
+    id.setLibrary(currentSession().get(LibraryImpl.class, targetId));
+
+
+    RequisitionSupplementalLibrary lib = currentSession().get(targetClass, id);
+    assertNotNull(lib);
+    assertEquals(reqId, lib.getRequisitionId());
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/" + reqId + "/supplementallibraries/remove")
@@ -222,8 +294,8 @@ public class RequisitionRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
 
-    assertNull(dao.getSupplementalLibrary(currentSession().get(entityClass, reqId),
-        currentSession().get(targetClass, targetId)));
+    assertNull(currentSession().get(targetClass, id));
+
   }
 
   @Test
@@ -258,9 +330,7 @@ public class RequisitionRestControllerST extends AbstractST {
   public void testBulkResume() throws Exception {
     List<Long> reqs = Arrays.asList(1L, 2L);
     String resumeDate = "2025-05-05";
-    BulkResumeRequest req = new BulkResumeRequest();
-    req.setRequisitionIds(reqs);
-    req.setResumeDate(resumeDate);
+    BulkResumeRequest req = new BulkResumeRequest(reqs, resumeDate);
 
     ResultActions ac = getMockMvc()
         .perform(post(CONTROLLER_BASE + "/bulk-resume").contentType(MediaType.APPLICATION_JSON).content(makeJson(req)));
@@ -276,4 +346,7 @@ public class RequisitionRestControllerST extends AbstractST {
       assertEquals(resumeDate, pause.getEndDate().toString());
     }
   }
+
+
+
 }
