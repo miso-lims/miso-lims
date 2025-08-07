@@ -55,7 +55,7 @@ public class InstrumentStatusRestControllerST extends AbstractST {
     getMockMvc().perform(get(CONTROLLER_BASE))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.*", hasSize(8)))
-        .andExpect(jsonPath("$[0].instrument.id").value(2))
+        .andExpect(jsonPath("$[0].instrument.id").value(5002))
         .andExpect(jsonPath("$[0].positions[0].run.type").value("Base"))
         .andExpect(jsonPath("$[1].instrument.id").value(2))
         .andExpect(jsonPath("$[2].instrument.id").value(3))
