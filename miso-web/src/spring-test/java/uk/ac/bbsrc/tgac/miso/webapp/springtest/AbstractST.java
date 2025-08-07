@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -413,29 +414,29 @@ public abstract class AbstractST {
     return result;
   }
 
-  // simple utility method to make maps out of property lists
-  // form (key, value, key, value, ...)
-  private HashMap<String, String> propMapMaker(List<String> props) throws Exception {
-    HashMap<String, String> properties = new HashMap<String, String>();
-    for (int i = 0; i < props.size(); i += 2) {
-      properties.put(props.get(i), props.get(i + 1));
-    }
-    return properties;
-  }
-
-  // makes a list of maps
-  // lets you make maps for specific properties for several objects
+  /**
+   * Makes a list of maps. Allows for the creation of maps for specific properties for several
+   * objects.
+   */
   private List<HashMap<String, String>> multiPropMapMaker(List<List<String>> props) throws Exception {
     List<HashMap<String, String>> properties = new ArrayList<HashMap<String, String>>();
+
     for (List<String> lis : props) {
-      properties.add(propMapMaker(lis));
+
+      MapBuilder<String, String> currMap = new MapBuilder<String, String>();
+      for (int i = 0; i < lis.size(); i += 2) {
+        currMap.put(lis.get(i), lis.get(i + 1));
+      }
+      properties.add((HashMap) currMap.build()); // safe case -- MapBuilder is implemented with a hash map
     }
     return properties;
   }
 
-  // tests the properties of objectes in a JSON array
+  /**
+   * Tests the properties of objectes in a JSON array.
+   */
   private void testJsonArrayProperties(String response, List<HashMap<String, String>> properties) throws Exception {
-    assertEquals(properties.size(), ((List<Object>) JsonPath.read(response, "$.*")).size());
+    assertEquals(Integer.valueOf(properties.size()), JsonPath.read(response, "$.length()"));
     for (int i = 0; i < properties.size(); i++) {
       HashMap<String, String> currMap = properties.get(i);
       for (Map.Entry<String, String> entry : currMap.entrySet()) {
@@ -449,7 +450,10 @@ public abstract class AbstractST {
     }
   }
 
-  // tests model static list endpoints
+
+  /**
+   * Tests model static list endpoints.
+   */
   protected void testModelList(String url, String listAttribute, List<List<String>> properties)
       throws Exception {
     ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
@@ -463,7 +467,9 @@ public abstract class AbstractST {
     testJsonArrayProperties(response, multiPropMapMaker(properties));
   }
 
-  // tests model bulk edit endpoints
+  /**
+   * Tests model bulk edit endpoints.
+   */
   protected void testModelBulkEdit(String url, String ids, String listAttribute, List<List<String>> properties)
       throws Exception {
     ResultActions ac = getMockMvc().perform(post(url).param("ids", ids).accept(MediaType.APPLICATION_JSON));
@@ -478,7 +484,9 @@ public abstract class AbstractST {
   }
 
 
-  // test model bulk create endpoints
+  /**
+   * Tests model bulk create endpoints.
+   */
   protected void testModelBulkCreate(String url, int numCreated, String listAttribute) throws Exception {
     ResultActions ac = getMockMvc().perform(get(url)
         .accept(MediaType.APPLICATION_JSON).param("quantity", Integer.toString(numCreated)));
