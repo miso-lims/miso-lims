@@ -415,6 +415,17 @@ public abstract class AbstractST {
   }
 
   /**
+   * Makes a (key, value) map for object field names and field values
+   */
+  private HashMap<String, String> propMapMaker(List<String> props) throws Exception {
+    MapBuilder<String, String> map = new MapBuilder<String, String>();
+    for (int i = 0; i < props.size(); i += 2) {
+      map.put(props.get(i), props.get(i + 1));
+    }
+    return (HashMap) map.build();
+  }
+
+  /**
    * Makes a list of maps. Allows for the creation of maps for specific properties for several
    * objects.
    */
