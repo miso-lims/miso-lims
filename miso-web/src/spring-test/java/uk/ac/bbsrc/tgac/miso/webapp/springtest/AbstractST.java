@@ -413,12 +413,11 @@ public abstract class AbstractST {
     return result;
   }
 
-
   // simple utility method to make maps out of property lists
   // form (key, value, key, value, ...)
   private HashMap<String, String> propMapMaker(List<String> props) throws Exception {
     HashMap<String, String> properties = new HashMap<String, String>();
-    for (int i = 0; i < props.size() / 2; i += 2) {
+    for (int i = 0; i < props.size(); i += 2) {
       properties.put(props.get(i), props.get(i + 1));
     }
     return properties;
@@ -442,7 +441,10 @@ public abstract class AbstractST {
       for (Map.Entry<String, String> entry : currMap.entrySet()) {
         String key = entry.getKey();
         String expectedValue = entry.getValue();
-        assertEquals(expectedValue, JsonPath.read(response, "$[" + i + "]." + key).toString());
+        String actual = JsonPath.read(response, "$[" + i + "]." + key).toString();
+        assertEquals(expectedValue, actual);
+        if (DEBUG_MODE)
+          System.out.println("\n\nEXPECTED IS: " + expectedValue + ", WHILE ACTUAL IS: " + actual + "\n\n");
       }
     }
   }
