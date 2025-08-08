@@ -46,8 +46,8 @@ public class LibraryDesignRestControllerST extends AbstractST {
   public void testBulkCreateAsync() throws Exception {
     List<LibraryDesign> codes = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
     assertEquals("1", codes.get(0).getName());
-    assertEquals(20L, codes.get(0).getSampleClass().getId());
-    assertEquals(1L, codes.get(0).getLibraryStrategyType().getId());
+    assertEquals(1L, codes.get(0).getSampleClass().getId());
+    assertEquals(20L, codes.get(0).getLibraryStrategyType().getId());
     assertEquals(15L, codes.get(0).getLibrarySelectionType().getId());
     assertEquals(7L, codes.get(0).getLibraryDesignCode().getId());
 
