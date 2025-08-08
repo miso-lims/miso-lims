@@ -442,14 +442,44 @@ public abstract class AbstractST {
       for (Map.Entry<String, String> entry : currMap.entrySet()) {
         String key = entry.getKey();
         String expectedValue = entry.getValue();
-        String actual = JsonPath.read(response, "$[" + i + "]." + key).toString();
-        assertEquals(expectedValue, actual);
+        Object actualValue = JsonPath.read(response, "$[" + i + "]." + key);
+
+
+        Object castedExpected = convertFieldType(expectedValue, actualValue);
+        assertEquals(castedExpected, actualValue);
         if (DEBUG_MODE)
-          System.out.println("\n\nEXPECTED IS: " + expectedValue + ", WHILE ACTUAL IS: " + actual + "\n\n");
+          System.out.println("\n\nEXPECTED IS: " + expectedValue + ", WHILE ACTUAL IS: " + actualValue + "\n\n");
       }
     }
   }
 
+  private Object convertFieldType(String expectedValue, Object actualValue) {
+    if (actualValue == null) {
+      return null;
+    }
+
+    Class<?> actualType = actualValue.getClass();
+
+    try {
+      if (actualType == String.class) {
+        return expectedValue;
+      } else if (actualType == Integer.class) {
+        return Integer.parseInt(expectedValue);
+      } else if (actualType == Double.class) {
+        return Double.parseDouble(expectedValue);
+      } else if (actualType == Boolean.class) {
+        return Boolean.parseBoolean(expectedValue);
+      } else if (actualType == Long.class) {
+        return Long.parseLong(expectedValue);
+      } else {
+        // for other types, return the string
+        return expectedValue;
+      }
+    } catch (NumberFormatException e) {
+      throw new AssertionError("Cannot convert '" + expectedValue +
+          "' to type " + actualType.getSimpleName());
+    }
+  }
 
   /**
    * Tests model static list endpoints.
