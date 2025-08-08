@@ -140,7 +140,6 @@ DELETE FROM WorksetCategory;
 DELETE FROM WorksetStage;
 DELETE FROM Deliverable;
 DELETE FROM ContactRole;
-DELETE FROM SequencingContainerModel;
 DELETE FROM ApiKey;
 DELETE FROM Attachment;
 DELETE FROM Sample_Attachment;
