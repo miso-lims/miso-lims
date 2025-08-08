@@ -131,7 +131,7 @@ public class LibraryIndexRestControllerST extends AbstractST {
 
   @Test
   public void testDatatableByPlatform() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/platform/PACBIO", Arrays.asList(13, 14));
+    testDtRequest(CONTROLLER_BASE + "/dt/platform/PACBIO", Arrays.asList(15, 16, 17, 18));
   }
 
   @Test

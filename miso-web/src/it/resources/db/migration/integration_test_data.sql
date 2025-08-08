@@ -359,8 +359,8 @@ VALUES (3,1),(3,2),(1,1),(1,3),(4,3);
 INSERT INTO LibraryIndexFamily (indexFamilyId, name, platformType) VALUES
   (1, 'Single Index 6bp', 'ILLUMINA'),
   (2, 'Dual Index 6bp', 'ILLUMINA'),
-  (3, 'Similar Index Pair', 'PACBIO'),
-  (4, 'Unused Family', 'ILLUMINA');
+  (3, 'Similar Index Pair', 'ILLUMINA'),
+  (4, 'Unused Family', 'PACBIO');
 
 INSERT INTO LibraryIndex (indexId, indexFamilyId, name, sequence, position) VALUES
   (1,  1, 'Index 01', 'AAAAAA', 1),
