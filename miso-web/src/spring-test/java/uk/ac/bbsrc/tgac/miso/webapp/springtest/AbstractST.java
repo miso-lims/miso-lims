@@ -415,76 +415,41 @@ public abstract class AbstractST {
   }
 
   /**
-   * Makes a list of maps. Allows for the creation of maps for specific properties for several
-   * objects.
+   * Simple utility method to turn a list of integer ids into a readable string of ids (as read by the
+   * miso.core.util package)
    */
-  private List<HashMap<String, String>> multiPropMapMaker(List<List<String>> props) throws Exception {
-    List<HashMap<String, String>> properties = new ArrayList<HashMap<String, String>>();
-
-    for (List<String> lis : props) {
-
-      MapBuilder<String, String> currMap = new MapBuilder<String, String>();
-      for (int i = 0; i < lis.size(); i += 2) {
-        currMap.put(lis.get(i), lis.get(i + 1));
-      }
-      properties.add((HashMap) currMap.build()); // safe case -- MapBuilder is implemented with a hash map
+  protected String idListString(List<Integer> ids) {
+    String result = "";
+    for (int i = 0; i < ids.size() - 1; i++) {
+      result += ids.get(i) + ",";
     }
-    return properties;
+    result += ids.get(ids.size() - 1); // last id
+    return result;
   }
 
   /**
-   * Tests the properties of objectes in a JSON array.
+   * Tests the properties of objects in a JSON array.
    */
-  private void testJsonArrayProperties(String response, List<HashMap<String, String>> properties) throws Exception {
+  private void testJsonArrayProperties(String response, List<HashMap<String, Object>> properties) throws Exception {
     assertEquals(Integer.valueOf(properties.size()), JsonPath.read(response, "$.length()"));
     for (int i = 0; i < properties.size(); i++) {
-      HashMap<String, String> currMap = properties.get(i);
-      for (Map.Entry<String, String> entry : currMap.entrySet()) {
+      HashMap<String, Object> currMap = properties.get(i);
+      for (Map.Entry<String, Object> entry : currMap.entrySet()) {
         String key = entry.getKey();
-        String expectedValue = entry.getValue();
+        Object expectedValue = entry.getValue();
         Object actualValue = JsonPath.read(response, "$[" + i + "]." + key);
 
-
-        Object castedExpected = convertFieldType(expectedValue, actualValue);
-        assertEquals(castedExpected, actualValue);
+        assertEquals(expectedValue, actualValue);
         if (DEBUG_MODE)
           System.out.println("\n\nEXPECTED IS: " + expectedValue + ", WHILE ACTUAL IS: " + actualValue + "\n\n");
       }
     }
   }
 
-  private Object convertFieldType(String expectedValue, Object actualValue) {
-    if (actualValue == null) {
-      return null;
-    }
-
-    Class<?> actualType = actualValue.getClass();
-
-    try {
-      if (actualType == String.class) {
-        return expectedValue;
-      } else if (actualType == Integer.class) {
-        return Integer.parseInt(expectedValue);
-      } else if (actualType == Double.class) {
-        return Double.parseDouble(expectedValue);
-      } else if (actualType == Boolean.class) {
-        return Boolean.parseBoolean(expectedValue);
-      } else if (actualType == Long.class) {
-        return Long.parseLong(expectedValue);
-      } else {
-        // for other types, return the string
-        return expectedValue;
-      }
-    } catch (NumberFormatException e) {
-      throw new AssertionError("Cannot convert '" + expectedValue +
-          "' to type " + actualType.getSimpleName());
-    }
-  }
-
   /**
    * Tests model static list endpoints.
    */
-  protected void testModelList(String url, String listAttribute, List<List<String>> properties)
+  protected void testModelList(String url, String listAttribute, List<HashMap<String, Object>> properties)
       throws Exception {
     ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
     if (DEBUG_MODE)
@@ -494,13 +459,14 @@ public abstract class AbstractST {
         .andExpect(model().attributeExists(listAttribute))
         .andReturn().getModelAndView().getModel().get(listAttribute).toString();
 
-    testJsonArrayProperties(response, multiPropMapMaker(properties));
+    testJsonArrayProperties(response, properties);
   }
 
   /**
    * Tests model bulk edit endpoints.
    */
-  protected void testModelBulkEdit(String url, String ids, String listAttribute, List<List<String>> properties)
+  protected void testModelBulkEdit(String url, String ids, String listAttribute,
+      List<HashMap<String, Object>> properties)
       throws Exception {
     ResultActions ac = getMockMvc().perform(post(url).param("ids", ids).accept(MediaType.APPLICATION_JSON));
     if (DEBUG_MODE)
@@ -510,7 +476,7 @@ public abstract class AbstractST {
         .andExpect(model().attributeExists(listAttribute))
         .andReturn().getModelAndView().getModel().get(listAttribute).toString();
 
-    testJsonArrayProperties(response, multiPropMapMaker(properties));
+    testJsonArrayProperties(response, properties);
   }
 
 
