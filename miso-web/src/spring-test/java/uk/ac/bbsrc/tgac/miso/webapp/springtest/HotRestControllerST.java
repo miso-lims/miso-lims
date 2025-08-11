@@ -78,16 +78,17 @@ public class HotRestControllerST extends AbstractST {
       s = s.replaceAll("\"", "");
       records[i] = s.split(",");
     }
-    checkArray(records[0], headers);
+    checkArray(headers, records[0]);
     for (int i = 0; i < rows.size(); i++) {
-      checkArray(records[i + 1], rows.get(i));
+      checkArray(rows.get(i), records[i + 1]);
     }
   }
 
-  private void checkArray(String[] values, List<String> expected) {
+  private void checkArray(List<String> expected, String[] actual) {
     for (int i = 0; i < expected.size(); i++) {
-      assertEquals(expected.get(i), values[i]);
+      assertEquals(expected.get(i), actual[i]);
     }
+
   }
 
   @Test
