@@ -26,13 +26,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 import uk.ac.bbsrc.tgac.miso.dto.KitConsumableDto;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto.RunPartitionDto;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 
 
 public class ExperimentRestControllerST extends AbstractST {
@@ -43,17 +44,19 @@ public class ExperimentRestControllerST extends AbstractST {
 
   @Test
   public void testAddKit() throws Exception {
-    KitImpl kit = currentSession().get(KitImpl.class, 1);
 
-    KitConsumableDto dto = Dtos.asDto(kit);
+    KitConsumableDto dto = new KitConsumableDto();
+    dto.setId(1L);
+    dto.setLotNumber("LOT34");
+    dto.setDescriptor(Dtos.asDto(currentSession().get(KitDescriptor.class, 1)));
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/2/addkit").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
     Experiment added = currentSession().get(entityClass, 2);
     assertEquals(1, added.getKits().size());
-    assertEquals(kit.getId(), added.getKits().iterator().next().getId());
-    assertEquals(kit.getName(), added.getKits().iterator().next().getName());
+    assertEquals(dto.getId().longValue(), added.getKits().iterator().next().getId());
+    assertEquals(dto.getLotNumber(), added.getKits().iterator().next().getLotNumber());
     // just checking that the right kit was added to the experiment
   }
 
@@ -63,7 +66,9 @@ public class ExperimentRestControllerST extends AbstractST {
         .andExpect(status().isOk());
 
     Experiment exp2 = currentSession().get(entityClass, 2);
-    assertEquals(exp2.getRunPartitions().get(0).getRun(), currentSession().get(Run.class, 1));
+    assertEquals(((Run) currentSession().get(Run.class, 1)).getId(), exp2.getRunPartitions().get(0).getRun().getId());
+    assertEquals(currentSession().get(PartitionImpl.class, 11),
+        exp2.getRunPartitions().get(0).getPartition());
   }
 
 
@@ -115,9 +120,8 @@ public class ExperimentRestControllerST extends AbstractST {
 
 
     Experiment updated = baseTestUpdate(CONTROLLER_BASE, dto, 3, entityClass);
-    assertEquals("updated", exp.getTitle()); // the only thing that has been modified is the title
+    assertEquals("updated", updated.getTitle()); // the only thing that has been modified is the title
     assertEquals(exp.getAlias(), updated.getAlias());
-    assertEquals(exp.getTitle(), updated.getTitle());
 
     for (int i = 0; i < exp.getChangeLog().size(); i++) {
       assertEquals(exp.getChangeLog().get(i).getId(), updated.getChangeLog().get(i).getId());
