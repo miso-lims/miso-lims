@@ -18,22 +18,21 @@ public class AssayTestRestControllerST extends AbstractST {
   private static final Class<AssayTest> entityClass = AssayTest.class;
 
   private List<AssayTestDto> makeCreateDtos() {
-    AssayTest atest1 = new AssayTest();
-    atest1.setLibraryQualificationMethod(AssayTest.LibraryQualificationMethod.LOW_DEPTH_SEQUENCING);
-    atest1.setPermittedSamples(AssayTest.PermittedSamples.ALL);
 
-    AssayTestDto test1 = AssayTestDto.from(atest1);
+
+    AssayTestDto test1 = new AssayTestDto();
+    test1.setLibraryQualificationMethod(AssayTest.LibraryQualificationMethod.LOW_DEPTH_SEQUENCING.name());
+    test1.setPermittedSamples(AssayTest.PermittedSamples.ALL.name());
     test1.setAlias("first");
     test1.setTissueTypeId(1L);
     test1.setExtractionClassId(11L);
     test1.setLibraryDesignCodeId(2L);
 
 
-    AssayTest atest2 = new AssayTest();
-    atest2.setLibraryQualificationMethod(AssayTest.LibraryQualificationMethod.NONE);
-    atest2.setPermittedSamples(AssayTest.PermittedSamples.REQUISITIONED);
 
-    AssayTestDto test2 = AssayTestDto.from(atest2);
+    AssayTestDto test2 = new AssayTestDto();
+    test2.setLibraryQualificationMethod(AssayTest.LibraryQualificationMethod.NONE.name());
+    test2.setPermittedSamples(AssayTest.PermittedSamples.REQUISITIONED.name());
     test2.setAlias("second");
     test2.setTissueTypeId(2L);
     test2.setExtractionClassId(12L);
