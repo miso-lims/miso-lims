@@ -1,7 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -41,15 +43,19 @@ public class InstrumentStatusRestController extends AbstractRestController {
           if (aRunning != bRunning) {
             return bRunning.ordinal() - aRunning.ordinal();
           }
-          long idA = a.getId();
-          long idB = b.getId();
-          if (idA < idB) {
-            return 1;
-          } else if (idA == idB) {
-            return 0;
-          } else {
+          LocalDate aDate = getCompareDate(a);
+          LocalDate bDate = getCompareDate(b);
+          if (bDate == null) {
             return -1;
+          } else if (aDate == null) {
+            return 1;
+          } else if (aDate.equals(bDate)) {
+            return Long.compare(a.getId(), b.getId());
           }
+          return bDate.compareTo(aDate);
+
+
+
         })
         .map(Dtos::asDto)//
         .collect(Collectors.toList());
@@ -64,5 +70,18 @@ public class InstrumentStatusRestController extends AbstractRestController {
     } else {
       return RunningPositions.NONE;
     }
+  }
+
+  private static LocalDate getCompareDate(InstrumentStatus status) {
+    return status.getPositions().stream()
+        .map(InstrumentStatusPosition::getRun)
+        .filter(Objects::nonNull)
+        .map(run -> getCompareDate(run))
+        .max(LocalDate::compareTo)
+        .orElse(null);
+  }
+
+  private static LocalDate getCompareDate(InstrumentStatusPositionRun run) {
+    return run.getCompletionDate() == null ? run.getStartDate() : run.getCompletionDate();
   }
 }
