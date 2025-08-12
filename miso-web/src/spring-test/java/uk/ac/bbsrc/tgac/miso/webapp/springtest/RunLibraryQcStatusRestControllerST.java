@@ -59,9 +59,8 @@ public class RunLibraryQcStatusRestControllerST extends AbstractST {
     statOne.setDescription("one");
     statTwo.setDescription("two");
 
-    List<RunLibraryQcStatus> statuses =
-        (List<RunLibraryQcStatus>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
-            Arrays.asList(statOne, statTwo), RunLibraryQcStatusDto::getId);
+    List<RunLibraryQcStatus> statuses = baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
+        Arrays.asList(statOne, statTwo), RunLibraryQcStatusDto::getId);
     assertEquals(statOne.getDescription(), statuses.get(0).getDescription());
     assertEquals(statTwo.getDescription(), statuses.get(1).getDescription());
 
