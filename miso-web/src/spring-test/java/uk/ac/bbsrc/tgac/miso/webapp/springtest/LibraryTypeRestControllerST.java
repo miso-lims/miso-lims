@@ -78,7 +78,7 @@ public class LibraryTypeRestControllerST extends AbstractST {
 
 
     List<LibraryType> libraryTypes =
-        (List<LibraryType>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, LibraryTypeDto::getId);
+        baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, LibraryTypeDto::getId);
 
     assertEquals(1L, libraryTypes.get(0).getId());
     assertEquals(2L, libraryTypes.get(1).getId());
