@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 import uk.ac.bbsrc.tgac.miso.dto.KitConsumableDto;
+import uk.ac.bbsrc.tgac.miso.dto.KitDescriptorDto;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto.RunPartitionDto;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -48,7 +49,9 @@ public class ExperimentRestControllerST extends AbstractST {
     KitConsumableDto dto = new KitConsumableDto();
     dto.setId(1L);
     dto.setLotNumber("LOT34");
-    dto.setDescriptor(Dtos.asDto(currentSession().get(KitDescriptor.class, 1)));
+    KitDescriptorDto descriptorDto = new KitDescriptorDto();
+    descriptorDto.setId(1L);
+    dto.setDescriptor(descriptorDto);
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/2/addkit").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
@@ -66,9 +69,9 @@ public class ExperimentRestControllerST extends AbstractST {
         .andExpect(status().isOk());
 
     Experiment exp2 = currentSession().get(entityClass, 2);
-    assertEquals(((Run) currentSession().get(Run.class, 1)).getId(), exp2.getRunPartitions().get(0).getRun().getId());
-    assertEquals(currentSession().get(PartitionImpl.class, 11),
-        exp2.getRunPartitions().get(0).getPartition());
+    assertEquals(1L, exp2.getRunPartitions().get(0).getRun().getId());
+    assertEquals(currentSession().get(PartitionImpl.class, 11).getId(),
+        exp2.getRunPartitions().get(0).getPartition().getId());
   }
 
 
