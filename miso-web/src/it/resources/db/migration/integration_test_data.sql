@@ -360,7 +360,10 @@ INSERT INTO LibraryIndexFamily (indexFamilyId, name, platformType) VALUES
   (1, 'Single Index 6bp', 'ILLUMINA'),
   (2, 'Dual Index 6bp', 'ILLUMINA'),
   (3, 'Similar Index Pair', 'ILLUMINA'),
-  (4, 'Unused Family', 'PACBIO');
+  (4, 'Unused Family', 'ILLUMINA'),
+  (5, 'PacBio Family', 'PACBIO');
+
+
 
 INSERT INTO LibraryIndex (indexId, indexFamilyId, name, sequence, position) VALUES
   (1,  1, 'Index 01', 'AAAAAA', 1),
@@ -380,7 +383,9 @@ INSERT INTO LibraryIndex (indexId, indexFamilyId, name, sequence, position) VALU
   (15, 4, 'A01', 'AAAAAA', 1),
   (16, 4, 'A02', 'CCCCCC', 1),
   (17, 4, 'B01', 'GGGGGG', 2),
-  (18, 4, 'B02', 'TTTTTT', 2);
+  (18, 4, 'B02', 'TTTTTT', 2),
+  (19, 5, 'A01', 'GATACA', 2),
+  (20, 5, 'B02', 'GGGGGG', 2);
 
 INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, instrumentType) VALUES
   (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),

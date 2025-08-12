@@ -126,12 +126,12 @@ public class LibraryIndexRestControllerST extends AbstractST {
   @Test
   public void testDatatable() throws Exception {
     testDtRequest(CONTROLLER_BASE + "/dt",
-        Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18));
+        Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20));
   }
 
   @Test
   public void testDatatableByPlatform() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/platform/PACBIO", Arrays.asList(15, 16, 17, 18));
+    testDtRequest(CONTROLLER_BASE + "/dt/platform/PACBIO", Arrays.asList(19, 20));
   }
 
   @Test
