@@ -85,9 +85,8 @@ public class QcRestControllerST extends AbstractST {
 
     // setting QC target is required for the request to go through properly
 
-    List<SampleQC> qcs =
-        (List<SampleQC>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, Arrays.asList(dto1, dto2),
-            QcDto::getId);
+    List<SampleQC> qcs = baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, Arrays.asList(dto1, dto2),
+        QcDto::getId);
     assertEquals(dto1.getDescription(), qcs.get(0).getDescription());
     assertEquals(dto2.getDescription(), qcs.get(1).getDescription());
 
