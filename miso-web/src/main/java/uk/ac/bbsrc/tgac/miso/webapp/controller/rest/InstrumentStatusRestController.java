@@ -49,9 +49,14 @@ public class InstrumentStatusRestController extends AbstractRestController {
             return -1;
           } else if (aDate == null) {
             return 1;
+          } else if (aDate.equals(bDate)) {
+            return Long.compare(a.getId(), b.getId());
           }
           return bDate.compareTo(aDate);
-        })//
+
+
+
+        })
         .map(Dtos::asDto)//
         .collect(Collectors.toList());
   }
@@ -79,5 +84,4 @@ public class InstrumentStatusRestController extends AbstractRestController {
   private static LocalDate getCompareDate(InstrumentStatusPositionRun run) {
     return run.getCompletionDate() == null ? run.getStartDate() : run.getCompletionDate();
   }
-
 }
