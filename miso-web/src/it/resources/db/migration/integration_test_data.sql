@@ -437,12 +437,12 @@ INSERT INTO SequencingContainerModel_InstrumentModel (instrumentModelId, sequenc
 (3, 18),
 (3, 19);
 
-INSERT INTO Instrument (instrumentId, name, instrumentModelId, defaultPurposeId) VALUES
-  (1, 'T2000', 1, 1),
-  (2, 'TMS1', 2, 1),
-  (3, 'TPB2', 3, 1),
-  (4, 'iScan1', 4, NULL),
-  (5, 'Deletable', 4, NULL);
+INSERT INTO Instrument (instrumentId, name, instrumentModelId, defaultPurposeId, workstationId) VALUES
+  (1, 'T2000', 1, 1, 1),
+  (2, 'TMS1', 2, 1, NULL),
+  (3, 'TPB2', 3, 1, NULL),
+  (4, 'iScan1', 4, NULL, NULL),
+  (5, 'Deletable', 4, NULL, NULL);
   
 INSERT INTO Instrument (instrumentId, name, instrumentModelId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId, defaultPurposeId) VALUES
   (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, 1),
