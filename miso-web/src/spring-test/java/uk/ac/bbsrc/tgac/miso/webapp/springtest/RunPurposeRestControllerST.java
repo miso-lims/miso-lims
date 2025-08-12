@@ -41,9 +41,8 @@ public class RunPurposeRestControllerST extends AbstractST {
     purposeOne.setAlias("one");
     purposeTwo.setAlias("two");
 
-    List<RunPurpose> purposes =
-        (List<RunPurpose>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
-            Arrays.asList(purposeOne, purposeTwo), RunPurposeDto::getId);
+    List<RunPurpose> purposes = baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
+        Arrays.asList(purposeOne, purposeTwo), RunPurposeDto::getId);
     assertEquals(purposeOne.getAlias(), purposes.get(0).getAlias());
     assertEquals(purposeTwo.getAlias(), purposes.get(1).getAlias());
   }
