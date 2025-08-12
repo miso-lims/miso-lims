@@ -21,7 +21,7 @@ public class ArrayModelControllerST extends AbstractST {
 
     for (int i = 0; i < ids.size(); i++) {
       ArrayModel dbObject = currentSession().get(entityClass, ids.get(i));
-      assertEquals(dbObject.getId(), ((Integer) JsonPath.read(resultJson, "$[" + i + "].id")).longValue());
+      assertEquals(dbObject.getId(), readLong(resultJson, "$[" + i + "].id"));
       assertEquals(dbObject.getAlias(), JsonPath.read(resultJson, "$[" + i + "].alias"));
     }
   }
@@ -30,7 +30,8 @@ public class ArrayModelControllerST extends AbstractST {
   public void testList() throws Exception {
     List<Long> ids = Arrays.asList(1L, 2L);
 
-    assertDbVsModelObjects(testStaticListPage(CONTROLLER_BASE + "/list", "data"), ids);
+    String resultJson = testStaticListPage(CONTROLLER_BASE + "/list", "data");
+    assertDbVsModelObjects(resultJson, ids);
   }
 
   @Test
@@ -41,7 +42,7 @@ public class ArrayModelControllerST extends AbstractST {
   @Test
   public void testBulkEdit() throws Exception {
     List<Long> ids = Arrays.asList(1L, 2L);
-
-    assertDbVsModelObjects(testBulkEditPage(CONTROLLER_BASE + "/bulk/edit", ids, "input"), ids);
+    String resultJson = testBulkEditPage(CONTROLLER_BASE + "/bulk/edit", ids, "input");
+    assertDbVsModelObjects(resultJson, ids);
   }
 }

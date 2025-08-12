@@ -574,8 +574,7 @@ public abstract class AbstractST {
   protected ModelAndView testBulkEditPage(String url, List<Long> ids)
       throws Exception {
 
-    List<String> stringList = ids.stream().map(String::valueOf).collect(Collectors.toList());
-    String stringIds = String.join(",", stringList);
+    String stringIds = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
     ResultActions ac = getMockMvc().perform(post(url).param("ids", stringIds).accept(MediaType.APPLICATION_JSON));
     if (DEBUG_MODE)
       ac = ac.andDo(print());
@@ -614,5 +613,28 @@ public abstract class AbstractST {
 
     String response = ac.andReturn().getModelAndView().getModel().get(listModelAttribute).toString();
     assertEquals(numCreated, ((List<Object>) JsonPath.read(response, "$.*")).size());
+  }
+
+  /**
+   * Reads an Integer from a JSON response given a path
+   * 
+   * @param resultJson JSON response
+   * @param path JSON path to long
+   * @return Read Integer
+   */
+  protected static Integer readInteger(String resultJson, String path) {
+    return JsonPath.read(resultJson, path);
+  }
+
+
+  /**
+   * Reads a long from a JSON response given a path
+   * 
+   * @param resultJson JSON response
+   * @param path JSON path to long
+   * @return Read long
+   */
+  protected static long readLong(String resultJson, String path) {
+    return readInteger(resultJson, path).longValue();
   }
 }
