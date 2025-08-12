@@ -87,8 +87,7 @@ public class AssayTestRestControllerST extends AbstractST {
     dtos.add(one);
     dtos.add(two);
 
-    List<AssayTest> assayTests =
-        (List<AssayTest>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, AssayTestDto::getId);
+    List<AssayTest> assayTests = baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, AssayTestDto::getId);
 
     assertEquals("one", assayTests.get(0).getAlias());
     assertEquals("two", assayTests.get(1).getAlias());
