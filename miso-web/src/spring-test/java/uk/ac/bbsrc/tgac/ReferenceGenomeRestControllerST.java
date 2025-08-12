@@ -67,9 +67,8 @@ public class ReferenceGenomeRestControllerST extends AbstractST {
     geneOne.setAlias("one");
     geneTwo.setAlias("two");
 
-    List<ReferenceGenomeImpl> genes =
-        (List<ReferenceGenomeImpl>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
-            Arrays.asList(geneOne, geneTwo), ReferenceGenomeDto::getId);
+    List<ReferenceGenomeImpl> genes = baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
+        Arrays.asList(geneOne, geneTwo), ReferenceGenomeDto::getId);
     assertEquals(geneOne.getAlias(), genes.get(0).getAlias());
     assertEquals(geneTwo.getAlias(), genes.get(1).getAlias());
 
