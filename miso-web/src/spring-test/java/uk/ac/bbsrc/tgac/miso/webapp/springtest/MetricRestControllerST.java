@@ -81,8 +81,7 @@ public class MetricRestControllerST extends AbstractST {
     dtos.add(m1);
     dtos.add(m2);
 
-    List<Metric> metrics =
-        (List<Metric>) baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, MetricDto::getId);
+    List<Metric> metrics = baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos, MetricDto::getId);
     assertEquals("m1", metrics.get(0).getAlias());
     assertEquals("m2", metrics.get(1).getAlias());
   }
