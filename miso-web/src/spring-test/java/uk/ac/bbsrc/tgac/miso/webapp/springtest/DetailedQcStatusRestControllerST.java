@@ -1,0 +1,109 @@
+package uk.ac.bbsrc.tgac.miso.webapp.springtest;
+
+import org.junit.Test;
+
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
+import uk.ac.bbsrc.tgac.miso.dto.DetailedQcStatusDto;
+
+import org.springframework.security.test.context.support.WithMockUser;
+import static org.junit.Assert.*;
+import java.util.List;
+import java.util.ArrayList;
+
+public class DetailedQcStatusRestControllerST extends AbstractST {
+
+  private static final String CONTROLLER_BASE = "/rest/detailedqcstatuses";
+  private static final Class<DetailedQcStatusImpl> entityClass = DetailedQcStatusImpl.class;
+
+  private List<DetailedQcStatusDto> makeCreateDtos() {
+    DetailedQcStatusDto stat1 = new DetailedQcStatusDto();
+    stat1.setArchived(false);
+    stat1.setDescription("status 1");
+    stat1.setNoteRequired(true);
+    stat1.setStatus(true);
+
+    DetailedQcStatusDto stat2 = new DetailedQcStatusDto();
+    stat2.setArchived(false);
+    stat2.setDescription("status 2");
+    stat2.setNoteRequired(false);
+    stat2.setStatus(false);
+
+    List<DetailedQcStatusDto> dtos = new ArrayList<DetailedQcStatusDto>();
+    dtos.add(stat1);
+    dtos.add(stat2);
+    return dtos;
+  }
+
+  @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
+  public void testBulkCreateAsync() throws Exception {
+    // must be admin to update
+    List<DetailedQcStatusImpl> statuses = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
+    assertEquals("status 1", statuses.get(0).getDescription());
+    assertEquals(false, statuses.get(0).getArchived());
+    assertEquals(true, statuses.get(0).getNoteRequired());
+    assertEquals(true, statuses.get(0).getStatus());
+
+    assertEquals("status 2", statuses.get(1).getDescription());
+    assertEquals(false, statuses.get(1).getArchived());
+    assertEquals(false, statuses.get(1).getNoteRequired());
+    assertEquals(false, statuses.get(1).getStatus());
+  }
+
+  @Test
+  public void testBulkCreateFail() throws Exception {
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
+  }
+
+  @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
+  public void testBulkUpdateAsync() throws Exception {
+    // must be admin to update
+    DetailedQcStatusImpl str = currentSession().get(entityClass, 5);
+    DetailedQcStatusImpl diagnosis = currentSession().get(entityClass, 6);
+    str.setDescription("STR");
+    diagnosis.setDescription("diagnosis");
+
+
+    List<DetailedQcStatusDto> dtos = new ArrayList<DetailedQcStatusDto>();
+    dtos.add(Dtos.asDto(str));
+    dtos.add(Dtos.asDto(diagnosis));
+
+
+    List<DetailedQcStatusImpl> detailedQcStatuses =
+        baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass, dtos,
+            DetailedQcStatusDto::getId);
+
+    assertEquals(5L, detailedQcStatuses.get(0).getId());
+    assertEquals(6L, detailedQcStatuses.get(1).getId());
+    assertEquals("STR", detailedQcStatuses.get(0).getDescription());
+    assertEquals("diagnosis", detailedQcStatuses.get(1).getDescription());
+  }
+
+  @Test
+  public void testBulkUpdateAsyncFail() throws Exception {
+    DetailedQcStatusImpl str = currentSession().get(entityClass, 5);
+    DetailedQcStatusImpl diagnosis = currentSession().get(entityClass, 6);
+    str.setDescription("STR");
+    diagnosis.setDescription("diagnosis");
+
+    List<DetailedQcStatusDto> dtos = new ArrayList<DetailedQcStatusDto>();
+    dtos.add(Dtos.asDto(str));
+    dtos.add(Dtos.asDto(diagnosis));
+
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
+  }
+
+  @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
+  public void testDelete() throws Exception {
+    testBulkDelete(entityClass, 10, CONTROLLER_BASE);
+  }
+
+  @Test
+  public void testDeleteFail() throws Exception {
+    testDeleteUnauthorized(entityClass, 10, CONTROLLER_BASE);
+  }
+}
