@@ -32,13 +32,21 @@ public class PipelineRestControllerST extends AbstractST {
   }
 
   @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
     List<Pipeline> pipelines = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
     assertEquals("one", pipelines.get(0).getAlias());
     assertEquals("two", pipelines.get(1).getAlias());
   }
 
+
   @Test
+  public void testBulkCreateFail() throws Exception {
+    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, entityClass, makeCreateDtos());
+  }
+
+  @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     PipelineDto p1 = Dtos.asDto(currentSession().get(entityClass, 1));
     PipelineDto p2 = Dtos.asDto(currentSession().get(entityClass, 2));
@@ -58,6 +66,22 @@ public class PipelineRestControllerST extends AbstractST {
     assertEquals("p1", pipelines.get(0).getAlias());
     assertEquals("p2", pipelines.get(1).getAlias());
   }
+
+  @Test
+  public void testBulkUpdateFail() throws Exception {
+    PipelineDto p1 = Dtos.asDto(currentSession().get(entityClass, 1));
+    PipelineDto p2 = Dtos.asDto(currentSession().get(entityClass, 2));
+
+    p1.setAlias("p1");
+    p2.setAlias("p2");
+
+    List<PipelineDto> dtos = new ArrayList<PipelineDto>();
+    dtos.add(p1);
+    dtos.add(p2);
+
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, dtos);
+  }
+
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
