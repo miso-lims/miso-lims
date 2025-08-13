@@ -26,7 +26,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
@@ -34,7 +33,6 @@ import uk.ac.bbsrc.tgac.miso.dto.KitConsumableDto;
 import uk.ac.bbsrc.tgac.miso.dto.KitDescriptorDto;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto.RunPartitionDto;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 
 
 public class ExperimentRestControllerST extends AbstractST {
@@ -70,8 +68,7 @@ public class ExperimentRestControllerST extends AbstractST {
 
     Experiment exp2 = currentSession().get(entityClass, 2);
     assertEquals(1L, exp2.getRunPartitions().get(0).getRun().getId());
-    assertEquals(currentSession().get(PartitionImpl.class, 11).getId(),
-        exp2.getRunPartitions().get(0).getPartition().getId());
+    assertEquals(11L, exp2.getRunPartitions().get(0).getPartition().getId());
   }
 
 
