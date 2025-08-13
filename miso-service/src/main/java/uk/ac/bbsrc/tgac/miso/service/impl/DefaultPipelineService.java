@@ -63,10 +63,17 @@ public class DefaultPipelineService extends AbstractSaveService<Pipeline> implem
   }
 
   @Override
-  protected void collectValidationErrors(Pipeline object, Pipeline beforeChange, List<ValidationError> errors) throws IOException {
-    if (ValidationUtils.isChanged(Pipeline::getAlias, object, beforeChange) && pipelineDao.getByAlias(object.getAlias()) != null) {
+  protected void collectValidationErrors(Pipeline object, Pipeline beforeChange, List<ValidationError> errors)
+      throws IOException {
+    if (ValidationUtils.isChanged(Pipeline::getAlias, object, beforeChange)
+        && pipelineDao.getByAlias(object.getAlias()) != null) {
       errors.add(ValidationError.forDuplicate("pipeline", "alias"));
     }
+  }
+
+  @Override
+  protected void authorizeUpdate(Pipeline object) throws IOException {
+    authorizationManager.throwIfNonAdmin();
   }
 
   @Override
