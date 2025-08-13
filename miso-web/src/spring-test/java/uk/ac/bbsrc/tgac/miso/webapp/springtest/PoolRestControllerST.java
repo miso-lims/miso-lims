@@ -119,6 +119,7 @@ public class PoolRestControllerST extends AbstractST {
     assertEquals("ILLUMINA", created.getPlatformType().toString());
     assertEquals("pool1_alias", created.getAlias());
     assertEquals(false, created.isDiscarded());
+    assertEquals("2025-07-29", created.getCreationDate().toString());
   }
 
   @Test
@@ -149,7 +150,7 @@ public class PoolRestControllerST extends AbstractST {
         .andExpect(status().isOk());
 
     PoolImpl changed = currentSession().get(entityClass, poolId);
-    assertEquals(beforeChange.getPoolContents().size() - 1, changed.getPoolContents().size());
+    assertEquals(1, changed.getPoolContents().size());
     assertEquals(1L, changed.getPoolContents().iterator().next().getAliquot().getId());
   }
 
@@ -386,6 +387,32 @@ public class PoolRestControllerST extends AbstractST {
   @Test
   public void testDeleteFail() throws Exception {
     testDeleteUnauthorized(entityClass, 1, CONTROLLER_BASE);
+  }
+
+
+  private void checkPoolIds(List<Integer> expectedIds, String response, boolean isItems) throws Exception {
+    List<Integer> returnedIds = new ArrayList<Integer>();
+    List<Integer> resultIds = JsonPath.read(response, "$.items[*].pool.id");
+    assertEquals(expectedIds.size(), resultIds.size());
+    for (Integer expectedId : expectedIds) {
+      assertTrue("id " + expectedId + " expected but not found", resultIds.contains(expectedId));
+    }
+
+  }
+
+
+  private ResultActions testListPools(String url, List<Integer> ids, MultiValueMap params, boolean isItems)
+      throws Exception {
+    ResultActions result = getMockMvc().perform(get(url).params(params));
+
+    String response = result.andReturn().getResponse().getContentAsString();
+    checkPoolIds(ids, false, response);
+
+    return result; // return the result for more content testing if needed
+  }
+
+  private ResultActions testListPools(String url, List<Integer> ids) throws Exception {
+    return testListPools(url, ids, new MultiValueMap());
   }
 
 }

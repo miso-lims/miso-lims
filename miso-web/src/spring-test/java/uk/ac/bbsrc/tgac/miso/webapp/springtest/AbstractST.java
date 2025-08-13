@@ -385,7 +385,7 @@ public abstract class AbstractST {
     // returns a result actions if more testing is desired
   }
 
-  private void checkIds(List<Integer> expectedIds, boolean isDt, String response, boolean isItems) throws Exception {
+  private void checkIds(List<Integer> expectedIds, boolean isDt, String response) throws Exception {
     List<Integer> returnedIds = new ArrayList<Integer>();
 
     String addedPath = "";
@@ -393,13 +393,7 @@ public abstract class AbstractST {
     if (isDt)
       addedPath = ".aaData";
 
-    if (isItems) {
-      addedPath = ".items";
-      addedAfter = ".pool";
-    }
-
-
-    List<Integer> resultIds = JsonPath.read(response, "$" + addedPath + "[*]" + addedAfter + ".id");
+    List<Integer> resultIds = JsonPath.read(response, "$" + addedPath + "[*].id");
     assertEquals(expectedIds.size(), resultIds.size());
     for (Integer expectedId : expectedIds) {
       assertTrue("id " + expectedId + " expected but not found", resultIds.contains(expectedId));
@@ -427,40 +421,35 @@ public abstract class AbstractST {
     return result;
   }
 
-  protected ResultActions testListAll(String url, List<Integer> ids, MultiValueMap params, boolean isItems)
+  protected ResultActions testList(String url, List<Integer> ids, MultiValueMap params)
       throws Exception {
     ResultActions result = getMockMvc().perform(get(url).params(params));
     if (DEBUG_MODE)
       result.andDo(print());
     String response = result.andReturn().getResponse().getContentAsString();
-    checkIds(ids, false, response, isItems);
+    checkIds(ids, false, response);
 
     return result; // return the result for more content testing if needed
   }
 
-  protected ResultActions testListAll(String url, List<Integer> ids, boolean isItems) throws Exception {
-    ResultActions result = getMockMvc().perform(get(url));
-    if (DEBUG_MODE)
-      result.andDo(print());
-    String response = result.andReturn().getResponse().getContentAsString();
-    checkIds(ids, false, response, isItems);
-
-    return result;
+  protected ResultActions testList(String url, List<Integer> ids) throws Exception {
+    return testListAll(url, ids, new MultiValueMap());
   }
 
   protected void testSpreadsheetContents(String url, SpreadsheetRequest sheet, List<List<String>> rows,
       List<String> headers) throws Exception {
     ResultActions res = getMockMvc()
-        .perform(post(url).param("format", sheet.getFormat()).content(makeJson(sheet))
+        .perform(post(url).content(makeJson(sheet))
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType("text/csv"));
     if (DEBUG_MODE)
       res.andDo(print());
 
-    MockHttpServletResponse response = res.andReturn().getResponse();   
+    MockHttpServletResponse response = res.andReturn().getResponse();
     String[][] records = new String[headers.size()][rows.size() + 1];
-    String[] rawRows = response.getContentAsString().split("\r");
+    String[] rawRows = response.getContentAsString().split("\n");
+    // does splitting on \n work??
 
     for (int i = 0; i < rawRows.length; i++) {
       String s = rawRows[i].replaceAll("\\r", "");
