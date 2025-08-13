@@ -189,6 +189,8 @@ public abstract class AbstractST {
       throws Exception {
     // tests failure for async create endpoints where admin permissions are required
     String response = pollingResponserHelper("post", dtos, controllerBase);
+    if (DEBUG_MODE)
+      System.out.println(response);
     assertEquals("An unexpected error has occurred", JsonPath.read(response, "$.detail"));
     // request should fail without admin permissions
   }
@@ -223,6 +225,8 @@ public abstract class AbstractST {
       throws Exception {
     // tests failure for async update endpoints where admin permissions are required
     String response = pollingResponserHelper("put", dtos, controllerBase);
+    if (DEBUG_MODE)
+      System.out.println(response);
     assertEquals("An unexpected error has occurred", JsonPath.read(response, "$.detail"));
     // request should fail without admin permissions }
   }
