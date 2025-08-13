@@ -41,9 +41,9 @@ public class PoolOrderRestControllerST extends AbstractST {
     one.setPurposeId(1L);
     one.setDraft(true);
     PoolOrder newPoolOrder = baseTestCreate(CONTROLLER_BASE, one, entityClass, 200);
-    assertEquals(newPoolOrder.getAlias(), one.getAlias());
-    assertEquals(newPoolOrder.getPurpose().getId(), one.getPurposeId().longValue());
-    assertEquals(newPoolOrder.isDraft(), one.isDraft());
+    assertEquals(one.getAlias(), newPoolOrder.getAlias());
+    assertEquals(one.getPurposeId().longValue(), newPoolOrder.getPurpose().getId());
+    assertEquals(one.isDraft(), newPoolOrder.isDraft());
 
   }
 
@@ -53,7 +53,7 @@ public class PoolOrderRestControllerST extends AbstractST {
     poolOrder.setAlias("updated");
 
     PoolOrder updated = baseTestUpdate(CONTROLLER_BASE, poolOrder, 1, entityClass);
-    assertEquals(updated.getAlias(), poolOrder.getAlias());
+    assertEquals(poolOrder.getAlias(), updated.getAlias());
   }
 
   @Test
@@ -69,8 +69,10 @@ public class PoolOrderRestControllerST extends AbstractST {
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.*", hasSize(2)))
-        .andExpect(jsonPath("$.duplicateIndices", hasSize(1))) // empty string, so size 1
+        .andExpect(jsonPath("$.duplicateIndices", hasSize(1))) // empty string, so size
+        .andExpect(jsonPath("$.duplicateIndices[0]").value("")) // empty string, so size
         .andExpect(jsonPath("$.nearDuplicateIndices", hasSize(3)))
+        .andExpect(jsonPath("$.nearDuplicateIndices[0]").value(""))
         .andExpect(jsonPath("$.nearDuplicateIndices[1]").value("AAAAGT"))
         .andExpect(jsonPath("$.nearDuplicateIndices[2]").value("AAAAAC"));
   }
