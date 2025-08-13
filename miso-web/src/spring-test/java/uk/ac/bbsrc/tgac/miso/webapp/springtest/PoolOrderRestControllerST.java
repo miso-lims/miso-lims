@@ -81,7 +81,7 @@ public class PoolOrderRestControllerST extends AbstractST {
   public void testList() throws Exception {
     testDtRequest(CONTROLLER_BASE + "/dt/Fulfilled", Arrays.asList(2))
         .andExpect(jsonPath("$.aaData[0].alias").value("Pool Order Two"))
-        .andExpect(jsonPath("$.aaData[0].orderAliquots[0].aliquot.indexIds[0]").value(14))
+        .andExpect(jsonPath("$.aaData[0].orderAliquots[0].aliquot.indexIds[0]").value(13))
         .andExpect(jsonPath("$.aaData[0].orderAliquots[0].aliquot.projectId").value(500));
   }
 
