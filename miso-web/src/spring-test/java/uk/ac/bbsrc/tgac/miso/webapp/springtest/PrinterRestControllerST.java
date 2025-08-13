@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
+
 
 import javax.ws.rs.core.MediaType;
 
@@ -236,18 +238,17 @@ public class PrinterRestControllerST extends AbstractST {
     layout.setContents(PrintableField.ALIAS);
     layout.setHeight(4.5);
     layout.setX(10.1);
+    LabelElementText[] elements = {layout}; // arrays save element type data
 
-    System.out.println(Arrays.asList(makeJson(layout)));
-
+    String json = makeJson(elements);
     getMockMvc()
-        .perform(put(CONTROLLER_BASE + "/1/layout").content(makeJson(Arrays.asList(layout)))
+        .perform(put(CONTROLLER_BASE + "/1/layout").content(json)
             .contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isNoContent());
 
     // TODO
     Printer printer = currentSession().get(entityClass, 1);
-    System.out.println(printer.getLayout());
+    assertEquals("[{\"element\":\"text\",\"contents\":{\"use\":\"ALIAS\"},\"direction\":\"NORMAL\",\"height\":4.5,\"justification\":\"LEFT\",\"lineLimit\":0,\"style\":\"REGULAR\",\"x\":10.1,\"y\":0.0}]", printer.getLayout());
   }
 
   @Test
