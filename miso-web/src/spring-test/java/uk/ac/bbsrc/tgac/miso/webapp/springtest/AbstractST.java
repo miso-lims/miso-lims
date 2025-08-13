@@ -50,6 +50,8 @@ import java.util.Collections;
 
 import java.util.ArrayList;
 import java.util.Date;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -110,11 +112,16 @@ public abstract class AbstractST {
 
     mapper = new ObjectMapper();
     mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+    mapper.disable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE);
     ow = mapper.writer().withDefaultPrettyPrinter();
   }
 
   public Session currentSession() {
     return entityManager.unwrap(Session.class);
+  }
+
+  public EntityManager getEntityManager() {
+    return entityManager;
   }
 
   private File getScript(String filename) {

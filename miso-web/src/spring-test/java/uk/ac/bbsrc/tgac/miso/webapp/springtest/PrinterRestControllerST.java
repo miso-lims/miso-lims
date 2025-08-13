@@ -12,10 +12,13 @@ import javax.ws.rs.core.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import org.mockito.InjectMocks;
+import com.jayway.jsonpath.JsonPath;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PrinterDto;
+import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePrinterDao;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.PrinterRestController.*;
 
 import static org.hamcrest.Matchers.*;
@@ -28,18 +31,30 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.util.Set;
 import java.util.stream.Collectors;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.*;
+import org.springframework.transaction.annotation.Transactional;
 
 public class PrinterRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/printers";
   private static final Class<Printer> entityClass = Printer.class;
 
+  @InjectMocks
+  private static HibernatePrinterDao dao = new HibernatePrinterDao();
+
   @Test
+  @Transactional
   public void testBoxContents() throws Exception {
     BoxPrintRequest req = new BoxPrintRequest();
     req.setCopies(1);
     req.setBoxes(Arrays.asList(1L, 2L));
-    
+
+
+    dao.setEntityManager(getEntityManager());
+    Printer printerOriginal = currentSession().get(entityClass, 1);
+    printerOriginal.setBackend(Backend.DEBUG);
+    dao.update(printerOriginal);
+
 
     getMockMvc()
         .perform(
@@ -51,6 +66,7 @@ public class PrinterRestControllerST extends AbstractST {
   }
 
   @Test
+  @Transactional
   public void testBoxPositions() throws Exception {
 
     BoxPositionPrintRequest req = new BoxPositionPrintRequest();
@@ -59,6 +75,12 @@ public class PrinterRestControllerST extends AbstractST {
     req.setSortOrder("column");
 
     req.setPositions(Arrays.asList("A01", "A07", "B02", "B05").stream().collect(Collectors.toSet()));
+
+    dao.setEntityManager(getEntityManager());
+    Printer printerOriginal = currentSession().get(entityClass, 1);
+    printerOriginal.setBackend(Backend.DEBUG);
+    dao.update(printerOriginal);
+
 
     getMockMvc()
         .perform(
@@ -143,18 +165,26 @@ public class PrinterRestControllerST extends AbstractST {
         .andDo(print())
         .andExpect(status().isNoContent());
 
-    // there are two printers in the test data
-    // therefore this duplicated one will have id 3
-    Printer duplicated = currentSession().get(entityClass, 2);
+
+    // need to get a list of the printers, as the newly duplicated printer has an inconsistent ID each
+    // time you run the tests
+
+    String response = getMockMvc().perform(get(CONTROLLER_BASE))
+        .andDo(print())
+        .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+    Integer printerId = JsonPath.read(response, "$[2].id");
+
+    Printer duplicated = currentSession().get(entityClass, printerId.intValue());
     assertNotNull(duplicated);
+    assertEquals(req.getHeight(), duplicated.getHeight(), 0);
+    assertEquals(req.getWidth(), duplicated.getWidth(), 0);
     assertEquals(req.getName(), duplicated.getName());
-    assertEquals(req.getHeight(), duplicated.getHeight());
-    assertEquals(req.getWidth(), duplicated.getWidth());
   }
 
   @Test
   public void testDuplicateFail() throws Exception {
-        DuplicateRequest req = new DuplicateRequest();
+    DuplicateRequest req = new DuplicateRequest();
     req.setName("duped");
     req.setHeight(17.2);
     req.setWidth(14.5);
@@ -178,32 +208,75 @@ public class PrinterRestControllerST extends AbstractST {
   @Test
   public void testGet() throws Exception {
     baseTestGetById(CONTROLLER_BASE, 1)
-      .andExpect(jsonPath("$.name").value("Printer"));
+        .andExpect(jsonPath("$.name").value("Printer"));
   }
 
   @Test
   public void testGetLayout() throws Exception {
-      // TODO
+
+    getMockMvc()
+        .perform(get(CONTROLLER_BASE + "/1/layout"))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.*", hasSize(1)))
+        .andExpect(jsonPath("$[0].element").value("text"))
+        .andExpect(jsonPath("$[0].contents.use").value("ALIAS"))
+        .andExpect(jsonPath("$[0].direction").value("NORMAL"))
+        .andExpect(jsonPath("$[0].height").value(0.0))
+        .andExpect(jsonPath("$[0].justification").value("LEFT"))
+        .andExpect(jsonPath("$[0].lineLimit").value(0))
+        .andExpect(jsonPath("$[0].style").value("REGULAR"))
+        .andExpect(jsonPath("$[0].x").value(0.0))
+        .andExpect(jsonPath("$[0].y").value(0.0));
   }
 
   @Test
   public void testSetLayout() throws Exception {
+    LabelElementText layout = new LabelElementText();
+    layout.setContents(PrintableField.ALIAS);
+    layout.setHeight(4.5);
+    layout.setX(10.1);
+
+    System.out.println(Arrays.asList(makeJson(layout)));
+
+    getMockMvc()
+        .perform(put(CONTROLLER_BASE + "/1/layout").content(makeJson(Arrays.asList(layout)))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isNoContent());
+
     // TODO
+    Printer printer = currentSession().get(entityClass, 1);
+    System.out.println(printer.getLayout());
   }
 
   @Test
   public void testList() throws Exception {
-        getMockMvc().perform(get(CONTROLLER_BASE))
+    getMockMvc().perform(get(CONTROLLER_BASE))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.*", hasSize(2)))
         .andExpect(jsonPath("$[0].id").value(1))
-        .andExpect(jsonPath("$[1].id").value(2)); 
+        .andExpect(jsonPath("$[1].id").value(2));
+  }
 
-        
-      }
   @Test
+  @Transactional
   public void testSubmit() throws Exception {
+    PrintRequest req = new PrintRequest();
+    req.setCopies(2);
+    req.setIds(Arrays.asList(1L, 2L, 500L));
+    req.setPrinterId(1L);
+    req.setType("box");
+
+    dao.setEntityManager(getEntityManager());
+    Printer printerOriginal = currentSession().get(entityClass, 1);
+    printerOriginal.setBackend(Backend.DEBUG);
+    dao.update(printerOriginal);
+
+    getMockMvc().perform(post(CONTROLLER_BASE + "/1").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk());
     // TODO
   }
 
