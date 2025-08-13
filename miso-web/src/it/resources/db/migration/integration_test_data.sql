@@ -517,6 +517,12 @@ INSERT INTO Deletion(deletionId, targetType, targetId, description, userId, chan
 (1, 'Sample', 1700, 'last sample', 3, '2025-07-18 09:35:00');
 
 
+INSERT INTO MetricSubcategory(subcategoryId, alias, category, libraryDesignCodeId, sortPriority) VALUES
+(1, 'Nucleic Acid Isolation', 'EXTRACTION', NULL, 1),
+(2, 'Fluorometric Quantification (Qubit or Plate Reader)', 'EXTRACTION', NULL, 2),
+(3, 'WG Library QC (Qubit, TS, FA)', 'LIBRARY_PREP', 2, 1),
+(4, 'WT Library QC (Qubit, TS, FA)', 'LIBRARY_PREP', 3, 2);
+
 INSERT INTO Assay_Metric(assayId, metricId, minimumThreshold, maximumThreshold) VALUES
 (1, 1, NULL, NULL),
 (1, 2, 10, NULL),
