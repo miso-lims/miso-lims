@@ -139,11 +139,10 @@ public class ContainerRestController extends AbstractRestController {
     return MisoWebUtils.generateSpreadsheet(request, input, detailedSample, PartitionSpreadsheets::valueOf, response);
   }
 
-  private static class SerialNumberValidationDto {
+  public static class SerialNumberValidationDto {
     private final String serialNumber;
     private final String containerId;
 
-    @SuppressWarnings("unused")
     public SerialNumberValidationDto(@JsonProperty("serialNumber") String serialNumber,
         @JsonProperty("containerId") String containerId) {
       this.serialNumber = serialNumber;
