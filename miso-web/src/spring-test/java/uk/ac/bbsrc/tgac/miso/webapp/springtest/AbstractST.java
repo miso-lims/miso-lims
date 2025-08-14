@@ -441,7 +441,7 @@ public abstract class AbstractST {
       res.andDo(print());
 
     MockHttpServletResponse response = res.andReturn().getResponse();
-    String[][] records = new String[headers.size()][rows.size() + 1];
+    String[][] records = new String[rows.size() + 1][headers.size()];
     String[] rawRows = response.getContentAsString().split("\n");
 
     for (int i = 0; i < rawRows.length; i++) {
