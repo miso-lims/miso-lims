@@ -69,8 +69,8 @@ public class PoolOrderRestControllerST extends AbstractST {
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.*", hasSize(2)))
-        .andExpect(jsonPath("$.duplicateIndices", hasSize(1))) // empty string, so size
-        .andExpect(jsonPath("$.duplicateIndices[0]").value("")) // empty string, so size
+        .andExpect(jsonPath("$.duplicateIndices", hasSize(1)))
+        .andExpect(jsonPath("$.duplicateIndices[0]").value(""))
         .andExpect(jsonPath("$.nearDuplicateIndices", hasSize(3)))
         .andExpect(jsonPath("$.nearDuplicateIndices[0]").value(""))
         .andExpect(jsonPath("$.nearDuplicateIndices[1]").value("AAAAGT"))
