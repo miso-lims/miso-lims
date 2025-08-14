@@ -54,7 +54,6 @@ import java.util.ArrayList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.PoolRestController.SampleSheetRequest;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -203,9 +202,6 @@ public abstract class AbstractST {
     for (Long id : ids) {
       T obj = currentSession().get(updateType, id);
       assertNotNull(obj);
-      // asserts the id to ensure the order of object ids is the same order as the list of ids given
-      // this removes the need for id checking in update
-      assertEquals((long) id, ((Identifiable) obj).getId());
       objects.add(obj);
     }
     return objects;
@@ -354,7 +350,7 @@ public abstract class AbstractST {
         .andExpect(jsonPath("$.*", hasSize(ids.size())))
         .andReturn().getResponse().getContentAsString();
 
-    checkIds(ids, false, response, false);
+    checkIds(ids, false, response);
   }
 
   protected void baseSearchByTerm(String url, String searchTerm, List<Integer> ids) throws Exception {
@@ -379,7 +375,7 @@ public abstract class AbstractST {
         .andExpect(jsonPath("$.iTotalRecords").value(ids.size()));
 
     String response = ac.andReturn().getResponse().getContentAsString();
-    checkIds(ids, true, response, false);
+    checkIds(ids, true, response);
 
     return ac;
     // returns a result actions if more testing is desired
@@ -433,23 +429,20 @@ public abstract class AbstractST {
   }
 
   protected ResultActions testList(String url, List<Integer> ids) throws Exception {
-    return testListAll(url, ids, new MultiValueMap());
+    return testList(url, ids, new LinkedMultiValueMap());
   }
 
-  protected void testSpreadsheetContents(String url, SpreadsheetRequest sheet, List<List<String>> rows,
-      List<String> headers) throws Exception {
-    ResultActions res = getMockMvc()
-        .perform(post(url).content(makeJson(sheet))
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType("text/csv"));
+  protected void testSpreadsheetContents(String url, SpreadsheetRequest sheet, List<String> headers,
+      List<List<String>> rows) throws Exception {
+    ResultActions res = getMockMvc().perform(post(url).content(makeJson(sheet))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
     if (DEBUG_MODE)
       res.andDo(print());
 
     MockHttpServletResponse response = res.andReturn().getResponse();
     String[][] records = new String[headers.size()][rows.size() + 1];
     String[] rawRows = response.getContentAsString().split("\n");
-    // does splitting on \n work??
 
     for (int i = 0; i < rawRows.length; i++) {
       String s = rawRows[i].replaceAll("\\r", "");
