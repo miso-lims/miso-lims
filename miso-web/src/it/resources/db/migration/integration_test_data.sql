@@ -1295,10 +1295,15 @@ INSERT INTO DetailedLibraryTemplate(libraryTemplateId, libraryDesignId, libraryD
 
 INSERT INTO Experiment(experimentId, name, title, alias, study_studyId, instrumentModelId, library_libraryId, creator, created, lastModifier, lastModified) VALUES
 (1, 'EXP1', 'Experiment One', 'Experiment One', 3, 2, 1, 1, '2020-02-20 11:47:00', 1, '2020-02-20 11:47:00'),
-(2, 'EXP2', 'Unused Experiment', 'Unused Experiment', 3, 2, 1, 1, '2020-03-02 16:32:00', 1, '2020-03-02 16:32:00');
+(2, 'EXP2', 'Unused Experiment', 'Unused Experiment', 3, 2, 1, 1, '2020-03-02 16:32:00', 1, '2020-03-02 16:32:00'),
+(3, 'EXP3', 'Regular user experiment', 'reguser', 3, 2, 1, 3, '2025-07-16 15:34:00', 3, '2025-07-16 15:34:00');
 
 INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partition_partitionId) VALUES
 (1, 1, 11);
+
+INSERT INTO `Kit`(`kitId`,`identificationBarcode`,`locationBarcode`,`lotNumber`,`kitDate`,`kitDescriptorId`) VALUES
+(1,'1234','Freezer2','LOT34',CURRENT_DATE(),1),
+(2,'5678','Freezer3','LOT35',CURRENT_DATE(),2);
 
 INSERT INTO Submission(submissionId, title, alias, creationDate) VALUES
 (1, 'Submission One', 'Submission One', '2020-02-20');
