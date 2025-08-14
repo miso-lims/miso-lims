@@ -458,6 +458,7 @@ public abstract class AbstractST {
 
 
   protected void checkArray(String[] values, List<String> expected) {
+    assertEquals(expected.size(), values.length);
     for (int i = 0; i < expected.size(); i++) {
       assertEquals(expected.get(i), values[i]);
     }
