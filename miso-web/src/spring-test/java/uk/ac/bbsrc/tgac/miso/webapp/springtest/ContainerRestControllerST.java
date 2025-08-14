@@ -29,7 +29,6 @@ public class ContainerRestControllerST extends AbstractST {
   public void testJsonRest() throws Exception {
     // this endpoint is essentially "get by barcode"
     getMockMvc().perform(get(CONTROLLER_BASE + "/PACBIO1"))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.*", hasSize(1)))
         .andExpect(jsonPath("$[0].type").value("Container"))
