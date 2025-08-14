@@ -131,6 +131,10 @@ public abstract class AbstractST {
     ow = mapper.writer().withDefaultPrettyPrinter();
   }
 
+  protected EntityManager getEntityManager() {
+    return entityManager;
+  }
+
   public Session currentSession() {
     return entityManager.unwrap(Session.class);
   }
@@ -175,6 +179,7 @@ public abstract class AbstractST {
       status = JsonPath.read(response, "$.status");
       Thread.sleep(1000);
     }
+    response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
     return response;
   }
 
