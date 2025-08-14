@@ -51,6 +51,8 @@ import java.util.Arrays;
 import java.util.function.Function;
 
 import java.util.ArrayList;
+
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -136,6 +138,16 @@ public abstract class AbstractST {
     return requestJson;
   }
 
+  /**
+   * Turns a generic list into JSON, maintaining the JSON type info
+   */
+  public <T> String makeJsonForGenericList(List<T> objects) throws Exception {
+    JavaType type = mapper.getTypeFactory().constructParametricType(List.class, objects.get(0).getClass());
+    String requestJson = mapper.writerFor(type).writeValueAsString(objects);
+    System.out.println(requestJson);
+    return requestJson;
+  }
+
   @Test
   public void initialization() {
     assertNotNull(wac);
@@ -215,19 +227,21 @@ public abstract class AbstractST {
     // request should fail without admin permissions }
   }
 
-  private String pollingResponserHelper(String requestType, List<?> dtos, String controllerBase) throws Exception {
+  private <D> String pollingResponserHelper(String requestType, List<D> dtos, String controllerBase) throws Exception {
     // helper method for async requests
     MvcResult mvcResult;
     ResultActions ac;
     switch (requestType) {
       case "post":
         ac = getMockMvc()
-            .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
+            .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON)
+                .content(makeJsonForGenericList(dtos)));
         break;
 
       case "put":
         ac = getMockMvc()
-            .perform(put(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
+            .perform(put(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON)
+                .content(makeJsonForGenericList(dtos)));
         break;
 
       default:
