@@ -85,6 +85,7 @@ public class HotRestControllerST extends AbstractST {
   }
 
   private void checkArray(List<String> expected, String[] actual) {
+    assertEquals(expected.size(), actual.length);
     for (int i = 0; i < expected.size(); i++) {
       assertEquals(expected.get(i), actual[i]);
     }
@@ -104,9 +105,18 @@ public class HotRestControllerST extends AbstractST {
         .andExpect(jsonPath("$.*", hasSize(4)))
         .andExpect(jsonPath("$[0].heading").value("id"))
         .andExpect(jsonPath("$[1].heading").value("name"))
+        .andExpect(jsonPath("$[1].heading").value("name"))
+        .andExpect(jsonPath("$[1].heading").value("name"))
+
         .andExpect(jsonPath("$[0].data.*", hasSize(2)))
         .andExpect(jsonPath("$[1].data[0]").value("John Doe"))
-        .andExpect(jsonPath("$[1].data[1]").value("Jane Smith"));
+        .andExpect(jsonPath("$[1].data[1]").value("Jane Smith"))
+
+        .andExpect(jsonPath("$[2].data[0]").value("john@email.com"))
+        .andExpect(jsonPath("$[2].data[1]").value("jane@email.com"))
+
+        .andExpect(jsonPath("$[3].data[0]").value("25"))
+        .andExpect(jsonPath("$[3].data[1]").value("30"));
   }
 
 }
