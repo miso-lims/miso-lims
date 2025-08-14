@@ -105,8 +105,8 @@ public class HotRestControllerST extends AbstractST {
         .andExpect(jsonPath("$.*", hasSize(4)))
         .andExpect(jsonPath("$[0].heading").value("id"))
         .andExpect(jsonPath("$[1].heading").value("name"))
-        .andExpect(jsonPath("$[1].heading").value("name"))
-        .andExpect(jsonPath("$[1].heading").value("name"))
+        .andExpect(jsonPath("$[2].heading").value("email"))
+        .andExpect(jsonPath("$[3].heading").value("age"))
 
         .andExpect(jsonPath("$[0].data.*", hasSize(2)))
         .andExpect(jsonPath("$[1].data[0]").value("John Doe"))
