@@ -59,6 +59,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import java.util.ArrayList;
+
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -143,6 +145,16 @@ public abstract class AbstractST {
 
   public String makeJson(Object obj) throws Exception {
     String requestJson = ow.writeValueAsString(obj);
+    return requestJson;
+  }
+
+  /**
+   * Turns a generic list into JSON, maintaining the JSON type info
+   */
+  public <T> String makeJsonForGenericList(List<T> objects) throws Exception {
+    JavaType type = mapper.getTypeFactory().constructParametricType(List.class, objects.get(0).getClass());
+    String requestJson = mapper.writerFor(type).writeValueAsString(objects);
+    System.out.println(requestJson);
     return requestJson;
   }
 
@@ -277,7 +289,8 @@ public abstract class AbstractST {
    * @return String JSON response from the endpoint
    * @throws Exception
    */
-  protected String pollingResponserHelper(String requestType, List<?> dtos, String url, String pollingResponseUrlPrefix,
+  protected <D> String pollingResponserHelper(String requestType, List<D> dtos, String url,
+      String pollingResponseUrlPrefix,
       int expectedResponseCode)
       throws Exception {
     // helper method for async requests
@@ -286,12 +299,12 @@ public abstract class AbstractST {
     switch (requestType) {
       case "post":
         ac = getMockMvc()
-            .perform(post(url).contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
+            .perform(post(url).contentType(MediaType.APPLICATION_JSON).content(makeJsonForGenericList(dtos)));
         break;
 
       case "put":
         ac = getMockMvc()
-            .perform(put(url).contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
+            .perform(put(url).contentType(MediaType.APPLICATION_JSON).content(makeJsonForGenericList(dtos)));
         break;
 
       default:
@@ -322,7 +335,7 @@ public abstract class AbstractST {
   }
 
 
- /**
+  /**
    * Tests the deletion of a single entity e.g. endpoints with a @PostMapping(value = "/bulk-delete")
    * mapping
    * 
