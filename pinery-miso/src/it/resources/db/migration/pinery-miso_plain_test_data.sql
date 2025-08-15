@@ -38,22 +38,16 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
   volume, concentration, locationBarcode, kitDescriptorId, index1Id, discriminator) VALUES
   (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 8, 'ILLUMINA',
     1, 3, 1,  '2016-11-07', 1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, '2017-07-20', 300,
-    5.0, 2.75, NULL, 1, 5, 'Library'),
-  (2, 'LIB2', 'TEST_0001_PACBIO_LIB1', NULL, NULL, 8, 'PACBIO',
-    28, 3, 1, '2025-11-06', 1, '2025-11-06 08:00:00', 1, '2025-11-06 08:00:00', NULL, NULL, NULL,
-    NULL, NULL, NULL, 3, NULL, 'Library');
+    5.0, 2.75, NULL, 1, 5, 'Library');
 
 INSERT INTO LibraryAliquot (aliquotId, name, alias, concentration, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated, discriminator) VALUES
-(1, 'LDI1', 'TEST_0001_Bn_R_PE_300_WG', 5.9, 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00', 'LibraryAliquot'),
-(2, 'LDI2', 'TEST_0001_PACBIO_LDI1', NULL, 2, NULL, '2025-11-06 08:00:00', 1, 1, '2025-11-06 08:00:00', 'LibraryAliquot');
+(1, 'LDI1', 'TEST_0001_Bn_R_PE_300_WG', 5.9, 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00', 'LibraryAliquot');
 
 INSERT INTO Pool (poolId, concentration, volume, name, alias, identificationBarcode, description, creationDate, platformType, lastModifier, creator, created, lastModified, qcPassed) VALUES
-(1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL),
-(2, NULL, NULL, 'IPO2', 'PACBIO_POOL', NULL, NULL, '2025-11-06', 'PACBIO', 1, 1, '2025-11-06 08:00:00', '2025-11-06 08:00:00', NULL);
+(1, 8.25, NULL, 'IPO1', 'POOL_1', '12341', NULL, '2017-07-20', 'ILLUMINA', 1, 1, '2017-07-20 10:01:00', '2017-07-20 10:01:00', NULL);
 
 INSERT INTO Pool_LibraryAliquot (poolId, aliquotId) VALUES
-(1, 1),
-(2, 2);
+(1, 1);
 
 INSERT INTO Box (boxId, boxSizeId, boxUseId, name, alias, lastModifier, creator, created, lastModified) VALUES
 (1, 1, 1, 'BOX1', 'First Box', 1, 1, '2017-07-20 13:01:01', '2017-07-20 13:01:01');
@@ -69,26 +63,19 @@ INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (1, 8, 'SAMPLE', 'H08');
 
 INSERT INTO SequencerPartitionContainer (containerId, identificationBarcode, sequencingContainerModelId, lastModifier, creator, created, lastModified) VALUES
-(1, 'MISEQXX', 1, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01'),
-(2, 'SMRTCELL1', 2, 1, 1, '2025-11-06 08:00:00', '2025-11-06 08:00:00'),
-(3, 'SMRTCELL2', 2, 1, 1, '2025-11-06 08:00:00', '2025-11-06 08:00:00');
+(1, 'MISEQXX', 1, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01');
 
-INSERT INTO `_Partition` (partitionId, containerId, partitionNumber, pool_poolId) VALUES 
-(1, 1, 1, 1),
-(2, 2, 1, 2),
-(3, 3, 1, 2);
+INSERT INTO `_Partition` (containerId, partitionId, partitionNumber, pool_poolId) VALUES 
+(1, 1, 1, 1);
 
 INSERT INTO Run (runId, name, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
-(1, 'RUN1', 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
-(2, 'RUN2', 'Revio_Run_1', 3, '2025-11-06', '2025-11-06', 'Completed', 1, '2025-11-06 08:10:00', 1, '2025-11-06 08:10:00');
+(1, 'RUN1', 'HiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02');
 
 INSERT INTO RunIllumina (runId, pairedEnd) VALUES
 (1, 1);
 
-INSERT INTO Run_SequencerPartitionContainer (Run_runId, containers_containerId, positionId, sequencingParametersId) VALUES
-(1, 1, NULL, NULL),
-(2, 2, 1, 5),
-(2, 3, 2, 5);
+INSERT INTO Run_SequencerPartitionContainer (Run_runId, containers_containerId) VALUES
+(1, 1);
 
 INSERT INTO RunPurpose(purposeId, alias) VALUES
 (1, 'Production');
