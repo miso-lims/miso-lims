@@ -600,8 +600,8 @@ public class RunRestController extends AbstractRestController {
             .filter(experiment -> experiment.getInstrumentModel().getId() == run.getSequencer().getInstrumentModel()
                 .getId())
             .flatMap(experiment -> group.getValue().stream()//
-                .filter(partition -> experiment.getRunPartitions().stream()
-                    .noneMatch(rp -> rp.getPartition().equals(partition)))
+                // .filter(partition -> experiment.getRunPartitions().stream()
+                // .noneMatch(rp -> rp.getPartition().equals(partition)))
                 .map(partition -> {
                   AddRequest request = new AddRequest();
                   request.experiment = Dtos.asDto(experiment);

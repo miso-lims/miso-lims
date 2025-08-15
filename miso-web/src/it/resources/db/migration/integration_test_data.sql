@@ -383,12 +383,17 @@ INSERT INTO LibraryIndex (indexId, indexFamilyId, name, sequence, position) VALU
   (18, 4, 'B02', 'TTTTTT', 2);
 
 INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, instrumentType) VALUES
-  (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),
+  (1, 'ILLUMINA', 'Illumina HiSeq 2500', 2, 'SEQUENCER'),
   (2, 'ILLUMINA', 'Illumina MiSeq', 1, 'SEQUENCER'),
   (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER'),
   (4, 'ILLUMINA', 'Illumina iScan', 1, 'ARRAY_SCANNER'),
   (5, 'ILLUMINA', 'Deletable', 1, 'OTHER');
-  
+
+INSERT INTO InstrumentPosition(positionId, instrumentModelId, alias) VALUES
+(1, 1, 'A'),
+(2, 1, 'B'),
+(3, 1, 'C');
+
 INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, readLength2, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
   (2, 'Rapid Run 2x151', 1, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
@@ -953,6 +958,7 @@ INSERT INTO Pool_LibraryAliquot (poolId, aliquotId) VALUES
 (803, 804),
 (804, 800);
 
+
 INSERT INTO SequencingOrder (sequencingOrderId, poolId, partitions, parametersId, createdBy, updatedBy, creationDate, lastUpdated, purposeId) VALUES
 (1, 5103, 2, 4, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00', 1),
 (2, 5103, 2, 3, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00', 1),
@@ -1034,21 +1040,21 @@ INSERT INTO _Partition (containerId, partitionId, partitionNumber, pool_poolId) 
 (6001, 60011, 1, NULL),(6001, 60012, 2, NULL),(6001, 60013, 3, NULL),(6001, 60014, 4, NULL);
 
 INSERT INTO Run (runId, name, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
-(1, 'RUN1', 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
+(1, 'RUN1', 'HiSeq_Run_1', 1, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
 (2, 'RUN2', 'PacBio_Run_1', 3, '2017-08-01', NULL, 'Running', 3, '2017-08-01 10:03:02', 3, '2017-08-01 10:03:02');
 
 INSERT INTO Run (runId, name, alias, instrumentId, sequencingParameters_parametersId, description, filePath, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
-(5001, 'RUN5001', 'Change_Values_Run', 5002, 2, 'description', '/filePath', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5002, 'RUN5002', 'Add_Existing_Container_Run', 5002, 2, 'add existing container to run', '/existing', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5003, 'RUN5003', 'Remove_Existing_Container_Run', 5002, 2, 'remove container from run', '/removable', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5004, 'RUN5004', 'Add_Pools_To_Container_Run', 5002, 2, 'add pools to container on run', '/add/pools', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5005, 'RUN5005', 'Remove_Pools_From_Container_Run', 5002, 2, 'remove pools from container on run', '/remove/pools', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5006, 'RUN5006', 'Replace_Pool_In_Container_Run', 5002, 2, 'replace pool in container on run', '/replace/pool', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5008, 'RUN5008', 'Fail_Lane_In_Container_Run', 5002, 2, 'fail lane in container on run', '/fail/lane', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5009, 'RUN5009', 'Fail_Lane_With_Note_Run', 5002, 2, 'fail lane with note on run', '/fail/note', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5010, 'RUN5010', 'Fail_Lane_To_Ok_Run', 5002, 2, 'fail lane change to ok', '/fail/ok', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5100, 'RUN5100', 'Search_Pool_Run', 2, 4, 'test pool searches', '/test/searches', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5101, 'RUN5101', 'Pool_Completed_Orders_Run', 2, 2, 'sequencing orders are complete', '/complete/orders', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00');
+(5001, 'RUN5001', 'Change_Values_Run', 5002, 2, 'description', '/filePath', '2017-09-05', NULL, 'Running', 1, '2017-07-25 11:00:00', 1, '2017-09-05 11:00:00'),
+(5002, 'RUN5002', 'Add_Existing_Container_Run', 5002, 2, 'add existing container to run', '/existing', '2017-07-24', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5003, 'RUN5003', 'Remove_Existing_Container_Run', 5002, 2, 'remove container from run', '/removable', '2017-07-23', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5004, 'RUN5004', 'Add_Pools_To_Container_Run', 5002, 2, 'add pools to container on run', '/add/pools', '2017-07-22', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5005, 'RUN5005', 'Remove_Pools_From_Container_Run', 5002, 2, 'remove pools from container on run', '/remove/pools', '2017-07-21', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5006, 'RUN5006', 'Replace_Pool_In_Container_Run', 5002, 2, 'replace pool in container on run', '/replace/pool', '2017-07-20', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5008, 'RUN5008', 'Fail_Lane_In_Container_Run', 5002, 2, 'fail lane in container on run', '/fail/lane', '2017-07-19', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5009, 'RUN5009', 'Fail_Lane_With_Note_Run', 5002, 2, 'fail lane with note on run', '/fail/note', '2017-07-18', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5010, 'RUN5010', 'Fail_Lane_To_Ok_Run', 5002, 2, 'fail lane change to ok', '/fail/ok', '2017-07-17', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5100, 'RUN5100', 'Search_Pool_Run', 2, 4, 'test pool searches', '/test/searches', '2017-07-16', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5101, 'RUN5101', 'Pool_Completed_Orders_Run', 2, 2, 'sequencing orders are complete', '/complete/orders', '2017-07-15', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00');
 
 INSERT INTO RunIllumina (runId, pairedEnd) VALUES (1, 1);
 INSERT INTO RunIllumina (runId, callCycle, imgCycle, numCycles, scoreCycle, pairedEnd) VALUES
@@ -1164,6 +1170,10 @@ INSERT INTO Run_Partition (runId, partitionId, purposeId, lastModifier) VALUES
 (5101, 51016, 1, 1),
 (5101, 51017, 1, 1),
 (5101, 51018, 1, 1);
+
+INSERT INTO Run_Partition_LibraryAliquot (runId, partitionId, lastModifier, aliquotId) VALUES
+(5002, 5101, 3, 304);
+
 
 INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES
   (1, '2017-08-22', 1, 'LIB110005 existing note', 3),
@@ -1282,7 +1292,8 @@ INSERT INTO DetailedLibraryTemplate(libraryTemplateId, libraryDesignId, libraryD
 
 INSERT INTO Experiment(experimentId, name, title, alias, study_studyId, instrumentModelId, library_libraryId, creator, created, lastModifier, lastModified) VALUES
 (1, 'EXP1', 'Experiment One', 'Experiment One', 3, 2, 1, 1, '2020-02-20 11:47:00', 1, '2020-02-20 11:47:00'),
-(2, 'EXP2', 'Unused Experiment', 'Unused Experiment', 3, 2, 1, 1, '2020-03-02 16:32:00', 1, '2020-03-02 16:32:00');
+(2, 'EXP2', 'Unused Experiment', 'Unused Experiment', 3, 2, 1, 1, '2020-03-02 16:32:00', 1, '2020-03-02 16:32:00'),
+(3, 'EXP3', 'Experiment Three', 'Experiment Three', 3, 3, 1, 1, '2020-02-21 11:47:00', 1, '2020-02-21 11:47:00');
 
 INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partition_partitionId) VALUES
 (1, 1, 11);

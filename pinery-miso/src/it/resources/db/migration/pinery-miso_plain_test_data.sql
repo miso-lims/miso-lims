@@ -69,7 +69,7 @@ INSERT INTO `_Partition` (containerId, partitionId, partitionNumber, pool_poolId
 (1, 1, 1, 1);
 
 INSERT INTO Run (runId, name, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
-(1, 'RUN1', 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02');
+(1, 'RUN1', 'HiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02');
 
 INSERT INTO RunIllumina (runId, pairedEnd) VALUES
 (1, 1);

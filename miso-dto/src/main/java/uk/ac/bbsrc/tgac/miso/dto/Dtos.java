@@ -2293,7 +2293,9 @@ public class Dtos {
 
   public static List<ContainerDto> asContainerDtos(@Nonnull Collection<SequencerPartitionContainer> containerSubset,
       boolean includeContainerPartitions, boolean includePoolContents) {
-    return asContainerDtos(containerSubset, includeContainerPartitions, includePoolContents);
+    return containerSubset.stream()
+        .map(container -> Dtos.asDto(container, includeContainerPartitions, includePoolContents, null)).toList();
+    // return asContainerDtos(containerSubset, includeContainerPartitions, includePoolContents);
   }
 
   public static SequencerPartitionContainer to(@Nonnull ContainerDto from) {
