@@ -26,7 +26,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.util.LinkedMultiValueMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.test.context.TestExecutionListeners.MergeMode;
 import org.springframework.test.context.TestExecutionListeners;
@@ -34,36 +37,30 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.MultiValueMap;
 import org.hibernate.Session;
-import org.hibernate.engine.jdbc.env.spi.IdentifierCaseStrategy;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.servlet.ServletContextEvent;
-import jakarta.transaction.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
-import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 
 import static org.junit.Assert.*;
 import java.util.List;
 import java.util.Arrays;
 import java.util.function.Function;
-
+import java.util.stream.Collectors;
 import java.util.ArrayList;
-
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import org.springframework.test.web.servlet.ResultActions;
 import javax.ws.rs.core.MediaType;
 import com.jayway.jsonpath.JsonPath;
-import org.springframework.mock.web.MockHttpServletResponse;
-
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration("/st-context.xml")
@@ -138,16 +135,6 @@ public abstract class AbstractST {
     return requestJson;
   }
 
-  /**
-   * Turns a generic list into JSON, maintaining the JSON type info
-   */
-  public <T> String makeJsonForGenericList(List<T> objects) throws Exception {
-    JavaType type = mapper.getTypeFactory().constructParametricType(List.class, objects.get(0).getClass());
-    String requestJson = mapper.writerFor(type).writeValueAsString(objects);
-    System.out.println(requestJson);
-    return requestJson;
-  }
-
   @Test
   public void initialization() {
     assertNotNull(wac);
@@ -157,7 +144,7 @@ public abstract class AbstractST {
     return mockMvc;
   }
 
-  protected String pollingResponse(String url) throws Exception {
+  private String pollingResponse(String url) throws Exception {
     String response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
     String status = JsonPath.read(response, "$.status");
     while (status.equals("running")) {
@@ -168,7 +155,15 @@ public abstract class AbstractST {
     return response;
   }
 
-
+  /**
+   * Creates new target entities in bulk (async)
+   * 
+   * @param controllerBase Controller URL prefix
+   * @param createType Type of target entity to create
+   * @param dtos DTOs of target entities to create
+   * @return List of created target entities
+   * @throws Exception
+   */
   protected <T> List<T> baseTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
 
@@ -184,7 +179,13 @@ public abstract class AbstractST {
     return objects;
   }
 
-
+  /**
+   * Test Create Async but without proper authorization
+   * 
+   * @param controllerBase Controller URL prefix
+   * @param createType Type of target entity to create
+   * @param dtos DTOs of target entities to create
+   */
   protected <T> void testBulkCreateAsyncUnauthorized(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
     // tests failure for async create endpoints where admin permissions are required
@@ -195,9 +196,18 @@ public abstract class AbstractST {
     // request should fail without admin permissions
   }
 
+
   /**
    * Sends a request to an async update endpoint and returns the resulting updated object. Note that
-   * the DTOs must be provided in order of ID.
+   * the DTOs must be provided in order of IDs (lowest to highest).
+   * 
+   * @param <T> Target entity type
+   * @param <D> Target entity DTO type
+   * @param controllerBase Controller URL prefix
+   * @param updateType Type of target entity to be updated
+   * @param dtos DTOs for the target entities to be updated
+   * @param getId The getId method for the target entity
+   * @return List of updated entities
    */
   protected <T, D> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<D> dtos,
       Function<D, Long> getId)
@@ -221,6 +231,14 @@ public abstract class AbstractST {
     return objects;
   }
 
+  /**
+   * Sends a request to an async update endpoint without proper authorization and asserts failure
+   * 
+   * @param <T> Target entity type
+   * @param controllerBase Controller URL prefix
+   * @param updateType Type of target entity to be updated
+   * @param dtos DTOs for the target entities to be updated
+   */
   protected <T> void testBulkUpdateAsyncUnauthorized(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
     // tests failure for async update endpoints where admin permissions are required
@@ -231,21 +249,19 @@ public abstract class AbstractST {
     // request should fail without admin permissions }
   }
 
-  private <D> String pollingResponserHelper(String requestType, List<D> dtos, String controllerBase) throws Exception {
+  private String pollingResponserHelper(String requestType, List<?> dtos, String controllerBase) throws Exception {
     // helper method for async requests
     MvcResult mvcResult;
     ResultActions ac;
     switch (requestType) {
       case "post":
         ac = getMockMvc()
-            .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON)
-                .content(makeJsonForGenericList(dtos)));
+            .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
         break;
 
       case "put":
         ac = getMockMvc()
-            .perform(put(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON)
-                .content(makeJsonForGenericList(dtos)));
+            .perform(put(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
         break;
 
       default:
@@ -261,7 +277,13 @@ public abstract class AbstractST {
     return response;
   }
 
-
+  /**
+   * Tests the deletion of a single entity
+   * 
+   * @param deleteType Target entity type
+   * @param id Target entity ID
+   * @param controllerBase Controller URL prefix
+   */
   protected <T> void testBulkDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
 
@@ -279,6 +301,14 @@ public abstract class AbstractST {
     assertNull(currentSession().get(deleteType, id));
   }
 
+
+  /**
+   * Tests the deletion of a single entity without proper authorization
+   * 
+   * @param deleteType Target entity type
+   * @param id Target entity ID
+   * @param controllerBase Controller URL prefix
+   */
   protected <T> void testDeleteUnauthorized(Class<T> deleteType, int id, String controllerBase) throws Exception {
     List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
 
@@ -294,7 +324,17 @@ public abstract class AbstractST {
     // this user doesn't have permissions to delete things
   }
 
-  protected <T, D> T baseTestCreate(String controllerBase, D dto, Class<T> controllerClass, int status)
+  /**
+   * Tests non-async creation of a single entity
+   * 
+   * @param controllerBase Controller URL prefix
+   * @param dto DTO of entity to be created
+   * @param entityClass Type of entity to be created
+   * @param status Status to be returned in the case of success. THis is usually either 200 or 201
+   *        (HTTP OK or HTTP CREATED).
+   * @return Created entity
+   */
+  protected <T, D> T baseTestCreate(String controllerBase, D dto, Class<T> entityClass, int status)
       throws Exception {
 
     ResultActions ac = getMockMvc()
@@ -308,12 +348,19 @@ public abstract class AbstractST {
         .andReturn();
     Integer id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
 
-    T obj = currentSession().get(controllerClass, id);
+    T obj = currentSession().get(entityClass, id);
     assertNotNull(obj);
     return obj;
   }
 
-  protected <T, D> void testCreateUnauthorized(String controllerBase, D dto, Class<T> controllerClass)
+  /**
+   * Tests non-async creation failure of a single entity (lacking proper authorization)
+   * 
+   * @param controllerBase Controller URL prefix
+   * @param dto DTO of entity to be created
+   * @param entityClass Type of entity to be created
+   */
+  protected <T, D> void testCreateUnauthorized(String controllerBase, D dto, Class<T> entityClass)
       throws Exception {
     ResultActions ac = getMockMvc()
         .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
@@ -323,8 +370,18 @@ public abstract class AbstractST {
     ac.andExpect(status().isUnauthorized());
   }
 
-
-  protected <T, D> T baseTestUpdate(String controllerBase, D dto, int id, Class<T> controllerClass)
+  /**
+   * Non-async template update test for a single entity
+   * 
+   * @param <T> Target entity type
+   * @param <D> Target entity DTO type
+   * @param controllerBase Controller URL prefix
+   * @param dto Target entity DTO
+   * @param id Target entity ID
+   * @param entityClass Target entity type
+   * @return Updated target entity
+   */
+  protected <T, D> T baseTestUpdate(String controllerBase, D dto, int id, Class<T> entityClass)
       throws Exception {
     ResultActions ac = getMockMvc()
         .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
@@ -333,7 +390,7 @@ public abstract class AbstractST {
 
     ac.andExpect(status().isOk());
 
-    T obj = currentSession().get(controllerClass, id);
+    T obj = currentSession().get(entityClass, id);
 
     assertNotNull(obj);
     assertEquals(id, (int) ((Identifiable) obj).getId());
@@ -341,6 +398,16 @@ public abstract class AbstractST {
     return obj;
   }
 
+  /**
+   * Non-async template update failure test for a single entity (unauthorized)
+   * 
+   * @param <T> Target entity type
+   * @param <D> Target entity DTO type
+   * @param controllerBase Controller URL prefix
+   * @param dto Target entity DTO
+   * @param id Target entity ID
+   * @param entityClass Target entity type
+   */
   protected <T, D> void testUpdateUnauthorized(String controllerBase, D dto, int id, Class<T> updateType)
       throws Exception {
     ResultActions ac = getMockMvc()
@@ -356,6 +423,13 @@ public abstract class AbstractST {
     return map;
   }
 
+  /**
+   * Search endpoint template test with multiple parameters
+   * 
+   * @param url URL to query for search
+   * @param params Parameters for the search
+   * @param ids Expected IDs from search
+   */
   protected void baseSearchByTerm(String url, MultiValueMap params, List<Integer> ids)
       throws Exception {
     ResultActions ac = getMockMvc().perform(get(url).params(params).accept(MediaType.APPLICATION_JSON));
@@ -371,15 +445,32 @@ public abstract class AbstractST {
     checkIds(ids, false, response);
   }
 
+  /**
+   * Search endpoint template test for single-parameter searches
+   * 
+   * @param url URL to query for search
+   * @param searchTerm Term to search for
+   * @param ids Expected IDs from search
+   */
   protected void baseSearchByTerm(String url, String searchTerm, List<Integer> ids) throws Exception {
     baseSearchByTerm(url, searchTerm(searchTerm), ids);
   }
+
+  /**
+   * Template datatable endpoint test
+   * 
+   * @param url URL to query for datatable
+   * @param displayLength Max number of entries displayed
+   * @param dataProp Property to sort on
+   * @param ids Expected IDs
+   * @return ResultActions response for further testing if needed
+   */
 
   protected void testListAll(String url, List<Integer> ids) throws Exception {
     String response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
     checkIds(ids, false, response);
   }
-
+  
   protected ResultActions testDtRequest(String url, int displayLength, String dataProp, int sortCol, List<Integer> ids)
       throws Exception {
     ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON)
@@ -407,24 +498,37 @@ public abstract class AbstractST {
   private void checkIds(List<Integer> expectedIds, boolean isDt, String response) throws Exception {
     List<Integer> returnedIds = new ArrayList<Integer>();
 
-    String addedPath = "";
-    String addedAfter = "";
+    String dtPath = "";
     if (isDt)
-      addedPath = ".aaData";
+      dtPath = ".aaData";
 
-    List<Integer> resultIds = JsonPath.read(response, "$" + addedPath + "[*].id");
+    List<Integer> resultIds = JsonPath.read(response, "$" + dtPath + "[*].id");
     assertEquals(expectedIds.size(), resultIds.size());
     for (Integer expectedId : expectedIds) {
-      assertTrue("id " + expectedId + " expected but not found", resultIds.contains(expectedId));
+      assertTrue(resultIds.contains(expectedId));
     }
 
   }
 
+  /**
+   * Template datatable endpoint test with default param values
+   * 
+   * @param url Datatable query URL
+   * @param ids Expected IDs
+   * @return ResultActions response for more testing if needed
+   */
   protected ResultActions testDtRequest(String url, List<Integer> ids)
       throws Exception {
-    return testDtRequest(url, 200, "id", 3, ids);
+    return testDtRequest(url, 25, "id", 3, ids);
   }
 
+  /**
+   * Template test for "getById" endpoints
+   * 
+   * @param controllerBase Controller URL prefix
+   * @param id ID of target entity
+   * @return ResultActions response for further testing
+   */
   protected ResultActions baseTestGetById(String controllerBase, int id) throws Exception {
 
     ResultActions result =
@@ -440,51 +544,107 @@ public abstract class AbstractST {
     return result;
   }
 
-  protected ResultActions testList(String url, List<Integer> ids, MultiValueMap params)
+  /**
+   * Tests model static list endpoints.
+   * 
+   * @param url URL to query
+   * @return Model and View response from the endpoint
+   */
+  protected ModelAndView testStaticListPage(String url)
       throws Exception {
-    ResultActions result = getMockMvc().perform(get(url).params(params));
+    ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
     if (DEBUG_MODE)
-      result.andDo(print());
-    String response = result.andReturn().getResponse().getContentAsString();
-    checkIds(ids, false, response);
+      ac = ac.andDo(print());
 
-    return result; // return the result for more content testing if needed
+    ModelAndView response = ac.andExpect(status().isOk())
+        .andReturn().getModelAndView();
+
+    return response;
   }
 
-  protected ResultActions testList(String url, List<Integer> ids) throws Exception {
-    return testList(url, ids, new LinkedMultiValueMap());
+  /**
+   * Tests model static list endpoints where only the returned DTOs are desired
+   * 
+   * @param url URL to query
+   * @param listModelAttribute The model attribute where the returned DTOs are found
+   * @return JSON response from the endpoint
+   */
+  protected String testStaticListPage(String url, String listModelAttribute) throws Exception {
+    return testStaticListPage(url).getModel().get(listModelAttribute).toString();
   }
 
-  protected void testSpreadsheetContents(String url, SpreadsheetRequest sheet, List<String> headers,
-      List<List<String>> rows) throws Exception {
-    ResultActions res = getMockMvc().perform(post(url).content(makeJson(sheet))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk());
+
+  /**
+   * Template test for model bulk edit endpoints.
+   * 
+   * @param url URL to query
+   * @param ids The target entity IDs
+   * @return Model and View response from the endpoint
+   */
+  protected ModelAndView testBulkEditPage(String url, List<Long> ids)
+      throws Exception {
+
+    String stringIds = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+    ResultActions ac = getMockMvc().perform(post(url).param("ids", stringIds).accept(MediaType.APPLICATION_JSON));
     if (DEBUG_MODE)
-      res.andDo(print());
+      ac = ac.andDo(print());
 
-    MockHttpServletResponse response = res.andReturn().getResponse();
-    String[][] records = new String[headers.size()][rows.size() + 1];
-    String[] rawRows = response.getContentAsString().split("\n");
+    ModelAndView response = ac.andExpect(status().isOk())
+        .andReturn().getModelAndView();
+    return response;
+  }
 
-    for (int i = 0; i < rawRows.length; i++) {
-      String s = rawRows[i].replaceAll("\\r", "");
-      s = s.replaceAll("\\n", "");
-      s = s.replaceAll("\"", "");
-      records[i] = s.split(",");
-    }
-    checkArray(records[0], headers);
-    for (int i = 0; i < rows.size(); i++) {
-      checkArray(records[i + 1], rows.get(i));
-    }
+  /**
+   * Template test for model bulk edit endpoints where only the returned DTOs are needed
+   * 
+   * @param url URL to query
+   * @param ids The target entity IDs
+   * @param listModelAttribute The model attribute where the returned DTOs are found
+   * @return String JSON response from endpoint
+   */
+  protected String testBulkEditPage(String url, List<Long> ids, String listModelAttribute) throws Exception {
+    return testBulkEditPage(url, ids).getModel().get(listModelAttribute).toString();
+  }
+
+  /**
+   * Tests model bulk create endpoints.
+   * 
+   * @param url URL to query
+   * @param numCreated Number of target entities created
+   * @param listModelAttribute The model attribute where the returned DTOs are found
+   */
+  protected void testBulkCreatePage(String url, int numCreated, String listModelAttribute) throws Exception {
+    ResultActions ac = getMockMvc().perform(get(url)
+        .accept(MediaType.APPLICATION_JSON).param("quantity", Integer.toString(numCreated)));
+    if (DEBUG_MODE)
+      ac = ac.andDo(print());
+
+    ac = ac.andExpect(status().isOk());
+
+    String response = ac.andReturn().getModelAndView().getModel().get(listModelAttribute).toString();
+    assertEquals(numCreated, ((List<Object>) JsonPath.read(response, "$.*")).size());
+  }
+
+  /**
+   * Reads an Integer from a JSON response given a path
+   * 
+   * @param resultJson JSON response
+   * @param path JSON path to long
+   * @return Read Integer
+   */
+  protected static Integer readInteger(String resultJson, String path) {
+    return JsonPath.read(resultJson, path);
   }
 
 
-  protected void checkArray(String[] values, List<String> expected) {
-    assertEquals(expected.size(), values.length);
-    for (int i = 0; i < expected.size(); i++) {
-      assertEquals(expected.get(i), values[i]);
-    }
+  /**
+   * Reads a long from a JSON response given a path
+   * 
+   * @param resultJson JSON response
+   * @param path JSON path to long
+   * @return Read long
+   */
+  protected static long readLong(String resultJson, String path) {
+    return readInteger(resultJson, path).longValue();
   }
-
 }
