@@ -702,9 +702,28 @@ public abstract class AbstractST {
    * @param title
    * @throws Exception
    */
-  protected void baseTestNewModel(String url, String title) throws Exception {
-    getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
+  protected ResultActions baseTestNewModel(String url, String title) throws Exception {
+    ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
+    if (DEBUG_MODE)
+      ac = ac.andDo(print());
+
+    ac = ac.andExpect(status().isOk())
         .andExpect(model().attribute("title", title));
+    return ac;
+  }
+
+  /**
+   * Tests single-entity edit model endpoints (usually a get mapping to /{entityId})
+   * 
+   * @param url URL to query
+   * @return ResultActions from request
+   */
+  protected ResultActions baseTestEditModel(String url) throws Exception {
+    ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
+    if (DEBUG_MODE)
+      ac = ac.andDo(print());
+
+    ac = ac.andExpect(status().isOk());
+    return ac;
   }
 }
