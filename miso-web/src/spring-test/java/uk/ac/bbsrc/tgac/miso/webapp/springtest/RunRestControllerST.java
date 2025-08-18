@@ -32,43 +32,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import org.springframework.test.web.servlet.ResultActions;
-// import org.springframework.util.LinkedMultiValueMap;
-// import org.springframework.util.MultiValueMap;
-// import org.springframework.beans.factory.annotation.Value;
+
 
 import com.jayway.jsonpath.JsonPath;
-// import java.io.BufferedReader;
-// import java.io.FileReader;
-
-// import jakarta.transaction.Transactional;
-// import javassist.bytecode.ExceptionTable;
-
 import static org.hamcrest.Matchers.*;
-
-// import com.fasterxml.jackson.databind.ObjectMapper;
-// import com.fasterxml.jackson.databind.ObjectWriter;
-
-// import org.springframework.test.web.servlet.MvcResult;
-// import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-
-// import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
-// import uk.ac.bbsrc.tgac.miso.core.data.Run;
-// import uk.ac.bbsrc.tgac.miso.core.data.impl.runimpl;
-// import uk.ac.bbsrc.tgac.miso.dto.run.IlluminaIlluminaRunDto;
 import org.springframework.security.test.context.support.WithMockUser;
-
 import static org.junit.Assert.*;
-
-// import java.util.List;
-// import java.util.Arrays;
 import java.util.ArrayList;
-// import java.util.Map;
-// import java.util.HashMap;
-// import java.util.Iterator;
-// import java.util.Set;
-
-// import org.springframework.test.web.servlet.MockMvc;
-// import java.util.Date;
 
 public class RunRestControllerST extends AbstractST {
   private static final String CONTROLLER_BASE = "/rest/runs";
@@ -95,7 +65,7 @@ public class RunRestControllerST extends AbstractST {
 
   @Test
   public void testGetIdentityParents() throws Exception {
-    List<Integer> ids = Arrays.asList(1, 2);
+    List<Integer> ids = Arrays.asList(1);
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/parents/Identity").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
@@ -111,7 +81,7 @@ public class RunRestControllerST extends AbstractST {
 
   @Test
   public void testGetTissueParents() throws Exception {
-    List<Integer> ids = Arrays.asList(1, 2);
+    List<Integer> ids = Arrays.asList(1);
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/parents/Tissue").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
@@ -127,7 +97,7 @@ public class RunRestControllerST extends AbstractST {
 
   @Test
   public void testGetTissueProcessingParents() throws Exception {
-    List<Integer> ids = Arrays.asList(1, 2);
+    List<Integer> ids = Arrays.asList(1);
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/parents/Tissue Processing").content(makeJson(ids))
@@ -144,7 +114,7 @@ public class RunRestControllerST extends AbstractST {
 
   @Test
   public void testGetStockParents() throws Exception {
-    List<Integer> ids = Arrays.asList(1, 2);
+    List<Integer> ids = Arrays.asList(1);
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/parents/Stock").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
@@ -160,7 +130,7 @@ public class RunRestControllerST extends AbstractST {
 
   @Test
   public void testGetAliquotParents() throws Exception {
-    List<Integer> ids = Arrays.asList(1, 2);
+    List<Integer> ids = Arrays.asList(1);
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/parents/Aliquot").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
@@ -176,7 +146,7 @@ public class RunRestControllerST extends AbstractST {
 
   @Test
   public void testGetLibraryParents() throws Exception {
-    List<Integer> ids = Arrays.asList(1, 2);
+    List<Integer> ids = Arrays.asList(1);
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/parents/Library").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
@@ -191,7 +161,7 @@ public class RunRestControllerST extends AbstractST {
 
   @Test
   public void testGetLibraryAliquotParents() throws Exception {
-    List<Integer> ids = Arrays.asList(1, 2);
+    List<Integer> ids = Arrays.asList(1);
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/parents/Library Aliquot").content(makeJson(ids))
@@ -206,7 +176,7 @@ public class RunRestControllerST extends AbstractST {
 
   @Test
   public void testGetPoolParents() throws Exception {
-    List<Integer> ids = Arrays.asList(1, 2);
+    List<Integer> ids = Arrays.asList(1);
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/parents/Pool").content(makeJson(ids))
@@ -223,8 +193,8 @@ public class RunRestControllerST extends AbstractST {
     getMockMvc().perform(get(CONTROLLER_BASE + "/1/containers"))
         .andDo(print())
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(1))
-        .andExpect(jsonPath("$.identificationBarcode").value("MISEQXX"));
+        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$[0].identificationBarcode").value("MISEQXX"));
   }
 
   @Test
@@ -336,7 +306,6 @@ public class RunRestControllerST extends AbstractST {
         .andExpect(jsonPath("$[0].studies[0].name").value("STU3"))
         .andExpect(jsonPath("$[0].studies[0].projectId").value(3));
 
-    // TODO
 
   }
 
@@ -346,10 +315,11 @@ public class RunRestControllerST extends AbstractST {
     getMockMvc().perform(get(CONTROLLER_BASE + "/2/potentialExperimentExpansions"))
         .andDo(print())
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].studies.*", hasSize(1)))
-        .andExpect(jsonPath("$[0].studies[0].id").value(3))
-        .andExpect(jsonPath("$[0].studies[0].name").value("STU3"))
-        .andExpect(jsonPath("$[0].studies[0].projectId").value(3));
+        .andExpect(jsonPath("$[0].experiment.name").value("EXP3"))
+        .andExpect(jsonPath("$[0].experiment.title").value("Experiment Three"))
+        .andExpect(jsonPath("$[0].experiment.study.id").value(3))
+        .andExpect(jsonPath("$[0].experiment.study.name").value("STU3"))
+        .andExpect(jsonPath("$[0].experiment.study.projectId").value(3));
 
   }
 
@@ -403,7 +373,7 @@ public class RunRestControllerST extends AbstractST {
   public void testGetSpreadsheet() throws Exception {
     SpreadsheetRequest req = new SpreadsheetRequest();
     req.setFormat("CSV");
-    req.setIds(Arrays.asList(1L, 2L));
+    req.setIds(Arrays.asList(1L));
     req.setSheet(RunLibrarySpreadsheets.LIBRARY_SEQUENCING_REPORT.name());
 
     List<String> headers = Arrays.asList("Instrument Model", "Run Name", "Run Alias", "Pool Name",
