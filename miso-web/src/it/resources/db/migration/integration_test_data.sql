@@ -1026,7 +1026,7 @@ INSERT INTO SequencerPartitionContainer (containerId, identificationBarcode, seq
 
 INSERT INTO _Partition (containerId, partitionId, partitionNumber, pool_poolId) VALUES
 (1, 11, 1, 1),(1, 12, 2, NULL),(1, 13, 3, NULL),(1, 14, 4, NULL),
-(2, 21, 1, NULL),(2, 22, 2, NULL),(2, 23, 3, NULL),(2, 24, 4, NULL),(2, 25, 5, NULL),(2, 26, 6, NULL),(2, 27, 7, NULL),(2, 28, 8, NULL),
+(2, 21, 1, 501),(2, 22, 2, NULL),(2, 23, 3, NULL),(2, 24, 4, NULL),(2, 25, 5, NULL),(2, 26, 6, NULL),(2, 27, 7, NULL),(2, 28, 8, NULL),
 (5002, 5101, 1, NULL),(5002, 5102, 2, NULL),(5002, 5103, 3, NULL),(5002, 5104, 4, NULL),(5002, 5105, 5, NULL),(5002, 5106, 6, NULL),(5002, 5107, 7, NULL),(5002, 5108, 8, NULL),
 (5003, 5201, 1, NULL),(5003, 5202, 2, NULL),(5003, 5203, 3, NULL),(5003, 5204, 4, NULL),(5003, 5205, 5, NULL),(5003, 5206, 6, NULL),(5003, 5207, 7, NULL),(5003, 5208, 8, NULL),
 (5004, 5401, 1, NULL),(5004, 5402, 2, NULL),(5004, 5403, 3, NULL),(5004, 5404, 4, NULL),(5004, 5405, 5, NULL),(5004, 5406, 6, NULL),(5004, 5407, 7, NULL),(5004, 5408, 8, NULL),
@@ -1291,9 +1291,9 @@ INSERT INTO DetailedLibraryTemplate(libraryTemplateId, libraryDesignId, libraryD
 (1, 3, 6);
 
 INSERT INTO Experiment(experimentId, name, title, alias, study_studyId, instrumentModelId, library_libraryId, creator, created, lastModifier, lastModified) VALUES
-(1, 'EXP1', 'Experiment One', 'Experiment One', 3, 2, 1, 1, '2020-02-20 11:47:00', 1, '2020-02-20 11:47:00'),
+(1, 'EXP1', 'Experiment One', 'Experiment One', 3, 1, 1, 1, '2020-02-20 11:47:00', 1, '2020-02-20 11:47:00'),
 (2, 'EXP2', 'Unused Experiment', 'Unused Experiment', 3, 2, 1, 1, '2020-03-02 16:32:00', 1, '2020-03-02 16:32:00'),
-(3, 'EXP3', 'Experiment Three', 'Experiment Three', 3, 3, 1, 1, '2020-02-21 11:47:00', 1, '2020-02-21 11:47:00');
+(3, 'EXP3', 'Experiment Three', 'Experiment Three', 3, 3, 504, 1, '2020-02-21 11:47:00', 1, '2020-02-21 11:47:00');
 
 INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partition_partitionId) VALUES
 (1, 1, 11);

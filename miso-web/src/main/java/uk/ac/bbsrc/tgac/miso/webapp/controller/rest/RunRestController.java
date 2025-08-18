@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -600,8 +601,8 @@ public class RunRestController extends AbstractRestController {
             .filter(experiment -> experiment.getInstrumentModel().getId() == run.getSequencer().getInstrumentModel()
                 .getId())
             .flatMap(experiment -> group.getValue().stream()//
-                // .filter(partition -> experiment.getRunPartitions().stream()
-                // .noneMatch(rp -> rp.getPartition().equals(partition)))
+                .filter(partition -> experiment.getRunPartitions().stream()
+                    .noneMatch(rp -> rp.getPartition().equals(partition)))
                 .map(partition -> {
                   AddRequest request = new AddRequest();
                   request.experiment = Dtos.asDto(experiment);
