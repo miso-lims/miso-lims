@@ -159,7 +159,7 @@ public abstract class AbstractST {
   }
 
   /**
-   * Creates new target entities in bulk (async)
+   * Creates new target entities in bulk (async) e.g. endpoints with a @PostMapping("/bulk") mapping
    * 
    * @param controllerBase Controller URL prefix
    * @param createType Type of target entity to create
@@ -183,7 +183,8 @@ public abstract class AbstractST {
   }
 
   /**
-   * Test Create Async but without proper authorization
+   * Test Create Async but without proper authorization e.g. e.g. endpoints with
+   * a @PostMapping("/bulk") mapping
    * 
    * @param controllerBase Controller URL prefix
    * @param createType Type of target entity to create
@@ -202,7 +203,8 @@ public abstract class AbstractST {
 
   /**
    * Sends a request to an async update endpoint and returns the resulting updated object. Note that
-   * the DTOs must be provided in order of IDs (lowest to highest).
+   * the DTOs must be provided in order of IDs (lowest to highest). e.g. e.g. endpoints with
+   * a @PutMapping("/bulk") mapping
    * 
    * @param <T> Target entity type
    * @param <D> Target entity DTO type
@@ -235,7 +237,8 @@ public abstract class AbstractST {
   }
 
   /**
-   * Sends a request to an async update endpoint without proper authorization and asserts failure
+   * Sends a request to an async update endpoint without proper authorization and asserts failure e.g.
+   * e.g. endpoints with a @PutMapping("/bulk") mapping
    * 
    * @param <T> Target entity type
    * @param controllerBase Controller URL prefix
@@ -281,7 +284,8 @@ public abstract class AbstractST {
   }
 
   /**
-   * Tests the deletion of a single entity
+   * Tests the deletion of a single entity e.g. endpoints with a @PostMapping(value = "/bulk-delete")
+   * mapping
    * 
    * @param deleteType Target entity type
    * @param id Target entity ID
@@ -306,7 +310,8 @@ public abstract class AbstractST {
 
 
   /**
-   * Tests the deletion of a single entity without proper authorization
+   * Tests the deletion of a single entity without proper authorization e.g. e.g. endpoints with
+   * a @PostMapping(value = "/bulk-delete") mapping
    * 
    * @param deleteType Target entity type
    * @param id Target entity ID
@@ -328,7 +333,7 @@ public abstract class AbstractST {
   }
 
   /**
-   * Tests non-async creation of a single entity
+   * Tests non-async creation of a single entity. Just a POST to the controller's base URL.
    * 
    * @param controllerBase Controller URL prefix
    * @param dto DTO of entity to be created
@@ -357,7 +362,8 @@ public abstract class AbstractST {
   }
 
   /**
-   * Tests non-async creation failure of a single entity (lacking proper authorization)
+   * Tests non-async creation failure of a single entity (lacking proper authorization) Just a POST to
+   * the controller's base URL.
    * 
    * @param controllerBase Controller URL prefix
    * @param dto DTO of entity to be created
@@ -374,7 +380,8 @@ public abstract class AbstractST {
   }
 
   /**
-   * Non-async template update test for a single entity
+   * Non-async template update test for a single entity. e.g. Endpoints with
+   * a @PutMapping("/{entityId}") mapping.
    * 
    * @param <T> Target entity type
    * @param <D> Target entity DTO type
@@ -402,7 +409,8 @@ public abstract class AbstractST {
   }
 
   /**
-   * Non-async template update failure test for a single entity (unauthorized)
+   * Non-async template update failure test for a single entity (unauthorized) e.g. Endpoints with
+   * a @PutMapping("/{entityId}") mapping.
    * 
    * @param <T> Target entity type
    * @param <D> Target entity DTO type
@@ -427,7 +435,8 @@ public abstract class AbstractST {
   }
 
   /**
-   * Search endpoint template test with multiple parameters
+   * Search endpoint template test with multiple parameters. e.g. endpoints with a @GetMapping(value =
+   * "/search") mapping with multiple @RequestParams
    * 
    * @param url URL to query for search
    * @param params Parameters for the search
@@ -449,7 +458,8 @@ public abstract class AbstractST {
   }
 
   /**
-   * Search endpoint template test for single-parameter searches
+   * Search endpoint template test for single-parameter searches e.g. endpoints with
+   * a @GetMapping(value = "/search") mapping with a single @RequestParam("q")
    * 
    * @param url URL to query for search
    * @param searchTerm Term to search for
@@ -460,7 +470,7 @@ public abstract class AbstractST {
   }
 
   /**
-   * Template datatable endpoint test
+   * Template datatable endpoint test. Useful for any "/dt" or "/dt/..." endpoints.
    * 
    * @param url URL to query for datatable
    * @param displayLength Max number of entries displayed
@@ -514,7 +524,8 @@ public abstract class AbstractST {
   }
 
   /**
-   * Template datatable endpoint test with default param values
+   * Template datatable endpoint test with default param values. Useful for any "/dt" or "/dt/..."
+   * endpoints.
    * 
    * @param url Datatable query URL
    * @param ids Expected IDs
@@ -526,7 +537,7 @@ public abstract class AbstractST {
   }
 
   /**
-   * Template test for "getById" endpoints
+   * Template test for "getById" endpoints. Useful for any @GetMapping("/{entityId}") endpoints
    * 
    * @param controllerBase Controller URL prefix
    * @param id ID of target entity
@@ -548,7 +559,7 @@ public abstract class AbstractST {
   }
 
   /**
-   * Tests model static list endpoints.
+   * Tests model static list endpoints. e.g. @GetMapping("/list")
    * 
    * @param url URL to query
    * @return Model and View response from the endpoint
@@ -567,6 +578,7 @@ public abstract class AbstractST {
 
   /**
    * Tests model static list endpoints where only the returned DTOs are desired
+   * e.g. @GetMapping("/list")
    * 
    * @param url URL to query
    * @param listModelAttribute The model attribute where the returned DTOs are found
@@ -578,7 +590,7 @@ public abstract class AbstractST {
 
 
   /**
-   * Template test for model bulk edit endpoints.
+   * Template test for model bulk edit endpoints. e.g. @PostMapping("/bulk/edit")
    * 
    * @param url URL to query
    * @param ids The target entity IDs
@@ -599,6 +611,7 @@ public abstract class AbstractST {
 
   /**
    * Template test for model bulk edit endpoints where only the returned DTOs are needed
+   * e.g. @PostMapping("/bulk/edit")
    * 
    * @param url URL to query
    * @param ids The target entity IDs
@@ -610,7 +623,7 @@ public abstract class AbstractST {
   }
 
   /**
-   * Tests model bulk create endpoints.
+   * Tests model bulk create endpoints. e.g. @GetMapping("/bulk/new")
    * 
    * @param url URL to query
    * @param numCreated Number of target entities created
@@ -652,25 +665,46 @@ public abstract class AbstractST {
   }
 
   /**
-   * Reads an Integer from a JSON response given a path
+   * Tests model "edit entity" form setup
    * 
-   * @param resultJson JSON response
-   * @param path JSON path to long
-   * @return Read Integer
+   * @param url url to query
+   * @return ModelAndView from the endpoint
    */
-  protected static Integer readInteger(String resultJson, String path) {
-    return JsonPath.read(resultJson, path);
+  protected ModelAndView testModelFormSetup(String url)
+      throws Exception {
+    ResultActions ac = getMockMvc().perform(get(url)
+        .accept(MediaType.APPLICATION_JSON));
+
+    if (DEBUG_MODE)
+      ac = ac.andDo(print());
+
+    ModelAndView mvc = ac.andExpect(status().isOk())
+        .andReturn().getModelAndView();
+
+    return mvc;
   }
 
+  /**
+   * Tests model "edit entity" form setup
+   * 
+   * @param url url to query
+   * @param listModelAttribute Model attribute, if relevant
+   * @return Resulting JSON response
+   */
+  protected String testModelFormSetup(String url, String listModelAttribute) throws Exception {
+    return testModelFormSetup(url).getModel().get(listModelAttribute).toString();
+  }
 
   /**
-   * Reads a long from a JSON response given a path
+   * Tests model single create endpoints.
    * 
-   * @param resultJson JSON response
-   * @param path JSON path to long
-   * @return Read long
+   * @param url
+   * @param title
+   * @throws Exception
    */
-  protected static long readLong(String resultJson, String path) {
-    return readInteger(resultJson, path).longValue();
+  protected void baseTestNewModel(String url, String title) throws Exception {
+    getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(model().attribute("title", title));
   }
 }
