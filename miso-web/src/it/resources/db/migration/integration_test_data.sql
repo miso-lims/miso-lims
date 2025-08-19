@@ -750,6 +750,13 @@ INSERT INTO Transfer_Sample(transferId, sampleId, received, qcPassed, qcNote) VA
 (1, 2, TRUE, TRUE, NULL),
 (2, 100002, TRUE, TRUE, NULL);
 
+INSERT INTO TransferNotification(notificationId, transferId, recipientName, recipientEmail, creator, created, sentTime, sendSuccess, failureSentTime) VALUES
+(1, 1, 'Me', 'me@example.com', 1, '2020-11-11 10:36:00', '2020-11-11 10:36:00', TRUE, NULL),
+(2, 1, 'Them', 'them@example.com', 1, '2020-11-11 10:36:00', '2020-11-11 10:36:00', FALSE, '2020-11-11 10:36:00'),
+(3, 2, 'Others', 'others@example.com', 1, '2020-11-11 10:36:00', NULL, NULL, NULL),
+(4, 2, 'Anyone', 'anyone@example.com', 1, '2020-11-11 10:36:00', '2020-11-11 10:36:00', FALSE, NULL),
+(5, 2, 'Nobody', 'nobody@example.com', 1, '2021-02-18 12:38:00', NULL, NULL, NULL);
+
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType, libraryType, librarySelectionType, libraryStrategyType, creationDate,
   creator, created, lastModifier, lastModified, detailedQcStatusId, qcUser, qcDate, dnaSize, volume, concentration, locationBarcode, kitDescriptorId, discarded, volumeUnits, concentrationUnits, spikeInId, spikeInDilutionFactor, spikeInVolume, lowQuality,
   discriminator, archived, libraryDesign, libraryDesignCodeId, nonStandardAlias, sopId, kitLot, index1Id, index2Id) VALUES

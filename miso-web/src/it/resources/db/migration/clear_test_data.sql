@@ -21,6 +21,7 @@ DELETE FROM Transfer_LibraryAliquot;
 DELETE FROM Transfer_Pool;
 DELETE FROM TransferChangeLog;
 DELETE FROM Transfer;
+DELETE FROM TransferNotification;
 DELETE FROM Workset_Sample;
 DELETE FROM Workset_Library;
 DELETE FROM Workset_LibraryAliquot;

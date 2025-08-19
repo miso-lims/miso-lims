@@ -24,9 +24,7 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Transfers;
-import java.util.TransferList;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+// import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 
 
@@ -37,6 +35,7 @@ public class TransferRestControllerST extends AbstractST {
 
 
   @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testPendingDatatable() throws Exception {
     // pending transfers for the groups that the current user is in
     testDtRequest(CONTROLLER_BASE + "/dt/pending", Arrays.asList(1, 2));
@@ -56,35 +55,48 @@ public class TransferRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testCreate() throws Exception {
+    // must be group member or admin to create
+
     TransferDto transfer = new TransferDto();
     transfer.setTransferTime("2025-08-19");
 
-    Transfer saved = baseTestCreate(CONTROLLER_BASE, transfer, entityClass, 201);
+    Transfer saved = baseTestCreate(CONTROLLER_BASE, transfer, entityClass, 200);
 
-    assertEquals(LimsUtils.getDateFormat().format(saved.getTransferTime()), transfer.getTransferTime());
+    assertEquals(saved.getTransferTime().toString(), transfer.getTransferTime());
   }
 
   @Test
   public void testCreateFail() throws Exception {
+    // must be group member or admin to create
+
     TransferDto transfer = new TransferDto();
     transfer.setTransferTime("2025-08-19");
 
-    testCreateUnauthorized(CONTROLLER_BASE, transfer, entityClass, 201);
+    testCreateUnauthorized(CONTROLLER_BASE, transfer, entityClass);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testUpdate() throws Exception {
+    // must be group member or admin to update
+
     TransferDto transfer = Dtos.asDto(currentSession().get(entityClass, 1));
+    transfer.setRecipient("new guy");
 
 
-    Transfer updatedTransfer = baseTestUpdate(CONTROLLER_BASE, transfer, 2, entityClass);
-    assertEquals("testing Transfer", updatedTransfer.getAlias());
+    Transfer updatedTransfer = baseTestUpdate(CONTROLLER_BASE, transfer, 1, entityClass);
+
+    assertEquals(transfer.getRecipient(), updatedTransfer.getRecipient());
   }
 
   @Test
   public void testUpdateFail() throws Exception {
+    // must be group member or admin to update
 
+    TransferDto transfer = Dtos.asDto(currentSession().get(entityClass, 1));
+    transfer.setRecipient("new guy");
+
+    testUpdateUnauthorized(CONTROLLER_BASE, transfer, 1, entityClass);
   }
 
   @Test
@@ -102,25 +114,69 @@ public class TransferRestControllerST extends AbstractST {
 
 
   @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testAddNotification() throws Exception {
+    TransferNotificationDto dto = Dtos.asDto(currentSession().get(TransferNotification.class, 3));
+    getMockMvc()
+        .perform(
+            post(CONTROLLER_BASE + "/1/notifications").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk());
 
+    TransferNotification transferNotif = currentSession().get(TransferNotification.class, 3);
+    assertEquals(1L, transferNotif.getTransfer().getId());
   }
 
   @Test
   public void testAddNotificationFail() throws Exception {
-
+    // must be group member or admin to add notifs
+    TransferNotificationDto dto = Dtos.asDto(currentSession().get(TransferNotification.class, 3));
+    getMockMvc()
+        .perform(
+            post(CONTROLLER_BASE + "/1/notifications").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
   public void testResendNotification() throws Exception {
-
+    getMockMvc().perform(post(CONTROLLER_BASE + "/1/notifications/1/resend"))
+        .andDo(print())
+        .andExpect(status().isOk());
   }
 
   @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkDeleteNotifications() throws Exception {
+    List<Long> deleteIds = Arrays.asList(3L, 4L);
+    assertEquals(2L, ((TransferNotification) currentSession().get(TransferNotification.class, deleteIds.get(0)))
+        .getTransfer().getId());
+    assertEquals(2L, ((TransferNotification) currentSession().get(TransferNotification.class, deleteIds.get(1)))
+        .getTransfer().getId());
 
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/2/notifications/bulk-delete").content(makeJson(deleteIds))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk());
+
+    assertNull(currentSession().get(TransferNotification.class, deleteIds.get(0)));
+    assertNull(currentSession().get(TransferNotification.class, deleteIds.get(1)));
   }
 
 
+  @Test
+  public void testDeleteNotificationsFail() throws Exception {
+    List<Long> deleteIds = Arrays.asList(3L, 4L);
+    assertEquals(2L, ((TransferNotification) currentSession().get(TransferNotification.class, deleteIds.get(0)))
+        .getTransfer().getId());
+    assertEquals(2L, ((TransferNotification) currentSession().get(TransferNotification.class, deleteIds.get(1)))
+        .getTransfer().getId());
 
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/2/notifications/bulk-delete").content(makeJson(deleteIds))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isUnauthorized());
+  }
 }
