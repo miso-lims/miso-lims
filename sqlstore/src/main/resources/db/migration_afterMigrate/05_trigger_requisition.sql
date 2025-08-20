@@ -45,7 +45,7 @@ FOR EACH ROW
           NEW.requisitionId,
           'assays',
           lastModifier,
-          CONCAT('Added assay ', (SELECT alias FROM Assay WHERE assayId = NEW.assayId)),
+          CONCAT('Added assay ', (SELECT alias FROM Assay WHERE assayId = NEW.assayId), ' ', (SELECT version FROM Assay WHERE assayId = NEW.assayId)),
           lastModified
         FROM Requisition
         WHERE requisitionId = NEW.requisitionId;
@@ -60,7 +60,7 @@ FOR EACH ROW
       OLD.requisitionId,
       'assays',
       lastModifier,
-      CONCAT('Removed assay ', (SELECT alias FROM Assay WHERE assayId = OLD.assayId)),
+      CONCAT('Removed assay ', (SELECT alias FROM Assay WHERE assayId = OLD.assayId), ' ', (SELECT version FROM Assay WHERE assayId = OLD.assayId)),
       lastModified
     FROM Requisition
     WHERE requisitionId = OLD.requisitionId//
