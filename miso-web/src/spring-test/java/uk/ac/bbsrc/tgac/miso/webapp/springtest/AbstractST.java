@@ -251,6 +251,20 @@ public abstract class AbstractST {
     // request should fail without admin permissions
   }
 
+  /**
+   * Helper method to send a request to an async endpoint, then calls pollingResponse to poll the
+   * endpoint until the request is processed.
+   * 
+   * @param requestType either "put" for async update or "post" for async creation
+   * @param dtos dtos to create
+   * @param url url to send the request to
+   * @param pollingResponseUrlPrefix prefix for the URL to poll for the request status (running,
+   *        completed, or failed)
+   * @param expectedResponseCode expected response code for the async endpoint request, usually HTTP
+   *        202 ACCEPTED
+   * @return String JSON response from the endpoint
+   * @throws Exception
+   */
   protected String pollingResponserHelper(String requestType, List<?> dtos, String url, String pollingResponseUrlPrefix,
       int expectedResponseCode)
       throws Exception {
@@ -281,9 +295,16 @@ public abstract class AbstractST {
     return response;
   }
 
-  // overloaded method for cases where the polling response URL is the same as the url
-  // this also assume that the expected response code is 202, or HTTP ACCEPTED, as is standard for
-  // nearly all of the async endpoints
+  /**
+   * Overloaded method for cases where the polling response URL is the same as the url. This also
+   * assume that the expected response code is 202, or HTTP ACCEPTED, as is standard for Nearly all of
+   * the async endpoints
+   * 
+   * @param requestType either "put" for async update or "post" for async creation
+   * @param dtos dtos to create
+   * @param url url to send the request to
+   * @return request response
+   */
   private String pollingResponserHelper(String requestType, List<?> dtos, String url) throws Exception {
     return pollingResponserHelper(requestType, dtos, url, url, 202);
   }

@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.stream.Stream;
 
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
@@ -40,7 +39,7 @@ public class RequisitionRestControllerST extends AbstractST {
 
   // template test for requsition sample and library testing
   protected <D> void testAddAsync(long requisitionId, String url, List<Long> entityIds, Class<D> entityType,
-      String pollUrl, Function<D, Identifiable> getRequisition)
+      String pollUrl, Function<D, Requisition> getRequisition)
       throws Exception {
 
     for (Long entityId : entityIds) {
@@ -57,7 +56,7 @@ public class RequisitionRestControllerST extends AbstractST {
 
   // template test for requsition sample and library testing
   private <D> void testRemoveAsync(long requisitionId, String url, List<Long> entityIds, Class<D> entityType,
-      String pollUrl, Function<D, Identifiable> getRequisition)
+      String pollUrl, Function<D, Requisition> getRequisition)
       throws Exception {
 
     for (Long entityId : entityIds) {
@@ -76,23 +75,15 @@ public class RequisitionRestControllerST extends AbstractST {
 
   // template test for requsition sample and library testing
   private <T> boolean isContained(long requisitionId, long entityId, Class<T> entityType,
-      Function<T, Identifiable> getRequisition) {
-    List<Identifiable> parent =
-        Stream.of(entityType.cast(currentSession().get(entityType, entityId))).map(getRequisition)
-            .filter(s -> s != null)
-            .toList();
-    boolean isNotContained = true; // true by default
-    if (!parent.isEmpty()) { // if the entity has a parent
-      if (parent.get(0).getId() == requisitionId) { // if the parent ids match
-        isNotContained = false;
-      } else {
-        // for debugging
-        System.out.println(
-            "ACTUAL REQUISITION OF " + entityType.toGenericString() + " " + entityId + " IS " + parent.get(0).getId()
-                + ", NOT " + requisitionId);
-      }
+      Function<T, Requisition> getRequisition) {
+    Requisition entityReq = getRequisition.apply(entityType.cast(currentSession().get(entityType, entityId)));
+
+    if (entityReq == null) { // null entity req means no req associated with that entity, so no requsiition contains
+                             // that entity
+      return false;
+    } else {
+      return entityReq.getId() == requisitionId;
     }
-    return !isNotContained;
   }
 
   @Test
@@ -101,17 +92,17 @@ public class RequisitionRestControllerST extends AbstractST {
   }
 
   private <T> void testMove(int id, String type, MoveItemsRequest request, Class<T> targetType,
-      Function<T, Identifiable> getRequisition) throws Exception {
+      Function<T, Requisition> getRequisition) throws Exception {
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/" + id + "/" + type + "/move").content(makeJson(request))
             .contentType(MediaType.APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk());
 
-
-    assertTrue(isContained(request.requisitionId(), request.itemIds().get(0), targetType, getRequisition));
+    for (long entityId : request.itemIds()) {
+      assertTrue(isContained(request.requisitionId(), entityId, targetType, getRequisition));
+    }
     // ensures that the move has been made
-
   }
 
   @Test
@@ -182,8 +173,7 @@ public class RequisitionRestControllerST extends AbstractST {
     id.setSample(currentSession().get(SampleImpl.class, targetId));
     Class<RequisitionSupplementalSample> targetClass = RequisitionSupplementalSample.class;
 
-
-    // the sample should not be a part of any requisition as a supplemental sample at this point
+    // the sample should not be a part of this requisition as a supplemental sample at this point
     assertNull(currentSession().get(targetClass, id));
 
 
