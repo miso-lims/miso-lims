@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
@@ -18,16 +18,17 @@ import javax.ws.rs.core.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserRestControllerST extends AbstractST {
-
 
   private static final String CONTROLLER_BASE = "/rest/users";
   private static final Class<UserImpl> entityClass = UserImpl.class;
 
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
-  // create, update, delete, search, change password
   private UserDto makeCreateDto() throws Exception {
     UserDto dto = new UserDto();
     dto.setAdmin(false);
@@ -43,12 +44,13 @@ public class UserRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testCreate() throws Exception {
     // must be admin to create user
-    UserImpl user = baseTestCreate(CONTROLLER_BASE, makeCreateDto(), entityClass, 200);
-    assertEquals(false, user.isAdmin());
-    assertEquals(true, user.isActive());
-    assertEquals(true, user.isInternal());
-    assertEquals("new", user.getLoginName());
-    assertEquals("new guy", user.getFullName());
+    UserDto dto = makeCreateDto();
+    UserImpl user = baseTestCreate(CONTROLLER_BASE, dto, entityClass, 200);
+    assertEquals(dto.isAdmin(), user.isAdmin());
+    assertEquals(dto.isActive(), user.isActive());
+    assertEquals(dto.isInternal(), user.isInternal());
+    assertEquals(dto.getLoginName(), user.getLoginName());
+    assertEquals(dto.getFullName(), user.getFullName());
   }
 
   @Test
@@ -99,23 +101,39 @@ public class UserRestControllerST extends AbstractST {
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
-  public void testChangePassword() throws Exception {
-    // must be admin or matching owner to change user password
+  public void testAdminChangePassword() throws Exception {
+    // non-admin user cannot change password of another user
     PasswordChangeDto dto = new PasswordChangeDto();
     dto.setOldPassword("user");
     dto.setNewPassword("OntarioInstituteOfCancerResearch2025");
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/3/password").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk());
+    UserImpl changedPass = currentSession().get(entityClass, 3);
 
+    assertTrue(passwordEncoder.matches(dto.getNewPassword(), changedPass.getPassword()));
+  }
+
+  @Test
+  public void testChangeOwnPassword() throws Exception {
+    // user with id 3 is the default user for the controller tests, so this is functionality testing the
+    // changing of one's own password
+    PasswordChangeDto dto = new PasswordChangeDto();
+    dto.setOldPassword("user");
+    dto.setNewPassword("OntarioInstituteOfCancerResearch2025");
+
+    getMockMvc()
+        .perform(post(CONTROLLER_BASE + "/3/password").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk());
+    UserImpl changedPass = currentSession().get(entityClass, 3);
+    assertTrue(passwordEncoder.matches(dto.getNewPassword(), changedPass.getPassword()));
   }
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testChangePasswordFail() throws Exception {
-    // must be admin or matching owner to change user password
+    // non-admin user cannot change password of another user
 
     PasswordChangeDto dto = new PasswordChangeDto();
     dto.setOldPassword("user");
@@ -123,7 +141,8 @@ public class UserRestControllerST extends AbstractST {
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/3/password").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isUnauthorized());
+    UserImpl unchangedPass = currentSession().get(entityClass, 3);
+    assertTrue(passwordEncoder.matches(dto.getOldPassword(), unchangedPass.getPassword()));
   }
 }
