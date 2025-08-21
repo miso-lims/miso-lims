@@ -45,12 +45,12 @@ public class ReferenceGenomeRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
     // only admin can create
-    List<ReferenceGenomeImpl> genes = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
-    assertEquals("newOne", genes.get(0).getAlias());
-    assertEquals(1L, genes.get(0).getDefaultScientificName().getId());
+    List<ReferenceGenomeImpl> genomes = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
+    assertEquals("newOne", genomes.get(0).getAlias());
+    assertEquals(1L, genomes.get(0).getDefaultScientificName().getId());
 
-    assertEquals("newTwo", genes.get(1).getAlias());
-    assertEquals(2L, genes.get(1).getDefaultScientificName().getId());
+    assertEquals("newTwo", genomes.get(1).getAlias());
+    assertEquals(2L, genomes.get(1).getDefaultScientificName().getId());
   }
 
   @Test
@@ -67,10 +67,10 @@ public class ReferenceGenomeRestControllerST extends AbstractST {
     geneOne.setAlias("one");
     geneTwo.setAlias("two");
 
-    List<ReferenceGenomeImpl> genes = baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
+    List<ReferenceGenomeImpl> genomes = baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
         Arrays.asList(geneOne, geneTwo), ReferenceGenomeDto::getId);
-    assertEquals(geneOne.getAlias(), genes.get(0).getAlias());
-    assertEquals(geneTwo.getAlias(), genes.get(1).getAlias());
+    assertEquals(geneOne.getAlias(), genomes.get(0).getAlias());
+    assertEquals(geneTwo.getAlias(), genomes.get(1).getAlias());
 
   }
 
