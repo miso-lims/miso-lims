@@ -581,11 +581,11 @@ public abstract class AbstractST {
    * e.g. @GetMapping("/list")
    * 
    * @param url URL to query
-   * @param listModelAttribute The model attribute where the returned DTOs are found
+   * @param jsonModelAttribute The model attribute where the returned DTOs are found
    * @return JSON response from the endpoint
    */
-  protected String testStaticListPage(String url, String listModelAttribute) throws Exception {
-    return testStaticListPage(url).getModel().get(listModelAttribute).toString();
+  protected String testStaticListPage(String url, String jsonModelAttribute) throws Exception {
+    return testStaticListPage(url).getModel().get(jsonModelAttribute).toString();
   }
 
 
@@ -615,11 +615,11 @@ public abstract class AbstractST {
    * 
    * @param url URL to query
    * @param ids The target entity IDs
-   * @param listModelAttribute The model attribute where the returned DTOs are found
+   * @param jsonModelAttribute The model attribute where the returned DTOs are found
    * @return String JSON response from endpoint
    */
-  protected String testBulkEditPage(String url, List<Long> ids, String listModelAttribute) throws Exception {
-    return testBulkEditPage(url, ids).getModel().get(listModelAttribute).toString();
+  protected String testBulkEditPage(String url, List<Long> ids, String jsonModelAttribute) throws Exception {
+    return testBulkEditPage(url, ids).getModel().get(jsonModelAttribute).toString();
   }
 
   /**
@@ -627,9 +627,9 @@ public abstract class AbstractST {
    * 
    * @param url URL to query
    * @param numCreated Number of target entities created
-   * @param listModelAttribute The model attribute where the returned DTOs are found
+   * @param jsonModelAttribute The model attribute where the returned DTOs are found
    */
-  protected void testBulkCreatePage(String url, int numCreated, String listModelAttribute) throws Exception {
+  protected void testBulkCreatePage(String url, int numCreated, String jsonModelAttribute) throws Exception {
     ResultActions ac = getMockMvc().perform(get(url)
         .accept(MediaType.APPLICATION_JSON).param("quantity", Integer.toString(numCreated)));
     if (DEBUG_MODE)
@@ -637,7 +637,7 @@ public abstract class AbstractST {
 
     ac = ac.andExpect(status().isOk());
 
-    String response = ac.andReturn().getModelAndView().getModel().get(listModelAttribute).toString();
+    String response = ac.andReturn().getModelAndView().getModel().get(jsonModelAttribute).toString();
     assertEquals(numCreated, ((List<Object>) JsonPath.read(response, "$.*")).size());
   }
 
@@ -679,11 +679,11 @@ public abstract class AbstractST {
    * Tests model "edit entity" form setup
    * 
    * @param url url to query
-   * @param listModelAttribute Model attribute, if relevant
+   * @param jsonModelAttribute Model attribute, if relevant
    * @return Resulting JSON response
    */
-  protected String testModelFormSetup(String url, String listModelAttribute) throws Exception {
-    return testModelFormSetup(url).getModel().get(listModelAttribute).toString();
+  protected String testModelFormSetup(String url, String jsonModelAttribute) throws Exception {
+    return testModelFormSetup(url).getModel().get(jsonModelAttribute).toString();
   }
 
   /**
