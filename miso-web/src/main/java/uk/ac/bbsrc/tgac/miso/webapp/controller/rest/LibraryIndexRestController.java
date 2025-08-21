@@ -37,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
-@RequestMapping(value = "/rest/libraryindices", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = "/rest/libraryindices", produces = MediaType.APPLICATION_JSON_VALUE)
 public class LibraryIndexRestController extends AbstractRestController {
 
   @Autowired

@@ -7,6 +7,14 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.12.0] - 2025-08-21
+
+### Added
+
+* Assay version to requisition changelogs when assay is added or removed
+* Tumour Content QC exported as a sample attribute in Pinery
+
+
 ## [3.11.0] - 2025-07-31
 
 ### Changed
