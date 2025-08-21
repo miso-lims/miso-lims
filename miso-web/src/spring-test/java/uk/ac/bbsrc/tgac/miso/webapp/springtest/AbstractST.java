@@ -146,7 +146,7 @@ public abstract class AbstractST {
     return mockMvc;
   }
 
-  private String pollingResponse(String url) throws Exception {
+  protected String pollingResponse(String url) throws Exception {
     String response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
     String status = JsonPath.read(response, "$.status");
     while (status.equals("running")) {
