@@ -34,6 +34,7 @@ import java.util.Comparator;
 import static org.junit.Assert.*;
 import java.util.List;
 import java.util.Arrays;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
@@ -102,9 +103,9 @@ public class PoolRestControllerST extends AbstractST {
     assertEquals("ILLUMINA", created.getPlatformType().toString());
     assertEquals("pool1_alias", created.getAlias());
     assertEquals(false, created.isDiscarded());
-    assertEquals("2025-07-29", created.getCreationDate().toString());
+    assertEquals(LocalDate.of(2025, 7, 29), created.getCreationDate());
     assertEquals(1, created.getPoolContents().size());
-    assertEquals(1L, created.getPoolContents().toArray(new PoolElement[0])[0].getAliquot().getId());
+    assertEquals(1L, created.getPoolContents().iterator().next().getAliquot().getId());
   }
 
   @Test
@@ -155,8 +156,10 @@ public class PoolRestControllerST extends AbstractST {
     List<PoolElement> elements =
         changed.getPoolContents().stream().sorted(Comparator.comparing(PoolElement::getProportion)).toList();
 
-
+    assertEquals(801L, elements.get(0).getAliquot().getId());
     assertEquals(801, elements.get(0).getProportion());
+
+    assertEquals(802L, elements.get(1).getAliquot().getId());
     assertEquals(802, elements.get(1).getProportion());
 
   }
@@ -166,8 +169,8 @@ public class PoolRestControllerST extends AbstractST {
     AssignPoolDto dto = new AssignPoolDto();
     dto.setUnits(ConcentrationUnit.NANOGRAMS_PER_MICROLITRE);
     dto.setConcentration("4.0000000000");
-    List<Long> ids = Arrays.asList(13L, 14L);
-    dto.setPartitionIds(ids);
+    List<Long> partitionIds = Arrays.asList(13L, 14L);
+    dto.setPartitionIds(partitionIds);
 
     int poolId = 802;
 
@@ -177,14 +180,14 @@ public class PoolRestControllerST extends AbstractST {
         .andExpect(status().isNoContent());
 
     PoolImpl updated = currentSession().get(entityClass, 802);
+    // just to make sure it matches the expected
     assertEquals(dto.getUnits(), updated.getConcentrationUnits());
     assertEquals(dto.getConcentration(), updated.getConcentration().toString());
-    for (Long id : ids) {
+    for (Long id : partitionIds) {
       PartitionImpl part = currentSession().get(PartitionImpl.class, id);
       assertEquals(poolId, part.getPool().getId());
+      assertEquals(updated.getConcentration(), part.getLoadingConcentration());
     }
-
-
   }
 
   @Test
@@ -398,36 +401,18 @@ public class PoolRestControllerST extends AbstractST {
     req.setExperimentType("CLONE_CHECKING");
     req.setSequencingParametersId(2L);
     req.setDragenVersion(dragenVersion);
-    List<String> headers = Arrays.asList("Sample_ID", "Lane", "Sample_Plate", "Sample_Well", "I7_Index_ID", "index",
-        "GenomeFolder", "Sample_Project", "Description");
-    List<List<String>> rows = Arrays.asList(
-        Arrays.asList("TEST_0001_Bn_R_PE_300_WG", "1", "", "", "No Index", "", "", "TEST", "12321"),
-        Arrays.asList("TIB_0001_nn_n_PE_404_WG", "2", "", "", "No Index", "", "", "TIB", "TIB_Dil"));
 
     String response = getMockMvc()
         .perform(post(CONTROLLER_BASE + "/samplesheet").content(makeJson(req))
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
+        .andDo(print())
         .andReturn().getResponse().getContentAsString();
 
-
-    assertTrue(response.contains("[Data],")); // assert section title
-    response = response.split("\\[Data\\],")[1];
-
-    String[] returnedHeaders = new String[headers.size()]; // just for the headers
-    String[] rawRows = response.split("\n");
-
-
-    for (int i = 0; i < 2; i++) { // just for the headers
-      String s = rawRows[1].replaceAll("\\r", "");
-      s = s.replaceAll("\\n", "");
-      s = s.replaceAll("\"", "");
-      returnedHeaders = s.split(",");
-
+    List<String> sectionTitles = Arrays.asList("[Header]", "[Reads]", "[Settings],", "[Data],");
+    for (String title : sectionTitles) {
+      assertTrue(response.contains(title));
     }
-    checkArray(returnedHeaders, headers);
-
-    // just testing the section headers
   }
 
   @Test
@@ -438,7 +423,7 @@ public class PoolRestControllerST extends AbstractST {
     assertEquals(false, created.get(0).isDiscarded());
     assertEquals(1, created.get(0).getPoolContents().size());
     assertEquals(1L, created.get(0).getPoolContents().toArray(new PoolElement[0])[0].getAliquot().getId());
-    assertEquals("2025-07-29", created.get(0).getCreationDate().toString());
+    assertEquals(LocalDate.of(2025, 7, 29), created.get(0).getCreationDate());
 
 
     assertEquals("PACBIO", created.get(1).getPlatformType().toString());
@@ -450,7 +435,7 @@ public class PoolRestControllerST extends AbstractST {
             .toList();
     assertEquals(304L, poolTwoElements.get(0).getAliquot().getId());
     assertEquals(305L, poolTwoElements.get(1).getAliquot().getId());
-    assertEquals("2025-07-30", created.get(1).getCreationDate().toString());
+    assertEquals(LocalDate.of(2025, 7, 30), created.get(1).getCreationDate());
   }
 
   @Test

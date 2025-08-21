@@ -41,6 +41,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.transaction.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
@@ -422,6 +423,7 @@ public abstract class AbstractST {
     ResultActions result = getMockMvc().perform(get(url).params(params));
     if (DEBUG_MODE)
       result.andDo(print());
+    result = result.andExpect(status().isOk());
     String response = result.andReturn().getResponse().getContentAsString();
     checkIds(ids, false, response);
 
@@ -434,9 +436,13 @@ public abstract class AbstractST {
 
   protected void testSpreadsheetContents(String url, SpreadsheetRequest sheet, List<String> headers,
       List<List<String>> rows) throws Exception {
+
+    SpreadSheetFormat format = SpreadSheetFormat.valueOf(sheet.getFormat());
+
     ResultActions res = getMockMvc().perform(post(url).content(makeJson(sheet))
         .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(format.mediaType()));
     if (DEBUG_MODE)
       res.andDo(print());
 
