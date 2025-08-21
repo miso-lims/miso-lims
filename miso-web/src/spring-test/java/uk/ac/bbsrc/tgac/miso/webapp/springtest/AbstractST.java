@@ -672,16 +672,7 @@ public abstract class AbstractST {
    */
   protected ModelAndView testModelFormSetup(String url)
       throws Exception {
-    ResultActions ac = getMockMvc().perform(get(url)
-        .accept(MediaType.APPLICATION_JSON));
-
-    if (DEBUG_MODE)
-      ac = ac.andDo(print());
-
-    ModelAndView mvc = ac.andExpect(status().isOk())
-        .andReturn().getModelAndView();
-
-    return mvc;
+    return baseTestEditModel(url).andReturn().getModelAndView();
   }
 
   /**

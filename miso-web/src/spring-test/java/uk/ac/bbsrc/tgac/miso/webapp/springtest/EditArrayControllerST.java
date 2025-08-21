@@ -25,7 +25,7 @@ public class EditArrayControllerST extends AbstractST {
   }
 
   @Test
-  public void testSetupForm() throws Exception {
+  public void testEditPage() throws Exception {
     int id = 1;
     String objectAttribute = "arrayJson";
     String resultJson = testModelFormSetup(CONTROLLER_BASE + "/1", objectAttribute);
