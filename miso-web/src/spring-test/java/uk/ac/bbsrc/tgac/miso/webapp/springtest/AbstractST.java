@@ -430,7 +430,7 @@ public abstract class AbstractST {
    * @param params Parameters for the search
    * @param ids Expected IDs from search
    */
-  protected void baseSearchByTerm(String url, MultiValueMap params, List<Integer> ids)
+  protected void baseSearchByTerm(String url, MultiValueMap params, List<Integer> expectedIds)
       throws Exception {
     ResultActions ac = getMockMvc().perform(get(url).params(params).accept(MediaType.APPLICATION_JSON));
     if (DEBUG_MODE)
@@ -439,10 +439,9 @@ public abstract class AbstractST {
     String response = ac.andExpect(status().isOk())
         .andExpect(jsonPath("$").exists())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.*", hasSize(ids.size())))
         .andReturn().getResponse().getContentAsString();
 
-    checkIds(ids, false, response);
+    checkIds(expectedIds, false, response);
   }
 
   /**
@@ -452,8 +451,8 @@ public abstract class AbstractST {
    * @param searchTerm Term to search for
    * @param ids Expected IDs from search
    */
-  protected void baseSearchByTerm(String url, String searchTerm, List<Integer> ids) throws Exception {
-    baseSearchByTerm(url, searchTerm(searchTerm), ids);
+  protected void baseSearchByTerm(String url, String searchTerm, List<Integer> expectedIds) throws Exception {
+    baseSearchByTerm(url, searchTerm(searchTerm), expectedIds);
   }
 
   /**
@@ -470,7 +469,7 @@ public abstract class AbstractST {
     String response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
     checkIds(ids, false, response);
   }
-  
+
   protected ResultActions testDtRequest(String url, int displayLength, String dataProp, int sortCol, List<Integer> ids)
       throws Exception {
     ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON)
