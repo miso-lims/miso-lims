@@ -45,12 +45,13 @@ public class ReferenceGenomeRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
     // only admin can create
-    List<ReferenceGenomeImpl> genomes = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
-    assertEquals("newOne", genomes.get(0).getAlias());
-    assertEquals(1L, genomes.get(0).getDefaultScientificName().getId());
-
-    assertEquals("newTwo", genomes.get(1).getAlias());
-    assertEquals(2L, genomes.get(1).getDefaultScientificName().getId());
+    List<ReferenceGenomeDto> dtos = makeCreateDtos();
+    List<ReferenceGenomeImpl> genomes = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, dtos);
+    assertEquals(dtos.get(0).getAlias(), genomes.get(0).getAlias());
+    assertEquals(dtos.get(0).getDefaultScientificNameId().longValue(), genomes.get(0).getDefaultScientificName().getId());
+  
+    assertEquals(dtos.get(1).getAlias(), genomes.get(1).getAlias());
+    assertEquals(dtos.get(1).getDefaultScientificNameId().longValue(), genomes.get(1).getDefaultScientificName().getId());
   }
 
   @Test
@@ -62,25 +63,25 @@ public class ReferenceGenomeRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // only admin can update
-    ReferenceGenomeDto geneOne = Dtos.asDto(currentSession().get(entityClass, 1));
-    ReferenceGenomeDto geneTwo = Dtos.asDto(currentSession().get(entityClass, 2));
-    geneOne.setAlias("one");
-    geneTwo.setAlias("two");
+    ReferenceGenomeDto genomeOne = Dtos.asDto(currentSession().get(entityClass, 1));
+    ReferenceGenomeDto genomeTwo = Dtos.asDto(currentSession().get(entityClass, 2));
+    genomeOne.setAlias("one");
+    genomeTwo.setAlias("two");
 
     List<ReferenceGenomeImpl> genomes = baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
-        Arrays.asList(geneOne, geneTwo), ReferenceGenomeDto::getId);
-    assertEquals(geneOne.getAlias(), genomes.get(0).getAlias());
-    assertEquals(geneTwo.getAlias(), genomes.get(1).getAlias());
+        Arrays.asList(genomeOne, genomeTwo), ReferenceGenomeDto::getId);
+    assertEquals(genomeOne.getAlias(), genomes.get(0).getAlias());
+    assertEquals(genomeTwo.getAlias(), genomes.get(1).getAlias());
 
   }
 
   @Test
   public void testUpdateFail() throws Exception {
-    ReferenceGenomeDto geneOne = Dtos.asDto(currentSession().get(entityClass, 1));
-    ReferenceGenomeDto geneTwo = Dtos.asDto(currentSession().get(entityClass, 2));
-    geneOne.setAlias("one");
-    geneTwo.setAlias("two");
-    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, Arrays.asList(geneOne, geneTwo));
+    ReferenceGenomeDto genomeOne = Dtos.asDto(currentSession().get(entityClass, 1));
+    ReferenceGenomeDto genomeTwo = Dtos.asDto(currentSession().get(entityClass, 2));
+    genomeOne.setAlias("one");
+    genomeTwo.setAlias("two");
+    testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, Arrays.asList(genomeOne, genomeTwo));
   }
 
   @Test
