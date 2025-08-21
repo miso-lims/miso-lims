@@ -204,7 +204,7 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteAttachmentCategory() {
-    testAdminDelete(ListTarget.ATTACHMENT_CATEGORIES, null, "Submission Forms", Columns.ALIAS, AttachmentCategory.class,
+    testAdminDelete(ListTarget.ATTACHMENT_CATEGORIES, null, "Unused", Columns.ALIAS, AttachmentCategory.class,
         4L);
   }
 

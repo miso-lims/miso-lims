@@ -80,7 +80,8 @@ INSERT INTO Workstation(workstationId, alias, description) VALUES
 INSERT INTO AttachmentCategory(categoryId, alias) VALUES
 (1, 'Submission Forms'),
 (2, 'Tapestation'),
-(3, 'Fragment Analyzer');
+(3, 'Fragment Analyzer'),
+(4, 'Unused');
 
 INSERT INTO RunPurpose(purposeId, alias) VALUES
 (1, 'Production'),
@@ -1356,4 +1357,4 @@ INSERT INTO Sample_Attachment(sampleId, attachmentId) VALUES
 (2, 2);
 
 -- Keep this at bottom - checked to verify that script has completed and constants all loaded
-INSERT INTO AttachmentCategory(categoryId, alias) VALUES (4, 'last entry');
+INSERT INTO AttachmentCategory(categoryId, alias) VALUES (5, 'last entry');
