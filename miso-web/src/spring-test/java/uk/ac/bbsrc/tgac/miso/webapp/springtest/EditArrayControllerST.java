@@ -5,6 +5,7 @@ import org.junit.Test;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import com.jayway.jsonpath.JsonPath;
 import static org.junit.Assert.assertEquals;
 
@@ -28,7 +29,7 @@ public class EditArrayControllerST extends AbstractST {
   public void testEditPage() throws Exception {
     int id = 1;
     String objectAttribute = "arrayJson";
-    String resultJson = testModelFormSetup(CONTROLLER_BASE + "/1", objectAttribute);
+    String resultJson = baseTestEditModel(CONTROLLER_BASE + "/1").get(objectAttribute).toString();
     assertDbVsModelObjects(resultJson, id);
   }
 

@@ -62,6 +62,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import org.springframework.test.web.servlet.ResultActions;
+
 import javax.ws.rs.core.MediaType;
 import com.jayway.jsonpath.JsonPath;
 
@@ -664,27 +665,6 @@ public abstract class AbstractST {
     return readInteger(resultJson, path).longValue();
   }
 
-  /**
-   * Tests model "edit entity" form setup
-   * 
-   * @param url url to query
-   * @return ModelAndView from the endpoint
-   */
-  protected ModelAndView testModelFormSetup(String url)
-      throws Exception {
-    return baseTestEditModel(url).andReturn().getModelAndView();
-  }
-
-  /**
-   * Tests model "edit entity" form setup
-   * 
-   * @param url url to query
-   * @param jsonModelAttribute Model attribute, if relevant
-   * @return Resulting JSON response
-   */
-  protected String testModelFormSetup(String url, String jsonModelAttribute) throws Exception {
-    return testModelFormSetup(url).getModel().get(jsonModelAttribute).toString();
-  }
 
   /**
    * Tests model single create endpoints.
@@ -707,14 +687,14 @@ public abstract class AbstractST {
    * Tests single-entity edit model endpoints (usually a get mapping to /{entityId})
    * 
    * @param url URL to query
-   * @return ResultActions from request
+   * @return model properties map returned from request
    */
-  protected ResultActions baseTestEditModel(String url) throws Exception {
+  protected Map<String, Object> baseTestEditModel(String url) throws Exception {
     ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
     if (DEBUG_MODE)
       ac = ac.andDo(print());
 
     ac = ac.andExpect(status().isOk());
-    return ac;
+    return ac.andReturn().getModelAndView().getModel();
   }
 }
