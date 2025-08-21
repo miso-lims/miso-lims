@@ -302,11 +302,11 @@ public abstract class AbstractST {
    * 
    * @param requestType either "put" for async update or "post" for async creation
    * @param dtos dtos to create
-   * @param url base URL for the async request
+   * @param baseUrl base URL for the async request
    * @return request response
    */
-  private String pollingResponserHelper(String requestType, List<?> dtos, String url) throws Exception {
-    return pollingResponserHelper(requestType, dtos, url + "/bulk", url, 202);
+  private String pollingResponserHelper(String requestType, List<?> dtos, String baseUrl) throws Exception {
+    return pollingResponserHelper(requestType, dtos, baseUrl + "/bulk", baseUrl + "/bulk", 202);
   }
 
   protected <T> void testBulkDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
