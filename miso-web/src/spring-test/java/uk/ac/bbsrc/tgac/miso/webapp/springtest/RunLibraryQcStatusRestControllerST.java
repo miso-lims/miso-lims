@@ -37,12 +37,13 @@ public class RunLibraryQcStatusRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
     // only admin can create
-    List<RunLibraryQcStatus> statuses = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
-    assertEquals("one", statuses.get(0).getDescription());
-    assertEquals("two", statuses.get(1).getDescription());
+    List<RunLibraryQcStatusDto> dtos = makeCreateDtos();
+    List<RunLibraryQcStatus> statuses = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, dtos);
+    assertEquals(dtos.get(0).getDescription(), statuses.get(0).getDescription());
+    assertEquals(dtos.get(1).getDescription(), statuses.get(1).getDescription());
 
-    assertEquals(true, statuses.get(0).getQcPassed());
-    assertEquals(false, statuses.get(1).getQcPassed());
+    assertEquals(dtos.get(0).getQcPassed(), statuses.get(0).getQcPassed());
+    assertEquals(dtos.get(1).getQcPassed(), statuses.get(1).getQcPassed());
   }
 
   @Test
