@@ -36,7 +36,7 @@ public class UserRestControllerST extends AbstractST {
     dto.setInternal(true);
     dto.setLoginName("new");
     dto.setFullName("new guy");
-    dto.setPassword("OntarioInstituteOfCancerResearch2025");
+    dto.setPassword("OntarioInstituteForCancerResearch2025");
     return dto;
   }
 
@@ -105,7 +105,7 @@ public class UserRestControllerST extends AbstractST {
     // non-admin user cannot change password of another user
     PasswordChangeDto dto = new PasswordChangeDto();
     dto.setOldPassword("user");
-    dto.setNewPassword("OntarioInstituteOfCancerResearch2025");
+    dto.setNewPassword("OntarioInstituteForCancerResearch2025");
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/3/password").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
@@ -121,7 +121,7 @@ public class UserRestControllerST extends AbstractST {
     // changing of one's own password
     PasswordChangeDto dto = new PasswordChangeDto();
     dto.setOldPassword("user");
-    dto.setNewPassword("OntarioInstituteOfCancerResearch2025");
+    dto.setNewPassword("OntarioInstituteForCancerResearch2025");
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/3/password").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
@@ -137,7 +137,7 @@ public class UserRestControllerST extends AbstractST {
 
     PasswordChangeDto dto = new PasswordChangeDto();
     dto.setOldPassword("user");
-    dto.setNewPassword("OntarioInstituteOfCancerResearch2025");
+    dto.setNewPassword("OntarioInstituteForCancerResearch2025");
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/3/password").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
