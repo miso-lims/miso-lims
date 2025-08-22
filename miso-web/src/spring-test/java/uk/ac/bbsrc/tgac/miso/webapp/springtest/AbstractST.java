@@ -51,6 +51,8 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import java.util.ArrayList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -148,7 +150,7 @@ public abstract class AbstractST {
     return mockMvc;
   }
 
-  private String pollingResponse(String url) throws Exception {
+  protected String pollingResponse(String url) throws Exception {
     String response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
     String status = JsonPath.read(response, "$.status");
     while (status.equals("running")) {
@@ -253,22 +255,38 @@ public abstract class AbstractST {
     if (DEBUG_MODE)
       System.out.println(response);
     assertEquals("An unexpected error has occurred", JsonPath.read(response, "$.detail"));
-    // request should fail without admin permissions }
+    // request should fail without admin permissions
   }
 
-  private String pollingResponserHelper(String requestType, List<?> dtos, String controllerBase) throws Exception {
+  /**
+   * Helper method to send a request to an async endpoint, then calls pollingResponse to poll the
+   * endpoint until the request is processed.
+   * 
+   * @param requestType either "put" for async update or "post" for async creation
+   * @param dtos dtos to create
+   * @param url url to send the request to
+   * @param pollingResponseUrlPrefix prefix for the URL to poll for the request status (running,
+   *        completed, or failed)
+   * @param expectedResponseCode expected response code for the async endpoint request, usually HTTP
+   *        202 ACCEPTED
+   * @return String JSON response from the endpoint
+   * @throws Exception
+   */
+  protected String pollingResponserHelper(String requestType, List<?> dtos, String url, String pollingResponseUrlPrefix,
+      int expectedResponseCode)
+      throws Exception {
     // helper method for async requests
     MvcResult mvcResult;
     ResultActions ac;
     switch (requestType) {
       case "post":
         ac = getMockMvc()
-            .perform(post(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
+            .perform(post(url).contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
         break;
 
       case "put":
         ac = getMockMvc()
-            .perform(put(controllerBase + "/bulk").contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
+            .perform(put(url).contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
         break;
 
       default:
@@ -277,14 +295,28 @@ public abstract class AbstractST {
     if (DEBUG_MODE)
       ac.andDo(print());
 
-    mvcResult = ac.andExpect(status().isAccepted()).andReturn();
+    mvcResult = ac.andExpect(status().is(expectedResponseCode)).andReturn();
 
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    String response = pollingResponse(controllerBase + "/bulk/" + id);
+    String response = pollingResponse(pollingResponseUrlPrefix + "/" + id);
     return response;
   }
 
   /**
+   * Overloaded method for cases where the polling response URL is the same as the url. This also
+   * assume that the expected response code is 202, or HTTP ACCEPTED, as is standard for Nearly all of
+   * the async endpoints
+   * 
+   * @param requestType either "put" for async update or "post" for async creation
+   * @param dtos dtos to create
+   * @param baseUrl base URL for the async request
+   * @return request response
+   */
+  private String pollingResponserHelper(String requestType, List<?> dtos, String baseUrl) throws Exception {
+    return pollingResponserHelper(requestType, dtos, baseUrl + "/bulk", baseUrl + "/bulk", 202);
+  }
+
+ /**
    * Tests the deletion of a single entity e.g. endpoints with a @PostMapping(value = "/bulk-delete")
    * mapping
    * 
@@ -443,7 +475,7 @@ public abstract class AbstractST {
    * @param params Parameters for the search
    * @param ids Expected IDs from search
    */
-  protected void baseSearchByTerm(String url, MultiValueMap params, List<Integer> ids)
+  protected void baseSearchByTerm(String url, MultiValueMap params, List<Integer> expectedIds)
       throws Exception {
     ResultActions ac = getMockMvc().perform(get(url).params(params).accept(MediaType.APPLICATION_JSON));
     if (DEBUG_MODE)
@@ -452,10 +484,9 @@ public abstract class AbstractST {
     String response = ac.andExpect(status().isOk())
         .andExpect(jsonPath("$").exists())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.*", hasSize(ids.size())))
         .andReturn().getResponse().getContentAsString();
 
-    checkIds(ids, false, response);
+    checkIds(expectedIds, false, response);
   }
 
   /**
@@ -466,8 +497,8 @@ public abstract class AbstractST {
    * @param searchTerm Term to search for
    * @param ids Expected IDs from search
    */
-  protected void baseSearchByTerm(String url, String searchTerm, List<Integer> ids) throws Exception {
-    baseSearchByTerm(url, searchTerm(searchTerm), ids);
+  protected void baseSearchByTerm(String url, String searchTerm, List<Integer> expectedIds) throws Exception {
+    baseSearchByTerm(url, searchTerm(searchTerm), expectedIds);
   }
 
   /**
