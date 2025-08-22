@@ -457,3 +457,57 @@ You can also populate the test data into the test environment using Docker:
 
 Make sure to refresh constants manually after doing this by logging in as admin, and clicking that
 option on the My Account page.
+
+### Spring Controller Testing
+
+#### Test data
+
+All test data is stored in `integration_test_data.sql`, so keep this in mind when writing the tests.
+
+#### Tests
+
+Spring controller tests should all extend `AbstractST`. The abstract class contains all the annotations needed to set up the test context/config/resources, as well as the mock user to run the tests. It also includes several template tests for common endpoints, for both the rest controllers and the model/view controllers.  The javadocs in `AbstractST.java` have more specific information on these.
+
+#### Running the tests
+Running the spring tests depends on whether you have the local database copy setup in a docker container or not.
+
+If you do, then you can run the tests as such:
+```
+mvn test-compile -DskipSTs=false -pl miso-web
+```
+To compile, then 
+```
+mvn -pl miso-web -Dmiso.it.mysql.url=jdbc:mysql://127.0.0.1:<port>/<test_db_name> -Dmiso.it.mysql.user=<user> -Dmiso.it.mysql.pw=<password> failsafe:integration-test -DskipSTs=false
+```
+ To run the tests.
+
+If not, then you can run the tests as follows
+```
+mvn clean verify -pl miso-web -DskipSTs=false
+```
+
+For either of these options add `-Dit.test=<test_name>` to run a specific controller test. You can run multiple by delimiting the names with commas (e.g. `-Dit.test=test1,test2...`).
+
+#### Relevant resources/documentation
+
+https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/web/servlet/result/MockMvcResultMatchers.html
+https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/web/servlet/result/ModelResultMatchers.html
+https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/web/servlet/result/ViewResultMatchers.html
+https://docs.spring.io/spring/reference/6.1/testing/spring-mvc-test-framework/server-performing-requests.html
+https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/web/servlet/result/StatusResultMatchers.html
+
+Also, look at the existing tests for a general idea of the format to follow when writing the tests.
+
+#### Debugging
+To debug your controller test, set `-Dst.debug=true` on the command line. This will enable printing of the response JSON for all template tests used. To look at this printed response, navigate to `{miso_base_directory}/miso-web/target/failsafe-reports`, then open `*.SomeControllerST-output.txt` to view the printed response from the request.
+
+#### Code coverage plugin
+The Spring controller tests use the Jacoco plugin to test endpoint coverage. This plugin is disabled by default. To run the code coverage plugin, run
+
+```
+mvn clean verify -pl miso-web -DskipSTs=false -Djacoco.skip=false
+```
+
+The default target output directory for the coverage report is `/miso-web/target/site/`.
+
+To view the report, open the `index.html` file in the `site` folder in a browser. For vscode, the "live server" plugin is quite useful for this, allowing you to right click and open the `index.html` with the live server plugin.
