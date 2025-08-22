@@ -304,9 +304,7 @@ public class RequisitionRestController extends AbstractRestController {
     return requisitions.stream().map(RequisitionDto::from).toList();
   }
 
-  private static class BulkResumeRequest {
-    public List<Long> requisitionIds;
-    public String resumeDate;
+  public record BulkResumeRequest(List<Long> requisitionIds, String resumeDate) {
   }
 
   @PostMapping("/bulk-resume")

@@ -5,7 +5,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>3.11.1-SNAPSHOT</version>
+    <version>3.12.1-SNAPSHOT</version>
   </parent>
   <artifactId>miso-web</artifactId>
   <packaging>war</packaging>
@@ -13,6 +13,7 @@
   <properties>
     <skipITs>true</skipITs>
     <skipSTs>true</skipSTs>
+    <jacoco.skip>true</jacoco.skip>
     <cargoInitGoal>start</cargoInitGoal>
     <mysql.db>lims</mysql.db>
     <mysql.rootpw>abc123</mysql.rootpw>
@@ -1067,6 +1068,39 @@
             </configuration>
           </plugin>
           <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+              <executions>        
+                <execution>
+                  <id>prepare-agent-integration</id>
+                  <goals>
+                    <goal>prepare-agent-integration</goal>
+                  </goals>
+                    <phase>pre-integration-test</phase>
+                    <configuration>
+                      <propertyName>jacoco.failsafe.argLine</propertyName>
+                    </configuration>
+                </execution>
+                <execution>
+                  <id>report-integration</id>
+                  <phase>post-integration-test</phase>
+                  <goals>
+                    <goal>report-integration</goal>
+                  </goals>
+                </execution>
+              </executions>
+              <configuration>
+                <includes>
+                  <include>**/webapp/controller/rest/*Controller*</include>
+                  <include>**/webapp/controller/view/*Controller*</include>
+                </includes>
+                <excludes>
+                  <exclude>**/webapp/controller/view/Abstract*</exclude>
+                </excludes>
+              <formats>HTML</formats>
+              </configuration>
+          </plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <executions>
@@ -1086,6 +1120,7 @@
                 <miso.it.mysql.pw>${mysql.pw}</miso.it.mysql.pw>
                 <security.method>jdbc</security.method>
               </systemPropertyVariables>
+              <argLine>${jacoco.failsafe.argLine}</argLine>
               <skipITs>${skipSTs}</skipITs>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>              
               <includes>

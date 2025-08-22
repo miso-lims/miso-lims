@@ -42,7 +42,7 @@ public class QcTypeRestController extends AbstractRestController {
 
   @PutMapping(value = "/{id}", headers = {"Content-type=application/json"})
   @ResponseBody
-  public QcTypeDto updateSubproject(@PathVariable("id") long id, @RequestBody QcTypeDto qcTypeDto) throws IOException {
+  public QcTypeDto updateQcType(@PathVariable("id") long id, @RequestBody QcTypeDto qcTypeDto) throws IOException {
     return RestUtils.updateObject("QC Type", id, qcTypeDto, Dtos::to, qcTypeService, qcType -> {
       QcTypeDto dto = Dtos.asDto(qcType);
       constantsController.refreshConstants();
