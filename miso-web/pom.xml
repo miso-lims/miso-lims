@@ -288,11 +288,6 @@
       <version>3.0</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.jacoco</groupId>
-      <artifactId>jacoco-maven-plugin</artifactId>
-      <version>0.8.12</version>
-    </dependency>
   </dependencies>
   <build>
     <finalName>ROOT</finalName>
@@ -1075,7 +1070,6 @@
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.8.12</version>
               <executions>        
                 <execution>
                   <id>prepare-agent-integration</id>
