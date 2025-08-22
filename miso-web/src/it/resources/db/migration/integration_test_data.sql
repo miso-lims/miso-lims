@@ -1051,7 +1051,7 @@ INSERT INTO SequencerPartitionContainer (containerId, identificationBarcode, seq
 
 INSERT INTO _Partition (containerId, partitionId, partitionNumber, pool_poolId) VALUES
 (1, 11, 1, 1),(1, 12, 2, 501),(1, 13, 3, NULL),(1, 14, 4, NULL),
-(2, 21, 1, NULL),(2, 22, 2, NULL),(2, 23, 3, NULL),(2, 24, 4, NULL),(2, 25, 5, NULL),(2, 26, 6, NULL),(2, 27, 7, NULL),(2, 28, 8, NULL),
+(2, 21, 1, 501),(2, 22, 2, NULL),(2, 23, 3, NULL),(2, 24, 4, NULL),(2, 25, 5, NULL),(2, 26, 6, NULL),(2, 27, 7, NULL),(2, 28, 8, NULL),
 (5002, 5101, 1, NULL),(5002, 5102, 2, NULL),(5002, 5103, 3, NULL),(5002, 5104, 4, NULL),(5002, 5105, 5, NULL),(5002, 5106, 6, NULL),(5002, 5107, 7, NULL),(5002, 5108, 8, NULL),
 (5003, 5201, 1, NULL),(5003, 5202, 2, NULL),(5003, 5203, 3, NULL),(5003, 5204, 4, NULL),(5003, 5205, 5, NULL),(5003, 5206, 6, NULL),(5003, 5207, 7, NULL),(5003, 5208, 8, NULL),
 (5004, 5401, 1, NULL),(5004, 5402, 2, NULL),(5004, 5403, 3, NULL),(5004, 5404, 4, NULL),(5004, 5405, 5, NULL),(5004, 5406, 6, NULL),(5004, 5407, 7, NULL),(5004, 5408, 8, NULL),
@@ -1065,7 +1065,7 @@ INSERT INTO _Partition (containerId, partitionId, partitionNumber, pool_poolId) 
 (6001, 60011, 1, NULL),(6001, 60012, 2, NULL),(6001, 60013, 3, NULL),(6001, 60014, 4, NULL);
 
 INSERT INTO Run (runId, name, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
-(1, 'RUN1', 'MiSeq_Run_1', 1, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
+(1, 'RUN1', 'HiSeq_Run_1', 1, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
 (2, 'RUN2', 'PacBio_Run_1', 3, '2017-08-01', NULL, 'Running', 3, '2017-08-01 10:03:02', 3, '2017-08-01 10:03:02');
 
 INSERT INTO Run (runId, name, alias, instrumentId, sequencingParameters_parametersId, description, filePath, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
@@ -1200,6 +1200,9 @@ INSERT INTO Run_Partition (runId, partitionId, purposeId, lastModifier) VALUES
 INSERT INTO Run_Partition_LibraryAliquot(runId, partitionId, aliquotId, lastModifier, statusId, qcUser, qcDate) VALUES
 (1, 11, 1, 1, 1, 1, '2021-02-19 14:41:00'),
 (1, 12, 304, 1, 1, 1, '2021-02-19 14:41:00');
+
+INSERT INTO Run_Partition_LibraryAliquot (runId, partitionId, lastModifier, aliquotId) VALUES
+(5002, 5101, 3, 304);
 
 INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES
   (1, '2017-08-22', 1, 'LIB110005 existing note', 3),
