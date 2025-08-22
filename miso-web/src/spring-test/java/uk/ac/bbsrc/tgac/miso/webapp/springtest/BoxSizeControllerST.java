@@ -27,8 +27,7 @@ public class BoxSizeControllerST extends AbstractST {
 
   @Test
   public void testList() throws Exception {
-    // sorted alphabetically by alias
-    List<Long> ids = Arrays.asList(1L,2L,3L);
+    List<Long> ids = Arrays.asList(1L, 2L, 3L);
 
     String resultJson = testStaticListPage(CONTROLLER_BASE + "/list", "data");
     assertDbVsModelObjects(resultJson, ids);
