@@ -771,7 +771,7 @@ INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, 
     1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
     'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, 2),
   (304, 'LIB304', 'DILT_0001_nn_n_PE_304_WG', NULL, 'description', 304, 'ILLUMINA', 1, 3, 1, '2017-08-14',
-    1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, 304, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
+    1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', 1, NULL, NULL, 304, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
     'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 5, NULL, NULL),
   (305, 'LIB305', 'DILT_0001_nn_n_PE_305_WG', NULL, 'description', 305, 'ILLUMINA', 1, 3, 1, '2017-08-14',
     1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, 305, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
@@ -951,6 +951,7 @@ INSERT INTO Pool (poolId, concentration, concentrationUnits, volume, volumeUnits
 
 INSERT INTO Pool_LibraryAliquot (poolId, aliquotId) VALUES
 (1, 1),
+(501, 304),
 (120001, 120001),
 (120001, 120002),
 (120002, 120001),
@@ -1042,7 +1043,7 @@ INSERT INTO SequencerPartitionContainer (containerId, identificationBarcode, seq
 (6001, 'CHANGEABLE', 1, 3, 3, '2017-10-03 14:45', '2017-10-03 14:45');
 
 INSERT INTO _Partition (containerId, partitionId, partitionNumber, pool_poolId) VALUES
-(1, 11, 1, 1),(1, 12, 2, NULL),(1, 13, 3, NULL),(1, 14, 4, NULL),
+(1, 11, 1, 1),(1, 12, 2, 501),(1, 13, 3, NULL),(1, 14, 4, NULL),
 (2, 21, 1, NULL),(2, 22, 2, NULL),(2, 23, 3, NULL),(2, 24, 4, NULL),(2, 25, 5, NULL),(2, 26, 6, NULL),(2, 27, 7, NULL),(2, 28, 8, NULL),
 (5002, 5101, 1, NULL),(5002, 5102, 2, NULL),(5002, 5103, 3, NULL),(5002, 5104, 4, NULL),(5002, 5105, 5, NULL),(5002, 5106, 6, NULL),(5002, 5107, 7, NULL),(5002, 5108, 8, NULL),
 (5003, 5201, 1, NULL),(5003, 5202, 2, NULL),(5003, 5203, 3, NULL),(5003, 5204, 4, NULL),(5003, 5205, 5, NULL),(5003, 5206, 6, NULL),(5003, 5207, 7, NULL),(5003, 5208, 8, NULL),
@@ -1057,7 +1058,7 @@ INSERT INTO _Partition (containerId, partitionId, partitionNumber, pool_poolId) 
 (6001, 60011, 1, NULL),(6001, 60012, 2, NULL),(6001, 60013, 3, NULL),(6001, 60014, 4, NULL);
 
 INSERT INTO Run (runId, name, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
-(1, 'RUN1', 'MiSeq_Run_1', 2, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
+(1, 'RUN1', 'MiSeq_Run_1', 1, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
 (2, 'RUN2', 'PacBio_Run_1', 3, '2017-08-01', NULL, 'Running', 3, '2017-08-01 10:03:02', 3, '2017-08-01 10:03:02');
 
 INSERT INTO Run (runId, name, alias, instrumentId, sequencingParameters_parametersId, description, filePath, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
@@ -1187,6 +1188,11 @@ INSERT INTO Run_Partition (runId, partitionId, purposeId, lastModifier) VALUES
 (5101, 51016, 1, 1),
 (5101, 51017, 1, 1),
 (5101, 51018, 1, 1);
+
+
+INSERT INTO Run_Partition_LibraryAliquot(runId, partitionId, aliquotId, lastModifier, statusId, qcUser, qcDate) VALUES
+(1, 11, 1, 1, 1, 1, '2021-02-19 14:41:00'),
+(1, 12, 304, 1, 1, 1, '2021-02-19 14:41:00');
 
 INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES
   (1, '2017-08-22', 1, 'LIB110005 existing note', 3),
