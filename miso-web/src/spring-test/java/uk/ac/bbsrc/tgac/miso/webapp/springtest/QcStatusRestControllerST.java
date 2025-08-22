@@ -181,7 +181,6 @@ public class QcStatusRestControllerST extends AbstractST {
     getMockMvc()
         .perform(put(CONTROLLER_BASE + "/bulk").contentType(MediaType.APPLICATION_JSON)
             .content(makeJson(Arrays.asList(dto1, dto2))))
-        .andDo(print())
         .andExpect(status().isNoContent());
 
 
@@ -203,7 +202,6 @@ public class QcStatusRestControllerST extends AbstractST {
     dto.setQcPassed(false);
     getMockMvc()
         .perform(put(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
-        .andDo(print())
         .andExpect(status().isNoContent());
 
     RunQcNode updated = currentSession().get(runQC, 1);
@@ -291,7 +289,6 @@ public class QcStatusRestControllerST extends AbstractST {
     getMockMvc()
         .perform(put(CONTROLLER_BASE + "/bulk").contentType(MediaType.APPLICATION_JSON)
             .content(makeJson(Arrays.asList(dto1, dto2))))
-        .andDo(print())
         .andExpect(status().isNoContent());
 
 
@@ -318,7 +315,7 @@ public class QcStatusRestControllerST extends AbstractST {
     QcNodeDto dto = Dtos.asDto(currentSession().get(runPartAlQC, id));
 
     dto.setQcPassed(false);
-    dto.setQcStatusId(5L); // qc failed: STR
+    dto.setQcStatusId(2L); // qc failed: STR
     getMockMvc()
         .perform(put(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
         .andExpect(status().isNoContent());
