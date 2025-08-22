@@ -187,6 +187,7 @@ public class PoolRestControllerST extends AbstractST {
       PartitionImpl part = currentSession().get(PartitionImpl.class, id);
       assertEquals(poolId, part.getPool().getId());
       assertEquals(updated.getConcentration(), part.getLoadingConcentration());
+      assertEquals(updated.getConcentrationUnits(), part.getLoadingConcentrationUnits());
     }
   }
 
@@ -406,10 +407,9 @@ public class PoolRestControllerST extends AbstractST {
         .perform(post(CONTROLLER_BASE + "/samplesheet").content(makeJson(req))
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andDo(print())
         .andReturn().getResponse().getContentAsString();
 
-    List<String> sectionTitles = Arrays.asList("[Header]", "[Reads]", "[Settings],", "[Data],");
+    List<String> sectionTitles = Arrays.asList("[Header]", "[Reads]", "[Settings]", "[Data]");
     for (String title : sectionTitles) {
       assertTrue(response.contains(title));
     }
