@@ -47,6 +47,7 @@ public class EditArrayController {
     List<ArrayModel> models = arrayModelService.list();
     model.addAttribute(MODEL_ATTR_MODELS,
         mapper.writeValueAsString(models.stream().map(Dtos::asDto).collect(Collectors.toList())));
+    model.put("title", "New Array");
     return new ModelAndView(JSP, model);
   }
 
