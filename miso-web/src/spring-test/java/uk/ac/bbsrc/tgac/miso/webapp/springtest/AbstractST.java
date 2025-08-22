@@ -39,12 +39,17 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.MultiValueMap;
 import org.hibernate.Session;
+import org.hibernate.engine.jdbc.env.spi.IdentifierCaseStrategy;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.transaction.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
+import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 
 import static org.junit.Assert.*;
 import java.util.List;
@@ -57,8 +62,6 @@ import java.util.ArrayList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
-import uk.ac.bbsrc.tgac.miso.core.util.MapBuilder;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -67,6 +70,8 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import javax.ws.rs.core.MediaType;
 import com.jayway.jsonpath.JsonPath;
+import org.springframework.mock.web.MockHttpServletResponse;
+
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration("/st-context.xml")
@@ -543,14 +548,15 @@ public abstract class AbstractST {
   private void checkIds(List<Integer> expectedIds, boolean isDt, String response) throws Exception {
     List<Integer> returnedIds = new ArrayList<Integer>();
 
-    String dtPath = "";
+    String addedPath = "";
+    String addedAfter = "";
     if (isDt)
-      dtPath = ".aaData";
+      addedPath = ".aaData";
 
-    List<Integer> resultIds = JsonPath.read(response, "$" + dtPath + "[*].id");
+    List<Integer> resultIds = JsonPath.read(response, "$" + addedPath + "[*].id");
     assertEquals(expectedIds.size(), resultIds.size());
     for (Integer expectedId : expectedIds) {
-      assertTrue(resultIds.contains(expectedId));
+      assertTrue("id " + expectedId + " expected but not found", resultIds.contains(expectedId));
     }
 
   }
@@ -565,7 +571,7 @@ public abstract class AbstractST {
    */
   protected ResultActions testDtRequest(String url, List<Integer> ids)
       throws Exception {
-    return testDtRequest(url, 25, "id", 3, ids);
+    return testDtRequest(url, 200, "id", 3, ids);
   }
 
   /**
@@ -589,6 +595,59 @@ public abstract class AbstractST {
 
     return result;
   }
+
+  protected ResultActions testList(String url, List<Integer> ids, MultiValueMap params)
+      throws Exception {
+    ResultActions result = getMockMvc().perform(get(url).params(params));
+    if (DEBUG_MODE)
+      result.andDo(print());
+    result = result.andExpect(status().isOk());
+    String response = result.andReturn().getResponse().getContentAsString();
+    checkIds(ids, false, response);
+
+    return result; // return the result for more content testing if needed
+  }
+
+  protected ResultActions testList(String url, List<Integer> ids) throws Exception {
+    return testList(url, ids, new LinkedMultiValueMap());
+  }
+
+  protected void testSpreadsheetContents(String url, SpreadsheetRequest sheet, List<String> headers,
+      List<List<String>> rows) throws Exception {
+
+    SpreadSheetFormat format = SpreadSheetFormat.valueOf(sheet.getFormat());
+
+    ResultActions res = getMockMvc().perform(post(url).content(makeJson(sheet))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(format.mediaType()));
+    if (DEBUG_MODE)
+      res.andDo(print());
+
+    MockHttpServletResponse response = res.andReturn().getResponse();
+    String[][] records = new String[rows.size() + 1][headers.size()];
+    String[] rawRows = response.getContentAsString().split("\n");
+
+    for (int i = 0; i < rawRows.length; i++) {
+      String s = rawRows[i].replaceAll("\\r", "");
+      s = s.replaceAll("\\n", "");
+      s = s.replaceAll("\"", "");
+      records[i] = s.split(",");
+    }
+    checkArray(records[0], headers);
+    for (int i = 0; i < rows.size(); i++) {
+      checkArray(records[i + 1], rows.get(i));
+    }
+  }
+
+
+  protected void checkArray(String[] values, List<String> expected) {
+    assertEquals(expected.size(), values.length);
+    for (int i = 0; i < expected.size(); i++) {
+      assertEquals(expected.get(i), values[i]);
+    }
+  }
+
 
   /**
    * Tests model static list endpoints. e.g. @GetMapping("/list")
