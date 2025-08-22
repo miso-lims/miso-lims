@@ -29,7 +29,7 @@ public class EditArrayControllerST extends AbstractST {
   public void testEditPage() throws Exception {
     int id = 1;
     String objectAttribute = "arrayJson";
-    String resultJson = baseTestEditModel(CONTROLLER_BASE + "/1").get(objectAttribute).toString();
+    String resultJson = baseTestEditModel(CONTROLLER_BASE + "/" + id).get(objectAttribute).toString();
     assertDbVsModelObjects(resultJson, id);
   }
 
