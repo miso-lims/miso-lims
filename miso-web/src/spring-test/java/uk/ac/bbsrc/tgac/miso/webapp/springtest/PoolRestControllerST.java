@@ -68,7 +68,7 @@ public class PoolRestControllerST extends AbstractST {
     getMockMvc().perform(get(CONTROLLER_BASE + "/1/runs"))
         .andExpect(jsonPath("$.*", hasSize(1)))
         .andExpect(jsonPath("$[0].id").value(1))
-        .andExpect(jsonPath("$[0].instrumentId").value(2))
+        .andExpect(jsonPath("$[0].instrumentId").value(1))
         .andExpect(jsonPath("$[0].name").value("RUN1"))
         .andExpect(jsonPath("$[0].type").value("Illumina"));
   }
@@ -392,7 +392,7 @@ public class PoolRestControllerST extends AbstractST {
         .andExpect(jsonPath("$.*", hasSize(1)))
         .andExpect(jsonPath("$[0].id").value(1))
         .andExpect(jsonPath("$[0].name").value("RUN1"))
-        .andExpect(jsonPath("$[0].instrumentId").value(2));
+        .andExpect(jsonPath("$[0].instrumentId").value(1));
   }
 
   @Test
