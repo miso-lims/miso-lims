@@ -42,13 +42,13 @@ public abstract class AbstractMisoClientIT {
 
   @Autowired
   private DataSource dataSource;
-  
+
   @Autowired
   private MisoClient sut;
-  
+
   /**
-   * @return filename of an SQL script with additional data to load after the base data file (pinery-miso_base_test_data.sql). May
-   *         return null if there is no additional data
+   * @return filename of an SQL script with additional data to load after the base data file
+   *         (pinery-miso_base_test_data.sql). May return null if there is no additional data
    */
   protected abstract String getAdditionalDataFilename();
 
@@ -186,7 +186,7 @@ public abstract class AbstractMisoClientIT {
 
   @Test
   public void testGetRunByName() throws Exception {
-    String runName = "MiSeq_Run_1";
+    String runName = "HiSeq_Run_1";
     Run run = sut.getRun(runName);
     assertNotNull(run);
     assertEquals(runName, run.getName());
