@@ -67,12 +67,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderSummaryViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
-import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
-import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
-import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
-import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.core.util.*;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
@@ -647,7 +642,7 @@ public class PoolRestController extends AbstractRestController {
   public HttpEntity<byte[]> samplesheet(@RequestBody SampleSheetRequest request,
       HttpServletRequest httpRequest,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    IlluminaExperiment experiment = IlluminaExperiment.valueOf(request.getExperimentType());
+    PoolSampleSheet experiment = PoolSampleSheetFactory.of(request.getExperimentType());
     SequencingParameters parameters = sequencingParametersService.get(request.getSequencingParametersId());
 
     List<Pool> pools = new ArrayList<>();
@@ -661,20 +656,20 @@ public class PoolRestController extends AbstractRestController {
       }
       lane += 1;
     }
-    response.setHeader("Content-Disposition", String.format("attachment; filename=%s-%s.csv", experiment.name(),
-        pools.stream().map(Pool::getAlias).collect(Collectors.joining("-"))));
-    return new HttpEntity<>(experiment
-        .makeSampleSheet(request.getGenomeFolder(), parameters, request.getCustomRead1Primer(),
-            request.getCustomIndexPrimer(),
-            request.getCustomRead2Primer(),
-            pools,
-            lanes,
-            request.getDragenVersion(),
-            request.getTrimUMI(),
-            request.getFastQCompressionFormat(),
-            novaSeqXSeriesMapping)
-        .getBytes(StandardCharsets.UTF_8));
 
+    response.setHeader("Content-Disposition", String.format("attachment; filename=%s-%s.csv", experiment.getDescription(), pools.stream().map(Pool::getAlias).collect(Collectors.joining("-"))));
+    return new HttpEntity<>( ((AbstractPoolSampleSheet) experiment)
+            .makeSampleSheet(
+                    request.getGenomeFolder(), parameters, request.getCustomRead1Primer(),
+                    request.getCustomIndexPrimer(),
+                    request.getCustomRead2Primer(),
+                    pools,
+                    lanes,
+                    request.getDragenVersion(),
+                    request.getTrimUMI(),
+                    request.getFastQCompressionFormat(),
+                    novaSeqXSeriesMapping
+            ).getBytes(StandardCharsets.UTF_8));
   }
 
   @PostMapping("/bulk")

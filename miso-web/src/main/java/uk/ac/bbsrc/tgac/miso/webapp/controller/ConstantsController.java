@@ -116,6 +116,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.PrintableField;
 import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
+import uk.ac.bbsrc.tgac.miso.core.util.PoolSampleSheet;
+import uk.ac.bbsrc.tgac.miso.core.util.PoolSampleSheetFactory;
+
 import uk.ac.bbsrc.tgac.miso.dto.AssayDto;
 import uk.ac.bbsrc.tgac.miso.dto.AssayTestDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -397,6 +400,7 @@ public class ConstantsController {
         illuminaChemistry.add(chemistry.name());
       }
       addIlluminaExperimentTypes(node);
+      addSampleSheetTypes(node);
       addHealthTypes(node);
       addIlluminaWorkflowTypes(node);
       addInstrumentTypes(node);
@@ -431,6 +435,19 @@ public class ConstantsController {
       dto.put("name", experiment.name());
       dto.put("description", experiment.getDescription());
       dto.put("dragen", experiment.isDragen());
+    }
+  }
+
+  private static void addSampleSheetTypes(ObjectNode node) {
+    ArrayNode sampleSheetTypes = node.putArray("sampleSheetTypes");
+    for (var entry : PoolSampleSheetFactory.values().entrySet()) {
+      String typeKey               = entry.getKey();
+      PoolSampleSheet experiment = entry.getValue();
+
+      ObjectNode dto = sampleSheetTypes.addObject();
+      dto.put("name",        typeKey);
+      dto.put("description", experiment.getDescription());
+      dto.put("dragen",      experiment.isDragen());
     }
   }
 
