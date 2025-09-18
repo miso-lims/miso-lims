@@ -429,15 +429,27 @@ After building the full MISO project, the database integration tests can be run 
 
 ### UI Integration Testing
 
+#### Test Data
+
+Before populating test data, everything is cleared using [clear_test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/it/resources/db/migration/clear_test_data.sql).
+Data is then populated from [integration_test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/it/resources/db/migration/integration_test_data.sql).
+There are a set of tests specifically for plain sample mode ([PlainSampleITs.java](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/it/java/uk/ac/bbsrc/tgac/miso/webapp/integrationtest/PlainSampleITs.java)) that use [plainSample_integration_test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/it/resources/db/migration/plainSample_integration_test_data.sql) instead.
+
+#### Tests
+
 UI integration tests should all extend `AbstractIT` for similar reasons as the DAO tests listed
 above. The UI tests run Selenium against a Tomcat instance using MySQL in Docker. After building the
 full MISO project, UI integration tests can be run using:
 
-    mvn clean verify -pl miso-web -DskipITs=false -DrunPlainITs
+    mvn clean verify -pl miso-web -DskipITs=false
 
 To run a specific IT test class, use:
 
     mvn clean verify -pl miso-web -DskipITs=false -Dit.test=NameOfITTestClass
+
+To run the plain sample mode tests, use:
+
+    mvn clean verify -pl miso-web -DrunPlainITs
 
 To spin up the test environment for manual testing, use:
 
@@ -449,7 +461,7 @@ finished starting up. As Tomcat is not running tests, it will have to be killed 
 the MySQL Docker container will have to be manually cleaned up.
 
 You can also populate the test data into the test environment using Docker:
-                  
+
     sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' \
     < ./src/it/resources/db/migration/clear_test_data.sql;
     sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' \
@@ -462,52 +474,63 @@ option on the My Account page.
 
 #### Test data
 
-All test data is stored in `integration_test_data.sql`, so keep this in mind when writing the tests.
+The Spring controller tests use the same `clear_test_data.sql` and `integration_test_data.sql`
+files as the UI integration tests (see above).
 
 #### Tests
 
-Spring controller tests should all extend `AbstractST`. The abstract class contains all the annotations needed to set up the test context/config/resources, as well as the mock user to run the tests. It also includes several template tests for common endpoints, for both the rest controllers and the model/view controllers.  The javadocs in `AbstractST.java` have more specific information on these.
+Spring controller tests should all extend `AbstractST`. The abstract class contains all the
+annotations needed to set up the test context/config/resources, as well as the mock user to run the
+tests. It also includes several template tests for common endpoints, for both the rest controllers
+and the model/view controllers. The javadocs in `AbstractST.java` have more specific information on
+these.
 
 #### Running the tests
-Running the spring tests depends on whether you have the local database copy setup in a docker container or not.
 
-If you do, then you can run the tests as such:
-```
-mvn test-compile -DskipSTs=false -pl miso-web
-```
-To compile, then 
-```
-mvn -pl miso-web -Dmiso.it.mysql.url=jdbc:mysql://127.0.0.1:<port>/<test_db_name> -Dmiso.it.mysql.user=<user> -Dmiso.it.mysql.pw=<password> failsafe:integration-test -DskipSTs=false
-```
- To run the tests.
+After building the full MISO project, the database integration tests can be run with:
 
-If not, then you can run the tests as follows
 ```
 mvn clean verify -pl miso-web -DskipSTs=false
 ```
 
-For either of these options add `-Dit.test=<test_name>` to run a specific controller test. You can run multiple by delimiting the names with commas (e.g. `-Dit.test=test1,test2...`).
+To run a specific test, add `-Dit.test=<test_name>`. You can run multiple by delimiting the names
+with commas (e.g. `-Dit.test=test1,test2...`).
 
-#### Relevant resources/documentation
+The tests use the Docker Maven Plugin to run a MySQL container and create a new database each time
+you run them, which is time consuming. If you are working on a lot of tests or going to be running
+them a lot, you can save significant time by setting up a local database to use instead. You'll
+need to run Flyway migrate on your database before running the tests. Here's an example of how you
+can do that using Docker:
 
-https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/web/servlet/result/MockMvcResultMatchers.html
-https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/web/servlet/result/ModelResultMatchers.html
-https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/web/servlet/result/ViewResultMatchers.html
-https://docs.spring.io/spring/reference/6.1/testing/spring-mvc-test-framework/server-performing-requests.html
-https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/test/web/servlet/result/StatusResultMatchers.html
+```
+# Create Docker container
+docker run --name=<test-db-name> -e MYSQL_ROOT_PASSWORD=<root_password> -e MYSQL_USER=<username> -e MYSQL_PASSWORD=<password> -e MYSQL_DATABASE=<test_db_name> -p <port>:3306 -d mysql:8.0
 
-Also, look at the existing tests for a general idea of the format to follow when writing the tests.
+# Run Flyway migrate
+mvn flyway:migrate -pl sqlstore -Dflyway.url=jdbc:mysql://localhost:<port>/<test_db_name> -Dflyway.driver=com.mysql.cj.jdbc.Driver -Dflyway.user=root -Dflyway.password=<root_password>
+
+# Run the tests
+mvn test-compile failsafe:integration-test -pl miso-web -Dmiso.it.mysql.url=jdbc:mysql://localhost:<port>/<test_db_name> -Dmiso.it.mysql.user=<user> -Dmiso.it.mysql.pw=<password> -DskipSTs=false
+```
+
 
 #### Debugging
-To debug your controller test, set `-Dst.debug=true` on the command line. This will enable printing of the response JSON for all template tests used. To look at this printed response, navigate to `{miso_base_directory}/miso-web/target/failsafe-reports`, then open `*.SomeControllerST-output.txt` to view the printed response from the request.
+
+To debug your controller test, set `-Dst.debug=true` on the command line. This will enable printing
+of the response JSON for all template tests used. To look at this printed response, navigate to
+`{miso_base_directory}/miso-web/target/failsafe-reports`, then open `*.SomeControllerST-output.txt`
+to view the printed response from the request.
 
 #### Code coverage plugin
-The Spring controller tests use the Jacoco plugin to test endpoint coverage. This plugin is disabled by default. To run the code coverage plugin, run
+
+The Spring controller tests use the Jacoco plugin to test endpoint coverage. This plugin is
+disabled by default. To run the code coverage plugin, run
 
 ```
 mvn clean verify -pl miso-web -DskipSTs=false -Djacoco.skip=false
 ```
 
-The default target output directory for the coverage report is `/miso-web/target/site/`.
-
-To view the report, open the `index.html` file in the `site` folder in a browser. For vscode, the "live server" plugin is quite useful for this, allowing you to right click and open the `index.html` with the live server plugin.
+The default target output directory for the coverage report is `/miso-web/target/site/`. To view
+the report, open the `index.html` file in the `site` folder in a browser. For VSCode, the "live
+server" plugin is quite useful for this, allowing you to right click and open the `index.html` with
+the live server plugin.
