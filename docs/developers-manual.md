@@ -402,7 +402,8 @@ database. The data access layer should have full test coverage.
 
 #### Test Data
 
-Any initial data is first cleared from the database using the script
+The following scripts are run automatically to reset the test data before each test. Any initial
+data is first cleared from the database using the script
 [V9000__clear_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/sqlstore/src/it/resources/db/migration/V9000__clear_data.sql),
 and then the test data is populated from
 [V9010__test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/sqlstore/src/it/resources/db/migration/V9010__test_data.sql).
@@ -419,7 +420,7 @@ data from the database without using a DAO. You can also create mocks for the DA
 dependencies using Mockito.
 
 If the class you're testing extends `HibernateSaveDao`, extending `AbstractHibernateSaveDaoTest`
-simplifies testing all the standard methods. The the class extends `PaginatedDataSource`, you should
+simplifies testing all the standard methods. If the class extends `PaginatedDataSource`, you should
 create a second test class that extends `PaginationFilterSinkIT` specifically for testing all
 possible search methods.
 
@@ -431,7 +432,8 @@ After building the full MISO project, the database integration tests can be run 
 
 #### Test Data
 
-Before populating test data, everything is cleared using [clear_test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/it/resources/db/migration/clear_test_data.sql).
+The following scripts are run automatically to reset the test data before each test. First, existing
+data is cleared using [clear_test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/it/resources/db/migration/clear_test_data.sql).
 Data is then populated from [integration_test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/it/resources/db/migration/integration_test_data.sql).
 There are a set of tests specifically for plain sample mode ([PlainSampleITs.java](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/it/java/uk/ac/bbsrc/tgac/miso/webapp/integrationtest/PlainSampleITs.java)) that use [plainSample_integration_test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/it/resources/db/migration/plainSample_integration_test_data.sql) instead.
 
@@ -472,10 +474,10 @@ option on the My Account page.
 
 ### Spring Controller Testing
 
-#### Test data
+#### Test Data
 
 The Spring controller tests use the same `clear_test_data.sql` and `integration_test_data.sql`
-files as the UI integration tests (see above).
+files as the UI integration tests (see above) to automatically reset the test data before each test.
 
 #### Tests
 
@@ -485,9 +487,9 @@ tests. It also includes several template tests for common endpoints, for both th
 and the model/view controllers. The javadocs in `AbstractST.java` have more specific information on
 these.
 
-#### Running the tests
+#### Running the Tests
 
-After building the full MISO project, the database integration tests can be run with:
+After building the full MISO project, the Spring controller tests can be run with:
 
 ```
 mvn clean verify -pl miso-web -DskipSTs=false
@@ -513,7 +515,6 @@ mvn flyway:migrate -pl sqlstore -Dflyway.url=jdbc:mysql://localhost:<port>/<test
 mvn test-compile failsafe:integration-test -pl miso-web -Dmiso.it.mysql.url=jdbc:mysql://localhost:<port>/<test_db_name> -Dmiso.it.mysql.user=<user> -Dmiso.it.mysql.pw=<password> -DskipSTs=false
 ```
 
-
 #### Debugging
 
 To debug your controller test, set `-Dst.debug=true` on the command line. This will enable printing
@@ -521,7 +522,7 @@ of the response JSON for all template tests used. To look at this printed respon
 `{miso_base_directory}/miso-web/target/failsafe-reports`, then open `*.SomeControllerST-output.txt`
 to view the printed response from the request.
 
-#### Code coverage plugin
+#### Code Coverage Plugin
 
 The Spring controller tests use the Jacoco plugin to test endpoint coverage. This plugin is
 disabled by default. To run the code coverage plugin, run
