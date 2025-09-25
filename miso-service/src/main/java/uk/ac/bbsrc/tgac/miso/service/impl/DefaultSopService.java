@@ -1,7 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.isChanged;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
@@ -23,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SopDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.isChanged;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -81,13 +80,14 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
     to.setUrl(from.getUrl());
     to.setArchived(from.isArchived());
   }
-
+  //09-24 Working on SOP deletion error bug.
   @Override
   public ValidationResult validateDeletion(Sop object) throws IOException {
     ValidationResult result = new ValidationResult();
     long sampleUsage = sopDao.getUsageBySamples(object);
     if (sampleUsage > 0) {
       result.addError(ValidationError.forDeletionUsage(object, sampleUsage, Pluralizer.samples(sampleUsage)));
+      //result.addError(new ValidationError("Error is this"));
     }
     long libUsage = sopDao.getUsageByLibraries(object);
     if (libUsage > 0) {
@@ -99,6 +99,7 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
     }
     return result;
   }
+
 
   @Override
   public List<Sop> listByIdList(List<Long> ids) throws IOException {
