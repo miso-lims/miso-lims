@@ -4203,7 +4203,7 @@ public class Dtos {
       setString(to::setBoxAlias, maybeGetProperty(maybeGetProperty(from.getItem(), Boxable::getBox), Box::getAlias));
       setString(to::setBoxPosition, maybeGetProperty(from.getItem(), Boxable::getBoxPosition));
     } else if (from.getDistributedBoxAlias() != null) {
-      setString(to::setBoxAlias, "DISTRIBUTED - " + from.getDistributedBoxAlias());
+      setString(to::setBoxAlias, from.getDistributedBoxAlias());
       setString(to::setBoxPosition, from.getDistributedBoxPosition());
     }
     return to;
