@@ -20,6 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -36,6 +37,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Barcode", Sample::getIdentificationBarcode), //
       Column.forString("Box", BoxUtils::makeBoxLabel), //
       Column.forString("Position", sam -> sam.getBoxPosition()), //
+      Column.forString("Custody", custody()), //
       Column.forString("Class", true, sampleClass()), //
       Column.forString("External Identifier", true,
           detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
@@ -69,7 +71,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Group ID", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
       Column.forBigDecimal("VOL (uL)", Sample::getVolume), //
       Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
-      Column.forBigDecimal("Total (ng)", getYield()) //
+      Column.forBigDecimal("Total (ng)", getYield())//
   ), //
 
   TRANSFER_LIST_V2("Transfer List V2", //
@@ -80,6 +82,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Barcode", Sample::getIdentificationBarcode), //
       Column.forString("Box", BoxUtils::makeBoxLabel), //
       Column.forString("Position", sam -> sam.getBoxPosition()), //
+      Column.forString("Custody", custody()), //
       Column.forString("Class", true, sampleClass()), //
       Column.forString("External Identifier", true,
           detailedSample(SampleIdentity.class, SampleIdentity::getExternalName, "")), //
@@ -91,7 +94,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
               : ""))), //
       Column.forBigDecimal("VOL (uL)", Sample::getVolume), //
       Column.forBigDecimal("[] (ng/uL)", Sample::getConcentration), //
-      Column.forBigDecimal("Total (ng)", getYield()) //
+      Column.forBigDecimal("Total (ng)", getYield())//
   ), //
   INITIAL_EXTRACTION_YIELDS("Initial Extraction Yields List", //
       Arrays.asList(SampleStock.CATEGORY_NAME, SampleAliquot.CATEGORY_NAME), //
@@ -243,7 +246,7 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("DNA Library ID", true, blankColumn()), // To be filled in manually
       Column.forString("DNA Library Alias", true, blankColumn()), // To be filled in manually
       Column.forString("DNA LDI ID", true, blankColumn()), // To be filled in manually
-      Column.forString("DNA LDI Alias", true, blankColumn()) // To be filled in manually
+      Column.forString("DNA LDI Alias", true, blankColumn())// To be filled in manually
   ), //
   MOH_EXTRACTION("MOH Extraction Tracker", //
       Arrays.asList(SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME,
@@ -260,6 +263,22 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Group ID", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupId)),
       Column.forString("Requisition", false, effectiveRequisition()));
 
+
+  private static Function<Sample, String> custody() {
+    return sam -> {
+      if (sam.getTransferViews() == null || sam.getTransferViews().isEmpty()) {
+        return null;
+      }
+      ListTransferView transfer = sam.getTransferViews().stream()
+          .max(Comparator.comparing(ListTransferView::getTransferTime))
+          .orElseThrow();
+      if (transfer.getRecipientGroup() != null) {
+        return transfer.getRecipientGroup().getName();
+      } else {
+        return transfer.getRecipient();
+      }
+    };
+  }
 
   private static Function<Sample, String> effectiveRequisition() {
     return sam -> {
