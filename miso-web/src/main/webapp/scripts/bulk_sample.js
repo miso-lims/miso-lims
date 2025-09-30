@@ -91,6 +91,7 @@ BulkTarget.sample = (function ($) {
         {
           name: "Propagate",
           action: function (samples) {
+            samples = samples.sort(Utils.sorting.standardSort("alias"));
             Utils.warnIfConsentRevoked(samples, function () {
               var idsString = samples.map(Utils.array.getId).join(",");
               var classes = getSampleClasses(samples);
@@ -202,6 +203,7 @@ BulkTarget.sample = (function ($) {
                         label: samples[i].alias,
                         value: result.replicates,
                         required: true,
+                        series: "replicates",
                       });
                     }
                     Utils.showDialog(
