@@ -239,6 +239,7 @@ public class TransferController {
     ObjectNode itemsListConfig = mapper.createObjectNode();
     itemsListConfig.put("editSend", editSend);
     itemsListConfig.put("editReceipt", editReceipt);
+    itemsListConfig.put("distribution", transfer.isDistribution());
 
     model.put(PageMode.PROPERTY, pageMode.getLabel());
     model.put("transfer", transfer);
