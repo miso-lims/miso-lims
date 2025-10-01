@@ -299,7 +299,7 @@ public class RequisitionRestControllerST extends AbstractST {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.*", hasSize(1)))
         .andExpect(jsonPath("$[0].runId").value(1))
-        .andExpect(jsonPath("$[0].runAlias").value("MiSeq_Run_1"));
+        .andExpect(jsonPath("$[0].runAlias").value("HiSeq_Run_1"));
   }
 
 
