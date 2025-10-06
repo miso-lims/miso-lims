@@ -1,1 +1,1 @@
-When attempting to delete SOPs will display validation message.
+When failing to delete SOPs, the error messages were not being shown.
