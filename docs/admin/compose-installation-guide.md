@@ -210,7 +210,7 @@ for more information on the types of data that can be added at this stage.
 ### Modifying the miso.properties file
 
 The
-[miso.properties](https://github.com/miso-lims/miso-lims/blob/master/miso-web/src/main/resources/internal/miso.properties)
+[miso.properties](https://github.com/miso-lims/miso-lims/blob/master/miso-web/src/main/resources/miso.properties)
 file has plenty of options to configure for site-specific use. See [Site Configuration](../site-configuration) for more
 information.
 
