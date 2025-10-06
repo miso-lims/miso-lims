@@ -890,6 +890,7 @@ INSERT INTO LibraryAliquot (aliquotId, name, alias, concentration, concentration
 (1, 'LDI1', 'TEST_0001_Bn_R_PE_300_WG', 5.9, 'NANOGRAMS_PER_MICROLITRE', 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
 (304, 'LDI304', 'DILT_0001_nn_n_PE_304_WG', 7.97, 'NANOGRAMS_PER_MICROLITRE', 304, '300304', '2017-08-14', 3, 3, '2017-08-14 12:25:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
 (305, 'LDI305', 'DILT_0001_nn_n_PE_305_WG', 7.97, 'NANOGRAMS_PER_MICROLITRE', 305, '300305', '2017-08-14', 1, 1, '2017-08-14 12:25:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
+(306, 'LDI306', 'DILT_0001_nn_n_PE_306_WG', 7.97, 'NANOGRAMS_PER_MICROLITRE', 305, '300306', '2017-08-14', 3, 3, '2017-08-14 12:25:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
 (504, 'LDI504', 'TIB_0001_nn_n_PE_404_WG', 5.9, 'NANOGRAMS_PER_MICROLITRE', 504, 'TIB_Dil', '2017-08-15', 1, 1, '2017-08-15 13:55:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
 (505, 'LDI505', 'TIB_0001_nn_n_PE_404_WG', 3.3, 'NANOGRAMS_PER_MICROLITRE', 504, 'TIB_replaceDil', '2017-08-15', 1, 1, '2017-08-15 13:55:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
 (701, 'LDI701', 'TIB_0001_nn_n_PE_404_WG', 2.2, 'NANOGRAMS_PER_MICROLITRE', 504, 'test_pooling_1', '2017-10-16', 1, 1, '2017-10-16 15:59:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
@@ -1059,7 +1060,7 @@ INSERT INTO _Partition (containerId, partitionId, partitionNumber, pool_poolId) 
 (6001, 60011, 1, NULL),(6001, 60012, 2, NULL),(6001, 60013, 3, NULL),(6001, 60014, 4, NULL);
 
 INSERT INTO Run (runId, name, alias, instrumentId, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
-(1, 'RUN1', 'MiSeq_Run_1', 1, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
+(1, 'RUN1', 'HiSeq_Run_1', 1, '2017-08-02', '2017-08-03', 'Completed', 1, '2017-08-02 10:03:02', 1, '2017-08-03 10:03:02'),
 (2, 'RUN2', 'PacBio_Run_1', 3, '2017-08-01', NULL, 'Running', 3, '2017-08-01 10:03:02', 3, '2017-08-01 10:03:02');
 
 INSERT INTO Run (runId, name, alias, instrumentId, sequencingParameters_parametersId, description, filePath, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES

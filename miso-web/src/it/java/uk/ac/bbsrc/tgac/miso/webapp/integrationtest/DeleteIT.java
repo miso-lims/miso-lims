@@ -111,7 +111,7 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteLibraryAliquot() {
-    testDelete(ListTarget.LIBRARY_ALIQUOTS, null, "LDI304", Columns.NAME, LibraryAliquot.class, 304L);
+    testDelete(ListTarget.LIBRARY_ALIQUOTS, null, "LDI306", Columns.NAME, LibraryAliquot.class, 306L);
   }
 
   @Test
