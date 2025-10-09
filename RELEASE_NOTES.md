@@ -7,6 +7,30 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.13.0] - 2025-10-09
+
+### Added
+
+* Custody column to the following sample download sheets
+  * Tracking List
+  * Transfer List V2
+
+### Changed
+
+* Improvements when propagating samples and choosing to specify replicates per sample:
+  * The inputs are now sorted by parent sample alias.
+  * Multiple values separated by line breaks can now be pasted to overwrite multiple inputs in the
+  dialog. This allows copying from a text document or spreadsheet column.
+* When a sample's project is changed, the changelog will include the project code, if set, instead of
+  the project name
+
+### Fixed
+
+* The Edit Transfer page only showed "DISTRIBUTED" in the item location if it had previously been in a
+  box
+* When failing to delete SOPs, the error messages were not being shown.
+
+
 ## [3.12.0] - 2025-08-21
 
 ### Added
