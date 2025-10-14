@@ -476,7 +476,7 @@ FormTarget.library = (function ($) {
                     title: "Spike-In Volume",
                     data: "spikeInVolume",
                     type: "decimal",
-                    precision: 16,
+                    precision: 14,
                     scale: 10,
                   },
                 ])

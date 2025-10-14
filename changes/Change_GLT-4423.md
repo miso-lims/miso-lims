@@ -1,14 +1,3 @@
-Size of following feilds increment upto 99999.9999999999 in respected tables.
-1. Sample
-  * concentration
-  * initialCellConcentration
-  * loadingCellConcentration
-  * ngUsed 
-2. Library
-  * concentration
-  * ngUsed
-3. Library Aliqote
-  * concentration
-  * ngUsed
-4. Pool
-  * concentration
+The following fields will now accept numbers with up to 6 digits before the decimal.
+* "Conc." field in Samples, Libraries, Library Aliquots, Pool.
+* "Parent ng Used" field in Library Aliquots.
