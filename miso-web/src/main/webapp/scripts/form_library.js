@@ -385,7 +385,7 @@ FormTarget.library = (function ($) {
                     title: "Parent ng Used",
                     data: "ngUsed",
                     type: "decimal",
-                    precision: 14,
+                    precision: 16,
                     scale: 10,
                   },
                   {
@@ -400,7 +400,7 @@ FormTarget.library = (function ($) {
                     title: "Concentration",
                     data: "concentration",
                     type: "decimal",
-                    precision: 14,
+                    precision: 16,
                     scale: 10,
                   },
                   FormUtils.makeUnitsField(object, "concentration"),
@@ -476,7 +476,7 @@ FormTarget.library = (function ($) {
                     title: "Spike-In Volume",
                     data: "spikeInVolume",
                     type: "decimal",
-                    precision: 14,
+                    precision: 16,
                     scale: 10,
                   },
                 ])
