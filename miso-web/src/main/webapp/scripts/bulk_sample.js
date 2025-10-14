@@ -1247,7 +1247,7 @@ BulkTarget.sample = (function ($) {
           include: show["Stock"],
           sampleSubcategory: ["Single Cell (stock)", "Single Cell (aliquot)"],
           includeSaved: targetCategory === "Stock",
-          precision: 16,
+          precision: 14,
           scale: 10,
         },
         {
@@ -1294,7 +1294,7 @@ BulkTarget.sample = (function ($) {
           include: show["Aliquot"],
           sampleSubcategory: "Single Cell (aliquot)",
           includeSaved: targetCategory === "Aliquot",
-          precision: 16,
+          precision: 14,
           scale: 10,
         }
       );

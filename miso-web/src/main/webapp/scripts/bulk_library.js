@@ -960,7 +960,7 @@ BulkTarget.library = (function ($) {
           title: "Spike-In Volume",
           type: "decimal",
           data: "spikeInVolume",
-          precision: 16,
+          precision: 14,
           scale: 10,
         }
       );
