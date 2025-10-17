@@ -43,22 +43,20 @@ public class LibraryAliquotRestControllerST extends AbstractST {
   @Test
   public void testDatatable() throws Exception {
     testDtRequest(CONTROLLER_BASE + "/dt",
-        Arrays.asList(1, 304, 305, 504, 505, 701, 702, 800, 801, 802, 803, 804, 901, 902, 1001, 1002, 1003, 1004,
-            120001,
-            120002, 200001, 200002));
+        Arrays.asList(1, 304, 305, 306, 504, 505, 701, 702, 800, 801, 802, 803, 804, 901, 902, 1001, 1002, 1003, 1004,
+            120001, 120002, 200001, 200002));
   }
 
   @Test
   public void testDatatableByProject() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/project/300", Arrays.asList(304, 305));
+    testDtRequest(CONTROLLER_BASE + "/dt/project/300", Arrays.asList(304, 305, 306));
   }
 
   @Test
   public void testDatatableByAvailable() throws Exception {
     testDtRequest(CONTROLLER_BASE + "/dt/pool/802/available",
-        Arrays.asList(1, 304, 305, 504, 505, 701, 702, 800, 801, 802, 803, 804, 901, 902, 1001, 1002, 1003, 1004,
-            120001,
-            120002, 200001, 200002));
+        Arrays.asList(1, 304, 305, 306, 504, 505, 701, 702, 800, 801, 802, 803, 804, 901, 902, 1001, 1002, 1003, 1004,
+            120001, 120002, 200001, 200002));
   }
 
   @Test
@@ -222,12 +220,12 @@ public class LibraryAliquotRestControllerST extends AbstractST {
   @Test
   public void testDeleteLibraryAliquot() throws Exception {
     // only creator can delete
-    testBulkDelete(entityClass, 304, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 306, CONTROLLER_BASE);
   }
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(entityClass, 304, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 306, CONTROLLER_BASE);
   }
 }
