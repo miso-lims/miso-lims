@@ -30,6 +30,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.util.LinkedMultiValueMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -172,14 +173,18 @@ public abstract class AbstractST {
   }
 
   protected String pollingResponse(String url) throws Exception {
-    String response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
-    String status = JsonPath.read(response, "$.status");
-    while (status.equals("running")) {
-      response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
-      status = JsonPath.read(response, "$.status");
-      Thread.sleep(1000);
-    }
-    response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
+    String response = null;
+    ResultActions actions = null;
+    do {
+      if (response != null) {
+        Thread.sleep(500);
+      }
+      actions = getMockMvc().perform(get(url));
+      if (DEBUG_MODE) {
+        actions.andDo(print());
+      }
+      response = actions.andReturn().getResponse().getContentAsString();
+    } while ("running".equals(JsonPath.read(response, "$.status")));
     return response;
   }
 
@@ -194,8 +199,8 @@ public abstract class AbstractST {
    */
   protected <T> List<T> baseTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
-
     String response = pollingResponserHelper("post", dtos, controllerBase);
+    assertEquals("completed", JsonPath.read(response, "$.status"));
     List<T> objects = new ArrayList<T>();
     for (int i = 0; i < dtos.size(); i++) {
       Integer id = JsonPath.read(response, "$.data[" + i + "].id");
@@ -219,6 +224,7 @@ public abstract class AbstractST {
       throws Exception {
     // tests failure for async create endpoints where admin permissions are required
     String response = pollingResponserHelper("post", dtos, controllerBase);
+    assertEquals("failed", JsonPath.read(response, "$.status"));
     if (DEBUG_MODE)
       System.out.println(response);
     assertEquals("An unexpected error has occurred", JsonPath.read(response, "$.detail"));
@@ -243,6 +249,7 @@ public abstract class AbstractST {
       Function<D, Long> getId)
       throws Exception {
     String response = pollingResponserHelper("put", dtos, controllerBase);
+    assertEquals("completed", JsonPath.read(response, "$.status"));
 
     // check order of returned IDs
     List<Long> ids = dtos.stream().map(getId).toList();
@@ -274,6 +281,7 @@ public abstract class AbstractST {
       throws Exception {
     // tests failure for async update endpoints where admin permissions are required
     String response = pollingResponserHelper("put", dtos, controllerBase);
+    assertEquals("failed", JsonPath.read(response, "$.status"));
     if (DEBUG_MODE)
       System.out.println(response);
     assertEquals("An unexpected error has occurred", JsonPath.read(response, "$.detail"));
@@ -315,14 +323,15 @@ public abstract class AbstractST {
       default:
         throw new RuntimeException("invalid async method specified");
     }
-    if (DEBUG_MODE)
+    if (DEBUG_MODE) {
       ac.andDo(print());
+    }
 
     mvcResult = ac.andExpect(status().is(expectedResponseCode)).andReturn();
 
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    String response = pollingResponse(pollingResponseUrlPrefix + "/" + id);
-    return response;
+
+    return pollingResponse(pollingResponseUrlPrefix + "/" + id);
   }
 
   /**

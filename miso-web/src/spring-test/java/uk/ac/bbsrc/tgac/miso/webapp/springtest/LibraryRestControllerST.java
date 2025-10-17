@@ -22,7 +22,6 @@ import com.jayway.jsonpath.JsonPath;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-
 import javassist.bytecode.ExceptionTable;
 
 import static org.hamcrest.Matchers.*;
@@ -31,7 +30,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import org.springframework.test.web.servlet.MvcResult;
+
+import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
@@ -70,53 +72,54 @@ public class LibraryRestControllerST extends AbstractST {
           604, 700, 701, 801, 802, 803, 804, 805, 806, 807, 901, 2201, 100001, 100002, 100003, 100004, 100005,
           100006, 100007, 100008, 110001, 110002, 110003, 110004, 110005, 120001, 120002, 200001, 200002);
 
-
-  private HibernateDeletionDao sut = new HibernateDeletionDao();
-
-
   @Test
   public void testGetById() throws Exception {
     baseTestGetById(CONTROLLER_BASE, 1).andExpect(jsonPath("$.name").value("LIB1"))
         .andExpect(jsonPath("$.alias").value("TEST_0001_Bn_R_PE_300_WG"));
   }
 
-  private List<LibraryDto> makeCreateDtos() {
-    LibraryDto lib1 = new LibraryDto();
-    lib1.setName("LIB1");
-    lib1.setSample(Dtos.asMinimalDto(currentSession().get(SampleImpl.class, 1)));
+  private LibraryDto makeCreateDto() {
+    DetailedLibraryDto lib1 = new DetailedLibraryDto();
+    lib1.setParentSampleId(8L);
+    lib1.setLibraryTypeId(1L);
+    lib1.setLibrarySelectionTypeId(3L);
+    lib1.setLibraryStrategyTypeId(1L);
+    lib1.setLibraryDesignCodeId(7L);
     lib1.setPaired(false);
     lib1.setDiscarded(false);
     lib1.setLowQuality(false);
     lib1.setUmis(false);
     lib1.setSopId(3L);
+    lib1.setKitDescriptorId(1L);
     lib1.setKitLot("KITLOTONE");
-    lib1.setPlatformType("ILLUMINA");
+    lib1.setPlatformType("Illumina");
+    lib1.setDnaSize(123);
 
-    LibraryDto lib2 = new LibraryDto();
-    lib2.setSample(Dtos.asMinimalDto(currentSession().get(SampleImpl.class, 2)));
-    lib2.setPaired(true);
-    lib2.setDiscarded(true);
-    lib2.setLowQuality(true);
-    lib2.setUmis(true);
-    lib2.setSopId(4L);
-    lib2.setKitLot("KITLOTONE");
-    lib2.setPlatformType("PACBIO");
-
-
-
-    return Arrays.asList(lib1, lib2);
+    return lib1;
   }
 
   @Test
   public void testCreate() throws Exception {
-    LibraryImpl lib = baseTestCreate(CONTROLLER_BASE, makeCreateDtos().get(0), entityClass, 200);
-    assertEquals("LIB1", lib.getName());
-    assertEquals(1L, lib.getSample().getId());
-    assertEquals(false, lib.getPaired());
-    assertEquals(false, lib.isDiscarded());
-    assertEquals(false, lib.isLowQuality());
-    assertEquals(false, lib.getUmis());
+    LibraryImpl lib = baseTestCreate(CONTROLLER_BASE, makeCreateDto(), entityClass, 201);
+    assertCreatedLibrary(lib);
+  }
 
+  private void assertCreatedLibrary(Library library) {
+    DetailedLibrary detailed = (DetailedLibrary) library;
+    assertEquals(8L, detailed.getSample().getId());
+    assertEquals(1L, detailed.getLibraryType().getId());
+    assertEquals(3L, detailed.getLibrarySelectionType().getId());
+    assertEquals(1L, detailed.getLibraryStrategyType().getId());
+    assertEquals(7L, detailed.getLibraryDesignCode().getId());
+    assertEquals(false, detailed.getPaired());
+    assertEquals(false, detailed.isDiscarded());
+    assertEquals(false, detailed.isLowQuality());
+    assertEquals(false, detailed.getUmis());
+    assertEquals(3L, detailed.getSop().getId());
+    assertEquals(1L, detailed.getKitDescriptor().getId());
+    assertEquals("KITLOTONE", detailed.getKitLot());
+    assertEquals(PlatformType.ILLUMINA, detailed.getPlatformType());
+    assertEquals(Integer.valueOf(123), detailed.getDnaSize());
   }
 
   @Test
@@ -147,22 +150,22 @@ public class LibraryRestControllerST extends AbstractST {
   }
 
   @Test
-  public void testDatatableSamplesByReq() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/requisition/1", Arrays.asList(1, 2, 201, 12));
+  public void testDatatableLibrariesByReq() throws Exception {
+    testDtRequest(CONTROLLER_BASE + "/dt/requisition/1", Arrays.asList(1, 204));
 
   }
 
   @Test
-  public void testDatatableSupplementalSamplesByReq() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/requisition-supplemental/2", Arrays.asList(502));
+  public void testDatatableSupplementalLibrariesByReq() throws Exception {
+    testDtRequest(CONTROLLER_BASE + "/dt/requisition-supplemental/2", Arrays.asList(205));
 
   }
 
   @Test
-  public void testDatatablePreparedSamplesByReq() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/requisition-prepared/1", Arrays.asList(1, 204, 205, 206));
-
-
+  public void testDatatablePreparedLibrariesByReq() throws Exception {
+    testDtRequest(CONTROLLER_BASE + "/dt/requisition-prepared/2",
+        Arrays.asList(504, 505, 600, 601, 602, 603, 604, 700, 701, 801, 802, 803, 804, 805, 806, 807, 901, 2201, 100001,
+            100002, 100003, 100004, 100005, 100006, 100007, 100008));
   }
 
   @Test
@@ -181,7 +184,6 @@ public class LibraryRestControllerST extends AbstractST {
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/query").content(makeJson(names)).contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.*", hasSize(2)))
         .andExpect(jsonPath("$[0].name").value("LIB1"))
@@ -206,39 +208,6 @@ public class LibraryRestControllerST extends AbstractST {
             "SAM8",
             "TEST_0001_Bn_R_nn_1-1_D_1", "88888", "SAM1", "TEST_0001", "TEST_external_1", "tube 1", "First Box - A01"));
     testSpreadsheetContents(CONTROLLER_BASE + "/spreadsheet", req, headers, rows);
-
-    // List<String> headers = Arrays.asList();
-
-    // MockHttpServletResponse response = getMockMvc()
-    // .perform(post(CONTROLLER_BASE +
-    // "/spreadsheet").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
-    // .andDo(print())
-    // .andExpect(status().isOk())
-    // .andExpect(content().contentType("text/csv")).andReturn().getResponse();
-
-    // String filename = response.getHeader("Content-Disposition").split("=")[1];
-    // List<List<String>> records = new ArrayList<>();
-    // try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-    // String line;
-    // int row = 0;
-    // while ((line = br.readLine()) != null) {
-    // String[] values = line.split(",");
-    // records.add(Arrays.asList(values));
-    // switch (row) {
-    // case 0:
-    // assertEquals(values[0], "Name");
-    // break;
-
-    // case 1:
-    // assertEquals(values[0], "LIB1");
-    // break;
-    // }
-    // row++;
-    // }
-    // } catch (Exception e) {
-    // }
-
-    // TODO: fix
   }
 
   @Test
@@ -249,7 +218,6 @@ public class LibraryRestControllerST extends AbstractST {
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/parents/Identity").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(jsonPath("$.*", hasSize(2)))
         .andExpect(jsonPath("$[0].id").value(1))
         .andExpect(jsonPath("$[0].name").value("SAM1"))
@@ -265,7 +233,6 @@ public class LibraryRestControllerST extends AbstractST {
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/children/Pool").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(jsonPath("$[0].box.name").value("BOX1"))
         .andExpect(jsonPath("$[0].box.tubeCount").value(11))
         .andExpect(jsonPath("$[0].boxPosition").value("C03"))
@@ -273,33 +240,25 @@ public class LibraryRestControllerST extends AbstractST {
         .andExpect(jsonPath("$[0].id").value(1));
   }
 
-
   @Test
   @Transactional
   public void testDelete() throws Exception {
     // only owner or admin can delete
-    sut.setEntityManager(getEntityManager());
-    SampleImpl associated = currentSession().get(SampleImpl.class, 200004);
-    sut.delete(associated, currentSession().get(UserImpl.class, 3));
-    // need to delete the associated library aliquot first
-
-    testBulkDelete(entityClass, 200002, CONTROLLER_BASE);
+    testBulkDelete(entityClass, 100001, CONTROLLER_BASE);
   }
 
   @Test
   @Transactional
+  @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
-    sut.setEntityManager(getEntityManager());
-    SampleImpl associated = currentSession().get(SampleImpl.class, 8);
-    sut.delete(associated, currentSession().get(UserImpl.class, 1));
-    testDeleteUnauthorized(entityClass, 1, CONTROLLER_BASE);
+    testDeleteUnauthorized(entityClass, 100001, CONTROLLER_BASE);
   }
 
   @Test
   public void testBulkCreate() throws Exception {
-    List<LibraryImpl> libs = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
-    // TODO
-    // ASSERTIONS HERE
+    List<LibraryImpl> libs = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, Arrays.asList(makeCreateDto()));
+    assertEquals(1, libs.size());
+    assertCreatedLibrary(libs.get(0));
   }
 
   @Test
@@ -316,8 +275,6 @@ public class LibraryRestControllerST extends AbstractST {
     assertEquals(lib204.getDescription(), updatedLibs.get(1).getDescription());
   }
 
-
-
   @Test
   public void testFindRelated() throws Exception {
     FindRelatedRequest req = new FindRelatedRequest();
@@ -327,15 +284,11 @@ public class LibraryRestControllerST extends AbstractST {
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/find-related").content(makeJson(req)).contentType(MediaType.APPLICATION_JSON))
-        .andDo(print())
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.*", hasSize(4)))
+        .andExpect(jsonPath("$.*", hasSize(2)))
         .andExpect(jsonPath("$[0].id").value(1))
-        .andExpect(jsonPath("$[1].id").value(204))
-        .andExpect(jsonPath("$[2].id").value(205))
-        .andExpect(jsonPath("$[3].id").value(206));
+        .andExpect(jsonPath("$[1].id").value(204));
 
   }
 
-  // TODO -- missing 1-2 tests
 }
