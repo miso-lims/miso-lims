@@ -22,12 +22,10 @@ SELECT DISTINCT r.alias
   ,sp.chemistry
   ,ri.runBasesMask AS runBasesMask
   ,ri.workflowType AS workflowType
-  ,scm.alias AS containerModel
   ,sk.partNumber AS sequencingKit
 FROM Run AS r  
 LEFT JOIN SequencingParameters AS sp ON sp.parametersId = r.sequencingParameters_parametersId 
 LEFT JOIN Run_SequencerPartitionContainer AS rscp ON rscp.Run_runId = r.runId 
 LEFT JOIN SequencerPartitionContainer AS spc ON spc.containerId = rscp.containers_containerId 
-LEFT JOIN SequencingContainerModel scm ON scm.sequencingContainerModelId = spc.sequencingContainerModelId
 LEFT JOIN KitDescriptor sk ON sk.kitDescriptorId = r.sequencingKitId 
 LEFT JOIN RunIllumina AS ri ON ri.runId = r.runId

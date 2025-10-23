@@ -53,7 +53,6 @@ import ca.on.oicr.pinery.api.PreparationKit;
 import ca.on.oicr.pinery.api.Requisition;
 import ca.on.oicr.pinery.api.RequisitionPause;
 import ca.on.oicr.pinery.api.Run;
-import ca.on.oicr.pinery.api.RunPosition;
 import ca.on.oicr.pinery.api.RunSample;
 import ca.on.oicr.pinery.api.Sample;
 import ca.on.oicr.pinery.api.SampleProject;
@@ -96,7 +95,7 @@ public class MisoClient implements Lims {
 
   // @formatter:off
   // InstrumentModel queries
-  private static final String QUERY_ALL_MODELS = "SELECT im.instrumentModelId, im.alias, im.platform " + "FROM InstrumentModel as im";
+  private static final String QUERY_ALL_MODELS = "SELECT im.instrumentModelId, im.alias, im.platform, im.numContainers " + "FROM InstrumentModel as im";
   private static final String QUERY_MODEL_BY_ID = QUERY_ALL_MODELS + " WHERE im.instrumentModelId = ?";
 
   // Instrument queries
@@ -457,18 +456,26 @@ public class MisoClient implements Lims {
       positions = getRunPositions(runIds);
     }
 
-    Map<Integer, Run> map = runs.stream().collect(Collectors.toMap(Run::getId, Function.identity()));
-    for (MisoRunPosition p : positions) {
-      Run r = map.get(p.getRunId());
-      if (r != null) {
-        Set<RunPosition> rp = r.getSamples();
-        if (rp == null) {
-          rp = new HashSet<>();
-          r.setSample(rp);
-        }
-        rp.add(p);
-      }
+    Map<Integer, Run> runsById = runs.stream().collect(Collectors.toMap(Run::getId, Function.identity()));
+    Map<Integer, Map<Integer, MisoRunContainer>> containersByRunIdAndId = new HashMap<>();
+    for (MisoRunPosition position : positions) {
+      Map<Integer, MisoRunContainer> containersById =
+          containersByRunIdAndId.computeIfAbsent(position.getRunId(), runId -> {
+            Map<Integer, MisoRunContainer> map = new HashMap<>();
+            map.put(position.getContainerId(), position.makeRunContainer());
+            return map;
+          });
+      MisoRunContainer container = containersById.get(position.getContainerId());
+      container.getPositions().add(position);
     }
+    containersByRunIdAndId.forEach((runId, containersById) -> {
+      Run run = runsById.get(runId);
+      if (run.getContainers() == null) {
+        run.setContainers(new HashSet<>());
+      }
+      containersById.values().forEach(container -> run.getContainers().add(container));
+    });
+
     return runs;
   }
 
@@ -500,9 +507,16 @@ public class MisoClient implements Lims {
       return null;
     }
     Run run = runs.get(0);
-    Set<RunPosition> rp = new HashSet<>();
-    rp.addAll(getRunPositions(run.getId()));
-    run.setSample(rp);
+
+    Map<Integer, MisoRunContainer> containersById = new HashMap<>();
+    List<MisoRunPosition> positions = getRunPositions(run.getId());
+    for (MisoRunPosition position : positions) {
+      MisoRunContainer container =
+          containersById.computeIfAbsent(position.getContainerId(), id -> position.makeRunContainer());
+      container.getPositions().add(position);
+    }
+    run.setContainers(new HashSet<>(containersById.values()));
+
     return run;
   }
 
@@ -856,6 +870,8 @@ public class MisoClient implements Lims {
       m.setId(rs.getInt("instrumentModelId"));
       m.setName(rs.getString("alias"));
       m.setPlatform(rs.getString("platform"));
+      int numContainers = rs.getInt("numContainers");
+      m.setMultipleContainers(numContainers > 1);
 
       return m;
     }
@@ -939,7 +955,6 @@ public class MisoClient implements Lims {
         String workflowType = workflowTypeMapper.get(rawWorkflowType);
         r.setWorkflowType(workflowType != null ? workflowType : rawWorkflowType);
       }
-      r.setContainerModel(rs.getString("containerModel"));
       r.setSequencingKit(rs.getString("sequencingKit"));
       r.setStatus(makeStatus(rs, "qcPassed", null, null, "qcDate", "qcUserId"));
 
@@ -965,6 +980,10 @@ public class MisoClient implements Lims {
 
       p.setPosition(rs.getInt("partitionNumber"));
       p.setRunId(rs.getInt("Run_runId"));
+      p.setContainerId(rs.getInt("containerId"));
+      p.setContainerModel(rs.getString("container_model"));
+      p.setInstrumentPosition(rs.getString("instrument_position"));
+      p.setSequencingParameters(rs.getString("sequencing_parameters"));
       p.setPartitionId(rs.getInt("partitionId"));
       p.setPoolId(rs.getInt("poolId"));
       p.setPoolName(rs.getString("pool_name"));
