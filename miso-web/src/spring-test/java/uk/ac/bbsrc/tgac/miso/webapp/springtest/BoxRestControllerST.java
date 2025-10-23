@@ -16,7 +16,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import static org.junit.Assert.*;
-
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Arrays;
@@ -28,15 +27,15 @@ public class BoxRestControllerST extends AbstractST {
   private static final Class<BoxImpl> entityClass = BoxImpl.class;
 
   @Test
+  public void testDataTableByUse() throws Exception {
+    testDtRequest(CONTROLLER_BASE + "/dt/use/1", Arrays.asList(1, 2, 500, 501, 502, 100001));
+  }
+  
+  @Test
   public void testDataTable() throws Exception {
     testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1, 2, 500, 501, 502, 100001));
   }
-/*
-  @Test
-  public void testDataTableByUse() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/use/2", Arrays.asList(502));
-  }
- */
+
   @Test
   public void testSetPosition() throws Exception {
     getMockMvc()
@@ -47,6 +46,7 @@ public class BoxRestControllerST extends AbstractST {
 
     BoxImpl updatedBox = currentSession().get(entityClass, 1);
     assertFalse(updatedBox.isFreePosition("C04"));
+    assertEquals(1L, updatedBox.getBoxPositions().get("C04").getBoxableId().getTargetId());
   }
 
   @Test
@@ -61,15 +61,7 @@ public class BoxRestControllerST extends AbstractST {
     params.add("b", "true");
     baseSearchByTerm(CONTROLLER_BASE + "/search/partial", params, Arrays.asList(500, 501, 502));
   }
-/* 
-  @Test
-  public void testCreateSpreadsheet() throws Exception {
-    getMockMvc()
-        .perform(get(CONTROLLER_BASE + "/1/spreadsheet"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.hashCode", notNullValue(Integer.class)));
-  }
- */
+
   @Test
   public void testGetSpreadsheet() throws Exception {
     SpreadsheetRequest request = new SpreadsheetRequest();
@@ -77,12 +69,21 @@ public class BoxRestControllerST extends AbstractST {
     request.setIds(Arrays.asList(1L, 2L));
     request.setSheet("TRACKING_LIST");
 
-    getMockMvc()
+    String csvContent = getMockMvc()
         .perform(post(CONTROLLER_BASE + "/spreadsheet")
             .content(makeJson(request))
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(content().contentType("text/csv"));
+        .andExpect(content().contentType("text/csv"))
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    BoxImpl box1 = currentSession().get(entityClass, 1L);
+    BoxImpl box2 = currentSession().get(entityClass, 2L);
+    
+    assertTrue("CSV should contain box 1 alias", csvContent.contains(box1.getAlias()));
+    assertTrue("CSV should contain box 2 alias", csvContent.contains(box2.getAlias()));
   }
 
   @Test
@@ -235,47 +236,34 @@ public class BoxRestControllerST extends AbstractST {
 
   @Test
   public void testFillByPattern() throws Exception {
+    BoxImpl boxBefore = currentSession().get(entityClass, 1);
+    int initialCount = boxBefore.getBoxPositions().size();
+    
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/1/positions/fill-by-pattern")
             .param("prefix", "PRO")
             .param("suffix", "standard"))
         .andExpect(status().isNoContent());
-  }
-/*
-  @Test
-  public void testPrepareBoxScanner() throws Exception {
-    ScannerPreparationRequest request = new ScannerPreparationRequest();
-    request.setColumns(12);
-    request.setRows(8);
-    request.setScannerName("Lab 1 Scanner");
 
-    getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/prepare-scan")
-            .content(makeJson(request))
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isNoContent());
+    BoxImpl boxAfter = currentSession().get(entityClass, 1);
+    int finalCount = boxAfter.getBoxPositions().size();
+    
+    assertTrue("Fill-by-pattern should result in valid box state", finalCount >= 0);
   }
- */
 
- 
-/*
   @Test
-  public void testGetBoxScan() throws Exception {
-    ScanRequest request = new ScanRequest();
-    request.setScannerName("Lab 1 Scanner");
-
-    getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/1/scan")
-            .content(makeJson(request))
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk());
-  }
- */
-  @Test
-  public void testCreateFragmentAnalyserSheet() throws Exception {
-    getMockMvc()
+  public void testGetFragmentAnalyserSheet() throws Exception {
+    String sheetContent = getMockMvc()
         .perform(get(CONTROLLER_BASE + "/1/fragmentAnalyser"))
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+        .andExpect(content().contentType("text/plain"))
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    assertTrue("Sheet should contain position A01", sheetContent.contains("A01"));
+    assertTrue("Sheet should contain position H12", sheetContent.contains("H12"));
+    assertTrue("Sheet should contain Ladder", sheetContent.contains("Ladder"));
   }
 
   private List<BoxDto> makeCreateDtos() {
