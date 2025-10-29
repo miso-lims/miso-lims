@@ -1477,10 +1477,7 @@ Urls = (function () {
 
   // External sites
   external.userManual = function (section, subsection) {
-    var url =
-      "https://miso-lims.readthedocs.io/projects/docs/en/" +
-      Constants.docsVersion +
-      "/user_manual/";
+    var url = "https://miso-lims.readthedocs.io/en/" + Constants.docsVersion + "/user_manual/";
     if (section) {
       url += section + "/";
       if (subsection) {
