@@ -4,7 +4,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>3.13.1-SNAPSHOT</version>
+    <version>3.14.0</version>
   </parent>
   <artifactId>integration-tools</artifactId>
   <packaging>jar</packaging>
