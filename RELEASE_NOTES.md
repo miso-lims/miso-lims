@@ -7,6 +7,22 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.14.0] - 2025-10-31
+
+### Changed
+
+* The following fields will now accept numbers with up to 6 digits before the decimal.
+  * "Concentration" field in samples, libraries, library aliquots, pool.
+  * "Parent ng Used" field in samples, libraries, library aliquots.
+  * "Initial Cell Concentration" in Single Cell samples (detailed sample).
+  * "Loading Cell Concentration" in Single Cell and Single Cell (stock) samples (detailed sample).
+
+### Fixed
+
+* Pinery now supports runs with multiple containers
+* 'Help' link to user manual
+
+
 ## [3.13.0] - 2025-10-09
 
 ### Added
