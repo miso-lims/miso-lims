@@ -5,7 +5,7 @@ anything is missing, please[let us know](https://github.com/miso-lims/miso-lims/
 
 Before developing MISO, the best first step is to set up your development environment and get MISO
 running. You can do that by following the
-[Bare Metal Install Guide](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/baremetal-installation-guide/).
+[Bare Metal Install Guide](https://miso-lims.readthedocs.io/en/latest/admin/baremetal-installation-guide/).
 
 ## Module Overview
 
@@ -120,7 +120,7 @@ plugin that is already configured for MISO.
 
 3. You should already have a database and user from your initial MISO setup. If not, create them
 now. See the
-[Bare Metal Install Guide](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/baremetal-installation-guide/).
+[Bare Metal Install Guide](https://miso-lims.readthedocs.io/en/latest/admin/baremetal-installation-guide/).
 4. Configure the Maven Flyway plugin to access your database. This is done by creating the file:
 `miso-lims/sqlstore/flyway.properties`. Replace the port, username, password, and database name
 below if necessary. This file is gitignored, so you don't have to worry about your credentials
