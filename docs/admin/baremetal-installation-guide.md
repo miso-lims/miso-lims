@@ -197,7 +197,7 @@ If using JDBC, once running, you should change the passwords of the `admin` and
 It is not required for a functioning MISO install, but without it, sequencer runs must be added manually.
 
 Please see the
-[Run Scanner Installation and Setup Guide](https://miso-lims.readthedocs.io/projects/runscanner/en/latest/installation/)
+[Run Scanner Installation and Setup Guide](https://runscanner.readthedocs.io/en/latest/installation/)
 for setup instructions.
 
 Once complete, edit `$CATALINA_HOME/conf/Catalina/localhost/miso.properties` of the MISO Tomcat server and set
