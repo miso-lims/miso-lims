@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.springframework.web.context.WebApplicationContext;
@@ -8,7 +7,15 @@ import org.springframework.web.context.WebApplicationContext;
 import jakarta.servlet.ServletContextEvent;
 import uk.ac.bbsrc.tgac.miso.webapp.context.MisoAppListener;
 
-
+/**
+ * The point of this class is to run MisoAppListener#contextInitialized, which does a bunch of
+ * setup.
+ * 
+ * One thing that does not work here is injecting/autowiring dependencies into the naming scheme
+ * objects. This might be because it's running before the context is fully initialized and/or
+ * because it's a mock context, which also does not support the addListener method, which would
+ * otherwise be more ideal.
+ */
 public class SpringTestExecutionListener extends AbstractTestExecutionListener {
 
   private static boolean initialized = false;
@@ -18,9 +25,7 @@ public class SpringTestExecutionListener extends AbstractTestExecutionListener {
     if (!initialized) {
       initialized = true;
       WebApplicationContext wac = (WebApplicationContext) testContext.getApplicationContext();
-      MockServletContext ctx = new MockServletContext();
-      ctx.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, wac);
-      new MisoAppListener().contextInitialized(new ServletContextEvent(ctx));
+      new MisoAppListener().contextInitialized(new ServletContextEvent(wac.getServletContext()));
     }
   }
 }

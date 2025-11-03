@@ -35,7 +35,7 @@ public class KitDescriptorRestControllerST extends AbstractST {
 
   @Test
   public void testDatatable() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1, 2, 3, 4));
+    testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1, 2, 3, 4, 5));
   }
 
   @Test
@@ -49,7 +49,7 @@ public class KitDescriptorRestControllerST extends AbstractST {
 
   @Test
   public void testListAll() throws Exception {
-    testListAll(CONTROLLER_BASE, Arrays.asList(1, 2, 3, 4));
+    testListAll(CONTROLLER_BASE, Arrays.asList(1, 2, 3, 4, 5));
   }
 
   @Test
