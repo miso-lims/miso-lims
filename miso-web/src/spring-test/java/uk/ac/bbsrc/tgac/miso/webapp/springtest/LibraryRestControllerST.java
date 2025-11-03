@@ -174,7 +174,7 @@ public class LibraryRestControllerST extends AbstractST {
   }
 
   @Test
-  public void testGetLibrariesByWorkstation() throws Exception {
+  public void testDatatableByWorkset() throws Exception {
     testDtRequest(CONTROLLER_BASE + "/dt/workset/1", Arrays.asList(100001, 100002, 100003));
   }
 
