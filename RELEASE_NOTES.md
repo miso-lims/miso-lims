@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.14.1] - 2025-11-06
+
+### Fixed
+
+* errors retrieving runs via Pinery
+
+
 ## [3.14.0] - 2025-10-31
 
 ### Changed
