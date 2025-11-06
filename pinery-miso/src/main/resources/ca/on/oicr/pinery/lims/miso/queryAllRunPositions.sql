@@ -1,4 +1,5 @@
 SELECT spc.containerId
+  ,spc.identificationBarcode AS container_barcode
   ,ipos.alias AS instrument_position
   ,sp.name AS sequencing_parameters
   ,scm.alias AS container_model

@@ -460,12 +460,9 @@ public class MisoClient implements Lims {
     Map<Integer, Map<Integer, MisoRunContainer>> containersByRunIdAndId = new HashMap<>();
     for (MisoRunPosition position : positions) {
       Map<Integer, MisoRunContainer> containersById =
-          containersByRunIdAndId.computeIfAbsent(position.getRunId(), runId -> {
-            Map<Integer, MisoRunContainer> map = new HashMap<>();
-            map.put(position.getContainerId(), position.makeRunContainer());
-            return map;
-          });
-      MisoRunContainer container = containersById.get(position.getContainerId());
+          containersByRunIdAndId.computeIfAbsent(position.getRunId(), runId -> new HashMap<>());
+      MisoRunContainer container =
+          containersById.computeIfAbsent(position.getContainerId(), containerId -> position.makeRunContainer());
       container.getPositions().add(position);
     }
     containersByRunIdAndId.forEach((runId, containersById) -> {
@@ -936,7 +933,6 @@ public class MisoClient implements Lims {
 
       r.setState(rs.getString("health"));
       r.setName(rs.getString("alias"));
-      r.setBarcode(rs.getString("identificationBarcode"));
       r.setInstrumentId(rs.getInt("instrumentId"));
       r.setCreatedById(rs.getInt("creator"));
       r.setCreatedDate(rs.getTimestamp("created"));
@@ -981,6 +977,7 @@ public class MisoClient implements Lims {
       p.setPosition(rs.getInt("partitionNumber"));
       p.setRunId(rs.getInt("Run_runId"));
       p.setContainerId(rs.getInt("containerId"));
+      p.setBarcode(rs.getString("container_barcode"));
       p.setContainerModel(rs.getString("container_model"));
       p.setInstrumentPosition(rs.getString("instrument_position"));
       p.setSequencingParameters(rs.getString("sequencing_parameters"));
