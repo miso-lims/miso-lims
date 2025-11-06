@@ -7,11 +7,20 @@ import ca.on.oicr.pinery.lims.DefaultRunPosition;
 public class MisoRunPosition extends DefaultRunPosition {
 
   private Integer runId;
+  private String barcode;
   private Integer containerId;
   private Integer partitionId;
   private String instrumentPosition;
   private String containerModel;
   private String sequencingParameters;
+
+  public String getBarcode() {
+    return barcode;
+  }
+
+  public void setBarcode(String barcode) {
+    this.barcode = barcode;
+  }
 
   public Integer getRunId() {
     return runId;
@@ -64,6 +73,7 @@ public class MisoRunPosition extends DefaultRunPosition {
   public MisoRunContainer makeRunContainer() {
     MisoRunContainer container = new MisoRunContainer();
     container.setContainerId(containerId);
+    container.setBarcode(barcode);
     container.setContainerModel(containerModel);
     container.setInstrumentPosition(instrumentPosition);
     container.setSequencingParameters(sequencingParameters);
@@ -76,6 +86,7 @@ public class MisoRunPosition extends DefaultRunPosition {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + ((runId == null) ? 0 : runId.hashCode());
+    result = prime * result + ((barcode == null) ? 0 : barcode.hashCode());
     result = prime * result + ((containerId == null) ? 0 : containerId.hashCode());
     result = prime * result + ((partitionId == null) ? 0 : partitionId.hashCode());
     result = prime * result + ((instrumentPosition == null) ? 0 : instrumentPosition.hashCode());
@@ -102,6 +113,11 @@ public class MisoRunPosition extends DefaultRunPosition {
       if (other.containerId != null)
         return false;
     } else if (!containerId.equals(other.containerId))
+      return false;
+    if (barcode == null) {
+      if (other.barcode != null)
+        return false;
+    } else if (!barcode.equals(other.barcode))
       return false;
     if (partitionId == null) {
       if (other.partitionId != null)
