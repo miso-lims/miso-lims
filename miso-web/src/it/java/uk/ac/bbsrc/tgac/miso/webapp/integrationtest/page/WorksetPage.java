@@ -39,6 +39,7 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
   private static final String samplesTableWrapper = "list_samples_wrapper";
   private static final String librariesTableWrapper = "list_libraries_wrapper";
   private static final String libraryAliquotsTableWrapper = "list_libraryAliquots_wrapper";
+  private static final String poolsTableWrapper = "list_pools_wrapper";
 
   private static final By okSelector = By.id("ok");
 
@@ -50,6 +51,7 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
   private DataTable samplesTable = null;
   private DataTable librariesTable = null;
   private DataTable libraryAliquotsTable = null;
+  private DataTable poolsTable = null;
 
   public WorksetPage(WebDriver driver) {
     super(driver, "worksetForm");
@@ -63,6 +65,9 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
     }
     if (findElementIfExists(By.id(libraryAliquotsTableWrapper)) != null) {
       libraryAliquotsTable = new DataTable(driver, libraryAliquotsTableWrapper);
+    }
+    if (findElementIfExists(By.id(poolsTableWrapper)) != null) {
+      poolsTable = new DataTable(driver, poolsTableWrapper);
     }
   }
 
@@ -124,6 +129,10 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
     return getNames(libraryAliquotsTable);
   }
 
+  public List<String> getPoolNames(){
+    return getNames(poolsTable);
+  }
+
   private List<String> getNames(DataTable table) {
     if (table == null) {
       return Collections.emptyList();
@@ -142,6 +151,10 @@ public class WorksetPage extends FormPage<WorksetPage.Field> {
 
   public WorksetPage removeLibraryAliquotsByName(List<String> names) {
     return removeMembersByName(names, libraryAliquotsTable);
+  }
+
+  public WorksetPage removePoolsByName(List<String> names){
+    return removeMembersByName(names, poolsTable);
   }
 
   private WorksetPage removeMembersByName(List<String> names, DataTable table) {

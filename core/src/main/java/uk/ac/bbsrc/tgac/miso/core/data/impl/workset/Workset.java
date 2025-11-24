@@ -83,6 +83,9 @@ public class Workset implements Serializable, Aliasable, ChangeLoggable, Deletab
   @OneToMany(mappedBy = "workset", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<WorksetLibraryAliquot> worksetLibraryAliquots;
 
+  @OneToMany(mappedBy = "workset", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<WorksetPool> worksetPools;
+
   @ManyToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "creator", nullable = false, updatable = false)
   private User creator;
@@ -196,6 +199,17 @@ public class Workset implements Serializable, Aliasable, ChangeLoggable, Deletab
 
   public void setWorksetLibraryAliquots(Set<WorksetLibraryAliquot> worksetLibraryAliquots) {
     this.worksetLibraryAliquots = worksetLibraryAliquots;
+  }
+
+  public Set<WorksetPool> getWorksetPools() {
+    if (worksetPools == null) {
+      worksetPools = new HashSet<>();
+    }
+    return worksetPools;
+  }
+
+  public void setWorksetPools(Set<WorksetPool> worksetPools) {
+    this.worksetPools = worksetPools;
   }
 
   @Override

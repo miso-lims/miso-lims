@@ -25,6 +25,7 @@ import com.eaglegenomics.simlims.core.Note;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.WorksetChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
@@ -33,12 +34,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetItem;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetPool;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetCategoryService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetStageService;
@@ -69,6 +72,8 @@ public class DefaultWorksetService implements WorksetService {
   @Autowired
   private LibraryAliquotService libraryAliquotService;
   @Autowired
+  private PoolService poolService;
+  @Autowired
   private ChangeLogService changeLogService;
   @Autowired
   private DeletionStore deletionStore;
@@ -93,6 +98,10 @@ public class DefaultWorksetService implements WorksetService {
 
   public void setLibraryAliquotService(LibraryAliquotService libraryAliquotService) {
     this.libraryAliquotService = libraryAliquotService;
+  }
+
+  public void setPoolService(PoolService poolService) {
+    this.poolService = poolService;
   }
 
   public void setDeletionStore(DeletionStore deletionStore) {
@@ -138,6 +147,11 @@ public class DefaultWorksetService implements WorksetService {
   @Override
   public List<Workset> listByLibraryAliquot(long aliquotId) throws IOException {
     return worksetStore.listByLibraryAliquot(aliquotId);
+  }
+
+  @Override
+  public List<Workset> listByPool(long poolId) throws IOException {
+    return worksetStore.listByPool(poolId);
   }
 
   @Override
@@ -269,6 +283,11 @@ public class DefaultWorksetService implements WorksetService {
   }
 
   @Override
+  public void addPools(Workset workset, Collection<Pool> items) throws IOException {
+    addItems(workset, null, items, Workset::getWorksetPools, WorksetPool::new, poolService, Pluralizer.pools(items.size()));
+  }
+
+  @Override
   public void removeSamples(Workset workset, Collection<Sample> items) throws IOException {
     removeItems(workset, null, items, Workset::getWorksetSamples, Pluralizer.samples(items.size()));
   }
@@ -281,6 +300,11 @@ public class DefaultWorksetService implements WorksetService {
   @Override
   public void removeLibraryAliquots(Workset workset, Collection<LibraryAliquot> items) throws IOException {
     removeItems(workset, null, items, Workset::getWorksetLibraryAliquots, Pluralizer.libraryAliquots(items.size()));
+  }
+
+  @Override
+  public void removePools(Workset workset, Collection<Pool> items) throws IOException {
+    removeItems(workset, null, items, Workset::getWorksetPools, Pluralizer.pools(items.size()));
   }
 
   @Override
@@ -300,6 +324,12 @@ public class DefaultWorksetService implements WorksetService {
     moveItems(from, to, items, Pluralizer.libraryAliquots(items.size()), Workset::getWorksetLibraryAliquots,
         WorksetLibraryAliquot::new,
         libraryAliquotService);
+  }
+
+   @Override
+  public void movePools(Workset from, Workset to, Collection<Pool> items) throws IOException {
+    moveItems(from, to, items, Pluralizer.pools(items.size()), Workset::getWorksetPools, WorksetPool::new,
+        poolService);
   }
 
   private <T extends Boxable, J extends WorksetItem<T>> void addItems(Workset toWorkset, Workset fromWorkset,
@@ -392,6 +422,11 @@ public class DefaultWorksetService implements WorksetService {
   @Override
   public Map<Long, Date> getLibraryAliquotAddedTimes(long worksetId) throws IOException {
     return worksetStore.getLibraryAliquotAddedTimes(worksetId);
+  }
+
+  @Override
+  public Map<Long, Date> getPoolAddedTimes(long worksetId) throws IOException {
+    return worksetStore.getPoolAddedTimes(worksetId);
   }
 
 }
