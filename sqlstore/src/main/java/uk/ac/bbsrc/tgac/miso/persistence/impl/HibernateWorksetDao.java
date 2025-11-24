@@ -15,11 +15,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibraryAliquot_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibrary_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetPool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetPool_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset_;
@@ -68,6 +72,16 @@ public class HibernateWorksetDao extends HibernateSaveDao<Workset> implements Wo
   }
 
   @Override
+  public List<Workset> listByPool(long poolId) {
+    QueryBuilder<Workset, Workset> builder = new QueryBuilder<>(currentSession(), Workset.class, Workset.class);
+    Join<Workset, WorksetPool> worksetPool = builder.getJoin(builder.getRoot(), Workset_.worksetPools);
+    Join<WorksetPool, PoolImpl> pool = builder.getJoin(worksetPool, WorksetPool_.item);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(pool.get(PoolImpl_.poolId), poolId));
+    return builder.getResultList();
+  }
+
+
+  @Override
   public Map<Long, Date> getSampleAddedTimes(long worksetId) {
     QueryBuilder<Object[], WorksetSample> builder =
         new QueryBuilder<>(currentSession(), WorksetSample.class, Object[].class);
@@ -86,6 +100,17 @@ public class HibernateWorksetDao extends HibernateSaveDao<Workset> implements Wo
     Join<WorksetLibrary, LibraryImpl> library = builder.getJoin(builder.getRoot(), WorksetLibrary_.item);
     builder.addPredicate(builder.getCriteriaBuilder().equal(workset.get(Workset_.id), worksetId));
     builder.setColumns(library.get(LibraryImpl_.libraryId), builder.getRoot().get(WorksetLibrary_.addedTime));
+    return filterResults(builder.getResultList());
+  }
+
+   @Override
+  public Map<Long, Date> getPoolAddedTimes(long worksetId) {
+    QueryBuilder<Object[], WorksetPool> builder =
+        new QueryBuilder<>(currentSession(), WorksetPool.class, Object[].class);
+    Join<WorksetPool, Workset> workset = builder.getJoin(builder.getRoot(), WorksetPool_.workset);
+    Join<WorksetPool, PoolImpl> pool = builder.getJoin(builder.getRoot(), WorksetPool_.item);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(workset.get(Workset_.id), worksetId));
+    builder.setColumns(pool.get(PoolImpl_.poolId), builder.getRoot().get(WorksetPool_.addedTime));
     return filterResults(builder.getResultList());
   }
 
