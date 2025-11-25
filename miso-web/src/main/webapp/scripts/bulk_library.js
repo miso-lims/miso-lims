@@ -373,22 +373,25 @@ BulkTarget.library = (function ($) {
             });
             var source = [];
             if (project && config.templatesByProjectId[project.id]) {
-              var parentSampleClassAlias = api.getValue(rowIndex, "sample.sampleClassId");
-              var parentSampleClass = Utils.array.findUniqueOrThrow(
-                Utils.array.aliasPredicate(parentSampleClassAlias),
-                Constants.sampleClasses
-              );
-              source = config.templatesByProjectId[project.id].filter(function (template) {
-                return (
-                  !template.designId ||
-                  Constants.libraryDesigns.some(function (design) {
-                    return (
-                      design.id === template.designId &&
-                      design.sampleClassId === parentSampleClass.id
-                    );
-                  })
+              source = config.templatesByProjectId[project.id];
+              if (Constants.isDetailedSample) {
+                var parentSampleClassAlias = api.getValue(rowIndex, "sample.sampleClassId");
+                var parentSampleClass = Utils.array.findUniqueOrThrow(
+                  Utils.array.aliasPredicate(parentSampleClassAlias),
+                  Constants.sampleClasses
                 );
-              });
+                source = source.filter(function (template) {
+                  return (
+                    !template.designId ||
+                    Constants.libraryDesigns.some(function (design) {
+                      return (
+                        design.id === template.designId &&
+                        design.sampleClassId === parentSampleClass.id
+                      );
+                    })
+                  );
+                });
+              }
             }
             api.updateField(rowIndex, "template", {
               source: source,
