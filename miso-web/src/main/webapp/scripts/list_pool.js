@@ -92,7 +92,7 @@ ListTarget.pool = {
   createStaticActions: function (config, prodjectId) {
     return [
       {
-        name: "Add",
+        name: "Create",
         handler: function () {
           window.location = Urls.ui.pools.create;
         },
