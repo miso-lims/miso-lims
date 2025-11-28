@@ -723,6 +723,7 @@ Urls = (function () {
     dragenSamplesheet: poolRestBase + "/dragensamplesheet",
     bulkSave: poolRestBase + "/bulk",
     bulkSaveProgress: idUrlFunction(poolRestBase + "/bulk"),
+    worksetDatatable: idUrlFunction(poolRestBase + "/dt/workset"),
   };
 
   // Pool Orders

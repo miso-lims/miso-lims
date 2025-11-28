@@ -6,7 +6,9 @@ ListTarget.pool = {
   createUrl: function (config, projectId) {
     if (projectId) {
       return Urls.rest.pools.projectDatatable(projectId);
-    } else {
+    }else if (config.worksetId) {
+      return Urls.rest.pools.worksetDatatable(config.worksetId);
+    }else {
       return Urls.rest.pools.platformDatatable(config.platformType);
     }
   },
@@ -41,6 +43,16 @@ ListTarget.pool = {
         });
       },
     });
+
+    if (config.worksetId) {
+      actions.push(
+        BulkUtils.actions.moveFromWorkset(
+          "pools",
+          Urls.rest.worksets.movePools(config.worksetId)
+        )
+      );
+    }
+
     actions.push({
       name: "Merge",
       action: function (pools) {
@@ -178,6 +190,14 @@ ListTarget.pool = {
         include: Constants.isDetailedSample,
         iSortPriority: 2,
       },
+      {
+          sTitle: "Added",
+          mData: "worksetAddedTime",
+          sDefaultContent: "n/a",
+          mRender: ListUtils.render.naIfNull,
+          include: config.worksetId,
+          bSortable: false,
+        },
     ];
   },
   searchTermSelector: function (searchTerms) {

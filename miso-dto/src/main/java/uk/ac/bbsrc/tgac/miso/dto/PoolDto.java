@@ -40,6 +40,7 @@ public class PoolDto extends AbstractBoxableDto {
   private boolean hasEmptySequence;
   private Set<String> prioritySubprojectAliases;
   private boolean mergeChild;
+  private String worksetAddedTime;
 
   public String getAlias() {
     return alias;
@@ -150,7 +151,11 @@ public class PoolDto extends AbstractBoxableDto {
     this.identificationBarcode = identificationBarcode;
   }
 
-  public void setLastModified(String lastModified) {
+    public void setWorksetAddedTime(String worksetAddedTime) {
+        this.worksetAddedTime = worksetAddedTime;
+    }
+
+    public void setLastModified(String lastModified) {
     this.lastModified = lastModified;
   }
 
