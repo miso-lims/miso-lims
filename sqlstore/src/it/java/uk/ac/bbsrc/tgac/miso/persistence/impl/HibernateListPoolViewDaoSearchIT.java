@@ -13,7 +13,7 @@ public class HibernateListPoolViewDaoSearchIT extends PaginationFilterSinkIT {
       EnumSet.of(SearchType.QUERY, SearchType.ID, SearchType.IDS,
           SearchType.INDEX, SearchType.BOX, SearchType.PROJECT, SearchType.PLATFORM_TYPE, SearchType.FREEZER,
           SearchType.DISTRIBUTION_RECIPIENT, SearchType.CREATED, SearchType.ENTERED, SearchType.UPDATED,
-          SearchType.CREATOR, SearchType.MODIFIER, SearchType.DISTRIBUTED, SearchType.RECEIVED, SearchType.BARCODE);
+          SearchType.CREATOR, SearchType.MODIFIER, SearchType.DISTRIBUTED, SearchType.RECEIVED, SearchType.BARCODE, SearchType.WORKSET);
   private static final List<String> SORT_FIELDS = Arrays.asList("alias", "creationDate");
 
   public HibernateListPoolViewDaoSearchIT() {
@@ -24,6 +24,7 @@ public class HibernateListPoolViewDaoSearchIT extends PaginationFilterSinkIT {
   protected PaginatedDataSource<?> constructTestSubject() {
     HibernateListPoolViewDao sut = new HibernateListPoolViewDao();
     sut.setEntityManager(getEntityManager());
+    sut.restrictPaginationByWorksetId(queryBuilder, builder, 1L);
     return sut;
   }
 
