@@ -24,7 +24,6 @@ public class HibernateListPoolViewDaoSearchIT extends PaginationFilterSinkIT {
   protected PaginatedDataSource<?> constructTestSubject() {
     HibernateListPoolViewDao sut = new HibernateListPoolViewDao();
     sut.setEntityManager(getEntityManager());
-    sut.restrictPaginationByWorksetId(queryBuilder, builder, 1L);
     return sut;
   }
 
