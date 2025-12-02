@@ -6,9 +6,9 @@ ListTarget.pool = {
   createUrl: function (config, projectId) {
     if (projectId) {
       return Urls.rest.pools.projectDatatable(projectId);
-    }else if (config.worksetId) {
+    }else if (config && config.worksetId) {
       return Urls.rest.pools.worksetDatatable(config.worksetId);
-    }else {
+    }else{
       return Urls.rest.pools.platformDatatable(config.platformType);
     }
   },
@@ -44,7 +44,7 @@ ListTarget.pool = {
       },
     });
 
-    if (config.worksetId) {
+    if (config && config.worksetId) {
       actions.push(
         BulkUtils.actions.moveFromWorkset(
           "pools",
@@ -195,7 +195,7 @@ ListTarget.pool = {
           mData: "worksetAddedTime",
           sDefaultContent: "n/a",
           mRender: ListUtils.render.naIfNull,
-          include: config.worksetId,
+          include: config && config.worksetId,
           bSortable: false,
         },
     ];

@@ -151,7 +151,7 @@ BulkTarget.pool = (function ($) {
       ]
         .concat(BulkUtils.actions.qc("Pool"))
         .concat([
-          config.worksetId
+          config && config.worksetId
             ? BulkUtils.actions.removeFromWorkset(
                 "pools",
                 Urls.rest.worksets.removePools(config.worksetId)
