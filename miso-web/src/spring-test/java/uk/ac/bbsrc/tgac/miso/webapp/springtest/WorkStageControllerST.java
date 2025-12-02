@@ -27,7 +27,6 @@ public class WorkStageControllerST extends AbstractST {
     public void testList() throws Exception {
         List<Long> ids = Arrays.asList(4L, 1L, 2L, 3L);
         String resultJson = testStaticListPage(CONTROLLER_BASE + "/list", "data");
-        System.out.println("------>"+resultJson);
         assertDbVsModelObjects(resultJson, ids);
     }
 
