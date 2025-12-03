@@ -177,6 +177,7 @@ public class DefaultWorksetService implements WorksetService {
     loadMembers(newWorkset, newWorkset.getWorksetSamples(), sampleService, timestamp);
     loadMembers(newWorkset, newWorkset.getWorksetLibraries(), libraryService, timestamp);
     loadMembers(newWorkset, newWorkset.getWorksetLibraryAliquots(), libraryAliquotService, timestamp);
+    loadMembers(newWorkset,newWorkset.getWorksetPools(), poolService, timestamp);
   }
 
   private <T extends Boxable, J extends WorksetItem<T>> void loadMembers(Workset workset, Collection<J> worksetItems,
