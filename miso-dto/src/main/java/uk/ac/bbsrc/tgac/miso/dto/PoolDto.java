@@ -106,6 +106,8 @@ public class PoolDto extends AbstractBoxableDto {
     return qcPassed;
   }
 
+  public String getWorsetAddedTime() { return worksetAddedTime; }
+
   public void setAlias(String alias) {
     this.alias = alias;
   }
@@ -151,11 +153,11 @@ public class PoolDto extends AbstractBoxableDto {
     this.identificationBarcode = identificationBarcode;
   }
 
-    public void setWorksetAddedTime(String worksetAddedTime) {
+  public void setWorksetAddedTime(String worksetAddedTime) {
         this.worksetAddedTime = worksetAddedTime;
     }
 
-    public void setLastModified(String lastModified) {
+  public void setLastModified(String lastModified) {
     this.lastModified = lastModified;
   }
 

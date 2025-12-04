@@ -1073,6 +1073,10 @@ INSERT INTO Workset_Library(worksetId, libraryId, addedTime) VALUES
 INSERT INTO Workset_LibraryAliquot(worksetId, aliquotId, addedTime) VALUES
 (2, 1, '2021-03-08 13:59:00');
 
+INSERT INTO Workset_Pool(worksetId, poolId, addedTime) VALUES
+(1, 2, '2025-12-04 11:30:00'),
+(2, 2, '2025-12-04 11:30:00');
+
 INSERT INTO SequencingOrder(sequencingOrderId, poolId, partitions, parametersId, purposeId, sequencingContainerModelId, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 1, 1, 1, 1, NULL, 'seq order 1', 1, '2019-09-23 10:30:00', 1, '2019-09-23 10:30:00'),
 (2, 1, 2, 1, 1, 1, 'seq order 2', 1, '2021-02-22 10:46:00', 1, '2021-02-22 10:46:00');

@@ -144,6 +144,7 @@ DELETE FROM WorksetChangeLog;
 DELETE FROM Workset_Library;
 DELETE FROM Workset_LibraryAliquot;
 DELETE FROM Workset_Sample;
+DELETE FROM Workset_Pool;
 DELETE FROM WorksetStage;
 DELETE FROM Workstation;
 
