@@ -15,7 +15,7 @@ public class ListWorksetsControllerST extends AbstractST {
 
     @Test
     public void testListWorksets() throws Exception {
-
+        WorksetCategory cat = currentSession().get(WorksetCategory.class, 1L);
         getMockMvc().perform(get("/worksets"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/WEB-INF/pages/listTabbed.jsp"))
@@ -23,13 +23,8 @@ public class ListWorksetsControllerST extends AbstractST {
                 .andExpect(model().attribute("targetType", "ListTarget.workset"))
                 .andExpect(model().attribute("tabs", hasKey(Workset.ReservedWord.MINE.getText())))
                 .andExpect(model().attribute("tabs", hasKey(Workset.ReservedWord.ALL.getText())))
-                .andExpect(model().attribute("tabs", hasKey(Workset.ReservedWord.UNCATEGORIZED.getText())));
+                .andExpect(model().attribute("tabs", hasKey(Workset.ReservedWord.UNCATEGORIZED.getText())))
+                .andExpect(model().attribute("tabs", hasKey(cat.getAlias())));
 
-
-        WorksetCategory cat = currentSession().get(WorksetCategory.class, 1L);
-        if(cat != null){
-            getMockMvc().perform(get("/worksets"))
-                    .andExpect(model().attribute("tabs", hasKey(cat.getAlias())));
-        }
     }
 }
