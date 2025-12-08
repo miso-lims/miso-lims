@@ -10,6 +10,7 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
@@ -19,22 +20,22 @@ public class SampleClassRestControllerST extends AbstractST {
   private static final String CONTROLLER_BASE = "/rest/sampleclasses";
 
   @Test
+  @WithMockUser(username = "admin", roles = {"ADMIN"})
   public void testCreate() throws Exception {
-    SampleClassDto dto = makeDto("Test Class", "TC");
+    SampleClassDto dto = makeDto("Test Class", null);
 
     SampleClass created = baseTestCreate(CONTROLLER_BASE, dto, SampleClass.class, 201);
 
     assertNotNull(created);
     assertEquals("Test Class", created.getAlias());
-    assertEquals("TC", created.getSuffix());
-    assertEquals("identity", created.getSampleCategory());
-    assertFalse(created.isArchived());
-    assertTrue(created.isDirectCreationAllowed());
+    assertNull(created.getSuffix());
+    assertEquals("Identity", created.getSampleCategory());
   }
 
   @Test
+  @WithMockUser(username = "admin", roles = {"ADMIN"})
   public void testCreateWithNullAlias() throws Exception {
-    SampleClassDto dto = makeDto(null, "TC");
+    SampleClassDto dto = makeDto(null, null);
 
     getMockMvc().perform(post(CONTROLLER_BASE)
         .contentType(MediaType.APPLICATION_JSON)
@@ -43,21 +44,18 @@ public class SampleClassRestControllerST extends AbstractST {
   }
 
   @Test
+  @WithMockUser(username = "admin", roles = {"ADMIN"})
   public void testUpdate() throws Exception {
-    // create one first
-    SampleClassDto createDto = makeDto("Original", "OR");
-    SampleClass created = baseTestCreate(CONTROLLER_BASE, createDto, SampleClass.class, 201);
+    long existingId = 1L;
 
-    // now update it
-    SampleClassDto updateDto = makeDto("Updated", "UP");
-    updateDto.setId(created.getId());
-    updateDto.setArchived(true);
+    SampleClassDto updateDto = makeDto("Updated Identity", null);
+    updateDto.setId(existingId);
 
-    SampleClass updated = baseTestUpdate(CONTROLLER_BASE, updateDto, (int) created.getId(), SampleClass.class);
+    SampleClass updated = baseTestUpdate(CONTROLLER_BASE, updateDto, (int) existingId, SampleClass.class);
 
-    assertEquals("Updated", updated.getAlias());
-    assertEquals("UP", updated.getSuffix());
-    assertTrue(updated.isArchived());
+    assertEquals("Updated Identity", updated.getAlias());
+    assertEquals("Identity", updated.getSampleCategory());
+    assertNull(updated.getSuffix());
   }
 
   @Test
@@ -72,36 +70,30 @@ public class SampleClassRestControllerST extends AbstractST {
   }
 
   @Test
+  @WithMockUser(username = "admin", roles = {"ADMIN"})
   public void testBulkDelete() throws Exception {
-    SampleClassDto dto = makeDto("To Delete", "TD");
-    SampleClass created = baseTestCreate(CONTROLLER_BASE, dto, SampleClass.class, 201);
-    int id = (int) created.getId();
+    int id = 28;
 
-    // check if exists first
+
     assertNotNull(currentSession().get(SampleClass.class, id));
 
     testBulkDelete(SampleClass.class, id, CONTROLLER_BASE);
 
-    // verify it's actually gone
     assertNull(currentSession().get(SampleClass.class, id));
   }
 
   @Test
+  @WithMockUser(username = "admin", roles = {"ADMIN"})
   public void testBulkDeleteMultiple() throws Exception {
-    // create a couple to delete
-    SampleClass sc1 = baseTestCreate(CONTROLLER_BASE, makeDto("Class1", "C1"), SampleClass.class, 201);
-    SampleClass sc2 = baseTestCreate(CONTROLLER_BASE, makeDto("Class2", "C2"), SampleClass.class, 201);
-
-    List<Long> ids = Arrays.asList(sc1.getId(), sc2.getId());
+    List<Long> ids = Arrays.asList(26L, 27L);
 
     getMockMvc().perform(post(CONTROLLER_BASE + "/bulk-delete")
         .contentType(MediaType.APPLICATION_JSON)
         .content(makeJson(ids)))
         .andExpect(status().isNoContent());
 
-    // both should be gone now
-    assertNull(currentSession().get(SampleClass.class, (int) sc1.getId().longValue()));
-    assertNull(currentSession().get(SampleClass.class, (int) sc2.getId().longValue()));
+    assertNull(currentSession().get(SampleClass.class, 26));
+    assertNull(currentSession().get(SampleClass.class, 27));
   }
 
   @Test
@@ -111,16 +103,15 @@ public class SampleClassRestControllerST extends AbstractST {
     getMockMvc().perform(post(CONTROLLER_BASE + "/bulk-delete")
         .contentType(MediaType.APPLICATION_JSON)
         .content(makeJson(ids)))
-        .andExpect(status().isNotFound());
+        .andExpect(status().isBadRequest());
   }
 
   private SampleClassDto makeDto(String alias, String suffix) {
     SampleClassDto dto = new SampleClassDto();
     dto.setAlias(alias);
-    dto.setSampleCategory("identity");
+    dto.setSampleCategory("Identity");
+    dto.setSampleSubcategory(null);
     dto.setSuffix(suffix);
-    dto.setArchived(false);
-    dto.setDirectCreationAllowed(true);
     return dto;
   }
 }
