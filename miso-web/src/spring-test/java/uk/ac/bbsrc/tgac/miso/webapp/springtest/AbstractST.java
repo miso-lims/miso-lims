@@ -132,13 +132,9 @@ public abstract class AbstractST {
         ow = mapper.writer().withDefaultPrettyPrinter();
     }
 
-  protected EntityManager getEntityManager() {
-    return entityManager;
-  }
-
-  public Session currentSession() {
-    return entityManager.unwrap(Session.class);
-  }
+    protected EntityManager getEntityManager() {
+        return entityManager;
+    }
 
     public Session currentSession() {
         return entityManager.unwrap(Session.class);
@@ -152,20 +148,10 @@ public abstract class AbstractST {
         return script;
     }
 
-  /**
-   * Turns a generic list into JSON, maintaining the JSON type info
-   */
-  public <T> String makeJsonForGenericList(List<T> objects) throws Exception {
-    JavaType type = mapper.getTypeFactory().constructParametricType(List.class, objects.get(0).getClass());
-    String requestJson = mapper.writerFor(type).writeValueAsString(objects);
-    System.out.println(requestJson);
-    return requestJson;
-  }
-
-  @Test
-  public void initialization() {
-    assertNotNull(wac);
-  }
+    public String makeJson(Object obj) throws Exception {
+        String requestJson = ow.writeValueAsString(obj);
+        return requestJson;
+    }
 
     /**
      * Turns a generic list into JSON, maintaining the JSON type info
@@ -177,41 +163,53 @@ public abstract class AbstractST {
         return requestJson;
     }
 
-  protected String pollingResponse(String url) throws Exception {
-    String response = null;
-    ResultActions actions = null;
-    do {
-      if (response != null) {
-        Thread.sleep(500);
-      }
-      actions = getMockMvc().perform(get(url));
-      if (DEBUG_MODE) {
-        actions.andDo(print());
-      }
-      response = actions.andReturn().getResponse().getContentAsString();
-    } while ("running".equals(JsonPath.read(response, "$.status")));
-    return response;
-  }
+    @Test
+    public void initialization() {
+        assertNotNull(wac);
+    }
 
-  /**
-   * Creates new target entities in bulk (async) e.g. endpoints with a @PostMapping("/bulk") mapping
-   * 
-   * @param controllerBase Controller URL prefix
-   * @param createType Type of target entity to create
-   * @param dtos DTOs of target entities to create
-   * @return List of created target entities
-   * @throws Exception
-   */
-  protected <T> List<T> baseTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
-      throws Exception {
-    String response = pollingResponserHelper("post", dtos, controllerBase);
-    assertEquals("completed", JsonPath.read(response, "$.status"));
-    List<T> objects = new ArrayList<T>();
-    for (int i = 0; i < dtos.size(); i++) {
-      Integer id = JsonPath.read(response, "$.data[" + i + "].id");
-      T obj = currentSession().get(createType, id);
-      assertNotNull(obj);
-      objects.add(obj);
+    protected MockMvc getMockMvc() {
+        return mockMvc;
+    }
+
+    protected String pollingResponse(String url) throws Exception {
+        String response = null;
+        ResultActions actions = null;
+        do {
+            if (response != null) {
+                Thread.sleep(500);
+            }
+            actions = getMockMvc().perform(get(url));
+            if (DEBUG_MODE) {
+                actions.andDo(print());
+            }
+            response = actions.andReturn().getResponse().getContentAsString();
+        } while ("running".equals(JsonPath.read(response, "$.status")));
+        return response;
+    }
+
+    /**
+     * Creates new target entities in bulk (async) e.g. endpoints with a @PostMapping("/bulk") mapping
+     *
+     * @param controllerBase Controller URL prefix
+     * @param createType Type of target entity to create
+     * @param dtos DTOs of target entities to create
+     * @return List of created target entities
+     * @throws Exception
+     */
+    protected <T> List<T> baseTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
+            throws Exception {
+        String response = pollingResponserHelper("post", dtos, controllerBase);
+        assertEquals("completed", JsonPath.read(response, "$.status"));
+        List<T> objects = new ArrayList<T>();
+        for (int i = 0; i < dtos.size(); i++) {
+            Integer id = JsonPath.read(response, "$.data[" + i + "].id");
+            T obj = currentSession().get(createType, id);
+            assertNotNull(obj);
+            objects.add(obj);
+        }
+
+        return objects;
     }
 
     /**
@@ -233,44 +231,62 @@ public abstract class AbstractST {
         // request should fail without admin permissions
     }
 
-  /**
-   * Test Create Async but without proper authorization e.g. e.g. endpoints with
-   * a @PostMapping("/bulk") mapping
-   * 
-   * @param controllerBase Controller URL prefix
-   * @param createType Type of target entity to create
-   * @param dtos DTOs of target entities to create
-   */
-  protected <T> void testBulkCreateAsyncUnauthorized(String controllerBase, Class<T> createType, List<?> dtos)
-      throws Exception {
-    // tests failure for async create endpoints where admin permissions are required
-    String response = pollingResponserHelper("post", dtos, controllerBase);
-    assertEquals("failed", JsonPath.read(response, "$.status"));
-    if (DEBUG_MODE)
-      System.out.println(response);
-    assertEquals("An unexpected error has occurred", JsonPath.read(response, "$.detail"));
-    // request should fail without admin permissions
-  }
 
+    /**
+     * Sends a request to an async update endpoint and returns the resulting updated object. Note that
+     * the DTOs must be provided in order of IDs (lowest to highest). e.g. e.g. endpoints with
+     * a @PutMapping("/bulk") mapping
+     *
+     * @param <T> Target entity type
+     * @param <D> Target entity DTO type
+     * @param controllerBase Controller URL prefix
+     * @param updateType Type of target entity to be updated
+     * @param dtos DTOs for the target entities to be updated
+     * @param getId The getId method for the target entity
+     * @return List of updated entities
+     */
+    protected <T, D> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<D> dtos,
+                                                     Function<D, Long> getId)
+            throws Exception {
+        String response = pollingResponserHelper("put", dtos, controllerBase);
+        assertEquals("completed", JsonPath.read(response, "$.status"));
 
-  /**
-   * Sends a request to an async update endpoint and returns the resulting updated object. Note that
-   * the DTOs must be provided in order of IDs (lowest to highest). e.g. e.g. endpoints with
-   * a @PutMapping("/bulk") mapping
-   * 
-   * @param <T> Target entity type
-   * @param <D> Target entity DTO type
-   * @param controllerBase Controller URL prefix
-   * @param updateType Type of target entity to be updated
-   * @param dtos DTOs for the target entities to be updated
-   * @param getId The getId method for the target entity
-   * @return List of updated entities
-   */
-  protected <T, D> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<D> dtos,
-      Function<D, Long> getId)
-      throws Exception {
-    String response = pollingResponserHelper("put", dtos, controllerBase);
-    assertEquals("completed", JsonPath.read(response, "$.status"));
+        // check order of returned IDs
+        List<Long> ids = dtos.stream().map(getId).toList();
+        for (int i = 0; i < ids.size(); i++) {
+            assertEquals(ids.get(i).longValue(), ((Integer) JsonPath.read(response, "$.data[" + i + "].id")).longValue());
+            // the Integer cast is required, otherwise .longValue cannot be called
+            // since the ids are always Integers as received from the JSON response, this is a safe cast
+        }
+
+        List<T> objects = new ArrayList<T>();
+        for (Long id : ids) {
+            T obj = currentSession().get(updateType, id);
+            assertNotNull(obj);
+            objects.add(obj);
+        }
+        return objects;
+    }
+
+    /**
+     * Sends a request to an async update endpoint without proper authorization and asserts failure e.g.
+     * e.g. endpoints with a @PutMapping("/bulk") mapping
+     *
+     * @param <T> Target entity type
+     * @param controllerBase Controller URL prefix
+     * @param updateType Type of target entity to be updated
+     * @param dtos DTOs for the target entities to be updated
+     */
+    protected <T> void testBulkUpdateAsyncUnauthorized(String controllerBase, Class<T> createType, List<?> dtos)
+            throws Exception {
+        // tests failure for async update endpoints where admin permissions are required
+        String response = pollingResponserHelper("put", dtos, controllerBase);
+        assertEquals("failed", JsonPath.read(response, "$.status"));
+        if (DEBUG_MODE)
+            System.out.println(response);
+        assertEquals("An unexpected error has occurred", JsonPath.read(response, "$.detail"));
+        // request should fail without admin permissions
+    }
 
     /**
      * Helper method to send a request to an async endpoint, then calls pollingResponse to poll the
@@ -332,102 +348,19 @@ public abstract class AbstractST {
         return pollingResponserHelper(requestType, dtos, baseUrl + "/bulk", baseUrl + "/bulk", 202);
     }
 
-  /**
-   * Sends a request to an async update endpoint without proper authorization and asserts failure e.g.
-   * e.g. endpoints with a @PutMapping("/bulk") mapping
-   * 
-   * @param <T> Target entity type
-   * @param controllerBase Controller URL prefix
-   * @param updateType Type of target entity to be updated
-   * @param dtos DTOs for the target entities to be updated
-   */
-  protected <T> void testBulkUpdateAsyncUnauthorized(String controllerBase, Class<T> createType, List<?> dtos)
-      throws Exception {
-    // tests failure for async update endpoints where admin permissions are required
-    String response = pollingResponserHelper("put", dtos, controllerBase);
-    assertEquals("failed", JsonPath.read(response, "$.status"));
-    if (DEBUG_MODE)
-      System.out.println(response);
-    assertEquals("An unexpected error has occurred", JsonPath.read(response, "$.detail"));
-    // request should fail without admin permissions
-  }
 
-  /**
-   * Helper method to send a request to an async endpoint, then calls pollingResponse to poll the
-   * endpoint until the request is processed.
-   * 
-   * @param requestType either "put" for async update or "post" for async creation
-   * @param dtos dtos to create
-   * @param url url to send the request to
-   * @param pollingResponseUrlPrefix prefix for the URL to poll for the request status (running,
-   *        completed, or failed)
-   * @param expectedResponseCode expected response code for the async endpoint request, usually HTTP
-   *        202 ACCEPTED
-   * @return String JSON response from the endpoint
-   * @throws Exception
-   */
-  protected <D> String pollingResponserHelper(String requestType, List<D> dtos, String url,
-      String pollingResponseUrlPrefix,
-      int expectedResponseCode)
-      throws Exception {
-    // helper method for async requests
-    MvcResult mvcResult;
-    ResultActions ac;
-    switch (requestType) {
-      case "post":
-        ac = getMockMvc()
-            .perform(post(url).contentType(MediaType.APPLICATION_JSON).content(makeJsonForGenericList(dtos)));
-        break;
+    /**
+     * Tests the deletion of a single entity e.g. endpoints with a @PostMapping(value = "/bulk-delete")
+     * mapping
+     *
+     * @param deleteType Target entity type
+     * @param id Target entity ID
+     * @param controllerBase Controller URL prefix
+     */
+    protected <T> void testBulkDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
+        List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
 
-      case "put":
-        ac = getMockMvc()
-            .perform(put(url).contentType(MediaType.APPLICATION_JSON).content(makeJsonForGenericList(dtos)));
-        break;
-
-        // now check that the lab was actually deleted
-        assertNull(currentSession().get(deleteType, id));
-    }
-    if (DEBUG_MODE) {
-      ac.andDo(print());
-    }
-
-    mvcResult = ac.andExpect(status().is(expectedResponseCode)).andReturn();
-
-    String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-
-    return pollingResponse(pollingResponseUrlPrefix + "/" + id);
-  }
-
-  /**
-   * Overloaded method for cases where the polling response URL is the same as the url. This also
-   * assume that the expected response code is 202, or HTTP ACCEPTED, as is standard for Nearly all of
-   * the async endpoints
-   * 
-   * @param requestType either "put" for async update or "post" for async creation
-   * @param dtos dtos to create
-   * @param baseUrl base URL for the async request
-   * @return request response
-   */
-  private String pollingResponserHelper(String requestType, List<?> dtos, String baseUrl) throws Exception {
-    return pollingResponserHelper(requestType, dtos, baseUrl + "/bulk", baseUrl + "/bulk", 202);
-  }
-
-
-  /**
-   * Tests the deletion of a single entity e.g. endpoints with a @PostMapping(value = "/bulk-delete")
-   * mapping
-   * 
-   * @param deleteType Target entity type
-   * @param id Target entity ID
-   * @param controllerBase Controller URL prefix
-   */
-  protected <T> void testBulkDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
-    List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
-
-    assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
-
-    ResultActions ac = getMockMvc()
-        .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)));
+        assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
 
         ResultActions ac = getMockMvc()
                 .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)));
@@ -435,99 +368,111 @@ public abstract class AbstractST {
         if (DEBUG_MODE)
             ac.andDo(print());
 
-    // now check that the lab was actually deleted
-    assertNull(currentSession().get(deleteType, id));
-  }
+        ac.andExpect(status().isNoContent());
+
+        // now check that the lab was actually deleted
+        assertNull(currentSession().get(deleteType, id));
+    }
 
 
-  /**
-   * Tests the deletion of a single entity without proper authorization e.g. e.g. endpoints with
-   * a @PostMapping(value = "/bulk-delete") mapping
-   * 
-   * @param deleteType Target entity type
-   * @param id Target entity ID
-   * @param controllerBase Controller URL prefix
-   */
-  protected <T> void testDeleteUnauthorized(Class<T> deleteType, int id, String controllerBase) throws Exception {
-    List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
+    /**
+     * Tests the deletion of a single entity without proper authorization e.g. e.g. endpoints with
+     * a @PostMapping(value = "/bulk-delete") mapping
+     *
+     * @param deleteType Target entity type
+     * @param id Target entity ID
+     * @param controllerBase Controller URL prefix
+     */
+    protected <T> void testDeleteUnauthorized(Class<T> deleteType, int id, String controllerBase) throws Exception {
+        List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
 
-    assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
+        assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
 
-    ResultActions ac = getMockMvc()
-        .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)));
+        ResultActions ac = getMockMvc()
+                .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)));
 
-    if (DEBUG_MODE)
-      ac.andDo(print());
+        if (DEBUG_MODE)
+            ac.andDo(print());
 
-    ac.andExpect(status().isUnauthorized());
-    // this user doesn't have permissions to delete things
-  }
+        ac.andExpect(status().isUnauthorized());
+        // this user doesn't have permissions to delete things
+    }
 
-  /**
-   * Tests non-async creation of a single entity. Just a POST to the controller's base URL.
-   * 
-   * @param controllerBase Controller URL prefix
-   * @param dto DTO of entity to be created
-   * @param entityClass Type of entity to be created
-   * @param status Status to be returned in the case of success. THis is usually either 200 or 201
-   *        (HTTP OK or HTTP CREATED).
-   * @return Created entity
-   */
-  protected <T, D> T baseTestCreate(String controllerBase, D dto, Class<T> entityClass, int status)
-      throws Exception {
+    /**
+     * Tests non-async creation of a single entity. Just a POST to the controller's base URL.
+     *
+     * @param controllerBase Controller URL prefix
+     * @param dto DTO of entity to be created
+     * @param entityClass Type of entity to be created
+     * @param status Status to be returned in the case of success. THis is usually either 200 or 201
+     *        (HTTP OK or HTTP CREATED).
+     * @return Created entity
+     */
+    protected <T, D> T baseTestCreate(String controllerBase, D dto, Class<T> entityClass, int status)
+            throws Exception {
 
-    ResultActions ac = getMockMvc()
-        .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
+        ResultActions ac = getMockMvc()
+                .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
 
-    if (DEBUG_MODE)
-      ac.andDo(print());
+        if (DEBUG_MODE)
+            ac.andDo(print());
 
-    MvcResult result = ac.andExpect(status().is(status))
-        .andExpect(jsonPath("$").exists())
-        .andReturn();
-    Integer id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+        MvcResult result = ac.andExpect(status().is(status))
+                .andExpect(jsonPath("$").exists())
+                .andReturn();
+        Integer id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
 
-    T obj = currentSession().get(entityClass, id);
-    assertNotNull(obj);
-    return obj;
-  }
+        T obj = currentSession().get(entityClass, id);
+        assertNotNull(obj);
+        return obj;
+    }
 
-  /**
-   * Tests non-async creation failure of a single entity (lacking proper authorization) Just a POST to
-   * the controller's base URL.
-   * 
-   * @param controllerBase Controller URL prefix
-   * @param dto DTO of entity to be created
-   * @param entityClass Type of entity to be created
-   */
-  protected <T, D> void testCreateUnauthorized(String controllerBase, D dto, Class<T> entityClass)
-      throws Exception {
-    ResultActions ac = getMockMvc()
-        .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
+    /**
+     * Tests non-async creation failure of a single entity (lacking proper authorization) Just a POST to
+     * the controller's base URL.
+     *
+     * @param controllerBase Controller URL prefix
+     * @param dto DTO of entity to be created
+     * @param entityClass Type of entity to be created
+     */
+    protected <T, D> void testCreateUnauthorized(String controllerBase, D dto, Class<T> entityClass)
+            throws Exception {
+        ResultActions ac = getMockMvc()
+                .perform(post(controllerBase).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
 
-    if (DEBUG_MODE)
-      ac.andDo(print());
-    ac.andExpect(status().isUnauthorized());
-  }
+        if (DEBUG_MODE)
+            ac.andDo(print());
+        ac.andExpect(status().isUnauthorized());
+    }
 
-  /**
-   * Non-async template update test for a single entity. e.g. Endpoints with
-   * a @PutMapping("/{entityId}") mapping.
-   * 
-   * @param <T> Target entity type
-   * @param <D> Target entity DTO type
-   * @param controllerBase Controller URL prefix
-   * @param dto Target entity DTO
-   * @param id Target entity ID
-   * @param entityClass Target entity type
-   * @return Updated target entity
-   */
-  protected <T, D> T baseTestUpdate(String controllerBase, D dto, int id, Class<T> entityClass)
-      throws Exception {
-    ResultActions ac = getMockMvc()
-        .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
-    if (DEBUG_MODE)
-      ac.andDo(print());
+    /**
+     * Non-async template update test for a single entity. e.g. Endpoints with
+     * a @PutMapping("/{entityId}") mapping.
+     *
+     * @param <T> Target entity type
+     * @param <D> Target entity DTO type
+     * @param controllerBase Controller URL prefix
+     * @param dto Target entity DTO
+     * @param id Target entity ID
+     * @param entityClass Target entity type
+     * @return Updated target entity
+     */
+    protected <T, D> T baseTestUpdate(String controllerBase, D dto, int id, Class<T> entityClass)
+            throws Exception {
+        ResultActions ac = getMockMvc()
+                .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
+        if (DEBUG_MODE)
+            ac.andDo(print());
+
+        ac.andExpect(status().isOk());
+
+        T obj = currentSession().get(entityClass, id);
+
+        assertNotNull(obj);
+        assertEquals(id, (int) ((Identifiable) obj).getId());
+
+        return obj;
+    }
 
     /**
      * Non-async template update failure test for a single entity (unauthorized) e.g. Endpoints with
@@ -549,7 +494,11 @@ public abstract class AbstractST {
         ac.andExpect(status().isUnauthorized());
     }
 
-    T obj = currentSession().get(entityClass, id);
+    private static MultiValueMap searchTerm(String term) {
+        MultiValueMap<String, String> map = new LinkedMultiValueMap();
+        map.add("q", term);
+        return map;
+    }
 
     /**
      * Search endpoint template test with multiple parameters. e.g. endpoints with a @GetMapping(value =
@@ -585,25 +534,20 @@ public abstract class AbstractST {
         baseSearchByTerm(url, searchTerm(searchTerm), expectedIds);
     }
 
-  /**
-   * Non-async template update failure test for a single entity (unauthorized) e.g. Endpoints with
-   * a @PutMapping("/{entityId}") mapping.
-   * 
-   * @param <T> Target entity type
-   * @param <D> Target entity DTO type
-   * @param controllerBase Controller URL prefix
-   * @param dto Target entity DTO
-   * @param id Target entity ID
-   * @param entityClass Target entity type
-   */
-  protected <T, D> void testUpdateUnauthorized(String controllerBase, D dto, int id, Class<T> updateType)
-      throws Exception {
-    ResultActions ac = getMockMvc()
-        .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
-    if (DEBUG_MODE)
-      ac.andDo(print());
-    ac.andExpect(status().isUnauthorized());
-  }
+    /**
+     * Template datatable endpoint test. Useful for any "/dt" or "/dt/..." endpoints.
+     *
+     * @param url URL to query for datatable
+     * @param displayLength Max number of entries displayed
+     * @param dataProp Property to sort on
+     * @param ids Expected IDs
+     * @return ResultActions response for further testing if needed
+     */
+
+    protected void testListAll(String url, List<Integer> ids) throws Exception {
+        String response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
+        checkIds(ids, false, response);
+    }
 
     protected ResultActions testDtRequest(String url, int displayLength, String dataProp, int sortCol, List<Integer> ids)
             throws Exception {
@@ -643,319 +587,232 @@ public abstract class AbstractST {
             assertTrue("id " + expectedId + " expected but not found", resultIds.contains(expectedId));
         }
 
-  /**
-   * Search endpoint template test with multiple parameters. e.g. endpoints with a @GetMapping(value =
-   * "/search") mapping with multiple @RequestParams
-   * 
-   * @param url URL to query for search
-   * @param params Parameters for the search
-   * @param ids Expected IDs from search
-   */
-  protected void baseSearchByTerm(String url, MultiValueMap params, List<Integer> expectedIds)
-      throws Exception {
-    ResultActions ac = getMockMvc().perform(get(url).params(params).accept(MediaType.APPLICATION_JSON));
-    if (DEBUG_MODE)
-      ac.andDo(print());
-
-    String response = ac.andExpect(status().isOk())
-        .andExpect(jsonPath("$").exists())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andReturn().getResponse().getContentAsString();
-
-    checkIds(expectedIds, false, response);
-  }
-
-  /**
-   * Search endpoint template test for single-parameter searches e.g. endpoints with
-   * a @GetMapping(value = "/search") mapping with a single @RequestParam("q")
-   * 
-   * @param url URL to query for search
-   * @param searchTerm Term to search for
-   * @param ids Expected IDs from search
-   */
-  protected void baseSearchByTerm(String url, String searchTerm, List<Integer> expectedIds) throws Exception {
-    baseSearchByTerm(url, searchTerm(searchTerm), expectedIds);
-  }
-
-  /**
-   * Template datatable endpoint test. Useful for any "/dt" or "/dt/..." endpoints.
-   * 
-   * @param url URL to query for datatable
-   * @param displayLength Max number of entries displayed
-   * @param dataProp Property to sort on
-   * @param ids Expected IDs
-   * @return ResultActions response for further testing if needed
-   */
-
-  protected void testListAll(String url, List<Integer> ids) throws Exception {
-    String response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
-    checkIds(ids, false, response);
-  }
-
-  protected ResultActions testDtRequest(String url, int displayLength, String dataProp, int sortCol, List<Integer> ids)
-      throws Exception {
-    ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON)
-        .param("iDisplayStart", "0")
-        .param("iDisplayLength", Integer.toString(displayLength))
-        .param("mDataProp_0", dataProp)
-        .param("sSortDir_0", "asc")
-        .param("iSortCol_0", Integer.toString(sortCol))
-        .param("sEcho", "1"));
-    if (DEBUG_MODE)
-      ac.andDo(print());
-
-    ac.andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$").exists())
-        .andExpect(jsonPath("$.iTotalRecords").value(ids.size()));
-
-    String response = ac.andReturn().getResponse().getContentAsString();
-    checkIds(ids, true, response);
-
-    return ac;
-    // returns a result actions if more testing is desired
-  }
-
-  private void checkIds(List<Integer> expectedIds, boolean isDt, String response) throws Exception {
-    List<Integer> returnedIds = new ArrayList<Integer>();
-
-    String addedPath = "";
-    String addedAfter = "";
-    if (isDt)
-      addedPath = ".aaData";
-
-    List<Integer> resultIds = JsonPath.read(response, "$" + addedPath + "[*].id");
-    assertEquals(expectedIds.size(), resultIds.size());
-    for (Integer expectedId : expectedIds) {
-      assertTrue("id " + expectedId + " expected but not found", resultIds.contains(expectedId));
     }
 
-  }
-
-  /**
-   * Template datatable endpoint test with default param values. Useful for any "/dt" or "/dt/..."
-   * endpoints.
-   * 
-   * @param url Datatable query URL
-   * @param ids Expected IDs
-   * @return ResultActions response for more testing if needed
-   */
-  protected ResultActions testDtRequest(String url, List<Integer> ids)
-      throws Exception {
-    return testDtRequest(url, 200, "id", 3, ids);
-  }
-
-  /**
-   * Template test for "getById" endpoints. Useful for any @GetMapping("/{entityId}") endpoints
-   * 
-   * @param controllerBase Controller URL prefix
-   * @param id ID of target entity
-   * @return ResultActions response for further testing
-   */
-  protected ResultActions baseTestGetById(String controllerBase, int id) throws Exception {
-
-    ResultActions result =
-        getMockMvc().perform(get(controllerBase + "/" + Integer.toString(id)).accept(MediaType.APPLICATION_JSON));
-    if (DEBUG_MODE)
-      result.andDo(print());
-
-    result.andExpect(status().isOk())
-        .andExpect(jsonPath("$").exists())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(id));
-
-    return result;
-  }
-
-  protected ResultActions testList(String url, List<Integer> ids, MultiValueMap params)
-      throws Exception {
-    ResultActions result = getMockMvc().perform(get(url).params(params));
-    if (DEBUG_MODE)
-      result.andDo(print());
-    result = result.andExpect(status().isOk());
-    String response = result.andReturn().getResponse().getContentAsString();
-    checkIds(ids, false, response);
-
-    return result; // return the result for more content testing if needed
-  }
-
-  protected ResultActions testList(String url, List<Integer> ids) throws Exception {
-    return testList(url, ids, new LinkedMultiValueMap());
-  }
-
-  protected void testSpreadsheetContents(String url, SpreadsheetRequest sheet, List<String> headers,
-      List<List<String>> rows) throws Exception {
-
-    SpreadSheetFormat format = SpreadSheetFormat.valueOf(sheet.getFormat());
-
-    ResultActions res = getMockMvc().perform(post(url).content(makeJson(sheet))
-        .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(format.mediaType()));
-    if (DEBUG_MODE)
-      res.andDo(print());
-
-    MockHttpServletResponse response = res.andReturn().getResponse();
-    String[][] records = new String[rows.size() + 1][headers.size()];
-    String[] rawRows = response.getContentAsString().split("\n");
-
-    for (int i = 0; i < rawRows.length; i++) {
-      String s = rawRows[i].replaceAll("\\r", "");
-      s = s.replaceAll("\\n", "");
-      s = s.replaceAll("\"", "");
-      records[i] = s.split(",");
+    /**
+     * Template datatable endpoint test with default param values. Useful for any "/dt" or "/dt/..."
+     * endpoints.
+     *
+     * @param url Datatable query URL
+     * @param ids Expected IDs
+     * @return ResultActions response for more testing if needed
+     */
+    protected ResultActions testDtRequest(String url, List<Integer> ids)
+            throws Exception {
+        return testDtRequest(url, 200, "id", 3, ids);
     }
-    checkArray(records[0], headers);
-    for (int i = 0; i < rows.size(); i++) {
-      checkArray(records[i + 1], rows.get(i));
+
+    /**
+     * Template test for "getById" endpoints. Useful for any @GetMapping("/{entityId}") endpoints
+     *
+     * @param controllerBase Controller URL prefix
+     * @param id ID of target entity
+     * @return ResultActions response for further testing
+     */
+    protected ResultActions baseTestGetById(String controllerBase, int id) throws Exception {
+
+        ResultActions result =
+                getMockMvc().perform(get(controllerBase + "/" + Integer.toString(id)).accept(MediaType.APPLICATION_JSON));
+        if (DEBUG_MODE)
+            result.andDo(print());
+
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$").exists())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(id));
+
+        return result;
     }
-  }
 
+    protected ResultActions testList(String url, List<Integer> ids, MultiValueMap params)
+            throws Exception {
+        ResultActions result = getMockMvc().perform(get(url).params(params));
+        if (DEBUG_MODE)
+            result.andDo(print());
+        result = result.andExpect(status().isOk());
+        String response = result.andReturn().getResponse().getContentAsString();
+        checkIds(ids, false, response);
 
-  protected void checkArray(String[] values, List<String> expected) {
-    assertEquals(expected.size(), values.length);
-    for (int i = 0; i < expected.size(); i++) {
-      assertEquals(expected.get(i), values[i]);
+        return result; // return the result for more content testing if needed
     }
-  }
+
+    protected ResultActions testList(String url, List<Integer> ids) throws Exception {
+        return testList(url, ids, new LinkedMultiValueMap());
+    }
+
+    protected void testSpreadsheetContents(String url, SpreadsheetRequest sheet, List<String> headers,
+                                           List<List<String>> rows) throws Exception {
+
+        SpreadSheetFormat format = SpreadSheetFormat.valueOf(sheet.getFormat());
+
+        ResultActions res = getMockMvc().perform(post(url).content(makeJson(sheet))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(format.mediaType()));
+        if (DEBUG_MODE)
+            res.andDo(print());
+
+        MockHttpServletResponse response = res.andReturn().getResponse();
+        String[][] records = new String[rows.size() + 1][headers.size()];
+        String[] rawRows = response.getContentAsString().split("\n");
+
+        for (int i = 0; i < rawRows.length; i++) {
+            String s = rawRows[i].replaceAll("\\r", "");
+            s = s.replaceAll("\\n", "");
+            s = s.replaceAll("\"", "");
+            records[i] = s.split(",");
+        }
+        checkArray(records[0], headers);
+        for (int i = 0; i < rows.size(); i++) {
+            checkArray(records[i + 1], rows.get(i));
+        }
+    }
 
 
-  /**
-   * Tests model static list endpoints. e.g. @GetMapping("/list")
-   * 
-   * @param url URL to query
-   * @return Model and View response from the endpoint
-   */
-  protected ModelAndView testStaticListPage(String url)
-      throws Exception {
-    ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
-    if (DEBUG_MODE)
-      ac = ac.andDo(print());
-
-    ModelAndView response = ac.andExpect(status().isOk())
-        .andReturn().getModelAndView();
-
-    return response;
-  }
-
-  /**
-   * Tests model static list endpoints where only the returned DTOs are desired
-   * e.g. @GetMapping("/list")
-   * 
-   * @param url URL to query
-   * @param jsonModelAttribute The model attribute where the returned DTOs are found
-   * @return JSON response from the endpoint
-   */
-  protected String testStaticListPage(String url, String jsonModelAttribute) throws Exception {
-    return testStaticListPage(url).getModel().get(jsonModelAttribute).toString();
-  }
+    protected void checkArray(String[] values, List<String> expected) {
+        assertEquals(expected.size(), values.length);
+        for (int i = 0; i < expected.size(); i++) {
+            assertEquals(expected.get(i), values[i]);
+        }
+    }
 
 
-  /**
-   * Template test for model bulk edit endpoints. e.g. @PostMapping("/bulk/edit")
-   * 
-   * @param url URL to query
-   * @param ids The target entity IDs
-   * @return Model and View response from the endpoint
-   */
-  protected ModelAndView testBulkEditPage(String url, List<Long> ids)
-      throws Exception {
+    /**
+     * Tests model static list endpoints. e.g. @GetMapping("/list")
+     *
+     * @param url URL to query
+     * @return Model and View response from the endpoint
+     */
+    protected ModelAndView testStaticListPage(String url)
+            throws Exception {
+        ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
+        if (DEBUG_MODE)
+            ac = ac.andDo(print());
 
-    String stringIds = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
-    ResultActions ac = getMockMvc().perform(post(url).param("ids", stringIds).accept(MediaType.APPLICATION_JSON));
-    if (DEBUG_MODE)
-      ac = ac.andDo(print());
+        ModelAndView response = ac.andExpect(status().isOk())
+                .andReturn().getModelAndView();
 
-    ModelAndView response = ac.andExpect(status().isOk())
-        .andReturn().getModelAndView();
-    return response;
-  }
+        return response;
+    }
 
-  /**
-   * Template test for model bulk edit endpoints where only the returned DTOs are needed
-   * e.g. @PostMapping("/bulk/edit")
-   * 
-   * @param url URL to query
-   * @param ids The target entity IDs
-   * @param jsonModelAttribute The model attribute where the returned DTOs are found
-   * @return String JSON response from endpoint
-   */
-  protected String testBulkEditPage(String url, List<Long> ids, String jsonModelAttribute) throws Exception {
-    return testBulkEditPage(url, ids).getModel().get(jsonModelAttribute).toString();
-  }
-
-  /**
-   * Tests model bulk create endpoints. e.g. @GetMapping("/bulk/new")
-   * 
-   * @param url URL to query
-   * @param numCreated Number of target entities created
-   * @param jsonModelAttribute The model attribute where the returned DTOs are found
-   */
-  protected void testBulkCreatePage(String url, int numCreated, String jsonModelAttribute) throws Exception {
-    ResultActions ac = getMockMvc().perform(get(url)
-        .accept(MediaType.APPLICATION_JSON).param("quantity", Integer.toString(numCreated)));
-    if (DEBUG_MODE)
-      ac = ac.andDo(print());
-
-    ac = ac.andExpect(status().isOk());
-
-    String response = ac.andReturn().getModelAndView().getModel().get(jsonModelAttribute).toString();
-    assertEquals(numCreated, ((List<Object>) JsonPath.read(response, "$.*")).size());
-  }
-
-  /**
-   * Reads an Integer from a JSON response given a path
-   * 
-   * @param resultJson JSON response
-   * @param path JSON path to long
-   * @return Read Integer
-   */
-  protected static Integer readInteger(String resultJson, String path) {
-    return JsonPath.read(resultJson, path);
-  }
+    /**
+     * Tests model static list endpoints where only the returned DTOs are desired
+     * e.g. @GetMapping("/list")
+     *
+     * @param url URL to query
+     * @param jsonModelAttribute The model attribute where the returned DTOs are found
+     * @return JSON response from the endpoint
+     */
+    protected String testStaticListPage(String url, String jsonModelAttribute) throws Exception {
+        return testStaticListPage(url).getModel().get(jsonModelAttribute).toString();
+    }
 
 
-  /**
-   * Reads a long from a JSON response given a path
-   * 
-   * @param resultJson JSON response
-   * @param path JSON path to long
-   * @return Read long
-   */
-  protected static long readLong(String resultJson, String path) {
-    return readInteger(resultJson, path).longValue();
-  }
+    /**
+     * Template test for model bulk edit endpoints. e.g. @PostMapping("/bulk/edit")
+     *
+     * @param url URL to query
+     * @param ids The target entity IDs
+     * @return Model and View response from the endpoint
+     */
+    protected ModelAndView testBulkEditPage(String url, List<Long> ids)
+            throws Exception {
+
+        String stringIds = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+        ResultActions ac = getMockMvc().perform(post(url).param("ids", stringIds).accept(MediaType.APPLICATION_JSON));
+        if (DEBUG_MODE)
+            ac = ac.andDo(print());
+
+        ModelAndView response = ac.andExpect(status().isOk())
+                .andReturn().getModelAndView();
+        return response;
+    }
+
+    /**
+     * Template test for model bulk edit endpoints where only the returned DTOs are needed
+     * e.g. @PostMapping("/bulk/edit")
+     *
+     * @param url URL to query
+     * @param ids The target entity IDs
+     * @param jsonModelAttribute The model attribute where the returned DTOs are found
+     * @return String JSON response from endpoint
+     */
+    protected String testBulkEditPage(String url, List<Long> ids, String jsonModelAttribute) throws Exception {
+        return testBulkEditPage(url, ids).getModel().get(jsonModelAttribute).toString();
+    }
+
+    /**
+     * Tests model bulk create endpoints. e.g. @GetMapping("/bulk/new")
+     *
+     * @param url URL to query
+     * @param numCreated Number of target entities created
+     * @param jsonModelAttribute The model attribute where the returned DTOs are found
+     */
+    protected void testBulkCreatePage(String url, int numCreated, String jsonModelAttribute) throws Exception {
+        ResultActions ac = getMockMvc().perform(get(url)
+                .accept(MediaType.APPLICATION_JSON).param("quantity", Integer.toString(numCreated)));
+        if (DEBUG_MODE)
+            ac = ac.andDo(print());
+
+        ac = ac.andExpect(status().isOk());
+
+        String response = ac.andReturn().getModelAndView().getModel().get(jsonModelAttribute).toString();
+        assertEquals(numCreated, ((List<Object>) JsonPath.read(response, "$.*")).size());
+    }
+
+    /**
+     * Reads an Integer from a JSON response given a path
+     *
+     * @param resultJson JSON response
+     * @param path JSON path to long
+     * @return Read Integer
+     */
+    protected static Integer readInteger(String resultJson, String path) {
+        return JsonPath.read(resultJson, path);
+    }
 
 
-  /**
-   * Tests model single create endpoints.
-   * 
-   * @param url
-   * @param title
-   * @throws Exception
-   */
-  protected ResultActions baseTestNewModel(String url, String title) throws Exception {
-    ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
-    if (DEBUG_MODE)
-      ac = ac.andDo(print());
+    /**
+     * Reads a long from a JSON response given a path
+     *
+     * @param resultJson JSON response
+     * @param path JSON path to long
+     * @return Read long
+     */
+    protected static long readLong(String resultJson, String path) {
+        return readInteger(resultJson, path).longValue();
+    }
 
-    ac = ac.andExpect(status().isOk())
-        .andExpect(model().attribute("title", title));
-    return ac;
-  }
 
-  /**
-   * Tests single-entity edit model endpoints (usually a get mapping to /{entityId})
-   * 
-   * @param url URL to query
-   * @return model properties map returned from request
-   */
-  protected Map<String, Object> baseTestEditModel(String url) throws Exception {
-    ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
-    if (DEBUG_MODE)
-      ac = ac.andDo(print());
+    /**
+     * Tests model single create endpoints.
+     *
+     * @param url
+     * @param title
+     * @throws Exception
+     */
+    protected ResultActions baseTestNewModel(String url, String title) throws Exception {
+        ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
+        if (DEBUG_MODE)
+            ac = ac.andDo(print());
 
-    ac = ac.andExpect(status().isOk());
-    return ac.andReturn().getModelAndView().getModel();
-  }
+        ac = ac.andExpect(status().isOk())
+                .andExpect(model().attribute("title", title));
+        return ac;
+    }
+
+    /**
+     * Tests single-entity edit model endpoints (usually a get mapping to /{entityId})
+     *
+     * @param url URL to query
+     * @return model properties map returned from request
+     */
+    protected Map<String, Object> baseTestEditModel(String url) throws Exception {
+        ResultActions ac = getMockMvc().perform(get(url).accept(MediaType.APPLICATION_JSON));
+        if (DEBUG_MODE)
+            ac = ac.andDo(print());
+
+        ac = ac.andExpect(status().isOk());
+        return ac.andReturn().getModelAndView().getModel();
+    }
 }
