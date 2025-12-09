@@ -106,7 +106,7 @@ public class PoolDto extends AbstractBoxableDto {
     return qcPassed;
   }
 
-  public String getWorsetAddedTime() { return worksetAddedTime; }
+  public String getWorksetAddedTime() { return worksetAddedTime; }
 
   public void setAlias(String alias) {
     this.alias = alias;
