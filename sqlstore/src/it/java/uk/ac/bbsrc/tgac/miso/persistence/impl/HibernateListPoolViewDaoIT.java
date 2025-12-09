@@ -34,12 +34,11 @@ public class HibernateListPoolViewDaoIT extends AbstractDAOTest {
         sut.setEntityManager(entityManager);
     }
 
-    public void assertWorksetHasPools(long worksetId, int expectedCount, long... expectedPoolIds) {
+    public void assertWorksetHasPools(long worksetId,long... expectedPoolIds) {
         QueryBuilder<ListPoolView, ListPoolView> builder = new QueryBuilder<>(currentSession(), ListPoolView.class, ListPoolView.class);
         sut.restrictPaginationByWorksetId(builder, worksetId, msg -> fail(msg));
 
         List<ListPoolView> results = builder.getResultList();
-        assertEquals(worksetId, expectedCount, results.size());
         List<Long> actualPoolIds = new ArrayList<>();
         for(ListPoolView row: results){
             actualPoolIds.add(row.getId());
@@ -53,8 +52,8 @@ public class HibernateListPoolViewDaoIT extends AbstractDAOTest {
 
     @Test
     public void testRestrictPaginationByWorksetId(){
-        assertWorksetHasPools(1L, 2, 1L, 2L);
-        assertWorksetHasPools(2L, 1, 1L);
+        assertWorksetHasPools(1L, 1L, 2L);
+        assertWorksetHasPools(2L, 1L);
     }
 
 }
