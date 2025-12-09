@@ -23,7 +23,8 @@ public enum QcConverter {
   DRAFT_CLINICAL_REPORT("^Draft Clinical Report$", "Draft Clinical Report", "Pass", "Fail"), //
   INFORMATICS_REVIEW("^Informatics Review$", "Informatics Review", "Pass", "Fail"), //
   PURITY("^Purity$", "Purity"), //
-  UMI_COLLAPSED_COVERAGE("^UMI-Collapsed Coverage$", "UMI-Collapsed Coverage");
+  UMI_COLLAPSED_COVERAGE("^UMI-Collapsed Coverage$", "UMI-Collapsed Coverage"), //
+  TUMOUR_CONTENT("^Tumour Content$", "Tumour Content");
 
   private final String pattern;
   private final String attributeName;

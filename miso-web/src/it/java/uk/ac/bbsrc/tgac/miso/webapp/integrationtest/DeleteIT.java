@@ -111,7 +111,7 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteLibraryAliquot() {
-    testDelete(ListTarget.LIBRARY_ALIQUOTS, null, "LDI304", Columns.NAME, LibraryAliquot.class, 304L);
+    testDelete(ListTarget.LIBRARY_ALIQUOTS, null, "LDI306", Columns.NAME, LibraryAliquot.class, 306L);
   }
 
   @Test
@@ -204,8 +204,8 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteAttachmentCategory() {
-    testAdminDelete(ListTarget.ATTACHMENT_CATEGORIES, null, "Submission Forms", Columns.ALIAS, AttachmentCategory.class,
-        1L);
+    testAdminDelete(ListTarget.ATTACHMENT_CATEGORIES, null, "Unused", Columns.ALIAS, AttachmentCategory.class,
+        4L);
   }
 
   @Test

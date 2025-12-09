@@ -48,7 +48,7 @@ these is required, but we have not investigated specifics)
 
         url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;sslMode=DISABLED&amp;connectionTimeZone=SERVER&amp;cacheDefaultTimeZone=false"
 
-1. Follow the usual [update procedure](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/baremetal-installation-guide/#installing-and-upgrading), but with one additional step:
+1. Follow the usual [update procedure](https://miso-lims.readthedocs.io/en/latest/admin/baremetal-installation-guide/#installing-and-upgrading), but with one additional step:
   after copying the sqlstore jar, but before running Flyway migrate, run Flyway repair
 
         ./flyway -user=root -password=$MYSQL_ROOT_PASSWORD -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration repair -placeholders.filesDir=${MISO_FILES_DIR}

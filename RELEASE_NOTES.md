@@ -7,6 +7,61 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.14.1] - 2025-11-06
+
+### Fixed
+
+* errors retrieving runs via Pinery
+
+
+## [3.14.0] - 2025-10-31
+
+### Changed
+
+* The following fields will now accept numbers with up to 6 digits before the decimal.
+  * "Concentration" field in samples, libraries, library aliquots, pool.
+  * "Parent ng Used" field in samples, libraries, library aliquots.
+  * "Initial Cell Concentration" in Single Cell samples (detailed sample).
+  * "Loading Cell Concentration" in Single Cell and Single Cell (stock) samples (detailed sample).
+
+### Fixed
+
+* Pinery now supports runs with multiple containers
+* 'Help' link to user manual
+
+
+## [3.13.0] - 2025-10-09
+
+### Added
+
+* Custody column to the following sample download sheets
+  * Tracking List
+  * Transfer List V2
+
+### Changed
+
+* Improvements when propagating samples and choosing to specify replicates per sample:
+  * The inputs are now sorted by parent sample alias.
+  * Multiple values separated by line breaks can now be pasted to overwrite multiple inputs in the
+  dialog. This allows copying from a text document or spreadsheet column.
+* When a sample's project is changed, the changelog will include the project code, if set, instead of
+  the project name
+
+### Fixed
+
+* The Edit Transfer page only showed "DISTRIBUTED" in the item location if it had previously been in a
+  box
+* When failing to delete SOPs, the error messages were not being shown.
+
+
+## [3.12.0] - 2025-08-21
+
+### Added
+
+* Assay version to requisition changelogs when assay is added or removed
+* Tumour Content QC exported as a sample attribute in Pinery
+
+
 ## [3.11.0] - 2025-07-31
 
 ### Changed
