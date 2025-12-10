@@ -17,39 +17,16 @@ public class ListUsersControllerST extends AbstractST {
   private static final String USERS_ENDPOINT = "/admin/users";
 
   @Test
-  public void testList() throws Exception {
-    String json = testStaticListPage(USERS_ENDPOINT, "data");
-
-    // verify response contains users
-    int userCount = JsonPath.<Integer>read(json, "$.length()");
-    assertTrue("Expected at least one user in response", userCount > 0);
-
-    // spot check first user has required fields
-    assertNotNull(JsonPath.read(json, "$[0].id"));
-    assertNotNull(JsonPath.read(json, "$[0].loginName"));
-    assertNotNull(JsonPath.read(json, "$[0].fullName"));
-    assertNotNull(JsonPath.read(json, "$[0].email"));
-
-    // boolean flags should be present
-    assertNotNull(JsonPath.read(json, "$[0].admin"));
-    assertNotNull(JsonPath.read(json, "$[0].internal"));
-    assertNotNull(JsonPath.read(json, "$[0].active"));
-    assertNotNull(JsonPath.read(json, "$[0].loggedIn"));
-  }
-
-  @Test
   public void testUserDataIntegrity() throws Exception {
     String json = testStaticListPage(USERS_ENDPOINT, "data");
 
-    // check a sample of users from the JSON response for data consistency
     int jsonUserCount = JsonPath.<Integer>read(json, "$.length()");
-    int samplesToCheck = Math.min(3, jsonUserCount);
+    assertTrue("Expected at least 3 users in test data", jsonUserCount >= 3);
 
-    for (int i = 0; i < samplesToCheck; i++) {
+    for (int i = 0; i < 3; i++) {
       String jsonPath = "$[" + i + "]";
       String loginName = JsonPath.read(json, jsonPath + ".loginName");
 
-      // query database for this specific user by login name
       UserImpl expected = currentSession()
           .createQuery("from UserImpl where loginName = :loginName", UserImpl.class)
           .setParameter("loginName", loginName)
@@ -59,6 +36,10 @@ public class ListUsersControllerST extends AbstractST {
       assertEquals(expected.getLoginName(), JsonPath.read(json, jsonPath + ".loginName"));
       assertEquals(expected.getFullName(), JsonPath.read(json, jsonPath + ".fullName"));
       assertEquals(expected.getEmail(), JsonPath.read(json, jsonPath + ".email"));
+      assertEquals(expected.isAdmin(), JsonPath.read(json, jsonPath + ".admin"));
+      assertEquals(expected.isInternal(), JsonPath.read(json, jsonPath + ".internal"));
+      assertEquals(expected.isActive(), JsonPath.read(json, jsonPath + ".active"));
+      assertNotNull(JsonPath.read(json, jsonPath + ".loggedIn"));
     }
   }
 
