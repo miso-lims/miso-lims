@@ -19,6 +19,8 @@ import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.QueryBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateListPoolViewDao;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetPool;
 
 public class HibernateListPoolViewDaoIT extends AbstractDAOTest {
 
@@ -34,17 +36,26 @@ public class HibernateListPoolViewDaoIT extends AbstractDAOTest {
         sut.setEntityManager(entityManager);
     }
 
-    public void assertWorksetHasPools(long worksetId,long... expectedPoolIds) {
+    public void assertWorksetHasPools(long worksetId) {
         QueryBuilder<ListPoolView, ListPoolView> builder = new QueryBuilder<>(currentSession(), ListPoolView.class, ListPoolView.class);
         sut.restrictPaginationByWorksetId(builder, worksetId, msg -> fail(msg));
 
         List<ListPoolView> results = builder.getResultList();
+
+        Workset workset = (Workset) currentSession().get(Workset.class, worksetId);
+
+        List<Long> expectedPoolIds = new ArrayList();
+        for(WorksetPool pool: workset.getWorksetPools()){
+            expectedPoolIds.add(pool.getItem().getId());
+        }
+        assertEquals(worksetId, expectedPoolIds.size(), results.size());
+
         List<Long> actualPoolIds = new ArrayList<>();
         for(ListPoolView row: results){
             actualPoolIds.add(row.getId());
         }
 
-        for(long expectedId: expectedPoolIds){
+        for(Long expectedId: expectedPoolIds){
             assertTrue("Expected poolID "+ expectedId + " for worksetID " + worksetId + " but it was not in " + actualPoolIds, actualPoolIds.contains(expectedId));
         }
 
@@ -52,8 +63,8 @@ public class HibernateListPoolViewDaoIT extends AbstractDAOTest {
 
     @Test
     public void testRestrictPaginationByWorksetId(){
-        assertWorksetHasPools(1L, 1L, 2L);
-        assertWorksetHasPools(2L, 1L);
+        assertWorksetHasPools(1L);
+        assertWorksetHasPools(2L);
     }
 
 }
