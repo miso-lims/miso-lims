@@ -7,6 +7,15 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.14.2] - 2025-12-11
+
+### Fixed
+
+* Error when attempting to receive libraries from the Edit Project page or when selecting a project on
+  the Create Libraries page (plain sample mode only)
+* Error merging pools with certain alias patterns
+
+
 ## [3.14.1] - 2025-11-06
 
 ### Fixed
