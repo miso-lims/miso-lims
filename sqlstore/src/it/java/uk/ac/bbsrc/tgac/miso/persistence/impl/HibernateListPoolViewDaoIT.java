@@ -36,35 +36,23 @@ public class HibernateListPoolViewDaoIT extends AbstractDAOTest {
         sut.setEntityManager(entityManager);
     }
 
-    public void assertWorksetHasPools(long worksetId) {
-        QueryBuilder<ListPoolView, ListPoolView> builder = new QueryBuilder<>(currentSession(), ListPoolView.class, ListPoolView.class);
-        sut.restrictPaginationByWorksetId(builder, worksetId, msg -> fail(msg));
-
-        List<ListPoolView> results = builder.getResultList();
-
+    public void assertWorksetHasPools(long worksetId, long... expectedPoolIds) {
         Workset workset = (Workset) currentSession().get(Workset.class, worksetId);
 
-        List<Long> expectedPoolIds = new ArrayList();
-        for(WorksetPool pool: workset.getWorksetPools()){
-            expectedPoolIds.add(pool.getItem().getId());
-        }
-        assertEquals(worksetId, expectedPoolIds.size(), results.size());
-
         List<Long> actualPoolIds = new ArrayList<>();
-        for(ListPoolView row: results){
-            actualPoolIds.add(row.getId());
+        for(WorksetPool wp: workset.getWorksetPools()){
+            actualPoolIds.add(wp.getItem().getId());
         }
-
+        assertEquals(worksetId, expectedPoolIds.length, actualPoolIds.size());
         for(Long expectedId: expectedPoolIds){
             assertTrue("Expected poolID "+ expectedId + " for worksetID " + worksetId + " but it was not in " + actualPoolIds, actualPoolIds.contains(expectedId));
         }
-
     }
 
     @Test
     public void testRestrictPaginationByWorksetId(){
-        assertWorksetHasPools(1L);
-        assertWorksetHasPools(2L);
+        assertWorksetHasPools(1L, 1L, 2L);
+        assertWorksetHasPools(2L, 1L);
     }
 
 }
