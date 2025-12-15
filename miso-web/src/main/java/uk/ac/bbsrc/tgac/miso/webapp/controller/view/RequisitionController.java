@@ -84,6 +84,7 @@ public class RequisitionController {
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
+    model.put("title", "Requisitions");
     return new ListRequisitionsPage(authorizationManager, mapper).list(model);
   }
 

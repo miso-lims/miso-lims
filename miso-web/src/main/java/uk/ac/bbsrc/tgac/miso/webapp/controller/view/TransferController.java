@@ -94,6 +94,7 @@ public class TransferController {
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
+    model.put("title", "Transfers");
     return new TabbedListItemsPage("transfer", "tab", TABS.stream(), (t1, t2) -> 1, Function.identity(),
         String::toLowerCase, mapper).list(model);
   }
