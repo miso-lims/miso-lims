@@ -174,6 +174,8 @@ Urls = (function () {
     fillByPattern: middleIdUrlFunction(boxRestBase, "/positions/fill-by-pattern"),
     prepareScan: boxRestBase + "/prepare-scan",
     scan: middleIdUrlFunction(boxRestBase, "/scan"),
+    matrixScan: middleIdUrlFunction(boxRestBase, "/matrix-scan"),
+    matrixAssign: middleIdUrlFunction(boxRestBase, "/matrix-assign"),
     spreadsheet: middleIdUrlFunction(boxRestBase, "/spreadsheet"),
     boxSpreadsheet: boxRestBase + "/spreadsheet",
     fragmentAnalyserSheet: middleIdUrlFunction(boxRestBase, "/fragmentAnalyser"),

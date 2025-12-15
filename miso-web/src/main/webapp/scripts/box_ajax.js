@@ -63,12 +63,70 @@ var Box = Box || {
   },
   // Start the scanning process
   initScan: function (scannerName) {
+
+    var dialog = jQuery("#dialogDialog");
+    jQuery("#dialogInfoAbove").html("<h1>Choose Scan Mode</h1>");
+    jQuery("#dialogInfoBelow").html("<p>Do you want to update item location or assign Barcode?</p>");
+    jQuery("#dialogVisual").html("");
+    dialog.dialog({
+        autoOpen: true,
+        title: "Scan Options",
+        modal: true,
+        width: 400,
+        height: 200,
+        buttons: {
+            "Update Location": function(){
+                dialog.dialog("close");
+                Box.startStandardScan(scannerName);
+            },
+            "Assign Barcodes": function(){
+                dialog.dialog("close");
+                Box.startMatrixScan(scannerName);
+            },
+            Cancel: function(){
+                dialog.dialog("close");
+            }
+        }
+    });
+  },
+
+  startStandardScan: function(scannerName){
     Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
     Box.dialogHeight = Box.boxJSON.rows * 40 + 300;
     Box.scanDialog = Box.ScanDialog(scannerName);
     Box.prepareScannerDialog = Box.PrepareScannerDialog(scannerName);
     Box.scanDiff = Box.ScanDiff(scannerName);
     Box.prepareScannerDialog.show();
+  },
+
+  startMatrixScan: function(scannerName){
+      Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
+      Box.dialogHeight = Box.boxJSON.rows * 40 + 300;
+      Box.matrixScanDialog = Box.MatrixScanDialog(scannerName);
+      console.log("Debug: MatrixBox: ", Box.MatrixScanDialog);
+      console.log("Debug: matrixBox: ", Box.matrixScanDialog);
+
+      var onPrepareSuccess = function () {
+        jQuery.ajax({
+                url: Urls.rest.boxes.matrixScan(Box.boxJSON.id),
+                type: "POST",
+                contentType: "application/json; charset=utf8",
+                data: JSON.stringify({ scannerName : scannerName})
+              })
+              .done(function (data) {
+                jQuery("#dialogDialog").dialog("close");
+                Box.matrixScanDialog.show(data);
+              })
+              .fail( function(response) {
+                jQuery("#dialogDialog").dialog("close");
+                var error = JSON.parse(response.responseText);
+                var message = error.detail ? error.detail : error.message;
+                Utils.showOkDialog("Scan Failed", [message]);
+              });
+      };
+
+      Box.prepareScannerDialog = Box.PrepareScannerDialog(scannerName, onPrepareSuccess);
+      Box.prepareScannerDialog.show();
   },
 
   createVisualization: function () {
@@ -127,7 +185,7 @@ var Box = Box || {
 };
 
 Box.scan = {
-  prepareScanner: function (scannerName, boxRows, boxColumns) {
+  prepareScanner: function (scannerName, boxRows, boxColumns, onSuccess) {
     var prepareScannerTimeout = setTimeout(Box.prepareScannerDialog.error, 10000); // otherwise box scanner may poll indefinitely
 
     jQuery
@@ -144,13 +202,17 @@ Box.scan = {
       .done(function (data) {
         clearTimeout(prepareScannerTimeout);
         jQuery("#dialogDialog").dialog("close");
-        Box.scanDialog.show({
-          size: {
-            rows: Box.boxJSON.rows,
-            cols: Box.boxJSON.cols,
-          },
-          data: Box.boxJSON.items,
-        });
+        if(onSuccess){
+            onSuccess();
+        } else {
+            Box.scanDialog.show({
+              size: {
+                 rows: Box.boxJSON.rows,
+                 cols: Box.boxJSON.cols,
+              },
+              data: Box.boxJSON.items,
+           });
+        }
       })
       .fail(function (response, textStatus, serverStatus) {
         clearTimeout(prepareScannerTimeout);

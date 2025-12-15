@@ -711,7 +711,7 @@
     return self;
   };
 
-  Box.PrepareScannerDialog = function (scannerName) {
+  Box.PrepareScannerDialog = function (scannerName, onSuccess) {
     var self = {};
 
     self.show = function () {
@@ -732,7 +732,7 @@
         buttons: {},
       });
       jQuery("#dialogDialog").dialog("open");
-      Box.scan.prepareScanner(scannerName, Box.boxJSON.rows, Box.boxJSON.cols);
+      Box.scan.prepareScanner(scannerName, Box.boxJSON.rows, Box.boxJSON.cols, onSuccess);
     };
 
     self.error = function () {
@@ -761,6 +761,107 @@
       });
       jQuery("#dialogDialog").dialog("open");
     };
+    return self;
+  };
+
+  Box.MatrixScanDialog = function(scannerName) {
+    var self = new BoxVisual();
+
+    self.show = function (results) {
+        self.results = results;
+
+        var summaryHTML = "<h1> Matrix Scan Results </h1><p>Scan Complete</p>";
+
+        if(results.errors && results.errors.length > 0){
+            summaryHTML += '<p class="warning"><b>Warnings:</b></p><ul>';
+            results.errors.forEach(function (e) {
+                summaryHTML += '<li>' + (e.message || e) + '</li>';
+            });
+            summaryHTML += '</ul>';
+        }
+
+        var diffList = "";
+        if(results.diffs && results.diffs.length>0){
+            diffList += '<ul style="list-style-type:none;overflow-y:scroll;height:125px;">';
+            results.diffs.forEach(function (diff){
+                var msg = diff.action + " : " + (diff.modified ? diff.modified.identificationBarcode : "Unknown") + " at " + (diff.modified ? diff.modified.coordinates : "Unknown");
+                diffList += '<li>' + diff + '</li>';
+
+            });
+            diffList += '</ul>';
+        }
+
+        jQuery("#dialogInfoAbove").html(summaryHTML);
+        jQuery("#dialogInfoBelow").html(diffList);
+
+        jQuery("dialogDialog").dialog({
+            autoOpen: false,
+            title: "Scan Results (Assign Mode)",
+            width: Box.dialogWidth,
+            modal: true,
+            resizable: false,
+            position: [ jQuery(window).width()/2 - Box.dialogWidth /2, 50 ],
+            buttons: {
+                "Confirm Assign": function() {
+                    jQuery("#dialogDialog").dialog("close");
+                    var url = Urls.rest.boxes.matrixAssign(Box.boxJSON.id);
+
+                    Utils.ajaxWithDialog(
+                        "Assigning Barcodes",
+                        "POST",
+                        url,
+                        results,
+                        function() {
+                            Utils.page.pageReload();
+                        }
+                    );
+                },
+                Cancel: function () {
+                    jQuery("#dialogDialog").dialog("close");
+                }
+            }
+        });
+
+        self.create({
+            div: "#dialogVisual",
+            size: {
+                rows: Box.boxJSON.rows,
+                cols: Box.boxJSON.cols
+            },
+            data: self.results.items || []
+        });
+
+        jQuery("#updateSelected, #removeSelected, #emptySelected")
+            .prop("disable", true)
+            .addClass("disable");
+
+        jQuery("#dialogDialog").dialog("open");
+    };
+
+    self.getBoxPositionOpts = function (row, col){
+        var pos = self.getPositionString(row,col);
+
+        var boxables = self.results.item
+            ? self.results.items.filter( function (item) {
+                return item.coordinates === pos;
+            })
+            : [];
+
+        if(boxables.length > 0){
+            return {
+                title: boxables[0].description || boxables[0].alias || "Item",
+                selectedImg: "/styles/images/tube_full_selected.png",
+                unselectedImg: "/styles/images/tube_full.png"
+            };
+        } else {
+            return {
+                title: "Empty",
+                selectedImg: "/styles/images/tube_empty_selected.png",
+                unselectedImg: "/styles/images/tube_empty.png"
+            };
+        }
+    };
+
     return self;
   };
 

@@ -13,12 +13,14 @@ import org.springframework.context.annotation.Configuration;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.integration.dp5mirage.DP5MirageScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
+import uk.ac.bbsrc.tgac.miso.integration.mock.MockBoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScanner;
 
 @Configuration
 public class BoxScannerConfigurer {
   private static final String VISIONMATE_SCANNER = "visionmate";
   private static final String DP5MIRAGE_SCANNER = "dp5mirage";
+  private static final String MOCK_SCANNER = "mock";
   protected static final Logger log = LoggerFactory.getLogger(BoxScannerConfigurer.class);
 
   @Value("${miso.boxscanner.servers:}")
@@ -27,7 +29,18 @@ public class BoxScannerConfigurer {
   @Bean
   public Map<String, BoxScanner> boxScanners() {
     Map<String, BoxScanner> scanners = new HashMap<>();
+      if(!scanners.containsKey("mockScanner")){
+          try{
+              MockBoxScanner mock = new MockBoxScanner();
+              scanners.put("mockScanner", mock);
+          } catch (Exception e) {
+              log.error("Could not instantiate MockBoxScanner", e);
+          }
+      }
+
     if (LimsUtils.isStringBlankOrNull(configLine)) {
+        log.info("Loaded scanner: {}", scanners.keySet());
+        log.info("miso.boxscanner.server = {}", configLine);
       return scanners;
     }
 
