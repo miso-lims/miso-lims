@@ -146,7 +146,7 @@ ListUtils = (function ($) {
     },
     requisition: {
       term: "req:TEXT",
-      help: "Checks whether an item has the specified requisition ID",
+      help: "Checks whether an item has the specified requisition (alias)",
     },
     stage: {
       term: "stage:TEXT",
