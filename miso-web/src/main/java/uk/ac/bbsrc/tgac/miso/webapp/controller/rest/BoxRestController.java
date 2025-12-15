@@ -12,6 +12,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.jena.base.Sys;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -680,6 +681,8 @@ public class BoxRestController extends AbstractRestController {
               );
           }
 
+          System.out.println("Debug: Matrix Scan: BoxID : " + boxId + ", Items in box : " + boxablesByPosition.size() + " , ScannedBarcodes : " + barcodesByPosition.size());
+
           allPositions.stream().sorted().forEach(position -> {
               BoxableView existingItem = boxablesByPosition.get(position);
               String scannedBarcode = barcodesByPosition.get(position);
@@ -687,6 +690,7 @@ public class BoxRestController extends AbstractRestController {
 
               if(existingItem != null) {
                   BoxableDto itemDto = Dtos.asDto(existingItem);
+                  itemDto.setCoordinates(position);
 
                   if(hasScannedBarcode) {
                       String currentBarcode = existingItem.getIdentificationBarcode();
@@ -704,27 +708,25 @@ public class BoxRestController extends AbstractRestController {
 
                           itemDto.setIdentificationBarcode(scannedBarcode);
 
-                      } else {
-                          ErrorMessage err = new ErrorMessage();
-                          err.setCoordinates(position);
-                          err.setMessage("Item at "+ position + " has no scanned barcode (Scanner returned " + (scannedBarcode == null ? "nothing" : scannedBarcode) + ")");
-                          errors.add(err);
                       }
-
-                      items.add(itemDto);
                   } else {
-
                       ErrorMessage err = new ErrorMessage();
                       err.setCoordinates(position);
-                      err.setMessage(String.format(
-                              "Sample at %s has no scanned barcode.", position
-                      ));
+                      err.setMessage("Item at "+ position + " has no scanned barcode (Scanner returned " + (scannedBarcode == null ? "nothing" : scannedBarcode) + ")");
                       errors.add(err);
                   }
                   items.add(itemDto);
               } else {
 
                   if(hasScannedBarcode) {
+
+                      BoxableDto placeholderDto = new BoxableDto();
+                      placeholderDto.setCoordinates(position);
+                      placeholderDto.setIdentificationBarcode(scannedBarcode);
+                      placeholderDto.setAlias("New Barcode");
+                      placeholderDto.setName(scannedBarcode);
+                      items.add(placeholderDto);
+
                       ErrorMessage err = new ErrorMessage();
                       err.setCoordinates(position);
                       err.setMessage(String.format(
@@ -764,17 +766,28 @@ public class BoxRestController extends AbstractRestController {
                   .collect(Collectors.toMap(BoxableView::getBoxPosition, Function.identity()));
 
           if (results.getDiffs() != null) {
+              System.out.println("DEBUG: Processing " + results.getDiffs().size() + " diffs for barcode assignment");
               for (DiffMessage diff : results.getDiffs()) {
+
 
                   if( !"changed".equals(diff.getAction()) && diff.getModified() != null ){
                       BoxableDto mod = diff.getModified();
                       String position = mod.getCoordinates();
                       String newBarcode = mod.getIdentificationBarcode();
 
+                      System.out.println("Debug: Processing diff at position " + position + " with new Barcode " + newBarcode);
+
                       if(position != null && newBarcode != null){
                           BoxableView existing = boxableByPosition.get(position);
-                          if(existing != null && existing.getId() == mod.getId()){
+                          if(existing != null ){
+
+                              System.out.println("Found existing ite, at " + position + ": " + existing.getAlias() + " (ID: " + existing.getId() + " , current Barcode: " + existing.getIdentificationBarcode() + " )" );
+
                               updateEntityBarcode(existing, newBarcode);
+
+                              System.out.println("Updated barcode for " + existing.getAlias() + " to " + newBarcode);
+                          } else {
+                              System.out.println("No exosting item found at position " + position + " -- Skiping ");
                           }
                       }
                   }
@@ -792,23 +805,28 @@ public class BoxRestController extends AbstractRestController {
 
   private void updateEntityBarcode(BoxableView view, String newBarcode) throws IOException {
 
+      System.out.println("Update entity called with:  "+ view.getEntityType());
+
       switch (view.getEntityType()) {
           case SAMPLE:
               Sample sample = sampleService.get(view.getId());
               sample.setIdentificationBarcode(newBarcode);
               sampleService.save(sample);
+              System.out.println("Saved Sample with new barcode");
               break;
 
           case LIBRARY_ALIQUOT:
               LibraryAliquot ali = libraryAliquotService.get(view.getId());
               ali.setIdentificationBarcode(newBarcode);
               libraryAliquotService.save(ali);
+              System.out.println("Saved Library aliquote with new barcode");
               break;
 
           case LIBRARY:
               Library lib = libraryService.get(view.getId());
               lib.setIdentificationBarcode(newBarcode);
               libraryService.save(lib);
+              System.out.println("Saved Library with new barcode");
               break;
 
           default:
@@ -818,7 +836,8 @@ public class BoxRestController extends AbstractRestController {
   }
 
   private static boolean isRealBarcode(BoxScan scan, String barcode) {
-    return !barcode.equals(scan.getNoTubeLabel()) && !barcode.equals(scan.getNoReadLabel());
+//    return !barcode.equals(scan.getNoTubeLabel()) && !barcode.equals(scan.getNoReadLabel());
+    return barcode != null && !barcode.isEmpty() && !barcode.equals(scan.getNoTubeLabel()) && !barcode.equals(scan.getNoReadLabel());
   }
 
   @DeleteMapping("/{boxId}/positions/{position}")

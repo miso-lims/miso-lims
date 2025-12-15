@@ -7,7 +7,6 @@ import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Component("mockScanner")
 public class MockBoxScanner implements BoxScanner {
@@ -52,18 +51,7 @@ public class MockBoxScanner implements BoxScanner {
             for(int r = 0; r<rows; r++) {
                 for (int c = 1; c<= cols; c++){
                     String pos = String.format("%c%02d", (char) ('A' + r), c);
-
-                    if(ThreadLocalRandom.current().nextDouble() > 2.0) {
-                        barcodes.put(pos, "Mock -" + pos + " - " + System.currentTimeMillis() % 100);
-                    } else {
-
-                        if(ThreadLocalRandom.current().nextDouble() > 0.5) {
-                            barcodes.put(pos, null);
-                        } else {
-                            barcodes.put(pos, "");
-                        }
-
-                    }
+                    barcodes.put(pos, "Mock -" + pos + " - " + System.currentTimeMillis() % 100);
 
                 }
             }

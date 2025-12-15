@@ -782,10 +782,10 @@
 
         var diffList = "";
         if(results.diffs && results.diffs.length>0){
-            diffList += '<ul style="list-style-type:none;overflow-y:scroll;height:125px;">';
+            diffList += '<p class="updates"><b>Updates:</b></p><ul>';
             results.diffs.forEach(function (diff){
                 var msg = diff.action + " : " + (diff.modified ? diff.modified.identificationBarcode : "Unknown") + " at " + (diff.modified ? diff.modified.coordinates : "Unknown");
-                diffList += '<li>' + diff + '</li>';
+                diffList += '<li>' + msg + '</li>';
 
             });
             diffList += '</ul>';
@@ -794,32 +794,43 @@
         jQuery("#dialogInfoAbove").html(summaryHTML);
         jQuery("#dialogInfoBelow").html(diffList);
 
-        jQuery("dialogDialog").dialog({
+        jQuery("#dialogDialog").dialog({
             autoOpen: false,
             title: "Scan Results (Assign Mode)",
             width: Box.dialogWidth,
             modal: true,
             resizable: false,
             position: [ jQuery(window).width()/2 - Box.dialogWidth /2, 50 ],
-            buttons: {
-                "Confirm Assign": function() {
-                    jQuery("#dialogDialog").dialog("close");
-                    var url = Urls.rest.boxes.matrixAssign(Box.boxJSON.id);
+            buttons: [
+                {
+                    text:  "Confirm Assign",
+                    click: function() {
+                        var url = Urls.rest.boxes.matrixAssign(Box.boxJSON.id);
 
-                    Utils.ajaxWithDialog(
-                        "Assigning Barcodes",
-                        "POST",
-                        url,
-                        results,
-                        function() {
-                            Utils.page.pageReload();
-                        }
-                    );
+                        console.log("URL: ", url);
+                        console.log("Result: ", results);
+
+                        Utils.ajaxWithDialog(
+                            "Assigning Barcodes",
+                            "POST",
+                            url,
+                            results,
+                            function(response) {
+                                jQuery("#dialogDialog").dialog("close");
+                                Utils.showOkDialog("Success", ["Barcodes have been successfully assigned!"], function () {
+                                    Utils.page.pageReload();
+                                });
+                            }
+                        );
+                    }
                 },
-                Cancel: function () {
-                    jQuery("#dialogDialog").dialog("close");
+                {
+                    text: "Cancel",
+                    click: function() {
+                        jQuery("#dialogDialog").dialog("close");
+                    }
                 }
-            }
+            ]
         });
 
         self.create({
@@ -841,18 +852,55 @@
     self.getBoxPositionOpts = function (row, col){
         var pos = self.getPositionString(row,col);
 
-        var boxables = self.results.item
+        var rowChar = Box.utils.getRowLabel(row);
+        var colNum = parseInt(Box.utils.getColLabel(col), 10);
+        var paddedPos = rowChar + (colNum < 10 ? "0" + colNum: colNum);
+        var unpaddedPos = rowChar + colNum;
+
+        var boxables = self.results.items
             ? self.results.items.filter( function (item) {
-                return item.coordinates === pos;
+                if(!item.coordinates) return false;
+                return item.coordinates === pos || item.coordinates === paddedPos || item.coordinates === unpaddedPos;
             })
             : [];
 
+        var hasChange = self.results.diffs && self.results.diffs.some(function(diff) {
+            if(!diff.modified || !diff.modified.coordinates) return false;
+            var diffPos = diff.modified.coordinates;
+            return ( diffPos === pos || diffPos === paddedPos || diffPos === unpaddedPos) && diff.action === "changed";
+
+        });
+
+        var hasError = self.results.errors && self.results.errors.some( function(err) {
+            if(!err.coordinates) return false;
+
+            var errPos = err.coordinates;
+            return errPos === pos || errPos ===paddedPos || errPos === unpaddedPos;
+        })
+
         if(boxables.length > 0){
-            return {
-                title: boxables[0].description || boxables[0].alias || "Item",
-                selectedImg: "/styles/images/tube_full_selected.png",
-                unselectedImg: "/styles/images/tube_full.png"
-            };
+            var title = boxables[0].description || boxables[0].alias || boxables[0].identificationBarcode || "Item";
+
+            if(hasError)
+            {
+                return {
+                    title: title + " (Warning) ",
+                    selectedImg: "/styles/images/tube_full_selected.png",
+                    unselectedImg: "/styles/images/tube_error.png"
+                };
+            } else if(hasChange) {
+                return {
+                    title: title + " (Barcode Will Change) ",
+                    selectedImg: "/styles/images/tube_full_selected.png",
+                    unselectedImg: "/styles/images/tube_full_changed.png"
+                };
+            } else {
+                return {
+                    title: title + " (Barcode Will Change) ",
+                    selectedImg: "/styles/images/tube_full_selected.png",
+                    unselectedImg: "/styles/images/tube_full.png"
+                };
+            }
         } else {
             return {
                 title: "Empty",

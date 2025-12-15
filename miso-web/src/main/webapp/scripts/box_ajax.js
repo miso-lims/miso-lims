@@ -90,6 +90,10 @@ var Box = Box || {
     });
   },
 
+  assignMatrixBarcodes: function (scannerName) {
+    Box.startMatrixScan(scannerName);
+  },
+
   startStandardScan: function(scannerName){
     Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
     Box.dialogHeight = Box.boxJSON.rows * 40 + 300;

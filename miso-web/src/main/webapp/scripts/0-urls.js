@@ -175,7 +175,7 @@ Urls = (function () {
     prepareScan: boxRestBase + "/prepare-scan",
     scan: middleIdUrlFunction(boxRestBase, "/scan"),
     matrixScan: middleIdUrlFunction(boxRestBase, "/matrix-scan"),
-    matrixAssign: middleIdUrlFunction(boxRestBase, "/matrix-assign"),
+    matrixAssign: middleIdUrlFunction(boxRestBase, "/matrix-scan/assign"),
     spreadsheet: middleIdUrlFunction(boxRestBase, "/spreadsheet"),
     boxSpreadsheet: boxRestBase + "/spreadsheet",
     fragmentAnalyserSheet: middleIdUrlFunction(boxRestBase, "/fragmentAnalyser"),
