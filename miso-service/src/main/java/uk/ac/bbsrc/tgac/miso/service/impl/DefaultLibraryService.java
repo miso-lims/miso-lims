@@ -15,7 +15,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.jena.atlas.lib.Lib;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -143,14 +142,11 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   @Override
-  public Library save(Library library) throws IOException {
-
-      if(!library.isSaved()){
-          return get(create(library));
-      } else {
-          update(library);
-          return get(library.getId());
-      }
+  @Transactional
+  public void saveBarcode(long libraryId, String barcode) throws IOException {
+      Library library = get(libraryId);
+      library.setIdentificationBarcode(barcode);
+      libraryDao.update(library);
   }
 
   private Library save(Library library, boolean validateAliasUniqueness) throws IOException {

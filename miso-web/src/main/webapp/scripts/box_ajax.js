@@ -104,13 +104,13 @@ var Box = Box || {
   },
 
   startMatrixScan: function(scannerName){
-      Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
-      Box.dialogHeight = Box.boxJSON.rows * 40 + 300;
-      Box.matrixScanDialog = Box.MatrixScanDialog(scannerName);
-      console.log("Debug: MatrixBox: ", Box.MatrixScanDialog);
-      console.log("Debug: matrixBox: ", Box.matrixScanDialog);
-
       var onPrepareSuccess = function () {
+
+        jQuery("#dialogDialog").dialog("close");
+        jQuery("#dialogDialog").dialog("destroy");
+
+        Box.scanDialog.show({size: Box.boxJSON, data: Box.boxJSON});
+
         jQuery.ajax({
                 url: Urls.rest.boxes.matrixScan(Box.boxJSON.id),
                 type: "POST",
@@ -129,6 +129,10 @@ var Box = Box || {
               });
       };
 
+      Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
+      Box.dialogHeight = Box.boxJSON.rows * 40 + 300;
+      Box.scanDialog = Box.ScanDialog(scannerName);
+      Box.matrixScanDialog = Box.MatrixScanDialog(scannerName);
       Box.prepareScannerDialog = Box.PrepareScannerDialog(scannerName, onPrepareSuccess);
       Box.prepareScannerDialog.show();
   },

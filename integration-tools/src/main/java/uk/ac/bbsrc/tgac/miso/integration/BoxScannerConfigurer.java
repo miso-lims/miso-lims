@@ -29,18 +29,8 @@ public class BoxScannerConfigurer {
   @Bean
   public Map<String, BoxScanner> boxScanners() {
     Map<String, BoxScanner> scanners = new HashMap<>();
-      if(!scanners.containsKey("mockScanner")){
-          try{
-              MockBoxScanner mock = new MockBoxScanner();
-              scanners.put("mockScanner", mock);
-          } catch (Exception e) {
-              log.error("Could not instantiate MockBoxScanner", e);
-          }
-      }
 
     if (LimsUtils.isStringBlankOrNull(configLine)) {
-        log.info("Loaded scanner: {}", scanners.keySet());
-        log.info("miso.boxscanner.server = {}", configLine);
       return scanners;
     }
 
@@ -52,7 +42,7 @@ public class BoxScannerConfigurer {
       String[] configParts = configStrings[i].split(":");
       if (configParts.length != 4
           || !Pattern.compile("^ *[a-zA-Z0-9][a-zA-Z0-9 ]{0,100} *$").matcher(configParts[0]).matches()
-          || !(configParts[1].equals(VISIONMATE_SCANNER) || configParts[1].equals(DP5MIRAGE_SCANNER)
+          || !(configParts[1].equals(VISIONMATE_SCANNER) || configParts[1].equals(DP5MIRAGE_SCANNER) || configParts[1].equals(MOCK_SCANNER)
           || !Pattern.compile("^ *[a-zA-Z0-9\\.-]+ *$").matcher(configParts[2]).matches()
           || !Pattern.compile("^ *\\d{1,5} *$").matcher(configParts[3]).matches())) {
         throw new IllegalArgumentException("Invalid box scanner configuration: " + configStrings[i]);
@@ -76,6 +66,11 @@ public class BoxScannerConfigurer {
         DP5MirageScanner scanner;
         scanner = new DP5MirageScanner(host, port);
         scanners.put(name, scanner);
+      }
+      else if(type.equals(MOCK_SCANNER)) {
+          MockBoxScanner mockBoxScanner;
+          mockBoxScanner = new MockBoxScanner(host, port);
+          scanners.put(name,mockBoxScanner);
       }
     }
 

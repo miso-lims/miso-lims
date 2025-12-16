@@ -44,4 +44,6 @@ public interface SampleService
   List<Sample> getChildren(Collection<Long> parentIds, String targetSampleCategory, long effectiveRequisitionId)
       throws IOException;
 
+  void saveBarcode(long sampleId, String barcode) throws IOException;
+
 }

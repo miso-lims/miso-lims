@@ -99,6 +99,13 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
   }
 
   @Override
+  @Transactional
+  public void saveBarcode(long aliquotId, String barcode) throws IOException {
+      LibraryAliquot ali = get(aliquotId);
+      ali.setIdentificationBarcode(barcode);
+      update(ali);
+  }
+
   public LibraryAliquot save(LibraryAliquot aliquot) throws IOException {
     try {
       NamingScheme namingScheme = getNamingScheme(aliquot);

@@ -6,7 +6,6 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
@@ -48,6 +47,6 @@ public interface LibraryService
    */
   List<Long> listIdsByAncestorSampleIds(Collection<Long> sampleIds, Long relatedRequisitionId) throws IOException;
 
-  Library save(Library library) throws IOException;
+  void saveBarcode(long libraryId, String barcode) throws IOException;
 
 }

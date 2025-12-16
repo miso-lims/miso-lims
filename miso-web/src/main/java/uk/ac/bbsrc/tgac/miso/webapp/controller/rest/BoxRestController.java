@@ -25,6 +25,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -681,8 +682,6 @@ public class BoxRestController extends AbstractRestController {
               );
           }
 
-          System.out.println("Debug: Matrix Scan: BoxID : " + boxId + ", Items in box : " + boxablesByPosition.size() + " , ScannedBarcodes : " + barcodesByPosition.size());
-
           allPositions.stream().sorted().forEach(position -> {
               BoxableView existingItem = boxablesByPosition.get(position);
               String scannedBarcode = barcodesByPosition.get(position);
@@ -730,7 +729,7 @@ public class BoxRestController extends AbstractRestController {
                       ErrorMessage err = new ErrorMessage();
                       err.setCoordinates(position);
                       err.setMessage(String.format(
-                              "Barcode %s scanned at %s but position is empty is MISO",
+                              "Barcode \"%s\" scanned at %s but position is empty in MISO",
                               scannedBarcode, position
                       ));
                       errors.add(err);
@@ -745,7 +744,6 @@ public class BoxRestController extends AbstractRestController {
           results.setDiffs(diffs);
           results.setRows(scan.getRowCount());
           results.setColumns(scan.getColumnCount());
-//          results.setEmptyPositions(Collections.emptyList());
 
           return results;
 
@@ -766,34 +764,25 @@ public class BoxRestController extends AbstractRestController {
                   .collect(Collectors.toMap(BoxableView::getBoxPosition, Function.identity()));
 
           if (results.getDiffs() != null) {
-              System.out.println("DEBUG: Processing " + results.getDiffs().size() + " diffs for barcode assignment");
               for (DiffMessage diff : results.getDiffs()) {
 
 
-                  if( !"changed".equals(diff.getAction()) && diff.getModified() != null ){
+                  if( "changed".equals(diff.getAction()) && diff.getModified() != null ){
                       BoxableDto mod = diff.getModified();
                       String position = mod.getCoordinates();
                       String newBarcode = mod.getIdentificationBarcode();
 
-                      System.out.println("Debug: Processing diff at position " + position + " with new Barcode " + newBarcode);
-
                       if(position != null && newBarcode != null){
                           BoxableView existing = boxableByPosition.get(position);
                           if(existing != null ){
-
-                              System.out.println("Found existing ite, at " + position + ": " + existing.getAlias() + " (ID: " + existing.getId() + " , current Barcode: " + existing.getIdentificationBarcode() + " )" );
-
                               updateEntityBarcode(existing, newBarcode);
-
-                              System.out.println("Updated barcode for " + existing.getAlias() + " to " + newBarcode);
                           } else {
-                              System.out.println("No exosting item found at position " + position + " -- Skiping ");
+                              log.warn("Barcode scan ignored, no existing item found at position {} - barcode {}", position, newBarcode);
                           }
                       }
                   }
               }
           }
-
           return getBoxDtoWithBoxables(boxId);
 
       } catch (IOException e){
@@ -804,39 +793,25 @@ public class BoxRestController extends AbstractRestController {
   }
 
   private void updateEntityBarcode(BoxableView view, String newBarcode) throws IOException {
-
-      System.out.println("Update entity called with:  "+ view.getEntityType());
-
       switch (view.getEntityType()) {
           case SAMPLE:
-              Sample sample = sampleService.get(view.getId());
-              sample.setIdentificationBarcode(newBarcode);
-              sampleService.save(sample);
-              System.out.println("Saved Sample with new barcode");
+              sampleService.saveBarcode(view.getId(), newBarcode);
               break;
 
           case LIBRARY_ALIQUOT:
-              LibraryAliquot ali = libraryAliquotService.get(view.getId());
-              ali.setIdentificationBarcode(newBarcode);
-              libraryAliquotService.save(ali);
-              System.out.println("Saved Library aliquote with new barcode");
+              libraryAliquotService.saveBarcode(view.getId(), newBarcode);
               break;
 
           case LIBRARY:
-              Library lib = libraryService.get(view.getId());
-              lib.setIdentificationBarcode(newBarcode);
-              libraryService.save(lib);
-              System.out.println("Saved Library with new barcode");
+              libraryService.saveBarcode(view.getId(), newBarcode);
               break;
 
           default:
               log.warn("Unsupported entity type for barcode assignment: {}", view.getEntityType());
       }
-
   }
 
   private static boolean isRealBarcode(BoxScan scan, String barcode) {
-//    return !barcode.equals(scan.getNoTubeLabel()) && !barcode.equals(scan.getNoReadLabel());
     return barcode != null && !barcode.isEmpty() && !barcode.equals(scan.getNoTubeLabel()) && !barcode.equals(scan.getNoReadLabel());
   }
 

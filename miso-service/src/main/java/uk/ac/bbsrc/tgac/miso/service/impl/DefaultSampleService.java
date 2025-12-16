@@ -256,6 +256,14 @@ public class DefaultSampleService implements SampleService {
   }
 
   @Override
+  @Transactional
+  public void saveBarcode(long sampleId, String barcode) throws IOException {
+      Sample sample = get(sampleId);
+      sample.setIdentificationBarcode(barcode);
+      update(sample);
+  }
+
+  @Override
   public long create(Sample sample) throws IOException {
     requisitionService.findOrCreateRequisition(sample);
     loadChildEntities(sample);

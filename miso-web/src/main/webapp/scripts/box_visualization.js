@@ -780,19 +780,11 @@
             summaryHTML += '</ul>';
         }
 
-        var diffList = "";
-        if(results.diffs && results.diffs.length>0){
-            diffList += '<p class="updates"><b>Updates:</b></p><ul>';
-            results.diffs.forEach(function (diff){
-                var msg = diff.action + " : " + (diff.modified ? diff.modified.identificationBarcode : "Unknown") + " at " + (diff.modified ? diff.modified.coordinates : "Unknown");
-                diffList += '<li>' + msg + '</li>';
-
-            });
-            diffList += '</ul>';
-        }
+        var belowMessage = "<p><img src = '/styles/images/tube_error.png' width= '14'> Conflict or Missing item </p>" +
+                           "<p><img src = '/styles/images/tube_full.png' width= '14'> Barcode will be assigned </p>"  ;
 
         jQuery("#dialogInfoAbove").html(summaryHTML);
-        jQuery("#dialogInfoBelow").html(diffList);
+        jQuery("#dialogInfoBelow").html(belowMessage);
 
         jQuery("#dialogDialog").dialog({
             autoOpen: false,
@@ -867,7 +859,14 @@
         var hasChange = self.results.diffs && self.results.diffs.some(function(diff) {
             if(!diff.modified || !diff.modified.coordinates) return false;
             var diffPos = diff.modified.coordinates;
-            return ( diffPos === pos || diffPos === paddedPos || diffPos === unpaddedPos) && diff.action === "changed";
+            if(!(diffPos === pos || diffPos === paddedPos || diffPos === unpaddedPos)){
+                return false;
+            }
+
+            var originalBarcode = diff.original && diff.original.identificationBarcode;
+            var modifiedBarcode = diff.modified && diff.modified.identificationBarcode;
+
+            return originalBarcode && modifiedBarcode && originalBarcode !== modifiedBarcode;
 
         });
 
@@ -880,7 +879,8 @@
 
         if(boxables.length > 0){
             var title = boxables[0].description || boxables[0].alias || boxables[0].identificationBarcode || "Item";
-
+            var existingBarcode = (boxables[0].identificationBarcode || "").trim();
+            var hasExistingBarcode = existingBarcode.length>0;
             if(hasError)
             {
                 return {
@@ -892,7 +892,13 @@
                 return {
                     title: title + " (Barcode Will Change) ",
                     selectedImg: "/styles/images/tube_full_selected.png",
-                    unselectedImg: "/styles/images/tube_full_changed.png"
+                    unselectedImg: "/styles/images/tube_error.png"
+                };
+            } else if (hasExistingBarcode) {
+                return {
+                    title: title + " (Barcode will be added) ",
+                    selectedImg: "/styles/images/tube_full_selected.png",
+                    unselectedImg: "/styles/images/tube_full.png"
                 };
             } else {
                 return {

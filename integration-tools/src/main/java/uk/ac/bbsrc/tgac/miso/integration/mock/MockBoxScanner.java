@@ -6,12 +6,21 @@ import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 
+import java.net.http.HttpClient;
 import java.util.*;
 
-@Component("mockScanner")
 public class MockBoxScanner implements BoxScanner {
+    private final String host;
+    private final int port;
+    private final HttpClient httpClient;
     private int rows = 8;
     private int cols = 12;
+
+    public MockBoxScanner(String host, int port) {
+        this.host = host;
+        this.port = port;
+        this.httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
+    }
 
     @Override
     public void prepareScan(int expectedRows, int expectedColums) throws IntegrationException {
@@ -47,15 +56,12 @@ public class MockBoxScanner implements BoxScanner {
         }
 
         private void generateBarcodes() {
-
             for(int r = 0; r<rows; r++) {
                 for (int c = 1; c<= cols; c++){
                     String pos = String.format("%c%02d", (char) ('A' + r), c);
                     barcodes.put(pos, "Mock -" + pos + " - " + System.currentTimeMillis() % 100);
-
                 }
             }
-
         }
 
         @Override
