@@ -62,11 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.BoxStorageAmount;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.BoxSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.core.service.StorageLocationService;
+import uk.ac.bbsrc.tgac.miso.core.service.*;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
@@ -110,6 +106,8 @@ public class BoxRestController extends AbstractRestController {
   private LibraryService libraryService;
   @Autowired
   private LibraryAliquotService libraryAliquotService;
+  @Autowired
+  private PoolService poolService;
   @Autowired
   private StorageLocationService storageLocationService;
 
@@ -804,6 +802,10 @@ public class BoxRestController extends AbstractRestController {
 
           case LIBRARY:
               libraryService.saveBarcode(view.getId(), newBarcode);
+              break;
+
+          case POOL:
+              poolService.saveBarcode(view.getId(), newBarcode);
               break;
 
           default:

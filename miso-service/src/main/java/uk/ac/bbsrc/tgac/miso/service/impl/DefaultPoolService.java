@@ -169,6 +169,14 @@ public class DefaultPoolService implements PoolService {
   }
 
   @Override
+  @Transactional
+  public void saveBarcode(long poolId, String barcode) throws IOException {
+      Pool pool = get(poolId);
+      pool.setIdentificationBarcode(barcode);
+      update(pool);
+  }
+
+  @Override
   public long create(Pool pool) throws IOException {
     if (pool.isDiscarded()) {
       pool.setVolume(BigDecimal.ZERO);

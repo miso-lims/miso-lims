@@ -24,4 +24,6 @@ public interface PoolService
 
   Pool getByAlias(String alias) throws IOException;
 
+  void saveBarcode(long poolId, String barcode) throws IOException;
+
 }
