@@ -1161,3 +1161,12 @@ INSERT INTO Project_Contact (projectId, contactId, contactRoleId) VALUES
 INSERT INTO ApiKey(keyId, userId, apiKey, apiSecret, creator, created) VALUES
 -- unencrypted key: LwTTBMu4QSOeTWp7Uo7Bva0Jm0+Zpnxb-jw24z317EwhjoqtswuROsj1DFXoD9WT6
 (1, 1, 'LwTTBMu4QSOeTWp7Uo7Bva0Jm0+Zpnxb', '{bcrypt}$2a$10$l2gtUtIdwV98avW6C7DYZOkhDdRKuiYADiOm33UkkdabaxjITvpDS', 1, '2025-03-11 15:10:00');
+
+INSERT INTO Sop (sopId, alias, version, category, archived) 
+VALUES (101, 'Test NovaSeq SOP', '1.0', 'Sequencing', 0);
+
+INSERT INTO SopField (sopId, name, units, fieldType) VALUES
+  (101, 'Flow Cell Lot Number', NULL, 'TEXT'),
+  (101, 'Reagent Cartridge Lot', NULL, 'TEXT'),
+  (101, 'PhiX Spike-in %', '%', 'PERCENTAGE'),
+  (101, 'Library Concentration', 'nM', 'NUMBER');

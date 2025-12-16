@@ -1,0 +1,1 @@
+SOPs can now have custom fields defined by administrators to capture standardized data. Each field has a name, optional unit (e.g., %,nM, μL), and a type that determines what values are valid.

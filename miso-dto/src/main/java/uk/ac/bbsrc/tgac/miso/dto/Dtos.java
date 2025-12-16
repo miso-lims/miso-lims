@@ -117,6 +117,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
+import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.StainCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -277,6 +278,7 @@ import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunPositionDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.SolidRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.UltimaRunDto;
+
 
 @SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
@@ -4418,6 +4420,13 @@ public class Dtos {
     setString(to::setCategory, maybeGetProperty(from.getCategory(), SopCategory::name));
     setString(to::setUrl, from.getUrl());
     setBoolean(to::setArchived, from.isArchived(), false);
+
+    if (from.getSopFields() != null && !from.getSopFields().isEmpty()) {
+      to.setFields(from.getSopFields().stream()
+          .map(Dtos::asDto)
+          .collect(Collectors.toList()));
+    }
+
     return to;
   }
 
@@ -4429,6 +4438,36 @@ public class Dtos {
     setObject(to::setCategory, from.getCategory(), SopCategory::valueOf);
     setString(to::setUrl, from.getUrl());
     setBoolean(to::setArchived, from.isArchived(), false);
+
+    if (from.getFields() != null && !from.getFields().isEmpty()) {
+      Set<SopField> fields = from.getFields().stream()
+          .map(fieldDto -> {
+            SopField field = Dtos.to(fieldDto);
+            field.setSop(to);
+            return field;
+          })
+          .collect(Collectors.toSet());
+      to.setSopFields(fields);
+    }
+
+    return to;
+  }
+
+  public static SopFieldDto asDto(@Nonnull SopField from) {
+    SopFieldDto dto = new SopFieldDto();
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setName, from.getName());
+    setString(dto::setUnits, from.getUnits());
+    setString(dto::setFieldType, maybeGetProperty(from.getFieldType(), SopField.FieldType::name));
+    return dto;
+  }
+
+  public static SopField to(@Nonnull SopFieldDto from) {
+    SopField to = new SopField();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    setString(to::setUnits, from.getUnits());
+    setObject(to::setFieldType, from.getFieldType(), fieldType -> SopField.FieldType.valueOf(fieldType));
     return to;
   }
 

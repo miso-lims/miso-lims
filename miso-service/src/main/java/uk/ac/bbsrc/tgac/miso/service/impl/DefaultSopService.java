@@ -3,7 +3,9 @@ package uk.ac.bbsrc.tgac.miso.service.impl;
 import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.isChanged;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -73,13 +76,61 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
         && sopDao.get(sop.getCategory(), sop.getAlias(), sop.getVersion()) != null) {
       errors.add(ValidationError.forDuplicate("SOP", null, "alias and version"));
     }
+
+    // ADDED: Validate SOP fields (Ticket 1)
+    validateSopFields(sop, errors);
   }
 
   @Override
   protected void applyChanges(Sop to, Sop from) throws IOException {
     to.setAlias(from.getAlias());
+    to.setVersion(from.getVersion());
+    to.setCategory(from.getCategory());
     to.setUrl(from.getUrl());
     to.setArchived(from.isArchived());
+
+    // CORRECTED: Handle SOP fields for Ticket 1
+    // Clear existing fields
+    to.getSopFields().clear();
+
+    // Add fields from the incoming object
+    if (from.getSopFields() != null) {
+      for (SopField fromField : from.getSopFields()) {
+        SopField toField = new SopField();
+        toField.setName(fromField.getName());
+        toField.setUnits(fromField.getUnits());
+        toField.setFieldType(fromField.getFieldType());
+        to.addSopField(toField); // This sets the bidirectional relationship
+      }
+    }
+  }
+
+
+  private void validateSopFields(Sop sop, List<ValidationError> errors) {
+    if (sop.getSopFields() == null || sop.getSopFields().isEmpty()) {
+      return; // No fields to validate
+    }
+
+    Set<String> fieldNames = new HashSet<>();
+    for (SopField field : sop.getSopFields()) {
+      // Check field name is not empty
+      if (field.getName() == null || field.getName().trim().isEmpty()) {
+        errors.add(new ValidationError("sopFields", "SOP field name cannot be empty"));
+        continue;
+      }
+
+      // Check for duplicate field names
+      String normalizedName = field.getName().trim().toLowerCase();
+      if (!fieldNames.add(normalizedName)) {
+        errors.add(new ValidationError("sopFields", "Duplicate field name: " + field.getName()));
+      }
+
+      // Ensure field type is set
+      if (field.getFieldType() == null) {
+        errors.add(new ValidationError("sopFields",
+            "Field type is required for field: " + field.getName()));
+      }
+    }
   }
 
   @Override
@@ -111,7 +162,8 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
   }
 
   @Override
-  public List<Sop> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol, PaginationFilter... filter)
+  public List<Sop> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
+      PaginationFilter... filter)
       throws IOException {
     return sopDao.list(offset, limit, sortDir, sortCol, filter);
   }

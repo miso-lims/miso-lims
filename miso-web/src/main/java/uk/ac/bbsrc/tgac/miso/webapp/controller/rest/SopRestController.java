@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response.Status;
+import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
@@ -27,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SopDto;
+import uk.ac.bbsrc.tgac.miso.dto.SopFieldDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
@@ -55,6 +57,56 @@ public class SopRestController extends AbstractRestController {
       return sopService;
     }
   };
+
+  // ADDED: GET single SOP with fields
+  @GetMapping(value = "/{id}", produces = "application/json")
+  @ResponseBody
+  public SopDto getSop(@PathVariable("id") long id) throws IOException {
+    Sop sop = sopService.get(id);
+    if (sop == null) {
+      throw new RestException("SOP not found", Status.NOT_FOUND);
+    }
+    return Dtos.asDto(sop);
+  }
+
+  // ADDED: POST create new SOP with fields
+  @PostMapping(produces = "application/json")
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public SopDto create(@RequestBody SopDto dto) throws IOException {
+    Sop sop = Dtos.to(dto);
+    long savedId = sopService.create(sop);
+    return Dtos.asDto(sopService.get(savedId));
+  }
+
+  // ADDED: PUT update existing SOP with fields
+  @PutMapping(value = "/{id}", produces = "application/json")
+  @ResponseBody
+  public SopDto update(@PathVariable("id") long id, @RequestBody SopDto dto) throws IOException {
+    Sop existing = sopService.get(id);
+    if (existing == null) {
+      throw new RestException("SOP not found", Status.NOT_FOUND);
+    }
+
+    // Update basic fields
+    existing.setAlias(dto.getAlias());
+    existing.setVersion(dto.getVersion());
+    existing.setCategory(SopCategory.valueOf(dto.getCategory()));
+    existing.setUrl(dto.getUrl());
+    existing.setArchived(dto.isArchived());
+
+    // Clear and re-add fields
+    existing.getSopFields().clear();
+    if (dto.getFields() != null && !dto.getFields().isEmpty()) {
+      for (SopFieldDto fieldDto : dto.getFields()) {
+        SopField field = Dtos.to(fieldDto);
+        existing.addSopField(field);
+      }
+    }
+
+    sopService.update(existing);
+    return Dtos.asDto(sopService.get(id));
+  }
 
   @GetMapping(value = "/dt/category/{category}")
   public @ResponseBody DataTablesResponseDto<SopDto> dataTableByCategory(@PathVariable("category") String categoryName,
