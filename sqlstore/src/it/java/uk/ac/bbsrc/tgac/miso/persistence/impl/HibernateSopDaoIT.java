@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
+import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 
 public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, HibernateSopDao> {
 
@@ -82,6 +83,64 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
   @Test
   public void testGetUsageByRuns() throws Exception {
     testGetUsage(HibernateSopDao::getUsageByRuns, 5L, 1L);
+  }
+
+  @Test
+  public void testSaveSopWithFields() throws Exception {
+    Sop sop = new Sop();
+    sop.setAlias("Integration Test SOP");
+    sop.setVersion("1.0");
+    sop.setCategory("Sequencing");
+    sop.setArchived(false);
+
+    SopField field1 = new SopField();
+    field1.setName("Flow Cell Lot");
+    field1.setFieldType(SopField.FieldType.TEXT);
+
+    SopField field2 = new SopField();
+    field2.setName("PhiX %");
+    field2.setUnits("%");
+    field2.setFieldType(SopField.FieldType.PERCENTAGE);
+
+    sop.addSopField(field1);
+    sop.addSopField(field2);
+
+    long savedId = sut.create(sop);
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    Sop loaded = sut.get(savedId);
+    assertNotNull(loaded);
+    assertEquals(2, loaded.getSopFields().size());
+  }
+
+  @Test
+  public void testDeleteSopCascadesToFields() throws Exception {
+    Sop sop = new Sop();
+    sop.setAlias("SOP To Delete");
+    sop.setVersion("1.0");
+    sop.setCategory("Sequencing");
+    sop.setArchived(false);
+
+    SopField field = new SopField();
+    field.setName("Test Field");
+    field.setFieldType(SopField.FieldType.TEXT);
+    sop.addSopField(field);
+
+    long sopId = sut.create(sop);
+    sessionFactory.getCurrentSession().flush();
+
+    Sop loaded = sut.get(sopId);
+    Long fieldId = loaded.getSopFields().iterator().next().getId();
+
+    sut.remove(loaded);
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    assertNull(sut.get(sopId));
+    SopField orphanField = (SopField) sessionFactory.getCurrentSession()
+        .get(SopField.class, fieldId);
+    assertNull(orphanField);
   }
 
 }

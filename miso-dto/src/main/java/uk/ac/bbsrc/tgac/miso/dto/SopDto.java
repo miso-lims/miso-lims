@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
+
 public class SopDto {
 
   private long id;
@@ -8,6 +10,7 @@ public class SopDto {
   private String category;
   private String url;
   private boolean archived;
+  private List<SopFieldDto> fields;
 
   public long getId() {
     return id;
@@ -55,6 +58,14 @@ public class SopDto {
 
   public void setArchived(boolean archived) {
     this.archived = archived;
+  }
+
+  public List<SopFieldDto> getFields() {
+    return fields;
+  }
+
+  public void setFields(List<SopFieldDto> fields) {
+    this.fields = fields;
   }
 
 }
