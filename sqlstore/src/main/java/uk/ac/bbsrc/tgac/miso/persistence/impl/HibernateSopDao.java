@@ -27,7 +27,8 @@ import uk.ac.bbsrc.tgac.miso.persistence.SopDao;
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
-public class HibernateSopDao extends HibernateSaveDao<Sop> implements JpaCriteriaPaginatedDataSource<Sop, Sop>, SopDao {
+public class HibernateSopDao extends HibernateSaveDao<Sop>
+    implements JpaCriteriaPaginatedDataSource<Sop, Sop>, SopDao {
 
   public HibernateSopDao() {
     super(Sop.class);
@@ -51,7 +52,7 @@ public class HibernateSopDao extends HibernateSaveDao<Sop> implements JpaCriteri
 
   @Override
   public List<Sop> listByIdList(Collection<Long> ids) throws IOException {
-    return listByIdList(Sop_.SOP_ID, ids);
+    return listByIdList(Sop_.sopId, ids);
   }
 
   @Override
