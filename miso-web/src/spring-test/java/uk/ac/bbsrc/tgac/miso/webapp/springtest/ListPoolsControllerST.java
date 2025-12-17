@@ -15,8 +15,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import org.junit.Test;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.servlet.ModelAndView;
 
 public class ListPoolsControllerST extends AbstractST {
 
@@ -30,30 +28,16 @@ public class ListPoolsControllerST extends AbstractST {
     @Test
     @WithMockUser(username = "admin", roles = {"INTERNAL", "ADMIN"})
     public void testGetPoolsPage() throws Exception {
+        PoolImpl pool = currentSession().get(PoolImpl.class, 1L);
+        assertNotNull(pool);
+        assertNotNull(pool.getPlatformType());
+
         getMockMvc()
                 .perform(get("/pools"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/WEB-INF/pages/listTabbed.jsp"))
                 .andExpect(model().attributeExists("title"))
-                .andExpect(model().attribute("title", "Pools"));
+                .andExpect(model().attribute("title", "Pools"))
+                .andExpect(model().attribute("tabs", hasKey(pool.getPlatformType().getKey())));
     }
-
-    @Test
-    @WithMockUser(username = "admin", roles = {"INTERNAL", "ADMIN"})
-    public void testPoolsTabsContainsLoadedPools() throws Exception {
-        Pool pool = poolService.getByAlias("POOL_1");
-        assertNotNull(pool.getPlatformType());
-
-        ModelMap model = new ModelMap();
-        ModelAndView mav = controller.listPools(model);
-
-        String platformName = pool.getPlatformType().name();
-        String modelString = String.valueOf(mav.getModel());
-
-        assertThat("Expected pools tab model to include platform type of a loaded pool",
-                modelString,
-                containsString(platformName));
-
-    }
-
 }
