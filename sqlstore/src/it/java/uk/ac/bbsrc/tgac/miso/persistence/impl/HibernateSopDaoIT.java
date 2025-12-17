@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, HibernateSopDao> {
 
   public HibernateSopDaoIT() {
-    super(Sop.class, 1L, 5);
+    super(Sop.class, 1L, 6);
   }
 
   @Override
@@ -90,7 +90,8 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
     Sop sop = new Sop();
     sop.setAlias("Integration Test SOP");
     sop.setVersion("1.0");
-    sop.setCategory("Sequencing");
+    sop.setCategory(SopCategory.RUN);
+    sop.setUrl("http://test.com/integration-sop");
     sop.setArchived(false);
 
     SopField field1 = new SopField();
@@ -105,13 +106,32 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
     sop.addSopField(field1);
     sop.addSopField(field2);
 
-    long savedId = sut.create(sop);
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    long savedId = getTestSubject().create(sop);
+    clearSession();
 
-    Sop loaded = sut.get(savedId);
+    Sop loaded = getTestSubject().get(savedId);
     assertNotNull(loaded);
     assertEquals(2, loaded.getSopFields().size());
+
+    SopField[] fields = loaded.getSopFields().toArray(new SopField[0]);
+
+    boolean hasFlowCell = false;
+    boolean hasPhiX = false;
+
+    for (SopField field : fields) {
+      if ("Flow Cell Lot".equals(field.getName())) {
+        hasFlowCell = true;
+        assertEquals(SopField.FieldType.TEXT, field.getFieldType());
+      }
+      if ("PhiX %".equals(field.getName())) {
+        hasPhiX = true;
+        assertEquals(SopField.FieldType.PERCENTAGE, field.getFieldType());
+        assertEquals("%", field.getUnits());
+      }
+    }
+
+    assertTrue("Should have Flow Cell Lot field", hasFlowCell);
+    assertTrue("Should have PhiX % field", hasPhiX);
   }
 
   @Test
@@ -119,28 +139,29 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
     Sop sop = new Sop();
     sop.setAlias("SOP To Delete");
     sop.setVersion("1.0");
-    sop.setCategory("Sequencing");
+    sop.setCategory(SopCategory.LIBRARY);
+    sop.setUrl("http://test.com/delete-sop");
     sop.setArchived(false);
 
     SopField field = new SopField();
     field.setName("Test Field");
     field.setFieldType(SopField.FieldType.TEXT);
+
     sop.addSopField(field);
 
-    long sopId = sut.create(sop);
-    sessionFactory.getCurrentSession().flush();
+    long sopId = getTestSubject().create(sop);
+    clearSession();
 
-    Sop loaded = sut.get(sopId);
-    Long fieldId = loaded.getSopFields().iterator().next().getId();
+    Sop loaded = getTestSubject().get(sopId);
+    assertNotNull(loaded);
+    assertEquals(1, loaded.getSopFields().size());
 
-    sut.remove(loaded);
-    sessionFactory.getCurrentSession().flush();
-    sessionFactory.getCurrentSession().clear();
+    currentSession().remove(loaded);
+    clearSession();
 
-    assertNull(sut.get(sopId));
-    SopField orphanField = (SopField) sessionFactory.getCurrentSession()
-        .get(SopField.class, fieldId);
-    assertNull(orphanField);
+
+    Sop deleted = getTestSubject().get(sopId);
+    assertNull(deleted);
   }
 
 }

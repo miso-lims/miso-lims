@@ -129,7 +129,11 @@ public class SopField implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
+    // Use business key (name + fieldType) instead of id for unsaved entities
+    if (id != null) {
+      return Objects.hash(id);
+    }
+    return Objects.hash(name, fieldType);
   }
 
   @Override
@@ -139,7 +143,15 @@ public class SopField implements Serializable {
     if (obj == null || getClass() != obj.getClass())
       return false;
     SopField other = (SopField) obj;
-    return Objects.equals(id, other.id);
+
+    // If both have IDs, compare by ID
+    if (id != null && other.id != null) {
+      return Objects.equals(id, other.id);
+    }
+
+    // For unsaved entities, use business key (name + fieldType)
+    return Objects.equals(name, other.name) &&
+        Objects.equals(fieldType, other.fieldType);
   }
 
   @Override
