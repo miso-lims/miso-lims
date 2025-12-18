@@ -50,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
@@ -256,10 +257,21 @@ public class DefaultSampleService implements SampleService {
   }
 
   @Override
-  @Transactional
   public void saveBarcode(long sampleId, String barcode) throws IOException {
-      Sample sample = get(sampleId);
+      Sample sample = sampleStore.get(sampleId);
+      Sample beforeChange = new SampleImpl();
+
+      beforeChange.setId(sample.getId());
+      beforeChange.setIdentificationBarcode(sample.getIdentificationBarcode());
       sample.setIdentificationBarcode(barcode);
+      System.out.println(sample.getIdentificationBarcode()+ "----" + beforeChange.getIdentificationBarcode());
+      List<ValidationError> errors = new ArrayList<>();
+      ValidationUtils.validateBarcodeUniqueness(sample, beforeChange,barcodableReferenceService,errors);
+
+      if(!errors.isEmpty()){
+          throw new ValidationException(errors);
+      }
+
       update(sample);
   }
 

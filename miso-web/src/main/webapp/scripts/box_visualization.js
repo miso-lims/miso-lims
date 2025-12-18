@@ -770,21 +770,22 @@
     self.show = function (results) {
         self.results = results;
 
-        var summaryHTML = "<h1> Matrix Scan Results </h1><p>Scan Complete</p>";
-
-        if(results.errors && results.errors.length > 0){
-            summaryHTML += '<p class="warning"><b>Warnings:</b></p><ul>';
-            results.errors.forEach(function (e) {
-                summaryHTML += '<li>' + (e.message || e) + '</li>';
-            });
-            summaryHTML += '</ul>';
-        }
-
-        var belowMessage = "<p><img src = '/styles/images/tube_error.png' width= '14'> Conflict or Missing item </p>" +
+        var summaryHTML = "<h1> Matrix Scan Results </h1><ul>";
+        var legendHTML = "<p><img src = '/styles/images/tube_error.png' width= '14'> Conflict or Missing item </p>" +
                            "<p><img src = '/styles/images/tube_full.png' width= '14'> Barcode will be assigned </p>"  ;
 
+        var Warnings = "";
+
+        if(results.errors && results.errors.length > 0){
+            Warnings += '<p class="warning"><b>Warnings:</b></p><ul>';
+            results.errors.forEach(function (e) {
+                Warnings += '<li>' + (e.message || e) + '</li>';
+            });
+            Warnings += '</ul>';
+        }
+
         jQuery("#dialogInfoAbove").html(summaryHTML);
-        jQuery("#dialogInfoBelow").html(belowMessage);
+        jQuery("#dialogInfoBelow").html(legendHTML + Warnings);
 
         jQuery("#dialogDialog").dialog({
             autoOpen: false,

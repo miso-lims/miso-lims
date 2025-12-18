@@ -659,12 +659,39 @@ public class BoxRestController extends AbstractRestController {
           }
 
           Map<String, String> barcodesByPosition = scan.getBarcodesMap();
+          Set<String> validBarcodes = barcodesByPosition.values().stream()
+                  .filter(barcode -> isRealBarcode(scan, barcode)).collect(Collectors.toSet());
+
+          Map<String, List<String>> positionByBarcode = barcodesByPosition.entrySet().stream()
+                  .filter(e -> isRealBarcode(scan, e.getValue()))
+                  .collect(Collectors.groupingBy(Map.Entry::getValue,
+                          Collectors.mapping(Map.Entry::getKey, Collectors.toList())));
+
+          Set<String> duplicateBarcodes = positionByBarcode.entrySet().stream()
+                  .filter(e -> e.getValue().size()>1)
+                  .map(Map.Entry::getKey)
+                  .collect(Collectors.toSet());
+
+          List<ErrorMessage> errors = new ArrayList<>();
+          duplicateBarcodes.forEach(bc -> {
+              ErrorMessage dto = new ErrorMessage();
+              dto.setMessage(String.format("Duplicate barcode '%s' scanned at '%s'",bc, positionByBarcode.get(bc)));
+              errors.add(dto);
+          });
+
+          long totalReal = barcodesByPosition.values().stream()
+                  .filter(b -> isRealBarcode(scan, b))
+                  .count();
+          if(validBarcodes.size() != totalReal) {
+              ErrorMessage e = new ErrorMessage();
+              e.setMessage("Duplicate barcode detected");
+              errors.add(e);
+          }
           Box box =  getBox(boxId);
           Map<String, BoxableView> boxablesByPosition = boxService.getBoxContents(boxId).stream()
-                  .collect(Collectors.toMap(BoxableView::getBoxPosition, Function.identity()));
+                  .collect(Collectors.toMap(BoxableView::getBoxPosition, Function.identity(), (a,b) -> a));
 
           List<BoxableDto> items = new ArrayList<>();
-          List<ErrorMessage> errors = new ArrayList<>();
           List<DiffMessage> diffs = new ArrayList<>();
 
           Set<String> allPositions = new HashSet<>();
@@ -688,25 +715,31 @@ public class BoxRestController extends AbstractRestController {
               if(existingItem != null) {
                   BoxableDto itemDto = Dtos.asDto(existingItem);
                   itemDto.setCoordinates(position);
+                  String currentBarcode = existingItem.getIdentificationBarcode();
 
-                  if(hasScannedBarcode) {
-                      String currentBarcode = existingItem.getIdentificationBarcode();
+                  if(hasScannedBarcode && !scannedBarcode.equals(currentBarcode)){
 
-                      if(!scannedBarcode.equals(existingItem.getIdentificationBarcode())) {
-                          DiffMessage diff = new DiffMessage();
-                          diff.setAction("changed");
-                          diff.setOriginal(Dtos.asDto(existingItem));
+                      DiffMessage diff = new DiffMessage();
+                      diff.setAction("changed");
+                      diff.setOriginal(Dtos.asDto(existingItem));
 
-                          BoxableDto modified = Dtos.asDto(existingItem);
-                          modified.setIdentificationBarcode(scannedBarcode);
+                      BoxableDto modified = Dtos.asDto(existingItem);
+                      modified.setIdentificationBarcode(scannedBarcode);
 
-                          diff.setModified(modified);
-                          diffs.add(diff);
+                      diff.setModified(modified);
+                      diffs.add(diff);
 
-                          itemDto.setIdentificationBarcode(scannedBarcode);
-
+                      itemDto.setIdentificationBarcode(scannedBarcode);
+                      if(currentBarcode != null) {
+                          ErrorMessage err = new ErrorMessage();
+                          err.setCoordinates(position);
+                          err.setMessage(String.format(
+                                  "Barcode at %s position will be changed from \"%s\" to \"%s\"", position, currentBarcode, scannedBarcode
+                          ));
+                          errors.add(err);
                       }
-                  } else {
+
+                  } else  if(!hasScannedBarcode){
                       ErrorMessage err = new ErrorMessage();
                       err.setCoordinates(position);
                       err.setMessage("Item at "+ position + " has no scanned barcode (Scanner returned " + (scannedBarcode == null ? "nothing" : scannedBarcode) + ")");
@@ -760,6 +793,7 @@ public class BoxRestController extends AbstractRestController {
           Box box = getBox(boxId);
           Map<String, BoxableView> boxableByPosition = boxService.getBoxContents(boxId).stream()
                   .collect(Collectors.toMap(BoxableView::getBoxPosition, Function.identity()));
+
 
           if (results.getDiffs() != null) {
               for (DiffMessage diff : results.getDiffs()) {

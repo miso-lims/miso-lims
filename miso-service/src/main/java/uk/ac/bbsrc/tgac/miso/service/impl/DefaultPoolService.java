@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
@@ -171,8 +172,20 @@ public class DefaultPoolService implements PoolService {
   @Override
   @Transactional
   public void saveBarcode(long poolId, String barcode) throws IOException {
-      Pool pool = get(poolId);
+      Pool pool = poolStore.get(poolId);
+      Pool beforeChange = new PoolImpl();
+
+      beforeChange.setId(pool.getId());
+      beforeChange.setIdentificationBarcode(pool.getIdentificationBarcode());
       pool.setIdentificationBarcode(barcode);
+
+      List<ValidationError> errors = new ArrayList<>();
+      ValidationUtils.validateBarcodeUniqueness(pool, beforeChange, barcodableReferenceService, errors);
+
+      if(!errors.isEmpty()){
+          throw new ValidationException(errors);
+      }
+
       update(pool);
   }
 

@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
@@ -142,10 +143,23 @@ public class DefaultLibraryService implements LibraryService {
   }
 
   @Override
-  @Transactional
   public void saveBarcode(long libraryId, String barcode) throws IOException {
-      Library library = get(libraryId);
+      Library library = libraryDao.get(libraryId);
+      Library beforeChange = new LibraryImpl();
+
+      beforeChange.setId(library.getId());
+      beforeChange.setIdentificationBarcode(library.getIdentificationBarcode());
+
       library.setIdentificationBarcode(barcode);
+      System.out.println(library.getIdentificationBarcode()+ "----" + beforeChange.getIdentificationBarcode());
+
+      List<ValidationError> errors = new ArrayList<>();
+      ValidationUtils.validateBarcodeUniqueness(library,beforeChange,barcodableReferenceService, errors);
+
+      if(!errors.isEmpty()){
+          throw new ValidationException(errors);
+      }
+
       libraryDao.update(library);
   }
 
