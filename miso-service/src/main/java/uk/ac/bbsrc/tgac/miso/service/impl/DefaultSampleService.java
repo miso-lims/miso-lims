@@ -256,24 +256,6 @@ public class DefaultSampleService implements SampleService {
     return sampleStore.get(sampleId);
   }
 
-  @Override
-  public void saveBarcode(long sampleId, String barcode) throws IOException {
-      Sample sample = sampleStore.get(sampleId);
-      Sample beforeChange = new SampleImpl();
-
-      beforeChange.setId(sample.getId());
-      beforeChange.setIdentificationBarcode(sample.getIdentificationBarcode());
-      sample.setIdentificationBarcode(barcode);
-      System.out.println(sample.getIdentificationBarcode()+ "----" + beforeChange.getIdentificationBarcode());
-      List<ValidationError> errors = new ArrayList<>();
-      ValidationUtils.validateBarcodeUniqueness(sample, beforeChange,barcodableReferenceService,errors);
-
-      if(!errors.isEmpty()){
-          throw new ValidationException(errors);
-      }
-
-      update(sample);
-  }
 
   @Override
   public long create(Sample sample) throws IOException {

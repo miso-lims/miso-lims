@@ -98,26 +98,6 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
     return aliquot;
   }
 
-  @Override
-  public void saveBarcode(long aliquotId, String barcode) throws IOException {
-      LibraryAliquot ali = libraryAliquotDao.get(aliquotId);
-      LibraryAliquot beforeChange = new LibraryAliquot();
-
-      beforeChange.setId(ali.getId());
-      beforeChange.setIdentificationBarcode(ali.getIdentificationBarcode());
-      ali.setIdentificationBarcode(barcode);
-      System.out.println(ali.getIdentificationBarcode()+ "----" + beforeChange.getIdentificationBarcode());
-
-      List<ValidationError> errors = new ArrayList<>();
-      ValidationUtils.validateBarcodeUniqueness(ali,beforeChange,barcodableReferenceService, errors);
-
-      if(!errors.isEmpty()){
-          throw new ValidationException(errors);
-      }
-
-      update(ali);
-  }
-
   public LibraryAliquot save(LibraryAliquot aliquot) throws IOException {
     try {
       NamingScheme namingScheme = getNamingScheme(aliquot);

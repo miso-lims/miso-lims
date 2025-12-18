@@ -47,6 +47,4 @@ public interface LibraryService
    */
   List<Long> listIdsByAncestorSampleIds(Collection<Long> sampleIds, Long relatedRequisitionId) throws IOException;
 
-  void saveBarcode(long libraryId, String barcode) throws IOException;
-
 }

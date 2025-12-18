@@ -24,6 +24,4 @@ public interface LibraryAliquotService extends PaginatedDataSource<LibraryAliquo
 
   public LibraryAliquot getByBarcode(String barcode) throws IOException;
 
-  void saveBarcode(long aliquotId, String barcode) throws IOException;
-
 }

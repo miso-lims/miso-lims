@@ -170,26 +170,6 @@ public class DefaultPoolService implements PoolService {
   }
 
   @Override
-  @Transactional
-  public void saveBarcode(long poolId, String barcode) throws IOException {
-      Pool pool = poolStore.get(poolId);
-      Pool beforeChange = new PoolImpl();
-
-      beforeChange.setId(pool.getId());
-      beforeChange.setIdentificationBarcode(pool.getIdentificationBarcode());
-      pool.setIdentificationBarcode(barcode);
-
-      List<ValidationError> errors = new ArrayList<>();
-      ValidationUtils.validateBarcodeUniqueness(pool, beforeChange, barcodableReferenceService, errors);
-
-      if(!errors.isEmpty()){
-          throw new ValidationException(errors);
-      }
-
-      update(pool);
-  }
-
-  @Override
   public long create(Pool pool) throws IOException {
     if (pool.isDiscarded()) {
       pool.setVolume(BigDecimal.ZERO);

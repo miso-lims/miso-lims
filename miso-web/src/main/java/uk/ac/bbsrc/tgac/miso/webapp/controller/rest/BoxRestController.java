@@ -45,16 +45,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response.Status;
 import net.sf.json.JSONObject;
-import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
-import uk.ac.bbsrc.tgac.miso.core.data.BoxableId;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
@@ -77,6 +69,8 @@ import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
+import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
@@ -104,6 +98,8 @@ public class BoxRestController extends AbstractRestController {
   private SampleService sampleService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private LibraryStore libraryDao;
   @Autowired
   private LibraryAliquotService libraryAliquotService;
   @Autowired
@@ -827,19 +823,27 @@ public class BoxRestController extends AbstractRestController {
   private void updateEntityBarcode(BoxableView view, String newBarcode) throws IOException {
       switch (view.getEntityType()) {
           case SAMPLE:
-              sampleService.saveBarcode(view.getId(), newBarcode);
+              Sample sample = sampleService.get(view.getId());
+              sample.setIdentificationBarcode(newBarcode);
+              sampleService.update(sample);
               break;
 
           case LIBRARY_ALIQUOT:
-              libraryAliquotService.saveBarcode(view.getId(), newBarcode);
+              LibraryAliquot ali = libraryAliquotService.get(view.getId());
+              ali.setIdentificationBarcode(newBarcode);
+              libraryAliquotService.update(ali);
               break;
 
           case LIBRARY:
-              libraryService.saveBarcode(view.getId(), newBarcode);
+              Library library = libraryService.get(view.getId());
+              library.setIdentificationBarcode(newBarcode);
+              libraryService.update(library);
               break;
 
           case POOL:
-              poolService.saveBarcode(view.getId(), newBarcode);
+              Pool pool = poolService.get(view.getId());
+              pool.setIdentificationBarcode(newBarcode);
+              poolService.update(pool);
               break;
 
           default:

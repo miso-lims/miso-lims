@@ -142,26 +142,6 @@ public class DefaultLibraryService implements LibraryService {
     return libraryDao.get(libraryId);
   }
 
-  @Override
-  public void saveBarcode(long libraryId, String barcode) throws IOException {
-      Library library = libraryDao.get(libraryId);
-      Library beforeChange = new LibraryImpl();
-
-      beforeChange.setId(library.getId());
-      beforeChange.setIdentificationBarcode(library.getIdentificationBarcode());
-
-      library.setIdentificationBarcode(barcode);
-      System.out.println(library.getIdentificationBarcode()+ "----" + beforeChange.getIdentificationBarcode());
-
-      List<ValidationError> errors = new ArrayList<>();
-      ValidationUtils.validateBarcodeUniqueness(library,beforeChange,barcodableReferenceService, errors);
-
-      if(!errors.isEmpty()){
-          throw new ValidationException(errors);
-      }
-
-      libraryDao.update(library);
-  }
 
   private Library save(Library library, boolean validateAliasUniqueness) throws IOException {
     NamingScheme namingScheme = getNamingScheme(library);
