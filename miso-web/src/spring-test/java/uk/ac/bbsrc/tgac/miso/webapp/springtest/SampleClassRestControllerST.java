@@ -31,6 +31,7 @@ public class SampleClassRestControllerST extends AbstractST {
     dto.setSampleCategory("Identity");
     dto.setSampleSubcategory(null);
     dto.setSuffix(null);
+    dto.setArchived(false);
 
     String json = makeJson(dto);
     String response = getMockMvc().perform(post(CONTROLLER_BASE)
@@ -79,6 +80,7 @@ public class SampleClassRestControllerST extends AbstractST {
     dto.setSampleCategory("Aliquot");
     dto.setSampleSubcategory(null);
     dto.setSuffix(null);
+    dto.setArchived(false);
 
     String json = makeJson(dto);
     String response = getMockMvc().perform(put(CONTROLLER_BASE + "/" + sampleClassId)
@@ -134,7 +136,7 @@ public class SampleClassRestControllerST extends AbstractST {
     getMockMvc().perform(post(CONTROLLER_BASE + "/bulk-delete")
         .contentType(MediaType.APPLICATION_JSON)
         .content(makeJson(ids)))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
