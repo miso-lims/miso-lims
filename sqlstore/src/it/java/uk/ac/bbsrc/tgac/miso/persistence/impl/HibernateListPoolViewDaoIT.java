@@ -43,7 +43,7 @@ public class HibernateListPoolViewDaoIT extends AbstractDAOTest {
         for(WorksetPool wp: workset.getWorksetPools()){
             actualPoolIds.add(wp.getItem().getId());
         }
-        assertEquals(worksetId, expectedPoolIds.length, actualPoolIds.size());
+        assertEquals("Expected pool count for worksetId " + worksetId + " =  " + expectedPoolIds.length+ "and actual pool count is " + actualPoolIds.size() , expectedPoolIds.length, actualPoolIds.size());
         for(Long expectedId: expectedPoolIds){
             assertTrue("Expected poolID "+ expectedId + " for worksetID " + worksetId + " but it was not in " + actualPoolIds, actualPoolIds.contains(expectedId));
         }
