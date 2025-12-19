@@ -199,7 +199,10 @@ To scan a box, first open the box scanner software on the computer (outside of M
 page by clicking the box name in the Boxes list page. The Contents section heading has an Options menu on the
 far right of the heading; hover over it to reveal the menu, and click "Scan with <scanner-name\>", where
 <scanner-name\> is a box scanner that your MISO is configured for. If "Scan with <scanner-name\>" is not visible
-in the list, your box may not be scannable or MISO may not be configured to use this box scanner.
+in the list, your box may not be scannable or MISO may not be configured to use this box scanner. 
+
+After clicking on "Scan with <scanner-name\>", you will see two scan options 1) Update Location 2) Assign Barcodes.
+Click on Update Location for scanning box.
 
 Wait until the Scan dialog box prompts you to place the box on the scanner. It will automatically scan the box.
 Once the scan is complete, the diagram will display the tubes which the scanner found.
@@ -224,6 +227,28 @@ sources of error are:
     * Fix these problems first, then rescan.
  * Specific to Ziath DP5 Mirage Rack Reader 
     * Check if Container UID on the DP5 application has a container named: 'mirage96sbs' 
+
+# Matrix Barcode Assigning
+
+Matrix Barcode Assignment allows users to assign barcodes to multiple items in a box in a single scanning operation. 
+This is designed to speed up bulk barcode assignment while clearly highlighting any conflicts or warnings before confirmation. 
+
+To assign barcodes, first open the box scanner software on the computer (outside of MISO). Then, go to the Edit Box
+page by clicking the box name in the Boxes list page. The Contents section heading has an Options menu on the
+far right of the heading; hover over it to reveal the menu, and click "Scan with <scanner-name\>", where
+<scanner-name\> is a box scanner that your MISO is configured for. If "Scan with <scanner-name\>" is not visible
+in the list, your box may not be scannable or MISO may not be configured to use this box scanner.
+
+After clicking on "Scan with <scanner-name\>", you will see two scan options 1) Update Location 2) Assign Barcodes.
+Click on Assign Barcodes. 
+
+Wait until the Scan dialog box prompts you to place the box on the scanner. It will automatically scan the box. Once the 
+scan is complete, the diagram will display the Matrix result grid and Warnings (if applicable). Warnings will display issues
+such as missing or invalid scans, barcode changes, duplicate barcodes.
+
+Once a successful scan is made, review the warnings and changes that would be made and click "Confirm".
+
+![Successful barcode assign](../images/barcode-assign-success.png)
 
 ## Exporting Box Information
 
