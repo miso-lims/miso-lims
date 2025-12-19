@@ -26,7 +26,6 @@ public class ListPoolsControllerST extends AbstractST {
 
 
     @Test
-    @WithMockUser(username = "admin", roles = {"INTERNAL", "ADMIN"})
     public void testGetPoolsPage() throws Exception {
         PoolImpl pool = currentSession().get(PoolImpl.class, 1L);
         assertNotNull(pool);
