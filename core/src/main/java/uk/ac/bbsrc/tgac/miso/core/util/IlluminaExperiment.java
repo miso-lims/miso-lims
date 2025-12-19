@@ -175,7 +175,7 @@ public enum IlluminaExperiment {
     }
 
   },
-  BCLCONVERT("BCL Convert", true) {
+  BCL_CONVERT("BCL Convert", true) {
     protected void applyHeader(Map<String, String> header, String experimentName, String instrument,
         String indexAdapters, String chemistry, String novaSeqXSeriesMapping) {
       applyDragenHeader(header, experimentName, instrument, novaSeqXSeriesMapping);

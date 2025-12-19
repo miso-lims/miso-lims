@@ -479,7 +479,7 @@ BulkTarget.pool = (function ($) {
             getLabel: function (type) {
               return type.description;
             },
-            values: Constants.illuminaExperimentTypes,
+            values: Constants.sampleSheetTypes,
           },
         ],
         function (result) {
