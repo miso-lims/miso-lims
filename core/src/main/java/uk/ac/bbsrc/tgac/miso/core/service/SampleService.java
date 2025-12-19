@@ -43,4 +43,5 @@ public interface SampleService
 
   List<Sample> getChildren(Collection<Long> parentIds, String targetSampleCategory, long effectiveRequisitionId)
       throws IOException;
+
 }

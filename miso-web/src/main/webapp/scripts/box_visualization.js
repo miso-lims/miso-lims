@@ -732,7 +732,15 @@
         buttons: {},
       });
       jQuery("#dialogDialog").dialog("open");
-      Box.scan.prepareScanner(scannerName, Box.boxJSON.rows, Box.boxJSON.cols, onSuccess);
+      Box.scan.prepareScanner(
+        scannerName,
+        Box.boxJSON.rows,
+        Box.boxJSON.cols,
+        function() {
+            if(typeof onSuccess === "function"){
+                onSuccess();
+            }
+        });
     };
 
     self.error = function () {

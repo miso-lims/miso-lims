@@ -98,7 +98,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
     return aliquot;
   }
 
-  public LibraryAliquot save(LibraryAliquot aliquot) throws IOException {
+  private LibraryAliquot save(LibraryAliquot aliquot) throws IOException {
     try {
       NamingScheme namingScheme = getNamingScheme(aliquot);
       Long newId = libraryAliquotDao.create(aliquot);

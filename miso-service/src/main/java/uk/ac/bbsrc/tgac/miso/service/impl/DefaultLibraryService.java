@@ -36,7 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferLibrary;
@@ -141,7 +140,6 @@ public class DefaultLibraryService implements LibraryService {
   public Library get(long libraryId) throws IOException {
     return libraryDao.get(libraryId);
   }
-
 
   private Library save(Library library, boolean validateAliasUniqueness) throws IOException {
     NamingScheme namingScheme = getNamingScheme(library);
