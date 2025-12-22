@@ -24,6 +24,7 @@ DELETE FROM Transfer;
 DELETE FROM Workset_Sample;
 DELETE FROM Workset_Library;
 DELETE FROM Workset_LibraryAliquot;
+DELETE FROM Workset_Pool;
 DELETE FROM WorksetChangeLog;
 DELETE FROM Workset;
 DELETE FROM BoxPosition;
