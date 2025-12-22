@@ -202,6 +202,11 @@ public class PoolRestControllerST extends AbstractST {
   }
 
   @Test
+  public void testDatatableByWorkset() throws Exception {
+      testDtRequest(CONTROLLER_BASE + "/dt/workset/1", Arrays.asList(120001, 120002));
+  }
+
+  @Test
   public void testGetDatatablePoolsByProject() throws Exception {
     testDtRequest(CONTROLLER_BASE + "/dt/project/3", Arrays.asList(1));
 

@@ -723,6 +723,7 @@ Urls = (function () {
     dragenSamplesheet: poolRestBase + "/dragensamplesheet",
     bulkSave: poolRestBase + "/bulk",
     bulkSaveProgress: idUrlFunction(poolRestBase + "/bulk"),
+    worksetDatatable: idUrlFunction(poolRestBase + "/dt/workset"),
   };
 
   // Pool Orders
@@ -1412,12 +1413,15 @@ Urls = (function () {
     addSamples: middleIdUrlFunction(worksetRestBase, "/samples"),
     addLibraries: middleIdUrlFunction(worksetRestBase, "/libraries"),
     addLibraryAliquots: middleIdUrlFunction(worksetRestBase, "/libraryaliquots"),
+    addPools: middleIdUrlFunction(worksetRestBase,"/pools"),
     removeSamples: middleIdUrlFunction(worksetRestBase, "/samples"),
     removeLibraries: middleIdUrlFunction(worksetRestBase, "/libraries"),
     removeLibraryAliquots: middleIdUrlFunction(worksetRestBase, "/libraryaliquots"),
+    removePools: middleIdUrlFunction(worksetRestBase,"/pools"),
     moveSamples: middleIdUrlFunction(worksetRestBase, "/samples/move"),
     moveLibraries: middleIdUrlFunction(worksetRestBase, "/libraries/move"),
     moveLibraryAliquots: middleIdUrlFunction(worksetRestBase, "/libraryaliquots/move"),
+    movePools: middleIdUrlFunction(worksetRestBase,"/pools/move"),
     merge: worksetRestBase + "/merge",
     categoryDatatable: idUrlFunction(worksetRestBase + "/dt"),
     bulkDelete: worksetRestBase + "/bulk-delete",

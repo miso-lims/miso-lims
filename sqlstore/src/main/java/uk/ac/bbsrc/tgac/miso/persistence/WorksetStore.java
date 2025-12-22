@@ -17,10 +17,14 @@ public interface WorksetStore extends SaveDao<Workset> {
 
   public List<Workset> listByLibraryAliquot(long aliquotId) throws IOException;
 
+  public List<Workset> listByPool(long poolId) throws IOException;
+
   public Map<Long, Date> getSampleAddedTimes(long worksetId) throws IOException;
 
   public Map<Long, Date> getLibraryAddedTimes(long worksetId) throws IOException;
 
   public Map<Long, Date> getLibraryAliquotAddedTimes(long worksetId) throws IOException;
+
+  public Map<Long, Date> getPoolAddedTimes(long worksetId) throws IOException;
 
 }

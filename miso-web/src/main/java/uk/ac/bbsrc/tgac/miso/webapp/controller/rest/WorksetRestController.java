@@ -28,17 +28,20 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListWorksetView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetItem;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetPool;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -65,6 +68,8 @@ public class WorksetRestController extends AbstractRestController {
   private LibraryService libraryService;
   @Autowired
   private LibraryAliquotService libraryAliquotService;
+  @Autowired
+  private PoolService poolService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -156,6 +161,16 @@ public class WorksetRestController extends AbstractRestController {
     worksetService.addLibraryAliquots(workset, items);
   }
 
+  @PostMapping(value = "/{worksetId}/pools")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void addPools(@PathVariable(value = "worksetId", required = true) long worksetId,
+      @RequestBody List<Long> poolIds)
+      throws IOException {
+    Workset workset = getWorkset(worksetId);
+    List<Pool> items = loadItems("Pool", poolIds, poolService);
+    worksetService.addPools(workset, items);
+  }
+
   @DeleteMapping("/{worksetId}/samples")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void removeSamples(@PathVariable(value = "worksetId", required = true) long worksetId,
@@ -184,6 +199,16 @@ public class WorksetRestController extends AbstractRestController {
     Workset workset = getWorkset(worksetId);
     List<LibraryAliquot> items = loadItems("Library aliquot", aliquotIds, libraryAliquotService);
     worksetService.removeLibraryAliquots(workset, items);
+  }
+
+  @DeleteMapping("/{worksetId}/pools")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void removePools(@PathVariable(value = "worksetId", required = true) long worksetId,
+      @RequestBody List<Long> poolIds)
+      throws IOException {
+    Workset workset = getWorkset(worksetId);
+    List<Pool> items = loadItems("Pool", poolIds, poolService);
+    worksetService.removePools(workset, items);
   }
 
   private Workset getWorkset(long id) throws IOException {
@@ -264,6 +289,7 @@ public class WorksetRestController extends AbstractRestController {
       }
       copyWorksetItems(child.getWorksetSamples(), workset.getWorksetSamples(), WorksetSample::new);
       copyWorksetItems(child.getWorksetLibraries(), workset.getWorksetLibraries(), WorksetLibrary::new);
+      copyWorksetItems(child.getWorksetPools(), workset.getWorksetPools(), WorksetPool::new);
       copyWorksetItems(child.getWorksetLibraryAliquots(), workset.getWorksetLibraryAliquots(),
           WorksetLibraryAliquot::new);
     }
@@ -315,6 +341,13 @@ public class WorksetRestController extends AbstractRestController {
   public @ResponseBody void moveLibraries(@PathVariable long worksetId, @RequestBody MoveItemsDto dto)
       throws IOException {
     moveItems(worksetId, dto, "Library", libraryService, worksetService::moveLibraries);
+  }
+
+  @PostMapping("/{worksetId}/pools/move")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public @ResponseBody void movePools(@PathVariable long worksetId, @RequestBody MoveItemsDto dto)
+      throws IOException {
+    moveItems(worksetId, dto, "Pool", poolService, worksetService::movePools);
   }
 
   @PostMapping("/{worksetId}/libraryaliquots/move")

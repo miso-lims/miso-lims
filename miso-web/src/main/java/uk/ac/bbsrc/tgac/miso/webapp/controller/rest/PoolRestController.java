@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -67,12 +68,14 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderSummaryViewService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
@@ -258,6 +261,8 @@ public class PoolRestController extends AbstractRestController {
   private LibraryService libraryService;
   @Autowired
   private LibraryAliquotService libraryAliquotService;
+  @Autowired
+  private WorksetService worksetService;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -455,6 +460,21 @@ public class PoolRestController extends AbstractRestController {
     List<PoolDto> poolDtos = pools.stream().map(this::makeEmptyPoolDto)
         .collect(Collectors.toList());
     return poolDtos;
+  }
+
+  @GetMapping(value = "/dt/workset/{id}", produces = {"application/json"})
+  @ResponseBody
+  public DataTablesResponseDto<PoolDto> getDTPoolByWorkset(@PathVariable("id") long id, HttpServletRequest request)
+      throws IOException {
+    DataTablesResponseDto<PoolDto> response =
+            jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
+    if (!response.getAaData().isEmpty()) {
+        Map<Long, Date> addedTimes = worksetService.getPoolAddedTimes(id);
+        for (PoolDto dto : response.getAaData()) {
+            dto.setWorksetAddedTime(LimsUtils.formatDateTime(addedTimes.get(dto.getId())));
+        }
+    }
+    return response;
   }
 
   @GetMapping(value = "/picker/search")

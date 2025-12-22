@@ -1280,6 +1280,10 @@ INSERT INTO Workset_LibraryAliquot(worksetId, aliquotId) VALUES
 (1, 120001),
 (1, 120002);
 
+INSERT INTO Workset_Pool(worksetId, poolId, addedTime) VALUES
+(1, 120001, NOW()),
+(1, 120002, NOW());
+
 INSERT INTO StorageLabel(labelId, label) VALUES
 (1, 'Label One'),
 (2, 'Label Two'),
