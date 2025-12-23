@@ -29,6 +29,6 @@ CREATE TABLE LibraryAliquotQcControl (
   controlId bigint NOT NULL,
   lot varchar(50) NOT NULL,
   qcPassed BOOLEAN NOT NULL,
-  CONSTRAINT fk_libraryAliquotQcControl_qc FOREIGN KEY (qcId) REFERENCES LibraryAliquotQC (qcId),
+  CONSTRAINT fk_libraryAliquotQcControl_qc FOREIGN KEY (qcId) REFERENCES LibraryAliquotQc (qcId),
   CONSTRAINT fk_libraryAliquotQcControl_control FOREIGN KEY (controlId) REFERENCES QcControl (controlId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
