@@ -210,7 +210,8 @@ BulkTarget.libraryaliquot = (function ($) {
               Urls.rest.worksets.addLibraryAliquots
             ),
         BulkUtils.actions.transfer("libraryAliquotIds"),
-      ];
+      ]
+      .concat(BulkUtils.actions.qc("LibraryAliquot"));
     },
     getFixedColumns: function (config) {
       return 2;

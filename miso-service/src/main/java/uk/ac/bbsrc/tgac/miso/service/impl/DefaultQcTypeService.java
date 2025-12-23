@@ -237,6 +237,8 @@ public class DefaultQcTypeService implements QcTypeService {
         case Sample:
           result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.samples(usage)));
           break;
+        case LibraryAliquot:
+          result.addError(ValidationError.forDeletionUsage(object,usage, Pluralizer.libraryAliquots(usage)));
         default:
           result.addError(ValidationError.forDeletionUsage(object, usage, Pluralizer.items(usage)));
           break;

@@ -4,11 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.hibernate.annotations.Immutable;
 
@@ -51,6 +47,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPositio
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryAliquotChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryAliquotQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -60,7 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @DiscriminatorColumn(name = "discriminator")
 @DiscriminatorValue("LibraryAliquot")
 public class LibraryAliquot extends AbstractBoxable
-    implements Comparable<LibraryAliquot>, Deletable, HierarchyEntity {
+    implements Comparable<LibraryAliquot>, Deletable, HierarchyEntity, QualityControllable<LibraryAliquotQC> {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
@@ -145,6 +144,9 @@ public class LibraryAliquot extends AbstractBoxable
   private User qcUser;
 
   private LocalDate qcDate;
+
+  @OneToMany(mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
+  private Collection<LibraryAliquotQC> qcs;
 
   @OneToMany(targetEntity = LibraryAliquotChangeLog.class, mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
@@ -530,6 +532,24 @@ public class LibraryAliquot extends AbstractBoxable
   @Override
   public <T> T visit(BarcodableVisitor<T> visitor) {
     return visitor.visitLibraryAliquot(this);
+  }
+
+  @Override
+  public QcTarget getQcTarget() {
+      System.out.println(QcTarget.LibraryAliquot);
+      return QcTarget.LibraryAliquot;
+  }
+
+  @Override
+  public Collection<LibraryAliquotQC> getQCs() {
+      if(qcs == null){
+          qcs = new ArrayList<>();
+      }
+      return qcs;
+  }
+
+  public void setQcs(Collection<LibraryAliquotQC> qcs){
+      this.qcs = qcs;
   }
 
 }
