@@ -375,6 +375,26 @@ The annotations mentioned above for MVC controllers are all useful for REST cont
 useful annotation is `@RequestBody`, which can be added to a method parameter to use the value from
 the body of the request.
 
+### Mock Box Scanner
+
+The mock box scanner is a development and testing utility that simulates the behaviour of a physical
+box barcode scanner. It allows developers to exercise box scanning workflow in MISO without requiring access to 
+VisionMate or DP5 Mirage scanner hardware.
+
+#### Configuration
+
+The mock scanner is enabled using the standard box scanner configuration property: `miso.boxscanner.servers`. To enable the mock scanner, configure a scanner entry using `mock` type:
+
+Example: `Mock Scanner:mock:localhost:0`.
+
+#### Behaviour
+
+When configured, the mock scanner behaves like a real scanner from the application's perspective. It
+integrates with the existing scanning infrastructure.
+
+The mock scanner return deterministic, test-friendly scan results suitable for validating UI behaviour
+and scan result handling.
+
 ## Pinery-MISO
 
 This is MISO's implementation of [Pinery](https://github.com/oicr-gsi/pinery), a read-only REST API

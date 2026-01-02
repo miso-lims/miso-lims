@@ -66,7 +66,7 @@ var Box = Box || {
 
     var dialog = jQuery("#dialogDialog");
     jQuery("#dialogInfoAbove").html("<h1>Choose Scan Mode</h1>");
-    jQuery("#dialogInfoBelow").html("<p>Do you want to update item location or assign Barcode?</p>");
+    jQuery("#dialogInfoBelow").html("<p>Do you want to update item locations or assign barcodes?</p>");
     jQuery("#dialogVisual").html("");
     dialog.dialog({
         autoOpen: true,
@@ -77,11 +77,11 @@ var Box = Box || {
         buttons: {
             "Update Location": function(){
                 dialog.dialog("close");
-                Box.startStandardScan(scannerName);
+                Box.startUpdateLocationsScan(scannerName);
             },
             "Assign Barcodes": function(){
                 dialog.dialog("close");
-                Box.startMatrixScan(scannerName);
+                Box.startAssignBarcodesScan(scannerName);
             },
             Cancel: function(){
                 dialog.dialog("close");
@@ -90,26 +90,42 @@ var Box = Box || {
     });
   },
 
-  assignMatrixBarcodes: function (scannerName) {
-    Box.startMatrixScan(scannerName);
-  },
-
-  startStandardScan: function(scannerName){
+  startUpdateLocationsScan: function(scannerName){
     Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
     Box.dialogHeight = Box.boxJSON.rows * 40 + 300;
     Box.scanDialog = Box.ScanDialog(scannerName);
-    Box.prepareScannerDialog = Box.PrepareScannerDialog(scannerName);
     Box.scanDiff = Box.ScanDiff(scannerName);
+
+    var onPrepareSuccess = function () {
+        jQuery("#dialogDialog").dialog("close");
+        jQuery("#dialogDialog").dialog("destroy");
+
+        Box.scanDialog.show({
+          size: {
+            rows: Box.boxJSON.rows,
+            cols: Box.boxJSON.cols,
+          },
+          data: Box.boxJSON.items,
+        });
+
+    }
+    Box.prepareScannerDialog = Box.PrepareScannerDialog(scannerName, onPrepareSuccess);
     Box.prepareScannerDialog.show();
   },
 
-  startMatrixScan: function(scannerName){
+  startAssignBarcodesScan: function(scannerName){
       var onPrepareSuccess = function () {
 
         jQuery("#dialogDialog").dialog("close");
         jQuery("#dialogDialog").dialog("destroy");
 
-        Box.scanDialog.show({size: Box.boxJSON, data: Box.boxJSON});
+        Box.scanDialog.show({
+          size: {
+            rows: Box.boxJSON.rows,
+            cols: Box.boxJSON.cols,
+          },
+          data: Box.boxJSON.items,
+        });
 
         jQuery.ajax({
                 url: Urls.rest.boxes.matrixScan(Box.boxJSON.id),

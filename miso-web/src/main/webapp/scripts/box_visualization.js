@@ -808,9 +808,6 @@
                     click: function() {
                         var url = Urls.rest.boxes.matrixAssign(Box.boxJSON.id);
 
-                        console.log("URL: ", url);
-                        console.log("Result: ", results);
-
                         Utils.ajaxWithDialog(
                             "Assigning Barcodes",
                             "POST",
@@ -844,8 +841,8 @@
         });
 
         jQuery("#updateSelected, #removeSelected, #emptySelected")
-            .prop("disable", true)
-            .addClass("disable");
+            .prop("disabled", true)
+            .addClass("disabled");
 
         jQuery("#dialogDialog").dialog("open");
     };
@@ -853,22 +850,18 @@
     self.getBoxPositionOpts = function (row, col){
         var pos = self.getPositionString(row,col);
 
-        var rowChar = Box.utils.getRowLabel(row);
-        var colNum = parseInt(Box.utils.getColLabel(col), 10);
-        var paddedPos = rowChar + (colNum < 10 ? "0" + colNum: colNum);
-        var unpaddedPos = rowChar + colNum;
-
         var boxables = self.results.items
             ? self.results.items.filter( function (item) {
                 if(!item.coordinates) return false;
-                return item.coordinates === pos || item.coordinates === paddedPos || item.coordinates === unpaddedPos;
+                  return item.coordinates === pos;
             })
             : [];
 
         var hasChange = self.results.diffs && self.results.diffs.some(function(diff) {
             if(!diff.modified || !diff.modified.coordinates) return false;
             var diffPos = diff.modified.coordinates;
-            if(!(diffPos === pos || diffPos === paddedPos || diffPos === unpaddedPos)){
+
+            if(!diffPos === pos){
                 return false;
             }
 
@@ -883,11 +876,11 @@
             if(!err.coordinates) return false;
 
             var errPos = err.coordinates;
-            return errPos === pos || errPos ===paddedPos || errPos === unpaddedPos;
+            return errPos === pos;
         })
 
         if(boxables.length > 0){
-            var title = boxables[0].description || boxables[0].alias || boxables[0].identificationBarcode || "Item";
+            var title = boxables[0].alias;
             var existingBarcode = (boxables[0].identificationBarcode || "").trim();
             var hasExistingBarcode = existingBarcode.length>0;
             if(hasError)

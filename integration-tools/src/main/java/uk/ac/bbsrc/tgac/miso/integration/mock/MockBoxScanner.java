@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.integration.mock;
 
 
 import org.springframework.stereotype.Component;
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
@@ -10,17 +11,8 @@ import java.net.http.HttpClient;
 import java.util.*;
 
 public class MockBoxScanner implements BoxScanner {
-    private final String host;
-    private final int port;
-    private final HttpClient httpClient;
     private int rows = 8;
     private int cols = 12;
-
-    public MockBoxScanner(String host, int port) {
-        this.host = host;
-        this.port = port;
-        this.httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
-    }
 
     @Override
     public void prepareScan(int expectedRows, int expectedColums) throws IntegrationException {
@@ -57,8 +49,8 @@ public class MockBoxScanner implements BoxScanner {
 
         private void generateBarcodes() {
             for(int r = 0; r<rows; r++) {
-                for (int c = 1; c<= cols; c++){
-                    String pos = String.format("%c%02d", (char) ('A' + r), c);
+                for (int c = 0; c< cols; c++){
+                    String pos = BoxUtils.getPositionString(r,c);
                     barcodes.put(pos, "Mock -" + pos + " - " + System.currentTimeMillis() % 100);
                 }
             }
@@ -71,14 +63,13 @@ public class MockBoxScanner implements BoxScanner {
 
         @Override
         public String getBarcode(char row, int column) {
-            String pos = String.format("%c%02", row, column + 1 );
-            return getBarcode(pos);
+            int rowIndex = Character.toUpperCase(row)-'A';
+            return getBarcode(BoxUtils.getPositionString(rowIndex, column));
         }
 
         @Override
         public String getBarcode(int row, int column) {
-            String pos = String.format("%c%02", (char) ('A' + row), column + 1);
-            return getBarcode(pos);
+            return getBarcode(BoxUtils.getPositionString(row,column));
         }
 
         @Override

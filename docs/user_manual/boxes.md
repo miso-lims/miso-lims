@@ -228,7 +228,7 @@ sources of error are:
  * Specific to Ziath DP5 Mirage Rack Reader 
     * Check if Container UID on the DP5 application has a container named: 'mirage96sbs' 
 
-# Matrix Barcode Assigning
+## Matrix Barcode Assigning
 
 Matrix Barcode Assignment allows users to assign barcodes to multiple items in a box in a single scanning operation. 
 This is designed to speed up bulk barcode assignment while clearly highlighting any conflicts or warnings before confirmation. 

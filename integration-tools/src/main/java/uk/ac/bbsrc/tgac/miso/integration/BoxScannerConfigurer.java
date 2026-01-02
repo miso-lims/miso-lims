@@ -69,7 +69,7 @@ public class BoxScannerConfigurer {
       }
       else if(type.equals(MOCK_SCANNER)) {
           MockBoxScanner mockBoxScanner;
-          mockBoxScanner = new MockBoxScanner(host, port);
+          mockBoxScanner = new MockBoxScanner();
           scanners.put(name,mockBoxScanner);
       }
     }
