@@ -375,8 +375,8 @@ public class RunRestController extends AbstractRestController {
     }
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(new MediaType("text", "csv"));
-    response.setHeader("Content-Disposition",
-        "attachment; filename=" + String.format("RUN%d-%s-SampleSheet.csv", run.getId(), casavaVersion.name()));
+    String filename = String.format("RUN%d-%s-SampleSheet.csv", run.getId(), casavaVersion.name());
+    MisoWebUtils.addAttachmentContentDisposition(response, filename);
 
     return new HttpEntity<>(casavaVersion.createSampleSheet(run, user), headers);
   }

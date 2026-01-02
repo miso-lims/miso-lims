@@ -990,8 +990,8 @@ public class BoxRestController extends AbstractRestController {
 
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.TEXT_PLAIN);
-    response.setHeader("Content-Disposition",
-        String.format("attachment; filename=FA-%s.txt", box.getAlias().replace(' ', '_')));
+    String filename = String.format("FA-%s.txt", box.getAlias().replace(' ', '_'));
+    MisoWebUtils.addAttachmentContentDisposition(response, filename);
     return new HttpEntity<>(sheet.getBytes(), headers);
   }
 
