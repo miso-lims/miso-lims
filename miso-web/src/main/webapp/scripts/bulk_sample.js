@@ -110,19 +110,21 @@ BulkTarget.sample = (function ($) {
               }
 
               // In the case of plain samples, this will be empty, which is fine.
-              var targets = getCommonChildCategories(classes).map(function (category) {
-                return {
-                  name: category,
-                  action: function (replicates, newBoxId) {
-                    Utils.page.post(Urls.ui.samples.bulkPropagate, {
-                      boxId: newBoxId,
-                      parentIds: idsString,
-                      replicates: replicates,
-                      targetCategory: category,
-                    });
-                  },
-                };
-              });
+              var targets = !Constants.isDetailedSample
+                ? []
+                : getCommonChildCategories(classes).map(function (category) {
+                    return {
+                      name: category,
+                      action: function (replicates, newBoxId) {
+                        Utils.page.post(Urls.ui.samples.bulkPropagate, {
+                          boxId: newBoxId,
+                          parentIds: idsString,
+                          replicates: replicates,
+                          targetCategory: category,
+                        });
+                      },
+                    };
+                  });
               if (!Constants.isDetailedSample || sourceCategories[0] === "Aliquot") {
                 targets.push({
                   name: "Library",
