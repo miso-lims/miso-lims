@@ -24,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -106,7 +107,7 @@ public class DownloadController {
       }
     }
 
-    response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+    MisoWebUtils.addAttachmentContentDisposition(response, filename);
     OutputStream responseStream = response.getOutputStream();
 
     // retrieval

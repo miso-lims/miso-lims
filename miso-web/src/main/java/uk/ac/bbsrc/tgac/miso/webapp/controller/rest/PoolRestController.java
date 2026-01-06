@@ -5,9 +5,9 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -71,11 +71,11 @@ import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
@@ -467,12 +467,12 @@ public class PoolRestController extends AbstractRestController {
   public DataTablesResponseDto<PoolDto> getDTPoolByWorkset(@PathVariable("id") long id, HttpServletRequest request)
       throws IOException {
     DataTablesResponseDto<PoolDto> response =
-            jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
+        jQueryBackend.get(request, advancedSearchParser, PaginationFilter.workset(id));
     if (!response.getAaData().isEmpty()) {
-        Map<Long, Date> addedTimes = worksetService.getPoolAddedTimes(id);
-        for (PoolDto dto : response.getAaData()) {
-            dto.setWorksetAddedTime(LimsUtils.formatDateTime(addedTimes.get(dto.getId())));
-        }
+      Map<Long, Date> addedTimes = worksetService.getPoolAddedTimes(id);
+      for (PoolDto dto : response.getAaData()) {
+        dto.setWorksetAddedTime(LimsUtils.formatDateTime(addedTimes.get(dto.getId())));
+      }
     }
     return response;
   }
@@ -681,8 +681,9 @@ public class PoolRestController extends AbstractRestController {
       }
       lane += 1;
     }
-    response.setHeader("Content-Disposition", String.format("attachment; filename=%s-%s.csv", experiment.name(),
-        pools.stream().map(Pool::getAlias).collect(Collectors.joining("-"))));
+    String filename = String.format("%s-%s.csv", experiment.name(),
+        pools.stream().map(Pool::getAlias).collect(Collectors.joining("-")));
+    MisoWebUtils.addAttachmentContentDisposition(response, filename);
     return new HttpEntity<>(experiment
         .makeSampleSheet(request.getGenomeFolder(), parameters, request.getCustomRead1Primer(),
             request.getCustomIndexPrimer(),

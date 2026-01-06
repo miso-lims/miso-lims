@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ServerErrorException;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
 @RequestMapping("/attachments")
@@ -114,7 +115,7 @@ public class AttachmentController {
       throw new ServerErrorException("MISO cannot access this file");
     }
 
-    response.setHeader("Content-Disposition", "attachment; filename=" + attachment.getFilename());
+    MisoWebUtils.addAttachmentContentDisposition(response, attachment.getFilename());
 
     try (OutputStream responseStream = response.getOutputStream();
         FileInputStream fis = new FileInputStream(file)) {
