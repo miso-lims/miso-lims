@@ -153,7 +153,10 @@ You can find items related to selected library aliquots using the "Parents" and 
 the top of the Library Aliquots list. For more information on this feature, see the
 [General Navigation section - Finding Related Items](../general_navigation/#finding-related-items).
 
+## Library Aliquot QCs
 
+Any number of quality control measures may be recorded for a library aliquot. For more information on this feature, see the
+[QCs section](../qcs/).
 
 ## Adding Library Aliquots to a Workset
 
