@@ -772,7 +772,7 @@
     return self;
   };
 
-  Box.MatrixScanDialog = function(scannerName) {
+  Box.BarcodeScanDialog = function(scannerName) {
     var self = new BoxVisual();
 
     self.show = function (results) {
@@ -806,7 +806,7 @@
                 {
                     text:  "Confirm Assign",
                     click: function() {
-                        var url = Urls.rest.boxes.matrixAssign(Box.boxJSON.id);
+                        var url = Urls.rest.boxes.barcodeAssign(Box.boxJSON.id);
 
                         Utils.ajaxWithDialog(
                             "Assigning Barcodes",

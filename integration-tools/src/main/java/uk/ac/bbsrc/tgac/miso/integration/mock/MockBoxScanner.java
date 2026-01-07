@@ -63,8 +63,7 @@ public class MockBoxScanner implements BoxScanner {
 
         @Override
         public String getBarcode(char row, int column) {
-            int rowIndex = Character.toUpperCase(row)-'A';
-            return getBarcode(BoxUtils.getPositionString(rowIndex, column));
+            return getBarcode(BoxUtils.getPositionString(row, column));
         }
 
         @Override

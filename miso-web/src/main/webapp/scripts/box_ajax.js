@@ -97,9 +97,6 @@ var Box = Box || {
     Box.scanDiff = Box.ScanDiff(scannerName);
 
     var onPrepareSuccess = function () {
-        jQuery("#dialogDialog").dialog("close");
-        jQuery("#dialogDialog").dialog("destroy");
-
         Box.scanDialog.show({
           size: {
             rows: Box.boxJSON.rows,
@@ -107,7 +104,6 @@ var Box = Box || {
           },
           data: Box.boxJSON.items,
         });
-
     }
     Box.prepareScannerDialog = Box.PrepareScannerDialog(scannerName, onPrepareSuccess);
     Box.prepareScannerDialog.show();
@@ -116,26 +112,15 @@ var Box = Box || {
   startAssignBarcodesScan: function(scannerName){
       var onPrepareSuccess = function () {
 
-        jQuery("#dialogDialog").dialog("close");
-        jQuery("#dialogDialog").dialog("destroy");
-
-        Box.scanDialog.show({
-          size: {
-            rows: Box.boxJSON.rows,
-            cols: Box.boxJSON.cols,
-          },
-          data: Box.boxJSON.items,
-        });
-
         jQuery.ajax({
-                url: Urls.rest.boxes.matrixScan(Box.boxJSON.id),
+                url: Urls.rest.boxes.barcodeScan(Box.boxJSON.id),
                 type: "POST",
                 contentType: "application/json; charset=utf8",
                 data: JSON.stringify({ scannerName : scannerName})
               })
               .done(function (data) {
                 jQuery("#dialogDialog").dialog("close");
-                Box.matrixScanDialog.show(data);
+                Box.barcodeScanDialog.show(data);
               })
               .fail( function(response) {
                 jQuery("#dialogDialog").dialog("close");
@@ -148,7 +133,7 @@ var Box = Box || {
       Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
       Box.dialogHeight = Box.boxJSON.rows * 40 + 300;
       Box.scanDialog = Box.ScanDialog(scannerName);
-      Box.matrixScanDialog = Box.MatrixScanDialog(scannerName);
+      Box.barcodeScanDialog = Box.BarcodeScanDialog(scannerName);
       Box.prepareScannerDialog = Box.PrepareScannerDialog(scannerName, onPrepareSuccess);
       Box.prepareScannerDialog.show();
   },

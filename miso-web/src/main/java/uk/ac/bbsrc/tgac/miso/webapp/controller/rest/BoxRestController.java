@@ -638,8 +638,8 @@ public class BoxRestController extends AbstractRestController {
     }
   }
 
-  @PostMapping(value = "/{boxId}/matrix-scan")
-  public @ResponseBody ScanResultsDto getMatrixScan(
+  @PostMapping(value = "/{boxId}/barcode-scan")
+  public @ResponseBody ScanResultsDto getBarcodeScan(
           @PathVariable(required = true) int boxId,
           @RequestBody(required = true) ScanRequest requestData){
 
@@ -780,8 +780,8 @@ public class BoxRestController extends AbstractRestController {
       }
   }
 
-  @PostMapping(value = "/{boxId}/matrix-scan/assign")
-  public @ResponseBody BoxDto assignMatrixBarcodes(
+  @PostMapping(value = "/{boxId}/barcode-scan/assign")
+  public @ResponseBody BoxDto assignBarcodes(
           @PathVariable(required = true) int boxId,
           @RequestBody(required = true) ScanResultsDto results) {
 
