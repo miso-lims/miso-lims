@@ -77,9 +77,20 @@ public class ContainerRestControllerST extends AbstractST {
         req.setIds(Arrays.asList(1L, 2L));
         req.setSheet("LOADING_CONCENTRATIONS");
 
-        List<String> headers = Arrays.asList("Container", "Partition", "Pool");
+        List<String> headers = Arrays.asList("Container", "Partition", "Pool", "Loading Concentration", "Units");
         List<List<String>> rows = Arrays.asList(
-                Arrays.asList("MISEQXX", "1", "POOL_1"));
+                Arrays.asList("MISEQXX", "1", "POOL_1"),
+                Arrays.asList("MISEQXX", "2", "TIB_Pool"),
+                Arrays.asList("MISEQXX", "3"),
+                Arrays.asList("MISEQXX", "4"),
+                Arrays.asList("PACBIO1", "1"),
+                Arrays.asList("PACBIO1", "2"),
+                Arrays.asList("PACBIO1", "3"),
+                Arrays.asList("PACBIO1", "4"),
+                Arrays.asList("PACBIO1", "5"),
+                Arrays.asList("PACBIO1", "6"),
+                Arrays.asList("PACBIO1", "7"),
+                Arrays.asList("PACBIO1", "8"));
         testSpreadsheetContents(CONTROLLER_BASE + "/spreadsheet", req, headers, rows);
     }
 
@@ -119,54 +130,4 @@ public class ContainerRestControllerST extends AbstractST {
                 .andExpect(status().isNoContent());
 
     }
-
-    @Override
-    protected void testSpreadsheetContents(String url, SpreadsheetRequest sheet, List<String> headers,
-                                           List<List<String>> rows) throws Exception {
-        MvcResult result = getMockMvc().perform(post(url).content(makeJson(sheet))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String csv = result.getResponse().getContentAsString();
-        assertFalse("SpreadSheet should not be empty", csv.isEmpty());
-
-        String[] rawRows = csv.split("\\r?\\n");
-        String[][] records = new String[rawRows.length][];
-
-        for (int i = 0; i < rawRows.length; i++) {
-            String s = rawRows[i].replaceAll("\\r", "");
-            s = s.replaceAll("\\n", "");
-            s = s.replaceAll("\"", "");
-            records[i] = s.split(",");
-        }
-
-        if(headers !=null && !headers.isEmpty() && records.length > 0) {
-            int compareLen = Math.min(headers.size(), records[0].length);
-            for(int i=0; i<compareLen; i++){
-                assertEquals(
-                        "headers mismatch at column " + i,
-                        headers.get(i),
-                        records[0][i]
-                );
-            }
-        }
-
-        if(rows != null && !rows.isEmpty()) {
-            for(int i=0;i< rows.size() && (i+1) > records.length; i++){
-                List<String> expected = rows.get(i);
-                String[] actual = records[i+1];
-
-                int compareLen = Math.min(expected.size(), actual.length);
-                for(int j=0;j <compareLen; j++){
-                    assertEquals(
-                            "Cell Mismatch at rows "+ i + "col " + j,
-                            expected.get(j),
-                            actual[j]
-                    );
-                }
-            }
-        }
-    }
-
 }
