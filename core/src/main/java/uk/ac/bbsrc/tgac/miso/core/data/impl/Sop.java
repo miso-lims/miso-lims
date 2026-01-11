@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -14,7 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-
+import jakarta.persistence.OrderBy;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.SopField;
@@ -58,6 +59,7 @@ public class Sop implements Aliasable, Deletable, Serializable {
   private boolean archived = false;
 
   @OneToMany(mappedBy = "sop", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OrderBy("name")
   private Set<SopField> sopFields = new HashSet<>();
 
   @Override
@@ -126,25 +128,44 @@ public class Sop implements Aliasable, Deletable, Serializable {
     this.archived = archived;
   }
 
+  /**
+   * Returns an unmodifiable view to avoid accidental mutation without maintaining SOP backreferences.
+   * Use {@link #addSopField(SopField)}, {@link #removeSopField(SopField)}, or
+   * {@link #setSopFields(Set)}.
+   */
   public Set<SopField> getSopFields() {
-    return sopFields;
+    return Collections.unmodifiableSet(sopFields);
   }
 
   public void setSopFields(Set<SopField> sopFields) {
-    this.sopFields.clear();
+
+    new HashSet<>(this.sopFields).forEach(this::removeSopField);
+
     if (sopFields != null) {
       sopFields.forEach(this::addSopField);
     }
   }
 
   public void addSopField(SopField field) {
+    if (field == null)
+      return;
+
+    if (field.getSop() != null && field.getSop() != this) {
+      field.getSop().sopFields.remove(field);
+    }
+
     this.sopFields.add(field);
     field.setSop(this);
   }
 
   public void removeSopField(SopField field) {
+    if (field == null)
+      return;
+
     this.sopFields.remove(field);
-    field.setSop(null);
+    if (field.getSop() == this) {
+      field.setSop(null);
+    }
   }
 
   @Override
@@ -161,5 +182,4 @@ public class Sop implements Aliasable, Deletable, Serializable {
         Sop::getUrl,
         Sop::isArchived);
   }
-
 }

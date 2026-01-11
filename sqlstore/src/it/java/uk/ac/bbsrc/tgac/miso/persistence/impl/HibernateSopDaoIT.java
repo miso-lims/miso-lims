@@ -9,9 +9,9 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
+import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
-import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 
 public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, HibernateSopDao> {
 
@@ -109,21 +109,20 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
     long savedId = getTestSubject().create(sop);
     clearSession();
 
-    Sop loaded = getTestSubject().get(savedId);
-    assertNotNull(loaded);
-    assertEquals(2, loaded.getSopFields().size());
 
-    SopField[] fields = loaded.getSopFields().toArray(new SopField[0]);
+    Sop loaded = currentSession().get(Sop.class, savedId);
+    assertNotNull(loaded);
+    assertNotNull(loaded.getSopFields());
+    assertEquals(2, loaded.getSopFields().size());
 
     boolean hasFlowCell = false;
     boolean hasPhiX = false;
 
-    for (SopField field : fields) {
+    for (SopField field : loaded.getSopFields()) {
       if ("Flow Cell Lot".equals(field.getName())) {
         hasFlowCell = true;
         assertEquals(SopField.FieldType.TEXT, field.getFieldType());
-      }
-      if ("PhiX %".equals(field.getName())) {
+      } else if ("PhiX %".equals(field.getName())) {
         hasPhiX = true;
         assertEquals(SopField.FieldType.PERCENTAGE, field.getFieldType());
         assertEquals("%", field.getUnits());
@@ -152,15 +151,18 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
     long sopId = getTestSubject().create(sop);
     clearSession();
 
-    Sop loaded = getTestSubject().get(sopId);
+    // Verify created (via session)
+    Sop loaded = currentSession().get(Sop.class, sopId);
     assertNotNull(loaded);
+    assertNotNull(loaded.getSopFields());
     assertEquals(1, loaded.getSopFields().size());
 
+    // Delete the SOP; cascade should remove SopField rows too
     currentSession().remove(loaded);
     clearSession();
 
-
-    Sop deleted = getTestSubject().get(sopId);
+    // Verify deletion (via session)
+    Sop deleted = currentSession().get(Sop.class, sopId);
     assertNull(deleted);
   }
 

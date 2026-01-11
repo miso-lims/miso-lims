@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -19,7 +21,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
@@ -28,7 +29,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SopDto;
-import uk.ac.bbsrc.tgac.miso.dto.SopFieldDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
@@ -58,18 +58,6 @@ public class SopRestController extends AbstractRestController {
     }
   };
 
-  // ADDED: GET single SOP with fields
-  @GetMapping(value = "/{id}", produces = "application/json")
-  @ResponseBody
-  public SopDto getSop(@PathVariable("id") long id) throws IOException {
-    Sop sop = sopService.get(id);
-    if (sop == null) {
-      throw new RestException("SOP not found", Status.NOT_FOUND);
-    }
-    return Dtos.asDto(sop);
-  }
-
-  // ADDED: POST create new SOP with fields
   @PostMapping(produces = "application/json")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
@@ -79,7 +67,6 @@ public class SopRestController extends AbstractRestController {
     return Dtos.asDto(sopService.get(savedId));
   }
 
-  // ADDED: PUT update existing SOP with fields
   @PutMapping(value = "/{id}", produces = "application/json")
   @ResponseBody
   public SopDto update(@PathVariable("id") long id, @RequestBody SopDto dto) throws IOException {
@@ -88,36 +75,24 @@ public class SopRestController extends AbstractRestController {
       throw new RestException("SOP not found", Status.NOT_FOUND);
     }
 
-    // Update basic fields
-    existing.setAlias(dto.getAlias());
-    existing.setVersion(dto.getVersion());
-    existing.setCategory(SopCategory.valueOf(dto.getCategory()));
-    existing.setUrl(dto.getUrl());
-    existing.setArchived(dto.isArchived());
+    Sop incoming = Dtos.to(dto);
+    incoming.setId(id);
 
-    // Clear and re-add fields
-    existing.getSopFields().clear();
-    if (dto.getFields() != null && !dto.getFields().isEmpty()) {
-      for (SopFieldDto fieldDto : dto.getFields()) {
-        SopField field = Dtos.to(fieldDto);
-        existing.addSopField(field);
-      }
-    }
-
-    sopService.update(existing);
+    sopService.update(incoming);
     return Dtos.asDto(sopService.get(id));
   }
 
   @GetMapping(value = "/dt/category/{category}")
-  public @ResponseBody DataTablesResponseDto<SopDto> dataTableByCategory(@PathVariable("category") String categoryName,
-      HttpServletRequest request)
-      throws IOException {
-    SopCategory category = null;
+  public @ResponseBody DataTablesResponseDto<SopDto> dataTableByCategory(
+      @PathVariable("category") String categoryName, HttpServletRequest request) throws IOException {
+
+    SopCategory category;
     try {
       category = SopCategory.valueOf(categoryName);
     } catch (IllegalArgumentException e) {
       throw new RestException("Invalid SOP category", Status.BAD_REQUEST);
     }
+
     return datatable.get(request, advancedSearchParser, PaginationFilter.category(category));
   }
 
@@ -138,10 +113,20 @@ public class SopRestController extends AbstractRestController {
     return asyncOperationManager.getAsyncProgress(uuid, Sop.class, sopService, Dtos::asDto);
   }
 
+  @GetMapping(value = "/bulk", produces = "application/json")
+  @ResponseBody
+  public List<SopDto> getBulk(@RequestParam("ids") List<Long> ids) throws IOException {
+    if (ids == null || ids.isEmpty()) {
+      return Collections.emptyList();
+    }
+    return sopService.listByIdList(ids).stream()
+        .map(Dtos::asDto)
+        .toList();
+  }
+
   @PostMapping(value = "/bulk-delete")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public @ResponseBody void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("SOP", ids, sopService);
   }
-
 }
