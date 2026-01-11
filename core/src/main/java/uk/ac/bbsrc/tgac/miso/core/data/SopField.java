@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -14,7 +15,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
-
 
 @Entity
 @Table(name = "SopField")
@@ -45,15 +45,15 @@ public class SopField implements Serializable {
   @JoinColumn(name = "sopId", nullable = false)
   private Sop sop;
 
-  @Column(nullable = false, length = 255)
+  @Column(name = "name", nullable = false, length = 255)
   private String name;
 
-  @Column(length = 50)
+  @Column(name = "units", length = 50)
   private String units;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false, length = 50)
-  private FieldType fieldType = FieldType.TEXT;
+  @Column(name = "fieldType", nullable = false, length = 50)
+  private FieldType fieldType;
 
   public SopField() {}
 
@@ -78,7 +78,7 @@ public class SopField implements Serializable {
   }
 
   public void setName(String name) {
-    this.name = name;
+    this.name = name == null ? null : name.trim();
   }
 
   public String getUnits() {
@@ -86,7 +86,7 @@ public class SopField implements Serializable {
   }
 
   public void setUnits(String units) {
-    this.units = units;
+    this.units = units == null ? null : units.trim();
   }
 
   public FieldType getFieldType() {
@@ -97,61 +97,60 @@ public class SopField implements Serializable {
     this.fieldType = fieldType;
   }
 
-  /**
-   * Validates a value against this field's type
-   */
   public boolean isValidValue(String value) {
-    if (value == null || value.trim().isEmpty()) {
+    if (value == null)
       return true;
-    }
 
-    switch (fieldType) {
+    String trimmed = value.trim();
+    if (trimmed.isEmpty())
+      return true;
+
+    FieldType type = fieldType == null ? FieldType.TEXT : fieldType;
+
+    switch (type) {
       case TEXT:
         return true;
+
       case NUMBER:
-        try {
-          Double.parseDouble(value);
-          return true;
-        } catch (NumberFormatException e) {
-          return false;
-        }
+        return isDecimal(trimmed);
+
       case PERCENTAGE:
+        if (!isDecimal(trimmed))
+          return false;
         try {
-          double percentage = Double.parseDouble(value);
-          return percentage >= 0 && percentage <= 100;
+          BigDecimal d = new BigDecimal(trimmed);
+          return d.compareTo(BigDecimal.ZERO) >= 0 && d.compareTo(new BigDecimal("100")) <= 0;
         } catch (NumberFormatException e) {
           return false;
         }
+
       default:
-        return false;
+        return true;
     }
   }
 
-  @Override
-  public int hashCode() {
-    // Use business key (name + fieldType) instead of id for unsaved entities
-    if (id != null) {
-      return Objects.hash(id);
+  private boolean isDecimal(String s) {
+    try {
+      new BigDecimal(s);
+      return true;
+    } catch (NumberFormatException e) {
+      return false;
     }
-    return Objects.hash(name, fieldType);
   }
 
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
       return true;
-    if (obj == null || getClass() != obj.getClass())
+    if (!(obj instanceof SopField))
       return false;
     SopField other = (SopField) obj;
+    return id != null && other.id != null && Objects.equals(id, other.id);
+  }
 
-    // If both have IDs, compare by ID
-    if (id != null && other.id != null) {
-      return Objects.equals(id, other.id);
-    }
-
-    // For unsaved entities, use business key (name + fieldType)
-    return Objects.equals(name, other.name) &&
-        Objects.equals(fieldType, other.fieldType);
+  @Override
+  public int hashCode() {
+    return id != null ? Objects.hash(id) : System.identityHashCode(this);
   }
 
   @Override

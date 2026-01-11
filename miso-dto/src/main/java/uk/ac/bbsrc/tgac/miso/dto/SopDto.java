@@ -1,7 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.Collections;
 import java.util.List;
 
+/**
+ * SOP DTO.
+ *
+ * <p>
+ * {@code fields} is a display-only string summary used by list/datatable views. {@code sopFields}
+ * contains full editable field definitions.
+ * </p>
+ */
 public class SopDto {
 
   private long id;
@@ -10,7 +19,12 @@ public class SopDto {
   private String category;
   private String url;
   private boolean archived;
-  private List<SopFieldDto> fields;
+  private String fields;
+
+  /**
+   * Full editable field definitions (ordered).
+   */
+  private List<SopFieldDto> sopFields = Collections.emptyList();
 
   public long getId() {
     return id;
@@ -60,12 +74,19 @@ public class SopDto {
     this.archived = archived;
   }
 
-  public List<SopFieldDto> getFields() {
+  public String getFields() {
     return fields;
   }
 
-  public void setFields(List<SopFieldDto> fields) {
+  public void setFields(String fields) {
     this.fields = fields;
   }
 
+  public List<SopFieldDto> getSopFields() {
+    return sopFields;
+  }
+
+  public void setSopFields(List<SopFieldDto> sopFields) {
+    this.sopFields = sopFields == null ? Collections.emptyList() : sopFields;
+  }
 }

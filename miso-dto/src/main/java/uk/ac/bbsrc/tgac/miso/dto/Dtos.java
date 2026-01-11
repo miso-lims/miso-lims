@@ -26,6 +26,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +42,6 @@ import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.type.IndexSequencing;
-import jakarta.annotation.Nonnull;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
@@ -185,7 +186,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
@@ -4408,40 +4408,57 @@ public class Dtos {
     return to;
   }
 
-  public static SopDto asDto(@Nonnull Sop from) {
+  public static SopDto asDto(@Nonnull uk.ac.bbsrc.tgac.miso.core.data.impl.Sop from) {
     SopDto to = new SopDto();
-    setLong(to::setId, from.getId(), false);
+    setLong(to::setId, from.getId(), true);
     setString(to::setAlias, from.getAlias());
     setString(to::setVersion, from.getVersion());
-    setString(to::setCategory, maybeGetProperty(from.getCategory(), SopCategory::name));
+    setString(to::setCategory, from.getCategory() == null ? null : from.getCategory().name());
     setString(to::setUrl, from.getUrl());
     setBoolean(to::setArchived, from.isArchived(), false);
 
+    String summary = from.getSopFields() == null ? ""
+        : from.getSopFields().stream()
+            .filter(Objects::nonNull)
+            .map(SopField::getName)
+            .filter(Objects::nonNull)
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .sorted(String.CASE_INSENSITIVE_ORDER)
+            .collect(Collectors.joining(", "));
+    to.setFields(summary);
+
     if (from.getSopFields() != null && !from.getSopFields().isEmpty()) {
-      to.setFields(from.getSopFields().stream()
+      to.setSopFields(from.getSopFields().stream()
+          .filter(Objects::nonNull)
+          .sorted(Comparator.comparing(
+              f -> f.getName() == null ? "" : f.getName().trim(),
+              String.CASE_INSENSITIVE_ORDER))
           .map(Dtos::asDto)
           .collect(Collectors.toList()));
+    } else {
+      to.setSopFields(Collections.emptyList());
     }
 
     return to;
   }
 
-  public static Sop to(@Nonnull SopDto from) {
-    Sop to = new Sop();
+  public static uk.ac.bbsrc.tgac.miso.core.data.impl.Sop to(@Nonnull SopDto from) {
+    uk.ac.bbsrc.tgac.miso.core.data.impl.Sop to = new uk.ac.bbsrc.tgac.miso.core.data.impl.Sop();
     setLong(to::setId, from.getId(), false);
     setString(to::setAlias, from.getAlias());
     setString(to::setVersion, from.getVersion());
-    setObject(to::setCategory, from.getCategory(), SopCategory::valueOf);
+    setObject(to::setCategory, from.getCategory(), uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory::valueOf);
     setString(to::setUrl, from.getUrl());
     setBoolean(to::setArchived, from.isArchived(), false);
 
-    if (from.getFields() != null && !from.getFields().isEmpty()) {
-      Set<SopField> fields = from.getFields().stream()
-          .map(fieldDto -> {
-            SopField field = Dtos.to(fieldDto);
-            field.setSop(to);
-            return field;
-          })
+
+    if (from.getSopFields() == null || from.getSopFields().isEmpty()) {
+      to.setSopFields(Collections.emptySet());
+    } else {
+      Set<SopField> fields = from.getSopFields().stream()
+          .filter(Objects::nonNull)
+          .map(Dtos::to)
           .collect(Collectors.toSet());
       to.setSopFields(fields);
     }
@@ -4460,10 +4477,16 @@ public class Dtos {
 
   public static SopField to(@Nonnull SopFieldDto from) {
     SopField to = new SopField();
-    setLong(to::setId, from.getId(), false);
+    setLong(to::setId, from.getId(), true);
     setString(to::setName, from.getName());
     setString(to::setUnits, from.getUnits());
-    setObject(to::setFieldType, from.getFieldType(), fieldType -> SopField.FieldType.valueOf(fieldType));
+
+    if (from.getFieldType() == null || from.getFieldType().trim().isEmpty()) {
+      to.setFieldType(null);
+    } else {
+      setObject(to::setFieldType, from.getFieldType().trim(), SopField.FieldType::valueOf);
+    }
+
     return to;
   }
 

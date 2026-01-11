@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,8 +31,10 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
 
   @Autowired
   private SopService sopService;
+
   @Autowired
   private AuthorizationManager authorizationManager;
+
   @Autowired
   private ObjectMapper mapper;
 
@@ -43,26 +45,70 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
     model.put("title", "SOPs");
+
     TabbedListItemsPage listSops = new TabbedListItemsPage("sop", "category",
-        Stream.of(SopCategory.values()), SopCategory::getLabel, SopCategory::name, mapper) {
+        Stream.of(SopCategory.values()),
+        SopCategory::getLabel, SopCategory::name, mapper) {
 
       @Override
       protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
         config.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
       }
-
     };
+
     return listSops.list(model);
   }
 
-  @PostMapping("/bulk/new")
-  public ModelAndView create(@RequestParam Map<String, String> formData, ModelMap model) throws IOException {
-    return bulkCreate(formData, model);
+  @GetMapping("/new")
+  public ModelAndView create(
+      @RequestParam(name = "baseId", required = false) Long baseId,
+      @RequestParam(name = "copyId", required = false) Long copyId,
+      ModelMap model) throws IOException {
+
+    authorizationManager.throwIfNonAdmin();
+
+    Long sourceId = baseId != null ? baseId : copyId;
+
+    SopDto dto;
+    if (sourceId != null) {
+      Sop sop = sopService.get(sourceId);
+      dto = sop == null ? makeDto() : Dtos.asDto(sop);
+
+      dto.setId(0L);
+    } else {
+      dto = makeDto();
+    }
+
+    model.put("title", "Create SOP");
+    model.put("sop", mapper.writeValueAsString(dto));
+    model.put("sopCategories", SopCategory.values());
+    model.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
+
+    return new ModelAndView("/WEB-INF/pages/editSop.jsp", model);
   }
 
-  @PostMapping("/bulk/edit")
-  public ModelAndView edit(@RequestParam Map<String, String> formData, ModelMap model) throws IOException {
-    return bulkEdit(formData, model);
+  @PostMapping("/new")
+  public ModelAndView createPost() {
+    return new ModelAndView("redirect:/sop/new");
+  }
+
+  @GetMapping("/{id}")
+  public ModelAndView edit(@PathVariable("id") long id, ModelMap model) throws IOException {
+    authorizationManager.throwIfNonAdmin();
+
+    Sop sop = sopService.get(id);
+    if (sop == null) {
+      return new ModelAndView("redirect:/sop/list");
+    }
+
+    SopDto dto = Dtos.asDto(sop);
+
+    model.put("title", "Edit SOP: " + sop.getAlias());
+    model.put("sop", mapper.writeValueAsString(dto));
+    model.put("sopCategories", SopCategory.values());
+    model.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
+
+    return new ModelAndView("/WEB-INF/pages/editSop.jsp", model);
   }
 
   @Override
@@ -84,5 +130,4 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
   protected SopDto makeDto() {
     return new SopDto();
   }
-
 }

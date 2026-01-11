@@ -52,6 +52,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.RunLibrarySpreadsheets;
@@ -68,6 +70,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -98,7 +101,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 /**
  * A controller to handle all REST requests for Runs
- * 
+ *
  * @author Rob Davey
  * @date 01-Sep-2011
  * @since 0.1.0
@@ -106,6 +109,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 @Controller
 @RequestMapping("/rest/runs")
 public class RunRestController extends AbstractRestController {
+
   public static class RunPartitionQCRequest {
     private List<Long> partitionIds;
     private Long qcTypeId;
@@ -158,7 +162,6 @@ public class RunRestController extends AbstractRestController {
   }
 
   public static class RunLibraryQcStatusUpdateRequest {
-
     private Boolean qcPassed;
     private String note;
 
@@ -177,7 +180,6 @@ public class RunRestController extends AbstractRestController {
     public void setNote(String note) {
       this.note = note;
     }
-
   }
 
   @Value("${miso.detailed.sample.enabled}")
@@ -211,6 +213,8 @@ public class RunRestController extends AbstractRestController {
   private IndexChecker indexChecker;
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
+  @Autowired
+  private SopService sopService;
 
   private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<>() {
 
@@ -399,7 +403,7 @@ public class RunRestController extends AbstractRestController {
   public DataTablesResponseDto<RunDto> dataTableByPlatform(@PathVariable("platform") String platform,
       HttpServletRequest request)
       throws IOException {
-    PlatformType platformType = null;
+    PlatformType platformType;
     try {
       platformType = PlatformType.valueOf(platform);
     } catch (IllegalArgumentException e) {
@@ -474,9 +478,9 @@ public class RunRestController extends AbstractRestController {
             .orElseThrow(
                 () -> new RestException(String.format("No partition QC type found with ID: %d", request.getQcTypeId()),
                     Status.BAD_REQUEST));
-    run.getSequencerPartitionContainers().stream()//
-        .flatMap(container -> container.getPartitions().stream())//
-        .filter(partition -> request.partitionIds.contains(partition.getId()))//
+    run.getSequencerPartitionContainers().stream()
+        .flatMap(container -> container.getPartitions().stream())
+        .filter(partition -> request.partitionIds.contains(partition.getId()))
         .map(WhineyFunction.rethrow(partition -> {
           RunPartition runPartition = runPartitionService.get(run, partition);
           if (runPartition == null) {
@@ -487,7 +491,8 @@ public class RunRestController extends AbstractRestController {
           runPartition.setQcType(qcType);
           runPartition.setNotes(request.notes);
           return runPartition;
-        })).forEach(WhineyConsumer.rethrow(runPartitionService::save));
+        }))
+        .forEach(WhineyConsumer.rethrow(runPartitionService::save));
   }
 
   @PutMapping("/{runId}/partition-purposes")
@@ -550,21 +555,23 @@ public class RunRestController extends AbstractRestController {
     InstrumentModelDto instrumentModelDto = Dtos.asDto(run.getSequencer().getInstrumentModel());
     Map<Library, List<Partition>> libraryGroups = getLibraryGroups(run);
 
-    return libraryGroups.entrySet().stream().map(group -> new Pair<>(group.getKey(),
-        group.getValue().stream().map(partition -> Dtos.asDto(partition, indexChecker))
-            .map(partitionDto -> new RunPartitionDto(runDto, partitionDto))
-            .collect(Collectors.toList())))
+    return libraryGroups.entrySet().stream()
+        .map(group -> new Pair<>(group.getKey(),
+            group.getValue().stream()
+                .map(partition -> Dtos.asDto(partition, indexChecker))
+                .map(partitionDto -> new RunPartitionDto(runDto, partitionDto))
+                .collect(Collectors.toList())))
         .map(group -> {
           StudiesForExperiment result = new StudiesForExperiment();
           result.experiment = new ExperimentDto();
           result.experiment.setLibrary(Dtos.asDto(group.getKey(), false));
           result.experiment.setInstrumentModel(instrumentModelDto);
           result.experiment.setPartitions(group.getValue());
-
           result.studies = group.getKey().getSample().getProject().getStudies().stream().map(Dtos::asDto)
               .collect(Collectors.toList());
           return result;
-        }).collect(Collectors.toList());
+        })
+        .collect(Collectors.toList());
   }
 
   public static class AddRequest {
@@ -595,46 +602,41 @@ public class RunRestController extends AbstractRestController {
     Map<Library, List<Partition>> libraryGroups = getLibraryGroups(run);
 
     return libraryGroups.entrySet().stream()
-        .<AddRequest>flatMap(WhineyFunction.rethrow(group -> //
-        experimentService.listAllByLibraryId(group.getKey().getId()).stream()//
-            .filter(experiment -> experiment.getInstrumentModel().getId() == run.getSequencer().getInstrumentModel()
-                .getId())
-            .flatMap(experiment -> group.getValue().stream()//
-                .filter(partition -> experiment.getRunPartitions().stream()
-                    .noneMatch(rp -> rp.getPartition().equals(partition)))
-                .map(partition -> {
-                  AddRequest request = new AddRequest();
-                  request.experiment = Dtos.asDto(experiment);
-                  request.partition = Dtos.asDto(partition, indexChecker);
-                  return request;
-                }))))
+        .<AddRequest>flatMap(
+            WhineyFunction.rethrow(group -> experimentService.listAllByLibraryId(group.getKey().getId()).stream()
+                .filter(experiment -> experiment.getInstrumentModel().getId() == run.getSequencer().getInstrumentModel()
+                    .getId())
+                .flatMap(experiment -> group.getValue().stream()
+                    .filter(partition -> experiment.getRunPartitions().stream()
+                        .noneMatch(rp -> rp.getPartition().equals(partition)))
+                    .map(partition -> {
+                      AddRequest request = new AddRequest();
+                      request.experiment = Dtos.asDto(experiment);
+                      request.partition = Dtos.asDto(partition, indexChecker);
+                      return request;
+                    }))))
         .collect(Collectors.toList());
   }
 
   private Map<Library, List<Partition>> getLibraryGroups(Run run) {
-    return run.getSequencerPartitionContainers().stream()//
-        .flatMap(container -> container.getPartitions().stream())//
-        .filter(partition -> partition.getPool() != null)//
-        .flatMap(partition -> partition.getPool().getPoolContents().stream()//
-            .map(PoolElement::getAliquot)//
-            .map(ListLibraryAliquotView::getLibraryId)//
+    return run.getSequencerPartitionContainers().stream()
+        .flatMap(container -> container.getPartitions().stream())
+        .filter(partition -> partition.getPool() != null)
+        .flatMap(partition -> partition.getPool().getPoolContents().stream()
+            .map(PoolElement::getAliquot)
+            .map(ListLibraryAliquotView::getLibraryId)
             .distinct()
-            .map(libraryId -> new Pair<>(libraryId, partition)))//
-        .collect(Collectors.groupingBy(Pair::getKey))//
-        .entrySet().stream()//
-        .collect(Collectors.toMap(//
-            WhineyFunction
-                .rethrow(entry -> libraryService.get(entry.getKey())), //
-            entry -> entry.getValue().stream()//
-                .map(Pair::getValue)//
-                .collect(Collectors.toList())));
+            .map(libraryId -> new Pair<>(libraryId, partition)))
+        .collect(Collectors.groupingBy(Pair::getKey))
+        .entrySet().stream()
+        .collect(Collectors.toMap(
+            WhineyFunction.rethrow(entry -> libraryService.get(entry.getKey())),
+            entry -> entry.getValue().stream().map(Pair::getValue).collect(Collectors.toList())));
   }
 
   @GetMapping("/search")
   public @ResponseBody List<RunDto> searchRuns(@RequestParam("q") String query) throws IOException {
-    return runService.list(0, 0, false, "id", PaginationFilter.query(query))
-        .stream()
-        .map(Dtos::asDto)
+    return runService.list(0, 0, false, "id", PaginationFilter.query(query)).stream().map(Dtos::asDto)
         .collect(Collectors.toList());
   }
 
@@ -651,13 +653,28 @@ public class RunRestController extends AbstractRestController {
     return run;
   }
 
+  private void validateRunSop(RunDto dto) throws IOException {
+    if (dto == null || dto.getSopId() == null)
+      return;
+
+    Sop sop = sopService.get(dto.getSopId());
+    if (sop == null) {
+      throw new RestException("SOP not found: " + dto.getSopId(), Status.BAD_REQUEST);
+    }
+    if (sop.getCategory() != SopCategory.RUN) {
+      throw new RestException("Only RUN SOPs may be assigned to a Run", Status.BAD_REQUEST);
+    }
+  }
+
   @PostMapping
   public @ResponseBody RunDto createRun(@RequestBody RunDto dto) throws IOException {
+    validateRunSop(dto);
     return RestUtils.createObject("Run", dto, Dtos::to, runService, Dtos::asDto);
   }
 
   @PutMapping("/{runId}")
   public @ResponseBody RunDto updateRun(@PathVariable long runId, @RequestBody RunDto dto) throws IOException {
+    validateRunSop(dto);
     return RestUtils.updateObject("Run", runId, dto, WhineyFunction.rethrow(d -> {
       Run run = Dtos.to(d);
       // Containers cannot be updated in this way

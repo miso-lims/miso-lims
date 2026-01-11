@@ -13,6 +13,16 @@ var Utils = Utils || {
     input.remove();
   },
 
+  escapeHtml: function (value) {
+    if (value === null || value === undefined) return "";
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  },
+
   decodeHtmlString: function (text) {
     var textarea = document.createElement("textarea");
     textarea.innerHTML = text;

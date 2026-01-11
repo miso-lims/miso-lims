@@ -1,6 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+/**
+ * DTO for SOP Field definitions.
+ */
 public class SopFieldDto {
+
   private Long id;
   private String name;
   private String units;
