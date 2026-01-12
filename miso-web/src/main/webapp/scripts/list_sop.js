@@ -12,7 +12,6 @@ ListTarget.sop = {
   getQueryUrl: null,
   showNewOptionSop: false,
 
-
   createStaticActions: function (config, projectId) {
     if (!config.isAdmin) return [];
 
@@ -97,23 +96,6 @@ ListTarget.sop = {
         mData: "version",
         iSortPriority: 2,
         bSortDirection: true,
-      },
-      {
-        sTitle: "Category",
-        mData: "category",
-        iSortPriority: 3,
-        bSortDirection: true,
-        mRender: function (data, type) {
-          if (
-            type === "display" &&
-            data &&
-            Constants.sopCategories &&
-            Constants.sopCategories[data]
-          ) {
-            return Constants.sopCategories[data];
-          }
-          return data || "";
-        },
       },
       {
         sTitle: "SOP",
