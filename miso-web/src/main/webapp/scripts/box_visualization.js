@@ -778,7 +778,7 @@
     self.show = function (results) {
         self.results = results;
 
-        var summaryHTML = "<h1> Matrix Scan Results </h1><ul>";
+        var summaryHTML = "<h1> Scan Results </h1><ul>";
         var legendHTML = "<p><img src = '/styles/images/tube_error.png' width= '14'> Conflict or Missing item </p>" +
                            "<p><img src = '/styles/images/tube_full.png' width= '14'> Barcode will be assigned </p>"  ;
 
@@ -797,7 +797,7 @@
 
         jQuery("#dialogDialog").dialog({
             autoOpen: false,
-            title: "Scan Results (Assign Mode)",
+            title: "Scan Results",
             width: Box.dialogWidth,
             modal: true,
             resizable: false,

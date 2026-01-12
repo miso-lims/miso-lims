@@ -75,7 +75,7 @@ var Box = Box || {
         width: 400,
         height: 200,
         buttons: {
-            "Update Location": function(){
+            "Update Locations": function(){
                 dialog.dialog("close");
                 Box.startUpdateLocationsScan(scannerName);
             },

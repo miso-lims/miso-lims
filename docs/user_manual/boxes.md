@@ -186,25 +186,25 @@ the far right of the heading; hover over it to reveal the menu, and click "Disca
 Discard All Contents dialog box that appears, click "Discard" to continue discarding all items from the box.
 The page will refresh and the box will be empty.
 
-## Scanning a Box
+## Scanning a box
 
 If your MISO is configured to use a box scanner, then the box contents can be updated in one operation using
-that box scanner (at the time of this writing, the Thermo Fisher VisionMate High Speed Barcode 
+that box scanner (at the time of this writing, the Thermo Fisher VisionMate High Speed Barcode
 Reader and Azenta Life Sciences' Ziath DP5 Mirage Rack Reader
-are supported). A MISO box must be scannable (part of the box size attribute) in order to have the 
-scanning
-option available.
+are supported). A MISO box must be scannable (part of the box size attribute) in order to have the
+scanning option available.
 
 To scan a box, first open the box scanner software on the computer (outside of MISO). Then, go to the Edit Box
 page by clicking the box name in the Boxes list page. The Contents section heading has an Options menu on the
 far right of the heading; hover over it to reveal the menu, and click "Scan with <scanner-name\>", where
 <scanner-name\> is a box scanner that your MISO is configured for. If "Scan with <scanner-name\>" is not visible
-in the list, your box may not be scannable or MISO may not be configured to use this box scanner. 
+in the list, your box may not be scannable or MISO may not be configured to use this box scanner.
 
-After clicking on "Scan with <scanner-name\>", you will see two scan options 1) Update Location 2) Assign Barcodes.
-Click on Update Location for scanning box.
+After clicking on "Scan with <scanner-name\>", you will see two scan options 1) Update Locations 2) Assign Barcodes.
 
-Wait until the Scan dialog box prompts you to place the box on the scanner. It will automatically scan the box.
+### Updating Item Locations
+
+To update Item locations click on "Update Locations" from scan options. Wait until the Scan dialog box prompts you to place the box on the scanner. It will automatically scan the box.
 Once the scan is complete, the diagram will display the tubes which the scanner found.
 
 Once a successful scan is made, review the changes that would be made and click "Save".
@@ -215,36 +215,30 @@ Once a successful scan is made, review the changes that would be made and click 
 If there are any errors with the scan, the scan will need to be retried until there are no errors. Possible
 sources of error are:
 
- * The scanning software is not open
+* The scanning software is not open
     * This will cause a "could not find the scanner" error message. Open the scanner software on the computer
       and rescan.
- * A "No Read" scan result for a tube
+* A "No Read" scan result for a tube
     * This is often caused by dust on the scanner surface or frost on the tubes. Clean the scanner surface
       and/or tube bottoms and rescan.
- * A barcode is scanned which is not associated with an item in MISO
+* A barcode is scanned which is not associated with an item in MISO
     * Ensure that the tube barcode is correctly associated with an item in MISO.
- * The network is down or MISO cannot connect to the scanner
+* The network is down or MISO cannot connect to the scanner
     * Fix these problems first, then rescan.
- * Specific to Ziath DP5 Mirage Rack Reader 
-    * Check if Container UID on the DP5 application has a container named: 'mirage96sbs' 
+* Specific to Ziath DP5 Mirage Rack Reader
+    * Check if Container UID on the DP5 application has a container named: 'mirage96sbs'
 
-## Matrix Barcode Assigning
+### Assigning Barcodes
 
-Matrix Barcode Assignment allows users to assign barcodes to multiple items in a box in a single scanning operation. 
-This is designed to speed up bulk barcode assignment while clearly highlighting any conflicts or warnings before confirmation. 
+Assign Barcodes allows users to assign barcodes to multiple items in a box in a single scanning operation.
+This is designed to speed up bulk barcode assignment while clearly highlighting any conflicts or warnings before confirmation.
 
-To assign barcodes, first open the box scanner software on the computer (outside of MISO). Then, go to the Edit Box
-page by clicking the box name in the Boxes list page. The Contents section heading has an Options menu on the
-far right of the heading; hover over it to reveal the menu, and click "Scan with <scanner-name\>", where
-<scanner-name\> is a box scanner that your MISO is configured for. If "Scan with <scanner-name\>" is not visible
-in the list, your box may not be scannable or MISO may not be configured to use this box scanner.
+To assign barcodes, click on "Assign Barcodes" from scan options. Wait until the Scan dialog box prompts you to place the box on the scanner. It will automatically scan the box. Once the
+scan is complete, the scan results dialog will appear. 
 
-After clicking on "Scan with <scanner-name\>", you will see two scan options 1) Update Location 2) Assign Barcodes.
-Click on Assign Barcodes. 
-
-Wait until the Scan dialog box prompts you to place the box on the scanner. It will automatically scan the box. Once the 
-scan is complete, the diagram will display the Matrix result grid and Warnings (if applicable). Warnings will display issues
-such as missing or invalid scans, barcode changes, duplicate barcodes.
+The scan results dialog shows a grid representing the box layout 
+and any warnings or conflicts detected during scan. Warnings include missing barcodes, extra barcodes scanned and barcode changes from
+previous value.
 
 Once a successful scan is made, review the warnings and changes that would be made and click "Confirm".
 
