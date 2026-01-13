@@ -67,7 +67,7 @@
     Utils.ui.updateHelpLink(FormTarget.libraryaliquot.getUserManualUrl());
   });
 </script>
-
+<miso:attachments item="${aliquot}" projectId="${aliquot.library.sample.project.id}"/>
 <miso:list-section id="list_transfer" name="Transfers" target="transfer" items="${aliquotTransfers}" config="{ libraryAliquotId: ${aliquot.id} }" alwaysShow="true"/>
 <miso:list-section id="list_pool" name="Pools" target="pool" items="${aliquotPools}"/>
 <miso:list-section id="list_run" name="Runs" target="run" items="${aliquotRuns}"/>

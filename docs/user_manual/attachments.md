@@ -11,6 +11,7 @@ multiple items. MISO allows you attach files to the following items.
 * Runs
 * Array Runs
 * Service Records
+* Library Aliquots
 
 
 
