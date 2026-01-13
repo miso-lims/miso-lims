@@ -79,18 +79,18 @@ public class ContainerRestControllerST extends AbstractST {
 
         List<String> headers = Arrays.asList("Container", "Partition", "Pool", "Loading Concentration", "Units");
         List<List<String>> rows = Arrays.asList(
-                Arrays.asList("MISEQXX", "1", "POOL_1"),
-                Arrays.asList("MISEQXX", "2", "TIB_Pool"),
-                Arrays.asList("MISEQXX", "3"),
-                Arrays.asList("MISEQXX", "4"),
-                Arrays.asList("PACBIO1", "1"),
-                Arrays.asList("PACBIO1", "2"),
-                Arrays.asList("PACBIO1", "3"),
-                Arrays.asList("PACBIO1", "4"),
-                Arrays.asList("PACBIO1", "5"),
-                Arrays.asList("PACBIO1", "6"),
-                Arrays.asList("PACBIO1", "7"),
-                Arrays.asList("PACBIO1", "8"));
+                Arrays.asList("MISEQXX", "1", "POOL_1", "", ""),
+                Arrays.asList("MISEQXX", "2", "TIB_Pool", "", ""),
+                Arrays.asList("MISEQXX", "3", "", "", ""),
+                Arrays.asList("MISEQXX", "4", "", "", ""),
+                Arrays.asList("PACBIO1", "1", "", "", ""),
+                Arrays.asList("PACBIO1", "2", "", "", ""),
+                Arrays.asList("PACBIO1", "3", "", "", ""),
+                Arrays.asList("PACBIO1", "4", "", "", ""),
+                Arrays.asList("PACBIO1", "5", "", "", ""),
+                Arrays.asList("PACBIO1", "6", "", "", ""),
+                Arrays.asList("PACBIO1", "7", "", "", ""),
+                Arrays.asList("PACBIO1", "8", "", "", ""));
         testSpreadsheetContents(CONTROLLER_BASE + "/spreadsheet", req, headers, rows);
     }
 
