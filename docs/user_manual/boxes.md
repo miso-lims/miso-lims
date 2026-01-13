@@ -186,7 +186,7 @@ the far right of the heading; hover over it to reveal the menu, and click "Disca
 Discard All Contents dialog box that appears, click "Discard" to continue discarding all items from the box.
 The page will refresh and the box will be empty.
 
-## Scanning a box
+## Scanning a Box
 
 If your MISO is configured to use a box scanner, then the box contents can be updated in one operation using
 that box scanner (at the time of this writing, the Thermo Fisher VisionMate High Speed Barcode
