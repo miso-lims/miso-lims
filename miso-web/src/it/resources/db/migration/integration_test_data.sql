@@ -1261,11 +1261,11 @@ INSERT INTO Workset(worksetId, alias, description, creator, created, lastModifie
 (1, 'Workset One', 'Workset One description', 1, '2018-08-03 13:12:00', 1, '2018-08-03 13:12:00'),
 (2, 'Workset Two', 'Workset Two description', 3, '2018-08-03 13:12:00', 3, '2018-08-03 13:12:00');
 
-INSERT INTO LibraryQC(library_libraryId, creator, date, type, results, created, lastModified) VALUES
-(2201, 1, '2018-07-10', 104, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
+INSERT INTO LibraryQC(qcId, library_libraryId, creator, date, type, results, created, lastModified) VALUES
+(3, 2201, 1, '2018-07-10', 104, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
 
-INSERT INTO PoolQC(pool_poolId, creator, date, type, results, created, lastModified) VALUES
-(2201, 1, '2018-07-10', 107, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
+INSERT INTO PoolQC(qcId, pool_poolId, creator, date, type, results, created, lastModified) VALUES
+(4, 2201, 1, '2018-07-10', 107, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
 
 INSERT INTO Workset_Sample(worksetId, sampleId) VALUES
 (1, 100001),
