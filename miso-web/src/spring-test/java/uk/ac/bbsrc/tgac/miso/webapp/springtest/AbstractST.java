@@ -660,7 +660,7 @@ public abstract class AbstractST {
       String s = rawRows[i].replaceAll("\\r", "");
       s = s.replaceAll("\\n", "");
       s = s.replaceAll("\"", "");
-      records[i] = s.split(",");
+      records[i] = s.split(",", -1);
     }
     checkArray(records[0], headers);
     for (int i = 0; i < rows.size(); i++) {
