@@ -209,6 +209,9 @@ BulkTarget.libraryaliquot = (function ($) {
               "libraryAliquotIds",
               Urls.rest.worksets.addLibraryAliquots
             ),
+        BulkUtils.actions.attachFile("libraryaliquot", function (libraryAliquot) {
+            return libraryAliquot.projectId;
+        }),
         BulkUtils.actions.transfer("libraryAliquotIds"),
       ]
       .concat(BulkUtils.actions.qc("LibraryAliquot"));

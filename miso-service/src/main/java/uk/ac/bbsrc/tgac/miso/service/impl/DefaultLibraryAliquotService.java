@@ -30,16 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
-import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
-import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
-import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryDesignCodeService;
-import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
-import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
-import uk.ac.bbsrc.tgac.miso.core.service.TargetedSequencingService;
-import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
+import uk.ac.bbsrc.tgac.miso.core.service.*;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -79,6 +70,8 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
   private BoxService boxService;
   @Autowired
   private WorksetService worksetService;
+  @Autowired
+  private FileAttachmentService fileAttachmentService;
   @Autowired
   private BarcodableReferenceService barcodableReferenceService;
   @Autowired
@@ -404,6 +397,10 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
 
   public void setWorksetService(WorksetService worksetService) {
     this.worksetService = worksetService;
+  }
+
+  public void setFileAttachmentService(FileAttachmentService fileAttachmentService) {
+      this.fileAttachmentService = fileAttachmentService;
   }
 
   @Override

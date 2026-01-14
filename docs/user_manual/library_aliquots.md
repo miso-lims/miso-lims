@@ -91,7 +91,11 @@ make the changes you would like, then click the "Save" button at the top right t
 with the data you've entered, the error messages will be displayed at the top of the screen and you can adjust as
 necessary before clicking "Save" again.
 
+## Attaching Files
 
+You can attach any type and number of files to a library aliquot in MISO. This feature might be used to attach QC output or a
+spreadsheet of library aliquot data provided by a collaborator. For more information, see the
+[Attachments section](../attachments/).
 
 ## Pooling Library Aliquots Together
 

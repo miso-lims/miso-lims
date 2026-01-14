@@ -12,6 +12,7 @@ public class WorksetDto {
   private List<Long> sampleIds;
   private List<Long> libraryIds;
   private List<Long> libraryAliquotIds;
+  private List<Long> poolIds;
   private String creator;
   private String lastModified;
 
@@ -77,6 +78,14 @@ public class WorksetDto {
 
   public void setLibraryAliquotIds(List<Long> libraryAliquotIds) {
     this.libraryAliquotIds = libraryAliquotIds;
+  }
+
+  public List<Long> getPoolIds() {
+    return poolIds;
+  }
+
+  public void setPoolIds(List<Long> poolIds) {
+    this.poolIds = poolIds;
   }
 
   public String getCreator() {

@@ -239,6 +239,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetItem;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetStage;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.*;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
@@ -3788,6 +3789,7 @@ public class Dtos {
     setWorksetItemIds(from.getWorksetSamples(), dto::setSampleIds);
     setWorksetItemIds(from.getWorksetLibraries(), dto::setLibraryIds);
     setWorksetItemIds(from.getWorksetLibraryAliquots(), dto::setLibraryAliquotIds);
+    setWorksetItemIds(from.getWorksetPools(), dto::setPoolIds);
     dto.setCreator(from.getCreator().getFullName());
     dto.setLastModified(formatDateTime(from.getLastModified()));
     return dto;
@@ -3813,7 +3815,7 @@ public class Dtos {
     setWorksetItems(workset::setWorksetLibraries, from.getLibraryIds(), WorksetLibrary::new, LibraryImpl::new);
     setWorksetItems(workset::setWorksetLibraryAliquots, from.getLibraryAliquotIds(), WorksetLibraryAliquot::new,
         LibraryAliquot::new);
-
+    setWorksetItems(workset::setWorksetPools, from.getPoolIds(), WorksetPool::new, PoolImpl::new);
     return workset;
   }
 
