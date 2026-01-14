@@ -250,7 +250,7 @@ public class WorksetRestController extends AbstractRestController {
     worksetService.bulkDelete(worksets);
   }
 
-  private static class MergeWorksetsRequestData {
+  public static class MergeWorksetsRequestData {
 
     private List<Long> ids;
     private String alias;
@@ -260,12 +260,24 @@ public class WorksetRestController extends AbstractRestController {
       return ids;
     }
 
+    public void setIds(List<Long> ids){
+        this.ids = ids;
+    }
+
     public String getAlias() {
       return alias;
     }
 
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
     public String getDescription() {
       return description;
+    }
+
+    public void setDescription(String Description) {
+        this.description = description;
     }
 
   }
