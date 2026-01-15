@@ -447,7 +447,7 @@
     return self;
   };
 
-  Box.ScanDialog = function (scannerName) {
+  Box.UpdateLocationsScanDialog = function (scannerName) {
     var self = new BoxVisual();
 
     self.show = function (opts) {
@@ -736,11 +736,8 @@
         scannerName,
         Box.boxJSON.rows,
         Box.boxJSON.cols,
-        function() {
-            if(typeof onSuccess === "function"){
-                onSuccess();
-            }
-        });
+        onSuccess
+        );
     };
 
     self.error = function () {
@@ -772,7 +769,7 @@
     return self;
   };
 
-  Box.BarcodeScanDialog = function(scannerName) {
+  Box.AssignBarcodesScanDialog = function(scannerName) {
     var self = new BoxVisual();
 
     self.show = function (results) {
@@ -802,11 +799,19 @@
             modal: true,
             resizable: false,
             position: [ jQuery(window).width()/2 - Box.dialogWidth /2, 50 ],
+            maxHeight: jQuery(window).height()-120,
+            open: function () {
+               jQuery(this).css({"overflow-y":"auto"});
+               jQuery(this).scrollTop(0);
+               setTimeout(function() {
+                jQuery(this).scrollTop(0);
+               });
+            },
             buttons: [
                 {
                     text:  "Confirm Assign",
                     click: function() {
-                        var url = Urls.rest.boxes.barcodeAssign(Box.boxJSON.id);
+                        var url = Urls.rest.boxes.assignBarcodesSave(Box.boxJSON.id);
 
                         Utils.ajaxWithDialog(
                             "Assigning Barcodes",
@@ -839,6 +844,8 @@
             },
             data: self.results.items || []
         });
+
+        jQuery("#resultScroll").prepend(jQuery("#dialogVisual"));
 
         jQuery("#updateSelected, #removeSelected, #emptySelected")
             .prop("disabled", true)

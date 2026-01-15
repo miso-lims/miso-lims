@@ -523,7 +523,7 @@ public class BoxRestController extends AbstractRestController {
    *         that were successfully read (if applicable) and the positions at which the error was
    *         triggered (if applicable)
    */
-  @PostMapping(value = "/{boxId}/scan")
+  @PostMapping(value = "/{boxId}/update-locations-scan")
   public @ResponseBody ScanResultsDto getBoxScan(@PathVariable(required = true) int boxId,
       @RequestBody(required = true) ScanRequest requestData) {
     try {
@@ -638,7 +638,7 @@ public class BoxRestController extends AbstractRestController {
     }
   }
 
-  @PostMapping(value = "/{boxId}/barcode-scan")
+  @PostMapping(value = "/{boxId}/assign-barcodes-scan")
   public @ResponseBody ScanResultsDto getBarcodeScan(
           @PathVariable(required = true) int boxId,
           @RequestBody(required = true) ScanRequest requestData){
@@ -780,7 +780,7 @@ public class BoxRestController extends AbstractRestController {
       }
   }
 
-  @PostMapping(value = "/{boxId}/barcode-scan/assign")
+  @PostMapping(value = "/{boxId}/assign-barcodes-save")
   public @ResponseBody BoxDto assignBarcodes(
           @PathVariable(required = true) int boxId,
           @RequestBody(required = true) ScanResultsDto results) {

@@ -93,11 +93,11 @@ var Box = Box || {
   startUpdateLocationsScan: function(scannerName){
     Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
     Box.dialogHeight = Box.boxJSON.rows * 40 + 300;
-    Box.scanDialog = Box.ScanDialog(scannerName);
+    Box.updateLocationsScanDialog = Box.UpdateLocationsScanDialog(scannerName);
     Box.scanDiff = Box.ScanDiff(scannerName);
 
     var onPrepareSuccess = function () {
-        Box.scanDialog.show({
+        Box.updateLocationsScanDialog.show({
           size: {
             rows: Box.boxJSON.rows,
             cols: Box.boxJSON.cols,
@@ -113,14 +113,14 @@ var Box = Box || {
       var onPrepareSuccess = function () {
 
         jQuery.ajax({
-                url: Urls.rest.boxes.barcodeScan(Box.boxJSON.id),
+                url: Urls.rest.boxes.assignBarcodesScan(Box.boxJSON.id),
                 type: "POST",
                 contentType: "application/json; charset=utf8",
                 data: JSON.stringify({ scannerName : scannerName})
               })
               .done(function (data) {
                 jQuery("#dialogDialog").dialog("close");
-                Box.barcodeScanDialog.show(data);
+                Box.assignBarcodesScanDialog.show(data);
               })
               .fail( function(response) {
                 jQuery("#dialogDialog").dialog("close");
@@ -132,8 +132,7 @@ var Box = Box || {
 
       Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
       Box.dialogHeight = Box.boxJSON.rows * 40 + 300;
-      Box.scanDialog = Box.ScanDialog(scannerName);
-      Box.barcodeScanDialog = Box.BarcodeScanDialog(scannerName);
+      Box.assignBarcodesScanDialog = Box.AssignBarcodesScanDialog(scannerName);
       Box.prepareScannerDialog = Box.PrepareScannerDialog(scannerName, onPrepareSuccess);
       Box.prepareScannerDialog.show();
   },
@@ -211,17 +210,7 @@ Box.scan = {
       .done(function (data) {
         clearTimeout(prepareScannerTimeout);
         jQuery("#dialogDialog").dialog("close");
-        if(onSuccess){
-            onSuccess();
-        } else {
-            Box.scanDialog.show({
-              size: {
-                 rows: Box.boxJSON.rows,
-                 cols: Box.boxJSON.cols,
-              },
-              data: Box.boxJSON.items,
-           });
-        }
+        onSuccess();
       })
       .fail(function (response, textStatus, serverStatus) {
         clearTimeout(prepareScannerTimeout);
@@ -232,7 +221,7 @@ Box.scan = {
   scanBox: function (scannerName) {
     jQuery
       .ajax({
-        url: Urls.rest.boxes.scan(Box.boxJSON.id),
+        url: Urls.rest.boxes.updateLocationsScan(Box.boxJSON.id),
         type: "POST",
         contentType: "application/json; charset=utf8",
         data: JSON.stringify({
@@ -250,7 +239,7 @@ Box.scan = {
           response && response.responseText && response.responseText.detail
             ? response.responseText.detail
             : "Scan failed";
-        Box.scanDialog.error(error);
+        Box.updateLocationsScanDialog.error(error);
       });
   },
 };

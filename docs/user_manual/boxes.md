@@ -204,6 +204,11 @@ After clicking on "Scan with <scanner-name\>", you will see two scan options 1) 
 
 ### Updating Item Locations
 
+Update item locations scans a box to identify which barcodes are present in each position and then updates MISO so those items
+are recorded as being in that box. The scan matches detected barcodes to items that already exist in MISO and shows a
+visual layout of the box after scanning. Once the scan finishes, users can review the detected positions and save the
+changes to update where the items are stored in MISO.
+
 To update Item locations click on "Update Locations" from scan options. Wait until the Scan dialog box prompts you to place the box on the scanner. It will automatically scan the box.
 Once the scan is complete, the diagram will display the tubes which the scanner found.
 
@@ -211,22 +216,6 @@ Once a successful scan is made, review the changes that would be made and click 
 
 ![Successful box scan](../images/box-scan-success.png)
 *Successful box scan*
-
-If there are any errors with the scan, the scan will need to be retried until there are no errors. Possible
-sources of error are:
-
-* The scanning software is not open
-    * This will cause a "could not find the scanner" error message. Open the scanner software on the computer
-      and rescan.
-* A "No Read" scan result for a tube
-    * This is often caused by dust on the scanner surface or frost on the tubes. Clean the scanner surface
-      and/or tube bottoms and rescan.
-* A barcode is scanned which is not associated with an item in MISO
-    * Ensure that the tube barcode is correctly associated with an item in MISO.
-* The network is down or MISO cannot connect to the scanner
-    * Fix these problems first, then rescan.
-* Specific to Ziath DP5 Mirage Rack Reader
-    * Check if Container UID on the DP5 application has a container named: 'mirage96sbs'
 
 ### Assigning Barcodes
 
@@ -243,6 +232,25 @@ previous value.
 Once a successful scan is made, review the warnings and changes that would be made and click "Confirm".
 
 ![Successful barcode assign](../images/barcode-assign-success.png)
+*Successful barcode assign*
+
+### Troubleshooting
+
+If there are any errors with the scan, the scan will need to be retried until there are no errors. Possible
+sources of error are:
+
+* The scanning software is not open
+    * This will cause a "could not find the scanner" error message. Open the scanner software on the computer
+      and rescan.
+* A "No Read" scan result for a tube
+    * This is often caused by dust on the scanner surface or frost on the tubes. Clean the scanner surface
+      and/or tube bottoms and rescan.
+* A barcode is scanned which is not associated with an item in MISO
+    * Ensure that the tube barcode is correctly associated with an item in MISO.
+* The network is down or MISO cannot connect to the scanner
+    * Fix these problems first, then rescan.
+* Specific to Ziath DP5 Mirage Rack Reader
+    * Check if Container UID on the DP5 application has a container named: 'mirage96sbs'
 
 ## Exporting Box Information
 
