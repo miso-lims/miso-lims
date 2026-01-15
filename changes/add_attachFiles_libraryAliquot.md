@@ -1,1 +1,0 @@
-"Attach files" option is available to user to attach file for Library aliquots.
