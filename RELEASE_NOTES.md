@@ -7,6 +7,25 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.15.0] - 2026-01-15
+
+### Added
+
+* "Attach files" option is available to user to attach file for Library aliquots.
+
+### Fixed
+
+* In plain sample mode, the Propagate Samples dialog included a "To" field that was intended for detailed sample mode only and contained several invalid options
+* Help text for "req" search term to clarify that it searches by requisition alias
+* The Requisitions and Transfers list pages were missing proper titles
+* Some file downloads were not working due to commas or other characters in the filename
+
+### Upgrade Notes
+
+* Updated Run Scanner to 2.3.1
+  
+
+
 ## [3.14.2] - 2025-12-11
 
 ### Fixed
