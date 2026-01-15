@@ -18,7 +18,7 @@ public class BulkQCPage extends BulkPage {
     public static final String SAMPLE_ALIAS = "Sample Alias";
     public static final String LIBRARY_ALIAS = "Library Alias";
     public static final String POOL_ALIAS = "Pool Alias";
-    public static final String LIBRARY_ALIQUOT_ALIAS = "LibraryAliquot Alias"
+    public static final String LIBRARY_ALIQUOT_ALIAS = "LibraryAliquot Alias";
     public static final String DATE = "Date";
     public static final String TYPE = "Type";
     public static final String INSTRUMENT = "Instrument";
