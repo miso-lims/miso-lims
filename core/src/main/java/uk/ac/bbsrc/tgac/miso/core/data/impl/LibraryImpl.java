@@ -141,7 +141,7 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   @JoinColumn(name = "index2Id")
   private LibraryIndex index2;
 
-  @OneToMany(targetEntity = LibraryQC.class, mappedBy = "library", cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = LibraryQC.class, mappedBy = "library", cascade = CascadeType.REMOVE)
   private final Collection<LibraryQC> libraryQCs = new TreeSet<>();
 
   @OneToMany(targetEntity = LibraryAliquot.class, mappedBy = "library")

@@ -1,1 +1,1 @@
-"Add Qcs" & "Edit Qcs" options are available in Library Aliquots.
+Able to add Qcs and Edit Qcs in Library Aliquots.

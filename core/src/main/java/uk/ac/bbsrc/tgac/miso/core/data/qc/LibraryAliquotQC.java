@@ -18,7 +18,7 @@ public class LibraryAliquotQC extends QC{
     private static final long serialVersionUID = 1L;
 
     @ManyToOne(targetEntity = LibraryAliquot.class)
-    @JoinColumn(name = "libraryaliquot_aliquotId")
+    @JoinColumn(name = "aliquotId")
     private LibraryAliquot libraryAliquot;
 
     @OneToMany(mappedBy = "qc", cascade = CascadeType.REMOVE)

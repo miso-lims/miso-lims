@@ -538,7 +538,6 @@ public class LibraryAliquot extends AbstractBoxable
 
   @Override
   public QcTarget getQcTarget() {
-      System.out.println(QcTarget.LibraryAliquot);
       return QcTarget.LibraryAliquot;
   }
 

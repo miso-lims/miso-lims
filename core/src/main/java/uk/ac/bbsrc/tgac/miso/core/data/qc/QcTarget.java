@@ -14,7 +14,7 @@ public enum QcTarget {
   Container("Container", ContainerQC.class, QcCorrespondingField.NONE), //
   Requisition("Requisition", RequisitionQC.class, QcCorrespondingField.NONE),
   LibraryAliquot("LibraryAliquot", LibraryAliquotQC.class, QcCorrespondingField.NONE, QcCorrespondingField.CONCENTRATION,
-          QcCorrespondingField.VOLUME ) ;
+          QcCorrespondingField.VOLUME, QcCorrespondingField.SIZE) ;
 
   private final String label;
   private final Class<? extends QC> entityClass;
