@@ -42,8 +42,7 @@ public class HibernateLibraryAliquotQcDaoIT extends AbstractHibernateQcDaoTest<L
 
     @Override
     protected void setConcentration(LibraryAliquot entity, BigDecimal concentration) {
-        entity.setConc347l
-    entration(concentration);
+        entity.setConcentration(concentration);
     }
 
 }
