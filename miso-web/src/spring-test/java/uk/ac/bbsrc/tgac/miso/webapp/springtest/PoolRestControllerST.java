@@ -261,8 +261,8 @@ public class PoolRestControllerST extends AbstractST {
     req.setSheet("QPCR_RESULTS");
 
     List<String> headers = Arrays.asList("Name", "Alias", "Barcode", "Latest qPCR QC");
-    List<List<String>> rows = Arrays.asList(Arrays.asList("IPO1", "POOL_1", "12341"),
-        Arrays.asList("IPO501", "TIB_Pool", "TIB_Pool"));
+    List<List<String>> rows = Arrays.asList(Arrays.asList("IPO1", "POOL_1", "12341",""),
+        Arrays.asList("IPO501", "TIB_Pool", "TIB_Pool",""));
     testSpreadsheetContents(CONTROLLER_BASE + "/spreadsheet", req, headers, rows);
 
   }
