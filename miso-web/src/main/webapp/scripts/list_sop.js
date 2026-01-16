@@ -1,122 +1,89 @@
-ListTarget.sop = {
-  name: "SOPs",
+ListTarget.sop = (function ($) {
+  "use strict";
 
-  getUserManualUrl: function () {
-    return Urls.external.userManual("type_data", "standard-operating-procedures");
-  },
+  var TYPE_LABEL = "SOPs";
 
-  createUrl: function (config, projectId) {
-    return Urls.rest.sops.categoryDatatable(config.category);
-  },
+  function doCopy(items) {
+    if (items.length > 1) {
+      Utils.showOkDialog("Error", ["Select an individual SOP to copy"]);
+      return;
+    }
+    Utils.page.pageRedirect(Urls.ui.sops.create + "?" + $.param({ baseId: items[0].id }));
+  }
 
-  getQueryUrl: null,
-  showNewOptionSop: false,
+  function renderSopLink(data, type) {
+    if (type === "display" && data) {
+      var href = encodeURI(String(data));
+      return '<a href="' + href + '" target="_blank" rel="noopener noreferrer">View SOP</a>';
+    }
+    return data || "";
+  }
 
-  createStaticActions: function (config, projectId) {
-    if (!config.isAdmin) return [];
+  return {
+    name: TYPE_LABEL,
 
-    var goCreate = function () {
-      Utils.page.pageRedirect(Urls.ui.sops.create); // should be /sop/new
-    };
+    getUserManualUrl: function () {
+      return Urls.external.userManual("type_data", "standard-operating-procedures");
+    },
 
-    return [
-      {
-        name: "Add",
-        action: goCreate,
-        handler: goCreate,
-      },
-    ];
-  },
+    createUrl: function (config, projectId) {
+      return Urls.rest.sops.categoryDatatable(config.category);
+    },
 
-  /**
-   * Bulk actions (selection required) -> Copy, Delete
-   * Provide BOTH action(items) and handler(items) for compatibility.
-   */
-  createBulkActions: function (config, projectId) {
-    if (!config.isAdmin) return [];
+    getQueryUrl: null,
+    showNewOptionSop: false,
 
-    var doCopy = function (items) {
-      // Some runners pass items; if not, fall back to selection helpers
-      if (!items) {
-        items = ListUtils.getSelectedItems ? ListUtils.getSelectedItems() : null;
-        if (!items && typeof ListUtils.getSelected === "function") {
-          items = ListUtils.getSelected();
-        }
-      }
+    createBulkActions: function (config, projectId) {
+      if (!config.isAdmin) return [];
 
-      if (!items || !items.length) {
-        Utils.showOkDialog("Copy SOP", ["Nothing is selected."]);
-        return;
-      }
-      if (items.length !== 1) {
-        Utils.showOkDialog("Copy SOP", ["Please select exactly one SOP to copy."]);
-        return;
-      }
-
-      var id = items[0].id || items[0];
-      Utils.page.pageRedirect(Urls.ui.sops.create + "?baseId=" + id);
-    };
-
-    var copyOne = {
-      name: "Copy",
-      action: doCopy,
-      handler: doCopy,
-    };
-
-    var deleteAction = ListUtils.createBulkDeleteAction("SOPs", "sops", function (sop) {
-      return sop.alias || "SOP " + (sop.id || "");
-    });
-
-    return [copyOne, deleteAction];
-  },
-
-  createColumns: function (config, projectId) {
-    return [
-      {
-        sTitle: "ID",
-        mData: "id",
-        bVisible: false,
-        bSortable: false,
-      },
-      {
-        sTitle: "Alias",
-        mData: "alias",
-        iSortPriority: 1,
-        bSortDirection: true,
-        mRender: function (data, type, full) {
-          if (type === "display") {
-            var label = data ? Utils.escapeHtml(data) : "SOP " + (full.id || "");
-            return '<a href="' + Urls.ui.sops.edit(full.id) + '">' + label + "</a>";
-          }
-          return data || "";
+      return [
+        {
+          name: "Copy",
+          action: doCopy,
         },
-      },
-      {
-        sTitle: "Version",
-        mData: "version",
-        iSortPriority: 2,
-        bSortDirection: true,
-      },
-      {
-        sTitle: "SOP",
-        mData: "url",
-        mRender: function (data, type) {
-          if (type === "display" && data) {
-            var href = Utils.escapeHtml(data);
-            return '<a href="' + href + '" target="_blank" rel="noopener noreferrer">View SOP</a>';
-          }
-          return data || "";
-        },
-      },
-      {
-        sTitle: "Archived",
-        mData: "archived",
-        mRender: ListUtils.render.archived,
-      },
-    ];
-  },
+        ListUtils.createBulkDeleteAction(TYPE_LABEL, "sops", function (sop) {
+          return sop.alias;
+        }),
+      ];
+    },
 
-  searchTermSelector: function (searchTerms) {
-    return [searchTerms["id"]];
-  },
-};
+    createStaticActions: function (config, projectId) {
+      if (!config.isAdmin) return [];
+      return [
+        {
+          name: "Add",
+          handler: function () {
+            Utils.page.pageRedirect(Urls.ui.sops.create);
+          },
+        },
+      ];
+    },
+
+    createColumns: function (config, projectId) {
+      return [
+        ListUtils.labelHyperlinkColumn(
+          "Alias",
+          Urls.ui.sops.edit,
+          Utils.array.getId,
+          "alias",
+          1,
+          true
+        ),
+        {
+          sTitle: "Version",
+          mData: "version",
+        },
+        {
+          sTitle: "SOP",
+          mData: "url",
+          mRender: renderSopLink,
+        },
+        {
+          sTitle: "Archived",
+          mData: "archived",
+          mRender: ListUtils.render.archived,
+        },
+      ];
+    },
+  };
+})(jQuery);

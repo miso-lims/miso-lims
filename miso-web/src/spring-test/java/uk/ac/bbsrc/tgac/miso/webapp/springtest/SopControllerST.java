@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Map;
@@ -65,11 +64,12 @@ public class SopControllerST extends AbstractST {
 
     Map<String, Object> model = mv.getModel();
     assertEquals("Create SOP", model.get("title"));
-    assertNotNull("Expected sop JSON in model", model.get("sop"));
+    assertEquals("create", model.get("pageMode"));
+    assertNotNull("Expected sopJson in model", model.get("sopJson"));
     assertNotNull("Expected sopCategories in model", model.get("sopCategories"));
     assertNotNull("Expected isAdmin in model", model.get("isAdmin"));
 
-    String sopJson = model.get("sop").toString();
+    String sopJson = model.get("sopJson").toString();
     assertEquals(0L, readLong(sopJson, "$.id"));
   }
 
@@ -91,7 +91,11 @@ public class SopControllerST extends AbstractST {
     assertNotNull(mv);
     assertEquals("/WEB-INF/pages/editSop.jsp", mv.getViewName());
 
-    String sopJson = mv.getModel().get("sop").toString();
+    Map<String, Object> model = mv.getModel();
+    assertEquals("Create SOP", model.get("title"));
+    assertEquals("create", model.get("pageMode"));
+
+    String sopJson = model.get("sopJson").toString();
 
     assertEquals(0L, readLong(sopJson, "$.id"));
     assertEquals(db.getAlias(), JsonPath.read(sopJson, "$.alias"));
@@ -99,6 +103,14 @@ public class SopControllerST extends AbstractST {
     assertEquals(db.getUrl(), JsonPath.read(sopJson, "$.url"));
     assertEquals(db.isArchived(), (boolean) JsonPath.read(sopJson, "$.archived"));
     assertEquals(db.getCategory().name(), JsonPath.read(sopJson, "$.category"));
+
+    // If fields exist, IDs must be reset for create-mode copy
+    if (JsonPath.read(sopJson, "$.sopFields") != null) {
+      int size = JsonPath.read(sopJson, "$.sopFields.length()");
+      for (int i = 0; i < size; i++) {
+        assertEquals(0, (int) JsonPath.read(sopJson, "$.sopFields[" + i + "].id"));
+      }
+    }
   }
 
   @Test
@@ -116,9 +128,14 @@ public class SopControllerST extends AbstractST {
         .andReturn()
         .getModelAndView();
 
+    assertNotNull(mv);
     assertEquals("/WEB-INF/pages/editSop.jsp", mv.getViewName());
 
-    String sopJson = mv.getModel().get("sop").toString();
+    Map<String, Object> model = mv.getModel();
+    assertEquals("Create SOP", model.get("title"));
+    assertEquals("create", model.get("pageMode"));
+
+    String sopJson = model.get("sopJson").toString();
     assertEquals(0L, readLong(sopJson, "$.id"));
     assertEquals(db.getAlias(), JsonPath.read(sopJson, "$.alias"));
   }
@@ -129,7 +146,7 @@ public class SopControllerST extends AbstractST {
    * present.
    */
   @Test
-  public void testCreateGetNewForbiddenForNonAdmin() throws Exception {
+  public void testCreateGetNewForbiddenForAnonymous() throws Exception {
     Exception ex = getMockMvc()
         .perform(get(CONTROLLER_BASE + "/new").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is5xxServerError())
@@ -152,14 +169,6 @@ public class SopControllerST extends AbstractST {
   }
 
   @Test
-  public void testCreatePostRedirectsToGetNew() throws Exception {
-    getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/new").accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/sop/new"));
-  }
-
-  @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testEditGetRendersEditSopPage() throws Exception {
     long id = 1L;
@@ -176,12 +185,13 @@ public class SopControllerST extends AbstractST {
     assertEquals("/WEB-INF/pages/editSop.jsp", mv.getViewName());
 
     Map<String, Object> model = mv.getModel();
-    assertEquals("Edit SOP: " + db.getAlias(), model.get("title"));
-    assertNotNull(model.get("sop"));
+    assertEquals("SOP " + id, model.get("title"));
+    assertEquals("edit", model.get("pageMode"));
+    assertNotNull(model.get("sopJson"));
     assertNotNull(model.get("sopCategories"));
     assertNotNull(model.get("isAdmin"));
 
-    String sopJson = model.get("sop").toString();
+    String sopJson = model.get("sopJson").toString();
     assertEquals(id, readLong(sopJson, "$.id"));
     assertEquals(db.getAlias(), JsonPath.read(sopJson, "$.alias"));
   }
@@ -208,4 +218,5 @@ public class SopControllerST extends AbstractST {
 
     assertNotNull("Expected authorization exception", ex);
   }
+
 }

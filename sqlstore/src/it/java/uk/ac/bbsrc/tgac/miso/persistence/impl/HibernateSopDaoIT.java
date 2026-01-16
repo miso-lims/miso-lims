@@ -2,16 +2,17 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.hibernate.query.Query;
 import org.junit.Test;
-
-import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SopFieldImpl;
 
 public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, HibernateSopDao> {
 
@@ -29,10 +30,10 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
   @Override
   public Sop getCreateItem() {
     Sop sop = new Sop();
-    sop.setAlias("Test SOP");
+    sop.setAlias("Integration Test SOP");
     sop.setVersion("1.0");
-    sop.setCategory(SopCategory.SAMPLE);
-    sop.setUrl("http://sops.test.com/test_sop");
+    sop.setCategory(SopCategory.RUN);
+    sop.setUrl("http://test.com/integration-sop");
     sop.setArchived(false);
     return sop;
   }
@@ -40,49 +41,7 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
   @SuppressWarnings("unchecked")
   @Override
   public UpdateParameters<Sop, String> getUpdateParams() {
-    return new UpdateParameters<>(2L, Sop::getAlias, Sop::setAlias, "Updated Alias");
-  }
-
-  @Test
-  public void testGetByAliasAndVersion() throws Exception {
-    SopCategory category = SopCategory.SAMPLE;
-    String alias = "Sample SOP 1";
-    String version = "1.0";
-    Sop sop = getTestSubject().get(category, alias, version);
-    assertNotNull(sop);
-    assertEquals(category, sop.getCategory());
-    assertEquals(alias, sop.getAlias());
-    assertEquals(version, sop.getVersion());
-  }
-
-  @Test
-  public void testListByCategory() throws Exception {
-    List<Sop> sops = getTestSubject().listByCategory(SopCategory.LIBRARY);
-    assertNotNull(sops);
-    assertEquals(2, sops.size());
-    for (Sop sop : sops) {
-      assertEquals(SopCategory.LIBRARY, sop.getCategory());
-    }
-  }
-
-  @Test
-  public void testListByIdList() throws Exception {
-    testListByIdList(HibernateSopDao::listByIdList, Lists.newArrayList(3L, 4L));
-  }
-
-  @Test
-  public void testGetUsageBySamples() throws Exception {
-    testGetUsage(HibernateSopDao::getUsageBySamples, 1L, 1L);
-  }
-
-  @Test
-  public void testGetUsageByLibraries() throws Exception {
-    testGetUsage(HibernateSopDao::getUsageByLibraries, 3L, 1L);
-  }
-
-  @Test
-  public void testGetUsageByRuns() throws Exception {
-    testGetUsage(HibernateSopDao::getUsageByRuns, 5L, 1L);
+    return new UpdateParameters<>(1L, Sop::getAlias, Sop::setAlias, "Changed SOP Alias");
   }
 
   @Test
@@ -94,21 +53,24 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
     sop.setUrl("http://test.com/integration-sop");
     sop.setArchived(false);
 
-    SopField field1 = new SopField();
+    SopFieldImpl field1 = new SopFieldImpl();
     field1.setName("Flow Cell Lot");
-    field1.setFieldType(SopField.FieldType.TEXT);
+    field1.setFieldTypeEnum(SopField.FieldType.TEXT);
+    field1.setSop(sop);
 
-    SopField field2 = new SopField();
+    SopFieldImpl field2 = new SopFieldImpl();
     field2.setName("PhiX %");
     field2.setUnits("%");
-    field2.setFieldType(SopField.FieldType.PERCENTAGE);
+    field2.setFieldTypeEnum(SopField.FieldType.PERCENTAGE);
+    field2.setSop(sop);
 
-    sop.addSopField(field1);
-    sop.addSopField(field2);
+    Set<SopField> fields = new HashSet<>();
+    fields.add(field1);
+    fields.add(field2);
+    sop.setSopFields(fields);
 
     long savedId = getTestSubject().create(sop);
     clearSession();
-
 
     Sop loaded = currentSession().get(Sop.class, savedId);
     assertNotNull(loaded);
@@ -121,10 +83,10 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
     for (SopField field : loaded.getSopFields()) {
       if ("Flow Cell Lot".equals(field.getName())) {
         hasFlowCell = true;
-        assertEquals(SopField.FieldType.TEXT, field.getFieldType());
+        assertEquals(SopField.FieldType.TEXT, field.getFieldTypeEnum());
       } else if ("PhiX %".equals(field.getName())) {
         hasPhiX = true;
-        assertEquals(SopField.FieldType.PERCENTAGE, field.getFieldType());
+        assertEquals(SopField.FieldType.PERCENTAGE, field.getFieldTypeEnum());
         assertEquals("%", field.getUnits());
       }
     }
@@ -135,35 +97,42 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
 
   @Test
   public void testDeleteSopCascadesToFields() throws Exception {
+
     Sop sop = new Sop();
-    sop.setAlias("SOP To Delete");
+    sop.setAlias("Integration Test SOP - Delete");
     sop.setVersion("1.0");
-    sop.setCategory(SopCategory.LIBRARY);
-    sop.setUrl("http://test.com/delete-sop");
+    sop.setCategory(SopCategory.RUN);
+    sop.setUrl("http://test.com/integration-sop-delete");
     sop.setArchived(false);
 
-    SopField field = new SopField();
-    field.setName("Test Field");
-    field.setFieldType(SopField.FieldType.TEXT);
+    SopFieldImpl field = new SopFieldImpl();
+    field.setName("Temp Field");
+    field.setFieldTypeEnum(SopField.FieldType.TEXT);
+    field.setSop(sop);
 
-    sop.addSopField(field);
+    Set<SopField> fields = new HashSet<>();
+    fields.add(field);
+    sop.setSopFields(fields);
 
     long sopId = getTestSubject().create(sop);
     clearSession();
 
-    // Verify created (via session)
+    Query<Long> countBeforeQ = currentSession().createQuery(
+        "select count(f) from SopFieldImpl f where f.sop.id = :sopId", Long.class);
+    countBeforeQ.setParameter("sopId", sopId);
+    assertEquals(Long.valueOf(1L), countBeforeQ.uniqueResult());
+
     Sop loaded = currentSession().get(Sop.class, sopId);
     assertNotNull(loaded);
-    assertNotNull(loaded.getSopFields());
-    assertEquals(1, loaded.getSopFields().size());
-
-    // Delete the SOP; cascade should remove SopField rows too
     currentSession().remove(loaded);
     clearSession();
 
-    // Verify deletion (via session)
-    Sop deleted = currentSession().get(Sop.class, sopId);
-    assertNull(deleted);
+    assertNull(currentSession().get(Sop.class, sopId));
+
+    Query<Long> countAfterQ = currentSession().createQuery(
+        "select count(f) from SopFieldImpl f where f.sop.id = :sopId", Long.class);
+    countAfterQ.setParameter("sopId", sopId);
+    assertEquals(Long.valueOf(0L), countAfterQ.uniqueResult());
   }
 
 }

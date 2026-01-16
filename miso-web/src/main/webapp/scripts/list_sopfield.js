@@ -1,20 +1,64 @@
-/*
- * SOP Fields list target ( Embedded table on SOP create/edit)
- *
- * This is used on the Create/Edit SOP page as a FormUtils embedded table.
- *
- * Requires Sop controller module (sop_ajax.js) with:
- *   - Sop.addField(field)
- *   - Sop.removeFields(removeFields)
- *
- * Note: SOP fields are user-defined, so "Add" creates a blank editable row.
- */
-ListTarget.sopfield = (function () {
+ListTarget.sopfield = (function ($) {
   "use strict";
 
   var FIELD_NAME_MAX = 255;
   var FIELD_UNITS_MAX = 50;
   var ALLOWED_TYPES = ["TEXT", "NUMBER", "PERCENTAGE"];
+
+  function normStr(v) {
+    return (v == null ? "" : String(v)).trim();
+  }
+
+  function normalizeType(v) {
+    var t = normStr(v).toUpperCase() || "TEXT";
+    return ALLOWED_TYPES.indexOf(t) !== -1 ? t : "TEXT";
+  }
+
+  function addFieldDialog() {
+    Utils.showDialog(
+      "Add SOP Field",
+      "Add",
+      [
+        {
+          label: "Name",
+          type: "text",
+          property: "name",
+          maxlength: FIELD_NAME_MAX,
+        },
+        {
+          label: "Type",
+          type: "select",
+          property: "fieldType",
+          values: ALLOWED_TYPES,
+        },
+        {
+          label: "Units",
+          type: "text",
+          property: "units",
+          maxlength: FIELD_UNITS_MAX,
+        },
+      ],
+      function (result) {
+        var name = normStr(result && result.name);
+        if (!name) {
+          Utils.showOkDialog("Error", ["Name is required"]);
+          return;
+        }
+
+        Sop.addField({
+          id: null,
+          name: name,
+          fieldType: normalizeType(result && result.fieldType),
+          units: normStr(result && result.units) || null,
+        });
+      }
+    );
+  }
+
+  function renderTextCell(data, type) {
+    if (type === "display") return Utils.escapeHtml(data || "");
+    return data || "";
+  }
 
   return {
     name: "SOP Fields",
@@ -23,118 +67,55 @@ ListTarget.sopfield = (function () {
       return Urls.external.userManual("type_data", "standard-operating-procedures");
     },
 
-    createUrl: function (config, projectId) {
+    createUrl: function () {
       throw new Error("Must be provided statically");
     },
 
     getQueryUrl: null,
 
-    // Keep consistent with other MISO list targets
-    showNewOptionSop: true,
-
-    createBulkActions: function (config, projectId) {
-      var actions = [];
-      if (config.isAdmin) {
-        if (config.pageMode === "edit" || config.pageMode === "create") {
-          // Embedded table on SOP page
-          actions.push({
-            name: "Remove",
-            action: Sop.removeFields,
-          });
-        }
-      }
-      return actions;
+    createBulkActions: function (config) {
+      if (!config.isAdmin) return [];
+      return [
+        {
+          name: "Remove",
+          action: Sop.removeFields,
+        },
+      ];
     },
 
-    createStaticActions: function (config, projectId) {
-      var actions = [];
-      if (config.isAdmin) {
-        if (config.pageMode === "edit" || config.pageMode === "create") {
-          actions.push({
-            name: "Add",
-            handler: addBlankField,
-          });
-        }
-      }
-      return actions;
+    createStaticActions: function (config) {
+      if (!config.isAdmin) return [];
+      return [
+        {
+          name: "Add",
+          handler: addFieldDialog,
+        },
+      ];
     },
 
-    createColumns: function (config, projectId) {
+    createColumns: function () {
       return [
         {
           sTitle: "Name",
           mData: "name",
-          mRender: function (data, type, full) {
-            if (type !== "display") return data;
-            return (
-              '<input type="text" class="sopfield_name" ' +
-              'maxlength="' +
-              FIELD_NAME_MAX +
-              '" value="' +
-              Utils.escapeHtml(data || "") +
-              '" />'
-            );
-          },
+          mRender: renderTextCell,
         },
         {
           sTitle: "Type",
           mData: "fieldType",
           sWidth: "220px",
-          mRender: function (data, type, full) {
-            if (type !== "display") return data;
-
-            var current = (data || "TEXT").toString().toUpperCase();
-            var html = '<select class="sopfield_type">';
-            for (var i = 0; i < ALLOWED_TYPES.length; i++) {
-              var t = ALLOWED_TYPES[i];
-              html +=
-                '<option value="' +
-                t +
-                '"' +
-                (t === current ? ' selected="selected"' : "") +
-                ">" +
-                t +
-                "</option>";
-            }
-            html += "</select>";
-            return html;
+          mRender: function (data, type) {
+            var v = normalizeType(data);
+            return type === "display" ? Utils.escapeHtml(v) : v;
           },
         },
         {
           sTitle: "Units",
           mData: "units",
           sWidth: "220px",
-          mRender: function (data, type, full) {
-            if (type !== "display") return data;
-            return (
-              '<input type="text" class="sopfield_units" ' +
-              'maxlength="' +
-              FIELD_UNITS_MAX +
-              '" value="' +
-              Utils.escapeHtml(data || "") +
-              '" />'
-            );
-          },
+          mRender: renderTextCell,
         },
       ];
     },
-
-    getModified: function (row, data) {
-      var $row = jQuery(row);
-      data.name = $row.find("input.sopfield_name").val();
-      data.fieldType = ($row.find("select.sopfield_type").val() || "TEXT").toUpperCase();
-      var units = $row.find("input.sopfield_units").val();
-      data.units = units && units.trim() ? units : null;
-      return data;
-    },
   };
-
-  function addBlankField() {
-    Sop.addField({
-      id: null,
-      name: "",
-      fieldType: "TEXT",
-      units: null,
-    });
-  }
-})();
+})(jQuery);

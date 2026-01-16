@@ -1,160 +1,81 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Objects;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import org.apache.commons.validator.routines.BigDecimalValidator;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 
-@Entity
-@Table(name = "SopField")
-public class SopField implements Serializable {
+public interface SopField {
 
-  private static final long serialVersionUID = 1L;
+  enum FieldType {
+    TEXT, NUMBER, PERCENTAGE
+  }
 
-  public enum FieldType {
-    TEXT("Text"), NUMBER("Number"), PERCENTAGE("Percentage");
+  long getId();
 
-    private final String label;
+  void setId(long id);
 
-    FieldType(String label) {
-      this.label = label;
+  Sop getSop();
+
+  void setSop(Sop sop);
+
+  String getName();
+
+  void setName(String name);
+
+  String getUnits();
+
+  void setUnits(String units);
+
+  String getFieldType();
+
+  void setFieldType(String fieldType);
+
+  default FieldType getFieldTypeEnum() {
+    String raw = getFieldType();
+    if (raw == null || raw.isEmpty()) {
+      throw new IllegalStateException("SOP field type is missing");
+    }
+    try {
+      return FieldType.valueOf(raw);
+    } catch (IllegalArgumentException ex) {
+      throw new IllegalStateException("Invalid SOP field type: " + raw, ex);
+    }
+  }
+
+  default void setFieldTypeEnum(FieldType fieldType) {
+    setFieldType(fieldType == null ? null : fieldType.name());
+  }
+
+  default boolean isValidValue(String value) {
+    if (value == null || value.isEmpty()) {
+      return true;
     }
 
-    public String getLabel() {
-      return label;
-    }
-  }
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "sopFieldId")
-  private Long id;
-
-  @ManyToOne(optional = false)
-  @JoinColumn(name = "sopId", nullable = false)
-  private Sop sop;
-
-  @Column(name = "name", nullable = false, length = 255)
-  private String name;
-
-  @Column(name = "units", length = 50)
-  private String units;
-
-  @Enumerated(EnumType.STRING)
-  @Column(name = "fieldType", nullable = false, length = 50)
-  private FieldType fieldType;
-
-  public SopField() {}
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public Sop getSop() {
-    return sop;
-  }
-
-  public void setSop(Sop sop) {
-    this.sop = sop;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name == null ? null : name.trim();
-  }
-
-  public String getUnits() {
-    return units;
-  }
-
-  public void setUnits(String units) {
-    this.units = units == null ? null : units.trim();
-  }
-
-  public FieldType getFieldType() {
-    return fieldType;
-  }
-
-  public void setFieldType(FieldType fieldType) {
-    this.fieldType = fieldType;
-  }
-
-  public boolean isValidValue(String value) {
-    if (value == null)
-      return true;
-
-    String trimmed = value.trim();
-    if (trimmed.isEmpty())
-      return true;
-
-    FieldType type = fieldType == null ? FieldType.TEXT : fieldType;
+    FieldType type = getFieldTypeEnum();
 
     switch (type) {
-      case TEXT:
-        return true;
-
       case NUMBER:
-        return isDecimal(trimmed);
+        return isBigDecimal(value);
 
       case PERCENTAGE:
-        if (!isDecimal(trimmed))
-          return false;
-        try {
-          BigDecimal d = new BigDecimal(trimmed);
-          return d.compareTo(BigDecimal.ZERO) >= 0 && d.compareTo(new BigDecimal("100")) <= 0;
-        } catch (NumberFormatException e) {
-          return false;
-        }
+        BigDecimal pct = parseBigDecimal(value);
+        return pct != null
+            && pct.compareTo(BigDecimal.ZERO) >= 0
+            && pct.compareTo(new BigDecimal("100")) <= 0;
 
+      case TEXT:
       default:
         return true;
     }
   }
 
-  private boolean isDecimal(String s) {
-    try {
-      new BigDecimal(s);
-      return true;
-    } catch (NumberFormatException e) {
-      return false;
-    }
+  static boolean isBigDecimal(String value) {
+    return parseBigDecimal(value) != null;
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (!(obj instanceof SopField))
-      return false;
-    SopField other = (SopField) obj;
-    return id != null && other.id != null && Objects.equals(id, other.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return id != null ? Objects.hash(id) : System.identityHashCode(this);
-  }
-
-  @Override
-  public String toString() {
-    return "SopField [id=" + id + ", name=" + name + ", fieldType=" + fieldType + "]";
+  static BigDecimal parseBigDecimal(String value) {
+    return BigDecimalValidator.getInstance().validate(value);
   }
 }

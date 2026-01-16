@@ -1,9 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -19,7 +17,6 @@ import jakarta.persistence.OrderBy;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.SopField;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 public class Sop implements Aliasable, Deletable, Serializable {
@@ -58,9 +55,9 @@ public class Sop implements Aliasable, Deletable, Serializable {
 
   private boolean archived = false;
 
-  @OneToMany(mappedBy = "sop", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "sop", cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = SopFieldImpl.class)
   @OrderBy("name")
-  private Set<SopField> sopFields = new HashSet<>();
+  private final Set<SopField> sopFields = new HashSet<>();
 
   @Override
   public long getId() {
@@ -128,58 +125,31 @@ public class Sop implements Aliasable, Deletable, Serializable {
     this.archived = archived;
   }
 
-  /**
-   * Returns an unmodifiable view to avoid accidental mutation without maintaining SOP backreferences.
-   * Use {@link #addSopField(SopField)}, {@link #removeSopField(SopField)}, or
-   * {@link #setSopFields(Set)}.
-   */
   public Set<SopField> getSopFields() {
-    return Collections.unmodifiableSet(sopFields);
+    return sopFields;
   }
 
   public void setSopFields(Set<SopField> sopFields) {
-
-    new HashSet<>(this.sopFields).forEach(this::removeSopField);
-
+    this.sopFields.clear();
     if (sopFields != null) {
-      sopFields.forEach(this::addSopField);
+      this.sopFields.addAll(sopFields);
     }
-  }
-
-  public void addSopField(SopField field) {
-    if (field == null)
-      return;
-
-    if (field.getSop() != null && field.getSop() != this) {
-      field.getSop().sopFields.remove(field);
-    }
-
-    this.sopFields.add(field);
-    field.setSop(this);
-  }
-
-  public void removeSopField(SopField field) {
-    if (field == null)
-      return;
-
-    this.sopFields.remove(field);
-    if (field.getSop() == this) {
-      field.setSop(null);
-    }
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(alias, version, category, url, archived);
   }
 
   @Override
   public boolean equals(Object obj) {
-    return LimsUtils.equals(this, obj,
-        Sop::getAlias,
-        Sop::getVersion,
-        Sop::getCategory,
-        Sop::getUrl,
-        Sop::isArchived);
+    if (this == obj)
+      return true;
+    if (!(obj instanceof Sop))
+      return false;
+    Sop other = (Sop) obj;
+
+    // MISO convention: only saved entities can be equal
+    return sopId != 0L && other.sopId != 0L && sopId == other.sopId;
+  }
+
+  @Override
+  public int hashCode() {
+    return sopId != 0L ? Long.hashCode(sopId) : System.identityHashCode(this);
   }
 }

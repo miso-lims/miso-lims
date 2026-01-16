@@ -10,7 +10,5 @@ CREATE TABLE SopField (
         ON DELETE CASCADE,
 
     CONSTRAINT uq_sopfield_sop_name
-        UNIQUE KEY (sopId, name),
-
-    INDEX idx_sopfield_sop (sopId)
+        UNIQUE KEY (sopId, name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

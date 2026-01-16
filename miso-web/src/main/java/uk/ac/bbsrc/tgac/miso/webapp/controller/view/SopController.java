@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -46,9 +45,13 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
   public ModelAndView list(ModelMap model) throws IOException {
     model.put("title", "SOPs");
 
-    TabbedListItemsPage listSops = new TabbedListItemsPage("sop", "category",
+    TabbedListItemsPage listSops = new TabbedListItemsPage(
+        "sop",
+        "category",
         Stream.of(SopCategory.values()),
-        SopCategory::getLabel, SopCategory::name, mapper) {
+        SopCategory::getLabel,
+        SopCategory::name,
+        mapper) {
 
       @Override
       protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
@@ -60,10 +63,8 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
   }
 
   @GetMapping("/new")
-  public ModelAndView create(
-      @RequestParam(name = "baseId", required = false) Long baseId,
-      @RequestParam(name = "copyId", required = false) Long copyId,
-      ModelMap model) throws IOException {
+  public ModelAndView create(@RequestParam(name = "baseId", required = false) Long baseId,
+      @RequestParam(name = "copyId", required = false) Long copyId, ModelMap model) throws IOException {
 
     authorizationManager.throwIfNonAdmin();
 
@@ -73,26 +74,28 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
     if (sourceId != null) {
       Sop sop = sopService.get(sourceId);
       dto = sop == null ? makeDto() : Dtos.asDto(sop);
-
       dto.setId(0L);
+      if (dto.getSopFields() != null) {
+        dto.getSopFields().forEach(f -> {
+          if (f != null) {
+            f.setId(0L);
+          }
+        });
+      }
     } else {
       dto = makeDto();
     }
 
     model.put("title", "Create SOP");
-    model.put("sop", mapper.writeValueAsString(dto));
+    model.put("pageMode", "create");
+    model.put("sopJson", mapper.writeValueAsString(dto));
     model.put("sopCategories", SopCategory.values());
     model.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
 
     return new ModelAndView("/WEB-INF/pages/editSop.jsp", model);
   }
 
-  @PostMapping("/new")
-  public ModelAndView createPost() {
-    return new ModelAndView("redirect:/sop/new");
-  }
-
-  @GetMapping("/{id}")
+  @GetMapping("/{id:\\d+}")
   public ModelAndView edit(@PathVariable("id") long id, ModelMap model) throws IOException {
     authorizationManager.throwIfNonAdmin();
 
@@ -103,8 +106,9 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
 
     SopDto dto = Dtos.asDto(sop);
 
-    model.put("title", "Edit SOP: " + sop.getAlias());
-    model.put("sop", mapper.writeValueAsString(dto));
+    model.put("title", "SOP " + id);
+    model.put("pageMode", "edit");
+    model.put("sopJson", mapper.writeValueAsString(dto));
     model.put("sopCategories", SopCategory.values());
     model.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
 
@@ -130,4 +134,5 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
   protected SopDto makeDto() {
     return new SopDto();
   }
+
 }
