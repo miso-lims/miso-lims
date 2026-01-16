@@ -717,6 +717,25 @@ VALUES (1,2,1,'TEST_0001_Bn_P_PE_300_WG','LDI1::TEST_0001_Bn_P_PE_300_WG','2015-
 (14,2,14,'TEST_0007_Bn_R_PE_300_WG','LDI14::TEST_0007_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI14',NULL,NULL, 'LibraryAliquot', NULL),
 (15,2,15,'TEST_0001_ALIQUOT_1_PE_300_WG','LDI15::TEST_0001_ALIQUOT_1_PE_300_WG','2018-02-15',1,1,'LDI15',NULL,NULL, 'LibraryAliquot', NULL);
 
+INSERT INTO LibraryAliquotQC(qcId, aliquotId, creator, date, type, results, instrumentId) VALUES
+ (1,1,1,'2015-08-27',4,3,NULL),
+ (2,2,1,'2015-08-27',4,3,NULL),
+ (3,3,1,'2015-08-27',4,3,NULL),
+ (4,4,1,'2015-08-27',4,3,NULL),
+ (5,5,1,'2015-08-27',4,3,NULL),
+ (6,6,1,'2015-08-27',4,3,NULL),
+ (7,7,1,'2015-08-27',4,3,NULL),
+ (8,8,1,'2015-08-27',4,3,NULL),
+ (9,9,1,'2015-08-27',4,3,NULL),
+ (10,10,1,'2015-08-27',4,3,NULL),
+ (11,11,1,'2015-08-27',4,3,NULL),
+ (12,12,1,'2015-08-27',4,3,NULL),
+ (13,13,1,'2015-08-27',4,3,NULL),
+ (14,14,1,'2015-08-27',4,3,NULL);
+
+ INSERT INTO LibraryAliquotQcControl(qcControlId, qcId, controlId, lot, qcPassed) VALUES
+ (1, 14, 5, '20210301', TRUE);
+
 INSERT INTO `LibraryQC`(`qcId`, `library_libraryId`, `creator`, `date`, `type`, `results`, instrumentId) VALUES
  (1,1,1,'2015-08-27',4,3,NULL),
  (2,2,1,'2015-08-27',4,3,NULL),
