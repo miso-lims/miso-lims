@@ -184,6 +184,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SopFieldImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
@@ -4433,23 +4434,8 @@ public class Dtos {
     setString(to::setUrl, from.getUrl());
     setBoolean(to::setArchived, from.isArchived(), false);
 
-    String summary = from.getSopFields() == null ? ""
-        : from.getSopFields().stream()
-            .filter(Objects::nonNull)
-            .map(SopField::getName)
-            .filter(Objects::nonNull)
-            .map(String::trim)
-            .filter(s -> !s.isEmpty())
-            .sorted(String.CASE_INSENSITIVE_ORDER)
-            .collect(Collectors.joining(", "));
-    to.setFields(summary);
-
     if (from.getSopFields() != null && !from.getSopFields().isEmpty()) {
       to.setSopFields(from.getSopFields().stream()
-          .filter(Objects::nonNull)
-          .sorted(Comparator.comparing(
-              f -> f.getName() == null ? "" : f.getName().trim(),
-              String.CASE_INSENSITIVE_ORDER))
           .map(Dtos::asDto)
           .collect(Collectors.toList()));
     } else {
@@ -4468,15 +4454,18 @@ public class Dtos {
     setString(to::setUrl, from.getUrl());
     setBoolean(to::setArchived, from.isArchived(), false);
 
-
-    if (from.getSopFields() == null || from.getSopFields().isEmpty()) {
-      to.setSopFields(Collections.emptySet());
-    } else {
+    if (from.getSopFields() != null && !from.getSopFields().isEmpty()) {
       Set<SopField> fields = from.getSopFields().stream()
-          .filter(Objects::nonNull)
           .map(Dtos::to)
           .collect(Collectors.toSet());
+
+      for (SopField field : fields) {
+        field.setSop(to);
+      }
+
       to.setSopFields(fields);
+    } else {
+      to.setSopFields(Collections.emptySet());
     }
 
     return to;
@@ -4487,24 +4476,35 @@ public class Dtos {
     setLong(dto::setId, from.getId(), true);
     setString(dto::setName, from.getName());
     setString(dto::setUnits, from.getUnits());
-    setString(dto::setFieldType, maybeGetProperty(from.getFieldType(), SopField.FieldType::name));
+
+    String fieldType = null;
+    try {
+      SopField.FieldType ft = from.getFieldTypeEnum();
+      fieldType = ft == null ? null : ft.name();
+    } catch (Throwable t) {
+      fieldType = from.getFieldType();
+    }
+    setString(dto::setFieldType, fieldType);
+
     return dto;
   }
 
   public static SopField to(@Nonnull SopFieldDto from) {
-    SopField to = new SopField();
-    setLong(to::setId, from.getId(), true);
+    SopField to = new SopFieldImpl();
+    setLong(to::setId, from.getId(), false);
     setString(to::setName, from.getName());
     setString(to::setUnits, from.getUnits());
 
-    if (from.getFieldType() == null || from.getFieldType().trim().isEmpty()) {
-      to.setFieldType(null);
-    } else {
-      setObject(to::setFieldType, from.getFieldType().trim(), SopField.FieldType::valueOf);
+    try {
+      setObject(to::setFieldTypeEnum, from.getFieldType(), SopField.FieldType::valueOf);
+    } catch (Throwable t) {
+      setObject(to::setFieldType, from.getFieldType(), v -> SopField.FieldType.valueOf(v).name());
     }
 
     return to;
   }
+
+
 
   public static LibraryBatchDto asDto(@Nonnull LibraryBatch from) {
     LibraryBatchDto to = new LibraryBatchDto();

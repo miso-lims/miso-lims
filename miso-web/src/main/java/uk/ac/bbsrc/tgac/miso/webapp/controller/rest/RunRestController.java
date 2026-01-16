@@ -52,8 +52,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.RunLibrarySpreadsheets;
@@ -70,7 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
-import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -213,8 +210,6 @@ public class RunRestController extends AbstractRestController {
   private IndexChecker indexChecker;
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
-  @Autowired
-  private SopService sopService;
 
   private final JQueryDataTableBackend<Run, RunDto> jQueryBackend = new JQueryDataTableBackend<>() {
 
@@ -653,31 +648,11 @@ public class RunRestController extends AbstractRestController {
     return run;
   }
 
-  private void validateRunSop(RunDto dto) throws IOException {
-    if (dto == null || dto.getSopId() == null)
-      return;
-
-    Sop sop = sopService.get(dto.getSopId());
-    if (sop == null) {
-      throw new RestException("SOP not found: " + dto.getSopId(), Status.BAD_REQUEST);
-    }
-    if (sop.getCategory() != SopCategory.RUN) {
-      throw new RestException("Only RUN SOPs may be assigned to a Run", Status.BAD_REQUEST);
-    }
-  }
-
-  @PostMapping
-  public @ResponseBody RunDto createRun(@RequestBody RunDto dto) throws IOException {
-    validateRunSop(dto);
-    return RestUtils.createObject("Run", dto, Dtos::to, runService, Dtos::asDto);
-  }
 
   @PutMapping("/{runId}")
   public @ResponseBody RunDto updateRun(@PathVariable long runId, @RequestBody RunDto dto) throws IOException {
-    validateRunSop(dto);
     return RestUtils.updateObject("Run", runId, dto, WhineyFunction.rethrow(d -> {
       Run run = Dtos.to(d);
-      // Containers cannot be updated in this way
       Run existing = runService.get(runId);
       run.getRunPositions().clear();
       for (RunPosition pos : existing.getRunPositions()) {

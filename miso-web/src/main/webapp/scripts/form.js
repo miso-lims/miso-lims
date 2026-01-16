@@ -367,10 +367,12 @@ FormUtils = (function ($) {
     },
 
     makeSopFields: function (object, sops) {
-      sops = Array.isArray(sops) ? sops : [];
+      if (!Array.isArray(sops)) {
+        throw new Error("makeSopFields expected 'sops' to be an array");
+      }
 
       var availableSops = sops.filter(function (sop) {
-        return !sop.archived || object.sopId === sop.id;
+        return !sop.archived || (object && object.sopId === sop.id);
       });
 
       var hasSops = availableSops.length > 0;
@@ -386,19 +388,12 @@ FormUtils = (function ($) {
             return item.alias + " v." + item.version;
           },
           getItemValue: Utils.array.getId,
-
-          // Always show SOP selector so user can set SOP if runscanner missed it.
-          include: true,
-
-          // If none exist, show field but make it non-editable with a helpful label
-          disabled: !hasSops,
-          nullLabel: hasSops ? "SELECT" : "No SOPs available",
-
+          include: hasSops,
+          nullLabel: "SELECT",
           onChange: function (newValue, form) {
             var sop = newValue
               ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), sops)
               : null;
-
             form.updateField("sopLink", {
               label: sop ? "View SOP" : null,
               link: sop ? sop.url : null,
@@ -416,7 +411,7 @@ FormUtils = (function ($) {
           getLink: function (item) {
             if (!item.sopId) return null;
             var sop = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.sopId), sops);
-            return sop ? sop.url : null;
+            return sop.url || null;
           },
           openNewTab: true,
         },

@@ -1098,22 +1098,15 @@ Urls = (function () {
   var sopUiBase = "/sop";
   ui.sops = {
     create: sopUiBase + "/new",
-    edit: idUrlFunction(sopUiBase),
-    bulkCreate: sopUiBase + "/bulk/new",
-    bulkEdit: sopUiBase + "/bulk/edit",
+    edit: function (id) {
+      return sopUiBase + "/" + id;
+    },
   };
 
   var sopRestBase = restBase + "/sops";
   rest.sops = {
-    // single-item REST
     create: sopRestBase,
     update: idUrlFunction(sopRestBase),
-
-    // legacy bulk REST
-    bulkSave: sopRestBase + "/bulk",
-    bulkSaveProgress: idUrlFunction(sopRestBase + "/bulk"),
-
-    // datatable by category
     categoryDatatable: idUrlFunction(sopRestBase + "/dt/category"),
   };
 

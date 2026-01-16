@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -38,6 +36,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 @RequestMapping("/rest/sops")
 public class SopRestController extends AbstractRestController {
 
+  private static final String TYPE_LABEL = "SOP";
+
   @Autowired
   private SopService sopService;
   @Autowired
@@ -58,33 +58,20 @@ public class SopRestController extends AbstractRestController {
     }
   };
 
-  @PostMapping(produces = "application/json")
+  @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
-  public SopDto create(@RequestBody SopDto dto) throws IOException {
-    Sop sop = Dtos.to(dto);
-    long savedId = sopService.create(sop);
-    return Dtos.asDto(sopService.get(savedId));
+  public @ResponseBody SopDto create(@RequestBody SopDto dto) throws IOException {
+    return RestUtils.createObject(TYPE_LABEL, dto, Dtos::to, sopService, Dtos::asDto);
   }
 
-  @PutMapping(value = "/{id}", produces = "application/json")
-  @ResponseBody
-  public SopDto update(@PathVariable("id") long id, @RequestBody SopDto dto) throws IOException {
-    Sop existing = sopService.get(id);
-    if (existing == null) {
-      throw new RestException("SOP not found", Status.NOT_FOUND);
-    }
-
-    Sop incoming = Dtos.to(dto);
-    incoming.setId(id);
-
-    sopService.update(incoming);
-    return Dtos.asDto(sopService.get(id));
+  @PutMapping("/{id}")
+  public @ResponseBody SopDto update(@RequestBody SopDto dto, @PathVariable long id) throws IOException {
+    return RestUtils.updateObject(TYPE_LABEL, id, dto, Dtos::to, sopService, Dtos::asDto);
   }
 
   @GetMapping(value = "/dt/category/{category}")
-  public @ResponseBody DataTablesResponseDto<SopDto> dataTableByCategory(
-      @PathVariable("category") String categoryName, HttpServletRequest request) throws IOException {
+  public @ResponseBody DataTablesResponseDto<SopDto> dataTableByCategory(@PathVariable("category") String categoryName,
+      HttpServletRequest request) throws IOException {
 
     SopCategory category;
     try {
@@ -99,13 +86,13 @@ public class SopRestController extends AbstractRestController {
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<SopDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkCreate("SOP", dtos, Dtos::to, sopService);
+    return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, sopService);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<SopDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkUpdate("SOP", dtos, Dtos::to, sopService);
+    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, Dtos::to, sopService);
   }
 
   @GetMapping("/bulk/{uuid}")
@@ -113,20 +100,10 @@ public class SopRestController extends AbstractRestController {
     return asyncOperationManager.getAsyncProgress(uuid, Sop.class, sopService, Dtos::asDto);
   }
 
-  @GetMapping(value = "/bulk", produces = "application/json")
-  @ResponseBody
-  public List<SopDto> getBulk(@RequestParam("ids") List<Long> ids) throws IOException {
-    if (ids == null || ids.isEmpty()) {
-      return Collections.emptyList();
-    }
-    return sopService.listByIdList(ids).stream()
-        .map(Dtos::asDto)
-        .toList();
-  }
-
-  @PostMapping(value = "/bulk-delete")
+  @PostMapping("/bulk-delete")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public @ResponseBody void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
-    RestUtils.bulkDelete("SOP", ids, sopService);
+    RestUtils.bulkDelete(TYPE_LABEL, ids, sopService);
   }
+
 }

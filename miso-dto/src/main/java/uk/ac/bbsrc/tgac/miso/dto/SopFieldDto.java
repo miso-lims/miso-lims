@@ -1,20 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-/**
- * DTO for SOP Field definitions.
- */
 public class SopFieldDto {
 
-  private Long id;
+  private long id;
   private String name;
   private String units;
   private String fieldType;
 
-  public Long getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(long id) {
     this.id = id;
   }
 

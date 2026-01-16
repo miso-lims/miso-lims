@@ -1,10 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.isChanged;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -15,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SopField;
+import uk.ac.bbsrc.tgac.miso.core.data.SopField.FieldType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SopFieldImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
@@ -27,7 +31,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SopDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
-import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.isChanged;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -77,142 +80,174 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
 
   @Override
   protected void collectValidationErrors(Sop sop, Sop beforeChange, List<ValidationError> errors) throws IOException {
-
     if (sop.getCategory() == null) {
-      errors.add(new ValidationError("category", "Category is required"));
+      errors.add(ValidationError.forRequired("category"));
+      return;
     }
 
-    // Duplicate check when any uniqueness component changes
-    if (sop.getCategory() != null
-        && (isChanged(Sop::getCategory, sop, beforeChange)
-            || isChanged(Sop::getAlias, sop, beforeChange)
-            || isChanged(Sop::getVersion, sop, beforeChange))) {
+    if (beforeChange != null) {
+      if (isChanged(Sop::getCategory, sop, beforeChange)) {
+        errors.add(new ValidationError("category", "Category cannot be changed"));
+      }
+      if (isChanged(Sop::getVersion, sop, beforeChange)) {
+        errors.add(new ValidationError("version", "Version cannot be changed"));
+      }
+    }
 
+    if (isChanged(Sop::getAlias, sop, beforeChange)) {
       Sop existing = sopDao.get(sop.getCategory(), sop.getAlias(), sop.getVersion());
       if (existing != null && existing.getId() != sop.getId()) {
         errors.add(ValidationError.forDuplicate("SOP", null, "alias and version"));
       }
     }
 
-    validateSopFields(sop, errors);
+    validateSopFields(sop, beforeChange, errors);
+  }
+
+  private void validateSopFields(Sop sop, Sop beforeChange, List<ValidationError> errors) {
+    Set<SopField> fields = sop.getSopFields();
+
+    if (sop.getCategory() != SopCategory.RUN) {
+      if (fields != null && !fields.isEmpty()) {
+        errors.add(new ValidationError("sopFields", "Only Run SOPs may have fields"));
+      }
+      return;
+    }
+
+    if (fields == null || fields.isEmpty()) {
+      return;
+    }
+
+    Map<String, SopField> byName = new HashMap<>();
+    Map<Long, SopField> beforeById = new HashMap<>();
+    if (beforeChange != null && beforeChange.getSopFields() != null) {
+      for (SopField f : beforeChange.getSopFields()) {
+        if (f != null && f.getId() > 0L) {
+          beforeById.put(f.getId(), f);
+        }
+      }
+    }
+
+    for (SopField field : fields) {
+      if (field == null) {
+        continue;
+      }
+
+      String name = field.getName();
+      if (name == null || name.isEmpty()) {
+        errors.add(ValidationError.forRequired("sopFields"));
+        continue;
+      }
+      if (name.length() > SOPFIELD_NAME_MAX) {
+        errors.add(new ValidationError("sopFields", "Field name must be at most " + SOPFIELD_NAME_MAX + " characters"));
+      }
+
+      String key = name.toLowerCase();
+      if (byName.containsKey(key)) {
+        errors.add(new ValidationError("sopFields", "Field names must be unique"));
+      } else {
+        byName.put(key, field);
+      }
+
+      String units = field.getUnits();
+      if (units != null && units.length() > SOPFIELD_UNITS_MAX) {
+        errors.add(new ValidationError("sopFields", "Units must be at most " + SOPFIELD_UNITS_MAX + " characters"));
+      }
+
+      String fieldType = field.getFieldType();
+      if (fieldType == null || fieldType.isEmpty()) {
+        errors.add(ValidationError.forRequired("sopFields"));
+      } else {
+        try {
+          FieldType.valueOf(fieldType);
+        } catch (IllegalArgumentException e) {
+          errors.add(new ValidationError("sopFields", "Invalid field type"));
+        }
+      }
+
+      if (beforeChange != null && field.getId() > 0L) {
+        SopField before = beforeById.get(field.getId());
+        if (before != null) {
+          String beforeType = before.getFieldType();
+          String afterType = field.getFieldType();
+          if (beforeType != null && afterType != null && !beforeType.equals(afterType)) {
+            errors.add(new ValidationError("sopFields", "Field type cannot be changed for existing fields"));
+          }
+        }
+      }
+    }
   }
 
   @Override
   protected void applyChanges(Sop to, Sop from) throws IOException {
     to.setAlias(from.getAlias());
-    to.setVersion(from.getVersion());
-    to.setCategory(from.getCategory());
-
     to.setUrl(from.getUrl());
     to.setArchived(from.isArchived());
 
-    to.setSopFields(cloneSopFieldsForSave(from, to));
+    syncSopFields(to, from);
   }
 
-  private Set<SopField> cloneSopFieldsForSave(Sop from, Sop targetSop) {
-    Set<SopField> result = new HashSet<>();
-    if (from.getSopFields() == null || from.getSopFields().isEmpty()) {
-      return result;
-    }
-
-    Map<Long, SopField> existingById = new HashMap<>();
-    Map<String, SopField> existingByName = new HashMap<>();
-
-    if (targetSop.getSopFields() != null) {
-      for (SopField existing : targetSop.getSopFields()) {
-        if (existing == null)
-          continue;
-
-        if (existing.getId() != null) {
-          existingById.put(existing.getId(), existing);
-        }
-
-        if (existing.getName() != null) {
-          String key = existing.getName().trim().toLowerCase(Locale.ROOT);
-          if (!key.isEmpty()) {
-            existingByName.put(key, existing);
-          }
-        }
-      }
-    }
-
-    // Prevent duplicates in incoming payload (by normalized name)
-    Set<String> seenIncomingNames = new HashSet<>();
-
-    for (SopField src : from.getSopFields()) {
-      if (src == null)
-        continue;
-
-      String name = src.getName() == null ? "" : src.getName().trim();
-      if (name.isEmpty())
-        continue;
-
-      String nameKey = name.toLowerCase(Locale.ROOT);
-      if (!seenIncomingNames.add(nameKey)) {
-        // skip duplicates (validation also covers this)
-        continue;
-      }
-
-      SopField dest = new SopField();
-      Long id = src.getId();
-      if (id != null) {
-        SopField existing = existingById.get(id);
-        if (existing != null) {
-          id = existing.getId();
-        }
-      } else {
-        SopField existing = existingByName.get(nameKey);
-        if (existing != null) {
-          id = existing.getId();
-        }
-      }
-
-      dest.setId(id);
-      dest.setName(name);
-      dest.setUnits(src.getUnits());
-      dest.setFieldType(src.getFieldType());
-      dest.setSop(targetSop);
-
-      result.add(dest);
-    }
-
-    return result;
-  }
-
-  private void validateSopFields(Sop sop, List<ValidationError> errors) {
-    if (sop.getSopFields() == null || sop.getSopFields().isEmpty()) {
+  private void syncSopFields(Sop to, Sop from) {
+    Set<SopField> target = to.getSopFields();
+    if (target == null) {
       return;
     }
 
-    Set<String> fieldNames = new HashSet<>();
-    for (SopField field : sop.getSopFields()) {
-      if (field == null) {
-        errors.add(new ValidationError("sopFields", "SOP field cannot be null"));
+    if (to.getCategory() != SopCategory.RUN) {
+      target.clear();
+      return;
+    }
+
+    Set<SopField> incoming = from.getSopFields();
+    if (incoming == null) {
+      incoming = new HashSet<>();
+    }
+
+    Set<Long> incomingIds = new HashSet<>();
+    for (SopField f : incoming) {
+      if (f != null && f.getId() > 0L) {
+        incomingIds.add(f.getId());
+      }
+    }
+
+    Map<Long, SopField> targetById = new HashMap<>();
+    for (SopField f : target) {
+      if (f != null && f.getId() > 0L) {
+        targetById.put(f.getId(), f);
+      }
+    }
+
+    for (Iterator<SopField> it = target.iterator(); it.hasNext();) {
+      SopField existing = it.next();
+      if (existing == null) {
+        it.remove();
+        continue;
+      }
+      long id = existing.getId();
+      if (id > 0L && !incomingIds.contains(id)) {
+        it.remove();
+      }
+    }
+
+    for (SopField f : incoming) {
+      if (f == null) {
         continue;
       }
 
-      String name = field.getName() == null ? null : field.getName().trim();
-      if (name == null || name.isEmpty()) {
-        errors.add(new ValidationError("sopFields.name", "SOP field name cannot be empty"));
-        continue;
-      }
-      if (name.length() > SOPFIELD_NAME_MAX) {
-        errors.add(new ValidationError("sopFields.name",
-            "SOP field name is too long (max " + SOPFIELD_NAME_MAX + "): " + name));
-      }
-
-      String normalizedName = name.toLowerCase(Locale.ROOT);
-      if (!fieldNames.add(normalizedName)) {
-        errors.add(new ValidationError("sopFields.name", "Duplicate field name: " + name));
-      }
-
-      if (field.getUnits() != null && field.getUnits().trim().length() > SOPFIELD_UNITS_MAX) {
-        errors.add(new ValidationError("sopFields.units",
-            "Units is too long for field '" + name + "' (max " + SOPFIELD_UNITS_MAX + ")"));
-      }
-
-      if (field.getFieldType() == null) {
-        errors.add(new ValidationError("sopFields.fieldType", "Field type is required for field: " + name));
+      if (f.getId() > 0L) {
+        SopField existing = targetById.get(f.getId());
+        if (existing != null) {
+          existing.setName(f.getName());
+          existing.setUnits(f.getUnits());
+          existing.setSop(to);
+        }
+      } else {
+        SopField created = new SopFieldImpl();
+        created.setSop(to);
+        created.setName(f.getName());
+        created.setUnits(f.getUnits());
+        created.setFieldType(f.getFieldType());
+        target.add(created);
       }
     }
   }
@@ -220,7 +255,6 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
   @Override
   public ValidationResult validateDeletion(Sop object) throws IOException {
     ValidationResult result = new ValidationResult();
-
     long sampleUsage = sopDao.getUsageBySamples(object);
     if (sampleUsage > 0) {
       result.addError(ValidationError.forDeletionUsage(object, sampleUsage, Pluralizer.samples(sampleUsage)));
@@ -233,7 +267,6 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
     if (runUsage > 0) {
       result.addError(ValidationError.forDeletionUsage(object, runUsage, Pluralizer.runs(runUsage)));
     }
-
     return result;
   }
 
@@ -249,8 +282,7 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
 
   @Override
   public List<Sop> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
-      PaginationFilter... filter)
-      throws IOException {
+      PaginationFilter... filter) throws IOException {
     return sopDao.list(offset, limit, sortDir, sortCol, filter);
   }
 

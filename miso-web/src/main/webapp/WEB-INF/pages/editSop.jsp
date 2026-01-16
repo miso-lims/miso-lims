@@ -1,147 +1,102 @@
-<%--
-  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
-  ~ MISO project contacts: Robert Davey @ TGAC
-  --%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ include file="../header.jsp" %>
 
 <div id="maincontent">
   <div id="contentcolumn">
 
     <h1 class="noPrint">
-      <span id="pageTitle"><c:out value="${title}" /></span>
-      <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
+      <c:out value="${title}" />
+      <c:if test="${isAdmin}">
+        <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
+      </c:if>
     </h1>
 
-    <!-- Match *.jsp Quick Help layout/alignment -->
-    <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers"></div>
-
-    <div class="sectionDivider noPrint"
-         onclick="Utils.ui.toggleLeftInfo(jQuery('#quickHelp_arrowclick'), 'quickHelpSection');">
-      Quick Help
-      <div id="quickHelp_arrowclick" class="toggleLeft"></div>
-    </div>
-
-    <div id="quickHelpSection" class="note noPrint" style="display:none;">
-      <b>Sop Fields:</b><br/>
-      Add one or more fields for this SOP. Each field has a Name, Type, and optional Units.
-      Field names must be unique (case-insensitive).
-      <br/>
-    </div>
-
     <div id="warnings"></div>
-    <div id="sopForm_error" class="errorContainer"></div>
+
     <form:form id="sopForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 
-    <br/>
+    <div class="sectionDivider noPrint">SOP Fields</div>
+    <div id="sopFieldsError"></div>
 
-    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#fields_arrowclick'), 'sopFieldsSection');">
-      SOP Fields
-      <div id="fields_arrowclick" class="toggleLeftDown"></div>
-    </div>
-
-    <!-- Assay-style embedded table container -->
-    <div id="sopFieldsSection">
-      <div id="sopFieldsUnsupported" class="note" style="display:none;">
-        SOP fields are only supported for RUN SOPs.
+    <div id="sopFieldsUnsupported" style="display:none;">
+      <div class="messagebox">
+        SOP Fields are only supported for Run category SOPs.
       </div>
-
-      <div id="sopFieldsError" class="errorContainer"></div>
-
-      <!-- MUST match Sop list id in sop_ajax.js -->
-      <div id="listSopFields"></div>
     </div>
 
-    <br/>
-
-    <!-- Required scripts (must be BEFORE inline script below) -->
-    <script type="text/javascript" src="<c:url value='/scripts/sop_ajax.js'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/list_sopfield.js'/>"></script>
+    <div id="listSopFields"></div>
 
     <script type="text/javascript">
       jQuery(function () {
-        var dto = ${sop};
+        var sop = <c:out value="${sopJson}" escapeXml="false" />;
 
-        if (!jQuery("#pageTitle").text() || jQuery("#pageTitle").text().trim() === "") {
-          jQuery("#pageTitle").text(dto && dto.id ? ("Edit SOP: " + (dto.alias || dto.id)) : "Create SOP");
+        var config = {
+          pageMode: '${pageMode}',
+          isAdmin: ${isAdmin},
+          sopId: sop && sop.id ? sop.id : null
+        };
+
+        if (sop && sop.id && window.Warning && window.WarningTarget && WarningTarget.sop) {
+          Warning.generateHeaderWarnings("warnings", WarningTarget.sop, sop);
         }
 
-        if (dto && dto.id && window.Warning && window.WarningTarget && WarningTarget.sop) {
-          Warning.generateHeaderWarnings("warnings", WarningTarget.sop, dto);
+        var form = FormUtils.createForm("sopForm", config.isAdmin ? "save" : null, sop, "sop", config);
+
+        if (window.Sop && typeof Sop.setForm === "function") {
+          Sop.setForm(form);
+        }
+        if (window.Sop && typeof Sop.setListConfig === "function") {
+          Sop.setListConfig(config);
+        }
+        if (window.Sop && typeof Sop.setFields === "function") {
+          Sop.setFields((sop && sop.sopFields) ? sop.sopFields : []);
         }
 
-        // Build form (capture form API)
-        var form = FormUtils.createForm("sopForm", "save", dto, "sop", {});
-
-        function findCategorySelect() {
-          var $sel = jQuery("#sopForm select[name='category']");
-          if ($sel.length) return $sel;
-
-          $sel = jQuery("#sopForm select#category");
-          if ($sel.length) return $sel;
-
-          $sel = jQuery("#sopForm select[id$='_category']");
-          if ($sel.length) return $sel;
-
-          $sel = jQuery("#sopForm select").filter(function () {
-            var all = jQuery(this).find("option").map(function () {
-              return (jQuery(this).val() || jQuery(this).text() || "").toString().toUpperCase();
-            }).get().join(" ");
-            return all.indexOf("RUN") !== -1 && all.indexOf("LIBRARY") !== -1 && all.indexOf("SAMPLE") !== -1;
-          }).first();
-
-          return $sel;
+        function normalizeCategory(value) {
+          return String(value || "").trim().toUpperCase();
         }
 
-        function getCategoryValue() {
-          var $cat = findCategorySelect();
-          if ($cat && $cat.length) {
-            return String($cat.val() || "").toUpperCase();
-          }
-          return String(dto && dto.category ? dto.category : "").toUpperCase();
+        function getSelectedCategory() {
+          var $cat = jQuery("#sopForm_category");
+          if ($cat.length) return normalizeCategory($cat.val());
+          return normalizeCategory(sop && sop.category);
         }
 
-        function showFieldsTable() {
-          var listConfig = {
-            isAdmin: true,
-            pageMode: (dto && dto.id) ? "edit" : "create",
-            sopId: (dto && dto.id) ? dto.id : null
-          };
-
-          if (window.Sop && typeof Sop.setForm === "function") {
-            Sop.setForm(form);
-          }
-          if (window.Sop && typeof Sop.setListConfig === "function") {
-            Sop.setListConfig(listConfig);
-          }
-          if (window.Sop && typeof Sop.setFields === "function") {
-            Sop.setFields((dto && dto.sopFields) ? dto.sopFields : []);
-          }
+        function syncCategoryFromSelect() {
+          var $cat = jQuery("#sopForm_category");
+          if (!$cat.length) return;
+          var selected = normalizeCategory($cat.val());
+          sop.category = selected;
+          $cat.val(selected);
         }
 
-        function toggleFieldsUI(enabled) {
-          if (!enabled) {
+        function toggleFieldsUI() {
+          var cat = getSelectedCategory();
+          if (cat !== "RUN") {
             jQuery("#listSopFields").hide();
             jQuery("#sopFieldsUnsupported").show();
             jQuery("#sopFieldsError").empty();
-            if (dto) dto.sopFields = [];
-            return;
-          }
 
-          jQuery("#sopFieldsUnsupported").hide();
-          jQuery("#listSopFields").show();
-          showFieldsTable();
+            if (window.Sop && typeof Sop.setFields === "function") {
+              Sop.setFields([]);
+            }
+          } else {
+            jQuery("#sopFieldsUnsupported").hide();
+            jQuery("#listSopFields").show();
+          }
         }
-        
-        setTimeout(function () {
-          toggleFieldsUI(getCategoryValue() === "RUN");
 
-          var $cat = findCategorySelect();
-          if ($cat && $cat.length) {
-            $cat.off("change.sopFields").on("change.sopFields", function () {
-              toggleFieldsUI(getCategoryValue() === "RUN");
-            });
-          }
-        }, 0);
+        syncCategoryFromSelect();
+        toggleFieldsUI();
+
+        jQuery(document).on("change", "#sopForm_category", function () {
+          syncCategoryFromSelect();
+          toggleFieldsUI();
+        });
+
+        jQuery("#save").on("mousedown", function () {
+          syncCategoryFromSelect();
+        });
 
         if (window.FormTarget && FormTarget.sop && typeof FormTarget.sop.getUserManualUrl === "function") {
           Utils.ui.updateHelpLink(FormTarget.sop.getUserManualUrl());
