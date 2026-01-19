@@ -14,6 +14,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleValidRelationshipDto;
@@ -22,18 +23,13 @@ public class SampleClassRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/sampleclasses";
   private static final Class<SampleClassImpl> ENTITY_CLASS = SampleClassImpl.class;
-
   private static final long IDENTITY_CLASS_ID = 1L;
-
-  // For delete success we keep using the explicit "Unused" fixture
+  private static final int UPDATE_CLASS_ID = 15;
   private static final int UNUSED_CLASS_ID = 28;
-
-  // For update success, use an existing class with existing valid relationships
-  private static final int UPDATE_CLASS_ID = 15; // gDNA (aliquot)
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
-  public void testCreate() throws Exception {
+  public void testCreateSuccess() throws Exception {
     SampleClassDto dto = new SampleClassDto();
     dto.setAlias("Test Tissue Class");
     dto.setSampleCategory("Tissue");
@@ -42,26 +38,25 @@ public class SampleClassRestControllerST extends AbstractST {
     dto.setArchived(false);
     dto.setDirectCreationAllowed(true);
 
-    // Tissue classes must have a single Identity parent relationship
     SampleValidRelationshipDto parentRel = new SampleValidRelationshipDto();
     parentRel.setParentId(IDENTITY_CLASS_ID);
     parentRel.setArchived(false);
     dto.setParentRelationships(Collections.singletonList(parentRel));
 
     SampleClassImpl created = baseTestCreate(CONTROLLER_BASE, dto, ENTITY_CLASS, 201);
+
     Assert.assertNotNull(created);
     Assert.assertEquals("Test Tissue Class", created.getAlias());
   }
 
   @Test
-  public void testCreateFail() throws Exception {
+  public void testCreateUnauthorized() throws Exception {
     SampleClassDto dto = new SampleClassDto();
     dto.setAlias("Should Fail");
     dto.setSampleCategory("Tissue");
     dto.setArchived(false);
     dto.setDirectCreationAllowed(true);
 
-    // include required parent relationship so this fails for auth, not validation
     SampleValidRelationshipDto parentRel = new SampleValidRelationshipDto();
     parentRel.setParentId(IDENTITY_CLASS_ID);
     parentRel.setArchived(false);
@@ -92,52 +87,64 @@ public class SampleClassRestControllerST extends AbstractST {
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
-  public void testUpdate() throws Exception {
-    SampleClassImpl existing = (SampleClassImpl) currentSession().get(SampleClassImpl.class, (long) UPDATE_CLASS_ID);
+  public void testUpdateSuccess() throws Exception {
+    SampleClassImpl existing =
+        (SampleClassImpl) currentSession().get(ENTITY_CLASS, (long) UPDATE_CLASS_ID);
+
     Assert.assertNotNull(existing);
     Assert.assertFalse(existing.getParentRelationships().isEmpty());
 
-    long parentRelationshipId = existing.getParentRelationships().iterator().next().getId();
-    Assert.assertTrue(parentRelationshipId > 0);
+    SampleValidRelationship existingRel = existing.getParentRelationships().iterator().next();
+    long parentRelationshipId = existingRel.getId();
+    long parentId = existingRel.getParent().getId();
 
     SampleClassDto dto = new SampleClassDto();
-    dto.setId((long) UPDATE_CLASS_ID);
+    dto.setId(existing.getId());
     dto.setAlias("Updated gDNA Aliquot Class");
-    dto.setSampleCategory("Aliquot"); // keep existing category
+    dto.setSampleCategory(existing.getSampleCategory());
     dto.setSampleSubcategory(existing.getSampleSubcategory());
     dto.setSuffix(existing.getSuffix());
-    dto.setArchived(false);
+    dto.setArchived(existing.isArchived());
     dto.setDirectCreationAllowed(existing.isDirectCreationAllowed());
 
-    // Reuse existing relationship by ID so we are not "creating" relationships as part of update
     SampleValidRelationshipDto parentRel = new SampleValidRelationshipDto();
     parentRel.setId(parentRelationshipId);
-    parentRel.setArchived(false);
+    parentRel.setParentId(parentId);
+    parentRel.setArchived(existingRel.isArchived());
     dto.setParentRelationships(Collections.singletonList(parentRel));
 
-    SampleClassImpl updated = baseTestUpdate(CONTROLLER_BASE, dto, UPDATE_CLASS_ID, ENTITY_CLASS);
-    Assert.assertNotNull(updated);
-    Assert.assertEquals("Updated gDNA Aliquot Class", updated.getAlias());
+    SampleClassImpl returned = baseTestUpdate(CONTROLLER_BASE, dto, UPDATE_CLASS_ID, ENTITY_CLASS);
+
+    Assert.assertNotNull(returned);
+    Assert.assertEquals(dto.getAlias(), returned.getAlias());
   }
 
   @Test
-  public void testUpdateFail() throws Exception {
-    // Ensure failure is due to auth, not validation. Reuse existing relationship ID like success test.
-    SampleClassImpl existing = (SampleClassImpl) currentSession().get(SampleClassImpl.class, (long) UPDATE_CLASS_ID);
+  public void testUpdateUnauthorized() throws Exception {
+    SampleClassImpl existing =
+        (SampleClassImpl) currentSession().get(ENTITY_CLASS, (long) UPDATE_CLASS_ID);
+
     Assert.assertNotNull(existing);
     Assert.assertFalse(existing.getParentRelationships().isEmpty());
 
-    long parentRelationshipId = existing.getParentRelationships().iterator().next().getId();
-    Assert.assertTrue(parentRelationshipId > 0);
+    SampleValidRelationship existingRel = existing.getParentRelationships().iterator().next();
+    long parentRelationshipId = existingRel.getId();
+    long parentId = existingRel.getParent().getId();
 
     SampleClassDto dto = new SampleClassDto();
-    dto.setId((long) UPDATE_CLASS_ID);
+    dto.setId(existing.getId());
     dto.setAlias("Should Fail Update");
-    dto.setSampleCategory("Aliquot");
+
+    dto.setSampleCategory(existing.getSampleCategory());
+    dto.setSampleSubcategory(existing.getSampleSubcategory());
+    dto.setSuffix(existing.getSuffix());
+    dto.setArchived(existing.isArchived());
+    dto.setDirectCreationAllowed(existing.isDirectCreationAllowed());
 
     SampleValidRelationshipDto parentRel = new SampleValidRelationshipDto();
     parentRel.setId(parentRelationshipId);
-    parentRel.setArchived(false);
+    parentRel.setParentId(parentId);
+    parentRel.setArchived(existingRel.isArchived());
     dto.setParentRelationships(Collections.singletonList(parentRel));
 
     testUpdateUnauthorized(CONTROLLER_BASE, dto, UPDATE_CLASS_ID, ENTITY_CLASS);
@@ -153,7 +160,6 @@ public class SampleClassRestControllerST extends AbstractST {
     dto.setArchived(false);
     dto.setDirectCreationAllowed(true);
 
-    // include required parent relationship so it fails for NOT FOUND, not validation
     SampleValidRelationshipDto parentRel = new SampleValidRelationshipDto();
     parentRel.setParentId(IDENTITY_CLASS_ID);
     parentRel.setArchived(false);
@@ -173,7 +179,7 @@ public class SampleClassRestControllerST extends AbstractST {
 
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
-  public void testDeleteFail() throws Exception {
+  public void testBulkDeleteUnauthorized() throws Exception {
     testDeleteUnauthorized(ENTITY_CLASS, UNUSED_CLASS_ID, CONTROLLER_BASE);
   }
 
