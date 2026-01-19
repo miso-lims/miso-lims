@@ -12,6 +12,7 @@ Starting with version 1.29.0, the format of this file is based on
 ### Added
 
 * "Attach files" option is available to user to attach file for Library aliquots.
+* Pools can be added to Worksets.
 
 ### Fixed
 
