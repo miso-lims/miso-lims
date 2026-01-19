@@ -13,7 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 public class HibernateLibraryAliquotQcDaoIT extends AbstractHibernateQcDaoTest<LibraryAliquotQC, HibernateLibraryAliquotQcDao, LibraryAliquot, LibraryAliquotQcControlRun> {
 
     public HibernateLibraryAliquotQcDaoIT() {
-        super(LibraryAliquotQC.class, LibraryAliquot.class, LibraryAliquotQcControlRun.class, QcTarget.LibraryAliquot, 4L, 4L, 6L, 4L, 4L);
+        super(LibraryAliquotQC.class, LibraryAliquot.class, LibraryAliquotQcControlRun.class, QcTarget.LibraryAliquot, 1L, 2L, 2L, 5L, 14L, 1L);
     }
 
     @Override
