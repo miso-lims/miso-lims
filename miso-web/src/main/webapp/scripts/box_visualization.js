@@ -447,7 +447,7 @@
     return self;
   };
 
-  Box.ScanDialog = function (scannerName) {
+  Box.UpdateLocationsScanDialog = function (scannerName) {
     var self = new BoxVisual();
 
     self.show = function (opts) {
@@ -711,7 +711,7 @@
     return self;
   };
 
-  Box.PrepareScannerDialog = function (scannerName) {
+  Box.PrepareScannerDialog = function (scannerName, onSuccess) {
     var self = {};
 
     self.show = function () {
@@ -732,7 +732,12 @@
         buttons: {},
       });
       jQuery("#dialogDialog").dialog("open");
-      Box.scan.prepareScanner(scannerName, Box.boxJSON.rows, Box.boxJSON.cols);
+      Box.scan.prepareScanner(
+        scannerName,
+        Box.boxJSON.rows,
+        Box.boxJSON.cols,
+        onSuccess
+        );
     };
 
     self.error = function () {
@@ -761,6 +766,165 @@
       });
       jQuery("#dialogDialog").dialog("open");
     };
+    return self;
+  };
+
+  Box.AssignBarcodesScanDialog = function(scannerName) {
+    var self = new BoxVisual();
+
+    self.show = function (results) {
+        self.results = results;
+
+        var summaryHTML = "<h1> Scan Results </h1><ul>";
+        var legendHTML = "<p><img src = '/styles/images/tube_error.png' width= '14'> Conflict or Missing item </p>" +
+                           "<p><img src = '/styles/images/tube_full.png' width= '14'> Barcode will be assigned </p>"  ;
+
+        var Warnings = "";
+
+        if(results.errors && results.errors.length > 0){
+            Warnings += '<p class="warning"><b>Warnings:</b></p><ul>';
+            results.errors.forEach(function (e) {
+                Warnings += '<li>' + (e.message || e) + '</li>';
+            });
+            Warnings += '</ul>';
+        }
+
+        jQuery("#dialogInfoAbove").html(summaryHTML);
+        jQuery("#dialogInfoBelow").html(legendHTML + Warnings);
+
+        jQuery("#dialogDialog").dialog({
+            autoOpen: false,
+            title: "Scan Results",
+            width: Box.dialogWidth,
+            modal: true,
+            resizable: false,
+            position: [ jQuery(window).width()/2 - Box.dialogWidth /2, 50 ],
+            maxHeight: jQuery(window).height()-120,
+            open: function () {
+               jQuery(this).css({"overflow-y":"auto"});
+               jQuery(this).scrollTop(0);
+               setTimeout(function() {
+                jQuery(this).scrollTop(0);
+               });
+            },
+            buttons: [
+                {
+                    text:  "Confirm Assign",
+                    click: function() {
+                        var url = Urls.rest.boxes.assignBarcodesSave(Box.boxJSON.id);
+
+                        Utils.ajaxWithDialog(
+                            "Assigning Barcodes",
+                            "POST",
+                            url,
+                            results,
+                            function(response) {
+                                jQuery("#dialogDialog").dialog("close");
+                                Utils.showOkDialog("Success", ["Barcodes have been successfully assigned!"], function () {
+                                    Utils.page.pageReload();
+                                });
+                            }
+                        );
+                    }
+                },
+                {
+                    text: "Cancel",
+                    click: function() {
+                        jQuery("#dialogDialog").dialog("close");
+                    }
+                }
+            ]
+        });
+
+        self.create({
+            div: "#dialogVisual",
+            size: {
+                rows: Box.boxJSON.rows,
+                cols: Box.boxJSON.cols
+            },
+            data: self.results.items || []
+        });
+
+        jQuery("#resultScroll").prepend(jQuery("#dialogVisual"));
+
+        jQuery("#updateSelected, #removeSelected, #emptySelected")
+            .prop("disabled", true)
+            .addClass("disabled");
+
+        jQuery("#dialogDialog").dialog("open");
+    };
+
+    self.getBoxPositionOpts = function (row, col){
+        var pos = self.getPositionString(row,col);
+
+        var boxables = self.results.items
+            ? self.results.items.filter( function (item) {
+                if(!item.coordinates) return false;
+                  return item.coordinates === pos;
+            })
+            : [];
+
+        var hasChange = self.results.diffs && self.results.diffs.some(function(diff) {
+            if(!diff.modified || !diff.modified.coordinates) return false;
+            var diffPos = diff.modified.coordinates;
+
+            if(!diffPos === pos){
+                return false;
+            }
+
+            var originalBarcode = diff.original && diff.original.identificationBarcode;
+            var modifiedBarcode = diff.modified && diff.modified.identificationBarcode;
+
+            return originalBarcode && modifiedBarcode && originalBarcode !== modifiedBarcode;
+
+        });
+
+        var hasError = self.results.errors && self.results.errors.some( function(err) {
+            if(!err.coordinates) return false;
+
+            var errPos = err.coordinates;
+            return errPos === pos;
+        })
+
+        if(boxables.length > 0){
+            var title = boxables[0].alias;
+            var existingBarcode = (boxables[0].identificationBarcode || "").trim();
+            var hasExistingBarcode = existingBarcode.length>0;
+            if(hasError)
+            {
+                return {
+                    title: title + " (Warning) ",
+                    selectedImg: "/styles/images/tube_full_selected.png",
+                    unselectedImg: "/styles/images/tube_error.png"
+                };
+            } else if(hasChange) {
+                return {
+                    title: title + " (Barcode Will Change) ",
+                    selectedImg: "/styles/images/tube_full_selected.png",
+                    unselectedImg: "/styles/images/tube_error.png"
+                };
+            } else if (hasExistingBarcode) {
+                return {
+                    title: title + " (Barcode will be added) ",
+                    selectedImg: "/styles/images/tube_full_selected.png",
+                    unselectedImg: "/styles/images/tube_full.png"
+                };
+            } else {
+                return {
+                    title: title + " (Barcode Will Change) ",
+                    selectedImg: "/styles/images/tube_full_selected.png",
+                    unselectedImg: "/styles/images/tube_full.png"
+                };
+            }
+        } else {
+            return {
+                title: "Empty",
+                selectedImg: "/styles/images/tube_empty_selected.png",
+                unselectedImg: "/styles/images/tube_empty.png"
+            };
+        }
+    };
+
     return self;
   };
 
