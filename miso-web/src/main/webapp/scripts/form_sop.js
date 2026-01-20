@@ -30,6 +30,10 @@ FormTarget.sop = (function ($) {
       return Urls.ui.sops.edit(sop.id);
     },
 
+    getObjectTitle: function (sop) {
+      return sop && sop.id ? "Edit SOP" : "Create SOP";
+    },
+
     getSections: function (config, object) {
       var isEdit = !!object.id;
 
