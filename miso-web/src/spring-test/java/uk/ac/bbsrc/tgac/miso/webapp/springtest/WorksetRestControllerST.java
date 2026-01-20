@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.dto.WorksetDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.WorksetRestController.MoveItemsDto;
@@ -356,9 +356,9 @@ public class WorksetRestControllerST extends AbstractST {
 
         MoveItemsDto dto = new MoveItemsDto();
         dto.setTargetWorksetId(target.getId());
-        dto.setItemIds(poolIds);
+        dto.setItemIds(aliquotIds);
 
-        getMockMvc().perform(post(CONTROLLER_BASE + "/" + source.getId() + "/pools/move")
+        getMockMvc().perform(post(CONTROLLER_BASE + "/" + source.getId() + "/libraryaliquots/move")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(makeJson(dto)))
                 .andExpect(status().isNoContent());
