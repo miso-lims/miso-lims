@@ -1,0 +1,1 @@
+User can scan an entire box at once to automatically assign and update barcodes for multiple positions. After scanning, they can review a visual summary with warnings and confirm or cancel the changes. 
