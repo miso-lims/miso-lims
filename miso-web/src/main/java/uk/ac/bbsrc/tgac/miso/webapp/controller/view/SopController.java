@@ -106,7 +106,7 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
 
     SopDto dto = Dtos.asDto(sop);
 
-    model.put("title", "SOP " + id);
+    model.put("title", "Edit SOP");
     model.put("pageMode", "edit");
     model.put("sopJson", mapper.writeValueAsString(dto));
     model.put("sopCategories", SopCategory.values());
