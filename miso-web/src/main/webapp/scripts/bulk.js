@@ -71,7 +71,8 @@ BulkUtils = (function ($) {
    *       be set when the field is *always* required. Otherwise, may be controlled with
    *       updateField (see API object below)
    *   maxLength: optional integer; maximum number of characters for text input
-   *   regex: optional regex string; validation regex for text input
+   *   regex: optional regex string; validation regex for text input. A description that explains
+   *       the pattern should be added
    *   initial: optional string; value to initialize field value to when missing. For dropdowns,
    *       this should be the item label. Affects new items only unless initializeOnEdit is set to
    *       true
@@ -120,6 +121,11 @@ BulkUtils = (function ($) {
    *   isSaved: function(); returns true if the data has been saved; else false,
    *   getData: function(); returns original data updated with changes made in the table. For use
    *       in custom actions only - will not work in onChange
+   *   validate: function(onValid); validates the table, displays any errors, and calls the onValid
+   *       callback if valid. The table is placed into a loading state (controls disabled) while
+   *       validating, and only reactivated if validation fails. The onValid function may return a
+   *       promise to indicate when it has completed. If the promise is resolved with a value of
+   *       true, the table will be reactivated
    *   rebuildTable: function(target, data); destroys the table and rebuilds using the provided
    *       BulkTarget and data. For use in custom actions only - will not work in onChange
    * }
@@ -1864,7 +1870,7 @@ BulkUtils = (function ($) {
     }
   }
 
-  function makeTable(target, config, data) {
+  function makeTable(target, config, data, skipInitialValues) {
     var hotContainer = document.getElementById(CONTAINER_ID);
 
     if (target.prepareData) {
@@ -1882,7 +1888,7 @@ BulkUtils = (function ($) {
     var targetDescription = target.getDescription ? target.getDescription(config) : null;
     addQuickHelp(targetDescription, columns);
 
-    var tableData = makeTableData(data, columns, config, api);
+    var tableData = makeTableData(data, columns, config, api, skipInitialValues);
     var cellMetas = processDropdownSources(columns, data, tableData, api);
     processFormatters(cellMetas, columns, data);
     var listeners = processOnChangeListeners(cellMetas, columns, tableData);
@@ -2161,7 +2167,7 @@ BulkUtils = (function ($) {
     };
   }
 
-  function makeTableData(data, columns, config, api) {
+  function makeTableData(data, columns, config, api, skipInitialValues) {
     var tableData = [];
     for (var i = 0; i < data.length; i++) {
       var rowData = {};
@@ -2171,6 +2177,7 @@ BulkUtils = (function ($) {
         }
         var defaultValue = null;
         if (
+          !skipInitialValues &&
           column.hasOwnProperty("initial") &&
           !tableSaved &&
           (column.initializeOnEdit || config.pageMode !== "edit")
@@ -2422,6 +2429,10 @@ BulkUtils = (function ($) {
     api.getData = function () {
       updateSourceData(data, hot, columns, api);
       return data;
+    };
+
+    api.validate = function (onValid) {
+      return validate(hot, columns, onValid);
     };
 
     api.rebuildTable = function (target, data) {
@@ -3023,17 +3034,7 @@ BulkUtils = (function ($) {
     $(SAVE).click(function () {
       showLoading(true, false);
       clearMessages();
-      hot.validateCells(function (valid) {
-        if (!valid) {
-          var message =
-            "Please fix highlighted cells. See the Quick Help section " +
-            "(above) for additional information regarding specific fields.";
-          var errors = collectValidationErrors(hot, columns);
-          showValidationErrors(message, errors, hot, columns);
-          showLoading(false, true);
-          return;
-        }
-
+      validate(hot, columns, function () {
         updateSourceData(data, hot, columns, api);
 
         $.when(target.confirmSave ? target.confirmSave(data, config, api) : null)
@@ -3046,6 +3047,27 @@ BulkUtils = (function ($) {
               showLoading(false, true);
             }
           });
+      });
+    });
+  }
+
+  function validate(hot, columns, onValid) {
+    showLoading(true, false);
+    hot.validateCells(function (valid) {
+      if (!valid) {
+        var message =
+          "Please fix highlighted cells. See the Quick Help section " +
+          "(above) for additional information regarding specific fields.";
+        var errors = collectValidationErrors(hot, columns);
+        showValidationErrors(message, errors, hot, columns);
+        showLoading(false, true);
+        return;
+      }
+
+      $.when(onValid()).then(function (reactivate) {
+        if (reactivate) {
+          showLoading(false, true);
+        }
       });
     });
   }
@@ -3205,6 +3227,7 @@ BulkUtils = (function ($) {
 
   function showLoading(loading, allowSave) {
     Utils.ui.setDisabled(SAVE, loading || allowSave === false);
+    Utils.ui.setDisabled("#bulkactions .ui-button", loading);
     if (loading) {
       $(LOADER).removeClass("hidden");
     } else {
@@ -3270,7 +3293,7 @@ BulkUtils = (function ($) {
     $(ACTION_BAR).empty();
     $(SAVE).off("click");
     hot.destroy();
-    makeTable(target, config, data);
+    makeTable(target, config, data, true);
   }
 
   function showBulkActions(target, config, data) {

@@ -12,6 +12,7 @@ public class SampleTissueProcessingDto extends SampleTissueDto {
   private List<SampleDto> relatedSlides;
   private Long indexFamilyId;
   private Long indexId;
+  private List<ProbeDto> probes;
 
   public List<SampleDto> getRelatedSlides() {
     return relatedSlides;
@@ -37,4 +38,11 @@ public class SampleTissueProcessingDto extends SampleTissueDto {
     this.indexId = indexId;
   }
 
+  public List<ProbeDto> getProbes() {
+    return probes;
+  }
+
+  public void setProbes(List<ProbeDto> probes) {
+    this.probes = probes;
+  }
 }

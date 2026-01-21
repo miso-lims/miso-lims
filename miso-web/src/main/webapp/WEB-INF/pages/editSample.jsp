@@ -55,11 +55,25 @@
 <form:form id="sampleForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    Warning.generateHeaderWarnings('warnings', WarningTarget.sample, ${sampleDto});
-    FormUtils.createForm('sampleForm', 'save', ${sampleDto}, 'sample', ${formConfig});
+    var sample = ${sampleDto};
+    var listConfig = {
+      sampleId: sample.id
+    };
+    Warning.generateHeaderWarnings('warnings', WarningTarget.sample, sample);
+    var form = FormUtils.createForm('sampleForm', 'save', sample, 'sample', ${formConfig});
+    Sample.setForm(form);
+    Sample.setListConfig(listConfig);
+    Sample.setProbes(sample.probes);
     Utils.ui.updateHelpLink(FormTarget.sample.getUserManualUrl());
   });
 </script>
+
+<c:if test="${detailedSample and sampleCategory eq 'Tissue Processing'}">
+  <br>
+  <h1>Probes</h1>
+  <div id="sampleForm_probesError"></div>
+  <div id="listProbes"></div>
+</c:if>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
   <div id="notes_arrowclick" class="toggleLeftDown"></div>

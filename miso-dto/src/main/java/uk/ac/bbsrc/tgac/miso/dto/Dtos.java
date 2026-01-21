@@ -1154,6 +1154,9 @@ public class Dtos {
     }
     setId(to::setIndexFamilyId, maybeGetProperty(from.getIndex(), SampleIndex::getFamily));
     setId(to::setIndexId, from.getIndex());
+    if (from.getProbes() != null) {
+      to.setProbes(from.getProbes().stream().map(ProbeDto::from).toList());
+    }
     return to;
   }
 
@@ -1169,6 +1172,9 @@ public class Dtos {
       to = new SampleTissueProcessingImpl();
     }
     setObject(to::setIndex, SampleIndex::new, from.getIndexId());
+    if (from.getProbes() != null) {
+      to.setProbes(from.getProbes().stream().map(ProbeDto::toSampleProbe).collect(Collectors.toSet()));
+    }
     return to;
   }
 

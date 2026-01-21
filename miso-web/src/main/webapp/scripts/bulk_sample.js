@@ -16,6 +16,41 @@ BulkTarget.sample = (function ($) {
    * }
    */
 
+  // stored state when editing probes
+  var probeEditingSamples = null;
+  var allSamples = null;
+
+  var sampleProbeTarget = {
+    getColumns: function (config, api) {
+      return BulkTarget.sampleprobe.getColumns(config, api);
+    },
+    getCustomActions: function (config, api) {
+      return [
+        {
+          name: "Apply Probe Changes",
+          action: function () {
+            switchToSamplesTable(api);
+          },
+        },
+        {
+          name: "Cancel Probe Changes",
+          action: function () {
+            api.rebuildTable(BulkTarget.sample, allSamples);
+          },
+        },
+      ];
+    },
+    confirmSave: function (data, config, api) {
+      var deferred = $.Deferred();
+      Utils.showOkDialog(
+        "Save Samples",
+        ["Please apply or cancel the probe changes before saving."],
+        deferred.reject
+      );
+      return deferred.promise();
+    },
+  };
+
   var originalProjectIdsBySampleId = {};
   var originalEffectiveGroupIdsByRow = {};
   var parentLocationsByRow = null;
@@ -51,6 +86,14 @@ BulkTarget.sample = (function ($) {
           );
         },
       });
+      if (config.targetCategory === "Tissue Processing") {
+        actions.push({
+          name: "Edit Probes",
+          action: function (api) {
+            showEditProbesDialog(api);
+          },
+        });
+      }
       return actions;
     },
     getBulkActions: function (config) {
@@ -1048,6 +1091,20 @@ BulkTarget.sample = (function ($) {
           getItemValue: Utils.array.getId,
         },
         {
+          title: "Probes",
+          type: "text",
+          data: "probes",
+          include: targetCategory === "Tissue Processing",
+          disabled: true,
+          getData: function (object, limitedApi) {
+            if (object.probes && object.probes.length) {
+              return "( " + object.probes.length + " attached)";
+            }
+            return null;
+          },
+          omit: true,
+        },
+        {
           title: "Initial Slides",
           type: "int",
           data: "initialSlides",
@@ -1562,6 +1619,146 @@ BulkTarget.sample = (function ($) {
   function anyMatch(arr1, arr2) {
     return arr1.some(function (x) {
       return arr2.includes(x);
+    });
+  }
+
+  function showEditProbesDialog(api) {
+    var samples = api.getData();
+
+    var fields = samples.map(function (sample, index) {
+      var label = "Row " + (index + 1);
+      if (sample.alias) {
+        label += ": " + sample.alias;
+      } else if (sample.parentAlias) {
+        label += ": " + sample.parentAlias;
+      }
+      return {
+        label: label,
+        property: "includeRow" + index,
+        type: "checkbox",
+      };
+    });
+    fields.unshift({
+      label: "Number of probes",
+      property: "count",
+      type: "int",
+    });
+
+    Utils.showDialog("Edit Probes - Select Samples", "Edit", fields, function (results) {
+      if (results.count < 1 || results.count > 1000) {
+        Utils.showOkDialog("Error", ["Number of probes must be between 1 and 1000"]);
+        return;
+      }
+      var selectedSamples = samples.filter(function (sample, index) {
+        return results["includeRow" + index];
+      });
+      if (!selectedSamples.length) {
+        Utils.showOkDialog("Error", ["No samples selected"]);
+        return;
+      }
+      if (!samplesHaveSameProbes(selectedSamples)) {
+        Utils.showOkDialog("Error", [
+          "Selected samples have different probes. Note that if the samples have already been" +
+            " saved with probes, each sample's probes must be edited individually.",
+        ]);
+        return;
+      }
+      if (selectedSamples[0].probes && results.count < selectedSamples[0].probes.length) {
+        Utils.showConfirmDialog(
+          "Edit Probes - Warning",
+          "OK",
+          [
+            "Number of probes is less than already present on the " +
+              (selectedSamples > 1 ? "samples" : "sample") +
+              ". This will remove the excess probes. OK to continue?",
+          ],
+          function () {
+            switchToProbesTable(api, selectedSamples, results.count);
+          }
+        );
+      } else {
+        switchToProbesTable(api, selectedSamples, results.count);
+      }
+    });
+  }
+
+  function samplesHaveSameProbes(samples) {
+    if (!samples[0].probes || !samples[0].probes.length) {
+      // ensure all samples have no probes
+      if (
+        samples.some(function (sample) {
+          return sample.probes && sample.probes.length;
+        })
+      ) {
+        return false;
+      }
+    } else {
+      // ensure all samples have the same probes
+      var referenceProbes = samples[0].probes;
+      for (var i = 1; i < samples.length; i++) {
+        var currentProbes = samples[i].probes;
+        if (currentProbes == null || currentProbes.length != referenceProbes.length) {
+          return false;
+        }
+        if (
+          referenceProbes.some(function (referenceProbe) {
+            return !currentProbes.some(function (currentProbe) {
+              return probesEqual(currentProbe, referenceProbe);
+            });
+          })
+        ) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  function probesEqual(one, two) {
+    var fields = sampleProbeTarget.getColumns({}, null).map(Utils.array.get("data"));
+    // Note: A saved sample probe is linked to an individual sample and has its own ID, which means
+    // it is not possible to edit saved probes for multiple samples at once.
+    fields.unshift("id");
+
+    for (var i = 0; i < fields.length; i++) {
+      var field = fields[i];
+      if (one[field] != two[field]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function switchToProbesTable(api, samples, count) {
+    allSamples = api.getData();
+    probeEditingSamples = samples;
+    var referenceProbes = samples[0].probes || [];
+    var probes = [];
+    for (var i = 0; i < count; i++) {
+      if (i < referenceProbes.length) {
+        probes.push(referenceProbes[i]);
+      } else {
+        probes.push({});
+      }
+    }
+    api.rebuildTable(sampleProbeTarget, probes);
+  }
+
+  function switchToSamplesTable(api) {
+    api.validate(function () {
+      var deferred = $.Deferred();
+      // wait a second to allow async HandsOnTable stuff to run before destroying the table (for
+      // some reason that doesn't finish before calling the callback... doesn't cause a real
+      // problem since the table is destroyed anyway, but this avoids JS errors in the console)
+      window.setTimeout(function () {
+        var probes = api.getData();
+        probeEditingSamples.forEach(function (sample) {
+          sample.probes = probes;
+        });
+        api.rebuildTable(BulkTarget.sample, allSamples);
+        deferred.resolve(true);
+      }, 1000);
+      return deferred.promise();
     });
   }
 })(jQuery);

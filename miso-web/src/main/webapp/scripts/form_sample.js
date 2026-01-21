@@ -700,6 +700,8 @@ FormTarget.sample = (function ($) {
       ];
     },
     confirmSave: function (object, isDialog, form) {
+      object.probes = Sample.getProbes();
+
       if (form.isChanged("projectId")) {
         var messages = [];
         if (object.identityConsentLevel && object.identityConsentLevel !== "All Projects") {

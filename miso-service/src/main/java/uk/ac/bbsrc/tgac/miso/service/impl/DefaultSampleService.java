@@ -12,9 +12,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -32,6 +36,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -48,8 +53,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Probe;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Probe.ProbeFeatureType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Probe.Read;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleProbe;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
@@ -59,6 +68,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
@@ -156,6 +166,8 @@ public class DefaultSampleService implements SampleService {
   private RequisitionService requisitionService;
   @Autowired
   private BarcodableReferenceService barcodableReferenceService;
+  @Autowired
+  private ChangeLogService changeLogService;
   @Autowired
   private TransactionTemplate transactionTemplate;
   @Autowired
@@ -303,8 +315,16 @@ public class DefaultSampleService implements SampleService {
     } else {
       sample.setInitialVolume(sample.getVolume());
     }
-    if (isSampleSlide(sample)) {
-      ((SampleSlide) sample).setInitialSlides(((SampleSlide) sample).getSlides());
+    if (isTissueProcessingSample(sample)) {
+      SampleTissueProcessing tissueProcessing = (SampleTissueProcessing) sample;
+      if (tissueProcessing.getProbes() != null) {
+        for (SampleProbe probe : tissueProcessing.getProbes()) {
+          probe.setSample(tissueProcessing);
+        }
+      }
+      if (isSampleSlide(sample)) {
+        ((SampleSlide) sample).setInitialSlides(((SampleSlide) sample).getSlides());
+      }
     }
     LimsUtils.updateParentVolume(sample, null, changeUser);
     updateParentSlides(sample, null, changeUser);
@@ -840,6 +860,11 @@ public class DefaultSampleService implements SampleService {
       validateGroupDescription(detailed, errors);
       if (isIdentitySample(sample) && sample.getRequisition() != null) {
         errors.add(new ValidationError("requisitionId", "Identity samples cannot be added to requisitions"));
+      } else if (isTissueProcessingSample(sample)) {
+        SampleTissueProcessing tissueProcessing = (SampleTissueProcessing) sample;
+        if (tissueProcessing.getProbes() != null && !tissueProcessing.getProbes().isEmpty()) {
+          validateProbes(tissueProcessing.getProbes(), errors);
+        }
       }
       if (detailed.isSynthetic()) {
         if (detailed.getRequisition() != null) {
@@ -861,6 +886,99 @@ public class DefaultSampleService implements SampleService {
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
+    }
+  }
+
+  private static final String PROBE_PATTERN_REGEX = "^(?:5P|\\^)?[NACGT]*\\(BC\\)[NACGT]*(?:3P|\\$)?$";
+  private static final String SEQUENCE_PATTERN_REGEX = "^[ACGT]+$";
+
+  /**
+   * Checks that probes are valid both individually and as a set. This method does not handle null or
+   * empty sets, so those conditions should be checked first, and this method should only be called if
+   * probes are present
+   * 
+   * @param probes collection containing one or more probes
+   * @param errors list to collect errors
+   */
+  private static void validateProbes(Collection<? extends Probe> probes, List<ValidationError> errors) {
+    if (probes == null || probes.isEmpty()) {
+      throw new IllegalArgumentException(
+          "The method should only be called after ensuring that there are probes in the set");
+    }
+
+    Set<String> identifiers = new HashSet<>();
+    Set<String> names = new HashSet<>();
+    Set<String> sequences = new HashSet<>();
+
+    Probe firstProbe = probes.iterator().next();
+    Read read = firstProbe.getRead();
+    String pattern = firstProbe.getPattern();
+    ProbeFeatureType featureType = firstProbe.getFeatureType();
+
+    // We only want to report each of these once
+    boolean multipleReads = false;
+    boolean multiplePatterns = false;
+    boolean multipleFeatureTypes = false;
+    boolean badPattern = false;
+    boolean badSequence = false;
+    boolean targetGeneMissing = false;
+    boolean targetGeneInvalid = false;
+
+    for (Probe probe : probes) {
+      multipleReads |= probe.getRead() != read;
+      multiplePatterns |= !Objects.equals(probe.getPattern(), pattern);
+      multipleFeatureTypes |= probe.getFeatureType() != featureType;
+
+
+      if (identifiers.contains(probe.getIdentifier())) {
+        errors.add(new ValidationError("probes", "Duplicate identifier: " + probe.getIdentifier()));
+      }
+      identifiers.add(probe.getIdentifier());
+
+      if (names.contains(probe.getName())) {
+        errors.add(new ValidationError("probes", "Duplicate name: " + probe.getName()));
+      }
+      names.add(probe.getName());
+
+      if (sequences.contains(probe.getSequence())) {
+        errors.add(new ValidationError("probes", "Duplicate sequence: " + probe.getSequence()));
+      }
+      sequences.add(probe.getSequence());
+
+      badPattern |= !probe.getPattern().matches(PROBE_PATTERN_REGEX);
+      badSequence |= !probe.getSequence().matches(SEQUENCE_PATTERN_REGEX);
+      if (probe.getFeatureType() == ProbeFeatureType.CRISPR) {
+        targetGeneMissing |= probe.getTargetGeneId() == null || probe.getTargetGeneName() == null;
+      } else {
+        targetGeneInvalid |= probe.getTargetGeneId() != null || probe.getTargetGeneName() != null;
+      }
+    }
+
+    if (multipleReads) {
+      errors.add(new ValidationError("probes", "All probes must have the same read"));
+    }
+    if (multiplePatterns) {
+      errors.add(new ValidationError("probes", "All probes must have the same pattern"));
+    }
+    if (multipleFeatureTypes) {
+      errors.add(new ValidationError("probes", "All probes must have the same feature type"));
+    }
+
+    // All below errors should be caught by front end validation, which provides better, row-specific
+    // help.
+    if (badPattern) {
+      errors.add(new ValidationError("probes", "Invalid pattern."));
+    }
+    if (badSequence) {
+      errors.add(new ValidationError("probes", "Invalid sequence."));
+    }
+    if (targetGeneMissing) {
+      errors.add(new ValidationError("probes",
+          "Target Gene ID and name are required for %s probes".formatted(ProbeFeatureType.CRISPR.getLabel())));
+    }
+    if (targetGeneInvalid) {
+      errors.add(new ValidationError("probes",
+          "Target Gene ID and name are only valid for %s probes".formatted(ProbeFeatureType.CRISPR.getLabel())));
     }
   }
 
@@ -1025,8 +1143,10 @@ public class DefaultSampleService implements SampleService {
     target.setTimepoint(source.getTimepoint());
   }
 
-  private void applyTissueProcessingChanges(SampleTissueProcessing target, SampleTissueProcessing source) {
+  private void applyTissueProcessingChanges(SampleTissueProcessing target, SampleTissueProcessing source)
+      throws IOException {
     target.setIndex(source.getIndex());
+    applyProbeChanges(target, source);
     if (source instanceof SampleSlide) {
       ((SampleSlide) target).setInitialSlides(((SampleSlide) source).getInitialSlides());
       ((SampleSlide) target).setSlides(((SampleSlide) source).getSlides());
@@ -1048,6 +1168,101 @@ public class DefaultSampleService implements SampleService {
           .setLoadingCellConcentration(((SampleSingleCell) source).getLoadingCellConcentration());
       ((SampleSingleCell) target).setDigestion(((SampleSingleCell) source).getDigestion());
     }
+  }
+
+  private void applyProbeChanges(SampleTissueProcessing to, SampleTissueProcessing from) throws IOException {
+    List<String> changeMessages = new ArrayList<>();
+    if (from.getProbes() == null || from.getProbes().isEmpty()) {
+      if (to.getProbes() != null && !to.getProbes().isEmpty()) {
+        changeMessages.add(to.getProbes().size() + " probes removed");
+        to.setProbes(null);
+      }
+    } else {
+      if (to.getProbes() == null) {
+        to.setProbes(new HashSet<>());
+      }
+      if (to.getProbes().isEmpty()) {
+        changeMessages.add(from.getProbes().size() + " probes added");
+        for (SampleProbe fromProbe : from.getProbes()) {
+          fromProbe.setSample(to);
+          to.getProbes().add(fromProbe);
+        }
+        to.getProbes().addAll(from.getProbes());
+      } else {
+        // source and target both have probes
+        int beforeSize = to.getProbes().size();
+        to.getProbes().removeIf(toProbe -> from.getProbes().stream()
+            .noneMatch(fromProbe -> fromProbe.getId() == toProbe.getId()));
+        int probesRemoved = beforeSize - to.getProbes().size();
+        int probesUpdated = 0;
+        int probesAdded = 0;
+        for (SampleProbe fromProbe : from.getProbes()) {
+          if (fromProbe.isSaved()) {
+            // update existing probe
+            SampleProbe toProbe = to.getProbes().stream()
+                .filter(probe -> probe.getId() == fromProbe.getId())
+                .findFirst()
+                .orElseThrow(() -> new ValidationException(new ValidationError("probes",
+                    "Probe ID %d belongs to a different sample".formatted(fromProbe.getId()))));
+            if (applyProbeChanges(toProbe, fromProbe)) {
+              probesUpdated++;
+            }
+          } else {
+            // add new probe
+            to.getProbes().add(fromProbe);
+            fromProbe.setSample(to);
+            probesAdded++;
+          }
+        }
+        if (from.getProbes().size() != to.getProbes().size()) {
+          throw new IllegalStateException("'to' has %d probes vs. 'from' %d. Expected to match."
+              .formatted(to.getProbes().size(), from.getProbes().size()));
+        }
+        if (probesRemoved > 0) {
+          changeMessages.add("%d %s removed".formatted(probesRemoved, Pluralizer.probes(probesRemoved)));
+        }
+        if (probesUpdated > 0) {
+          changeMessages.add("%d %s updated".formatted(probesUpdated, Pluralizer.probes(probesUpdated)));
+        }
+        if (probesAdded > 0) {
+          changeMessages.add("%d %s added".formatted(probesAdded, Pluralizer.probes(probesAdded)));
+        }
+      }
+    }
+    if (changeMessages.size() > 0) {
+      String message = changeMessages.stream().collect(Collectors.joining("; "));
+      ChangeLog change = to.createChangeLog(message, "probes", authorizationManager.getCurrentUser());
+      changeLogService.create(change);
+    }
+  }
+
+  /**
+   * Applies any submitted changes to the persisted probe
+   * 
+   * @param to the persisted probe
+   * @param from the submitted probe including any changes
+   * @return true if any changes are made; false otherwise
+   */
+  private boolean applyProbeChanges(SampleProbe to, SampleProbe from) {
+    return updateField(SampleProbe::getIdentifier, SampleProbe::setIdentifier, to, from)
+        || updateField(SampleProbe::getName, SampleProbe::setName, to, from)
+        || updateField(SampleProbe::getPattern, SampleProbe::setPattern, to, from)
+        || updateField(SampleProbe::getRead, SampleProbe::setRead, to, from)
+        || updateField(SampleProbe::getSequence, SampleProbe::setSequence, to, from)
+        || updateField(SampleProbe::getFeatureType, SampleProbe::setFeatureType, to, from)
+        || updateField(SampleProbe::getTargetGeneId, SampleProbe::setTargetGeneId, to, from)
+        || updateField(SampleProbe::getTargetGeneName, SampleProbe::setTargetGeneName, to, from);
+  }
+
+  private static <P extends Probe, T> boolean updateField(Function<P, T> getter, BiConsumer<P, T> setter, P to,
+      P from) {
+    T toValue = getter.apply(to);
+    T fromValue = getter.apply(from);
+    if (!Objects.equals(toValue, fromValue)) {
+      setter.accept(to, fromValue);
+      return true;
+    }
+    return false;
   }
 
   /**
