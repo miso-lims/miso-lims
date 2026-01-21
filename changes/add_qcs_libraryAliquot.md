@@ -1,1 +1,1 @@
-Able to add Qcs and Edit Qcs in Library Aliquots.
+Ability to add QCs to Library Aliquots.

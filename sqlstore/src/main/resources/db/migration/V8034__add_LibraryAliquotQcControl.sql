@@ -5,7 +5,7 @@ CREATE TABLE LibraryAliquotQc(
     creator BIGINT NOT NULL,
     date DATE NOT NULL,
     type BIGINT NOT NULL,
-    results DECIMAL (16, 10),
+    results DECIMAL (16, 10) NOT NULL,
     created TIMESTAMP NOT NULL,
     lastModified TIMESTAMP NOT NULL,
     description VARCHAR(255),
