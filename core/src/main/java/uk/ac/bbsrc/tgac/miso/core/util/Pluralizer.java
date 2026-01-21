@@ -98,6 +98,10 @@ public class Pluralizer {
     return pluralize(count, "pool", "pools");
   }
 
+  public static String probes(long count) {
+    return pluralize(count, "probe", "probes");
+  }
+
   public static String projects(long count) {
     return pluralize(count, "project", "projects");
   }

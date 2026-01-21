@@ -1,21 +1,27 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
+import java.util.List;
+
 public interface SampleSingleCellRelative {
 
-  public String getInitialCellConcentration();
+  String getInitialCellConcentration();
 
-  public void setInitialCellConcentration(String initialCellConcentration);
+  void setInitialCellConcentration(String initialCellConcentration);
 
-  public Integer getTargetCellRecovery();
+  Integer getTargetCellRecovery();
 
-  public void setTargetCellRecovery(Integer targetCellRecovery);
+  void setTargetCellRecovery(Integer targetCellRecovery);
 
-  public String getLoadingCellConcentration();
+  String getLoadingCellConcentration();
 
-  public void setLoadingCellConcentration(String loadingCellConcentration);
+  void setLoadingCellConcentration(String loadingCellConcentration);
 
-  public String getDigestion();
+  String getDigestion();
 
-  public void setDigestion(String digestion);
+  void setDigestion(String digestion);
+
+  List<ProbeDto> getProbes();
+
+  void setProbes(List<ProbeDto> probes);
 
 }

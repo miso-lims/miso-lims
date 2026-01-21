@@ -636,6 +636,17 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
   FALSE, FALSE, 24, 4442, 1, NULL, NULL, NULL, NULL, NULL, NULL, 0, 'Slide',
   3, 3);
 
+-- Single Cell
+INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificNameId, volume, volumeUnits, concentration, concentrationUnits, creator, created, lastModifier, lastModified,
+  nonStandardAlias, isSynthetic, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, qcUser, qcDate, archived, discriminator) VALUES
+(15, 3, 'SAM15', 'TEST_SINGLE_CELL', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2026-02-04 11:18:00', 1, '2026-02-04 11:18:00',
+  TRUE, FALSE, 25, 2, 1, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, 'SingleCell');
+
+INSERT INTO SampleProbe(probeId, sampleId, identifier, name, readNumber, pattern, sequence, featureType) VALUES
+(1, 15, 'C0001', 'probe 1', 'R2', '5PNNNNNNNNNN(BC)', 'GCATTCTGTCACCTA', 'ANTIBODY_CAPTURE'),
+(2, 15, 'C0002', 'probe 2', 'R2', '5PNNNNNNNNNN(BC)', 'CTACGACGTAGAAGA', 'ANTIBODY_CAPTURE'),
+(3, 15, 'C0003', 'probe 3', 'R2', '5PNNNNNNNNNN(BC)', 'CTCAGATGGAGTATG', 'ANTIBODY_CAPTURE');
+
 -- Tissue Pieces
 INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificNameId, volume, volumeUnits, concentration, concentrationUnits, creator, created, lastModifier, lastModified,
   nonStandardAlias, isSynthetic, sampleClassId, parentId, siblingNumber, groupId, groupDescription, detailedQcStatusId, detailedQcStatusNote, qcUser, qcDate, archived, discriminator,

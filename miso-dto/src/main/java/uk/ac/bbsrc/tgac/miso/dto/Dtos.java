@@ -1192,6 +1192,9 @@ public class Dtos {
     setInteger(dto::setTargetCellRecovery, from.getTargetCellRecovery(), true);
     setString(dto::setLoadingCellConcentration, from.getLoadingCellConcentration());
     setString(dto::setDigestion, from.getDigestion());
+    if (from.getProbes() != null) {
+      dto.setProbes(from.getProbes().stream().map(ProbeDto::from).toList());
+    }
     return dto;
   }
 
@@ -1209,6 +1212,9 @@ public class Dtos {
     setInteger(to::setTargetCellRecovery, from.getTargetCellRecovery(), true);
     setBigDecimal(to::setLoadingCellConcentration, from.getLoadingCellConcentration());
     setString(to::setDigestion, from.getDigestion());
+    if (from.getProbes() != null) {
+      to.setProbes(from.getProbes().stream().map(ProbeDto::toSampleProbe).collect(Collectors.toSet()));
+    }
     return to;
   }
 

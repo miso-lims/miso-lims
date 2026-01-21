@@ -81,6 +81,7 @@ DELETE FROM SampleQC;
 DELETE FROM Sample_Note;
 DELETE FROM SampleChangeLog;
 DELETE FROM Sample;
+DELETE FROM SampleProbe;
 DELETE FROM SampleValidRelationship;
 DELETE FROM SampleClass;
 DELETE FROM TissueMaterial;

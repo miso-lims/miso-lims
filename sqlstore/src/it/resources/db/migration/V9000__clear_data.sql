@@ -102,6 +102,7 @@ DELETE FROM SampleIndexFamily;
 DELETE FROM Sample_Note;
 DELETE FROM SampleNumberPerProject;
 DELETE FROM SamplePurpose;
+DELETE FROM SampleProbe;
 DELETE FROM SampleQC;
 DELETE FROM SampleType;
 DELETE FROM SampleValidRelationship;

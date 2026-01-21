@@ -36,5 +36,4 @@ public class SampleTissueProcessingDto extends SampleTissueDto {
   public void setIndexId(Long indexId) {
     this.indexId = indexId;
   }
-
 }

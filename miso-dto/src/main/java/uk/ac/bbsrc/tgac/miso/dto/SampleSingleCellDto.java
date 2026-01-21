@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 
+import java.util.List;
+
 @JsonTypeName(value = SampleSingleCell.SUBCATEGORY_NAME)
 public class SampleSingleCellDto extends SampleTissueProcessingDto implements SampleSingleCellRelative {
 
@@ -11,6 +13,7 @@ public class SampleSingleCellDto extends SampleTissueProcessingDto implements Sa
   private Integer targetCellRecovery;
   private String loadingCellConcentration;
   private String digestion;
+  private List<ProbeDto> probes;
 
   @Override
   public String getInitialCellConcentration() {
@@ -50,6 +53,16 @@ public class SampleSingleCellDto extends SampleTissueProcessingDto implements Sa
   @Override
   public void setDigestion(String digestion) {
     this.digestion = digestion;
+  }
+
+  @Override
+  public List<ProbeDto> getProbes() {
+    return probes;
+  }
+
+  @Override
+  public void setProbes(List<ProbeDto> probes) {
+    this.probes = probes;
   }
 
 }

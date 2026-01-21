@@ -508,6 +508,9 @@ INSERT INTO Sample(discriminator, sampleId, name, alias, project_projectId, samp
 INSERT INTO SampleHierarchy(sampleId, identityId, tissueId) VALUES
 (25, 15, 17);
 
+INSERT INTO SampleProbe(sampleId, probeId, identifier, name, readNumber, pattern, sequence, featureType) VALUES
+(25, 1, 'C0023', 'anti-human_CD155_PVR', 'R2', '5PNNNNNNNNNN(BC)', 'ATCACATCGTTGCCA', 'ANTIBODY_CAPTURE');
+
 -- Stocks
 INSERT INTO `Sample`(`sampleId`, `accession`, `name`, `description`, `identificationBarcode`, `locationBarcode`, `sampleType`, `detailedQcStatusId`,
   qcUser, qcDate, `alias`, `project_projectId`, `scientificNameId`, `taxonIdentifier`, sequencingControlTypeId, `lastModifier`, `lastModified`, `creator`, `created`, sopId,

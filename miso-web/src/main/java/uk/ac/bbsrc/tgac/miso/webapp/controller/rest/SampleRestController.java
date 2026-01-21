@@ -1,5 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isProcessingSingleCellSample;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueProcessingSample;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,19 +40,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.core.Response.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
@@ -72,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
+import uk.ac.bbsrc.tgac.miso.dto.ProbeDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
@@ -91,6 +85,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 public class SampleRestController extends AbstractRestController {
 
   protected static final Logger log = LoggerFactory.getLogger(SampleRestController.class);
+
+  private static final String TYPE_LABEL = "Sample";
 
   @Autowired
   private LibraryService libraryService;
@@ -140,7 +136,7 @@ public class SampleRestController extends AbstractRestController {
   @GetMapping(value = "/{id}", produces = {"application/json"})
   @ResponseBody
   public SampleDto getSample(@PathVariable long id) throws IOException {
-    return RestUtils.getObject("Sample", id, sampleService, sam -> Dtos.asDto(sam, false));
+    return RestUtils.getObject(TYPE_LABEL, id, sampleService, sam -> Dtos.asDto(sam, false));
   }
 
   @GetMapping(produces = {"application/json"})
@@ -229,9 +225,9 @@ public class SampleRestController extends AbstractRestController {
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody SampleDto createSample(@RequestBody SampleDto sampleDto)
       throws IOException {
-    RestUtils.validateDtoProvided("Sample", sampleDto);
+    RestUtils.validateDtoProvided(TYPE_LABEL, sampleDto);
     Sample sample = buildHierarchy(sampleDto);
-    RestUtils.validateNewObject("Sample", sample);
+    RestUtils.validateNewObject(TYPE_LABEL, sample);
     long savedId = sampleService.create(sample);
     return Dtos.asDto(sampleService.get(savedId), false);
   }
@@ -333,7 +329,7 @@ public class SampleRestController extends AbstractRestController {
   @ResponseStatus(HttpStatus.OK)
   public @ResponseBody SampleDto updateSample(@PathVariable long id, @RequestBody SampleDto sampleDto)
       throws IOException {
-    return RestUtils.updateObject("Sample", id, sampleDto, Dtos::to, sampleService, sam -> Dtos.asDto(sam, false));
+    return RestUtils.updateObject(TYPE_LABEL, id, sampleDto, Dtos::to, sampleService, sam -> Dtos.asDto(sam, false));
   }
 
   /**
@@ -528,14 +524,14 @@ public class SampleRestController extends AbstractRestController {
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<SampleDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkCreate("Sample", dtos, WhineyFunction.rethrow(this::buildHierarchy),
+    return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, WhineyFunction.rethrow(this::buildHierarchy),
         sampleService);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<SampleDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkUpdate("Sample", dtos, WhineyFunction.rethrow(this::buildHierarchy),
+    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, WhineyFunction.rethrow(this::buildHierarchy),
         sampleService);
   }
 
@@ -593,6 +589,22 @@ public class SampleRestController extends AbstractRestController {
     return parent.getChildren().stream()
         .flatMap(child -> Stream.concat(Stream.of(child).filter(x -> x.getSampleClass().getId() == sampleClassId),
             searchChildren(sampleClassId, child)));
+  }
+
+  @PutMapping("/{sampleId}/probes")
+  public @ResponseBody ObjectNode updateProbes(@PathVariable long sampleId, @RequestBody List<ProbeDto> dtos)
+      throws IOException {
+    Sample sample = RestUtils.retrieve(TYPE_LABEL, sampleId, sampleService);
+    if (!isProcessingSingleCellSample(sample)) {
+      throw new BadRequestException("Cannot save probes for non tissue processing sample");
+    }
+    SampleSingleCell singleCell = (SampleSingleCell) sample;
+    singleCell.setProbes(dtos.stream().map(ProbeDto::toSampleProbe).collect(Collectors.toSet()));
+
+    List<Sample> samples = new ArrayList<>();
+    samples.add(singleCell);
+    // Note: the regular bulk sample getProgress endpoint should be used with this
+    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, samples, sampleService);
   }
 
 }

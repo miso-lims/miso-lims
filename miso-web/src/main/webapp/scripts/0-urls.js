@@ -927,6 +927,7 @@ Urls = (function () {
     bulkEdit: sampleUiBase + "/bulk/edit",
     bulkPropagate: sampleUiBase + "/bulk/propagate",
     qcHierarchy: middleIdUrlFunction(sampleUiBase, "/qc-hierarchy"),
+    bulkEditProbes: middleIdUrlFunction(sampleUiBase, "/probes"),
   };
 
   var sampleRestBase = restBase + "/samples";
@@ -951,6 +952,7 @@ Urls = (function () {
     ),
     samplesPreparedDatatable: idUrlFunction(sampleRestBase + "/dt/samples-prepared"),
     findRelated: sampleRestBase + "/find-related",
+    bulkSaveProbes: middleIdUrlFunction(sampleRestBase, "/probes"),
   };
 
   // Sample Classes
@@ -1415,15 +1417,15 @@ Urls = (function () {
     addSamples: middleIdUrlFunction(worksetRestBase, "/samples"),
     addLibraries: middleIdUrlFunction(worksetRestBase, "/libraries"),
     addLibraryAliquots: middleIdUrlFunction(worksetRestBase, "/libraryaliquots"),
-    addPools: middleIdUrlFunction(worksetRestBase,"/pools"),
+    addPools: middleIdUrlFunction(worksetRestBase, "/pools"),
     removeSamples: middleIdUrlFunction(worksetRestBase, "/samples"),
     removeLibraries: middleIdUrlFunction(worksetRestBase, "/libraries"),
     removeLibraryAliquots: middleIdUrlFunction(worksetRestBase, "/libraryaliquots"),
-    removePools: middleIdUrlFunction(worksetRestBase,"/pools"),
+    removePools: middleIdUrlFunction(worksetRestBase, "/pools"),
     moveSamples: middleIdUrlFunction(worksetRestBase, "/samples/move"),
     moveLibraries: middleIdUrlFunction(worksetRestBase, "/libraries/move"),
     moveLibraryAliquots: middleIdUrlFunction(worksetRestBase, "/libraryaliquots/move"),
-    movePools: middleIdUrlFunction(worksetRestBase,"/pools/move"),
+    movePools: middleIdUrlFunction(worksetRestBase, "/pools/move"),
     merge: worksetRestBase + "/merge",
     categoryDatatable: idUrlFunction(worksetRestBase + "/dt"),
     bulkDelete: worksetRestBase + "/bulk-delete",
