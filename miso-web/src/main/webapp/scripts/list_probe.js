@@ -7,12 +7,12 @@ ListTarget.probe = {
     return [
       {
         name: "Remove",
-        action: Sample.removeProbes,
+        action: config.sample ? Sample.removeProbes : ProbeSet.removeProbes,
       },
     ];
   },
   createStaticActions: function (config, projectId) {
-    return [
+    var actions = [
       {
         name: "Edit All",
         handler: function () {
@@ -31,18 +31,32 @@ ListTarget.probe = {
                 Utils.showOkDialog("Error", ["Can't add a negative number of probes."]);
                 return;
               }
-              Utils.page.pageRedirect(
-                Urls.ui.samples.bulkEditProbes(config.sampleId) +
-                  "?" +
-                  Utils.page.param({
-                    addProbes: results.addProbes,
-                  })
-              );
+              var params =
+                "?" +
+                Utils.page.param({
+                  addProbes: results.addProbes,
+                });
+              if (config.sample) {
+                Utils.page.pageRedirect(Urls.ui.samples.bulkEditProbes(config.sample.id) + params);
+              } else {
+                Utils.page.pageRedirect(
+                  Urls.ui.probeSets.bulkEditProbes(config.probeSet.id) + params
+                );
+              }
             }
           );
         },
       },
     ];
+    if (config.sample) {
+      actions.push({
+        name: "Apply Probe Set",
+        handler: function () {
+          Sample.showAddProbeSetDialog([config.sample], Sample.setProbes);
+        },
+      });
+    }
+    return actions;
   },
   createColumns: function (config, projectId) {
     return [

@@ -100,6 +100,17 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
     }
   }
 
+  protected List<T> searchBy(String value, boolean exactMatch, SingularAttribute<T, String> property) {
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<T> query = builder.createQuery(getResultClass());
+    Root<? extends T> root = query.from(getEntityClass());
+    if (!exactMatch) {
+      value = "%" + value + "%";
+    }
+    query.select(root).where(builder.like(root.get(property), value));
+    return currentSession().createQuery(query).getResultList();
+  }
+
   protected List<T> listByIdList(String idProperty, Collection<Long> ids) {
     if (ids == null || ids.isEmpty()) {
       return Collections.emptyList();

@@ -57,7 +57,7 @@
   jQuery(document).ready(function () {
     var sample = ${sampleDto};
     var listConfig = {
-      sampleId: sample.id
+      sample: sample
     };
     Warning.generateHeaderWarnings('warnings', WarningTarget.sample, sample);
     var form = FormUtils.createForm('sampleForm', 'save', sample, 'sample', ${formConfig});

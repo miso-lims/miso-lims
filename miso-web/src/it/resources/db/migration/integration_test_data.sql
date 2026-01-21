@@ -547,6 +547,14 @@ INSERT INTO Assay_AssayTest(assayId, testId) VALUES
 (1, 2),
 (1, 3);
 
+INSERT INTO ProbeSet(probeSetId, name) VALUES
+(1, 'Test Probes'),
+(2, 'Empty Set');
+
+INSERT INTO ProbeSetProbe(probeId, probeSetId, identifier, name, readNumber, pattern, sequence, featureType) VALUES
+(1, 1, 'sp1', 'set probe 1', 'R2', '5PNNNNNNNNNN(BC)', 'AAGTATGCCCTACGA', 'ANTIBODY_CAPTURE'),
+(2, 1, 'sp2', 'set probe 2', 'R2', '5PNNNNNNNNNN(BC)', 'GGATAACCGCGCTTT', 'ANTIBODY_CAPTURE');
+
 INSERT INTO Requisition(requisitionId, alias, creator, created, lastModifier, lastModified) VALUES
 (1, 'Req One', 1, '2021-07-21 11:31:00', 1, '2021-07-21 11:31:00'),
 (2, 'Req Two', 3, '2021-07-21 11:31:00', 3, '2021-07-21 11:31:00');

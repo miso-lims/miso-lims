@@ -3,7 +3,8 @@ BulkUtils = (function ($) {
    * BulkTarget structure: {
    *   getSaveUrl: required function(config) returning url for bulk save. POST is used for create
    *       and PUT for edits
-   *   getSaveProgressUrl: required function(operationId) returning url for checking save progress
+   *   getSaveProgressUrl: required function(operationId, config) returning url for checking save
+   *       progress
    *   getUserManualUrl: optional (recommended) function() returning url of specific user manual
    *       page to set on 'Help' link
    *   description: optional string; help text to include in the page Quick Help
@@ -3070,11 +3071,15 @@ BulkUtils = (function ($) {
         return;
       }
 
-      $.when(onValid()).then(function (reactivate) {
-        if (reactivate) {
+      $.when(onValid())
+        .then(function (reactivate) {
+          if (reactivate) {
+            showLoading(false, true);
+          }
+        })
+        .fail(function () {
           showLoading(false, true);
-        }
-      });
+        });
     });
   }
 
@@ -3179,7 +3184,7 @@ BulkUtils = (function ($) {
                 $.ajax({
                   dataType: "json",
                   type: "GET",
-                  url: target.getSaveProgressUrl(update.operationId),
+                  url: target.getSaveProgressUrl(update.operationId, config),
                   contentType: "application/json; charset=utf8",
                 })
                   .done(function (progressData) {

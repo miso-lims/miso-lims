@@ -112,6 +112,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 slugs.add("deliverable/list");
                 slugs.add("deliverablecategory/list");
                 slugs.add("contactrole/list");
+                slugs.add("probeset/list");
 
                 slugs.add("studies");
                 slugs.add("experiments");
@@ -183,6 +184,8 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 slugs.add("submission/new?experimentIds=1");
                 slugs.add("submission/1");
                 slugs.add("user/3");
+                slugs.add("probeset/new");
+                slugs.add("probeset/1");
 
                 // Bulk pages
                 slugs.add("assaytest/bulk/new?quantity=3");
