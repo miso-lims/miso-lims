@@ -21,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.dto.WorksetDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.WorksetRestController.MoveItemsDto;
@@ -69,6 +70,7 @@ public class WorksetRestControllerST extends AbstractST {
         WorksetDto dto = makeCreateDto();
         Workset created = baseTestCreate(CONTROLLER_BASE, dto, entityClass, 200);
         assertTrue(created.getAlias().startsWith("New Workset"));
+        assertTrue(created.getDescription().startsWith("Description for new workset"));
         assertEquals(1, created.getWorksetSamples().size());
         assertEquals(1L, created.getWorksetSamples().iterator().next().getItem().getId());
         assertEquals(0, created.getWorksetLibraries().size());
@@ -102,6 +104,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         Workset workset = currentSession().get(Workset.class, 2L);
         assertEquals(2, workset.getWorksetSamples().size());
+        assertTrue(workset.getWorksetSamples().stream().anyMatch(ws -> ws.getItem().getId() == 100001L));
     }
 
     @Test
@@ -116,6 +119,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         Workset workset = currentSession().get(Workset.class, 2L);
         assertEquals(1, workset.getWorksetLibraries().size());
+        assertTrue(workset.getWorksetLibraries().stream().anyMatch(ws -> ws.getItem().getId() ==100001L));
     }
 
     @Test
@@ -130,7 +134,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         Workset workset = currentSession().get(Workset.class, 2L);
         assertEquals(1, workset.getWorksetLibraryAliquots().size());
-
+        assertTrue(workset.getWorksetLibraryAliquots().stream().anyMatch(ws -> ws.getItem().getId() == 120001L));
     }
 
     @Test
@@ -145,7 +149,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         Workset workset = currentSession().get(Workset.class, 2L);
         assertEquals(1, workset.getWorksetPools().size());
-
+        assertTrue(workset.getWorksetPools().stream().anyMatch(ws -> ws.getItem().getId() == 120001L));
     }
 
     @Test
@@ -161,6 +165,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         Workset workset = currentSession().get(Workset.class, 1L);
         assertEquals(2, workset.getWorksetSamples().size());
+        assertFalse(workset.getWorksetSamples().stream().anyMatch(ws -> ws.getItem().getId() == 100001L));
     }
 
     @Test
@@ -176,6 +181,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         Workset workset = currentSession().get(Workset.class, 1L);
         assertEquals(2, workset.getWorksetLibraries().size());
+        assertFalse(workset.getWorksetLibraries().stream().anyMatch(ws -> ws.getItem().getId() == 100001L));
 
     }
 
@@ -192,7 +198,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         Workset workset = currentSession().get(Workset.class, 1L);
         assertEquals(1, workset.getWorksetLibraryAliquots().size());
-
+        assertFalse(workset.getWorksetLibraryAliquots().stream().anyMatch(ws -> ws.getItem().getId() == 120001L));
     }
 
     @Test
@@ -208,7 +214,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         Workset workset = currentSession().get(Workset.class, 1L);
         assertEquals(1, workset.getWorksetPools().size());
-
+        assertFalse(workset.getWorksetPools().stream().anyMatch(ws -> ws.getItem().getId() == 120001L));
     }
 
     @Test
@@ -269,7 +275,6 @@ public class WorksetRestControllerST extends AbstractST {
 
         Set<Long> actualSampleIds = new HashSet<>();
         merged.getWorksetSamples().forEach(wsSample -> actualSampleIds.add(wsSample.getItem().getId()));
-
         assertEquals(expectedSampleIds, actualSampleIds);
     }
 
@@ -295,7 +300,8 @@ public class WorksetRestControllerST extends AbstractST {
 
         assertEquals(2, updatedSource.getWorksetSamples().size());
         assertEquals(2, updatedTarget.getWorksetSamples().size());
-
+        assertFalse(updatedSource.getWorksetSamples().stream().anyMatch(ws -> ws.getItem().getId() == 100001L));
+        assertTrue(updatedTarget.getWorksetSamples().stream().anyMatch(ws -> ws.getItem().getId() == 100001L));
     }
 
     @Test
@@ -320,7 +326,8 @@ public class WorksetRestControllerST extends AbstractST {
 
         assertEquals(2, updatedSource.getWorksetLibraries().size());
         assertEquals(1, updatedTarget.getWorksetLibraries().size());
-
+        assertFalse(updatedSource.getWorksetLibraries().stream().anyMatch(ws -> ws.getItem().getId() == 100001L));
+        assertTrue(updatedTarget.getWorksetLibraries().stream().anyMatch(ws -> ws.getItem().getId() == 100001L));
     }
 
     @Test
@@ -345,7 +352,8 @@ public class WorksetRestControllerST extends AbstractST {
 
         assertEquals(1, updatedSource.getWorksetLibraryAliquots().size());
         assertEquals(1, updatedTarget.getWorksetLibraryAliquots().size());
-
+        assertFalse(updatedSource.getWorksetLibraryAliquots().stream().anyMatch(ws -> ws.getItem().getId() == 120001L));
+        assertTrue(updatedTarget.getWorksetLibraryAliquots().stream().anyMatch(ws -> ws.getItem().getId() == 120001L));
     }
 
     @Test
@@ -356,9 +364,9 @@ public class WorksetRestControllerST extends AbstractST {
 
         MoveItemsDto dto = new MoveItemsDto();
         dto.setTargetWorksetId(target.getId());
-        dto.setItemIds(aliquotIds);
+        dto.setItemIds(poolIds);
 
-        getMockMvc().perform(post(CONTROLLER_BASE + "/" + source.getId() + "/libraryaliquots/move")
+        getMockMvc().perform(post(CONTROLLER_BASE + "/" + source.getId() + "/pools/move")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(makeJson(dto)))
                 .andExpect(status().isNoContent());
@@ -370,7 +378,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         assertEquals(1, updatedSource.getWorksetPools().size());
         assertEquals(1, updatedTarget.getWorksetPools().size());
-
+        assertFalse(updatedSource.getWorksetPools().stream().anyMatch(ws -> ws.getItem().getId() == 120001L));
+        assertTrue(updatedTarget.getWorksetPools().stream().anyMatch(ws -> ws.getItem().getId() == 120001L));
     }
-
 }
