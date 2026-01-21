@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -54,22 +55,22 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
       SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.TIMEPOINT);
 
   // columns specific to creating Slides
-  private static final Set<String> slideColumns =
-      Sets.newHashSet(SamColumns.SOP, SamColumns.SLIDES, SamColumns.THICKNESS, SamColumns.STAIN,
-          SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS, SamColumns.MARKED_AREA,
-          SamColumns.MARKED_AREA_PERCENT_TUMOUR,
-          SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
+  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.SLIDES,
+      SamColumns.THICKNESS, SamColumns.STAIN, SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS,
+      SamColumns.MARKED_AREA, SamColumns.MARKED_AREA_PERCENT_TUMOUR, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
+      SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
   // columns specific to creating curls
   private static final Set<String> tissuePieceColumns =
-      Sets.newHashSet(SamColumns.SOP, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED,
-          SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
+      Sets.newHashSet(SamColumns.SOP, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED, SamColumns.VOLUME,
+          SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
   // columns specific to creating single cells (tissue processing)
+  private static final Set<String> singleCellDirectOnlyColumns = Collections.singleton(SamColumns.PROBES);
   private static final Set<String> singleCellColumns =
       Sets.newHashSet(SamColumns.SOP, SamColumns.INITIAL_CELL_CONC, SamColumns.TARGET_CELL_RECOVERY,
-          SamColumns.LOADING_CELL_CONC, SamColumns.DIGESTION,
-          SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
+          SamColumns.LOADING_CELL_CONC, SamColumns.DIGESTION, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
+          SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
   // columns specific to creating stocks
   private static final Set<String> stockColumns =
@@ -356,6 +357,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(tissueColumns);
     expectedHeadings.addAll(slideColumns);
     expectedHeadings.addAll(tissuePieceColumns);
+    expectedHeadings.addAll(singleCellDirectOnlyColumns);
     expectedHeadings.addAll(singleCellColumns);
 
     BulkSamplePage page = getCreatePage(1, null, SampleTissueProcessing.CATEGORY_NAME);

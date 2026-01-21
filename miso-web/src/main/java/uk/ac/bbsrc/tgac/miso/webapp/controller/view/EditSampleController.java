@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.getEffectiveRequisition;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils.*;
 
 import java.io.IOException;
@@ -28,6 +28,7 @@ import com.eaglegenomics.simlims.core.Group;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import jakarta.ws.rs.BadRequestException;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -35,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
@@ -63,6 +65,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DetailedSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.NoteDto;
+import uk.ac.bbsrc.tgac.miso.dto.ProbeDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.SampleIdentityDto;
@@ -72,10 +75,13 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 
 @Controller
@@ -166,8 +172,13 @@ public class EditSampleController {
     model.put("previousSample", sampleService.getPreviousInProject(sample));
     model.put("nextSample", sampleService.getNextInProject(sample));
 
-    model.put("sampleCategory",
-        LimsUtils.isDetailedSample(sample) ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");
+    if (LimsUtils.isDetailedSample(sample)) {
+      DetailedSample detailed = (DetailedSample) sample;
+      model.put("sampleCategory", detailed.getSampleClass().getSampleCategory());
+      model.put("sampleSubcategory", detailed.getSampleClass().getSampleSubcategory());
+    } else {
+      model.put("sampleCategory", "plain");
+    }
     List<LibraryDto> libraries = sample.isSaved()
         ? libraryService.listBySampleId(sample.getId()).stream().map(lib -> Dtos.asDto(lib, false))
             .collect(Collectors.toList())
@@ -541,6 +552,42 @@ public class EditSampleController {
   @GetMapping("/{id}/qc-hierarchy")
   public ModelAndView getQcHierarchy(@PathVariable long id, ModelMap model) throws IOException {
     return MisoWebUtils.getQcHierarchy("Sample", id, qcNodeService::getForSample, model, mapper);
+  }
+
+  private static final class BulkEditProbesBackend extends BulkTableBackend<ProbeDto> {
+
+    private final Sample sample;
+
+    public BulkEditProbesBackend(Sample sample, ObjectMapper mapper) {
+      super("sampleprobe", ProbeDto.class, mapper);
+      this.sample = sample;
+    }
+
+    @Override
+    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      config.put("sampleId", sample.getId());
+    }
+
+    public ModelAndView edit(int additionalProbes, ModelMap model) throws IOException {
+      if (!isProcessingSingleCellSample(sample)) {
+        throw new BadRequestException("Sample %d is not a tissue processing sample".formatted(sample.getId()));
+      }
+      SampleSingleCell singleCell = (SampleSingleCell) sample;
+      List<ProbeDto> dtos = singleCell.getProbes() == null ? new ArrayList<>()
+          : singleCell.getProbes().stream().map(ProbeDto::from).collect(Collectors.toCollection(ArrayList::new));
+      for (int i = 0; i < additionalProbes; i++) {
+        dtos.add(new ProbeDto());
+      }
+      return prepare(model, PageMode.EDIT, "Edit Sample Probes", dtos);
+    }
+
+  }
+
+  @GetMapping("/{sampleId}/probes")
+  public ModelAndView getBulkEditProbesPage(@PathVariable long sampleId,
+      @RequestParam(required = false) Integer addProbes, ModelMap model) throws IOException {
+    Sample sample = RestUtils.retrieve("Sample", sampleId, sampleService);
+    return new BulkEditProbesBackend(sample, mapper).edit(addProbes, model);
   }
 
 }

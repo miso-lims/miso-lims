@@ -230,6 +230,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 slugs.add("deliverable/bulk/new?quantity=3");
                 slugs.add("deliverablecategory/bulk/new?quantity=3");
                 slugs.add("contactrole/bulk/new?quantity=3");
+                slugs.add("sample/15/probes?addProbes=2");
 
                 urlSlugs = Collections.unmodifiableSet(slugs);
 

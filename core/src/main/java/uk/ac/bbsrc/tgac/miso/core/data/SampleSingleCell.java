@@ -1,25 +1,32 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleProbe;
+
 import java.math.BigDecimal;
+import java.util.Set;
 
 public interface SampleSingleCell extends SampleTissueProcessing {
 
   public static final String SUBCATEGORY_NAME = "Single Cell";
 
-  public BigDecimal getInitialCellConcentration();
+  BigDecimal getInitialCellConcentration();
 
-  public void setInitialCellConcentration(BigDecimal initialCellConcentration);
+  void setInitialCellConcentration(BigDecimal initialCellConcentration);
 
-  public Integer getTargetCellRecovery();
+  Integer getTargetCellRecovery();
 
-  public void setTargetCellRecovery(Integer targetCellRecovery);
+  void setTargetCellRecovery(Integer targetCellRecovery);
 
-  public BigDecimal getLoadingCellConcentration();
+  BigDecimal getLoadingCellConcentration();
 
-  public void setLoadingCellConcentration(BigDecimal loadingCellConcentration);
+  void setLoadingCellConcentration(BigDecimal loadingCellConcentration);
 
-  public String getDigestion();
+  String getDigestion();
 
-  public void setDigestion(String digestion);
+  void setDigestion(String digestion);
+
+  Set<SampleProbe> getProbes();
+
+  void setProbes(Set<SampleProbe> probes);
 
 }
