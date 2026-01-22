@@ -63,7 +63,9 @@
     var form = FormUtils.createForm('sampleForm', 'save', sample, 'sample', ${formConfig});
     Sample.setForm(form);
     Sample.setListConfig(listConfig);
-    Sample.setProbes(sample.probes);
+    if (sample.probes) {
+      Sample.setProbes(sample.probes);
+    }
     Utils.ui.updateHelpLink(FormTarget.sample.getUserManualUrl());
   });
 </script>

@@ -5,7 +5,6 @@ import static uk.ac.bbsrc.tgac.miso.dto.Dtos.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Probe;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Probe.ProbeFeatureType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Probe.Read;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProbeSetProbe;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleProbe;
 
 public class ProbeDto {
@@ -104,12 +103,6 @@ public class ProbeDto {
 
   public void setTargetGeneName(String targetGeneName) {
     this.targetGeneName = targetGeneName;
-  }
-
-  public ProbeSetProbe toProbeSetProbe() {
-    ProbeSetProbe probe = new ProbeSetProbe();
-    toProbe(probe);
-    return probe;
   }
 
   public SampleProbe toSampleProbe() {

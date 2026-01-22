@@ -637,8 +637,8 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
 
 INSERT INTO SampleProbe(probeId, sampleId, identifier, name, readNumber, pattern, sequence, featureType) VALUES
 (1, 3, 'C0001', 'probe 1', 'R2', '5PNNNNNNNNNN(BC)', 'GCATTCTGTCACCTA', 'ANTIBODY_CAPTURE'),
-(1, 3, 'C0002', 'probe 2', 'R2', '5PNNNNNNNNNN(BC)', 'CTACGACGTAGAAGA', 'ANTIBODY_CAPTURE'),
-(1, 3, 'C0003', 'probe 3', 'R2', '5PNNNNNNNNNN(BC)', 'CTCAGATGGAGTATG', 'ANTIBODY_CAPTURE');
+(2, 3, 'C0002', 'probe 2', 'R2', '5PNNNNNNNNNN(BC)', 'CTACGACGTAGAAGA', 'ANTIBODY_CAPTURE'),
+(3, 3, 'C0003', 'probe 3', 'R2', '5PNNNNNNNNNN(BC)', 'CTCAGATGGAGTATG', 'ANTIBODY_CAPTURE');
 
 -- Tissue Pieces
 INSERT INTO Sample (sampleId, project_projectId, name, alias, description, identificationBarcode, sampleType, scientificNameId, volume, volumeUnits, concentration, concentrationUnits, creator, created, lastModifier, lastModified,

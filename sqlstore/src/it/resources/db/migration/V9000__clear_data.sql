@@ -67,8 +67,6 @@ DELETE FROM PoolOrder_LibraryAliquot;
 DELETE FROM PoolQC;
 DELETE FROM PoolQcControl;
 DELETE FROM Printer;
-DELETE FROM ProbeSet;
-DELETE FROM ProbeSetProbe;
 DELETE FROM Project;
 DELETE FROM ProjectChangeLog;
 DELETE FROM QcControl;
