@@ -549,7 +549,9 @@ INSERT INTO Assay_AssayTest(assayId, testId) VALUES
 
 INSERT INTO Requisition(requisitionId, alias, creator, created, lastModifier, lastModified) VALUES
 (1, 'Req One', 1, '2021-07-21 11:31:00', 1, '2021-07-21 11:31:00'),
-(2, 'Req Two', 3, '2021-07-21 11:31:00', 3, '2021-07-21 11:31:00'),
+(2, 'Req Two', 3, '2021-07-21 11:31:00', 3, '2021-07-21 11:31:00');
+
+INSERT INTO Requisition(requisitionId, alias, creator, created, lastModifier, lastModified) VALUES
 (2201, 'Req TestQc', 1, '2021-07-21 11:31:00', 1, '2021-07-21 11:31:00');
 
 INSERT INTO Requisition_Assay(requisitionId, assayId) VALUES
@@ -1239,7 +1241,7 @@ INSERT INTO QCType(qcTypeId, name, description, qcTarget, units, archived, preci
 (108, 'update volume qc', '', 'Pool', 'µL', FALSE, 2, 'VOLUME', TRUE),
 (109, 'update concentration qc', '', 'Pool', 'nM', FALSE, 2, 'CONCENTRATION', TRUE),
 (110, 'unused qc', '', 'Sample', 'things', FALSE, 2, 'NONE', FALSE),
-(111, 'test RequisitionQc', '', 'Requisition', 'test units', FALSE, 2, 'NONE', FALSE);
+(111, 'test edit qc', '', 'Requisition', 'test units', FALSE, 2, 'NONE', FALSE);
 
 INSERT INTO QcControl(controlId, qcTypeId, alias) VALUES
 (1, 110, 'standard control');

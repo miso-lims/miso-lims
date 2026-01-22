@@ -88,7 +88,7 @@ public class RequisitionRestControllerST extends AbstractST {
 
   @Test
   public void testDatatable() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1, 2));
+    testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1, 2, 2201));
   }
 
   private <T> void testMove(int id, String type, MoveItemsRequest request, Class<T> targetType,
