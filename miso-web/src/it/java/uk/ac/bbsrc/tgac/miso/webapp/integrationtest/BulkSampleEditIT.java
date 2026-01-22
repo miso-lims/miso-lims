@@ -19,28 +19,38 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils;
 
 public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
-  private static final Set<String> commonColumns = Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
-      SamColumns.SAMPLE_TYPE, SamColumns.PROJECT, SamColumns.SCIENTIFIC_NAME, SamColumns.SUBPROJECT, SamColumns.SAMPLE_CLASS,
-      SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.CREATION_DATE, SamColumns.QC_STATUS, SamColumns.QC_NOTE);
+  private static final Set<String> commonColumns =
+      Sets.newHashSet(SamColumns.NAME, SamColumns.ALIAS, SamColumns.DESCRIPTION,
+          SamColumns.SAMPLE_TYPE, SamColumns.PROJECT, SamColumns.SCIENTIFIC_NAME, SamColumns.SUBPROJECT,
+          SamColumns.SAMPLE_CLASS,
+          SamColumns.GROUP_ID, SamColumns.GROUP_DESCRIPTION, SamColumns.CREATION_DATE, SamColumns.QC_STATUS,
+          SamColumns.QC_NOTE);
 
-  private static final Set<String> boxableColumns = Sets.newHashSet(SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
-      SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.EFFECTIVE_GROUP_ID);
+  private static final Set<String> boxableColumns =
+      Sets.newHashSet(SamColumns.ID_BARCODE, SamColumns.BOX_SEARCH, SamColumns.BOX_ALIAS,
+          SamColumns.BOX_POSITION, SamColumns.DISCARDED, SamColumns.EFFECTIVE_GROUP_ID);
 
-  private static final Set<String> identityColumns = Sets.newHashSet(SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX, SamColumns.CONSENT);
+  private static final Set<String> identityColumns =
+      Sets.newHashSet(SamColumns.EXTERNAL_NAME, SamColumns.DONOR_SEX, SamColumns.CONSENT);
 
   private static final Set<String> nonIdentityColumns = Sets.newHashSet(SamColumns.PARENT_NAME, SamColumns.PARENT_ALIAS,
       SamColumns.PARENT_LOCATION, SamColumns.REQUISITION_ASSAY);
 
   private static final Set<String> tissueColumns = Sets.newHashSet(SamColumns.TISSUE_ORIGIN, SamColumns.TISSUE_TYPE,
-      SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER, SamColumns.LAB, SamColumns.SECONDARY_ID,
+      SamColumns.PASSAGE_NUMBER, SamColumns.TIMES_RECEIVED, SamColumns.TUBE_NUMBER, SamColumns.LAB,
+      SamColumns.SECONDARY_ID,
       SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.TIMEPOINT);
 
-  private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.INITIAL_SLIDES, SamColumns.SLIDES,
-      SamColumns.THICKNESS, SamColumns.STAIN, SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS, SamColumns.MARKED_AREA,
-      SamColumns.MARKED_AREA_PERCENT_TUMOUR, SamColumns.INITIAL_VOLUME, SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
+  private static final Set<String> slideColumns =
+      Sets.newHashSet(SamColumns.SOP, SamColumns.PROBES, SamColumns.INITIAL_SLIDES, SamColumns.SLIDES,
+          SamColumns.THICKNESS, SamColumns.STAIN, SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS,
+          SamColumns.MARKED_AREA, SamColumns.MARKED_AREA_PERCENT_TUMOUR, SamColumns.INITIAL_VOLUME, SamColumns.VOLUME,
+          SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
-  private static final Set<String> tissuePieceColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED,
-      SamColumns.REFERENCE_SLIDE, SamColumns.INITIAL_VOLUME, SamColumns.VOLUME, SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
+  private static final Set<String> tissuePieceColumns =
+      Sets.newHashSet(SamColumns.SOP, SamColumns.PROBES, SamColumns.PIECE_TYPE, SamColumns.SLIDES_CONSUMED,
+          SamColumns.REFERENCE_SLIDE, SamColumns.INITIAL_VOLUME, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
+          SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
   private BulkSamplePage getEditPage(List<Long> ids) {
     return BulkSamplePage.getForEdit(getDriver(), getBaseUrl(), ids);
@@ -152,11 +162,11 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
 
   @Test
   public void testEditTissueFields() throws Exception {
-   // Goal: ensure all editable fields can be changed, and all readOnly fields can not.
+    // Goal: ensure all editable fields can be changed, and all readOnly fields can not.
     BulkSamplePage page = getEditPage(Arrays.asList(getSampleId("Tissue")));
-   HandsOnTable table = page.getTable();
+    HandsOnTable table = page.getTable();
 
-   Map<String, String> editable = new HashMap<>();
+    Map<String, String> editable = new HashMap<>();
     editable.put(SamColumns.ALIAS, "TEST_0002_Pa_M_13_2-5");
     editable.put(SamColumns.DESCRIPTION, "changed");
     editable.put(SamColumns.ID_BARCODE, "changed"); // increment
@@ -183,12 +193,12 @@ public class BulkSampleEditIT extends AbstractBulkSampleIT {
     editable.forEach((k, v) -> table.enterText(k, 0, v));
     // assert that the changes have been made
     editable.forEach((k, v) -> assertEquals(v, table.getText(k, 0)));
-   
+
     // ensure dependent columns update properly
     assertEquals("changed", table.getText(SamColumns.EFFECTIVE_GROUP_ID, 0));
     // no tissue-specific dependent columns at this time
   }
-  
+
   @Test
   public void testEditSaveEmptySaveTissue() throws Exception {
     // Goal: ensure all tissue fields can be changed and that these changes will be persisted.
