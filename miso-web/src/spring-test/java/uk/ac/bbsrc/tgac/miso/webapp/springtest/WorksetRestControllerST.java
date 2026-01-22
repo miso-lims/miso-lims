@@ -232,9 +232,7 @@ public class WorksetRestControllerST extends AbstractST {
     @Test
     @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
     public void testFailBulkDelete() throws Exception {
-        getMockMvc().perform(delete(CONTROLLER_BASE)
-                .param("ids","2"))
-                .andExpect(status().isMethodNotAllowed());
+        testDeleteUnauthorized(entityClass, 2, CONTROLLER_BASE);
     }
 
     @Test
