@@ -79,6 +79,17 @@ public class QcRestControllerST extends AbstractST {
     return Arrays.asList(dto);
   }
 
+    private List<QcDto> makeRequisitionCreateDtos() {
+        QcDto dto = new QcDto();
+        dto.setEntityId(1L);
+        dto.setDate("2021-07-13");
+        dto.setQcTypeId(111L);
+        dto.setResults("1.2");
+        dto.setQcTarget("Requisition");
+
+        return Arrays.asList(dto);
+    }
+
   @Test
   public void testSampleBulkCreateAsync() throws Exception {
       List<SampleQC> qcs = baseTestBulkCreateAsync(CONTROLLER_BASE, sampleEntityClass, makeSampleCreateDtos());
@@ -117,41 +128,70 @@ public class QcRestControllerST extends AbstractST {
     }
 
     @Test
-    public void testBulkUpdateAsync() throws Exception {
+    public void testReuisitionBulkCreateAsync() throws Exception {
+        List<RequisitionQC> requisitionQcs = baseTestBulkCreateAsync(CONTROLLER_BASE, requisitionEntityClass, makeRequisitionCreateDtos());
+        assertEquals(1L, requisitionQcs.get(0).getEntity().getId());
+        assertEquals("2021-07-13", requisitionQcs.get(0).getDate().toString());
+        assertEquals(111L, requisitionQcs.get(0).getType().getId());
+        assertEquals(1.2, requisitionQcs.get(0).getResults().doubleValue(), 0.0);
+        assertEquals(QcTarget.Requisition, requisitionQcs.get(0).getType().getQcTarget());
+    }
+
+    @Test
+    public void testBulkSampleUpdateAsync() throws Exception {
         QcDto dto1 = Dtos.asDto(currentSession().get(sampleEntityClass, 1));
         QcDto dto2 = Dtos.asDto(currentSession().get(sampleEntityClass, 2));
-        QcDto dto3 = Dtos.asDto(currentSession().get(libraryEntityClass, 3));
-        QcDto dto4 = Dtos.asDto(currentSession().get(poolEntityClass, 4));
 
         dto1.setDescription("updated one");
         dto1.setQcTarget("Sample");
         dto2.setDescription("updated two");
         dto2.setQcTarget("Sample");
-        dto3.setDescription("updated one library");
-        dto3.setQcTarget("Library");
-        dto4.setDescription("updated one pool");
-        dto4.setQcTarget("Pool");
-
 
         List<SampleQC> qcs = baseTestBulkUpdateAsync(CONTROLLER_BASE, sampleEntityClass, Arrays.asList(dto1, dto2),
-            QcDto::getId);
+                QcDto::getId);
         assertEquals(dto1.getDescription(), qcs.get(0).getDescription());
         assertEquals(dto2.getDescription(), qcs.get(1).getDescription());
+    }
 
-        List<LibraryQC> libraryQcs = baseTestBulkUpdateAsync(CONTROLLER_BASE, libraryEntityClass, Arrays.asList(dto3),
+    @Test
+    public void testBulkLibraryUpdateAsync() throws Exception {
+        QcDto dto = Dtos.asDto(currentSession().get(libraryEntityClass, 1));
+
+        dto.setDescription("updated one library");
+        dto.setQcTarget("Library");
+
+        List<LibraryQC> libraryQcs = baseTestBulkUpdateAsync(CONTROLLER_BASE, libraryEntityClass, Arrays.asList(dto),
                 QcDto::getId);
-        assertEquals(dto3.getDescription(), libraryQcs.get(0).getDescription());
+        assertEquals(dto.getDescription(), libraryQcs.get(0).getDescription());
+    }
 
-        List<PoolQC> poolQcs = baseTestBulkUpdateAsync(CONTROLLER_BASE, poolEntityClass, Arrays.asList(dto4),
+    @Test
+    public void testBulkPoolUpdateAsync() throws Exception {
+        QcDto dto = Dtos.asDto(currentSession().get(poolEntityClass, 1));
+
+        dto.setDescription("updated one pool");
+        dto.setQcTarget("Pool");
+
+        List<PoolQC> poolQcs = baseTestBulkUpdateAsync(CONTROLLER_BASE, poolEntityClass, Arrays.asList(dto),
                 QcDto::getId);
-        assertEquals(dto4.getDescription(), poolQcs.get(0).getDescription());
+        assertEquals(dto.getDescription(), poolQcs.get(0).getDescription());
+    }
 
+    @Test
+    public void testBulkRequisitionUpdateAsync() throws Exception {
+        QcDto dto = Dtos.asDto(currentSession().get(requisitionEntityClass, 1));
+
+        dto.setDescription("updated one requisition");
+        dto.setQcTarget("Requisition");
+
+        List<RequisitionQC> requisitionQcs = baseTestBulkUpdateAsync(CONTROLLER_BASE, requisitionEntityClass, Arrays.asList(dto),
+                QcDto::getId);
+        assertEquals(dto.getDescription(), requisitionQcs.get(0).getDescription());
     }
 
     @Test
     @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
     public void testSampleDelete() throws Exception {
-        // only admin or owner can delete
         assertNotNull(currentSession().get(sampleEntityClass, 1));
 
         getMockMvc()
@@ -164,35 +204,42 @@ public class QcRestControllerST extends AbstractST {
     @Test
     @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
     public void testLibraryDelete() throws Exception {
-        // only admin or owner can delete
-        assertNotNull(currentSession().get(libraryEntityClass, 3));
+        assertNotNull(currentSession().get(libraryEntityClass, 1));
 
         getMockMvc()
-                .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Library").content(makeJson(Arrays.asList(3L)))
+                .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Library").content(makeJson(Arrays.asList(1L)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-        assertNull(currentSession().get(libraryEntityClass, 3));
+        assertNull(currentSession().get(libraryEntityClass, 1));
     }
 
     @Test
     @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
     public void testPoolDelete() throws Exception {
-        // only admin or owner can delete
-        assertNotNull(currentSession().get(poolEntityClass, 4));
+        assertNotNull(currentSession().get(poolEntityClass, 1));
 
 
         getMockMvc()
-                .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Pool").content(makeJson(Arrays.asList(4L)))
+                .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Pool").content(makeJson(Arrays.asList(1L)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-        assertNull(currentSession().get(poolEntityClass, 4));
+        assertNull(currentSession().get(poolEntityClass, 1));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
+    public void testRequisitionDelete() throws Exception {
+        assertNotNull(currentSession().get(requisitionEntityClass, 1));
+        getMockMvc()
+                .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Requisition").content(makeJson(Arrays.asList(1L)))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+        assertNull(currentSession().get(requisitionEntityClass, 1));
     }
 
 
     @Test
     public void testSampleDeleteFail() throws Exception {
-        // only admin or owner can delete
-
         assertNotNull(currentSession().get(sampleEntityClass, 1));
 
         getMockMvc()
@@ -203,72 +250,31 @@ public class QcRestControllerST extends AbstractST {
 
     @Test
     public void testLibraryDeleteFail() throws Exception {
-        // only admin or owner can delete
-        assertNotNull(currentSession().get(libraryEntityClass, 3));
+        assertNotNull(currentSession().get(libraryEntityClass, 1));
 
         getMockMvc()
-                .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Library").content(makeJson(Arrays.asList(3L)))
+                .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Library").content(makeJson(Arrays.asList(1L)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void testPoolDeleteFail() throws Exception {
-        // only admin or owner can delete
-        assertNotNull(currentSession().get(poolEntityClass, 4));
+        assertNotNull(currentSession().get(poolEntityClass, 1));
 
         getMockMvc()
-                .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Pool").content(makeJson(Arrays.asList(4L)))
+                .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Pool").content(makeJson(Arrays.asList(1L)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
 
-
-      @Test
-      public void testSampleCreate() throws Exception {
-        SampleQC newQc = baseTestCreate(CONTROLLER_BASE, makeSampleCreateDtos().get(0), sampleEntityClass, 201);
-        assertEquals(101L, newQc.getType().getId());
-      }
-
     @Test
-    public void testLibraryCreate() throws Exception {
-        LibraryQC newQc = baseTestCreate(CONTROLLER_BASE, makeLibraryCreateDtos().get(0), libraryEntityClass, 201);
-        assertEquals(104L, newQc.getType().getId());
-    }
+    public void testRequisitionDeleteFail() throws Exception {
+        assertNotNull(currentSession().get(requisitionEntityClass, 1));
 
-    @Test
-    public void testPoolCreate() throws Exception {
-        PoolQC newQc = baseTestCreate(CONTROLLER_BASE, makePoolCreateDtos().get(0), poolEntityClass, 201);
-        assertEquals(107L, newQc.getType().getId());
-    }
-
-    @Test
-    public void testSampleUpdate() throws Exception {
-      QcDto dto = Dtos.asDto(currentSession().get(sampleEntityClass, 1));
-
-      dto.setDescription("updated one");
-      dto.setQcTarget("Sample");
-      SampleQC updated = baseTestUpdate(CONTROLLER_BASE, dto, 1, sampleEntityClass);
-      assertEquals(dto.getDescription(), updated.getDescription());
-    }
-
-    @Test
-    public void testLibraryUpdate() throws Exception {
-        QcDto dto = Dtos.asDto(currentSession().get(libraryEntityClass, 3));
-
-        dto.setDescription("updated one");
-        dto.setQcTarget("Library");
-        LibraryQC updated = baseTestUpdate(CONTROLLER_BASE, dto, 3, libraryEntityClass);
-        assertEquals(dto.getDescription(), updated.getDescription());
-    }
-
-    @Test
-    public void testPoolUpdate() throws Exception {
-        QcDto dto = Dtos.asDto(currentSession().get(poolEntityClass, 4));
-
-        dto.setDescription("updated one");
-        dto.setQcTarget("Pool");
-        PoolQC updated = baseTestUpdate(CONTROLLER_BASE, dto, 4, poolEntityClass);
-        assertEquals(dto.getDescription(), updated.getDescription());
+        getMockMvc()
+                .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Requisition").content(makeJson(Arrays.asList(1L)))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
     }
 }

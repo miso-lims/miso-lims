@@ -549,7 +549,8 @@ INSERT INTO Assay_AssayTest(assayId, testId) VALUES
 
 INSERT INTO Requisition(requisitionId, alias, creator, created, lastModifier, lastModified) VALUES
 (1, 'Req One', 1, '2021-07-21 11:31:00', 1, '2021-07-21 11:31:00'),
-(2, 'Req Two', 3, '2021-07-21 11:31:00', 3, '2021-07-21 11:31:00');
+(2, 'Req Two', 3, '2021-07-21 11:31:00', 3, '2021-07-21 11:31:00'),
+(2201, 'Req TestQc', 1, '2021-07-21 11:31:00', 1, '2021-07-21 11:31:00');
 
 INSERT INTO Requisition_Assay(requisitionId, assayId) VALUES
 (1, 1),
@@ -1237,7 +1238,8 @@ INSERT INTO QCType(qcTypeId, name, description, qcTarget, units, archived, preci
 (107, 'test edit qc', '', 'Pool', 'test units', FALSE, 2, 'NONE', FALSE),
 (108, 'update volume qc', '', 'Pool', 'µL', FALSE, 2, 'VOLUME', TRUE),
 (109, 'update concentration qc', '', 'Pool', 'nM', FALSE, 2, 'CONCENTRATION', TRUE),
-(110, 'unused qc', '', 'Sample', 'things', FALSE, 2, 'NONE', FALSE);
+(110, 'unused qc', '', 'Sample', 'things', FALSE, 2, 'NONE', FALSE),
+(111, 'test RequisitionQc', '', 'Requisition', 'test units', FALSE, 2, 'NONE', FALSE);
 
 INSERT INTO QcControl(controlId, qcTypeId, alias) VALUES
 (1, 110, 'standard control');
@@ -1262,10 +1264,13 @@ INSERT INTO Workset(worksetId, alias, description, creator, created, lastModifie
 (2, 'Workset Two', 'Workset Two description', 3, '2018-08-03 13:12:00', 3, '2018-08-03 13:12:00');
 
 INSERT INTO LibraryQC(qcId, library_libraryId, creator, date, type, results, created, lastModified) VALUES
-(3, 2201, 1, '2018-07-10', 104, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
+(1, 2201, 1, '2018-07-10', 104, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
 
 INSERT INTO PoolQC(qcId, pool_poolId, creator, date, type, results, created, lastModified) VALUES
-(4, 2201, 1, '2018-07-10', 107, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
+(1, 2201, 1, '2018-07-10', 107, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
+
+INSERT INTO RequisitionQc(qcId, requisitionId, creator, date, type, results, created, lastModified) VALUES
+(1, 2201, 1, '2021-07-13', 111, 1.2, '2021-07-13 14:29:00', '2021-07-13 14:29:00');
 
 INSERT INTO Workset_Sample(worksetId, sampleId) VALUES
 (1, 100001),

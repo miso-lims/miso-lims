@@ -69,6 +69,7 @@ DELETE FROM LibraryDesignCode;
 DELETE FROM LibrarySpikeIn;
 DELETE FROM Metric;
 DELETE FROM Requisition;
+DELETE FROM RequisitionQc;
 DELETE FROM RequisitionChangeLog;
 DELETE FROM Requisition_Assay;
 DELETE FROM Requisition_SupplementalSample;

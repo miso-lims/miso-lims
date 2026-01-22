@@ -37,23 +37,6 @@ public class QcRestController extends AbstractRestController {
   @Autowired
   private AsyncOperationManager asyncOperationManager;
 
-  @PostMapping(headers = {"Content-type=application/json"})
-  @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
-  public QcDto create(@RequestBody QcDto qc) throws IOException {
-    QC result = qcService.create(Dtos.to(qc));
-    return Dtos.asDto(result);
-  }
-
-  @PutMapping(path = "/{id}")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public QcDto update(@PathVariable("id") Long id, @RequestBody QcDto qc) throws IOException {
-    QC updated = Dtos.to(qc);
-    updated.setId(id);
-    return Dtos.asDto(qcService.update(updated));
-  }
-
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<QcDto> dtos) throws IOException {
