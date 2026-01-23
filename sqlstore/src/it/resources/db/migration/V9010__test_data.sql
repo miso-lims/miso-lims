@@ -717,6 +717,25 @@ VALUES (1,2,1,'TEST_0001_Bn_P_PE_300_WG','LDI1::TEST_0001_Bn_P_PE_300_WG','2015-
 (14,2,14,'TEST_0007_Bn_R_PE_300_WG','LDI14::TEST_0007_Bn_R_PE_300_WG','2015-08-27',1,1,'LDI14',NULL,NULL, 'LibraryAliquot', NULL),
 (15,2,15,'TEST_0001_ALIQUOT_1_PE_300_WG','LDI15::TEST_0001_ALIQUOT_1_PE_300_WG','2018-02-15',1,1,'LDI15',NULL,NULL, 'LibraryAliquot', NULL);
 
+INSERT INTO LibraryAliquotQc(qcId, aliquotId, creator, date, type, results,created, lastModified,description, instrumentId, kitLot, kitDescriptorId) VALUES
+ (1,1,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL),
+ (2,2,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL),
+ (3,3,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL),
+ (4,4,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL),
+ (5,5,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL),
+ (6,6,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL),
+ (7,7,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL),
+ (8,8,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL),
+ (9,9,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL),
+ (10,10,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL),
+ (11,11,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL),
+ (12,12,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL),
+ (13,13,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL),
+ (14,14,1,'2015-08-27',4,3,'2015-08-27','2015-08-27',NULL,NULL,NULL,NULL);
+
+INSERT INTO LibraryAliquotQcControl(qcControlId, qcId, controlId, lot, qcPassed) VALUES
+ (1, 14, 5, '20150827', TRUE);
+
 INSERT INTO `LibraryQC`(`qcId`, `library_libraryId`, `creator`, `date`, `type`, `results`, instrumentId) VALUES
  (1,1,1,'2015-08-27',4,3,NULL),
  (2,2,1,'2015-08-27',4,3,NULL),
@@ -1072,6 +1091,11 @@ INSERT INTO Workset_Library(worksetId, libraryId, addedTime) VALUES
 
 INSERT INTO Workset_LibraryAliquot(worksetId, aliquotId, addedTime) VALUES
 (2, 1, '2021-03-08 13:59:00');
+
+INSERT INTO Workset_Pool(worksetId, poolId, addedTime) VALUES
+(1, 1, '2025-12-04 11:30:00'),
+(1, 2, '2025-12-04 11:30:00'),
+(2, 1, '2025-12-04 11:30:00');
 
 INSERT INTO SequencingOrder(sequencingOrderId, poolId, partitions, parametersId, purposeId, sequencingContainerModelId, description, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (1, 1, 1, 1, 1, NULL, 'seq order 1', 1, '2019-09-23 10:30:00', 1, '2019-09-23 10:30:00'),

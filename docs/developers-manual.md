@@ -5,7 +5,7 @@ anything is missing, please[let us know](https://github.com/miso-lims/miso-lims/
 
 Before developing MISO, the best first step is to set up your development environment and get MISO
 running. You can do that by following the
-[Bare Metal Install Guide](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/baremetal-installation-guide/).
+[Bare Metal Install Guide](https://miso-lims.readthedocs.io/en/latest/admin/baremetal-installation-guide/).
 
 ## Module Overview
 
@@ -120,7 +120,7 @@ plugin that is already configured for MISO.
 
 3. You should already have a database and user from your initial MISO setup. If not, create them
 now. See the
-[Bare Metal Install Guide](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/baremetal-installation-guide/).
+[Bare Metal Install Guide](https://miso-lims.readthedocs.io/en/latest/admin/baremetal-installation-guide/).
 4. Configure the Maven Flyway plugin to access your database. This is done by creating the file:
 `miso-lims/sqlstore/flyway.properties`. Replace the port, username, password, and database name
 below if necessary. This file is gitignored, so you don't have to worry about your credentials
@@ -375,6 +375,26 @@ The annotations mentioned above for MVC controllers are all useful for REST cont
 useful annotation is `@RequestBody`, which can be added to a method parameter to use the value from
 the body of the request.
 
+### Mock Box Scanner
+
+The mock box scanner is a development and testing utility that simulates the behaviour of a physical
+box barcode scanner. It allows developers to exercise box scanning workflow in MISO without requiring access to 
+VisionMate or DP5 Mirage scanner hardware.
+
+#### Configuration
+
+The mock scanner is enabled using the standard box scanner configuration property: `miso.boxscanner.servers`. To enable the mock scanner, configure a scanner entry using `mock` type:
+
+Example: `Mock Scanner:mock:localhost:0`.
+
+#### Behaviour
+
+When configured, the mock scanner behaves like a real scanner from the application's perspective. It
+integrates with the existing scanning infrastructure.
+
+The mock scanner return deterministic, test-friendly scan results suitable for validating UI behaviour
+and scan result handling.
+
 ## Pinery-MISO
 
 This is MISO's implementation of [Pinery](https://github.com/oicr-gsi/pinery), a read-only REST API
@@ -402,7 +422,8 @@ database. The data access layer should have full test coverage.
 
 #### Test Data
 
-Any initial data is first cleared from the database using the script
+The following scripts are run automatically to reset the test data before each test. Any initial
+data is first cleared from the database using the script
 [V9000__clear_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/sqlstore/src/it/resources/db/migration/V9000__clear_data.sql),
 and then the test data is populated from
 [V9010__test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/sqlstore/src/it/resources/db/migration/V9010__test_data.sql).
@@ -419,7 +440,7 @@ data from the database without using a DAO. You can also create mocks for the DA
 dependencies using Mockito.
 
 If the class you're testing extends `HibernateSaveDao`, extending `AbstractHibernateSaveDaoTest`
-simplifies testing all the standard methods. The the class extends `PaginatedDataSource`, you should
+simplifies testing all the standard methods. If the class extends `PaginatedDataSource`, you should
 create a second test class that extends `PaginationFilterSinkIT` specifically for testing all
 possible search methods.
 
@@ -429,15 +450,28 @@ After building the full MISO project, the database integration tests can be run 
 
 ### UI Integration Testing
 
+#### Test Data
+
+The following scripts are run automatically to reset the test data before each test. First, existing
+data is cleared using [clear_test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/it/resources/db/migration/clear_test_data.sql).
+Data is then populated from [integration_test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/it/resources/db/migration/integration_test_data.sql).
+There are a set of tests specifically for plain sample mode ([PlainSampleITs.java](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/it/java/uk/ac/bbsrc/tgac/miso/webapp/integrationtest/PlainSampleITs.java)) that use [plainSample_integration_test_data.sql](https://github.com/miso-lims/miso-lims/blob/develop/miso-web/src/it/resources/db/migration/plainSample_integration_test_data.sql) instead.
+
+#### Tests
+
 UI integration tests should all extend `AbstractIT` for similar reasons as the DAO tests listed
 above. The UI tests run Selenium against a Tomcat instance using MySQL in Docker. After building the
 full MISO project, UI integration tests can be run using:
 
-    mvn clean verify -pl miso-web -DskipITs=false -DrunPlainITs
+    mvn clean verify -pl miso-web -DskipITs=false
 
 To run a specific IT test class, use:
 
     mvn clean verify -pl miso-web -DskipITs=false -Dit.test=NameOfITTestClass
+
+To run the plain sample mode tests, use:
+
+    mvn clean verify -pl miso-web -DrunPlainITs
 
 To spin up the test environment for manual testing, use:
 
@@ -449,7 +483,7 @@ finished starting up. As Tomcat is not running tests, it will have to be killed 
 the MySQL Docker container will have to be manually cleaned up.
 
 You can also populate the test data into the test environment using Docker:
-                  
+
     sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' \
     < ./src/it/resources/db/migration/clear_test_data.sql;
     sudo docker exec -i ${CONTAINER_ID} sh -c 'exec mysql -uroot -pabc123 -D lims' \
@@ -457,3 +491,67 @@ You can also populate the test data into the test environment using Docker:
 
 Make sure to refresh constants manually after doing this by logging in as admin, and clicking that
 option on the My Account page.
+
+### Spring Controller Testing
+
+#### Test Data
+
+The Spring controller tests use the same `clear_test_data.sql` and `integration_test_data.sql`
+files as the UI integration tests (see above) to automatically reset the test data before each test.
+
+#### Tests
+
+Spring controller tests should all extend `AbstractST`. The abstract class contains all the
+annotations needed to set up the test context/config/resources, as well as the mock user to run the
+tests. It also includes several template tests for common endpoints, for both the rest controllers
+and the model/view controllers. The javadocs in `AbstractST.java` have more specific information on
+these.
+
+#### Running the Tests
+
+After building the full MISO project, the Spring controller tests can be run with:
+
+```
+mvn clean verify -pl miso-web -DskipSTs=false
+```
+
+To run a specific test, add `-Dit.test=<test_name>`. You can run multiple by delimiting the names
+with commas (e.g. `-Dit.test=test1,test2...`).
+
+The tests use the Docker Maven Plugin to run a MySQL container and create a new database each time
+you run them, which is time consuming. If you are working on a lot of tests or going to be running
+them a lot, you can save significant time by setting up a local database to use instead. You'll
+need to run Flyway migrate on your database before running the tests. Here's an example of how you
+can do that using Docker:
+
+```
+# Create Docker container
+docker run --name=<test-db-name> -e MYSQL_ROOT_PASSWORD=<root_password> -e MYSQL_USER=<username> -e MYSQL_PASSWORD=<password> -e MYSQL_DATABASE=<test_db_name> -p <port>:3306 -d mysql:8.0
+
+# Run Flyway migrate
+mvn flyway:migrate -pl sqlstore -Dflyway.url=jdbc:mysql://localhost:<port>/<test_db_name> -Dflyway.driver=com.mysql.cj.jdbc.Driver -Dflyway.user=root -Dflyway.password=<root_password>
+
+# Run the tests
+mvn test-compile failsafe:integration-test -pl miso-web -Dmiso.it.mysql.url=jdbc:mysql://localhost:<port>/<test_db_name> -Dmiso.it.mysql.user=<user> -Dmiso.it.mysql.pw=<password> -DskipSTs=false
+```
+
+#### Debugging
+
+To debug your controller test, set `-Dst.debug=true` on the command line. This will enable printing
+of the response JSON for all template tests used. To look at this printed response, navigate to
+`{miso_base_directory}/miso-web/target/failsafe-reports`, then open `*.SomeControllerST-output.txt`
+to view the printed response from the request.
+
+#### Code Coverage Plugin
+
+The Spring controller tests use the Jacoco plugin to test endpoint coverage. This plugin is
+disabled by default. To run the code coverage plugin, run
+
+```
+mvn clean verify -pl miso-web -DskipSTs=false -Djacoco.skip=false
+```
+
+The default target output directory for the coverage report is `/miso-web/target/site/`. To view
+the report, open the `index.html` file in the `site` folder in a browser. For VSCode, the "live
+server" plugin is quite useful for this, allowing you to right click and open the `index.html` with
+the live server plugin.

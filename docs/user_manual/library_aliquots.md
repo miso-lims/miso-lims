@@ -91,7 +91,11 @@ make the changes you would like, then click the "Save" button at the top right t
 with the data you've entered, the error messages will be displayed at the top of the screen and you can adjust as
 necessary before clicking "Save" again.
 
+## Attaching Files
 
+You can attach any type and number of files to a library aliquot in MISO. This feature might be used to attach QC output or a
+spreadsheet of library aliquot data provided by a collaborator. For more information, see the
+[Attachments section](../attachments/).
 
 ## Pooling Library Aliquots Together
 
@@ -153,7 +157,10 @@ You can find items related to selected library aliquots using the "Parents" and 
 the top of the Library Aliquots list. For more information on this feature, see the
 [General Navigation section - Finding Related Items](../general_navigation/#finding-related-items).
 
+## Library Aliquot QCs
 
+Any number of quality control measures may be recorded for a library aliquot. For more information on this feature, see the
+[QCs section](../qcs/).
 
 ## Adding Library Aliquots to a Workset
 

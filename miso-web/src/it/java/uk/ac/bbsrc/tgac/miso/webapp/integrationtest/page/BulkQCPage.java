@@ -18,6 +18,7 @@ public class BulkQCPage extends BulkPage {
     public static final String SAMPLE_ALIAS = "Sample Alias";
     public static final String LIBRARY_ALIAS = "Library Alias";
     public static final String POOL_ALIAS = "Pool Alias";
+    public static final String LIBRARY_ALIQUOT_ALIAS = "LibraryAliquot Alias";
     public static final String DATE = "Date";
     public static final String TYPE = "Type";
     public static final String INSTRUMENT = "Instrument";
@@ -38,7 +39,8 @@ public class BulkQCPage extends BulkPage {
     super(driver);
     waitWithTimeout().until(
         or(titleContains("Add Sample QCs "), titleContains("Edit Sample QCs "), titleContains("Add Library QCs "),
-            titleContains("Edit Library QCs "), titleContains("Add Pool QCs "), titleContains("Edit Pool QCs ")));
+            titleContains("Edit Library QCs "), titleContains("Add Pool QCs "), titleContains("Edit Pool QCs "),
+                titleContains("Add LibraryAliquot QCs"), titleContains("Edit LibraryAliquot QCs")));
     refreshElements();
   }
 
@@ -107,6 +109,25 @@ public class BulkQCPage extends BulkPage {
         .build();
     postData(driver, baseUrl + "qc/bulk/addFrom/Pool", params);
     return new BulkQCPage(driver);
+  }
+  public static BulkQCPage getForEditLibraryAliquot(WebDriver driver, String baseUrl, Collection<Long> aliquotIds, int addControls) {
+        Map<String, String> params = new MapBuilder<String, String>()
+                .put("entityIds", Joiner.on(',').join(aliquotIds))
+                .put("addControls", Integer.toString(addControls))
+                .build();
+        postData(driver, baseUrl + "qc/bulk/editFrom/LibraryAliquot", params);
+        return new BulkQCPage(driver);
+  }
+
+  public static BulkQCPage getForAddLibraryAliquot(WebDriver driver, String baseUrl, Collection<Long> aliquotIds, int copies,
+                                           int controls) {
+        Map<String, String> params = new MapBuilder<String, String>()
+                .put("entityIds", Joiner.on(',').join(aliquotIds))
+                .put("copies", Integer.toString(copies))
+                .put("controls", Integer.toString(controls))
+                .build();
+        postData(driver, baseUrl + "qc/bulk/addFrom/LibraryAliquot", params);
+        return new BulkQCPage(driver);
   }
 
   @Override

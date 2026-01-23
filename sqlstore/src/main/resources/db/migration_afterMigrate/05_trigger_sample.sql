@@ -11,7 +11,7 @@ FOR EACH ROW
     makeChangeMessage('description', OLD.description, NEW.description),
     makeChangeMessage('barcode', OLD.identificationBarcode, NEW.identificationBarcode),
     makeChangeMessage('location', OLD.locationBarcode, NEW.locationBarcode),
-    makeChangeMessage('project', (SELECT name FROM Project WHERE projectId = OLD.project_projectId), (SELECT name FROM Project WHERE projectId = NEW.project_projectId)),
+    makeChangeMessage('project', (SELECT COALESCE(code, name) FROM Project WHERE projectId = OLD.project_projectId), (SELECT COALESCE(code, name) FROM Project WHERE projectId = NEW.project_projectId)),
     makeChangeMessage('type', OLD.sampleType, NEW.sampleType),
     makeChangeMessage('scientific name', (SELECT alias FROM ScientificName WHERE scientificNameId = OLD.scientificNameId), (SELECT alias FROM ScientificName WHERE scientificNameId = NEW.scientificNameId)),
     makeChangeMessage('taxon', OLD.taxonIdentifier, NEW.taxonIdentifier),

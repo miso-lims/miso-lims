@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
+import jakarta.persistence.criteria.JoinType;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,8 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.metamodel.SingularAttribute;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
@@ -24,6 +27,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferViewPool_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetPool;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetPool_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset_;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.ListPoolViewDao;
@@ -166,6 +173,22 @@ public class HibernateListPoolViewDao
   public void restrictPaginationByBarcode(QueryBuilder<?, ListPoolView> builder, String barcode,
       Consumer<String> errorHandler) {
     builder.addTextRestriction(builder.getRoot().get(ListPoolView_.identificationBarcode), barcode);
+  }
+
+  @Override
+  public void restrictPaginationByWorksetId(QueryBuilder<?, ListPoolView> builder, long worksetId,
+                                            Consumer<String> errorHandler) {
+      QueryBuilder<Long, Workset> idBuilder = new QueryBuilder<>(currentSession(), Workset.class, Long.class);
+      Join<Workset, WorksetPool> worksetPool =
+              idBuilder.getJoin(idBuilder.getRoot(), Workset_.worksetPools, JoinType.INNER);
+
+      Join<WorksetPool, PoolImpl> pool = idBuilder.getJoin(worksetPool, WorksetPool_.item, JoinType.INNER);
+
+      idBuilder.addPredicate(idBuilder.getCriteriaBuilder().equal(idBuilder.getRoot().get(Workset_.id), worksetId));
+      idBuilder.setColumn(pool.get(PoolImpl_.poolId));
+
+      List<Long> ids = idBuilder.getResultList();
+      builder.addInPredicate(builder.getRoot().get(ListPoolView_.poolId), ids);
   }
 
 }

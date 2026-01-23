@@ -65,6 +65,7 @@
   <miso:list-section-ajax id="list_samples" name="Samples" target="sample" config="{worksetId: ${worksetId}}"/>
   <miso:list-section-ajax id="list_libraries" name="Libraries" target="library" config="{worksetId: ${worksetId}}"/>
   <miso:list-section-ajax id="list_libraryAliquots" name="Library Aliquots" target="libraryaliquot" config="{worksetId: ${worksetId}}"/>
+  <miso:list-section-ajax id="list_pool" name="Pools" target="pool" config="{worksetId: ${worksetId}}"/>
   <miso:changelog item="${workset}"/>
 </c:if>
 

@@ -5,7 +5,7 @@
 ![Other UI Tests](https://github.com/miso-lims/miso-lims/actions/workflows/miso_web_other_it.yml/badge.svg)
 ![Pinery-MISO Integration Tests](https://github.com/miso-lims/miso-lims/actions/workflows/pinery_miso_it.yml/badge.svg)
 [![DOI](https://zenodo.org/badge/4726428.svg)](https://zenodo.org/badge/latestdoi/4726428)
-[![Documentation Status](https://readthedocs.org/projects/miso-lims-docs/badge/?version=latest)](https://miso-lims.readthedocs.io/projects/docs/en/latest/?badge=latest)
+[![Documentation Status](https://app.readthedocs.org/projects/miso-lims/badge/?version=latest)](https://miso-lims.readthedocs.io)
 
 
 # MISO: An open source LIMS for small-to-large scale sequencing centres
@@ -98,7 +98,7 @@ networks and release their resources to the host operating system.
 
 These compose files are intended as a demonstration and __not a permanent installation__.
 
-Please see the [Docker Compose Guide](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/compose-installation-guide/) for more information on configuring the containers and the compose files.
+Please see the [Docker Compose Guide](https://miso-lims.readthedocs.io/en/latest/admin/compose-installation-guide/) for more information on configuring the containers and the compose files.
 
 
 ## User Tutorial
@@ -117,5 +117,5 @@ lab's specific needs.
 To run your own MISO instance in the long term, download the
 [latest release](https://github.com/miso-lims/miso-lims/releases/latest).
 
-Installation and configuration details can be found in the [MISO building and deploying guide](https://miso-lims.readthedocs.io/projects/docs/en/latest/admin/installation-guide/).
+Installation and configuration details can be found in the [MISO building and deploying guide](https://miso-lims.readthedocs.io/en/latest/admin/installation-guide/).
 

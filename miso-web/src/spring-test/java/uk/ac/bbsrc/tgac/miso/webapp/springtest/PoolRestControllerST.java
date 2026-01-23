@@ -68,7 +68,7 @@ public class PoolRestControllerST extends AbstractST {
     getMockMvc().perform(get(CONTROLLER_BASE + "/1/runs"))
         .andExpect(jsonPath("$.*", hasSize(1)))
         .andExpect(jsonPath("$[0].id").value(1))
-        .andExpect(jsonPath("$[0].instrumentId").value(2))
+        .andExpect(jsonPath("$[0].instrumentId").value(1))
         .andExpect(jsonPath("$[0].name").value("RUN1"))
         .andExpect(jsonPath("$[0].type").value("Illumina"));
   }
@@ -202,6 +202,11 @@ public class PoolRestControllerST extends AbstractST {
   }
 
   @Test
+  public void testDatatableByWorkset() throws Exception {
+      testDtRequest(CONTROLLER_BASE + "/dt/workset/1", Arrays.asList(120001, 120002));
+  }
+
+  @Test
   public void testGetDatatablePoolsByProject() throws Exception {
     testDtRequest(CONTROLLER_BASE + "/dt/project/3", Arrays.asList(1));
 
@@ -256,8 +261,8 @@ public class PoolRestControllerST extends AbstractST {
     req.setSheet("QPCR_RESULTS");
 
     List<String> headers = Arrays.asList("Name", "Alias", "Barcode", "Latest qPCR QC");
-    List<List<String>> rows = Arrays.asList(Arrays.asList("IPO1", "POOL_1", "12341"),
-        Arrays.asList("IPO501", "TIB_Pool", "TIB_Pool"));
+    List<List<String>> rows = Arrays.asList(Arrays.asList("IPO1", "POOL_1", "12341",""),
+        Arrays.asList("IPO501", "TIB_Pool", "TIB_Pool",""));
     testSpreadsheetContents(CONTROLLER_BASE + "/spreadsheet", req, headers, rows);
 
   }
@@ -392,7 +397,7 @@ public class PoolRestControllerST extends AbstractST {
         .andExpect(jsonPath("$.*", hasSize(1)))
         .andExpect(jsonPath("$[0].id").value(1))
         .andExpect(jsonPath("$[0].name").value("RUN1"))
-        .andExpect(jsonPath("$[0].instrumentId").value(2));
+        .andExpect(jsonPath("$[0].instrumentId").value(1));
   }
 
   @Test

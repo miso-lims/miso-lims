@@ -13,12 +13,14 @@ import org.springframework.context.annotation.Configuration;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.integration.dp5mirage.DP5MirageScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
+import uk.ac.bbsrc.tgac.miso.integration.mock.MockBoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScanner;
 
 @Configuration
 public class BoxScannerConfigurer {
   private static final String VISIONMATE_SCANNER = "visionmate";
   private static final String DP5MIRAGE_SCANNER = "dp5mirage";
+  private static final String MOCK_SCANNER = "mock";
   protected static final Logger log = LoggerFactory.getLogger(BoxScannerConfigurer.class);
 
   @Value("${miso.boxscanner.servers:}")
@@ -27,6 +29,7 @@ public class BoxScannerConfigurer {
   @Bean
   public Map<String, BoxScanner> boxScanners() {
     Map<String, BoxScanner> scanners = new HashMap<>();
+
     if (LimsUtils.isStringBlankOrNull(configLine)) {
       return scanners;
     }
@@ -39,7 +42,7 @@ public class BoxScannerConfigurer {
       String[] configParts = configStrings[i].split(":");
       if (configParts.length != 4
           || !Pattern.compile("^ *[a-zA-Z0-9][a-zA-Z0-9 ]{0,100} *$").matcher(configParts[0]).matches()
-          || !(configParts[1].equals(VISIONMATE_SCANNER) || configParts[1].equals(DP5MIRAGE_SCANNER)
+          || !(configParts[1].equals(VISIONMATE_SCANNER) || configParts[1].equals(DP5MIRAGE_SCANNER) || configParts[1].equals(MOCK_SCANNER)
           || !Pattern.compile("^ *[a-zA-Z0-9\\.-]+ *$").matcher(configParts[2]).matches()
           || !Pattern.compile("^ *\\d{1,5} *$").matcher(configParts[3]).matches())) {
         throw new IllegalArgumentException("Invalid box scanner configuration: " + configStrings[i]);
@@ -63,6 +66,11 @@ public class BoxScannerConfigurer {
         DP5MirageScanner scanner;
         scanner = new DP5MirageScanner(host, port);
         scanners.put(name, scanner);
+      }
+      else if(type.equals(MOCK_SCANNER)) {
+          MockBoxScanner mockBoxScanner;
+          mockBoxScanner = new MockBoxScanner();
+          scanners.put(name,mockBoxScanner);
       }
     }
 

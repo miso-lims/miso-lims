@@ -189,7 +189,7 @@ public class LibraryRestController extends AbstractRestController {
 
   @GetMapping(value = "/dt/requisition/{id}", produces = {"application/json"})
   @ResponseBody
-  public DataTablesResponseDto<LibraryDto> getDTSamplesByRequisition(@PathVariable("id") long id,
+  public DataTablesResponseDto<LibraryDto> getDtLibrariesByRequisition(@PathVariable("id") long id,
       HttpServletRequest request)
       throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.requisitionId(id));
@@ -197,7 +197,7 @@ public class LibraryRestController extends AbstractRestController {
 
   @GetMapping(value = "/dt/requisition-supplemental/{id}", produces = {"application/json"})
   @ResponseBody
-  public DataTablesResponseDto<LibraryDto> getDTSamplesByRequisitionSupplemental(@PathVariable("id") long id,
+  public DataTablesResponseDto<LibraryDto> getDtLibrariesByRequisitionSupplemental(@PathVariable("id") long id,
       HttpServletRequest request)
       throws IOException {
     return jQueryBackend.get(request, advancedSearchParser, PaginationFilter.supplementalToRequisitionId(id));

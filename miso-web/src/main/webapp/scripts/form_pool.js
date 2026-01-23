@@ -88,6 +88,8 @@ FormTarget.pool = (function ($) {
               title: "Concentration",
               data: "concentration",
               type: "decimal",
+              precision: 16,
+              scale: 10,
             },
             FormUtils.makeUnitsField(object, "concentration"),
             {

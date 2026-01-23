@@ -91,6 +91,7 @@ BulkTarget.sample = (function ($) {
         {
           name: "Propagate",
           action: function (samples) {
+            samples = samples.sort(Utils.sorting.standardSort("alias"));
             Utils.warnIfConsentRevoked(samples, function () {
               var idsString = samples.map(Utils.array.getId).join(",");
               var classes = getSampleClasses(samples);
@@ -109,19 +110,21 @@ BulkTarget.sample = (function ($) {
               }
 
               // In the case of plain samples, this will be empty, which is fine.
-              var targets = getCommonChildCategories(classes).map(function (category) {
-                return {
-                  name: category,
-                  action: function (replicates, newBoxId) {
-                    Utils.page.post(Urls.ui.samples.bulkPropagate, {
-                      boxId: newBoxId,
-                      parentIds: idsString,
-                      replicates: replicates,
-                      targetCategory: category,
-                    });
-                  },
-                };
-              });
+              var targets = !Constants.isDetailedSample
+                ? []
+                : getCommonChildCategories(classes).map(function (category) {
+                    return {
+                      name: category,
+                      action: function (replicates, newBoxId) {
+                        Utils.page.post(Urls.ui.samples.bulkPropagate, {
+                          boxId: newBoxId,
+                          parentIds: idsString,
+                          replicates: replicates,
+                          targetCategory: category,
+                        });
+                      },
+                    };
+                  });
               if (!Constants.isDetailedSample || sourceCategories[0] === "Aliquot") {
                 targets.push({
                   name: "Library",
@@ -202,6 +205,7 @@ BulkTarget.sample = (function ($) {
                         label: samples[i].alias,
                         value: result.replicates,
                         required: true,
+                        series: "replicates",
                       });
                     }
                     Utils.showDialog(
@@ -1146,7 +1150,7 @@ BulkTarget.sample = (function ($) {
           include: show["Tissue Processing"],
           sampleSubcategory: ["Single Cell", "Single Cell (stock)", "Single Cell (aliquot)"],
           includeSaved: targetCategory === "Tissue Processing",
-          precision: 14,
+          precision: 16,
           scale: 10,
           description: "Initial concentration of cells in the sample at the time of receipt",
         },
@@ -1166,7 +1170,7 @@ BulkTarget.sample = (function ($) {
           include: targetCategory === "Tissue Processing",
           sampleSubcategory: ["Single Cell"],
           includeSaved: targetCategory === "Tissue Processing",
-          precision: 14,
+          precision: 16,
           scale: 10,
           description: "Concentration of cells prepared for loading into the instrument",
         },
@@ -1255,7 +1259,7 @@ BulkTarget.sample = (function ($) {
           include: show["Stock"],
           sampleSubcategory: ["Single Cell (stock)", "Single Cell (aliquot)"],
           includeSaved: targetCategory === "Stock",
-          precision: 14,
+          precision: 16,
           scale: 10,
         },
         referenceSlideColumn(

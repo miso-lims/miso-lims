@@ -414,6 +414,30 @@ var Utils = Utils || {
         default:
           throw new Error("Unknown field type: " + field.type);
       }
+      if (input.tagName === "INPUT" && input.type === "text" && field.series) {
+        input.classList.add(field.series + "InputSeries");
+        input.addEventListener("paste", function (event) {
+          var lines = event.clipboardData.getData("text").split("\n");
+          if (lines.length < 2) {
+            return;
+          }
+          event.preventDefault();
+          var lineNumber = 0;
+          var seriesInputs = document.querySelectorAll(
+            "#dialog input." + field.series + "InputSeries"
+          );
+          for (var i = 0; i < seriesInputs.length; i++) {
+            if (lineNumber >= lines.length) {
+              break;
+            }
+            if (seriesInputs[i] === event.target || lineNumber > 0) {
+              seriesInputs[i].value = lines[lineNumber++].trim();
+              seriesInputs[i].dispatchEvent(new Event("change"));
+              seriesInputs[i].focus();
+            }
+          }
+        });
+      }
       p.appendChild(input);
       dialogArea.appendChild(p);
     });

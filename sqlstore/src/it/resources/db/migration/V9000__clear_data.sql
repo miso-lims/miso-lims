@@ -38,6 +38,8 @@ DELETE FROM Kit_Note;
 DELETE FROM Lab;
 DELETE FROM Library;
 DELETE FROM LibraryAliquot;
+DELETE FROM LibraryAliquotQc;
+DELETE FROM LibraryAliquotQcControl;
 DELETE FROM LibraryAliquotChangeLog;
 DELETE FROM LibraryChangeLog;
 DELETE FROM LibraryDesign;
@@ -144,6 +146,7 @@ DELETE FROM WorksetChangeLog;
 DELETE FROM Workset_Library;
 DELETE FROM Workset_LibraryAliquot;
 DELETE FROM Workset_Sample;
+DELETE FROM Workset_Pool;
 DELETE FROM WorksetStage;
 DELETE FROM Workstation;
 

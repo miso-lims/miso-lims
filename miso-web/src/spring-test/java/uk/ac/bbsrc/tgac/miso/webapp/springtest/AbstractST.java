@@ -30,6 +30,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.util.LinkedMultiValueMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,6 +64,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import java.util.ArrayList;
+
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -134,6 +137,10 @@ public abstract class AbstractST {
     ow = mapper.writer().withDefaultPrettyPrinter();
   }
 
+  protected EntityManager getEntityManager() {
+    return entityManager;
+  }
+
   public Session currentSession() {
     return entityManager.unwrap(Session.class);
   }
@@ -151,6 +158,16 @@ public abstract class AbstractST {
     return requestJson;
   }
 
+  /**
+   * Turns a generic list into JSON, maintaining the JSON type info
+   */
+  public <T> String makeJsonForGenericList(List<T> objects) throws Exception {
+    JavaType type = mapper.getTypeFactory().constructParametricType(List.class, objects.get(0).getClass());
+    String requestJson = mapper.writerFor(type).writeValueAsString(objects);
+    System.out.println(requestJson);
+    return requestJson;
+  }
+
   @Test
   public void initialization() {
     assertNotNull(wac);
@@ -161,13 +178,18 @@ public abstract class AbstractST {
   }
 
   protected String pollingResponse(String url) throws Exception {
-    String response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
-    String status = JsonPath.read(response, "$.status");
-    while (status.equals("running")) {
-      response = getMockMvc().perform(get(url)).andReturn().getResponse().getContentAsString();
-      status = JsonPath.read(response, "$.status");
-      Thread.sleep(1000);
-    }
+    String response = null;
+    ResultActions actions = null;
+    do {
+      if (response != null) {
+        Thread.sleep(500);
+      }
+      actions = getMockMvc().perform(get(url));
+      if (DEBUG_MODE) {
+        actions.andDo(print());
+      }
+      response = actions.andReturn().getResponse().getContentAsString();
+    } while ("running".equals(JsonPath.read(response, "$.status")));
     return response;
   }
 
@@ -182,8 +204,8 @@ public abstract class AbstractST {
    */
   protected <T> List<T> baseTestBulkCreateAsync(String controllerBase, Class<T> createType, List<?> dtos)
       throws Exception {
-
     String response = pollingResponserHelper("post", dtos, controllerBase);
+    assertEquals("completed", JsonPath.read(response, "$.status"));
     List<T> objects = new ArrayList<T>();
     for (int i = 0; i < dtos.size(); i++) {
       Integer id = JsonPath.read(response, "$.data[" + i + "].id");
@@ -207,6 +229,7 @@ public abstract class AbstractST {
       throws Exception {
     // tests failure for async create endpoints where admin permissions are required
     String response = pollingResponserHelper("post", dtos, controllerBase);
+    assertEquals("failed", JsonPath.read(response, "$.status"));
     if (DEBUG_MODE)
       System.out.println(response);
     assertEquals("An unexpected error has occurred", JsonPath.read(response, "$.detail"));
@@ -231,6 +254,7 @@ public abstract class AbstractST {
       Function<D, Long> getId)
       throws Exception {
     String response = pollingResponserHelper("put", dtos, controllerBase);
+    assertEquals("completed", JsonPath.read(response, "$.status"));
 
     // check order of returned IDs
     List<Long> ids = dtos.stream().map(getId).toList();
@@ -262,6 +286,7 @@ public abstract class AbstractST {
       throws Exception {
     // tests failure for async update endpoints where admin permissions are required
     String response = pollingResponserHelper("put", dtos, controllerBase);
+    assertEquals("failed", JsonPath.read(response, "$.status"));
     if (DEBUG_MODE)
       System.out.println(response);
     assertEquals("An unexpected error has occurred", JsonPath.read(response, "$.detail"));
@@ -282,7 +307,8 @@ public abstract class AbstractST {
    * @return String JSON response from the endpoint
    * @throws Exception
    */
-  protected String pollingResponserHelper(String requestType, List<?> dtos, String url, String pollingResponseUrlPrefix,
+  protected <D> String pollingResponserHelper(String requestType, List<D> dtos, String url,
+      String pollingResponseUrlPrefix,
       int expectedResponseCode)
       throws Exception {
     // helper method for async requests
@@ -291,25 +317,26 @@ public abstract class AbstractST {
     switch (requestType) {
       case "post":
         ac = getMockMvc()
-            .perform(post(url).contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
+            .perform(post(url).contentType(MediaType.APPLICATION_JSON).content(makeJsonForGenericList(dtos)));
         break;
 
       case "put":
         ac = getMockMvc()
-            .perform(put(url).contentType(MediaType.APPLICATION_JSON).content(makeJson(dtos)));
+            .perform(put(url).contentType(MediaType.APPLICATION_JSON).content(makeJsonForGenericList(dtos)));
         break;
 
       default:
         throw new RuntimeException("invalid async method specified");
     }
-    if (DEBUG_MODE)
+    if (DEBUG_MODE) {
       ac.andDo(print());
+    }
 
     mvcResult = ac.andExpect(status().is(expectedResponseCode)).andReturn();
 
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    String response = pollingResponse(pollingResponseUrlPrefix + "/" + id);
-    return response;
+
+    return pollingResponse(pollingResponseUrlPrefix + "/" + id);
   }
 
   /**
@@ -638,7 +665,7 @@ public abstract class AbstractST {
       String s = rawRows[i].replaceAll("\\r", "");
       s = s.replaceAll("\\n", "");
       s = s.replaceAll("\"", "");
-      records[i] = s.split(",");
+      records[i] = s.split(",", -1);
     }
     checkArray(records[0], headers);
     for (int i = 0; i < rows.size(); i++) {

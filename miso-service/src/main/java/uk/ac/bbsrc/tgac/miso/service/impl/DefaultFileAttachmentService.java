@@ -82,6 +82,9 @@ public class DefaultFileAttachmentService implements FileAttachmentService {
   }
 
   @Autowired
+  public void setLibraryAliquotService(LibraryAliquotService libraryAliquotService) { entityProviders.put("libraryaliquot", libraryAliquotService); }
+
+  @Autowired
   public void setServiceRecordService(ServiceRecordService serviceRecordService) {
     entityProviders.put("servicerecord", serviceRecordService);
   }

@@ -4,53 +4,21 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.nullifyStringIfBlank;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.Immutable;
 
 import com.eaglegenomics.simlims.core.User;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorColumn;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrimaryKeyJoinColumn;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
-import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
-import uk.ac.bbsrc.tgac.miso.core.data.Box;
-import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
-import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
-import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryAliquotChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryAliquotQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControllable;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -60,7 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @DiscriminatorColumn(name = "discriminator")
 @DiscriminatorValue("LibraryAliquot")
 public class LibraryAliquot extends AbstractBoxable
-    implements Comparable<LibraryAliquot>, Deletable, HierarchyEntity {
+    implements Attachable,Comparable<LibraryAliquot>, Deletable, HierarchyEntity, QualityControllable<LibraryAliquotQC> {
 
   private static final long serialVersionUID = 1L;
   public static final Long UNSAVED_ID = 0L;
@@ -146,6 +114,9 @@ public class LibraryAliquot extends AbstractBoxable
 
   private LocalDate qcDate;
 
+  @OneToMany(mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
+  private Collection<LibraryAliquotQC> qcs;
+
   @OneToMany(targetEntity = LibraryAliquotChangeLog.class, mappedBy = "libraryAliquot", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
@@ -154,6 +125,14 @@ public class LibraryAliquot extends AbstractBoxable
   @JoinTable(name = "Transfer_LibraryAliquot", joinColumns = {@JoinColumn(name = "aliquotId")}, inverseJoinColumns = {
       @JoinColumn(name = "transferId")})
   private Set<ListTransferView> listTransferViews;
+
+  @OneToMany(targetEntity = FileAttachment.class)
+  @JoinTable(name = "Library_Aliquot_Attachment", joinColumns = {@JoinColumn(name = "aliquotId")}, inverseJoinColumns = {
+          @JoinColumn(name = "attachmentId")})
+  private List<FileAttachment> attachments;
+
+  @Transient
+  private List<FileAttachment> pendingAttachmentDeletions;
 
   @Override
   public Boxable.EntityType getEntityType() {
@@ -299,6 +278,31 @@ public class LibraryAliquot extends AbstractBoxable
   public Long getPreMigrationId() {
     return preMigrationId;
   }
+
+    @Override
+    public List<FileAttachment> getAttachments() {
+        return attachments;
+    }
+
+    @Override
+    public void setAttachments(List<FileAttachment> attachments) {
+        this.attachments = attachments;
+    }
+
+    @Override
+    public String getAttachmentsTarget() {
+        return "libraryaliquot";
+    }
+
+    @Override
+    public List<FileAttachment> getPendingAttachmentDeletions() {
+        return pendingAttachmentDeletions;
+    }
+
+    @Override
+    public void setPendingAttachmentDeletions(List<FileAttachment> pendingAttachmentDeletions) {
+        this.pendingAttachmentDeletions = pendingAttachmentDeletions;
+    }
 
   public void setPreMigrationId(Long preMigrationId) {
     this.preMigrationId = preMigrationId;
@@ -530,6 +534,23 @@ public class LibraryAliquot extends AbstractBoxable
   @Override
   public <T> T visit(BarcodableVisitor<T> visitor) {
     return visitor.visitLibraryAliquot(this);
+  }
+
+  @Override
+  public QcTarget getQcTarget() {
+      return QcTarget.LibraryAliquot;
+  }
+
+  @Override
+  public Collection<LibraryAliquotQC> getQCs() {
+      if(qcs == null){
+          qcs = new ArrayList<>();
+      }
+      return qcs;
+  }
+
+  public void setQcs(Collection<LibraryAliquotQC> qcs){
+      this.qcs = qcs;
   }
 
 }

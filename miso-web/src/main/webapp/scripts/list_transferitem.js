@@ -207,7 +207,16 @@ ListTarget.transferitem = (function () {
                   "</a>"
                 );
               } else if (full.boxAlias) {
-                return full.boxAlias + " " + full.boxPosition;
+                // If boxId is null, but boxAlias is set, it's because the item was removed from the
+                // box when distributed and we retain that information for display
+                return (
+                  (config.distribution ? "DISTRIBUTED - " : "") +
+                  full.boxAlias +
+                  " " +
+                  full.boxPosition
+                );
+              } else if (config.distribution) {
+                return "DISTRIBUTED";
               } else {
                 return "Unknown";
               }

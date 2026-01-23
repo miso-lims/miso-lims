@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SubmissionDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
 @RequestMapping("/rest/submissions")
@@ -53,10 +54,9 @@ public class SubmissionRestController extends AbstractRestController {
     User user = authorizationManager.getCurrentUser();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(new MediaType("application", "zip"));
-    response.setHeader("Content-Disposition",
-        "attachment; filename="
-            + String.format("SUBMISSON%d-%s.zip", submission.getId(),
-                new SimpleDateFormat("yyyy-MM-dd").format(new Date())));
+    String filename =
+        String.format("SUBMISSON%d-%s.zip", submission.getId(), new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+    MisoWebUtils.addAttachmentContentDisposition(response, filename);
     return new EnaSubmissionPreparation(submission, user, centreName, SubmissionActionType.valueOf(action)).toBytes();
   }
 

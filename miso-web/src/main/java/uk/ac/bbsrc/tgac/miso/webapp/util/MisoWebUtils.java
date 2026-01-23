@@ -2,6 +2,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -252,6 +254,18 @@ public class MisoWebUtils {
       dto.put("value", method.name());
     }
     return libraryQualificationMethods;
+  }
+
+  public static void addAttachmentContentDisposition(HttpServletResponse response, String filename) {
+    response.setHeader("Content-Disposition", makeAttachmentContentDisposition(filename));
+  }
+
+  private static String makeAttachmentContentDisposition(String filename) {
+    // Strip non-ASCII characters from legacy parameter
+    String oldFilename = filename.replaceAll("[^\\x20-\\x7e]", "_").replace("\"", "\\\"");
+    // URL Encode modern parameter, but replace + with %20 for spaces since that's safer in headers
+    String newFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8).replace("+", "%20");
+    return "attachment; filename=\"%s\"; filename*=UTF-8''%s".formatted(oldFilename, newFilename);
   }
 
 }

@@ -239,20 +239,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetItem;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetStage;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.RequisitionQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.*;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
@@ -2474,6 +2463,13 @@ public class Dtos {
         newLibraryQc.setLibrary(ownerLibrary);
         to = newLibraryQc;
         break;
+      case "LibraryAliquot":
+        LibraryAliquotQC newLibraryAliquotQc = new LibraryAliquotQC();
+        LibraryAliquot ownerLibraryAliquot = new LibraryAliquot();
+        ownerLibraryAliquot.setId(dto.getEntityId());
+        newLibraryAliquotQc.setLibraryAliquot(ownerLibraryAliquot);
+        to = newLibraryAliquotQc;
+        break;
       case "Sample":
         SampleQC newSampleQc = new SampleQC();
         Sample ownerSample = new SampleImpl();
@@ -2549,6 +2545,12 @@ public class Dtos {
           ((LibraryQC) qc).getControls().add(libraryQcControlRun);
           to = libraryQcControlRun;
           break;
+        case LibraryAliquot:
+            LibraryAliquotQcControlRun libraryAliquotQcControlRun = new LibraryAliquotQcControlRun();
+            libraryAliquotQcControlRun.setQc((LibraryAliquotQC) qc);
+            ((LibraryAliquotQC) qc).getControls().add(libraryAliquotQcControlRun);
+            to = libraryAliquotQcControlRun;
+            break;
         case Pool:
           PoolQcControlRun poolQcControlRun = new PoolQcControlRun();
           poolQcControlRun.setQc((PoolQC) qc);
@@ -3789,6 +3791,7 @@ public class Dtos {
     setWorksetItemIds(from.getWorksetSamples(), dto::setSampleIds);
     setWorksetItemIds(from.getWorksetLibraries(), dto::setLibraryIds);
     setWorksetItemIds(from.getWorksetLibraryAliquots(), dto::setLibraryAliquotIds);
+    setWorksetItemIds(from.getWorksetPools(), dto::setPoolIds);
     dto.setCreator(from.getCreator().getFullName());
     dto.setLastModified(formatDateTime(from.getLastModified()));
     return dto;
@@ -3814,7 +3817,7 @@ public class Dtos {
     setWorksetItems(workset::setWorksetLibraries, from.getLibraryIds(), WorksetLibrary::new, LibraryImpl::new);
     setWorksetItems(workset::setWorksetLibraryAliquots, from.getLibraryAliquotIds(), WorksetLibraryAliquot::new,
         LibraryAliquot::new);
-
+    setWorksetItems(workset::setWorksetPools, from.getPoolIds(), WorksetPool::new, PoolImpl::new);
     return workset;
   }
 
@@ -4205,7 +4208,7 @@ public class Dtos {
       setString(to::setBoxAlias, maybeGetProperty(maybeGetProperty(from.getItem(), Boxable::getBox), Box::getAlias));
       setString(to::setBoxPosition, maybeGetProperty(from.getItem(), Boxable::getBoxPosition));
     } else if (from.getDistributedBoxAlias() != null) {
-      setString(to::setBoxAlias, "DISTRIBUTED - " + from.getDistributedBoxAlias());
+      setString(to::setBoxAlias, from.getDistributedBoxAlias());
       setString(to::setBoxPosition, from.getDistributedBoxPosition());
     }
     return to;

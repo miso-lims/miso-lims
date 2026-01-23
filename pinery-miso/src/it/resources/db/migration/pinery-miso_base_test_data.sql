@@ -109,24 +109,37 @@ INSERT INTO ScientificName(scientificNameId, alias) VALUES
 INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, instrumentType) VALUES
   (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),
   (2, 'ILLUMINA', 'Illumina MiSeq', 1, 'SEQUENCER'),
-  (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER');
+  (3, 'PACBIO', 'Revio', 8, 'SEQUENCER');
+
+INSERT INTO InstrumentPosition (positionId, instrumentModelId, alias) VALUES
+(1, 3, '1_A01'),
+(2, 3, '1_A02'),
+(3, 3, '1_A03'),
+(4, 3, '1_A04'),
+(5, 3, '2_B01'),
+(6, 3, '2_B02'),
+(7, 3, '2_B03'),
+(8, 3, '2_B04');
   
-INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, readLength2, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
-  (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
-  (2, 'Rapid Run 2x151', 1, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
-  (3, '1x151', 1, 151, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V4'),
-  (4, 'Micro 2x151', 2, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V3');
+INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, readLength2, createdBy, updatedBy, creationDate, lastUpdated, chemistry, movieTime) VALUES
+  (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL, NULL),
+  (2, 'Rapid Run 2x151', 1, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN', NULL),
+  (3, '1x151', 1, 151, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V4', NULL),
+  (4, 'Micro 2x151', 2, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'V3', NULL),
+  (5, 'Revio Custom', 3, 0, 0, 1, 1, '2025-11-06 07:45:00', '2025-11-06 07:45:00', NULL, 24);
 
 INSERT INTO SequencingContainerModel (sequencingContainerModelId, alias, identificationBarcode, partitionCount, platformType, fallback) VALUES
-(1, 'Generic 1-Lane Illumina Flow Cell', NULL, 1, 'ILLUMINA', 1);
+(1, 'Generic 1-Lane Illumina Flow Cell', NULL, 1, 'ILLUMINA', TRUE),
+(2, 'Revio SMRT Cell', NULL, 1, 'PACBIO', FALSE);
 
 INSERT INTO SequencingContainerModel_InstrumentModel (sequencingContainerModelId, instrumentModelId) VALUES
-(1, 2);
+(1, 2),
+(2, 3);
 
 INSERT INTO Instrument (instrumentId, name, instrumentModelId) VALUES
   (1, 'T2000', 1),
   (2, 'TMS1', 2),
-  (3, 'TPB2', 3),
+  (3, 'Revio1', 3),
   (4, 'T2001', 1);
 
 INSERT INTO `ReferenceGenome` (`referenceGenomeId`, `alias`) VALUES (1, 'Human hg19 random');
@@ -199,7 +212,8 @@ INSERT INTO LibraryStrategyType (libraryStrategyTypeId, name, description) VALUE
 
 INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNumber, kitType, platformType, creator, created, lastModifier, lastModified) VALUES
   (1, 'Test Kit', 1, 'TestCo', '123', 'LIBRARY', 'ILLUMINA', 1, '2018-04-24 12:20:00', 1, '2018-04-24 12:20:00'),
-  (2, 'Test Kit Two', 2, 'TestCo', '124', 'LIBRARY', 'ILLUMINA', 1, '2018-04-24 12:20:00', 1, '2018-04-24 12:20:00');
+  (2, 'Test Kit Two', 2, 'TestCo', '124', 'LIBRARY', 'ILLUMINA', 1, '2018-04-24 12:20:00', 1, '2018-04-24 12:20:00'),
+  (3, 'PacBio Test Kit', 1, 'PacBio', '125', 'LIBRARY', 'PACBIO', 1, '2025-11-06 08:00:00', 1, '2025-11-06 08:00:00');
   
 INSERT INTO BoxUse (boxUseId, alias) VALUES 
 (1, 'DNA'), (2, 'RNA'), (3, 'Libraries'), (4, 'Sequencing'), (5, 'Storage'), (6, 'Tissue');

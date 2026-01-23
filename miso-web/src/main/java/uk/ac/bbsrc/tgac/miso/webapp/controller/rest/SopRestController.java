@@ -27,13 +27,14 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SopDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
 @RequestMapping("/rest/sops")
-public class SopRestController {
+public class SopRestController extends AbstractRestController {
 
   @Autowired
   private SopService sopService;
