@@ -143,9 +143,7 @@ public class QcRestControllerST extends AbstractST {
         QcDto dto2 = Dtos.asDto(currentSession().get(sampleEntityClass, 2));
 
         dto1.setDescription("updated one");
-        dto1.setQcTarget("Sample");
         dto2.setDescription("updated two");
-        dto2.setQcTarget("Sample");
 
         List<SampleQC> qcs = baseTestBulkUpdateAsync(CONTROLLER_BASE, sampleEntityClass, Arrays.asList(dto1, dto2),
                 QcDto::getId);
@@ -158,7 +156,6 @@ public class QcRestControllerST extends AbstractST {
         QcDto dto = Dtos.asDto(currentSession().get(libraryEntityClass, 1));
 
         dto.setDescription("updated one library");
-        dto.setQcTarget("Library");
 
         List<LibraryQC> libraryQcs = baseTestBulkUpdateAsync(CONTROLLER_BASE, libraryEntityClass, Arrays.asList(dto),
                 QcDto::getId);
@@ -170,7 +167,6 @@ public class QcRestControllerST extends AbstractST {
         QcDto dto = Dtos.asDto(currentSession().get(poolEntityClass, 1));
 
         dto.setDescription("updated one pool");
-        dto.setQcTarget("Pool");
 
         List<PoolQC> poolQcs = baseTestBulkUpdateAsync(CONTROLLER_BASE, poolEntityClass, Arrays.asList(dto),
                 QcDto::getId);
@@ -182,7 +178,6 @@ public class QcRestControllerST extends AbstractST {
         QcDto dto = Dtos.asDto(currentSession().get(requisitionEntityClass, 1));
 
         dto.setDescription("updated one requisition");
-        dto.setQcTarget("Requisition");
 
         List<RequisitionQC> requisitionQcs = baseTestBulkUpdateAsync(CONTROLLER_BASE, requisitionEntityClass, Arrays.asList(dto),
                 QcDto::getId);
