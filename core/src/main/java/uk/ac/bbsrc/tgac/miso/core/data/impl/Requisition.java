@@ -58,7 +58,7 @@ public class Requisition implements Attachable, Deletable, QualityControllable<R
   private boolean stopped = false;
   private String stopReason;
 
-  @OneToMany(targetEntity = RequisitionQC.class, mappedBy = "requisition", cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = RequisitionQC.class, mappedBy = "requisition", cascade = CascadeType.REMOVE)
   private Collection<RequisitionQC> qcs = new TreeSet<>();
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)

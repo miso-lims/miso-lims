@@ -111,7 +111,7 @@ public class SequencerPartitionContainerImpl implements SequencerPartitionContai
   @JoinColumn(name = "sequencingContainerModelId")
   private SequencingContainerModel model;
 
-  @OneToMany(targetEntity = ContainerQC.class, mappedBy = "container")
+  @OneToMany(targetEntity = ContainerQC.class, mappedBy = "container", cascade = CascadeType.REMOVE)
   private final Collection<ContainerQC> containerQCs = new TreeSet<>();
 
   /**

@@ -112,7 +112,8 @@ ListTarget.qc = function (qcTarget) {
               if (qcType.precisionAfterDecimal < 0) {
                 return ListUtils.render.booleanChecks(data > 0, type, full);
               } else {
-                return data + " " + qcType.units;
+                var units = qcType.units;
+                return units ? (data + " " + units) : data;
               }
             } else {
               return data;

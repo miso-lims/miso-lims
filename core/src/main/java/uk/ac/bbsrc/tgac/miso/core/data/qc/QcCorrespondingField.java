@@ -10,6 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 
 public enum QcCorrespondingField {
   CONCENTRATION {
@@ -39,6 +40,15 @@ public enum QcCorrespondingField {
       if (concUnit != null) {
         sample.setConcentrationUnits(concUnit);
       }
+    }
+
+    @Override
+    public void updateField(LibraryAliquot libraryAliquot, BigDecimal value, String units) {
+        libraryAliquot.setConcentration(value);
+        ConcentrationUnit concUnit = ConcentrationUnit.getFromString(units);
+        if(concUnit != null) {
+            libraryAliquot.setConcentrationUnits(concUnit);
+        }
     }
 
   },
@@ -71,6 +81,15 @@ public enum QcCorrespondingField {
       }
     }
 
+    @Override
+    public void updateField(LibraryAliquot libraryAliquot, BigDecimal value, String units) {
+        libraryAliquot.setVolume(value);
+        VolumeUnit volUnit = VolumeUnit.getFromString(units);
+        if (volUnit != null) {
+            libraryAliquot.setVolumeUnits(volUnit);
+        }
+    }
+
   },
   SIZE {
 
@@ -83,6 +102,11 @@ public enum QcCorrespondingField {
     public void updateField(Library library, BigDecimal value, String units) {
       library.setDnaSize(value.intValue());
     }
+
+    @Override
+    public void updateField(LibraryAliquot libraryAliquot, BigDecimal value, String units) {
+        libraryAliquot.setDnaSize(value.intValue());
+      }
 
   },
   NONE;
@@ -109,6 +133,10 @@ public enum QcCorrespondingField {
 
   public void updateField(Requisition requisition, BigDecimal value, String units) {
     throw new UnsupportedOperationException("Method not implemented for unspecified field");
+  }
+
+  public void updateField(LibraryAliquot libraryAliquot, BigDecimal value, String units) {
+      throw new UnsupportedOperationException("Method not implemented for unspecified field");
   }
 
 }

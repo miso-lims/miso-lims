@@ -241,19 +241,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetStage;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.RequisitionQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.*;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
@@ -2473,6 +2461,13 @@ public class Dtos {
         newLibraryQc.setLibrary(ownerLibrary);
         to = newLibraryQc;
         break;
+      case "LibraryAliquot":
+        LibraryAliquotQC newLibraryAliquotQc = new LibraryAliquotQC();
+        LibraryAliquot ownerLibraryAliquot = new LibraryAliquot();
+        ownerLibraryAliquot.setId(dto.getEntityId());
+        newLibraryAliquotQc.setLibraryAliquot(ownerLibraryAliquot);
+        to = newLibraryAliquotQc;
+        break;
       case "Sample":
         SampleQC newSampleQc = new SampleQC();
         Sample ownerSample = new SampleImpl();
@@ -2548,6 +2543,12 @@ public class Dtos {
           ((LibraryQC) qc).getControls().add(libraryQcControlRun);
           to = libraryQcControlRun;
           break;
+        case LibraryAliquot:
+            LibraryAliquotQcControlRun libraryAliquotQcControlRun = new LibraryAliquotQcControlRun();
+            libraryAliquotQcControlRun.setQc((LibraryAliquotQC) qc);
+            ((LibraryAliquotQC) qc).getControls().add(libraryAliquotQcControlRun);
+            to = libraryAliquotQcControlRun;
+            break;
         case Pool:
           PoolQcControlRun poolQcControlRun = new PoolQcControlRun();
           poolQcControlRun.setQc((PoolQC) qc);

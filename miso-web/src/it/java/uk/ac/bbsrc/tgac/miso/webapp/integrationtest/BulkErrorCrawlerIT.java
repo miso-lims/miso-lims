@@ -293,6 +293,12 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                                 .put("qc/bulk/editFrom/Library",
                                                 (driver, baseUrl) -> BulkQCPage.getForEditLibrary(driver, baseUrl,
                                                                 Arrays.asList(2201L), 1))
+                                .put("qc/bulk/addFrom/LibraryAliquot",
+                                                (driver, baseUrl) -> BulkQCPage.getForAddLibraryAliquot(driver, baseUrl,
+                                                                Arrays.asList(304L, 305L), 1, 1))
+                                .put("qc/bulk/editFrom/LibraryAliquot",
+                                                (driver, baseUrl) -> BulkQCPage.getForEditLibraryAliquot(driver, baseUrl,
+                                                                Arrays.asList(1L), 1))
                                 .build());
 
                 postPages = Collections.unmodifiableMap(new MapBuilder<String, Map<String, String>>()

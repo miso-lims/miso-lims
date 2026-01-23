@@ -1266,6 +1266,9 @@ INSERT INTO LibraryQC(library_libraryId, creator, date, type, results, created, 
 INSERT INTO PoolQC(pool_poolId, creator, date, type, results, created, lastModified) VALUES
 (2201, 1, '2018-07-10', 107, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
 
+INSERT INTO LibraryAliquotQc(aliquotId, creator, date, type, results, created, lastModified) VALUES
+(1, 1, '2018-07-10', 107, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
+
 INSERT INTO Workset_Sample(worksetId, sampleId) VALUES
 (1, 100001),
 (1, 100002),
