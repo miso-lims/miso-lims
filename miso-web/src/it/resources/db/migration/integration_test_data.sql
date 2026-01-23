@@ -1269,7 +1269,8 @@ INSERT INTO PoolQC(pool_poolId, creator, date, type, results, created, lastModif
 INSERT INTO Workset_Sample(worksetId, sampleId) VALUES
 (1, 100001),
 (1, 100002),
-(1, 100003);
+(1, 100003),
+(2, 100004);
 
 INSERT INTO Workset_Library(worksetId, libraryId) VALUES
 (1, 100001),
