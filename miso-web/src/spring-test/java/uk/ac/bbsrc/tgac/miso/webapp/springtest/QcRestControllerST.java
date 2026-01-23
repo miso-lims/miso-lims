@@ -128,7 +128,7 @@ public class QcRestControllerST extends AbstractST {
     }
 
     @Test
-    public void testReuisitionBulkCreateAsync() throws Exception {
+    public void testRequisitionBulkCreateAsync() throws Exception {
         List<RequisitionQC> requisitionQcs = baseTestBulkCreateAsync(CONTROLLER_BASE, requisitionEntityClass, makeRequisitionCreateDtos());
         assertEquals(1L, requisitionQcs.get(0).getEntity().getId());
         assertEquals("2021-07-13", requisitionQcs.get(0).getDate().toString());
