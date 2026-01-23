@@ -81,7 +81,7 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @JoinColumn(name = "project_projectId")
   private Project project;
 
-  @OneToMany(targetEntity = SampleQC.class, mappedBy = "sample", cascade = CascadeType.ALL)
+  @OneToMany(targetEntity = SampleQC.class, mappedBy = "sample", cascade = CascadeType.REMOVE)
   private Collection<SampleQC> sampleQCs = new TreeSet<>();
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)

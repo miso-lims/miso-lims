@@ -38,6 +38,8 @@ DELETE FROM Kit_Note;
 DELETE FROM Lab;
 DELETE FROM Library;
 DELETE FROM LibraryAliquot;
+DELETE FROM LibraryAliquotQc;
+DELETE FROM LibraryAliquotQcControl;
 DELETE FROM LibraryAliquotChangeLog;
 DELETE FROM LibraryChangeLog;
 DELETE FROM LibraryDesign;
