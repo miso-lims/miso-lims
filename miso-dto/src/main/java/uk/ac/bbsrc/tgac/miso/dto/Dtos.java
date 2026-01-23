@@ -2446,6 +2446,7 @@ public class Dtos {
     dto.setId(from.getId());
     dto.setDate(formatDate(from.getDate()));
     dto.setCreator(from.getCreator().getFullName());
+    dto.setQcTarget(from.getEntity().getQcTarget().getLabel());
     setId(dto::setQcTypeId, from.getType());
     setString(dto::setResults, from.getResults());
     dto.setEntityId(from.getEntity().getId());
