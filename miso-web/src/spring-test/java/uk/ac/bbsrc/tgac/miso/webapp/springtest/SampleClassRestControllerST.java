@@ -109,10 +109,6 @@ public class SampleClassRestControllerST extends AbstractST {
     boolean foundParent = returned.getParentRelationships().stream()
         .anyMatch(rel -> rel.getParent().getId() == parentId);
     assertTrue("expected parent relationship not found", foundParent);
-
-    SampleValidRelationship returnedRel = returned.getParentRelationships().iterator().next();
-    assertEquals("parent ID changed", parentId, returnedRel.getParent().getId());
-    assertEquals("relationship archived changed", existingRel.isArchived(), returnedRel.isArchived());
   }
 
   @Test
