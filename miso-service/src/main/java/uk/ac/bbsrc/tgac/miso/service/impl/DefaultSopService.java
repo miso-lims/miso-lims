@@ -20,7 +20,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.SopField.FieldType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SopFieldImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
@@ -94,7 +93,7 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
       }
     }
 
-    if (isChanged(Sop::getAlias, sop, beforeChange)) {
+    if (isChanged(Sop::getAlias, sop, beforeChange) || isChanged(Sop::getVersion, sop, beforeChange)) {
       Sop existing = sopDao.get(sop.getCategory(), sop.getAlias(), sop.getVersion());
       if (existing != null && existing.getId() != sop.getId()) {
         errors.add(ValidationError.forDuplicate("SOP", null, "alias and version"));
@@ -121,9 +120,13 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
     Map<String, SopField> byName = new HashMap<>();
     Map<Long, SopField> beforeById = new HashMap<>();
     if (beforeChange != null && beforeChange.getSopFields() != null) {
-      for (SopField f : beforeChange.getSopFields()) {
-        if (f != null && f.getId() > 0L) {
-          beforeById.put(f.getId(), f);
+      for (SopField beforeField : beforeChange.getSopFields()) {
+        if (beforeField != null && beforeField.getId() > 0L) {
+          beforeById.put(beforeField.getId(), beforeField);
+          String beforeName = beforeField.getName();
+          if (beforeName != null && !beforeName.isEmpty()) {
+            byName.put(beforeName.toLowerCase(), beforeField);
+          }
         }
       }
     }
@@ -143,8 +146,11 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
       }
 
       String key = name.toLowerCase();
-      if (byName.containsKey(key)) {
-        errors.add(new ValidationError("sopFields", "Field names must be unique"));
+      SopField existingWithName = byName.get(key);
+      if (existingWithName != null) {
+        if (field.getId() == 0L || existingWithName.getId() != field.getId()) {
+          errors.add(new ValidationError("sopFields", "Field names must be unique"));
+        }
       } else {
         byName.put(key, field);
       }
@@ -154,22 +160,16 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
         errors.add(new ValidationError("sopFields", "Units must be at most " + SOPFIELD_UNITS_MAX + " characters"));
       }
 
-      String fieldType = field.getFieldType();
-      if (fieldType == null || fieldType.isEmpty()) {
+      FieldType fieldType = field.getFieldType();
+      if (fieldType == null) {
         errors.add(ValidationError.forRequired("sopFields"));
-      } else {
-        try {
-          FieldType.valueOf(fieldType);
-        } catch (IllegalArgumentException e) {
-          errors.add(new ValidationError("sopFields", "Invalid field type"));
-        }
       }
 
       if (beforeChange != null && field.getId() > 0L) {
         SopField before = beforeById.get(field.getId());
         if (before != null) {
-          String beforeType = before.getFieldType();
-          String afterType = field.getFieldType();
+          FieldType beforeType = before.getFieldType();
+          FieldType afterType = field.getFieldType();
           if (beforeType != null && afterType != null && !beforeType.equals(afterType)) {
             errors.add(new ValidationError("sopFields", "Field type cannot be changed for existing fields"));
           }
@@ -188,66 +188,55 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
   }
 
   private void syncSopFields(Sop to, Sop from) {
-    Set<SopField> target = to.getSopFields();
-    if (target == null) {
+    Set<SopField> toFields = to.getSopFields();
+    if (toFields == null) {
       return;
     }
 
-    if (to.getCategory() != SopCategory.RUN) {
-      target.clear();
+    Set<SopField> fromFields = from.getSopFields();
+    if (fromFields == null || fromFields.isEmpty()) {
+      toFields.clear();
       return;
     }
 
-    Set<SopField> incoming = from.getSopFields();
-    if (incoming == null) {
-      incoming = new HashSet<>();
-    }
-
-    Set<Long> incomingIds = new HashSet<>();
-    for (SopField f : incoming) {
-      if (f != null && f.getId() > 0L) {
-        incomingIds.add(f.getId());
+    Set<Long> fromFieldIds = new HashSet<>();
+    for (SopField fromField : fromFields) {
+      if (fromField != null && fromField.getId() > 0L) {
+        fromFieldIds.add(fromField.getId());
       }
     }
 
-    Map<Long, SopField> targetById = new HashMap<>();
-    for (SopField f : target) {
-      if (f != null && f.getId() > 0L) {
-        targetById.put(f.getId(), f);
+    Map<Long, SopField> toFieldById = new HashMap<>();
+    for (SopField toField : toFields) {
+      if (toField != null && toField.getId() > 0L) {
+        toFieldById.put(toField.getId(), toField);
       }
     }
 
-    for (Iterator<SopField> it = target.iterator(); it.hasNext();) {
-      SopField existing = it.next();
-      if (existing == null) {
-        it.remove();
-        continue;
-      }
-      long id = existing.getId();
-      if (id > 0L && !incomingIds.contains(id)) {
+    for (Iterator<SopField> it = toFields.iterator(); it.hasNext();) {
+      SopField toField = it.next();
+      long id = toField.getId();
+      if (id > 0L && !fromFieldIds.contains(id)) {
         it.remove();
       }
     }
 
-    for (SopField f : incoming) {
-      if (f == null) {
-        continue;
-      }
-
-      if (f.getId() > 0L) {
-        SopField existing = targetById.get(f.getId());
-        if (existing != null) {
-          existing.setName(f.getName());
-          existing.setUnits(f.getUnits());
-          existing.setSop(to);
+    for (SopField fromField : fromFields) {
+      if (fromField.getId() > 0L) {
+        SopField toField = toFieldById.get(fromField.getId());
+        if (toField != null) {
+          toField.setName(fromField.getName());
+          toField.setUnits(fromField.getUnits());
+          toField.setFieldType(fromField.getFieldType());
+          toField.setSop(to);
         }
       } else {
-        SopField created = new SopFieldImpl();
-        created.setSop(to);
-        created.setName(f.getName());
-        created.setUnits(f.getUnits());
-        created.setFieldType(f.getFieldType());
-        target.add(created);
+        SopField newField = new SopField();
+        newField.setSop(to);
+        newField.setName(fromField.getName());
+        newField.setUnits(fromField.getUnits());
+        newField.setFieldType(fromField.getFieldType());
+        toFields.add(newField);
       }
     }
   }

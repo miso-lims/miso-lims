@@ -83,18 +83,6 @@ public class SopRestController extends AbstractRestController {
     return datatable.get(request, advancedSearchParser, PaginationFilter.category(category));
   }
 
-  @PostMapping("/bulk")
-  @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<SopDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkCreate(TYPE_LABEL, dtos, Dtos::to, sopService);
-  }
-
-  @PutMapping("/bulk")
-  @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<SopDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, dtos, Dtos::to, sopService);
-  }
-
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
     return asyncOperationManager.getAsyncProgress(uuid, Sop.class, sopService, Dtos::asDto);

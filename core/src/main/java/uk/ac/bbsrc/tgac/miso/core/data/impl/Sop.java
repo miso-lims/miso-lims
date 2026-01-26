@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -17,6 +18,7 @@ import jakarta.persistence.OrderBy;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import uk.ac.bbsrc.tgac.miso.core.data.SopField;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 public class Sop implements Aliasable, Deletable, Serializable {
@@ -55,7 +57,7 @@ public class Sop implements Aliasable, Deletable, Serializable {
 
   private boolean archived = false;
 
-  @OneToMany(mappedBy = "sop", cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = SopFieldImpl.class)
+  @OneToMany(mappedBy = "sop", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("name")
   private final Set<SopField> sopFields = new HashSet<>();
 
@@ -137,19 +139,17 @@ public class Sop implements Aliasable, Deletable, Serializable {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (!(obj instanceof Sop))
-      return false;
-    Sop other = (Sop) obj;
-
-    // MISO convention: only saved entities can be equal
-    return sopId != 0L && other.sopId != 0L && sopId == other.sopId;
+  public int hashCode() {
+    return Objects.hash(alias, version, category, url, archived);
   }
 
   @Override
-  public int hashCode() {
-    return sopId != 0L ? Long.hashCode(sopId) : System.identityHashCode(this);
+  public boolean equals(Object obj) {
+    return LimsUtils.equals(this, obj,
+        Sop::getAlias,
+        Sop::getVersion,
+        Sop::getCategory,
+        Sop::getUrl,
+        Sop::isArchived);
   }
 }

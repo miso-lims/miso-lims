@@ -648,11 +648,16 @@ public class RunRestController extends AbstractRestController {
     return run;
   }
 
+  @PostMapping
+  public @ResponseBody RunDto createRun(@RequestBody RunDto dto) throws IOException {
+    return RestUtils.createObject("Run", dto, Dtos::to, runService, Dtos::asDto);
+  }
 
   @PutMapping("/{runId}")
   public @ResponseBody RunDto updateRun(@PathVariable long runId, @RequestBody RunDto dto) throws IOException {
     return RestUtils.updateObject("Run", runId, dto, WhineyFunction.rethrow(d -> {
       Run run = Dtos.to(d);
+      // Containers cannot be updated in this way
       Run existing = runService.get(runId);
       run.getRunPositions().clear();
       for (RunPosition pos : existing.getRunPositions()) {

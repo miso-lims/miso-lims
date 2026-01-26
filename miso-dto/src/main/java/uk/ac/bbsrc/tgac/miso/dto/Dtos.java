@@ -184,7 +184,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingOrderImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SopFieldImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
@@ -4425,47 +4425,43 @@ public class Dtos {
     return to;
   }
 
-  public static SopDto asDto(@Nonnull uk.ac.bbsrc.tgac.miso.core.data.impl.Sop from) {
+  public static SopDto asDto(@Nonnull Sop from) {
     SopDto to = new SopDto();
     setLong(to::setId, from.getId(), true);
     setString(to::setAlias, from.getAlias());
     setString(to::setVersion, from.getVersion());
-    setString(to::setCategory, from.getCategory() == null ? null : from.getCategory().name());
+    setString(to::setCategory, maybeGetProperty(from.getCategory(), SopCategory::name));
     setString(to::setUrl, from.getUrl());
     setBoolean(to::setArchived, from.isArchived(), false);
 
     if (from.getSopFields() != null && !from.getSopFields().isEmpty()) {
-      to.setSopFields(from.getSopFields().stream()
+      to.setFields(from.getSopFields().stream()
           .map(Dtos::asDto)
           .collect(Collectors.toList()));
     } else {
-      to.setSopFields(Collections.emptyList());
+      to.setFields(Collections.emptyList());
     }
 
     return to;
   }
 
-  public static uk.ac.bbsrc.tgac.miso.core.data.impl.Sop to(@Nonnull SopDto from) {
-    uk.ac.bbsrc.tgac.miso.core.data.impl.Sop to = new uk.ac.bbsrc.tgac.miso.core.data.impl.Sop();
+  public static Sop to(@Nonnull SopDto from) {
+    Sop to = new Sop();
     setLong(to::setId, from.getId(), false);
     setString(to::setAlias, from.getAlias());
     setString(to::setVersion, from.getVersion());
-    setObject(to::setCategory, from.getCategory(), uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory::valueOf);
+    setObject(to::setCategory, from.getCategory(), SopCategory::valueOf);
     setString(to::setUrl, from.getUrl());
     setBoolean(to::setArchived, from.isArchived(), false);
 
-    if (from.getSopFields() != null && !from.getSopFields().isEmpty()) {
-      Set<SopField> fields = from.getSopFields().stream()
-          .map(Dtos::to)
-          .collect(Collectors.toSet());
-
-      for (SopField field : fields) {
+    if (from.getFields() != null && !from.getFields().isEmpty()) {
+      Set<SopField> fields = new HashSet<>();
+      for (SopFieldDto fieldDto : from.getFields()) {
+        SopField field = Dtos.to(fieldDto);
         field.setSop(to);
+        fields.add(field);
       }
-
       to.setSopFields(fields);
-    } else {
-      to.setSopFields(Collections.emptySet());
     }
 
     return to;
@@ -4476,30 +4472,17 @@ public class Dtos {
     setLong(dto::setId, from.getId(), true);
     setString(dto::setName, from.getName());
     setString(dto::setUnits, from.getUnits());
-
-    String fieldType = null;
-    try {
-      SopField.FieldType ft = from.getFieldTypeEnum();
-      fieldType = ft == null ? null : ft.name();
-    } catch (Throwable t) {
-      fieldType = from.getFieldType();
-    }
-    setString(dto::setFieldType, fieldType);
+    setString(dto::setFieldType, maybeGetProperty(from.getFieldType(), SopField.FieldType::name));
 
     return dto;
   }
 
   public static SopField to(@Nonnull SopFieldDto from) {
-    SopField to = new SopFieldImpl();
+    SopField to = new SopField();
     setLong(to::setId, from.getId(), false);
     setString(to::setName, from.getName());
     setString(to::setUnits, from.getUnits());
-
-    try {
-      setObject(to::setFieldTypeEnum, from.getFieldType(), SopField.FieldType::valueOf);
-    } catch (Throwable t) {
-      setObject(to::setFieldType, from.getFieldType(), v -> SopField.FieldType.valueOf(v).name());
-    }
+    setObject(to::setFieldType, from.getFieldType(), SopField.FieldType::valueOf);
 
     return to;
   }

@@ -15,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -22,6 +23,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SopDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
 @Controller
@@ -55,7 +59,7 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
 
       @Override
       protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-        config.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
+        config.put("isAdmin", authorizationManager.isAdminUser());
       }
     };
 
@@ -68,50 +72,54 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
 
     authorizationManager.throwIfNonAdmin();
 
+    Sop sop = new Sop();
     Long sourceId = baseId != null ? baseId : copyId;
 
-    SopDto dto;
     if (sourceId != null) {
-      Sop sop = sopService.get(sourceId);
-      dto = sop == null ? makeDto() : Dtos.asDto(sop);
-      dto.setId(0L);
-      if (dto.getSopFields() != null) {
-        dto.getSopFields().forEach(f -> {
-          if (f != null) {
-            f.setId(0L);
-          }
-        });
+      Sop source = sopService.get(sourceId);
+      if (source == null) {
+        throw new ClientErrorException("SOP with ID %d not found to copy".formatted(sourceId));
       }
-    } else {
-      dto = makeDto();
+      sop.setAlias(source.getAlias());
+      sop.setVersion(source.getVersion());
+      sop.setCategory(source.getCategory());
+      sop.setUrl(source.getUrl());
+      sop.setArchived(source.isArchived());
+      if (source.getSopFields() != null) {
+        for (SopField sourceField : source.getSopFields()) {
+          SopField field = new SopField();
+          field.setName(sourceField.getName());
+          field.setUnits(sourceField.getUnits());
+          field.setFieldType(sourceField.getFieldType());
+          sop.getSopFields().add(field);
+        }
+      }
     }
 
-    model.put("title", "Create SOP");
-    model.put("pageMode", "create");
-    model.put("sopJson", mapper.writeValueAsString(dto));
-    model.put("sopCategories", SopCategory.values());
-    model.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
-
-    return new ModelAndView("/WEB-INF/pages/editSop.jsp", model);
+    model.put("title", "New SOP");
+    model.addAttribute(PageMode.PROPERTY, PageMode.CREATE.getLabel());
+    return setupForm(sop, PageMode.CREATE, model);
   }
 
-  @GetMapping("/{id:\\d+}")
-  public ModelAndView edit(@PathVariable("id") long id, ModelMap model) throws IOException {
+  @GetMapping("/{id}")
+  public ModelAndView edit(@PathVariable long id, ModelMap model) throws IOException {
     authorizationManager.throwIfNonAdmin();
 
     Sop sop = sopService.get(id);
     if (sop == null) {
-      return new ModelAndView("redirect:/sop/list");
+      throw new NotFoundException("No SOP found for ID: " + id);
     }
 
-    SopDto dto = Dtos.asDto(sop);
+    model.put("title", "SOP " + id);
+    model.addAttribute(PageMode.PROPERTY, PageMode.EDIT.getLabel());
+    return setupForm(sop, PageMode.EDIT, model);
+  }
 
-    model.put("title", "Edit SOP");
-    model.put("pageMode", "edit");
-    model.put("sopJson", mapper.writeValueAsString(dto));
+  private ModelAndView setupForm(Sop sop, PageMode pageMode, ModelMap model) throws IOException {
+    model.put(PageMode.PROPERTY, pageMode.getLabel());
+    model.put("isAdmin", authorizationManager.isAdminUser());
+    model.put("sopDto", mapper.writeValueAsString(Dtos.asDto(sop)));
     model.put("sopCategories", SopCategory.values());
-    model.put("isAdmin", authorizationManager.getCurrentUser().isAdmin());
-
     return new ModelAndView("/WEB-INF/pages/editSop.jsp", model);
   }
 

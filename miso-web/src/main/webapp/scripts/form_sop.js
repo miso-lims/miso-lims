@@ -5,14 +5,6 @@ if (typeof FormTarget === "undefined") {
 FormTarget.sop = (function ($) {
   "use strict";
 
-  function getCategorySource() {
-    return [
-      { name: "Sample", value: "SAMPLE" },
-      { name: "Library", value: "LIBRARY" },
-      { name: "Run", value: "RUN" },
-    ];
-  }
-
   return {
     getUserManualUrl: function () {
       return Urls.external.userManual("type_data", "standard-operating-procedures");
@@ -30,12 +22,8 @@ FormTarget.sop = (function ($) {
       return Urls.ui.sops.edit(sop.id);
     },
 
-    getObjectTitle: function (sop) {
-      return sop && sop.id ? "Edit SOP" : "Create SOP";
-    },
-
     getSections: function (config, object) {
-      var isEdit = !!object.id;
+      var isEdit = config.pageMode === "edit";
 
       return [
         {
@@ -59,24 +47,35 @@ FormTarget.sop = (function ($) {
             {
               title: "Version",
               data: "version",
-              type: "text",
+              type: isEdit ? "read-only" : "text",
               required: true,
               maxLength: 50,
-              disabled: isEdit,
             },
             {
               title: "Category",
               data: "category",
-              type: "dropdown",
+              type: isEdit ? "read-only" : "dropdown",
               required: true,
-              disabled: isEdit,
-              source: getCategorySource(),
+              source: [
+                { name: "Sample", value: "SAMPLE" },
+                { name: "Library", value: "LIBRARY" },
+                { name: "Run", value: "RUN" },
+              ],
               sortSource: Utils.sorting.standardSort("name"),
               getItemLabel: function (item) {
                 return item.name;
               },
               getItemValue: function (item) {
                 return item.value;
+              },
+              onChange: function (value, formObject) {
+                var isRun = value === "RUN";
+                jQuery("#listSopFields").toggle(isRun);
+                jQuery("#sopFieldsUnsupported").toggle(!isRun);
+                jQuery("#sopForm_fieldsError").empty();
+                if (!isRun) {
+                  Sop.setFields([]);
+                }
               },
             },
             {
@@ -98,9 +97,7 @@ FormTarget.sop = (function ($) {
 
     confirmSave: function (sop, isDialog) {
       if (sop.category === "RUN") {
-        sop.sopFields = Sop.getFields();
-      } else {
-        sop.sopFields = [];
+        sop.fields = Sop.getFields();
       }
     },
   };

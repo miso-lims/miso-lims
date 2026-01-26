@@ -41,9 +41,7 @@ ListTarget.sop = (function ($) {
           name: "Copy",
           action: doCopy,
         },
-        ListUtils.createBulkDeleteAction(TYPE_LABEL, "sops", function (sop) {
-          return sop.alias;
-        }),
+        ListUtils.createBulkDeleteAction(TYPE_LABEL, "sops", Utils.array.getAlias),
       ];
     },
 

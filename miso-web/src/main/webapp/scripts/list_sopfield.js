@@ -5,15 +5,6 @@ ListTarget.sopfield = (function ($) {
   var FIELD_UNITS_MAX = 50;
   var ALLOWED_TYPES = ["TEXT", "NUMBER", "PERCENTAGE"];
 
-  function normStr(v) {
-    return (v == null ? "" : String(v)).trim();
-  }
-
-  function normalizeType(v) {
-    var t = normStr(v).toUpperCase() || "TEXT";
-    return ALLOWED_TYPES.indexOf(t) !== -1 ? t : "TEXT";
-  }
-
   function addFieldDialog() {
     Utils.showDialog(
       "Add SOP Field",
@@ -24,12 +15,14 @@ ListTarget.sopfield = (function ($) {
           type: "text",
           property: "name",
           maxlength: FIELD_NAME_MAX,
+          required: true,
         },
         {
           label: "Type",
           type: "select",
           property: "fieldType",
           values: ALLOWED_TYPES,
+          required: true,
         },
         {
           label: "Units",
@@ -39,25 +32,14 @@ ListTarget.sopfield = (function ($) {
         },
       ],
       function (result) {
-        var name = normStr(result && result.name);
-        if (!name) {
-          Utils.showOkDialog("Error", ["Name is required"]);
-          return;
-        }
-
         Sop.addField({
           id: null,
-          name: name,
-          fieldType: normalizeType(result && result.fieldType),
-          units: normStr(result && result.units) || null,
+          name: result.name,
+          fieldType: result.fieldType,
+          units: result.units || null,
         });
       }
     );
-  }
-
-  function renderTextCell(data, type) {
-    if (type === "display") return Utils.escapeHtml(data || "");
-    return data || "";
   }
 
   return {
@@ -98,22 +80,14 @@ ListTarget.sopfield = (function ($) {
         {
           sTitle: "Name",
           mData: "name",
-          mRender: renderTextCell,
         },
         {
           sTitle: "Type",
           mData: "fieldType",
-          sWidth: "220px",
-          mRender: function (data, type) {
-            var v = normalizeType(data);
-            return type === "display" ? Utils.escapeHtml(v) : v;
-          },
         },
         {
           sTitle: "Units",
           mData: "units",
-          sWidth: "220px",
-          mRender: renderTextCell,
         },
       ];
     },
