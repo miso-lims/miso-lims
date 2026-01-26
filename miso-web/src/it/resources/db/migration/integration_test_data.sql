@@ -1323,6 +1323,10 @@ INSERT INTO LibraryTemplate(libraryTemplateId, alias, defaultVolume, platformTyp
 (2, 'TestLibTempTwo', 12.34, 'ILLUMINA', 1, 3, 5, 1, 1, 'MICROLITRES'),
 (3, 'to_delete', 12.34, 'ILLUMINA', 1, 3, 5, 1, 1, 'MICROLITRES');
 
+INSERT INTO LibraryTemplate_Project (libraryTemplateId, projectId) VALUES
+(1,1),
+(2,1);
+
 INSERT INTO LibraryTemplate_Index1(libraryTemplateId, `position`, indexId) VALUES
 (1, 'A01', 1),
 (1, 'A02', 2);
