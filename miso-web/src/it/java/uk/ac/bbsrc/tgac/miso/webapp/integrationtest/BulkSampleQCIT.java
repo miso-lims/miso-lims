@@ -97,7 +97,7 @@ public class BulkSampleQCIT extends AbstractBulkSampleIT {
   @Test
   public void testEditQc() throws Exception {
     // Goal: ensure a sample QC can be edited
-    BulkQCPage page = getEditPage(Arrays.asList(2201L));
+    BulkQCPage page = getEditPage(Arrays.asList(4447L));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
