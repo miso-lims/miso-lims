@@ -18,11 +18,7 @@ public class EditRunControllerST extends AbstractST {
   private static final long SEQUENCER_INSTRUMENT_ID = 5002L;
   private static final long NON_SEQUENCER_INSTRUMENT_ID = 4L;
 
-  @Test
-  public void testSetupFormByIdOk() throws Exception {
-    Map<String, Object> modelMap = baseTestEditModel(CONTROLLER_BASE + "/" + EXISTING_RUN_ID);
-
-    assertEquals("Run " + EXISTING_RUN_ID, modelMap.get("title"));
+  private static void assertSetupFormModelKeys(Map<String, Object> modelMap) {
     assertNotNull(modelMap.get("run"));
     assertNotNull(modelMap.get("runDto"));
     assertNotNull(modelMap.get("runPositions"));
@@ -33,6 +29,15 @@ public class EditRunControllerST extends AbstractST {
     assertNotNull(modelMap.get("formConfig"));
     assertNotNull(modelMap.get("metrics"));
     assertNotNull(modelMap.get("partitionNames"));
+    assertNotNull(modelMap.get("experiments"));
+  }
+
+  @Test
+  public void testSetupFormByIdOk() throws Exception {
+    Map<String, Object> modelMap = baseTestEditModel(CONTROLLER_BASE + "/" + EXISTING_RUN_ID);
+
+    assertEquals("Run " + EXISTING_RUN_ID, modelMap.get("title"));
+    assertSetupFormModelKeys(modelMap);
   }
 
   @Test
@@ -44,8 +49,9 @@ public class EditRunControllerST extends AbstractST {
   @Test
   public void testSetupFormByAliasOk() throws Exception {
     Map<String, Object> modelMap = baseTestEditModel(CONTROLLER_BASE + "/alias/" + EXISTING_RUN_ALIAS);
-    assertNotNull(modelMap.get("run"));
-    assertNotNull(modelMap.get("formConfig"));
+
+    assertEquals("Run " + EXISTING_RUN_ID, modelMap.get("title"));
+    assertSetupFormModelKeys(modelMap);
   }
 
   @Test
@@ -59,8 +65,16 @@ public class EditRunControllerST extends AbstractST {
     baseTestNewModel(CONTROLLER_BASE + "/new/" + SEQUENCER_INSTRUMENT_ID, "New Run")
         .andExpect(view().name("/WEB-INF/pages/editRun.jsp"))
         .andExpect(model().attributeExists("run"))
+        .andExpect(model().attributeExists("runDto"))
+        .andExpect(model().attributeExists("runPositions"))
+        .andExpect(model().attributeExists("runPartitions"))
+        .andExpect(model().attributeExists("runAliquots"))
         .andExpect(model().attributeExists("partitionConfig"))
-        .andExpect(model().attributeExists("formConfig"));
+        .andExpect(model().attributeExists("experimentConfiguration"))
+        .andExpect(model().attributeExists("formConfig"))
+        .andExpect(model().attributeExists("metrics"))
+        .andExpect(model().attributeExists("partitionNames"))
+        .andExpect(model().attributeExists("experiments"));
   }
 
   @Test
