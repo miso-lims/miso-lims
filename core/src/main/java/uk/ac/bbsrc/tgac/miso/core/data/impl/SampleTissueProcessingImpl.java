@@ -25,7 +25,8 @@ public class SampleTissueProcessingImpl extends DetailedSampleImpl implements Sa
   @JoinColumn(name = "indexId")
   private SampleIndex index;
 
-  @OneToMany(mappedBy = "sample", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "sampleId", nullable = false)
   private Set<SampleProbe> probes;
 
   @Override

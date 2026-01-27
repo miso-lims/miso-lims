@@ -316,12 +316,6 @@ public class DefaultSampleService implements SampleService {
       sample.setInitialVolume(sample.getVolume());
     }
     if (isTissueProcessingSample(sample)) {
-      SampleTissueProcessing tissueProcessing = (SampleTissueProcessing) sample;
-      if (tissueProcessing.getProbes() != null) {
-        for (SampleProbe probe : tissueProcessing.getProbes()) {
-          probe.setSample(tissueProcessing);
-        }
-      }
       if (isSampleSlide(sample)) {
         ((SampleSlide) sample).setInitialSlides(((SampleSlide) sample).getSlides());
       }
@@ -1184,7 +1178,6 @@ public class DefaultSampleService implements SampleService {
       if (to.getProbes().isEmpty()) {
         changeMessages.add(from.getProbes().size() + " probes added");
         for (SampleProbe fromProbe : from.getProbes()) {
-          fromProbe.setSample(to);
           to.getProbes().add(fromProbe);
         }
         to.getProbes().addAll(from.getProbes());
@@ -1210,7 +1203,6 @@ public class DefaultSampleService implements SampleService {
           } else {
             // add new probe
             to.getProbes().add(fromProbe);
-            fromProbe.setSample(to);
             probesAdded++;
           }
         }
