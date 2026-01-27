@@ -190,7 +190,7 @@ public class LibraryTemplateRestControllerST extends AbstractST {
     indexDto.setBoxPosition("A03");
     indexDto.setIndex1Id(3L);
 
-    pollingHelper("post", Arrays.asList(indexDto), CONTROLLER_BASE + "/" + templateId + "/indices");
+    pollingResponserHelper("post", Arrays.asList(indexDto), CONTROLLER_BASE + "/" + templateId + "/indices", CONTROLLER_BASE + "/bulk/", 202);
 
     LibraryTemplate template = currentSession().get(entityClass, templateId);
     assertNotNull(template.getIndexOnes().get("A03"));
@@ -205,7 +205,7 @@ public class LibraryTemplateRestControllerST extends AbstractST {
       indexDto.setBoxPosition("A01");
       indexDto.setIndex1Id(4L);
 
-      pollingHelper("put", Arrays.asList(indexDto), CONTROLLER_BASE + "/" + templateId + "/indices");
+      pollingResponserHelper("put", Arrays.asList(indexDto), CONTROLLER_BASE + "/" + templateId + "/indices", CONTROLLER_BASE + "/bulk/", 202);
 
       LibraryTemplate template = currentSession().get(entityClass, templateId);
       assertNotNull(template.getIndexOnes().get("A01"));
@@ -215,24 +215,6 @@ public class LibraryTemplateRestControllerST extends AbstractST {
   @Test
   public void testDeleteLibraryTemplate() throws Exception {
     testBulkDelete(entityClass, 3, CONTROLLER_BASE);
-  }
-
-  private String pollingHelper(String requestType, List<?> dtos, String url) throws Exception {
-      ResultActions ac;
-      if("post".equalsIgnoreCase(requestType)) {
-          ac = getMockMvc().perform(post(url).contentType(MediaType.APPLICATION_JSON)
-                  .content(makeJson(dtos)));
-      } else if ("put".equalsIgnoreCase(requestType)) {
-          ac = getMockMvc().perform(put(url).contentType(MediaType.APPLICATION_JSON)
-                  .content(makeJson(dtos)));
-      } else {
-          throw new IllegalArgumentException("Unknown request type: " + requestType);
-      }
-
-      String responseContent = ac.andExpect(status().isAccepted()).andReturn().getResponse().getContentAsString();
-      String id = JsonPath.read(responseContent, "$.operationId");
-
-      return pollingResponse(CONTROLLER_BASE + "/bulk/" + id);
   }
 
 }
