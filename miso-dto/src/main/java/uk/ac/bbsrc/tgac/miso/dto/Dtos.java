@@ -2282,7 +2282,7 @@ public class Dtos {
 
   public static List<ContainerDto> asContainerDtos(@Nonnull Collection<SequencerPartitionContainer> containerSubset,
       boolean includeContainerPartitions, boolean includePoolContents) {
-      return asContainerDtos(containerSubset, includeContainerPartitions, includePoolContents);
+    return asContainerDtos(containerSubset, includeContainerPartitions, includePoolContents);
   }
 
   public static SequencerPartitionContainer to(@Nonnull ContainerDto from) {
