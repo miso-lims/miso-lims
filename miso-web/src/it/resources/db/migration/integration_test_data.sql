@@ -331,17 +331,18 @@ INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNum
   (1, 'Test Kit', 1, 'TestCo', '123', 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
   (2, 'Test Kit Two', 2, 'TestCo', '124', 'LIBRARY', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
   (3, 'Test Kit Three', 1, 'ACME', '125', 'CLUSTERING', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
-  (4, 'Test Kit Four', 1, 'DONUT', '126', 'MULTIPLEXING', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
-  
+  (4, 'Test Kit Four', 1, 'DONUT', '126', 'MULTIPLEXING', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
+  (5, 'PacBio Test Kit', 1, 'SomeCo', '127', 'LIBRARY', 'PACBIO', 1, '2025-10-21 13:49:00', 1, '2025-10-21 13:49:00');
+
 INSERT INTO TargetedSequencing (targetedSequencingId, alias, description, archived, createdBy, updatedBy, creationDate, lastUpdated) VALUES
   (1, 'Test TarSeq One', 'first test targeted sequencing', 0, 1, 1, '2017-08-14 14:00:00', '2017-08-14 14:00:00'),
   (2, 'Test TarSeq Two', 'second test targeted sequencing', 0, 1, 1, '2017-08-14 14:00:00', '2017-08-14 14:00:00'),
   (3, 'Test TarSeq Three', 'third test targeted sequencing', 0, 1, 1, '2017-08-14 14:00:00', '2017-08-14 14:00:00');
-  
+
 INSERT INTO TargetedSequencing_KitDescriptor (targetedSequencingId, kitDescriptorId) VALUES
   (1, 1), (2, 1), (3, 2);
 
-INSERT INTO BoxUse (boxUseId, alias) VALUES 
+INSERT INTO BoxUse (boxUseId, alias) VALUES
 (1, 'DNA'), (2, 'RNA'), (3, 'Libraries'), (4, 'Sequencing'), (5, 'Storage'), (6, 'Tissue');
 
 INSERT INTO BoxSize (boxSizeId, boxSizeRows, boxSizeColumns, scannable) VALUES
@@ -389,16 +390,11 @@ INSERT INTO LibraryIndex (indexId, indexFamilyId, name, sequence, position) VALU
   (20, 5, 'B02', 'GGGGGG', 2);
 
 INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, instrumentType) VALUES
-  (1, 'ILLUMINA', 'Illumina HiSeq 2500', 2, 'SEQUENCER'),
+  (1, 'ILLUMINA', 'Illumina HiSeq 2500', 1, 'SEQUENCER'),
   (2, 'ILLUMINA', 'Illumina MiSeq', 1, 'SEQUENCER'),
   (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER'),
   (4, 'ILLUMINA', 'Illumina iScan', 1, 'ARRAY_SCANNER'),
   (5, 'ILLUMINA', 'Deletable', 1, 'OTHER');
-
-INSERT INTO InstrumentPosition(positionId, instrumentModelId, alias) VALUES
-(1, 1, 'A'),
-(2, 1, 'B'),
-(3, 1, 'C');
 
 INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, readLength2, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
@@ -454,7 +450,7 @@ INSERT INTO Instrument (instrumentId, name, instrumentModelId, defaultPurposeId,
   (3, 'TPB2', 3, 1, NULL),
   (4, 'iScan1', 4, NULL, NULL),
   (5, 'Deletable', 4, NULL, NULL);
-  
+
 INSERT INTO Instrument (instrumentId, name, instrumentModelId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId, defaultPurposeId) VALUES
   (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, 1),
   (101, 'NewHiSeq_101', 1, '101', '2017-02-01', NULL, NULL, 1),
@@ -497,7 +493,7 @@ INSERT INTO Subproject(subprojectId, projectId, alias, referenceGenomeId, descri
 (1, 6, 'Subproject 1', 1, 'test subproject one', TRUE, 1, '2020-02-20 11:35:00', 1, '2020-02-20 11:35:00'),
 (2, 6, 'Subproject 2', 1, 'test subproject two', TRUE, 1, '2020-02-20 11:35:00', 1, '2020-02-20 11:35:00'),
 (3, 6, 'Subproject 3', 1, 'test subproject three', TRUE, 1, '2020-02-20 11:35:00', 1, '2020-02-20 11:35:00');
-  
+
 INSERT INTO SampleNumberPerProject(projectId, highestSampleNumber, padding, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (100001, 1, 4, 1, '2017-10-11 15:33:00', 1, '2017-10-11 15:33:00');
 
@@ -554,6 +550,9 @@ INSERT INTO Assay_AssayTest(assayId, testId) VALUES
 INSERT INTO Requisition(requisitionId, alias, creator, created, lastModifier, lastModified) VALUES
 (1, 'Req One', 1, '2021-07-21 11:31:00', 1, '2021-07-21 11:31:00'),
 (2, 'Req Two', 3, '2021-07-21 11:31:00', 3, '2021-07-21 11:31:00');
+
+INSERT INTO Requisition(requisitionId, alias, creator, created, lastModifier, lastModified) VALUES
+(2201, 'Req TestQc', 1, '2021-07-21 11:31:00', 1, '2021-07-21 11:31:00');
 
 INSERT INTO Requisition_Assay(requisitionId, assayId) VALUES
 (1, 1),
@@ -749,7 +748,7 @@ INSERT INTO Sample (sampleId, project_projectId, name, alias, description, ident
 (120004, 120001, 'SAM120004', '1IPO_0001_Ly_P_1-1_D1', NULL, NULL, 'GENOMIC', 1, NULL, NULL,NULL, NULL,  1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00',
   FALSE, FALSE, 15, 120003, NULL, NULL, NULL, 1, NULL, 1, '2017-07-24', 0, 'Aliquot',
   NULL),
-(200004, 200001, 'SAM200004', 'IPOT_0001_Pa_P_1-1_D_1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00',
+(200004, 200001, 'SAM200004', 'IPOT_0001_Pa_P_1-1_D_1', NULL, NULL, 'GENOMIC', 1, NULL, NULL, NULL, NULL, 3, '2017-07-24 16:11:00', 3, '2017-07-24 16:11:00',
   FALSE, FALSE, 15, 200003, NULL, NULL, NULL, 1, NULL, 1, '2017-07-24', 0, 'Aliquot',
   NULL);
 
@@ -763,138 +762,139 @@ INSERT INTO Transfer_Sample(transferId, sampleId, received, qcPassed, qcNote) VA
 
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType, libraryType, librarySelectionType, libraryStrategyType, creationDate,
   creator, created, lastModifier, lastModified, detailedQcStatusId, qcUser, qcDate, dnaSize, volume, concentration, locationBarcode, kitDescriptorId, discarded, volumeUnits, concentrationUnits, spikeInId, spikeInDilutionFactor, spikeInVolume, lowQuality,
-  discriminator, archived, libraryDesign, libraryDesignCodeId, nonStandardAlias, sopId, kitLot, index1Id, index2Id, requisitionId) VALUES
-  (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 8, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 
+  discriminator, archived, libraryDesign, libraryDesignCodeId, nonStandardAlias, sopId, kitLot, index1Id, index2Id, requisitionId, workstationId) VALUES
+  (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 8, 'ILLUMINA', 1, 3, 1,  '2016-11-07',
     1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 1, '2017-07-20', 300, 5.0, 2.75, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, 1, 7, FALSE, NULL, NULL, NULL, NULL, 1),
-  (204, 'LIB204', 'SORT_0001_nn_n_PE_204_WG', NULL, 'description', 204, 'ILLUMINA', 1, 3, 1, '2017-08-09',
+    'DetailedLibrary', 0, 1, 7, FALSE, NULL, NULL, NULL, NULL, 1, 1),
+  (204, 'LIB204', 'SORT_0001_nn_n_PE_204_WG', '11311', 'description', 204, 'ILLUMINA', 1, 3, 1, '2017-08-09',
     1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, 1, 1),
   (205, 'LIB205', 'SORT_0001_nn_n_PE_205_WG', NULL, 'description', 205, 'ILLUMINA', 1, 3, 1, '2017-08-09',
     1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, 1),
   (206, 'LIB206', 'SORT_0001_nn_n_PE_206_WG', NULL, 'description', 206, 'ILLUMINA', 1, 3, 1, '2017-08-09',
     1, '2017-08-09 11:58:00', 1, '2017-08-09 11:58:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, 2),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, 2, 1),
   (304, 'LIB304', 'DILT_0001_nn_n_PE_304_WG', NULL, 'description', 304, 'ILLUMINA', 1, 3, 1, '2017-08-14',
-    1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', 1, NULL, NULL, 304, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 5, NULL, NULL),
+    1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, 304, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 5, NULL, NULL, 1),
   (305, 'LIB305', 'DILT_0001_nn_n_PE_305_WG', NULL, 'description', 305, 'ILLUMINA', 1, 3, 1, '2017-08-14',
     1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, 305, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 6, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 6, NULL, NULL, 1),
   (306, 'LIB306', 'DILT_0001_nn_n_PE_306_WG', NULL, 'description', 304, 'ILLUMINA', 1, 3, 1, '2017-08-14',
     1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', NULL, NULL, NULL, 306, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 9, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 9, NULL, NULL, 1),
   (504, 'LIB504', 'TIB_0001_nn_n_PE_404_WG', 'TIB_Lib', NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, 1),
   (505, 'LIB505', 'TIB_0001_nn_n_PE_505_WG', 'TIB_Lib2', NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, 1),
   (600, 'LIB600', 'TIB_0001_nn_n_PE_600_WG', 'BADLIB', NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, TRUE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 9, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 9, NULL, NULL, NULL),
   (601, 'LIB601', 'TIB_0001_nn_n_PE_601_WG', 'SimLib1', NULL, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
     1, '2018-06-26 11:38:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 13, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 13, NULL, NULL, NULL),
   (602, 'LIB602', 'TIB_0001_nn_n_PE_602_WG', 'SimLib2', NULL, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
     1, '2018-06-26 11:38:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 14, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 14, NULL, NULL, NULL),
   (603, 'LIB603', 'TIB_0001_nn_n_PE_603_WG', 'SameLib1', NULL, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
     1, '2018-06-26 11:38:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 8, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 8, NULL, NULL, NULL),
   (604, 'LIB604', 'TIB_0001_nn_n_PE_604_WG', 'SameLib2', NULL, 504, 'ILLUMINA', 1, 3, 1, '2018-06-26',
     1, '2018-06-26 11:38:00', 1, '2018-06-26 11:38:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 8, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 8, NULL, NULL, NULL),
   (700, 'LIB700', 'TIB_0001_nn_n_PE_700_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, 700, 100, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (701, 'LIB701', 'TIB_0001_nn_n_PE_701_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, 701, 100, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (801, 'LIB801', 'TIB_0001_nn_n_PE_801_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, 801, 100, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (802, 'LIB802', 'TIB_0001_nn_n_PE_802_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, 802, 100, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (803, 'LIB803', 'TIB_0001_nn_n_PE_803_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, 803, 100, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (804, 'LIB804', 'TIB_0001_nn_n_PE_804_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, NULL, 60, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (805, 'LIB805', 'TIB_0001_nn_n_PE_805_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, NULL, 100, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (806, 'LIB806', 'TIB_0001_nn_n_PE_806_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, NULL, 60, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (807, 'LIB807', 'TIB_0001_nn_n_PE_807_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, NULL, 60, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (901, 'LIB901', 'TIB_0001_nn_n_PE_901_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, NULL, -30, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (2201, 'LIB2201', 'TIB_0001_nn_n_PE_2201_WG', NULL, NULL, 504, 'ILLUMINA', 1, 3, 1, '2017-08-15',
     1, '2017-08-15 13:55:00', 1, '2017-08-15 13:55:00', NULL, NULL, NULL, NULL, 50, 60, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (100001, 'LIB100001', 'LIBT_0001_Ly_P_PE_251_WG', 'libbar100001', 'libdesc100001', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     3, '2017-07-24 16:11:00', 3, '2017-07-24 16:11:00', 7, 1, '2017-07-24', 251,  2.5,  10, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE', 1, 'TEN', 12.34, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 5, 9, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 5, 9, NULL, NULL),
   (100002, 'LIB100002', 'LIBT_0001_Ly_P_PE_252_WG', 'libbar100002', 'libdesc100002', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 7, 1, '2017-07-24', 252,  4,    6.3, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE', 1, 'TEN', 12.34, FALSE,
-    'DetailedLibrary', 0, 1, 7, FALSE, NULL, NULL, 6, 10, NULL),
+    'DetailedLibrary', 0, 1, 7, FALSE, NULL, NULL, 6, 10, NULL, NULL),
   (100003, 'LIB100003', 'LIBT_0001_Ly_P_PE_253_WG', NULL,           NULL,            100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (100004, 'LIB100004', 'LIBT_0001_Ly_P_PE_254_WG', NULL,           'libdesc100004', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (100005, 'LIB100005', 'LIBT_0001_Ly_P_PE_255_WG', NULL,           'libdesc100005', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (100006, 'LIB100006', 'LIBT_0001_Ly_P_PE_256_WG', NULL,           'libdesc100006', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (100007, 'LIB100007', 'LIBT_0001_Ly_P_PE_257_WG', NULL,           'libdesc100007', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (100008, 'LIB100008', 'LIBT_0001_Ly_P_PE_258_WG', NULL,           'libdesc100008', 100004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (110001, 'LIB110001', '1LIB_0001_Ly_P_PE_251_WG', 'libbar110001', 'libdesc110001', 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 7, 1, '2017-07-24',    251,  2.5,  10, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 5, 9, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 5, 9, NULL, NULL),
   (110002, 'LIB110002', '1LIB_0001_Ly_P_PE_252_WG', 'libbar110002', 'libdesc110002', 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 7, 1, '2017-07-24',    252,  4,    6.3, 'lib_location_110002', 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, 1, 7, FALSE, NULL, NULL, 5, 9, NULL),
+    'DetailedLibrary', 0, 1, 7, FALSE, NULL, NULL, 5, 9, NULL, NULL),
   (110003, 'LIB110003', '1LIB_0001_Ly_P_PE_253_WG', NULL,           NULL,            110004, 'ILLUMINA', 1, NULL, NULL, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (110004, 'LIB110004', '1LIB_0001_Ly_P_PE_254_WG', NULL,           'libdesc110004', 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, 5, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, NULL, NULL, NULL, NULL),
   (110005, 'LIB110005', '1LIB_0001_Ly_P_PE_255_WG', NULL,           'libdesc110005', 110004, 'ILLUMINA', 1, NULL, NULL, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', NULL, NULL, NULL, NULL, 5, NULL, NULL, 1, 0, 'MICROLITRES', NULL, NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 3, FALSE, NULL, NULL, 5, 9, NULL),
+    'DetailedLibrary', 0, NULL, 3, FALSE, NULL, NULL, 5, 9, NULL, NULL),
   (120001, 'LIB120001', '1IPO_0001_Ly_P_PE_251_WG', 'libbar120001', 'libdesc120001', 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 7, 1, '2017-07-24',    251,  2.5,  10, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 1, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, NULL, NULL, 1, NULL, NULL, NULL),
   (120002, 'LIB120002', '1IPO_0001_Ly_P_PE_252_WG', 'libbar120002', 'libdesc120002', 110004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 7, 1, '2017-07-24',    252,  4,    6.3, 'lib_location_120002', 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, 1, 7, FALSE, NULL, NULL, 2, NULL, NULL),
+    'DetailedLibrary', 0, 1, 7, FALSE, NULL, NULL, 2, NULL, NULL, NULL),
   (200001, 'LIB200001', 'IPOT_0001_Pa_P_PE_251_WG', 'libbar200001', 'libdesc200001', 200004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
     1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 7, 1, '2017-07-24',    251,  2.5,  10, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, NULL, 7, FALSE, 3, 'KITLOTONE', NULL, NULL, NULL),
+    'DetailedLibrary', 0, NULL, 7, FALSE, 3, 'KITLOTONE', NULL, NULL, NULL, NULL),
   (200002, 'LIB200002', 'IPOT_0001_Pa_P_PE_252_WG', 'libbar200002', 'libdesc200002', 200004, 'ILLUMINA', 1, 3, 1, '2017-07-24',
-    1, '2017-07-24 16:11:00', 1, '2017-07-24 16:11:00', 7, 1, '2017-07-24',    252,  4,    6.3, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, NULL, FALSE,
-    'DetailedLibrary', 0, 1, 7, FALSE, 3, 'KITLOTONE', NULL, NULL, NULL);
+    3, '2017-07-24 16:11:00', 3, '2017-07-24 16:11:00', 7, 1, '2017-07-24',    252,  4,    6.3, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, NULL, FALSE,
+    'DetailedLibrary', 0, 1, 7, FALSE, 3, 'KITLOTONE', NULL, NULL, NULL, NULL);
 
 INSERT INTO LibraryAliquot (aliquotId, name, alias, concentration, concentrationUnits, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated, volumeUsed, discriminator, libraryDesignCodeId, nonStandardAlias) VALUES
 (1, 'LDI1', 'TEST_0001_Bn_R_PE_300_WG', 5.9, 'NANOGRAMS_PER_MICROLITRE', 1, '12321', '2017-07-20', 1, 1, '2017-07-20 09:01:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
 (304, 'LDI304', 'DILT_0001_nn_n_PE_304_WG', 7.97, 'NANOGRAMS_PER_MICROLITRE', 304, '300304', '2017-08-14', 3, 3, '2017-08-14 12:25:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
 (305, 'LDI305', 'DILT_0001_nn_n_PE_305_WG', 7.97, 'NANOGRAMS_PER_MICROLITRE', 305, '300305', '2017-08-14', 1, 1, '2017-08-14 12:25:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
+(306, 'LDI306', 'DILT_0001_nn_n_PE_306_WG', 7.97, 'NANOGRAMS_PER_MICROLITRE', 305, '300306', '2017-08-14', 3, 3, '2017-08-14 12:25:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
 (504, 'LDI504', 'TIB_0001_nn_n_PE_404_WG', 5.9, 'NANOGRAMS_PER_MICROLITRE', 504, 'TIB_Dil', '2017-08-15', 1, 1, '2017-08-15 13:55:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
 (505, 'LDI505', 'TIB_0001_nn_n_PE_404_WG', 3.3, 'NANOGRAMS_PER_MICROLITRE', 504, 'TIB_replaceDil', '2017-08-15', 1, 1, '2017-08-15 13:55:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
 (701, 'LDI701', 'TIB_0001_nn_n_PE_404_WG', 2.2, 'NANOGRAMS_PER_MICROLITRE', 504, 'test_pooling_1', '2017-10-16', 1, 1, '2017-10-16 15:59:00', NULL, 'DetailedLibraryAliquot', 7, FALSE),
@@ -983,7 +983,6 @@ INSERT INTO Pool_LibraryAliquot (poolId, aliquotId) VALUES
 (803, 804),
 (804, 800);
 
-
 INSERT INTO SequencingOrder (sequencingOrderId, poolId, partitions, parametersId, createdBy, updatedBy, creationDate, lastUpdated, purposeId) VALUES
 (1, 5103, 2, 4, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00', 1),
 (2, 5103, 2, 3, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00', 1),
@@ -1032,7 +1031,7 @@ INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (500, 501, 'POOL', 'D01'),
 (500, 505, 'LIBRARY', 'F10'),
 (100001, 100006, 'LIBRARY', 'A02'),
-(100001, 100007, 'LIBRARY', 'A03'); 
+(100001, 100007, 'LIBRARY', 'A03');
 
 INSERT INTO SequencerPartitionContainer (containerId, identificationBarcode, sequencingContainerModelId, lastModifier, creator, created, lastModified) VALUES
 (1, 'MISEQXX', 1, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01'),
@@ -1051,7 +1050,7 @@ INSERT INTO SequencerPartitionContainer (containerId, identificationBarcode, seq
 
 INSERT INTO _Partition (containerId, partitionId, partitionNumber, pool_poolId) VALUES
 (1, 11, 1, 1),(1, 12, 2, 501),(1, 13, 3, NULL),(1, 14, 4, NULL),
-(2, 21, 1, 501),(2, 22, 2, NULL),(2, 23, 3, NULL),(2, 24, 4, NULL),(2, 25, 5, NULL),(2, 26, 6, NULL),(2, 27, 7, NULL),(2, 28, 8, NULL),
+(2, 21, 1, NULL),(2, 22, 2, NULL),(2, 23, 3, NULL),(2, 24, 4, NULL),(2, 25, 5, NULL),(2, 26, 6, NULL),(2, 27, 7, NULL),(2, 28, 8, NULL),
 (5002, 5101, 1, NULL),(5002, 5102, 2, NULL),(5002, 5103, 3, NULL),(5002, 5104, 4, NULL),(5002, 5105, 5, NULL),(5002, 5106, 6, NULL),(5002, 5107, 7, NULL),(5002, 5108, 8, NULL),
 (5003, 5201, 1, NULL),(5003, 5202, 2, NULL),(5003, 5203, 3, NULL),(5003, 5204, 4, NULL),(5003, 5205, 5, NULL),(5003, 5206, 6, NULL),(5003, 5207, 7, NULL),(5003, 5208, 8, NULL),
 (5004, 5401, 1, NULL),(5004, 5402, 2, NULL),(5004, 5403, 3, NULL),(5004, 5404, 4, NULL),(5004, 5405, 5, NULL),(5004, 5406, 6, NULL),(5004, 5407, 7, NULL),(5004, 5408, 8, NULL),
@@ -1069,17 +1068,17 @@ INSERT INTO Run (runId, name, alias, instrumentId, startDate, completionDate, he
 (2, 'RUN2', 'PacBio_Run_1', 3, '2017-08-01', NULL, 'Running', 3, '2017-08-01 10:03:02', 3, '2017-08-01 10:03:02');
 
 INSERT INTO Run (runId, name, alias, instrumentId, sequencingParameters_parametersId, description, filePath, startDate, completionDate, health, creator, created, lastModifier, lastModified) VALUES
-(5001, 'RUN5001', 'Change_Values_Run', 5002, 2, 'description', '/filePath', '2017-09-05', NULL, 'Running', 1, '2017-07-25 11:00:00', 1, '2017-09-05 11:00:00'),
-(5002, 'RUN5002', 'Add_Existing_Container_Run', 5002, 2, 'add existing container to run', '/existing', '2017-07-24', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5003, 'RUN5003', 'Remove_Existing_Container_Run', 5002, 2, 'remove container from run', '/removable', '2017-07-23', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5004, 'RUN5004', 'Add_Pools_To_Container_Run', 5002, 2, 'add pools to container on run', '/add/pools', '2017-07-22', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5005, 'RUN5005', 'Remove_Pools_From_Container_Run', 5002, 2, 'remove pools from container on run', '/remove/pools', '2017-07-21', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5006, 'RUN5006', 'Replace_Pool_In_Container_Run', 5002, 2, 'replace pool in container on run', '/replace/pool', '2017-07-20', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5008, 'RUN5008', 'Fail_Lane_In_Container_Run', 5002, 2, 'fail lane in container on run', '/fail/lane', '2017-07-19', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5009, 'RUN5009', 'Fail_Lane_With_Note_Run', 5002, 2, 'fail lane with note on run', '/fail/note', '2017-07-18', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5010, 'RUN5010', 'Fail_Lane_To_Ok_Run', 5002, 2, 'fail lane change to ok', '/fail/ok', '2017-07-17', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5100, 'RUN5100', 'Search_Pool_Run', 2, 4, 'test pool searches', '/test/searches', '2017-07-16', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
-(5101, 'RUN5101', 'Pool_Completed_Orders_Run', 2, 2, 'sequencing orders are complete', '/complete/orders', '2017-07-15', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00');
+(5001, 'RUN5001', 'Change_Values_Run', 5002, 2, 'description', '/filePath', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5002, 'RUN5002', 'Add_Existing_Container_Run', 5002, 2, 'add existing container to run', '/existing', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5003, 'RUN5003', 'Remove_Existing_Container_Run', 5002, 2, 'remove container from run', '/removable', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5004, 'RUN5004', 'Add_Pools_To_Container_Run', 5002, 2, 'add pools to container on run', '/add/pools', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5005, 'RUN5005', 'Remove_Pools_From_Container_Run', 5002, 2, 'remove pools from container on run', '/remove/pools', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5006, 'RUN5006', 'Replace_Pool_In_Container_Run', 5002, 2, 'replace pool in container on run', '/replace/pool', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5008, 'RUN5008', 'Fail_Lane_In_Container_Run', 5002, 2, 'fail lane in container on run', '/fail/lane', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5009, 'RUN5009', 'Fail_Lane_With_Note_Run', 5002, 2, 'fail lane with note on run', '/fail/note', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5010, 'RUN5010', 'Fail_Lane_To_Ok_Run', 5002, 2, 'fail lane change to ok', '/fail/ok', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5100, 'RUN5100', 'Search_Pool_Run', 2, 4, 'test pool searches', '/test/searches', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00'),
+(5101, 'RUN5101', 'Pool_Completed_Orders_Run', 2, 2, 'sequencing orders are complete', '/complete/orders', '2017-09-05', NULL, 'Running', 1, '2017-09-05 11:00:00', 1, '2017-09-05 11:00:00');
 
 INSERT INTO RunIllumina (runId, pairedEnd) VALUES (1, 1);
 INSERT INTO RunIllumina (runId, callCycle, imgCycle, numCycles, scoreCycle, pairedEnd) VALUES
@@ -1201,9 +1200,6 @@ INSERT INTO Run_Partition_LibraryAliquot(runId, partitionId, aliquotId, lastModi
 (1, 11, 1, 1, 1, 1, '2021-02-19 14:41:00'),
 (1, 12, 304, 1, 1, 1, '2021-02-19 14:41:00');
 
-INSERT INTO Run_Partition_LibraryAliquot (runId, partitionId, lastModifier, aliquotId) VALUES
-(5002, 5101, 3, 304);
-
 INSERT INTO Note(noteId, creationDate, internalOnly, text, owner_userId) VALUES
   (1, '2017-08-22', 1, 'LIB110005 existing note', 3),
   (2, '2017-08-25', 1, 'IPO120001 existing note', 3),
@@ -1244,13 +1240,15 @@ INSERT INTO QCType(qcTypeId, name, description, qcTarget, units, archived, preci
 (107, 'test edit qc', '', 'Pool', 'test units', FALSE, 2, 'NONE', FALSE),
 (108, 'update volume qc', '', 'Pool', 'µL', FALSE, 2, 'VOLUME', TRUE),
 (109, 'update concentration qc', '', 'Pool', 'nM', FALSE, 2, 'CONCENTRATION', TRUE),
-(110, 'unused qc', '', 'Sample', 'things', FALSE, 2, 'NONE', FALSE);
+(110, 'unused qc', '', 'Sample', 'things', FALSE, 2, 'NONE', FALSE),
+(111, 'test edit qc', '', 'Requisition', 'test units', FALSE, 2, 'NONE', FALSE);
 
 INSERT INTO QcControl(controlId, qcTypeId, alias) VALUES
 (1, 110, 'standard control');
 
-INSERT INTO SampleQC(sample_sampleId, creator, date, type, results, created, lastModified) VALUES
-(2201, 1, '2018-07-10', 101, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
+INSERT INTO SampleQC(qcId, sample_sampleId, creator, date, type, results, created, lastModified) VALUES
+(1, 2201, 1, '2018-07-10', 101, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00'),
+(2, 4447, 3, '2025-07-10', 102, 8.9, '2025-07-10 14:29:00', '2025-07-10 14:29:00');
 
 INSERT INTO WorksetCategory(categoryId, alias) VALUES
 (1, 'Category A'),
@@ -1267,16 +1265,23 @@ INSERT INTO Workset(worksetId, alias, description, creator, created, lastModifie
 (1, 'Workset One', 'Workset One description', 1, '2018-08-03 13:12:00', 1, '2018-08-03 13:12:00'),
 (2, 'Workset Two', 'Workset Two description', 3, '2018-08-03 13:12:00', 3, '2018-08-03 13:12:00');
 
-INSERT INTO LibraryQC(library_libraryId, creator, date, type, results, created, lastModified) VALUES
-(2201, 1, '2018-07-10', 104, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
+INSERT INTO LibraryQC(qcId, library_libraryId, creator, date, type, results, created, lastModified) VALUES
+(1, 2201, 1, '2018-07-10', 104, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
 
-INSERT INTO PoolQC(pool_poolId, creator, date, type, results, created, lastModified) VALUES
-(2201, 1, '2018-07-10', 107, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
+INSERT INTO PoolQC(qcId, pool_poolId, creator, date, type, results, created, lastModified) VALUES
+(1, 2201, 1, '2018-07-10', 107, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
+
+INSERT INTO RequisitionQc(qcId, requisitionId, creator, date, type, results, created, lastModified) VALUES
+(1, 2201, 1, '2021-07-13', 111, 1.2, '2021-07-13 14:29:00', '2021-07-13 14:29:00');
+
+INSERT INTO LibraryAliquotQc(aliquotId, creator, date, type, results, created, lastModified) VALUES
+(1, 1, '2018-07-10', 107, 4.3, '2018-07-10 14:29:00', '2018-07-10 14:29:00');
 
 INSERT INTO Workset_Sample(worksetId, sampleId) VALUES
 (1, 100001),
 (1, 100002),
-(1, 100003);
+(1, 100003),
+(2, 100004);
 
 INSERT INTO Workset_Library(worksetId, libraryId) VALUES
 (1, 100001),
@@ -1286,6 +1291,10 @@ INSERT INTO Workset_Library(worksetId, libraryId) VALUES
 INSERT INTO Workset_LibraryAliquot(worksetId, aliquotId) VALUES
 (1, 120001),
 (1, 120002);
+
+INSERT INTO Workset_Pool(worksetId, poolId, addedTime) VALUES
+(1, 120001, NOW()),
+(1, 120002, NOW());
 
 INSERT INTO StorageLabel(labelId, label) VALUES
 (1, 'Label One'),
@@ -1320,9 +1329,9 @@ INSERT INTO DetailedLibraryTemplate(libraryTemplateId, libraryDesignId, libraryD
 (1, 3, 6);
 
 INSERT INTO Experiment(experimentId, name, title, alias, study_studyId, instrumentModelId, library_libraryId, creator, created, lastModifier, lastModified) VALUES
-(1, 'EXP1', 'Experiment One', 'Experiment One', 3, 1, 1, 1, '2020-02-20 11:47:00', 1, '2020-02-20 11:47:00'),
+(1, 'EXP1', 'Experiment One', 'Experiment One', 3, 2, 1, 1, '2020-02-20 11:47:00', 1, '2020-02-20 11:47:00'),
 (2, 'EXP2', 'Unused Experiment', 'Unused Experiment', 3, 2, 1, 1, '2020-03-02 16:32:00', 1, '2020-03-02 16:32:00'),
-(3, 'EXP3', 'Experiment Three', 'Experiment Three', 3, 3, 504, 1, '2020-02-21 11:47:00', 1, '2020-02-21 11:47:00');
+(3, 'EXP3', 'Regular user experiment', 'reguser', 3, 2, 1, 3, '2025-07-16 15:34:00', 3, '2025-07-16 15:34:00');
 
 INSERT INTO Experiment_Run_Partition(experiment_experimentId, run_runId, partition_partitionId) VALUES
 (1, 1, 11);

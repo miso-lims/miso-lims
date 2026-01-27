@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
