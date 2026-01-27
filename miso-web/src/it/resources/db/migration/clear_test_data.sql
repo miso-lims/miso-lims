@@ -13,7 +13,6 @@ DELETE FROM Deliverable;
 DELETE FROM DeliverableCategory;
 DELETE FROM DetailedLibraryTemplate;
 DELETE FROM LibraryTemplate;
-DELETE FROM LibraryTemplate_Project;
 DELETE FROM LibraryTemplate_Index1;
 DELETE FROM LibraryTemplate_Index2;
 DELETE FROM Transfer_Sample;
