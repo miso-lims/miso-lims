@@ -15,8 +15,6 @@ import org.mockito.MockitoAnnotations;
 
 import com.eaglegenomics.simlims.core.User;
 
-import net.sf.json.JSONObject;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -60,9 +58,6 @@ public class BoxRestControllerTest {
     when(boxScanner.getScan()).thenReturn(scan);
     when(scan.getReadErrorPositions()).thenReturn(Arrays.asList("A01"));
     when(boxService.get(1L)).thenReturn(box);
-
-    JSONObject json = new JSONObject();
-    json.put("boxId", id);
 
     ScanRequest request = new ScanRequest();
     request.setScannerName(scannerName);

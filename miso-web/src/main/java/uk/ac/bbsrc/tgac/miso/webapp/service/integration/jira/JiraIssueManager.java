@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 
@@ -26,8 +28,6 @@ import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 
 import io.prometheus.metrics.core.metrics.Gauge;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -52,6 +52,7 @@ public class JiraIssueManager implements IssueTrackerManager {
       .register();
 
   private final DateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+  private final ObjectMapper mapper = new ObjectMapper();
 
   private String oAuthConsumerKey;
   private String oAuthConsumerSecret;
@@ -138,11 +139,11 @@ public class JiraIssueManager implements IssueTrackerManager {
   private List<Issue> retrieveList(WebResource webResource) throws IOException {
     try {
       String json = webResource.get(String.class);
-      JSONObject jsonData = JSONObject.fromObject(json);
-      JSONArray jsonIssues = jsonData.getJSONArray("issues");
+      JsonNode jsonData = mapper.readTree(json);
+      JsonNode jsonIssues = jsonData.get("issues");
       List<Issue> issues = new ArrayList<>();
       for (int i = 0; i < jsonIssues.size(); i++) {
-        issues.add(makeIssue(jsonIssues.getJSONObject(i)));
+        issues.add(makeIssue(jsonIssues.get(i)));
       }
       errorGauge.set(0);
       return issues;
@@ -152,31 +153,31 @@ public class JiraIssueManager implements IssueTrackerManager {
     }
   }
 
-  private Issue makeIssue(JSONObject json) {
+  private Issue makeIssue(JsonNode json) {
     Issue issue = new Issue();
-    String key = json.getString("key");
+    String key = json.get("key").textValue();
     issue.setKey(key);
-    JSONObject fields = json.getJSONObject("fields");
-    issue.setSummary(fields.getString("summary"));
+    JsonNode fields = json.get("fields");
+    issue.setSummary(fields.get("summary").textValue());
     issue.setUrl(baseTrackerUrl + "/browse/" + key);
-    JSONObject status = fields.getJSONObject("status");
-    issue.setStatus(status.getString("name"));
+    JsonNode status = fields.get("status");
+    issue.setStatus(status.get("name").textValue());
     issue.setAssignee("(Unassigned)");
     if (fields.has("assignee")) {
-      JSONObject assignee = fields.getJSONObject("assignee");
-      if (!assignee.isNullObject() && assignee.has("displayName")) {
-        issue.setAssignee(assignee.getString("displayName"));
+      JsonNode assignee = fields.get("assignee");
+      if (assignee != null && assignee.has("displayName")) {
+        issue.setAssignee(assignee.get("displayName").textValue());
       }
     }
     try {
-      issue.setLastUpdated(iso8601Format.parse(fields.getString("updated")));
+      issue.setLastUpdated(iso8601Format.parse(fields.get("updated").textValue()));
     } catch (ParseException e) {
-      throw new IllegalArgumentException("Invalid date format: " + fields.getString("updated"), e);
+      throw new IllegalArgumentException("Invalid date format: " + fields.get("updated").textValue(), e);
     }
     return issue;
   }
 
-  private abstract class ConfigValue {
+  private static abstract class ConfigValue {
     private final String name;
 
     protected ConfigValue(String name) {

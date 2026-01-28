@@ -19,8 +19,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -692,7 +692,7 @@ public class DefaultRunService implements RunService {
         // Nothing to do
         break;
       default:
-        throw new NotImplementedException();
+        throw new NotImplementedException("Unexpected platform type: " + source.getPlatformType());
     }
 
     isMutated |= updateSequencingParameters(target, user, source.getSequencingParameters());

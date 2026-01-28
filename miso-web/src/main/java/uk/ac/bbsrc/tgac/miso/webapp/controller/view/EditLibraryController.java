@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -553,7 +553,7 @@ public class EditLibraryController {
     batchDto.setSopUrl(sop.getUrl());
     batchDto.setKitName(kit.getName());
 
-    model.put("batchId", StringEscapeUtils.escapeJavaScript(batchId));
+    model.put("batchId", StringEscapeUtils.escapeEcmaScript(batchId));
     model.put("batchDto", mapper.writeValueAsString(batchDto));
 
     return new ModelAndView("/WEB-INF/pages/editLibraryBatch.jsp", model);

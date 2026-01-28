@@ -33,8 +33,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 
-import net.sf.json.JSONArray;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -156,9 +154,7 @@ public class EditPoolController {
   public void addSequencingParameters(ModelMap model) throws IOException {
     Collection<SequencingParametersDto> sequencingParameters =
         Dtos.asSequencingParametersDtos(sequencingParametersService.list());
-    JSONArray array = new JSONArray();
-    array.addAll(sequencingParameters);
-    model.put("sequencingParametersJson", array.toString());
+    model.put("sequencingParametersJson", mapper.writeValueAsString(sequencingParameters));
   }
 
   private class BulkEditBackend extends BulkEditTableBackend<Pool, PoolDto> {
