@@ -28,7 +28,7 @@ public class SampleClassRestControllerST extends AbstractST {
   private static final int UNUSED_CLASS_ID = 28;
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = { "INTERNAL", "ADMIN"})
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testCreateSuccess() throws Exception {
     SampleClassDto dto = new SampleClassDto();
     dto.setAlias("Test Tissue Class");
@@ -54,14 +54,11 @@ public class SampleClassRestControllerST extends AbstractST {
     assertTrue(created.isDirectCreationAllowed());
 
     assertNotNull(created.getParentRelationships());
-    assertFalse("parent relationships is empty", created.getParentRelationships().isEmpty());
-
-    boolean foundExpectedParent = created.getParentRelationships().stream()
-        .anyMatch(rel -> rel.getParent() != null && rel.getParent().getId() == IDENTITY_CLASS_ID);
-    assertTrue("expected parent relationship not found", foundExpectedParent);
+    assertEquals(1, created.getParentRelationships().size());
 
     SampleValidRelationship createdRel = created.getParentRelationships().iterator().next();
     assertNotNull(createdRel.getParent());
+    assertEquals("parent ID mismatch", IDENTITY_CLASS_ID, createdRel.getParent().getId());
     assertFalse("relationship archived should be false", createdRel.isArchived());
   }
 
@@ -82,16 +79,15 @@ public class SampleClassRestControllerST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = { "INTERNAL", "ADMIN" })
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testUpdateSuccess() throws Exception {
     SampleClassImpl existing = (SampleClassImpl) currentSession().get(ENTITY_CLASS, (long) UPDATE_CLASS_ID);
     assertNotNull(existing);
 
-    Set<Long> parentIdsBefore = existing.getParentRelationships() == null ? Collections.emptySet()
-        : existing.getParentRelationships().stream()
-            .filter(rel -> rel.getParent() != null)
-            .map(rel -> rel.getParent().getId())
-            .collect(Collectors.toSet());
+    Set<Long> parentIdsBefore = existing.getParentRelationships().stream()
+        .filter(rel -> rel.getParent() != null)
+        .map(rel -> rel.getParent().getId())
+        .collect(Collectors.toSet());
 
     SampleClassDto dto = Dtos.asDto(existing);
     dto.setAlias("Updated gDNA Aliquot Class");
@@ -100,22 +96,22 @@ public class SampleClassRestControllerST extends AbstractST {
     assertNotNull(returned);
 
     assertEquals("Updated gDNA Aliquot Class", returned.getAlias());
-
     assertEquals("category changed", existing.getSampleCategory(), returned.getSampleCategory());
     assertEquals("subcategory changed", existing.getSampleSubcategory(), returned.getSampleSubcategory());
     assertEquals("suffix changed", existing.getSuffix(), returned.getSuffix());
     assertEquals("archived changed", existing.isArchived(), returned.isArchived());
-    assertEquals("directCreationAllowed changed", existing.isDirectCreationAllowed(), returned.isDirectCreationAllowed());
+    assertEquals("directCreationAllowed changed", existing.isDirectCreationAllowed(),
+        returned.isDirectCreationAllowed());
 
     assertNotNull("parent relationships is null", returned.getParentRelationships());
     assertFalse("parent relationships is empty", returned.getParentRelationships().isEmpty());
 
-    if (!parentIdsBefore.isEmpty()) {
-      boolean containsAllParents = parentIdsBefore.stream()
-          .allMatch(id -> returned.getParentRelationships().stream()
-              .anyMatch(rel -> rel.getParent() != null && rel.getParent().getId() == id));
-      assertTrue("parent relationships changed", containsAllParents);
-    }
+    Set<Long> parentIdsAfter = returned.getParentRelationships().stream()
+        .filter(rel -> rel.getParent() != null)
+        .map(rel -> rel.getParent().getId())
+        .collect(Collectors.toSet());
+
+    assertEquals("parent relationships changed", parentIdsBefore, parentIdsAfter);
   }
 
   @Test
@@ -130,13 +126,13 @@ public class SampleClassRestControllerST extends AbstractST {
   }
 
   @Test
-  @WithMockUser(username = "admin", password = "admin", roles = { "INTERNAL", "ADMIN" })
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkDelete() throws Exception {
     testBulkDelete(ENTITY_CLASS, UNUSED_CLASS_ID, CONTROLLER_BASE);
   }
 
   @Test
-  @WithMockUser(username = "hhenderson", roles = { "INTERNAL" })
+  @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testBulkDeleteUnauthorized() throws Exception {
     testDeleteUnauthorized(ENTITY_CLASS, UNUSED_CLASS_ID, CONTROLLER_BASE);
   }
