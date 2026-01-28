@@ -12,7 +12,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.jena.base.Sys;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -25,7 +24,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,10 +42,8 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response.Status;
-import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation.BoxStorageAmount;
@@ -70,7 +66,6 @@ import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.service.impl.DefaultLibraryService;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
@@ -202,7 +197,7 @@ public class BoxRestController extends AbstractRestController {
    * @return JSON object with "hashCode" field representing the hash code of the spreadsheet filename
    */
   @GetMapping(value = "/{boxId}/spreadsheet")
-  public @ResponseBody JSONObject createSpreadsheet(@PathVariable("boxId") Long boxId) {
+  public @ResponseBody ObjectNode createSpreadsheet(@PathVariable("boxId") Long boxId) {
     try {
       return exportBoxContentsForm(boxId);
     } catch (Exception e) {
@@ -218,7 +213,7 @@ public class BoxRestController extends AbstractRestController {
         BoxSpreadSheets::valueOf, response);
   }
 
-  private JSONObject exportBoxContentsForm(Long boxId) throws IOException {
+  private ObjectNode exportBoxContentsForm(Long boxId) throws IOException {
     Box box = boxService.get(boxId);
 
     List<List<String>> boxContents = getBoxContents(box);
@@ -232,7 +227,9 @@ public class BoxRestController extends AbstractRestController {
       createPlainBoxSpreadsheet(f, name, alias, boxContents);
     }
 
-    return JSONObject.fromObject("{hashCode: " + f.getName().hashCode() + "}");
+    ObjectNode response = getObjectMapper().createObjectNode();
+    response.put("hashCode", f.getName().hashCode());
+    return response;
   }
 
   /**

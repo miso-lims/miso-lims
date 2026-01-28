@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -2918,7 +2918,7 @@ public class Dtos {
         setIlluminaRunValues((IlluminaNotificationDto) from, (IlluminaRun) to);
         break;
       default:
-        throw new NotImplementedException();
+        throw new NotImplementedException("Unexpected platform type: " + to.getPlatformType());
     }
     return to;
   }

@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,11 +51,7 @@ public abstract class JQueryDataTableBackend<Model, Dto> {
         if (errorBuffer.getBuffer().length() > 0) {
           errorBuffer.append("<br/>");
         }
-        try {
-          StringEscapeUtils.escapeHtml(errorBuffer, message);
-        } catch (IOException e) {
-          log.error("Failed to write to string writer.", e);
-        }
+        errorBuffer.append(StringEscapeUtils.escapeHtml4(message));
       };
       if (!isStringEmptyOrNull(sSearch)) {
         additionalFilters

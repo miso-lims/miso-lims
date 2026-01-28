@@ -6,7 +6,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -414,7 +414,7 @@ public enum PrintableField implements PrintableText {
   private static String unescapeHtml(String string) {
     if (string == null)
       return null;
-    return StringEscapeUtils.unescapeHtml(string);
+    return StringEscapeUtils.unescapeHtml4(string);
   }
 
   @Override
