@@ -1,3 +1,4 @@
+-- add_LibraryAliquotQcControl
 CREATE TABLE LibraryAliquotQc(
     qcId BIGINT NOT NULL AUTO_INCREMENT,
     aliquotId BIGINT NOT NULL,
@@ -32,3 +33,4 @@ CREATE TABLE LibraryAliquotQcControl (
   CONSTRAINT fk_libraryAliquotQcControl_qc FOREIGN KEY (qcId) REFERENCES LibraryAliquotQc (qcId),
   CONSTRAINT fk_libraryAliquotQcControl_control FOREIGN KEY (controlId) REFERENCES QcControl (controlId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
+

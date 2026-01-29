@@ -7,6 +7,18 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.16.0] - 2026-01-29
+
+### Added
+
+* Ability to add QCs to Library Aliquots.
+* User can scan an entire box at once to automatically assign and update barcodes for multiple positions. After scanning, they can review a visual summary with warnings and confirm or cancel the changes.
+
+### Changed
+
+* Tracking List downloads for samples, libraries, and library aliquots now include Requisition and Assay columns
+
+
 ## [3.15.0] - 2026-01-15
 
 ### Added
