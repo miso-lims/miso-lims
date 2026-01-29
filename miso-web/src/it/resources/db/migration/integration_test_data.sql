@@ -549,9 +549,7 @@ INSERT INTO Assay_AssayTest(assayId, testId) VALUES
 
 INSERT INTO Requisition(requisitionId, alias, creator, created, lastModifier, lastModified) VALUES
 (1, 'Req One', 1, '2021-07-21 11:31:00', 1, '2021-07-21 11:31:00'),
-(2, 'Req Two', 3, '2021-07-21 11:31:00', 3, '2021-07-21 11:31:00');
-
-INSERT INTO Requisition(requisitionId, alias, creator, created, lastModifier, lastModified) VALUES
+(2, 'Req Two', 3, '2021-07-21 11:31:00', 3, '2021-07-21 11:31:00'),
 (2201, 'Req TestQc', 1, '2021-07-21 11:31:00', 1, '2021-07-21 11:31:00');
 
 INSERT INTO Requisition_Assay(requisitionId, assayId) VALUES

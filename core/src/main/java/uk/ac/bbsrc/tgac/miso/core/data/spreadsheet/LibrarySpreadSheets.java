@@ -3,14 +3,10 @@ package uk.ac.bbsrc.tgac.miso.core.data.spreadsheet;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -18,6 +14,8 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
   TRACKING_LIST("Tracking List", //
       Column.forString("Name", Library::getName), //
       Column.forString("Alias", Library::getAlias), //
+      Column.forString("Requisition", LibrarySpreadSheets::getEffectiveRequisition), //
+      Column.forString("Assay", LibrarySpreadSheets::getEffectiveAssay), //
       Column.forString("Tissue Origin", true, tissueOrigin()), //
       Column.forString("Tissue Type", true, tissueType()), //
       Column.forString("Barcode", Library::getIdentificationBarcode), //
@@ -120,6 +118,24 @@ public enum LibrarySpreadSheets implements Spreadsheet<Library> {
       GroupIdentifiable entity = ((DetailedSample) lib.getSample()).getEffectiveGroupIdEntity();
       return entity == null ? "" : entity.getGroupId();
     };
+  }
+
+  private static String getEffectiveRequisition(Library library) {
+    Requisition requisition = LimsUtils.getEffectiveRequisition(library);
+    if (requisition == null) {
+      return null;
+    }
+    return requisition.getAlias();
+  }
+
+  private static String getEffectiveAssay(Library library) {
+    Requisition requisition = LimsUtils.getEffectiveRequisition(library);
+    if (requisition == null || requisition.getAssays() == null || requisition.getAssays().isEmpty()) {
+      return null;
+    }
+    return requisition.getAssays().stream()
+        .map(assay -> assay.getAlias() + " v" + assay.getVersion())
+        .collect(Collectors.joining("; "));
   }
 
   private final List<Column<Library>> columns;

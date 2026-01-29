@@ -3,15 +3,12 @@ package uk.ac.bbsrc.tgac.miso.core.data.spreadsheet;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -19,6 +16,8 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
   TRACKING_LIST("Tracking List", //
       Column.forString("Name", LibraryAliquot::getName), //
       Column.forString("Alias", LibraryAliquot::getAlias), //
+      Column.forString("Requisition", LibraryAliquotSpreadSheets::getEffectiveRequisition), //
+      Column.forString("Assay", LibraryAliquotSpreadSheets::getEffectiveAssay), //
       Column.forString("Tissue Origin", true, tissueOrigin()), //
       Column.forString("Tissue Type", true, tissueType()), //
       Column.forString("Barcode", LibraryAliquot::getIdentificationBarcode), //
@@ -143,6 +142,24 @@ public enum LibraryAliquotSpreadSheets implements Spreadsheet<LibraryAliquot> {
       GroupIdentifiable entity = ((DetailedSample) aliquot.getLibrary().getSample()).getEffectiveGroupIdEntity();
       return entity == null ? "" : entity.getGroupId();
     };
+  }
+
+  private static String getEffectiveRequisition(LibraryAliquot aliquot) {
+    Requisition requisition = LimsUtils.getEffectiveRequisition(aliquot.getLibrary());
+    if (requisition == null) {
+      return null;
+    }
+    return requisition.getAlias();
+  }
+
+  private static String getEffectiveAssay(LibraryAliquot aliquot) {
+    Requisition requisition = LimsUtils.getEffectiveRequisition(aliquot.getLibrary());
+    if (requisition == null || requisition.getAssays() == null || requisition.getAssays().isEmpty()) {
+      return null;
+    }
+    return requisition.getAssays().stream()
+        .map(assay -> assay.getAlias() + " v" + assay.getVersion())
+        .collect(Collectors.joining("; "));
   }
 
   private final List<Column<LibraryAliquot>> columns;
