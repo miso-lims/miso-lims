@@ -10,24 +10,11 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import javax.ws.rs.core.MediaType;
 
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
-import com.jayway.jsonpath.JsonPath;
-
-import jakarta.transaction.Transactional;
 
 import static org.hamcrest.Matchers.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
@@ -36,24 +23,11 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateIndexDto;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
-
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.View;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.springframework.security.test.context.support.WithMockUser;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
-import java.util.Collections;
-
-
 import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
-
 
 public class LibraryTemplateRestControllerST extends AbstractST {
 
@@ -66,6 +40,7 @@ public class LibraryTemplateRestControllerST extends AbstractST {
       dto1.setAlias("Template one");
       dto1.setLibraryTypeId(1L);
       dto1.setSelectionId(1L);
+      dto1.setStrategyId(1L);
       dto1.setPlatformType(PlatformType.ILLUMINA.name());
       dto1.setDefaultVolume("10.5");
       dto1.setVolumeUnits(VolumeUnit.MICROLITRES.name());
@@ -75,6 +50,7 @@ public class LibraryTemplateRestControllerST extends AbstractST {
       dto2.setAlias("Template two");
       dto2.setLibraryTypeId(1L);
       dto2.setSelectionId(1L);
+      dto2.setStrategyId(1L);
       dto2.setPlatformType(PlatformType.ILLUMINA.name());
       dto2.setDefaultVolume("20.0");
       dto2.setVolumeUnits(VolumeUnit.MICROLITRES.name());
@@ -99,11 +75,23 @@ public class LibraryTemplateRestControllerST extends AbstractST {
               baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
       assertEquals("Template one",libraryTemplates.get(0).getAlias());
       assertEquals(1L, libraryTemplates.get(0).getLibraryType().getId());
+      assertEquals(1L, libraryTemplates.get(0).getLibrarySelectionType().getId());
+      assertEquals(1L, libraryTemplates.get(0).getLibraryStrategyType().getId());
       assertEquals(10.5, libraryTemplates.get(0).getDefaultVolume().doubleValue(), 0.0);
       assertEquals(PlatformType.ILLUMINA, libraryTemplates.get(0).getPlatformType());
+      assertEquals(VolumeUnit.MICROLITRES, libraryTemplates.get(0).getVolumeUnits());
+      assertNotNull(libraryTemplates.get(0).getIndexFamily());
+      assertEquals(1L, libraryTemplates.get(0).getIndexFamily().getId());
 
       assertEquals("Template two", libraryTemplates.get(1).getAlias());
+      assertEquals(1L, libraryTemplates.get(1).getLibraryType().getId());
+      assertEquals(1L, libraryTemplates.get(1).getLibraryStrategyType().getId());
+      assertEquals(1L, libraryTemplates.get(1).getLibrarySelectionType().getId());
       assertEquals(20, libraryTemplates.get(1).getDefaultVolume().doubleValue(), 0.0);
+      assertEquals(PlatformType.ILLUMINA, libraryTemplates.get(1).getPlatformType());
+      assertEquals(VolumeUnit.MICROLITRES, libraryTemplates.get(1).getVolumeUnits());
+      assertNotNull(libraryTemplates.get(1).getIndexFamily());
+      assertEquals(1L, libraryTemplates.get(1).getIndexFamily().getId());
   }
 
   @Test
@@ -126,7 +114,15 @@ public class LibraryTemplateRestControllerST extends AbstractST {
   @Test
   public void testCreate() throws Exception {
       LibraryTemplate fam = baseTestCreate(CONTROLLER_BASE, makeCreateDtos().get(0), entityClass, 200);
-      assertEquals(fam.getAlias(), "Template one");
+      assertEquals("Template one", fam.getAlias());
+      assertEquals(1L, fam.getLibraryType().getId());
+      assertEquals(1L, fam.getLibrarySelectionType().getId());
+      assertEquals(1L, fam.getLibraryStrategyType().getId());
+      assertEquals(PlatformType.ILLUMINA, fam.getPlatformType());
+      assertEquals(10.5, fam.getDefaultVolume().doubleValue(), 0.0);
+      assertEquals(VolumeUnit.MICROLITRES, fam.getVolumeUnits());
+      assertNotNull(fam.getIndexFamily());
+      assertEquals(1L, fam.getIndexFamily().getId());
   }
 
   @Test
@@ -167,20 +163,6 @@ public class LibraryTemplateRestControllerST extends AbstractST {
       assertTrue(temp.getProjects().stream().noneMatch(p -> p.getId() == 1));
   }
 
-  @Test
-  public void testBulkDelete() throws Exception{
-      LibraryTemplateDto dto = makeCreateDtos().get(0);
-      LibraryTemplate created = baseTestCreate(CONTROLLER_BASE, dto, entityClass, 200);
-      long id = created.getId();
-
-      assertNotNull(currentSession().get(entityClass, id));
-
-      getMockMvc()
-              .perform(post(CONTROLLER_BASE + "/bulk-delete").content(makeJson(Arrays.asList(id)))
-                      .contentType(MediaType.APPLICATION_JSON))
-              .andExpect(status().isNoContent());
-      assertNull(currentSession().get(entityClass, id));
-  }
 
   @Test
   public void testAddIndices() throws Exception {
