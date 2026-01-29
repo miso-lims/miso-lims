@@ -74,17 +74,18 @@ public class LibraryAliquotRestControllerST extends AbstractST {
     req.setIds(ids);
     req.setSheet("TRACKING_LIST");
 
-    List<String> headers = Arrays.asList("Name", "Alias", "Tissue Origin", "Tissue Type", "Barcode", "Library Name",
-        "Library Alias", "Library Barcode", "Library Type", "Library Design", "Index(es)", "i7 Index", "i5 Index",
-        "Targeted Sequencing", "Sample Name", "Sample Alias", "Sample Barcode", "Identity Name", "Identity Alias",
-        "External Identifier", "Secondary Identifier", "Group ID", "Location");
+    List<String> headers = Arrays.asList("Name", "Alias", "Requisition", "Assay", "Tissue Origin", "Tissue Type",
+        "Barcode", "Library Name", "Library Alias", "Library Barcode", "Library Type", "Library Design", "Index(es)",
+        "i7 Index", "i5 Index", "Targeted Sequencing", "Sample Name", "Sample Alias", "Sample Barcode", "Identity Name",
+        "Identity Alias", "External Identifier", "Secondary Identifier", "Group ID", "Location");
     List<List<String>> rows = Arrays.asList(
-        Arrays.asList("LDI1", "TEST_0001_Bn_R_PE_300_WG", "Bn", "R", "12321", "LIB1", "TEST_0001_Bn_R_PE_300_WG",
-            "11211", "Paired End", "WG", "", "", "", "", "SAM8", "TEST_0001_Bn_R_nn_1-1_D_1", "88888", "SAM1",
-            "TEST_0001", "TEST_external_1", "tube 1", "7357", "First Box - B02"),
-        Arrays.asList("LDI304", "DILT_0001_nn_n_PE_304_WG", "Bn", "R", "300304", "LIB304", "DILT_0001_nn_n_PE_304_WG",
-            "", "Paired End", "WG", "AAACCC", "AAACCC", "", "", "SAM304", "DILT_0001_nn_n_1-1_D_1", "", "SAM301",
-            "DILT_0001", "DILT_identity_1", "", "", "Unknown"));
+        Arrays.asList("LDI1", "TEST_0001_Bn_R_PE_300_WG", "Req One", "Main Assay v1.0", "Bn", "R", "12321", "LIB1",
+            "TEST_0001_Bn_R_PE_300_WG", "11211", "Paired End", "WG", "", "", "", "", "SAM8",
+            "TEST_0001_Bn_R_nn_1-1_D_1", "88888", "SAM1", "TEST_0001", "TEST_external_1", "tube 1", "7357",
+            "First Box - B02"),
+        Arrays.asList("LDI304", "DILT_0001_nn_n_PE_304_WG", "", "", "Bn", "R", "300304", "LIB304",
+            "DILT_0001_nn_n_PE_304_WG", "", "Paired End", "WG", "AAACCC", "AAACCC", "", "", "SAM304",
+            "DILT_0001_nn_n_1-1_D_1", "", "SAM301", "DILT_0001", "DILT_identity_1", "", "", "Unknown"));
     testSpreadsheetContents(CONTROLLER_BASE + "/spreadsheet", req, headers, rows);
 
 

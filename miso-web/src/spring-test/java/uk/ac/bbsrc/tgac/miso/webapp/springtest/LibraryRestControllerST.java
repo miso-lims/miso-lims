@@ -200,13 +200,14 @@ public class LibraryRestControllerST extends AbstractST {
     ids.add(1L);
     req.setIds(ids);
     req.setSheet("TRACKING_LIST");
-    List<String> headers = Arrays.asList("Name", "Alias", "Tissue Origin", "Tissue Type", "Barcode", "Library Type",
-        "Library Design", "i7 Index Name", "i7 Index", "i5 Index Name", "i5 Index", "Sample Name", "Sample Alias",
-        "Sample Barcode", "Identity Name", "Identity Alias", "External Identifier", "Secondary Identifier", "Location");
-    List<List<String>> rows = Arrays.asList(
-        Arrays.asList("LIB1", "TEST_0001_Bn_R_PE_300_WG", "Bn", "R", "11211", "Paired End", "WG", "", "", "", "",
-            "SAM8",
-            "TEST_0001_Bn_R_nn_1-1_D_1", "88888", "SAM1", "TEST_0001", "TEST_external_1", "tube 1", "First Box - A01"));
+    List<String> headers = Arrays.asList("Name", "Alias", "Requisition", "Assay", "Tissue Origin", "Tissue Type",
+        "Barcode", "Library Type", "Library Design", "i7 Index Name", "i7 Index", "i5 Index Name", "i5 Index",
+        "Sample Name", "Sample Alias", "Sample Barcode", "Identity Name", "Identity Alias", "External Identifier",
+        "Secondary Identifier", "Location");
+    List<List<String>> rows = Collections.singletonList(
+        Arrays.asList("LIB1", "TEST_0001_Bn_R_PE_300_WG", "Req One", "Main Assay v1.0", "Bn", "R", "11211",
+            "Paired End", "WG", "", "", "", "", "SAM8", "TEST_0001_Bn_R_nn_1-1_D_1", "88888", "SAM1", "TEST_0001",
+            "TEST_external_1", "tube 1", "First Box - A01"));
     testSpreadsheetContents(CONTROLLER_BASE + "/spreadsheet", req, headers, rows);
   }
 

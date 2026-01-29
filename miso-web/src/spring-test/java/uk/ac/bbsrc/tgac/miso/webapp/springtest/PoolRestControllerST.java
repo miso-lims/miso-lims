@@ -203,7 +203,7 @@ public class PoolRestControllerST extends AbstractST {
 
   @Test
   public void testDatatableByWorkset() throws Exception {
-      testDtRequest(CONTROLLER_BASE + "/dt/workset/1", Arrays.asList(120001, 120002));
+    testDtRequest(CONTROLLER_BASE + "/dt/workset/1", Arrays.asList(120001, 120002));
   }
 
   @Test
@@ -261,8 +261,8 @@ public class PoolRestControllerST extends AbstractST {
     req.setSheet("QPCR_RESULTS");
 
     List<String> headers = Arrays.asList("Name", "Alias", "Barcode", "Latest qPCR QC");
-    List<List<String>> rows = Arrays.asList(Arrays.asList("IPO1", "POOL_1", "12341",""),
-        Arrays.asList("IPO501", "TIB_Pool", "TIB_Pool",""));
+    List<List<String>> rows = Arrays.asList(Arrays.asList("IPO1", "POOL_1", "12341", ""),
+        Arrays.asList("IPO501", "TIB_Pool", "TIB_Pool", ""));
     testSpreadsheetContents(CONTROLLER_BASE + "/spreadsheet", req, headers, rows);
 
   }
@@ -276,15 +276,16 @@ public class PoolRestControllerST extends AbstractST {
     req.setIds(ids);
     req.setSheet("TRACKING_LIST");
 
-    List<String> headers = Arrays.asList("Name", "Alias", "Tissue Origin", "Tissue Type", "Barcode", "Library Name",
-        "Library Alias", "Library Barcode", "Library Type", "Library Design", "Index(es)", "i7 Index", "i5 Index",
-        "Targeted Sequencing", "Sample Name", "Sample Alias", "Sample Barcode", "Identity Name", "Identity Alias",
-        "External Identifier", "Secondary Identifier", "Group ID", "Location");
+    List<String> headers = Arrays.asList("Name", "Alias", "Requisition", "Assay", "Tissue Origin", "Tissue Type",
+        "Barcode", "Library Name", "Library Alias", "Library Barcode", "Library Type", "Library Design", "Index(es)",
+        "i7 Index", "i5 Index", "Targeted Sequencing", "Sample Name", "Sample Alias", "Sample Barcode", "Identity Name",
+        "Identity Alias", "External Identifier", "Secondary Identifier", "Group ID", "Location");
 
-    List<List<String>> rows = Arrays.asList(Arrays.asList("LDI1", "TEST_0001_Bn_R_PE_300_WG", "Bn", "R", "12321",
-        "LIB1", "TEST_0001_Bn_R_PE_300_WG",
-        "11211", "Paired End", "WG", "", "", "", "", "SAM8", "TEST_0001_Bn_R_nn_1-1_D_1", "88888", "SAM1", "TEST_0001",
-        "TEST_external_1", "tube 1", "7357", "First Box - B02"));
+    List<List<String>> rows =
+        Arrays.asList(Arrays.asList("LDI1", "TEST_0001_Bn_R_PE_300_WG", "Req One", "Main Assay v1.0",
+            "Bn", "R", "12321", "LIB1", "TEST_0001_Bn_R_PE_300_WG", "11211", "Paired End", "WG", "", "", "", "", "SAM8",
+            "TEST_0001_Bn_R_nn_1-1_D_1", "88888", "SAM1", "TEST_0001", "TEST_external_1", "tube 1", "7357",
+            "First Box - B02"));
 
     testSpreadsheetContents(CONTROLLER_BASE + "/contents/spreadsheet", req, headers, rows);
   }
