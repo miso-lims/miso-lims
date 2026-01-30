@@ -282,3 +282,15 @@ INSERT INTO RunPurpose(purposeId, alias) VALUES
 INSERT INTO SequencingOrder (sequencingOrderId, poolId, partitions, parametersId, createdBy, updatedBy, creationDate, lastUpdated, purposeId) VALUES
 (1, 1, 2, 4, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00', 1),
 (2, 1, 1, 1, 1, 1, '2017-09-30 14:30:00', '2017-09-30 14:30:00', 1);
+
+
+INSERT INTO Project(projectId, name, title, code, created, description, status, referenceGenomeId, lastModified, creator, lastModifier, pipelineId) VALUES
+(3, 'PRO3', 'Project Three', 'PRO3', '2017-06-27', 'test project three', 'ACTIVE', 1, '2017-06-27 14:11:00', 1, 1, 1);
+
+INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType, libraryType, librarySelectionType, libraryStrategyType, creationDate,
+  creator, created, lastModifier, lastModified, discriminator, archived, libraryDesignCodeId, nonStandardAlias )  VALUES
+(304, 'LIB304', 'DILT_0001_nn_n_PE_304_WG', NULL, 'description', 8, 'ILLUMINA', 1, 3, 1, '2017-08-14',
+     1, '2017-08-14 12:05:00', 1, '2017-08-14 12:05:00', 'DetailedLibrary', 0, 7, FALSE);
+
+INSERT INTO LibraryAliquot (aliquotId, name, alias, concentration, concentrationUnits, libraryId, identificationBarcode, creationDate, creator, lastModifier, lastUpdated, volumeUsed, discriminator, libraryDesignCodeId, nonStandardAlias) VALUES
+(304, 'LDI304', 'DILT_0001_nn_n_PE_304_WG', 7.97, 'NANOGRAMS_PER_MICROLITRE', 304, '300304', '2017-08-14', 3, 3, '2017-08-14 12:25:00', NULL, 'DetailedLibraryAliquot', 7, FALSE);
