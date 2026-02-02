@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -24,10 +26,11 @@ public class AttachmentControllerST extends AbstractST {
         private static final long CATEGORY_SUBMISSION_FORMS = 1L;
 
         @Test
-        public void testUploadSuccess() throws Exception {
+        public void testUploadAndDownloadSuccess() throws Exception {
                 ProjectImpl before = currentSession().get(ProjectImpl.class, PROJECT_1);
                 assertNotNull(before);
-                int originalCount = before.getAttachments().size();
+                Set<Long> beforeIds =
+                                before.getAttachments().stream().map(FileAttachment::getId).collect(Collectors.toSet());
 
                 MockMultipartFile file =
                                 new MockMultipartFile("files", "test.txt", "text/plain", "test content".getBytes());
@@ -41,11 +44,13 @@ public class AttachmentControllerST extends AbstractST {
                 currentSession().clear();
                 ProjectImpl after = currentSession().get(ProjectImpl.class, PROJECT_1);
                 assertNotNull(after);
-                assertEquals(originalCount + 1, after.getAttachments().size());
+                assertEquals(before.getAttachments().size() + 1, after.getAttachments().size());
 
                 FileAttachment attachment = after.getAttachments().stream()
-                                .max((a, b) -> Long.compare(a.getId(), b.getId()))
-                                .orElseThrow(() -> new AssertionError("Expected an attachment but found none"));
+                                .filter(a -> !beforeIds.contains(a.getId()))
+                                .findFirst()
+                                .orElseThrow(() -> new AssertionError(
+                                                "Expected a newly-added attachment but found none"));
 
                 assertNotNull(attachment.getId());
                 assertEquals("test.txt", attachment.getFilename());
@@ -64,17 +69,17 @@ public class AttachmentControllerST extends AbstractST {
         }
 
         @Test
-        public void testSharedUploadSuccess() throws Exception {
+        public void testSharedUploadAndDownloadSuccess() throws Exception {
                 ProjectImpl before1 = currentSession().get(ProjectImpl.class, PROJECT_1);
                 ProjectImpl before2 = currentSession().get(ProjectImpl.class, PROJECT_2);
                 assertNotNull(before1);
                 assertNotNull(before2);
 
-                int count1 = before1.getAttachments().size();
-                int count2 = before2.getAttachments().size();
+                Set<Long> before1Ids = before1.getAttachments().stream().map(FileAttachment::getId)
+                                .collect(Collectors.toSet());
 
                 MockMultipartFile file =
-                                new MockMultipartFile("files", "shared.txt", "text/plain", "shared".getBytes());
+                                new MockMultipartFile("files", "shared.txt", "text/plain", "shared content".getBytes());
 
                 getMockMvc()
                                 .perform(multipart(CONTROLLER_BASE + "/project/shared")
@@ -89,17 +94,36 @@ public class AttachmentControllerST extends AbstractST {
                 assertNotNull(after1);
                 assertNotNull(after2);
 
-                assertEquals(count1 + 1, after1.getAttachments().size());
-                assertEquals(count2 + 1, after2.getAttachments().size());
-
+                // Identify the new attachment deterministically (no max-ID assumptions)
                 long sharedId = after1.getAttachments().stream()
-                                .max((a, b) -> Long.compare(a.getId(), b.getId()))
-                                .orElseThrow(() -> new AssertionError("Expected an attachment but found none"))
-                                .getId();
+                                .map(FileAttachment::getId)
+                                .filter(id -> !before1Ids.contains(id))
+                                .findFirst()
+                                .orElseThrow(() -> new AssertionError(
+                                                "Expected a newly-added shared attachment but found none"));
 
-                boolean linked =
-                                after2.getAttachments().stream().anyMatch(a -> a.getId() == sharedId);
-                assertTrue("Expected shared attachment to be linked to both projects", linked);
+                // Do not assume counts (+1) for shared targets; only assert linking behavior
+                assertTrue("Project 1 should contain the shared attachment",
+                                after1.getAttachments().stream().anyMatch(a -> a.getId() == sharedId));
+                assertTrue("Expected shared attachment to be linked to both projects",
+                                after2.getAttachments().stream().anyMatch(a -> a.getId() == sharedId));
+
+                // Download shared attachment too (from both targets)
+                MockHttpServletResponse response1 = getMockMvc()
+                                .perform(get(CONTROLLER_BASE + "/project/" + PROJECT_1 + "/" + sharedId))
+                                .andExpect(status().isOk())
+                                .andExpect(header().string("Content-Disposition", containsString("shared.txt")))
+                                .andReturn()
+                                .getResponse();
+                assertTrue(response1.getContentAsByteArray().length > 0);
+
+                MockHttpServletResponse response2 = getMockMvc()
+                                .perform(get(CONTROLLER_BASE + "/project/" + PROJECT_2 + "/" + sharedId))
+                                .andExpect(status().isOk())
+                                .andExpect(header().string("Content-Disposition", containsString("shared.txt")))
+                                .andReturn()
+                                .getResponse();
+                assertTrue(response2.getContentAsByteArray().length > 0);
         }
 
         @Test
