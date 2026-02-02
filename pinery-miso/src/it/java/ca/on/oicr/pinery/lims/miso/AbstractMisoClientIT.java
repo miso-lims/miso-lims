@@ -186,7 +186,7 @@ public abstract class AbstractMisoClientIT {
 
   @Test
   public void testGetRunByName() throws Exception {
-    String runName = "HiSeq_Run_1";
+    String runName = "MiSeq_Run_1";
     Run run = sut.getRun(runName);
     assertNotNull(run);
     assertEquals(runName, run.getName());
