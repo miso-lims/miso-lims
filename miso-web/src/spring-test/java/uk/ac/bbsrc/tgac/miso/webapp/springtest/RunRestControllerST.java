@@ -363,9 +363,9 @@ public class RunRestControllerST extends AbstractST {
     List<List<String>> rows = Arrays.asList(
             Arrays.asList("Illumina HiSeq 2500", "RUN1", "HiSeq_Run_1", "IPO1", "LDI1",
                     "TEST_0001_Bn_R_PE_300_WG", "TEST_external_1", ""),
-            Arrays.asList("Illumina HiSeq 2500", "RUN1", "HiSeq_Run_1", "IPO501", "LDI504",
-                    "TIB_0001_nn_n_PE_404_WG", "TIB_identity_1", ""),
             Arrays.asList("Illumina HiSeq 2500", "RUN1", "HiSeq_Run_1", "IPO501", "LDI304",
+                    "TIB_0001_nn_n_PE_404_WG", "TIB_identity_1", ""),
+            Arrays.asList("Illumina HiSeq 2500", "RUN1", "HiSeq_Run_1", "IPO501", "LDI504",
                     "DILT_0001_nn_n_PE_304_WG", "DILT_identity_1", ""));
     testSpreadsheetContents(CONTROLLER_BASE + "/spreadsheet", req, headers, rows);
   }

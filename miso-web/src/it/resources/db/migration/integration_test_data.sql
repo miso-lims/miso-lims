@@ -333,16 +333,16 @@ INSERT INTO KitDescriptor (kitDescriptorId, name, version, manufacturer, partNum
   (3, 'Test Kit Three', 1, 'ACME', '125', 'CLUSTERING', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
   (4, 'Test Kit Four', 1, 'DONUT', '126', 'MULTIPLEXING', 'ILLUMINA', 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00'),
   (5, 'PacBio Test Kit', 1, 'SomeCo', '127', 'LIBRARY', 'PACBIO', 1, '2025-10-21 13:49:00', 1, '2025-10-21 13:49:00');
-
+  
 INSERT INTO TargetedSequencing (targetedSequencingId, alias, description, archived, createdBy, updatedBy, creationDate, lastUpdated) VALUES
   (1, 'Test TarSeq One', 'first test targeted sequencing', 0, 1, 1, '2017-08-14 14:00:00', '2017-08-14 14:00:00'),
   (2, 'Test TarSeq Two', 'second test targeted sequencing', 0, 1, 1, '2017-08-14 14:00:00', '2017-08-14 14:00:00'),
   (3, 'Test TarSeq Three', 'third test targeted sequencing', 0, 1, 1, '2017-08-14 14:00:00', '2017-08-14 14:00:00');
-
+  
 INSERT INTO TargetedSequencing_KitDescriptor (targetedSequencingId, kitDescriptorId) VALUES
   (1, 1), (2, 1), (3, 2);
 
-INSERT INTO BoxUse (boxUseId, alias) VALUES
+INSERT INTO BoxUse (boxUseId, alias) VALUES 
 (1, 'DNA'), (2, 'RNA'), (3, 'Libraries'), (4, 'Sequencing'), (5, 'Storage'), (6, 'Tissue');
 
 INSERT INTO BoxSize (boxSizeId, boxSizeRows, boxSizeColumns, scannable) VALUES
@@ -395,7 +395,7 @@ INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, 
   (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER'),
   (4, 'ILLUMINA', 'Illumina iScan', 1, 'ARRAY_SCANNER'),
   (5, 'ILLUMINA', 'Deletable', 1, 'OTHER');
-
+  
 INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, readLength2, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
   (2, 'Rapid Run 2x151', 1, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
@@ -450,7 +450,7 @@ INSERT INTO Instrument (instrumentId, name, instrumentModelId, defaultPurposeId,
   (3, 'TPB2', 3, 1, NULL),
   (4, 'iScan1', 4, NULL, NULL),
   (5, 'Deletable', 4, NULL, NULL);
-
+  
 INSERT INTO Instrument (instrumentId, name, instrumentModelId, serialNumber, dateCommissioned, dateDecommissioned, upgradedInstrumentId, defaultPurposeId) VALUES
   (100, 'HiSeq_100', 1, '100', '2017-01-01', NULL, NULL, 1),
   (101, 'NewHiSeq_101', 1, '101', '2017-02-01', NULL, NULL, 1),
@@ -493,7 +493,7 @@ INSERT INTO Subproject(subprojectId, projectId, alias, referenceGenomeId, descri
 (1, 6, 'Subproject 1', 1, 'test subproject one', TRUE, 1, '2020-02-20 11:35:00', 1, '2020-02-20 11:35:00'),
 (2, 6, 'Subproject 2', 1, 'test subproject two', TRUE, 1, '2020-02-20 11:35:00', 1, '2020-02-20 11:35:00'),
 (3, 6, 'Subproject 3', 1, 'test subproject three', TRUE, 1, '2020-02-20 11:35:00', 1, '2020-02-20 11:35:00');
-
+  
 INSERT INTO SampleNumberPerProject(projectId, highestSampleNumber, padding, createdBy, creationDate, updatedBy, lastUpdated) VALUES
 (100001, 1, 4, 1, '2017-10-11 15:33:00', 1, '2017-10-11 15:33:00');
 
@@ -763,7 +763,7 @@ INSERT INTO Transfer_Sample(transferId, sampleId, received, qcPassed, qcNote) VA
 INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType, libraryType, librarySelectionType, libraryStrategyType, creationDate,
   creator, created, lastModifier, lastModified, detailedQcStatusId, qcUser, qcDate, dnaSize, volume, concentration, locationBarcode, kitDescriptorId, discarded, volumeUnits, concentrationUnits, spikeInId, spikeInDilutionFactor, spikeInVolume, lowQuality,
   discriminator, archived, libraryDesign, libraryDesignCodeId, nonStandardAlias, sopId, kitLot, index1Id, index2Id, requisitionId, workstationId) VALUES
-  (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 8, 'ILLUMINA', 1, 3, 1,  '2016-11-07',
+  (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 8, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 
     1, '2017-07-20 09:01:00', 1, '2017-07-20 09:01:00', 1, 1, '2017-07-20', 300, 5.0, 2.75, NULL, 1, 0, 'MICROLITRES', 'NANOGRAMS_PER_MICROLITRE', NULL, NULL, NULL, FALSE,
     'DetailedLibrary', 0, 1, 7, FALSE, NULL, NULL, NULL, NULL, 1, 1),
   (204, 'LIB204', 'SORT_0001_nn_n_PE_204_WG', '11311', 'description', 204, 'ILLUMINA', 1, 3, 1, '2017-08-09',
@@ -1031,7 +1031,7 @@ INSERT INTO BoxPosition (boxId, targetId, targetType, position) VALUES
 (500, 501, 'POOL', 'D01'),
 (500, 505, 'LIBRARY', 'F10'),
 (100001, 100006, 'LIBRARY', 'A02'),
-(100001, 100007, 'LIBRARY', 'A03');
+(100001, 100007, 'LIBRARY', 'A03'); 
 
 INSERT INTO SequencerPartitionContainer (containerId, identificationBarcode, sequencingContainerModelId, lastModifier, creator, created, lastModified) VALUES
 (1, 'MISEQXX', 1, 1, 1, '2017-07-20 13:30:01', '2017-07-20 13:30:01'),
