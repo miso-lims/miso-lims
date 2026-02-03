@@ -8,8 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -29,8 +27,7 @@ public class AttachmentControllerST extends AbstractST {
         public void testUploadAndDownloadSuccess() throws Exception {
                 ProjectImpl before = currentSession().get(ProjectImpl.class, PROJECT_1);
                 assertNotNull(before);
-                Set<Long> beforeIds =
-                                before.getAttachments().stream().map(FileAttachment::getId).collect(Collectors.toSet());
+                int beforeCount = before.getAttachments().size();
 
                 MockMultipartFile file =
                                 new MockMultipartFile("files", "test.txt", "text/plain", "test content".getBytes());
@@ -44,20 +41,14 @@ public class AttachmentControllerST extends AbstractST {
                 currentSession().clear();
                 ProjectImpl after = currentSession().get(ProjectImpl.class, PROJECT_1);
                 assertNotNull(after);
-                assertEquals(before.getAttachments().size() + 1, after.getAttachments().size());
+                assertEquals(beforeCount + 1, after.getAttachments().size());
 
-                FileAttachment attachment = after.getAttachments().stream()
-                                .filter(a -> !beforeIds.contains(a.getId()))
-                                .findFirst()
-                                .orElseThrow(() -> new AssertionError(
-                                                "Expected a newly-added attachment but found none"));
-
+                FileAttachment attachment = after.getAttachments().get(after.getAttachments().size() - 1);
                 assertNotNull(attachment.getId());
                 assertEquals("test.txt", attachment.getFilename());
                 assertNotNull(attachment.getCategory());
                 assertEquals(CATEGORY_SUBMISSION_FORMS, attachment.getCategory().getId());
 
-                // Download: assert behavior, not formatting
                 MockHttpServletResponse response = getMockMvc()
                                 .perform(get(CONTROLLER_BASE + "/project/" + PROJECT_1 + "/" + attachment.getId()))
                                 .andExpect(status().isOk())
@@ -75,8 +66,9 @@ public class AttachmentControllerST extends AbstractST {
                 assertNotNull(before1);
                 assertNotNull(before2);
 
-                Set<Long> before1Ids = before1.getAttachments().stream().map(FileAttachment::getId)
-                                .collect(Collectors.toSet());
+                // Reviewer requirement: known starting state
+                assertTrue(before1.getAttachments().isEmpty());
+                assertTrue(before2.getAttachments().isEmpty());
 
                 MockMultipartFile file =
                                 new MockMultipartFile("files", "shared.txt", "text/plain", "shared content".getBytes());
@@ -94,21 +86,16 @@ public class AttachmentControllerST extends AbstractST {
                 assertNotNull(after1);
                 assertNotNull(after2);
 
-                // Identify the new attachment deterministically (no max-ID assumptions)
-                long sharedId = after1.getAttachments().stream()
-                                .map(FileAttachment::getId)
-                                .filter(id -> !before1Ids.contains(id))
-                                .findFirst()
-                                .orElseThrow(() -> new AssertionError(
-                                                "Expected a newly-added shared attachment but found none"));
+                // Reviewer requirement: exactly one attachment after
+                assertEquals(1, after1.getAttachments().size());
+                assertEquals(1, after2.getAttachments().size());
 
-                // Do not assume counts (+1) for shared targets; only assert linking behavior
-                assertTrue("Project 1 should contain the shared attachment",
-                                after1.getAttachments().stream().anyMatch(a -> a.getId() == sharedId));
-                assertTrue("Expected shared attachment to be linked to both projects",
-                                after2.getAttachments().stream().anyMatch(a -> a.getId() == sharedId));
+                FileAttachment shared1 = after1.getAttachments().get(0);
+                FileAttachment shared2 = after2.getAttachments().get(0);
+                assertEquals(shared1.getId(), shared2.getId());
+                long sharedId = shared1.getId();
 
-                // Download shared attachment too (from both targets)
+                // Download shared attachment from both targets
                 MockHttpServletResponse response1 = getMockMvc()
                                 .perform(get(CONTROLLER_BASE + "/project/" + PROJECT_1 + "/" + sharedId))
                                 .andExpect(status().isOk())
