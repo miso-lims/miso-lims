@@ -171,27 +171,32 @@
     var addTheItem = function () {
       showSamplesLoading(true);
 
-      $.ajax({
-        url:
-          Urls.rest.arrays.position(arrayJson.id, selectedPosition) +
-          "?" +
-          Utils.page.param({
-            sampleId: jQuery("#resultSelect").val(),
-          }),
-        type: "PUT",
-        dataType: "json",
-      })
-        .done(function (data) {
-          clearSampleSearchResults();
-          SampleArray.setArrayJson(data);
-        })
-        .fail(function (response, textStatus, serverStatus) {
-          var error = JSON.parse(response.responseText);
-          var message = error.detail ? error.detail : error.message;
-          $("#warningMessages").html("Error adding item: " + message);
-          $("#ajaxLoader").addClass("hidden");
-          showSamplesLoading(false);
-        });
+      var url = Urls.rest.arrays.position(arrayJson.id, selectedPosition) +
+                          "?" +
+                          Utils.page.param({
+                            sampleId: jQuery("#resultSelect").val(),
+                          });
+      Utils.ajaxWithDialog(
+      "Update Position",
+      "PUT",
+      url,
+      null,
+      function (data) {
+        clearSampleSearchResults();
+        SampleArray.setArrayJson(data);
+        showSamplesLoading(false);
+      },
+      function (xhr, textStatus, errorThrown) {
+        var message = "Request Failed";
+        try {
+            var error = xhr.responseJSON || JSON.parse(xhr.responseText);
+            message = error.detail ? error.detail : error.message;
+        } catch (e) {
+            message = errorThrown || textStatus || message;
+        }
+        $("#warningMessages").html("Error adding item: " + message);
+        showSamplesLoading(false);
+      });
     };
 
     var checkConsentAndAdd = function () {
