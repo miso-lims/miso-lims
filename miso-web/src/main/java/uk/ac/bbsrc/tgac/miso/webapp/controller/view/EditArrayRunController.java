@@ -68,7 +68,8 @@ public class EditArrayRunController {
     model.addAttribute(MODEL_ATTR_TITLE, "Array Run " + arrayRunId);
     model.addAttribute(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     model.addAttribute(MODEL_ATTR_JSON, mapper.writer().writeValueAsString(Dtos.asDto(run)));
-    model.addAttribute(MODEL_ATTR_ARRAY_JSON, mapper.writer().writeValueAsString(Dtos.asDto(run.getArray())));
+    String arrayJson = run.getArray() == null ? "null" : mapper.writer().writeValueAsString(Dtos.asDto(run.getArray()));
+    model.addAttribute(MODEL_ATTR_ARRAY_JSON, arrayJson);
     model.addAttribute(MODEL_ATTR_RUN, run);
     return new ModelAndView(JSP, model);
   }
