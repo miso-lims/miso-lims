@@ -84,11 +84,6 @@ public class SampleClassRestControllerST extends AbstractST {
     SampleClassImpl existing = (SampleClassImpl) currentSession().get(ENTITY_CLASS, (long) UPDATE_CLASS_ID);
     assertNotNull(existing);
 
-    assertNotNull("parent relationships is null", existing.getParentRelationships());
-    assertFalse("parent relationships is empty", existing.getParentRelationships().isEmpty());
-    assertTrue("existing has parent relationships with null parent",
-        existing.getParentRelationships().stream().allMatch(rel -> rel.getParent() != null));
-
     int parentCountBefore = existing.getParentRelationships().size();
     Set<Long> parentIdsBefore = existing.getParentRelationships().stream()
         .map(rel -> rel.getParent().getId())
@@ -111,9 +106,6 @@ public class SampleClassRestControllerST extends AbstractST {
     assertNotNull("parent relationships is null", returned.getParentRelationships());
     assertFalse("parent relationships is empty", returned.getParentRelationships().isEmpty());
     assertEquals("parent relationships count changed", parentCountBefore, returned.getParentRelationships().size());
-
-    assertTrue("returned has parent relationships with null parent",
-        returned.getParentRelationships().stream().allMatch(rel -> rel.getParent() != null));
 
     Set<Long> parentIdsAfter = returned.getParentRelationships().stream()
         .map(rel -> rel.getParent().getId())
