@@ -245,7 +245,7 @@ public abstract class AbstractST {
    * @param getId The getId method for the target entity
    * @return List of updated entities
    */
-  protected <T, D> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<D> dtos,
+  protected <T extends Identifiable, D> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<D> dtos,
       Function<D, Long> getId)
       throws Exception {
     String response = pollingResponserHelper("put", dtos, controllerBase);
@@ -263,6 +263,7 @@ public abstract class AbstractST {
     for (Long id : ids) {
       T obj = currentSession().get(updateType, id);
       assertNotNull(obj);
+      assertEquals(id.longValue(), obj.getId());
       objects.add(obj);
     }
     return objects;
