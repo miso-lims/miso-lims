@@ -1167,5 +1167,5 @@ INSERT INTO Sop (sopId, alias, version, category, url, archived) VALUES (101, 'T
 INSERT INTO SopField (sopId, name, units, fieldType) VALUES
   (101, 'Flow Cell Lot Number', NULL, 'TEXT'),
   (101, 'Reagent Cartridge Lot', NULL, 'TEXT'),
-  (101, 'PhiX Spike-in %', '%', 'PERCENTAGE'),
+  (101, 'PhiX Spike-in %', '%', 'NUMBER'),
   (101, 'Library Concentration', 'nM', 'NUMBER');

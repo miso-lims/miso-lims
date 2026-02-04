@@ -37,6 +37,7 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
 
   private static final int SOPFIELD_NAME_MAX = 255;
   private static final int SOPFIELD_UNITS_MAX = 50;
+  private static final String FIELDS_PROPERTY = "fields";
 
   @Autowired
   private SopDao sopDao;
@@ -108,7 +109,7 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
 
     if (sop.getCategory() != SopCategory.RUN) {
       if (fields != null && !fields.isEmpty()) {
-        errors.add(new ValidationError("sopFields", "Only Run SOPs may have fields"));
+        errors.add(new ValidationError(FIELDS_PROPERTY, "Only Run SOPs may have fields"));
       }
       return;
     }
@@ -121,35 +122,27 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
     Map<Long, SopField> beforeById = new HashMap<>();
     if (beforeChange != null && beforeChange.getSopFields() != null) {
       for (SopField beforeField : beforeChange.getSopFields()) {
-        if (beforeField != null && beforeField.getId() > 0L) {
-          beforeById.put(beforeField.getId(), beforeField);
-          String beforeName = beforeField.getName();
-          if (beforeName != null && !beforeName.isEmpty()) {
-            byName.put(beforeName.toLowerCase(), beforeField);
-          }
-        }
+        beforeById.put(beforeField.getId(), beforeField);
+        byName.put(beforeField.getName().toLowerCase(), beforeField);
       }
     }
 
     for (SopField field : fields) {
-      if (field == null) {
-        continue;
-      }
-
       String name = field.getName();
       if (name == null || name.isEmpty()) {
-        errors.add(ValidationError.forRequired("sopFields"));
+        errors.add(ValidationError.forRequired(FIELDS_PROPERTY));
         continue;
       }
       if (name.length() > SOPFIELD_NAME_MAX) {
-        errors.add(new ValidationError("sopFields", "Field name must be at most " + SOPFIELD_NAME_MAX + " characters"));
+        errors.add(
+            new ValidationError(FIELDS_PROPERTY, "Field name must be at most " + SOPFIELD_NAME_MAX + " characters"));
       }
 
       String key = name.toLowerCase();
       SopField existingWithName = byName.get(key);
       if (existingWithName != null) {
-        if (field.getId() == 0L || existingWithName.getId() != field.getId()) {
-          errors.add(new ValidationError("sopFields", "Field names must be unique"));
+        if (!field.isSaved() || existingWithName.getId() != field.getId()) {
+          errors.add(new ValidationError(FIELDS_PROPERTY, "Field names must be unique"));
         }
       } else {
         byName.put(key, field);
@@ -157,21 +150,21 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
 
       String units = field.getUnits();
       if (units != null && units.length() > SOPFIELD_UNITS_MAX) {
-        errors.add(new ValidationError("sopFields", "Units must be at most " + SOPFIELD_UNITS_MAX + " characters"));
+        errors.add(new ValidationError(FIELDS_PROPERTY, "Units must be at most " + SOPFIELD_UNITS_MAX + " characters"));
       }
 
       FieldType fieldType = field.getFieldType();
       if (fieldType == null) {
-        errors.add(ValidationError.forRequired("sopFields"));
+        errors.add(ValidationError.forRequired(FIELDS_PROPERTY));
       }
 
-      if (beforeChange != null && field.getId() > 0L) {
+      if (beforeChange != null && field.isSaved()) {
         SopField before = beforeById.get(field.getId());
         if (before != null) {
           FieldType beforeType = before.getFieldType();
           FieldType afterType = field.getFieldType();
-          if (beforeType != null && afterType != null && !beforeType.equals(afterType)) {
-            errors.add(new ValidationError("sopFields", "Field type cannot be changed for existing fields"));
+          if (!beforeType.equals(afterType)) {
+            errors.add(new ValidationError(FIELDS_PROPERTY, "Field type cannot be changed for existing fields"));
           }
         }
       }
@@ -189,10 +182,6 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
 
   private void syncSopFields(Sop to, Sop from) {
     Set<SopField> toFields = to.getSopFields();
-    if (toFields == null) {
-      return;
-    }
-
     Set<SopField> fromFields = from.getSopFields();
     if (fromFields == null || fromFields.isEmpty()) {
       toFields.clear();
@@ -201,28 +190,27 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
 
     Set<Long> fromFieldIds = new HashSet<>();
     for (SopField fromField : fromFields) {
-      if (fromField != null && fromField.getId() > 0L) {
+      if (fromField.isSaved()) {
         fromFieldIds.add(fromField.getId());
       }
     }
 
     Map<Long, SopField> toFieldById = new HashMap<>();
     for (SopField toField : toFields) {
-      if (toField != null && toField.getId() > 0L) {
+      if (toField.isSaved()) {
         toFieldById.put(toField.getId(), toField);
       }
     }
 
     for (Iterator<SopField> it = toFields.iterator(); it.hasNext();) {
       SopField toField = it.next();
-      long id = toField.getId();
-      if (id > 0L && !fromFieldIds.contains(id)) {
+      if (toField.isSaved() && !fromFieldIds.contains(toField.getId())) {
         it.remove();
       }
     }
 
     for (SopField fromField : fromFields) {
-      if (fromField.getId() > 0L) {
+      if (fromField.isSaved()) {
         SopField toField = toFieldById.get(fromField.getId());
         if (toField != null) {
           toField.setName(fromField.getName());

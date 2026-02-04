@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 import org.apache.commons.validator.routines.BigDecimalValidator;
 
@@ -28,7 +27,7 @@ public class SopField implements Identifiable, Serializable {
   private static final long UNSAVED_ID = 0L;
 
   public enum FieldType {
-    TEXT, NUMBER, PERCENTAGE
+    TEXT, NUMBER
   }
 
   @Id
@@ -108,26 +107,12 @@ public class SopField implements Identifiable, Serializable {
 
     switch (fieldType) {
       case NUMBER:
-        return isBigDecimal(value);
-
-      case PERCENTAGE:
-        BigDecimal pct = parseBigDecimal(value);
-        return pct != null
-            && pct.compareTo(BigDecimal.ZERO) >= 0
-            && pct.compareTo(new BigDecimal("100")) <= 0;
+        return BigDecimalValidator.getInstance().validate(value) != null;
 
       case TEXT:
       default:
         return true;
     }
-  }
-
-  public static boolean isBigDecimal(String value) {
-    return parseBigDecimal(value) != null;
-  }
-
-  public static BigDecimal parseBigDecimal(String value) {
-    return BigDecimalValidator.getInstance().validate(value);
   }
 
   @Override

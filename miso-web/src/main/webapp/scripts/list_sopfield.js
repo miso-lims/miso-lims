@@ -3,7 +3,7 @@ ListTarget.sopfield = (function ($) {
 
   var FIELD_NAME_MAX = 255;
   var FIELD_UNITS_MAX = 50;
-  var ALLOWED_TYPES = ["TEXT", "NUMBER", "PERCENTAGE"];
+  var ALLOWED_TYPES = ["TEXT", "NUMBER"];
 
   function addFieldDialog() {
     Utils.showDialog(
@@ -29,6 +29,7 @@ ListTarget.sopfield = (function ($) {
           type: "text",
           property: "units",
           maxlength: FIELD_UNITS_MAX,
+          required: true,
         },
       ],
       function (result) {

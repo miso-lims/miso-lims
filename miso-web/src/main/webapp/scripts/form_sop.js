@@ -82,6 +82,7 @@ FormTarget.sop = (function ($) {
               title: "URL",
               data: "url",
               type: "text",
+              required: true,
               maxLength: 500,
               regex: Utils.validation.uriRegex,
             },

@@ -14,23 +14,13 @@ public class SopFieldTest {
     assertTrue(field.isValidValue("42"));
     assertTrue(field.isValidValue("3.14"));
     assertFalse(field.isValidValue("ABC"));
-
-    assertTrue(field.isValidValue(null));
-    assertTrue(field.isValidValue(""));
-  }
-
-  @Test
-  public void testPercentageFieldValidation() {
-    SopField field = new SopField();
-    field.setFieldType(SopField.FieldType.PERCENTAGE);
-
     assertTrue(field.isValidValue("50"));
     assertTrue(field.isValidValue("1.5"));
-    assertFalse(field.isValidValue("101"));
-    assertFalse(field.isValidValue("-1"));
-
+    assertTrue(field.isValidValue("101"));
+    assertTrue(field.isValidValue("-1"));
 
     assertTrue(field.isValidValue(null));
     assertTrue(field.isValidValue(""));
   }
+
 }

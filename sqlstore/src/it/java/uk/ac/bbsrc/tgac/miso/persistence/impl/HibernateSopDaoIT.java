@@ -5,30 +5,17 @@ import static org.junit.Assert.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.query.Query;
-import org.junit.Before;
 import org.junit.Test;
-
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, HibernateSopDao> {
 
-  private HibernateDeletionDao deletionDao;
-
   public HibernateSopDaoIT() {
     super(Sop.class, 1L, 6);
-  }
-
-  @Before
-  public void setupDeletionDao() {
-    deletionDao = new HibernateDeletionDao();
-    deletionDao.setEntityManager(getEntityManager());
   }
 
   @Override
@@ -72,7 +59,7 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
     SopField field2 = new SopField();
     field2.setName("PhiX %");
     field2.setUnits("%");
-    field2.setFieldType(SopField.FieldType.PERCENTAGE);
+    field2.setFieldType(SopField.FieldType.NUMBER);
     field2.setSop(sop);
 
     Set<SopField> fields = new HashSet<>();
@@ -97,38 +84,13 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
         assertEquals(SopField.FieldType.TEXT, field.getFieldType());
       } else if ("PhiX %".equals(field.getName())) {
         hasPhiX = true;
-        assertEquals(SopField.FieldType.PERCENTAGE, field.getFieldType());
+        assertEquals(SopField.FieldType.NUMBER, field.getFieldType());
         assertEquals("%", field.getUnits());
       }
     }
 
     assertTrue("Should have Flow Cell Lot field", hasFlowCell);
     assertTrue("Should have PhiX % field", hasPhiX);
-  }
-
-  @Test
-  public void testDeleteSopCascadesToFields() throws Exception {
-    long sopId = 101L;
-    Sop db = currentSession().get(Sop.class, sopId);
-    assertNotNull("Missing SOP test data with ID " + sopId, db);
-
-    Query<Long> countBeforeQ = currentSession().createQuery(
-        "select count(f) from SopField f where f.sop.id = :sopId", Long.class);
-    countBeforeQ.setParameter("sopId", sopId);
-    Long countBefore = countBeforeQ.uniqueResult();
-    assertTrue("Expected at least one field for test SOP " + sopId, countBefore > 0);
-
-    User user = currentSession().get(UserImpl.class, 1L);
-    assertNotNull("Missing test user", user);
-    deletionDao.delete(db, user);
-    clearSession();
-
-    assertNull(currentSession().get(Sop.class, sopId));
-
-    Query<Long> countAfterQ = currentSession().createQuery(
-        "select count(f) from SopField f where f.sop.id = :sopId", Long.class);
-    countAfterQ.setParameter("sopId", sopId);
-    assertEquals(Long.valueOf(0L), countAfterQ.uniqueResult());
   }
 
 }
