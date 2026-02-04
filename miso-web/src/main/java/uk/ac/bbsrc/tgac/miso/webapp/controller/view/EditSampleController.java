@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
@@ -171,8 +172,13 @@ public class EditSampleController {
     model.put("previousSample", sampleService.getPreviousInProject(sample));
     model.put("nextSample", sampleService.getNextInProject(sample));
 
-    model.put("sampleCategory",
-        LimsUtils.isDetailedSample(sample) ? ((DetailedSample) sample).getSampleClass().getSampleCategory() : "plain");
+    if (LimsUtils.isDetailedSample(sample)) {
+      DetailedSample detailed = (DetailedSample) sample;
+      model.put("sampleCategory", detailed.getSampleClass().getSampleCategory());
+      model.put("sampleSubcategory", detailed.getSampleClass().getSampleSubcategory());
+    } else {
+      model.put("sampleCategory", "plain");
+    }
     List<LibraryDto> libraries = sample.isSaved()
         ? libraryService.listBySampleId(sample.getId()).stream().map(lib -> Dtos.asDto(lib, false))
             .collect(Collectors.toList())
@@ -563,12 +569,12 @@ public class EditSampleController {
     }
 
     public ModelAndView edit(int additionalProbes, ModelMap model) throws IOException {
-      if (!isTissueProcessingSample(sample)) {
+      if (!isProcessingSingleCellSample(sample)) {
         throw new BadRequestException("Sample %d is not a tissue processing sample".formatted(sample.getId()));
       }
-      SampleTissueProcessing tissueProcessiong = (SampleTissueProcessing) sample;
-      List<ProbeDto> dtos = tissueProcessiong.getProbes() == null ? new ArrayList<>()
-          : tissueProcessiong.getProbes().stream().map(ProbeDto::from).collect(Collectors.toCollection(ArrayList::new));
+      SampleSingleCell singleCell = (SampleSingleCell) sample;
+      List<ProbeDto> dtos = singleCell.getProbes() == null ? new ArrayList<>()
+          : singleCell.getProbes().stream().map(ProbeDto::from).collect(Collectors.toCollection(ArrayList::new));
       for (int i = 0; i < additionalProbes; i++) {
         dtos.add(new ProbeDto());
       }

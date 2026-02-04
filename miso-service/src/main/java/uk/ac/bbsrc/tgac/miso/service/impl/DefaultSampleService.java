@@ -854,10 +854,10 @@ public class DefaultSampleService implements SampleService {
       validateGroupDescription(detailed, errors);
       if (isIdentitySample(sample) && sample.getRequisition() != null) {
         errors.add(new ValidationError("requisitionId", "Identity samples cannot be added to requisitions"));
-      } else if (isTissueProcessingSample(sample)) {
-        SampleTissueProcessing tissueProcessing = (SampleTissueProcessing) sample;
-        if (tissueProcessing.getProbes() != null && !tissueProcessing.getProbes().isEmpty()) {
-          validateProbes(tissueProcessing.getProbes(), errors);
+      } else if (isProcessingSingleCellSample(sample)) {
+        SampleSingleCell singleCell = (SampleSingleCell) sample;
+        if (singleCell.getProbes() != null && !singleCell.getProbes().isEmpty()) {
+          validateProbes(singleCell.getProbes(), errors);
         }
       }
       if (detailed.isSynthetic()) {
@@ -1140,7 +1140,6 @@ public class DefaultSampleService implements SampleService {
   private void applyTissueProcessingChanges(SampleTissueProcessing target, SampleTissueProcessing source)
       throws IOException {
     target.setIndex(source.getIndex());
-    applyProbeChanges(target, source);
     if (source instanceof SampleSlide) {
       ((SampleSlide) target).setInitialSlides(((SampleSlide) source).getInitialSlides());
       ((SampleSlide) target).setSlides(((SampleSlide) source).getSlides());
@@ -1155,16 +1154,17 @@ public class DefaultSampleService implements SampleService {
       ((SampleTissuePiece) target).setTissuePieceType(((SampleTissuePiece) source).getTissuePieceType());
       ((SampleTissuePiece) target).setReferenceSlideId(((SampleTissuePiece) source).getReferenceSlideId());
     } else if (source instanceof SampleSingleCell) {
-      ((SampleSingleCell) target)
-          .setInitialCellConcentration(((SampleSingleCell) source).getInitialCellConcentration());
-      ((SampleSingleCell) target).setTargetCellRecovery(((SampleSingleCell) source).getTargetCellRecovery());
-      ((SampleSingleCell) target)
-          .setLoadingCellConcentration(((SampleSingleCell) source).getLoadingCellConcentration());
-      ((SampleSingleCell) target).setDigestion(((SampleSingleCell) source).getDigestion());
+      SampleSingleCell singleCellTarget = (SampleSingleCell) target;
+      SampleSingleCell singleCellSource = (SampleSingleCell) source;
+      singleCellTarget.setInitialCellConcentration(singleCellSource.getInitialCellConcentration());
+      singleCellTarget.setTargetCellRecovery(singleCellSource.getTargetCellRecovery());
+      singleCellTarget.setLoadingCellConcentration(singleCellSource.getLoadingCellConcentration());
+      singleCellTarget.setDigestion(singleCellSource.getDigestion());
+      applyProbeChanges(singleCellTarget, singleCellSource);
     }
   }
 
-  private void applyProbeChanges(SampleTissueProcessing to, SampleTissueProcessing from) throws IOException {
+  private void applyProbeChanges(SampleSingleCell to, SampleSingleCell from) throws IOException {
     List<String> changeMessages = new ArrayList<>();
     if (from.getProbes() == null || from.getProbes().isEmpty()) {
       if (to.getProbes() != null && !to.getProbes().isEmpty()) {

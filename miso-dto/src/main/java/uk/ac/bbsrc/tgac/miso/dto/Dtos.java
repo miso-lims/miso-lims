@@ -1154,9 +1154,6 @@ public class Dtos {
     }
     setId(to::setIndexFamilyId, maybeGetProperty(from.getIndex(), SampleIndex::getFamily));
     setId(to::setIndexId, from.getIndex());
-    if (from.getProbes() != null) {
-      to.setProbes(from.getProbes().stream().map(ProbeDto::from).toList());
-    }
     return to;
   }
 
@@ -1172,9 +1169,6 @@ public class Dtos {
       to = new SampleTissueProcessingImpl();
     }
     setObject(to::setIndex, SampleIndex::new, from.getIndexId());
-    if (from.getProbes() != null) {
-      to.setProbes(from.getProbes().stream().map(ProbeDto::toSampleProbe).collect(Collectors.toSet()));
-    }
     return to;
   }
 
@@ -1210,6 +1204,9 @@ public class Dtos {
     setInteger(dto::setTargetCellRecovery, from.getTargetCellRecovery(), true);
     setString(dto::setLoadingCellConcentration, from.getLoadingCellConcentration());
     setString(dto::setDigestion, from.getDigestion());
+    if (from.getProbes() != null) {
+      dto.setProbes(from.getProbes().stream().map(ProbeDto::from).toList());
+    }
     return dto;
   }
 
@@ -1227,6 +1224,9 @@ public class Dtos {
     setInteger(to::setTargetCellRecovery, from.getTargetCellRecovery(), true);
     setBigDecimal(to::setLoadingCellConcentration, from.getLoadingCellConcentration());
     setString(to::setDigestion, from.getDigestion());
+    if (from.getProbes() != null) {
+      to.setProbes(from.getProbes().stream().map(ProbeDto::toSampleProbe).collect(Collectors.toSet()));
+    }
     return to;
   }
 

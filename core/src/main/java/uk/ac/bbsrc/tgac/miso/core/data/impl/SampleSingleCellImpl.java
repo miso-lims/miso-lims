@@ -1,10 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 
 @Entity
@@ -18,6 +23,10 @@ public class SampleSingleCellImpl extends SampleTissueProcessingImpl implements 
   private Integer targetCellRecovery;
   private BigDecimal loadingCellConcentration;
   private String digestion;
+
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "sampleId", nullable = false)
+  private Set<SampleProbe> probes;
 
   @Override
   public BigDecimal getInitialCellConcentration() {
@@ -57,6 +66,19 @@ public class SampleSingleCellImpl extends SampleTissueProcessingImpl implements 
   @Override
   public void setDigestion(String digestion) {
     this.digestion = digestion;
+  }
+
+  @Override
+  public Set<SampleProbe> getProbes() {
+    if (probes == null) {
+      probes = new HashSet<>();
+    }
+    return probes;
+  }
+
+  @Override
+  public void setProbes(Set<SampleProbe> probes) {
+    this.probes = probes;
   }
 
   @Override

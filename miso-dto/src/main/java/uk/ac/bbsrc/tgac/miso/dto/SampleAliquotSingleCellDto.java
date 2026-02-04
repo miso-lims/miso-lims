@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
 
+import java.util.List;
+
 @JsonTypeName(value = SampleAliquotSingleCell.SUBCATEGORY_NAME)
 public class SampleAliquotSingleCellDto extends SampleAliquotDto implements SampleStockSingleCellRelative {
 
@@ -16,6 +18,7 @@ public class SampleAliquotSingleCellDto extends SampleAliquotDto implements Samp
   private String loadingCellConcentration;
 
   private String inputIntoLibrary;
+  private List<ProbeDto> probes;
 
   @Override
   public Long getTissueProcessingClassId() {
@@ -83,6 +86,16 @@ public class SampleAliquotSingleCellDto extends SampleAliquotDto implements Samp
 
   public void setInputIntoLibrary(String inputIntoLibrary) {
     this.inputIntoLibrary = inputIntoLibrary;
+  }
+
+  @Override
+  public List<ProbeDto> getProbes() {
+    return probes;
+  }
+
+  @Override
+  public void setProbes(List<ProbeDto> probes) {
+    this.probes = probes;
   }
 
 }

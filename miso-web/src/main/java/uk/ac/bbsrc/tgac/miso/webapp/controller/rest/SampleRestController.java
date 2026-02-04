@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isProcessingSingleCellSample;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueProcessingSample;
 
 import java.io.IOException;
@@ -41,18 +42,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.core.Response.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
@@ -605,14 +595,14 @@ public class SampleRestController extends AbstractRestController {
   public @ResponseBody ObjectNode updateProbes(@PathVariable long sampleId, @RequestBody List<ProbeDto> dtos)
       throws IOException {
     Sample sample = RestUtils.retrieve(TYPE_LABEL, sampleId, sampleService);
-    if (!isTissueProcessingSample(sample)) {
+    if (!isProcessingSingleCellSample(sample)) {
       throw new BadRequestException("Cannot save probes for non tissue processing sample");
     }
-    SampleTissueProcessing tissueProcessing = (SampleTissueProcessing) sample;
-    tissueProcessing.setProbes(dtos.stream().map(ProbeDto::toSampleProbe).collect(Collectors.toSet()));
+    SampleSingleCell singleCell = (SampleSingleCell) sample;
+    singleCell.setProbes(dtos.stream().map(ProbeDto::toSampleProbe).collect(Collectors.toSet()));
 
     List<Sample> samples = new ArrayList<>();
-    samples.add(tissueProcessing);
+    samples.add(singleCell);
     // Note: the regular bulk sample getProgress endpoint should be used with this
     return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, samples, sampleService);
   }

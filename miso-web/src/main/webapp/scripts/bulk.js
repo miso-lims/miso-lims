@@ -119,8 +119,11 @@ BulkUtils = (function ($) {
    *       updateField calls to improve performance. changes is an array of arrays where the inner
    *       arrays have three elements - rowIndex, dataProperty, and newValue
    *   isSaved: function(); returns true if the data has been saved; else false,
-   *   getData: function(); returns original data updated with changes made in the table. For use
-   *       in custom actions only - will not work in onChange
+   *   getData: function(); returns original data updated with changes made in the table. This will
+   *       work in work in onChange functions *after* the table is built, but not during initial
+   *       population. This means that either the column initOnChange needs to be false, or you
+   *       need to check that this function exists before using, and not depend on it during
+   *       initial population
    *   validate: function(onValid); validates the table, displays any errors, and calls the onValid
    *       callback if valid. The table is placed into a loading state (controls disabled) while
    *       validating, and only reactivated if validation fails. The onValid function may return a
@@ -340,9 +343,12 @@ BulkUtils = (function ($) {
             data: "receivedTime",
             includeSaved: false,
             getData: function (object) {
-              return object.receivedTime
-                ? Utils.formatTwelveHourTime(object.receivedTime.split(" ")[1])
-                : null;
+              if (!object.receivedTime) {
+                return null;
+              }
+              var time = object.receivedTime.split(" ")[1];
+              var timeParts = time.split(":");
+              return Utils.formatTwelveHourTime(timeParts[0], timeParts[1]);
             },
             setData: function (object, value, rowIndex, api) {
               // Do nothing - handled in Date of Receipt

@@ -70,7 +70,7 @@
   });
 </script>
 
-<c:if test="${detailedSample and sampleCategory eq 'Tissue Processing'}">
+<c:if test="${detailedSample and sampleCategory eq 'Tissue Processing' and sampleSubcategory eq 'Single Cell'}">
   <br>
   <h1>Probes</h1>
   <div id="sampleForm_probesError"></div>

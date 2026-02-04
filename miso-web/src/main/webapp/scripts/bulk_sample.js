@@ -695,11 +695,14 @@ BulkTarget.sample = (function ($) {
                   var newValue = undefined;
                   if (!subcategoryMatch) {
                     newValue = null;
-                  } else if (config.pageMode !== "edit" && column.initial) {
+                  } else if (
+                    column.initial &&
+                    (config.pageMode !== "edit" || column.initializeOnEdit)
+                  ) {
                     newValue = column.initial;
                   }
                   api.updateField(rowIndex, dataField, {
-                    disabled: !subcategoryMatch,
+                    disabled: column.disabled || !subcategoryMatch,
                     required: subcategoryMatch ? column.required : false,
                     value: newValue,
                   });
@@ -709,6 +712,15 @@ BulkTarget.sample = (function ($) {
                   value: selected.defaultSampleType,
                 });
               }
+            }
+            if (
+              api.getData &&
+              (!selected ||
+                selected.sampleCategory !== "Tissue Processing" ||
+                selected.sampleSubcategory !== "Single Cell")
+            ) {
+              var sample = api.getData()[rowIndex];
+              sample.probes = null;
             }
           },
         },
@@ -1095,6 +1107,7 @@ BulkTarget.sample = (function ($) {
           type: "text",
           data: "probes",
           include: targetCategory === "Tissue Processing",
+          sampleSubcategory: "Single Cell",
           disabled: true,
           getData: function (object, limitedApi) {
             if (object.probes && object.probes.length) {
@@ -1103,6 +1116,7 @@ BulkTarget.sample = (function ($) {
             return null;
           },
           omit: true,
+          description: "Use the Edit Probes button to add/edit",
         },
         {
           title: "Initial Slides",
@@ -1540,13 +1554,13 @@ BulkTarget.sample = (function ($) {
         });
     });
 
-    return ["Identity", "Tissue", "Tissue Processing", "Stock", "Aliquot"].filter(function (
-      category
-    ) {
-      return childCategoriesPerClass.every(function (childCategories) {
-        return childCategories.indexOf(category) !== -1;
-      });
-    });
+    return ["Identity", "Tissue", "Tissue Processing", "Stock", "Aliquot"].filter(
+      function (category) {
+        return childCategoriesPerClass.every(function (childCategories) {
+          return childCategories.indexOf(category) !== -1;
+        });
+      }
+    );
   }
 
   function referenceSlideColumn(include, sampleSubcategory) {
@@ -1625,19 +1639,35 @@ BulkTarget.sample = (function ($) {
   function showEditProbesDialog(api) {
     var samples = api.getData();
 
-    var fields = samples.map(function (sample, index) {
-      var label = "Row " + (index + 1);
-      if (sample.alias) {
-        label += ": " + sample.alias;
-      } else if (sample.parentAlias) {
-        label += ": " + sample.parentAlias;
+    var fields = [];
+    for (var i = 0; i < samples.length; i++) {
+      var sampleClass = api.getValueObject(i, "sampleClassId");
+      if (
+        sampleClass &&
+        sampleClass.sampleCategory === "Tissue Processing" &&
+        sampleClass.sampleSubcategory === "Single Cell"
+      ) {
+        var sample = samples[i];
+        // Note: table row labels are i+1
+        var label = "Row " + (i + 1);
+        if (sample.alias) {
+          label += ": " + sample.alias;
+        } else if (sample.parentAlias) {
+          label += ": " + sample.parentAlias;
+        }
+        fields.push({
+          label: label,
+          property: "includeRow" + i,
+          type: "checkbox",
+        });
       }
-      return {
-        label: label,
-        property: "includeRow" + index,
-        type: "checkbox",
-      };
-    });
+    }
+    if (!fields.length) {
+      Utils.showOkDialog("Error", [
+        "No Single Cell samples found. Please select Sample Class before editing probes.",
+      ]);
+      return;
+    }
     fields.unshift({
       label: "Number of probes",
       property: "count",
