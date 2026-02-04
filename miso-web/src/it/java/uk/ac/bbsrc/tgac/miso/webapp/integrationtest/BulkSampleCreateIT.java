@@ -53,8 +53,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
       SamColumns.TUBE_NUMBER,
       SamColumns.SECONDARY_ID, SamColumns.TISSUE_MATERIAL, SamColumns.REGION, SamColumns.TIMEPOINT);
 
-  private static final Set<String> tissueProcessingDirectColumns = Sets.newHashSet(SamColumns.PROBES);
-
   // columns specific to creating Slides
   private static final Set<String> slideColumns = Sets.newHashSet(SamColumns.SOP, SamColumns.SLIDES,
       SamColumns.THICKNESS, SamColumns.STAIN, SamColumns.PERCENT_TUMOUR, SamColumns.PERCENT_NECROSIS,
@@ -68,7 +66,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
 
   // columns specific to creating single cells (tissue processing)
   private static final Set<String> singleCellColumns =
-      Sets.newHashSet(SamColumns.SOP, SamColumns.INITIAL_CELL_CONC, SamColumns.TARGET_CELL_RECOVERY,
+      Sets.newHashSet(SamColumns.PROBES, SamColumns.SOP, SamColumns.INITIAL_CELL_CONC, SamColumns.TARGET_CELL_RECOVERY,
           SamColumns.LOADING_CELL_CONC, SamColumns.DIGESTION, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
           SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
@@ -355,7 +353,6 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(identityColumns);
     expectedHeadings.addAll(tissueColumns);
-    expectedHeadings.addAll(tissueProcessingDirectColumns);
     expectedHeadings.addAll(slideColumns);
     expectedHeadings.addAll(tissuePieceColumns);
     expectedHeadings.addAll(singleCellColumns);
