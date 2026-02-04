@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import javax.annotation.Nonnull;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
