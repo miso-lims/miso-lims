@@ -1,0 +1,4 @@
+ALTER TABLE ArrayRun ADD COLUMN qcPassed BOOLEAN;
+ALTER TABLE ArrayRun ADD COLUMN qcUser bigint;
+ALTER TABLE ArrayRun ADD COLUMN qcDate DATE;
+ALTER TABLE ArrayRun ADD CONSTRAINT fk_arrayRun_qcUser FOREIGN KEY (qcUser) REFERENCES User (userId);

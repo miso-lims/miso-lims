@@ -11,6 +11,9 @@ public class ArrayRunDto {
   private Long arrayId;
   private String arrayAlias;
   private String status;
+  private Boolean qcPassed;
+  private String qcUserName;
+  private String qcDate;
   private String startDate;
   private String completionDate;
   private String lastModified;
@@ -85,6 +88,30 @@ public class ArrayRunDto {
 
   public void setStatus(String status) {
     this.status = status;
+  }
+
+  public Boolean getQcPassed() {
+      return qcPassed;
+  }
+
+  public void setQcPassed(Boolean qcPassed){
+      this.qcPassed = qcPassed;
+  }
+
+  public String getQcUserName(){
+      return qcUserName;
+  }
+
+  public void setQcUserName(String qcUserName){
+      this.qcUserName = qcUserName;
+  }
+
+  public String getQcDate(){
+      return qcDate;
+  }
+
+  public void setQcDate(String qcDate) {
+      this.qcDate = qcDate;
   }
 
   public String getStartDate() {

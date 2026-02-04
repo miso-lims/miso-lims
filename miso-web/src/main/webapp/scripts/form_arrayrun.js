@@ -197,6 +197,9 @@ FormTarget.arrayrun = (function ($) {
               // Only editable by admin if run is done
               disabled: !object.status ? false : getStatus(object.status).isDone && !config.isAdmin,
             },
+            FormUtils.makeQcPassedField(),
+            FormUtils.makeQcUserField(),
+            FormUtils.makeQcDateField(),
             {
               title: "Start Date",
               data: "startDate",
