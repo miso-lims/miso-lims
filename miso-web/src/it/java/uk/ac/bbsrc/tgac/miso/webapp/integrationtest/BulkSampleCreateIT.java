@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 import static org.junit.Assert.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -65,8 +66,9 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
           SamColumns.VOLUME_UNITS, SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
   // columns specific to creating single cells (tissue processing)
+  private static final Set<String> singleCellDirectOnlyColumns = Collections.singleton(SamColumns.PROBES);
   private static final Set<String> singleCellColumns =
-      Sets.newHashSet(SamColumns.PROBES, SamColumns.SOP, SamColumns.INITIAL_CELL_CONC, SamColumns.TARGET_CELL_RECOVERY,
+      Sets.newHashSet(SamColumns.SOP, SamColumns.INITIAL_CELL_CONC, SamColumns.TARGET_CELL_RECOVERY,
           SamColumns.LOADING_CELL_CONC, SamColumns.DIGESTION, SamColumns.VOLUME, SamColumns.VOLUME_UNITS,
           SamColumns.CONCENTRATION, SamColumns.CONCENTRATION_UNITS);
 
@@ -355,6 +357,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     expectedHeadings.addAll(tissueColumns);
     expectedHeadings.addAll(slideColumns);
     expectedHeadings.addAll(tissuePieceColumns);
+    expectedHeadings.addAll(singleCellDirectOnlyColumns);
     expectedHeadings.addAll(singleCellColumns);
 
     BulkSamplePage page = getCreatePage(1, null, SampleTissueProcessing.CATEGORY_NAME);
