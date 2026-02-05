@@ -418,7 +418,7 @@ public class DeleteIT extends AbstractIT {
 
   @Test
   public void testDeleteRunItemQcStatus() {
-    testAdminDelete(ListTarget.RUN_LIBRARY_QC_STATUSES, null, "DeleteMe", Columns.DESCRIPTION, RunItemQcStatus.class,
+    testAdminDelete(ListTarget.RUN_ITEM_QC_STATUSES, null, "DeleteMe", Columns.DESCRIPTION, RunItemQcStatus.class,
         4L);
   }
 
