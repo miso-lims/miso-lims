@@ -27,7 +27,7 @@ public class AttachmentControllerST extends AbstractST {
         public void testUploadAndDownloadSuccess() throws Exception {
                 ProjectImpl before = currentSession().get(ProjectImpl.class, PROJECT_1);
                 assertNotNull(before);
-                int beforeCount = before.getAttachments().size();
+                assertTrue(before.getAttachments().isEmpty());
 
                 MockMultipartFile file =
                                 new MockMultipartFile("files", "test.txt", "text/plain", "test content".getBytes());
@@ -41,9 +41,9 @@ public class AttachmentControllerST extends AbstractST {
                 currentSession().clear();
                 ProjectImpl after = currentSession().get(ProjectImpl.class, PROJECT_1);
                 assertNotNull(after);
-                assertEquals(beforeCount + 1, after.getAttachments().size());
+                assertEquals(1, after.getAttachments().size());
 
-                FileAttachment attachment = after.getAttachments().get(after.getAttachments().size() - 1);
+                FileAttachment attachment = after.getAttachments().get(0);
                 assertNotNull(attachment.getId());
                 assertEquals("test.txt", attachment.getFilename());
                 assertNotNull(attachment.getCategory());
@@ -65,8 +65,6 @@ public class AttachmentControllerST extends AbstractST {
                 ProjectImpl before2 = currentSession().get(ProjectImpl.class, PROJECT_2);
                 assertNotNull(before1);
                 assertNotNull(before2);
-
-                // Reviewer requirement: known starting state
                 assertTrue(before1.getAttachments().isEmpty());
                 assertTrue(before2.getAttachments().isEmpty());
 
@@ -85,17 +83,12 @@ public class AttachmentControllerST extends AbstractST {
                 ProjectImpl after2 = currentSession().get(ProjectImpl.class, PROJECT_2);
                 assertNotNull(after1);
                 assertNotNull(after2);
-
-                // Reviewer requirement: exactly one attachment after
                 assertEquals(1, after1.getAttachments().size());
                 assertEquals(1, after2.getAttachments().size());
 
-                FileAttachment shared1 = after1.getAttachments().get(0);
-                FileAttachment shared2 = after2.getAttachments().get(0);
-                assertEquals(shared1.getId(), shared2.getId());
-                long sharedId = shared1.getId();
+                long sharedId = after1.getAttachments().get(0).getId();
+                assertEquals(sharedId, after2.getAttachments().get(0).getId());
 
-                // Download shared attachment from both targets
                 MockHttpServletResponse response1 = getMockMvc()
                                 .perform(get(CONTROLLER_BASE + "/project/" + PROJECT_1 + "/" + sharedId))
                                 .andExpect(status().isOk())
