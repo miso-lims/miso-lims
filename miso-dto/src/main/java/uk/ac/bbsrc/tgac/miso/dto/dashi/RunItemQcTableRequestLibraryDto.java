@@ -4,12 +4,12 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RunLibraryQcTableRequestLibraryDto {
+public class RunItemQcTableRequestLibraryDto {
 
   private String name;
   private Long runId;
   private Integer partition;
-  private List<RunLibraryQcTableRequestMetricDto> metrics;
+  private List<RunItemQcTableRequestMetricDto> metrics;
 
   public String getName() {
     return name;
@@ -36,11 +36,11 @@ public class RunLibraryQcTableRequestLibraryDto {
     this.partition = partition;
   }
 
-  public List<RunLibraryQcTableRequestMetricDto> getMetrics() {
+  public List<RunItemQcTableRequestMetricDto> getMetrics() {
     return metrics;
   }
 
-  public void setMetrics(List<RunLibraryQcTableRequestMetricDto> metrics) {
+  public void setMetrics(List<RunItemQcTableRequestMetricDto> metrics) {
     this.metrics = metrics;
   }
 

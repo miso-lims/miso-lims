@@ -139,7 +139,7 @@ DELETE FROM SequencingControlType;
 DELETE FROM ScientificName;
 DELETE FROM Sop;
 DELETE FROM Pipeline;
-DELETE FROM RunLibraryQcStatus;
+DELETE FROM RunItemQcStatus;
 DELETE FROM WorksetCategory;
 DELETE FROM WorksetStage;
 DELETE FROM Deliverable;

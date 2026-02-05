@@ -22,7 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Printer;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.RunItemQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
@@ -417,8 +417,8 @@ public class DeleteIT extends AbstractIT {
   }
 
   @Test
-  public void testDeleteRunLibraryQcStatus() {
-    testAdminDelete(ListTarget.RUN_LIBRARY_QC_STATUSES, null, "DeleteMe", Columns.DESCRIPTION, RunLibraryQcStatus.class,
+  public void testDeleteRunItemQcStatus() {
+    testAdminDelete(ListTarget.RUN_LIBRARY_QC_STATUSES, null, "DeleteMe", Columns.DESCRIPTION, RunItemQcStatus.class,
         4L);
   }
 

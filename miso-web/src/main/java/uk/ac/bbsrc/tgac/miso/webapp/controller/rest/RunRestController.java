@@ -157,7 +157,7 @@ public class RunRestController extends AbstractRestController {
     }
   }
 
-  public static class RunLibraryQcStatusUpdateRequest {
+  public static class RunItemQcStatusUpdateRequest {
 
     private Boolean qcPassed;
     private String note;

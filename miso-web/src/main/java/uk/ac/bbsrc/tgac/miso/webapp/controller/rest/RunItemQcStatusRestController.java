@@ -17,20 +17,20 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
-import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
+import uk.ac.bbsrc.tgac.miso.core.data.RunItemQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.service.RunItemQcStatusService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.RunLibraryQcStatusDto;
+import uk.ac.bbsrc.tgac.miso.dto.RunItemQcStatusDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
-@RequestMapping("/rest/runlibraryqcstatuses")
-public class RunLibraryQcStatusRestController extends AbstractRestController {
+@RequestMapping("/rest/RunItemQcStatuses")
+public class RunItemQcStatusRestController extends AbstractRestController {
 
   @Autowired
-  private RunLibraryQcStatusService runLibraryQcStatusService;
+  private RunItemQcStatusService runItemQcStatusService;
   @Autowired
   private AsyncOperationManager asyncOperationManager;
   @Autowired
@@ -40,27 +40,27 @@ public class RunLibraryQcStatusRestController extends AbstractRestController {
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
-    RestUtils.bulkDelete("Run-Library QC Status", ids, runLibraryQcStatusService);
+    RestUtils.bulkDelete("Run-Item QC Status", ids, runItemQcStatusService);
     constantsController.refreshConstants();
   }
 
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<RunLibraryQcStatusDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkCreate("Run-Library QC Status", dtos, Dtos::to,
-        runLibraryQcStatusService, true);
+  public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<RunItemQcStatusDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkCreate("Run-Item QC Status", dtos, Dtos::to,
+            runItemQcStatusService, true);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<RunLibraryQcStatusDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkUpdate("Run-Library QC Status", dtos, Dtos::to,
-        runLibraryQcStatusService, true);
+  public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<RunItemQcStatusDto> dtos) throws IOException {
+    return asyncOperationManager.startAsyncBulkUpdate("Run-Item QC Status", dtos, Dtos::to,
+            runItemQcStatusService, true);
   }
 
   @GetMapping("/bulk/{uuid}")
   public @ResponseBody ObjectNode getProgress(@PathVariable String uuid) throws Exception {
-    return asyncOperationManager.getAsyncProgress(uuid, RunLibraryQcStatus.class, runLibraryQcStatusService,
+    return asyncOperationManager.getAsyncProgress(uuid, RunItemQcStatus.class, runItemQcStatusService,
         Dtos::asDto);
   }
 

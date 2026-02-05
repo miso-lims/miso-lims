@@ -33,11 +33,11 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.QcNodeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcNodeDto;
-import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQCTableRowDto;
-import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestDto;
-import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestLibraryDto;
-import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestMetricDto;
-import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRowMetricDto;
+import uk.ac.bbsrc.tgac.miso.dto.dashi.RunItemQCTableRowDto;
+import uk.ac.bbsrc.tgac.miso.dto.dashi.RunItemQcTableRequestDto;
+import uk.ac.bbsrc.tgac.miso.dto.dashi.RunItemQcTableRequestLibraryDto;
+import uk.ac.bbsrc.tgac.miso.dto.dashi.RunItemQcTableRequestMetricDto;
+import uk.ac.bbsrc.tgac.miso.dto.dashi.RunItemQcTableRowMetricDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 
@@ -59,22 +59,22 @@ public class RunLibraryController {
   private ObjectMapper mapper;
 
   @PostMapping("/metrics")
-  public ModelAndView getRunLibraryQcTable(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
-    RunLibraryQcTableRequestDto data = validateRunLibraryQcTableRequest(form, mapper);
+  public ModelAndView getRunItemQcTable(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+    RunItemQcTableRequestDto data = validateRunItemQcTableRequest(form, mapper);
 
-    List<RunLibraryQCTableRowDto> rows = new ArrayList<>();
-    for (RunLibraryQcTableRequestLibraryDto item : data.getLibraryAliquots()) {
+    List<RunItemQCTableRowDto> rows = new ArrayList<>();
+    for (RunItemQcTableRequestLibraryDto item : data.getLibraryAliquots()) {
       long aliquotId = getAliquotIdFromName(item.getName());
       long partitionId = containerService.getPartitionIdByRunIdAndPartitionNumber(item.getRunId(), item.getPartition());
       SampleQcNode hierarchy = qcNodeService.getForRunLibrary(item.getRunId(), partitionId, aliquotId);
       if (hierarchy == null) {
         throw new NotFoundException("Run-library not found");
       }
-      RunLibraryQCTableRowDto row = new RunLibraryQCTableRowDto();
+      RunItemQCTableRowDto row = new RunItemQCTableRowDto();
       LibraryAliquot aliquot = libraryAliquotService.get(aliquotId);
       row.setLibraryAliquot(Dtos.asDto(aliquot, false));
       row.setMetrics(
-          item.getMetrics().stream().map(RunLibraryQcTableRowMetricDto::fromRequestDto).collect(Collectors.toList()));
+          item.getMetrics().stream().map(RunItemQcTableRowMetricDto::fromRequestDto).collect(Collectors.toList()));
       row.setQcNodes(getNodes(hierarchy, item.getRunId(), partitionId, aliquotId));
       rows.add(row);
     }
@@ -131,14 +131,14 @@ public class RunLibraryController {
     return Long.parseLong(m.group(1));
   }
 
-  private static RunLibraryQcTableRequestDto validateRunLibraryQcTableRequest(Map<String, String> form,
+  private static RunItemQcTableRequestDto validateRunItemQcTableRequest(Map<String, String> form,
       ObjectMapper mapper)
       throws IOException {
-    RunLibraryQcTableRequestDto data = null;
+    RunItemQcTableRequestDto data = null;
     if (form.containsKey("data")) {
       try {
         String json = form.get("data");
-        data = mapper.readValue(json, RunLibraryQcTableRequestDto.class);
+        data = mapper.readValue(json, RunItemQcTableRequestDto.class);
       } catch (JsonProcessingException e) {
         throw new ClientErrorException("Invalid request data", e);
       }
@@ -149,12 +149,12 @@ public class RunLibraryController {
     } else if (data.getLibraryAliquots() == null || data.getLibraryAliquots().isEmpty()) {
       throw new ClientErrorException("No library aliquots specified");
     }
-    for (RunLibraryQcTableRequestLibraryDto lib : data.getLibraryAliquots()) {
+    for (RunItemQcTableRequestLibraryDto lib : data.getLibraryAliquots()) {
       if (lib.getMetrics() == null || lib.getMetrics().isEmpty()) {
         throw new ClientErrorException("No metrics specified");
       }
       for (int i = 0; i < lib.getMetrics().size(); i++) {
-        RunLibraryQcTableRequestMetricDto m1 = lib.getMetrics().get(i);
+        RunItemQcTableRequestMetricDto m1 = lib.getMetrics().get(i);
         if (m1.getTitle() == null || m1.getThresholdType() == null) {
           throw new ClientErrorException("Invalid metrics specified");
         }
@@ -191,14 +191,14 @@ public class RunLibraryController {
   // final long run2Id = 4862L;
 
 
-  // RunLibraryQcTableRequestDto dto = new RunLibraryQcTableRequestDto();
+  // RunItemQcTableRequestDto dto = new RunItemQcTableRequestDto();
 
   // dto.setReport("Some Report");
-  // List<RunLibraryQcTableRequestLibraryDto> aliquots = new ArrayList<>();
+  // List<RunItemQcTableRequestLibraryDto> aliquots = new ArrayList<>();
   // dto.setLibraryAliquots(aliquots);
 
-  // RunLibraryQcTableRequestLibraryDto aliquot = new RunLibraryQcTableRequestLibraryDto();
-  // RunLibraryQcTableRequestLibraryDto aliquot2 = new RunLibraryQcTableRequestLibraryDto();
+  // RunItemQcTableRequestLibraryDto aliquot = new RunItemQcTableRequestLibraryDto();
+  // RunItemQcTableRequestLibraryDto aliquot2 = new RunItemQcTableRequestLibraryDto();
   // aliquots.add(aliquot);
   // aliquots.add(aliquot2);
 
@@ -206,44 +206,44 @@ public class RunLibraryController {
   // aliquot.setName(aliquot1Name);
   // aliquot.setRunId(runId);
   // aliquot.setPartition(partitionNumber);
-  // List<RunLibraryQcTableRequestMetricDto> metrics = new ArrayList<>();
+  // List<RunItemQcTableRequestMetricDto> metrics = new ArrayList<>();
   // aliquot.setMetrics(metrics);
 
   // aliquot2.setName(aliquot2Name);
   // aliquot2.setRunId(run2Id);
   // aliquot2.setPartition(partitionNumber);
-  // List<RunLibraryQcTableRequestMetricDto> metrics2 = new ArrayList<>();
+  // List<RunItemQcTableRequestMetricDto> metrics2 = new ArrayList<>();
   // aliquot2.setMetrics(metrics2);
 
-  // RunLibraryQcTableRequestMetricDto metric1 = new RunLibraryQcTableRequestMetricDto();
+  // RunItemQcTableRequestMetricDto metric1 = new RunItemQcTableRequestMetricDto();
   // metrics.add(metric1);
   // metric1.setTitle("Something");
   // metric1.setThreshold(100D);
   // metric1.setThresholdType("gt");
   // metric1.setValue(120D);
 
-  // RunLibraryQcTableRequestMetricDto metric2 = new RunLibraryQcTableRequestMetricDto();
+  // RunItemQcTableRequestMetricDto metric2 = new RunItemQcTableRequestMetricDto();
   // metrics.add(metric2);
   // metric2.setTitle("Another Thing");
   // metric2.setThreshold(100D);
   // metric2.setThresholdType("le");
   // metric2.setValue(120D);
 
-  // RunLibraryQcTableRequestMetricDto metric3 = new RunLibraryQcTableRequestMetricDto();
+  // RunItemQcTableRequestMetricDto metric3 = new RunItemQcTableRequestMetricDto();
   // metrics2.add(metric3);
   // metric3.setTitle("Another Thing");
   // metric3.setThreshold(150D);
   // metric3.setThresholdType("gt");
   // metric3.setValue(562.6D);
 
-  // RunLibraryQcTableRequestMetricDto metric4 = new RunLibraryQcTableRequestMetricDto();
+  // RunItemQcTableRequestMetricDto metric4 = new RunItemQcTableRequestMetricDto();
   // metrics2.add(metric4);
   // metric4.setTitle("Another Thing 2");
   // metric4.setThreshold(10000D);
   // metric4.setThresholdType("gt");
   // metric4.setValue(46363D);
 
-  // RunLibraryQcTableRequestMetricDto metric5 = new RunLibraryQcTableRequestMetricDto();
+  // RunItemQcTableRequestMetricDto metric5 = new RunItemQcTableRequestMetricDto();
   // metrics2.add(metric5);
   // metric5.setTitle("Another Thing 3");
   // metric5.setThreshold(35D);
@@ -252,7 +252,7 @@ public class RunLibraryController {
 
   // Map<String, String> form = new HashMap<>();
   // form.put("data", mapper.writeValueAsString(dto));
-  // return getRunLibraryQcTable(form, model);
+  // return getRunItemQcTable(form, model);
   // }
 
 }

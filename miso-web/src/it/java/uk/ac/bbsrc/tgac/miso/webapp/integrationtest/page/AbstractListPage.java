@@ -204,7 +204,7 @@ public abstract class AbstractListPage extends HeaderFooterPage {
     public static final String REFERENCE_GENOMES = "referencegenome/list";
     public static final String REQUISITIONS = "requisition/list";
     public static final String RUNS = "runs";
-    public static final String RUN_LIBRARY_QC_STATUSES = "runlibraryqcstatus/list";
+    public static final String RUN_LIBRARY_QC_STATUSES = "RunItemQcStatus/list";
     public static final String RUN_PURPOSES = "runpurpose/list";
     public static final String SAMPLES = "samples";
     public static final String SAMPLE_CLASSES = "sampleclass/list";

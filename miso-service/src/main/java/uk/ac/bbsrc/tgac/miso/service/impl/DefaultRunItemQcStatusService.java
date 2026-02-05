@@ -8,24 +8,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.RunItemQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunItemQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
-import uk.ac.bbsrc.tgac.miso.persistence.RunLibraryQcStatusDao;
+import uk.ac.bbsrc.tgac.miso.persistence.RunItemQcStatusDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class DefaultRunLibraryQcStatusService extends AbstractSaveService<RunLibraryQcStatus>
-    implements RunLibraryQcStatusService {
+public class DefaultRunItemQcStatusService extends AbstractSaveService<RunItemQcStatus>
+    implements RunItemQcStatusService {
 
   @Autowired
-  private RunLibraryQcStatusDao runLibraryQcStatusDao;
+  private RunItemQcStatusDao runItemQcStatusDao;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -44,8 +44,8 @@ public class DefaultRunLibraryQcStatusService extends AbstractSaveService<RunLib
   }
 
   @Override
-  public List<RunLibraryQcStatus> listByIdList(List<Long> ids) throws IOException {
-    return runLibraryQcStatusDao.listByIdList(ids);
+  public List<RunItemQcStatus> listByIdList(List<Long> ids) throws IOException {
+    return runItemQcStatusDao.listByIdList(ids);
   }
 
   @Override
@@ -54,45 +54,45 @@ public class DefaultRunLibraryQcStatusService extends AbstractSaveService<RunLib
   }
 
   @Override
-  public List<RunLibraryQcStatus> list() throws IOException {
-    return runLibraryQcStatusDao.list();
+  public List<RunItemQcStatus> list() throws IOException {
+    return runItemQcStatusDao.list();
   }
 
   @Override
-  public SaveDao<RunLibraryQcStatus> getDao() {
-    return runLibraryQcStatusDao;
+  public SaveDao<RunItemQcStatus> getDao() {
+    return runItemQcStatusDao;
   }
 
   @Override
-  public RunLibraryQcStatus getByDescription(String description) throws IOException {
-    return runLibraryQcStatusDao.getByDescription(description);
+  public RunItemQcStatus getByDescription(String description) throws IOException {
+    return runItemQcStatusDao.getByDescription(description);
   }
 
   @Override
-  protected void collectValidationErrors(RunLibraryQcStatus object, RunLibraryQcStatus beforeChange,
-      List<ValidationError> errors)
+  protected void collectValidationErrors(RunItemQcStatus object, RunItemQcStatus beforeChange,
+                                         List<ValidationError> errors)
       throws IOException {
-    if (ValidationUtils.isChanged(RunLibraryQcStatus::getDescription, object, beforeChange)
-        && runLibraryQcStatusDao.getByDescription(object.getDescription()) != null) {
-      errors.add(ValidationError.forDuplicate("run-library QC status", "description"));
+    if (ValidationUtils.isChanged(RunItemQcStatus::getDescription, object, beforeChange)
+        && runItemQcStatusDao.getByDescription(object.getDescription()) != null) {
+      errors.add(ValidationError.forDuplicate("run-Item QC status", "description"));
     }
   }
 
   @Override
-  protected void applyChanges(RunLibraryQcStatus to, RunLibraryQcStatus from) throws IOException {
+  protected void applyChanges(RunItemQcStatus to, RunItemQcStatus from) throws IOException {
     to.setDescription(from.getDescription());
     to.setQcPassed(from.getQcPassed());
   }
 
   @Override
-  protected void authorizeUpdate(RunLibraryQcStatus object) throws IOException {
+  protected void authorizeUpdate(RunItemQcStatus object) throws IOException {
     authorizationManager.throwIfNonAdmin();
   }
 
   @Override
-  public ValidationResult validateDeletion(RunLibraryQcStatus object) throws IOException {
+  public ValidationResult validateDeletion(RunItemQcStatus object) throws IOException {
     ValidationResult result = new ValidationResult();
-    long usage = runLibraryQcStatusDao.getUsage(object);
+    long usage = runItemQcStatusDao.getUsage(object);
     if (usage > 0L) {
       result.addError(ValidationError.forDeletionUsage(object, usage, "run " + Pluralizer.libraries(usage)));
     }

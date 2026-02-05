@@ -12,7 +12,7 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.RunItemQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.RunPartitionAliquotQcNode.RunPartitionAliquotQcNodeId;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -90,7 +90,7 @@ public class RunPartitionAliquotQcNode implements QcNode {
 
   @ManyToOne
   @JoinColumn(name = "statusId")
-  private RunLibraryQcStatus qcStatus;
+  private RunItemQcStatus qcStatus;
 
   private String qcNote;
 
@@ -151,11 +151,11 @@ public class RunPartitionAliquotQcNode implements QcNode {
         getAliquot().getAlias());
   }
 
-  public RunLibraryQcStatus getQcStatus() {
+  public RunItemQcStatus getQcStatus() {
     return qcStatus;
   }
 
-  public void setQcStatus(RunLibraryQcStatus qcStatus) {
+  public void setQcStatus(RunItemQcStatus qcStatus) {
     this.qcStatus = qcStatus;
   }
 

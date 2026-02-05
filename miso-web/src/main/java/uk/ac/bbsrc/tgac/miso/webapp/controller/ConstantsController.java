@@ -89,7 +89,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.PipelineService;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
 import uk.ac.bbsrc.tgac.miso.core.service.ReferenceGenomeService;
-import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunItemQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleIndexFamilyService;
@@ -214,7 +214,7 @@ public class ConstantsController {
   @Autowired
   private PipelineService pipelineService;
   @Autowired
-  private RunLibraryQcStatusService runLibraryQcStatusService;
+  private RunItemQcStatusService runItemQcStatusService;
   @Autowired
   private WorksetCategoryService worksetCategoryService;
   @Autowired
@@ -327,7 +327,7 @@ public class ConstantsController {
       addJsonArray(mapper, node, "sequencingControlTypes", sequencingControlTypeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "scientificNames", scientificNameService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "pipelines", pipelineService.list(), Dtos::asDto);
-      addJsonArray(mapper, node, "runLibraryQcStatuses", runLibraryQcStatusService.list(), Dtos::asDto);
+      addJsonArray(mapper, node, "RunItemQcStatuses", runItemQcStatusService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "worksetCategories", worksetCategoryService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "worksetStages", worksetStageService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "metrics", metricService.list(), MetricDto::from);

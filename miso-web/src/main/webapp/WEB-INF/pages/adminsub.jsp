@@ -96,7 +96,7 @@
       <a href="<c:url value="/pipeline/list"/>">Pipelines</a>
       <a href="<c:url value="/qctype/list"/>">QC Types</a>
       <a href="<c:url value="/referencegenome/list"/>">Reference Genomes</a>
-      <a href="<c:url value="/runlibraryqcstatus/list"/>">Run-Library QC Statuses</a>
+      <a href="<c:url value="/RunItemQcStatus/list"/>">Run-Library QC Statuses</a>
       <a href="<c:url value="/runpurpose/list"/>">Run Purposes</a>
       <c:if test="${detailedSample}">
         <a href="<c:url value="/sampleclass/list"/>">Sample Classes</a>

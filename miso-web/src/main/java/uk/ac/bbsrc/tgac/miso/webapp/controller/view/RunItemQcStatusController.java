@@ -12,30 +12,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.RunItemQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
-import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunItemQcStatusService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
-import uk.ac.bbsrc.tgac.miso.dto.RunLibraryQcStatusDto;
+import uk.ac.bbsrc.tgac.miso.dto.RunItemQcStatusDto;
 
 @Controller
-@RequestMapping("/runlibraryqcstatus")
-public class RunLibraryQcStatusController extends AbstractTypeDataController<RunLibraryQcStatus, RunLibraryQcStatusDto> {
+@RequestMapping("/RunItemQcStatus")
+public class RunItemQcStatusController extends AbstractTypeDataController<RunItemQcStatus, RunItemQcStatusDto> {
 
   @Autowired
-  private RunLibraryQcStatusService runLibraryQcStatusService;
+  private RunItemQcStatusService runItemQcStatusService;
 
   @Autowired
   private AuthorizationManager authorizationManager;
 
-  public RunLibraryQcStatusController() {
-    super("Run-Library QC Statuses", "runlibraryqcstatus", "runlibraryqcstatus");
+  public RunItemQcStatusController() {
+    super("Run-Library QC Statuses", "RunItemQcStatus", "RunItemQcStatus");
   }
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
-    return listStatic(runLibraryQcStatusService.list(), model);
+    return listStatic(runItemQcStatusService.list(), model);
   }
 
   @GetMapping("/bulk/new")
@@ -54,18 +54,18 @@ public class RunLibraryQcStatusController extends AbstractTypeDataController<Run
   }
 
   @Override
-  protected ProviderService<RunLibraryQcStatus> getService() {
-    return runLibraryQcStatusService;
+  protected ProviderService<RunItemQcStatus> getService() {
+    return runItemQcStatusService;
   }
 
   @Override
-  protected RunLibraryQcStatusDto toDto(RunLibraryQcStatus object) {
+  protected RunItemQcStatusDto toDto(RunItemQcStatus object) {
     return Dtos.asDto(object);
   }
 
   @Override
-  protected RunLibraryQcStatusDto makeDto() {
-    return new RunLibraryQcStatusDto();
+  protected RunItemQcStatusDto makeDto() {
+    return new RunItemQcStatusDto();
   }
 
 }

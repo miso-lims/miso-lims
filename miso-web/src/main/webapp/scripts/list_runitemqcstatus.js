@@ -1,4 +1,4 @@
-ListTarget.runlibraryqcstatus = (function () {
+ListTarget.RunItemQcStatus = (function () {
   var pluralLabel = "Run-Library QC Statuses";
 
   return {
@@ -12,12 +12,12 @@ ListTarget.runlibraryqcstatus = (function () {
     getQueryUrl: null,
     showNewOptionSop: true,
     createBulkActions: function (config, projectId) {
-      var actions = BulkTarget.runlibraryqcstatus.getBulkActions(config);
+      var actions = BulkTarget.RunItemQcStatus.getBulkActions(config);
       if (config.isAdmin) {
         actions.push(
           ListUtils.createBulkDeleteAction(
             pluralLabel,
-            "runlibraryqcstatuses",
+            "RunItemQcStatuses",
             Utils.array.get("description")
           )
         );
@@ -29,7 +29,7 @@ ListTarget.runlibraryqcstatus = (function () {
         ? [
             ListUtils.createStaticAddAction(
               pluralLabel,
-              Urls.ui.runLibraryQcStatuses.bulkCreate,
+              Urls.ui.RunItemQcStatuses.bulkCreate,
               true
             ),
           ]

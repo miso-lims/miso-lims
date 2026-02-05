@@ -5,10 +5,10 @@ import java.util.List;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.QcNodeDto;
 
-public class RunLibraryQCTableRowDto {
+public class RunItemQCTableRowDto {
 
   private LibraryAliquotDto libraryAliquot;
-  private List<RunLibraryQcTableRowMetricDto> metrics;
+  private List<RunItemQcTableRowMetricDto> metrics;
   private List<QcNodeDto> qcNodes;
 
   public LibraryAliquotDto getLibraryAliquot() {
@@ -19,11 +19,11 @@ public class RunLibraryQCTableRowDto {
     this.libraryAliquot = libraryAliquot;
   }
 
-  public List<RunLibraryQcTableRowMetricDto> getMetrics() {
+  public List<RunItemQcTableRowMetricDto> getMetrics() {
     return metrics;
   }
 
-  public void setMetrics(List<RunLibraryQcTableRowMetricDto> metrics) {
+  public void setMetrics(List<RunItemQcTableRowMetricDto> metrics) {
     this.metrics = metrics;
   }
 

@@ -10,7 +10,7 @@ INSERT INTO `_Group`(`groupId`, `name`, `description`) VALUES
 INSERT INTO `User_Group` (`users_userId`, `groups_groupId`)
 VALUES (3,1),(1,1);
 
-INSERT INTO RunLibraryQcStatus(statusId, description, qcPassed) VALUES
+INSERT INTO RunItemQcStatus(statusId, description, qcPassed) VALUES
 (1, 'Passed', TRUE),
 (2, 'Failed', FALSE),
 (3, 'Top-up required', NULL);
