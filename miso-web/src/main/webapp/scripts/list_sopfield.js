@@ -29,7 +29,6 @@ ListTarget.sopfield = (function ($) {
           type: "text",
           property: "units",
           maxlength: FIELD_UNITS_MAX,
-          required: true,
         },
       ],
       function (result) {
