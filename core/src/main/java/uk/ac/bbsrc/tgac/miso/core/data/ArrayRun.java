@@ -69,6 +69,14 @@ public class ArrayRun implements Serializable, Aliasable, Attachable, ChangeLogg
       @JoinColumn(name = "attachmentId")})
   private List<FileAttachment> attachments;
 
+  private Boolean qcPassed;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "qcUser")
+  private User qcUser;
+
+  private LocalDate qcDate;
+
   @Transient
   private List<FileAttachment> pendingAttachmentDeletions;
 
@@ -189,6 +197,30 @@ public class ArrayRun implements Serializable, Aliasable, Attachable, ChangeLogg
   @Override
   public void setPendingAttachmentDeletions(List<FileAttachment> pendingAttachmentDeletions) {
     this.pendingAttachmentDeletions = pendingAttachmentDeletions;
+  }
+
+  public Boolean getQcPassed() {
+      return qcPassed;
+  }
+
+  public void setQcPassed(Boolean qcPassed){
+      this.qcPassed = qcPassed;
+  }
+
+  public User getQcUser() {
+      return qcUser;
+  }
+
+  public void setQcUser(User qcUser){
+      this.qcUser = qcUser;
+  }
+
+  public LocalDate getQcDate(){
+      return qcDate;
+  }
+
+  public void setQcDate(LocalDate qcDate){
+      this.qcDate = qcDate;
   }
 
   @Override

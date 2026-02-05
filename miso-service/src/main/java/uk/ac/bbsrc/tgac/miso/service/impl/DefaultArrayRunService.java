@@ -146,6 +146,9 @@ public class DefaultArrayRunService implements ArrayRunService {
   private void validateChange(ArrayRun arrayRun, ArrayRun beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
+    ValidationUtils.updateQcDetails(arrayRun, beforeChange, ArrayRun::getQcPassed, ArrayRun::getQcUser,
+            ArrayRun::setQcUser, authorizationManager, ArrayRun::getQcDate, ArrayRun::setQcDate);
+
     if (arrayRun.isSaved() && beforeChange == null) {
       errors.add(new ValidationError("Array Run not found"));
     }
@@ -171,6 +174,7 @@ public class DefaultArrayRunService implements ArrayRunService {
 
     validateStartDate(arrayRun, beforeChange, errors);
     validateStatusAndCompletion(arrayRun, beforeChange, errors);
+    ValidationUtils.validateQcUser(arrayRun.getQcPassed(), arrayRun.getQcUser(), errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
@@ -228,6 +232,9 @@ public class DefaultArrayRunService implements ArrayRunService {
     to.setHealth(from.getHealth());
     to.setStartDate(from.getStartDate());
     to.setCompletionDate(from.getCompletionDate());
+    to.setQcPassed(from.getQcPassed());
+    to.setQcUser(from.getQcUser());
+    to.setQcDate(from.getQcDate());
   }
 
   @Override

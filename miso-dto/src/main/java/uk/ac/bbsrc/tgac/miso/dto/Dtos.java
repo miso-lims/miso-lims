@@ -3455,6 +3455,9 @@ public class Dtos {
     dto.setStatus(from.getHealth().getKey());
     setDateString(dto::setStartDate, from.getStartDate());
     setDateString(dto::setCompletionDate, from.getCompletionDate());
+    setBoolean(dto::setQcPassed, from.getQcPassed(), true);
+    setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
+    setDateString(dto::setQcDate, from.getQcDate());
     setDateString(dto::setLastModified, from.getLastModified());
     return dto;
   }
@@ -3496,6 +3499,7 @@ public class Dtos {
     run.setHealth(HealthType.get(from.getStatus()));
     setLocalDate(run::setStartDate, from.getStartDate());
     setLocalDate(run::setCompletionDate, from.getCompletionDate());
+    setBoolean(run::setQcPassed, from.getQcPassed(), true);
     setDate(run::setLastModified, from.getLastModified());
     return run;
   }
