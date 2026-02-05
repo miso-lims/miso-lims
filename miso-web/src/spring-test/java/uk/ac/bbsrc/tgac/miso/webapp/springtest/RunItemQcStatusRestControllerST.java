@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 public class RunItemQcStatusRestControllerST extends AbstractST {
 
-  private static final String CONTROLLER_BASE = "/rest/RunItemQcStatuses";
+  private static final String CONTROLLER_BASE = "/rest/runitemqcstatuses";
   private static final Class<RunItemQcStatus> entityClass = RunItemQcStatus.class;
 
   private List<RunItemQcStatusDto> makeCreateDtos() {

@@ -894,13 +894,13 @@ Urls = (function () {
   };
 
   // Run-Library QC Statuses
-  var RunItemQcStatusUiBase = "/RunItemQcStatus";
+  var RunItemQcStatusUiBase = "/runitemqcstatus";
   ui.RunItemQcStatuses = {
     bulkCreate: RunItemQcStatusUiBase + "/bulk/new",
     bulkEdit: RunItemQcStatusUiBase + "/bulk/edit",
   };
 
-  var RunItemQcStatusRestBase = restBase + "/RunItemQcStatuses";
+  var RunItemQcStatusRestBase = restBase + "/runitemqcstatuses";
   rest.RunItemQcStatuses = {
     bulkSave: RunItemQcStatusRestBase + "/bulk",
     bulkSaveProgress: idUrlFunction(RunItemQcStatusRestBase + "/bulk"),

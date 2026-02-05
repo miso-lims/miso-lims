@@ -26,7 +26,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
 @Controller
-@RequestMapping("/rest/RunItemQcStatuses")
+@RequestMapping("/rest/runitemqcstatuses")
 public class RunItemQcStatusRestController extends AbstractRestController {
 
   @Autowired

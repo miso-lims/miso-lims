@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RunItemQcStatusDto;
 
 @Controller
-@RequestMapping("/RunItemQcStatus")
+@RequestMapping("/runitemqcstatus")
 public class RunItemQcStatusController extends AbstractTypeDataController<RunItemQcStatus, RunItemQcStatusDto> {
 
   @Autowired
