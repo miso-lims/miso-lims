@@ -20,7 +20,7 @@ ListTarget.runaliquot = {
                     id: null,
                     description: "Pending",
                   },
-                ].concat(Constants.RunItemQcStatuses),
+                ].concat(Constants.runItemQcStatuses),
                 getLabel: Utils.array.get("description"),
               },
               {
@@ -233,7 +233,7 @@ ListTarget.runaliquot = {
           }
           var status = Utils.array.findUniqueOrThrow(
             Utils.array.idPredicate(data),
-            Constants.RunItemQcStatuses
+            Constants.runItemQcStatuses
           );
           if (type !== "display") {
             return status.description;

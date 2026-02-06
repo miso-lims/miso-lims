@@ -33,11 +33,11 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.QcNodeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcNodeDto;
-import uk.ac.bbsrc.tgac.miso.dto.dashi.RunItemQCTableRowDto;
-import uk.ac.bbsrc.tgac.miso.dto.dashi.RunItemQcTableRequestDto;
-import uk.ac.bbsrc.tgac.miso.dto.dashi.RunItemQcTableRequestLibraryDto;
-import uk.ac.bbsrc.tgac.miso.dto.dashi.RunItemQcTableRequestMetricDto;
-import uk.ac.bbsrc.tgac.miso.dto.dashi.RunItemQcTableRowMetricDto;
+import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQCTableRowDto;
+import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestDto;
+import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestLibraryDto;
+import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRequestMetricDto;
+import uk.ac.bbsrc.tgac.miso.dto.dashi.RunLibraryQcTableRowMetricDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 
@@ -60,21 +60,21 @@ public class RunLibraryController {
 
   @PostMapping("/metrics")
   public ModelAndView getRunItemQcTable(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
-    RunItemQcTableRequestDto data = validateRunItemQcTableRequest(form, mapper);
+    RunLibraryQcTableRequestDto data = validateRunItemQcTableRequest(form, mapper);
 
-    List<RunItemQCTableRowDto> rows = new ArrayList<>();
-    for (RunItemQcTableRequestLibraryDto item : data.getLibraryAliquots()) {
+    List<RunLibraryQCTableRowDto> rows = new ArrayList<>();
+    for (RunLibraryQcTableRequestLibraryDto item : data.getLibraryAliquots()) {
       long aliquotId = getAliquotIdFromName(item.getName());
       long partitionId = containerService.getPartitionIdByRunIdAndPartitionNumber(item.getRunId(), item.getPartition());
       SampleQcNode hierarchy = qcNodeService.getForRunLibrary(item.getRunId(), partitionId, aliquotId);
       if (hierarchy == null) {
         throw new NotFoundException("Run-library not found");
       }
-      RunItemQCTableRowDto row = new RunItemQCTableRowDto();
+      RunLibraryQCTableRowDto row = new RunLibraryQCTableRowDto();
       LibraryAliquot aliquot = libraryAliquotService.get(aliquotId);
       row.setLibraryAliquot(Dtos.asDto(aliquot, false));
       row.setMetrics(
-          item.getMetrics().stream().map(RunItemQcTableRowMetricDto::fromRequestDto).collect(Collectors.toList()));
+          item.getMetrics().stream().map(RunLibraryQcTableRowMetricDto::fromRequestDto).collect(Collectors.toList()));
       row.setQcNodes(getNodes(hierarchy, item.getRunId(), partitionId, aliquotId));
       rows.add(row);
     }
@@ -131,14 +131,14 @@ public class RunLibraryController {
     return Long.parseLong(m.group(1));
   }
 
-  private static RunItemQcTableRequestDto validateRunItemQcTableRequest(Map<String, String> form,
-      ObjectMapper mapper)
+  private static RunLibraryQcTableRequestDto validateRunItemQcTableRequest(Map<String, String> form,
+                                                                           ObjectMapper mapper)
       throws IOException {
-    RunItemQcTableRequestDto data = null;
+    RunLibraryQcTableRequestDto data = null;
     if (form.containsKey("data")) {
       try {
         String json = form.get("data");
-        data = mapper.readValue(json, RunItemQcTableRequestDto.class);
+        data = mapper.readValue(json, RunLibraryQcTableRequestDto.class);
       } catch (JsonProcessingException e) {
         throw new ClientErrorException("Invalid request data", e);
       }
@@ -149,12 +149,12 @@ public class RunLibraryController {
     } else if (data.getLibraryAliquots() == null || data.getLibraryAliquots().isEmpty()) {
       throw new ClientErrorException("No library aliquots specified");
     }
-    for (RunItemQcTableRequestLibraryDto lib : data.getLibraryAliquots()) {
+    for (RunLibraryQcTableRequestLibraryDto lib : data.getLibraryAliquots()) {
       if (lib.getMetrics() == null || lib.getMetrics().isEmpty()) {
         throw new ClientErrorException("No metrics specified");
       }
       for (int i = 0; i < lib.getMetrics().size(); i++) {
-        RunItemQcTableRequestMetricDto m1 = lib.getMetrics().get(i);
+        RunLibraryQcTableRequestMetricDto m1 = lib.getMetrics().get(i);
         if (m1.getTitle() == null || m1.getThresholdType() == null) {
           throw new ClientErrorException("Invalid metrics specified");
         }

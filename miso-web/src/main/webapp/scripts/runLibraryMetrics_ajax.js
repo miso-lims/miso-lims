@@ -88,7 +88,7 @@ var RunLibraryMetrics = (function ($) {
               id: 0,
               description: "Pending",
             },
-          ].concat(Constants.RunItemQcStatuses),
+          ].concat(Constants.runItemQcStatuses),
           getLabel: Utils.array.get("description"),
         },
         {
@@ -98,7 +98,7 @@ var RunLibraryMetrics = (function ($) {
         },
       ];
       Utils.showDialog("QC All Run-Libraries", "Apply", fields, function (results) {
-        setAllRunItemQcs(results.option.id, results.note);
+        setAllRunLibraryQcs(results.option.id, results.note);
       });
     },
     showReviewAllDialog: function () {
@@ -381,7 +381,7 @@ var RunLibraryMetrics = (function ($) {
       case "Run-Library":
         controls.status.append(makeSelectOption(0, "Pending", !qcNode.qcStatusId));
         controls.status.append(
-          Constants.RunItemQcStatuses.map(function (item) {
+          Constants.runItemQcStatuses.map(function (item) {
             return makeSelectOption(item.id, item.description, qcNode.qcStatusId === item.id);
           })
         );
@@ -414,7 +414,7 @@ var RunLibraryMetrics = (function ($) {
           if (statusId) {
             qcPassed = Utils.array.findUniqueOrThrow(
               Utils.array.idPredicate(statusId),
-              Constants.RunItemQcStatuses
+              Constants.runItemQcStatuses
             ).qcPassed;
           }
 
@@ -548,7 +548,7 @@ var RunLibraryMetrics = (function ($) {
     table.append($("<tr>").append($("<td>").text(label), $("<td>").append(control)));
   }
 
-  function setAllRunItemQcs(optionValue, note) {
+  function setAllRunLibraryQcs(optionValue, note) {
     $(".nodeSelect").each(function () {
       $(this).val($(this).find("option").length - 1);
       $(this).change();

@@ -894,16 +894,16 @@ Urls = (function () {
   };
 
   // Run-Library QC Statuses
-  var RunItemQcStatusUiBase = "/runitemqcstatus";
-  ui.RunItemQcStatuses = {
-    bulkCreate: RunItemQcStatusUiBase + "/bulk/new",
-    bulkEdit: RunItemQcStatusUiBase + "/bulk/edit",
+  var runItemQcStatusUiBase = "/runitemqcstatus";
+  ui.runItemQcStatuses = {
+    bulkCreate: runItemQcStatusUiBase + "/bulk/new",
+    bulkEdit: runItemQcStatusUiBase + "/bulk/edit",
   };
 
-  var RunItemQcStatusRestBase = restBase + "/runitemqcstatuses";
-  rest.RunItemQcStatuses = {
-    bulkSave: RunItemQcStatusRestBase + "/bulk",
-    bulkSaveProgress: idUrlFunction(RunItemQcStatusRestBase + "/bulk"),
+  var runItemQcStatusRestBase = restBase + "/runitemqcstatuses";
+  rest.runItemQcStatuses = {
+    bulkSave: runItemQcStatusRestBase + "/bulk",
+    bulkSaveProgress: idUrlFunction(runItemQcStatusRestBase + "/bulk"),
   };
 
   // Run Purposes

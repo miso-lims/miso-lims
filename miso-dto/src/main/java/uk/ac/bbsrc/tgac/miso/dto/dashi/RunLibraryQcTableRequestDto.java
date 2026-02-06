@@ -4,10 +4,10 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RunItemQcTableRequestDto {
+public class RunLibraryQcTableRequestDto {
 
   private String report;
-  private List<RunItemQcTableRequestLibraryDto> libraryAliquots;
+  private List<RunLibraryQcTableRequestLibraryDto> libraryAliquots;
 
   public String getReport() {
     return report;
@@ -18,11 +18,11 @@ public class RunItemQcTableRequestDto {
   }
 
   @JsonProperty("library_aliquots")
-  public List<RunItemQcTableRequestLibraryDto> getLibraryAliquots() {
+  public List<RunLibraryQcTableRequestLibraryDto> getLibraryAliquots() {
     return libraryAliquots;
   }
 
-  public void setLibraryAliquots(List<RunItemQcTableRequestLibraryDto> libraryAliquots) {
+  public void setLibraryAliquots(List<RunLibraryQcTableRequestLibraryDto> libraryAliquots) {
     this.libraryAliquots = libraryAliquots;
   }
 

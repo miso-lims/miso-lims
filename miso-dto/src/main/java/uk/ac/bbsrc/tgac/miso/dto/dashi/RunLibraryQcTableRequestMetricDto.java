@@ -1,22 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.dto.dashi;
 
-public class RunItemQcTableRowMetricDto {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class RunLibraryQcTableRequestMetricDto {
 
   private String title;
   private String thresholdType;
   private double threshold;
   private double threshold2;
   private Double value;
-
-  public static RunItemQcTableRowMetricDto fromRequestDto(RunItemQcTableRequestMetricDto from) {
-    RunItemQcTableRowMetricDto to = new RunItemQcTableRowMetricDto();
-    to.setTitle(from.getTitle());
-    to.setThresholdType(from.getThresholdType());
-    to.setThreshold(from.getThreshold());
-    to.setThreshold2(from.getThreshold2());
-    to.setValue(from.getValue());
-    return to;
-  }
 
   public String getTitle() {
     return title;
@@ -26,6 +18,7 @@ public class RunItemQcTableRowMetricDto {
     this.title = title;
   }
 
+  @JsonProperty("threshold_type")
   public String getThresholdType() {
     return thresholdType;
   }
@@ -42,6 +35,7 @@ public class RunItemQcTableRowMetricDto {
     this.threshold = threshold;
   }
 
+  @JsonProperty(value = "threshold_2")
   public double getThreshold2() {
     return threshold2;
   }

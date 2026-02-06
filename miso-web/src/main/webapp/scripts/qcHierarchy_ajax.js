@@ -253,7 +253,7 @@ var QcHierarchy = (function ($) {
         var status = item.qcStatusId
           ? Utils.array.findUniqueOrThrow(
               Utils.array.idPredicate(item.qcStatusId),
-              Constants.RunItemQcStatuses
+              Constants.runItemQcStatuses
             )
           : null;
         return makeNodeHtml(item, status ? status.description : "Pending", item.qcNote);
@@ -333,7 +333,7 @@ var QcHierarchy = (function ($) {
         updatePartitionQcControls(selectedItem);
         break;
       case "Run-Library":
-        updateRunItemQcControls(selectedItem);
+        updateRunLibraryQcControls(selectedItem);
         break;
       default:
         throw new Error("Unknown entity type: " + selectedItem.entityType);
@@ -421,10 +421,10 @@ var QcHierarchy = (function ($) {
     });
   }
 
-  function updateRunItemQcControls(selectedItem) {
+  function updateRunLibraryQcControls(selectedItem) {
     $(statusInput).append(makeSelectOption(0, "Pending", !selectedItem.qcStatusId));
     $(statusInput).append(
-      Constants.RunItemQcStatuses.map(function (x) {
+      Constants.runItemQcStatuses.map(function (x) {
         var qcPassed = selectedItem.qcPassed === undefined ? null : selectedItem.qcPassed;
         return makeSelectOption(x.id, x.description, selectedItem.qcStatusId === x.id);
       })

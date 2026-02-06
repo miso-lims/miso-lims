@@ -327,7 +327,7 @@ public class ConstantsController {
       addJsonArray(mapper, node, "sequencingControlTypes", sequencingControlTypeService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "scientificNames", scientificNameService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "pipelines", pipelineService.list(), Dtos::asDto);
-      addJsonArray(mapper, node, "RunItemQcStatuses", runItemQcStatusService.list(), Dtos::asDto);
+      addJsonArray(mapper, node, "runItemQcStatuses", runItemQcStatusService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "worksetCategories", worksetCategoryService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "worksetStages", worksetStageService.list(), Dtos::asDto);
       addJsonArray(mapper, node, "metrics", metricService.list(), MetricDto::from);
