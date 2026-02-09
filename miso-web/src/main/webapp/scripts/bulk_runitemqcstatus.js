@@ -1,5 +1,5 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.runItemQcStatus = (function () {
+BulkTarget.runitemqcstatus = (function () {
   /*
    * Expected config: {
    *   pageMode: string {create, edit}
@@ -15,7 +15,7 @@ BulkTarget.runItemQcStatus = (function () {
       return Urls.rest.runItemQcStatuses.bulkSaveProgress(operationId);
     },
     getUserManualUrl: function () {
-      return Urls.external.userManual("type_data", "run-library-qc-statuses");
+      return Urls.external.userManual("type_data", "run-item-qc-statuses");
     },
     getBulkActions: function (config) {
       return !config.isAdmin ? [] : [BulkUtils.actions.edit(Urls.ui.runItemQcStatuses.bulkEdit)];

@@ -30,7 +30,7 @@ public class RunItemQcStatusController extends AbstractTypeDataController<RunIte
   private AuthorizationManager authorizationManager;
 
   public RunItemQcStatusController() {
-    super("Run-Library QC Statuses", "RunItemQcStatus", "RunItemQcStatus");
+    super("Run-Item QC Statuses", "RunItemQcStatus", "RunItemQcStatus");
   }
 
   @GetMapping("/list")

@@ -84,10 +84,10 @@ reflect your selection.
 
 
 
-## Setting Run-Library QC Status
+## Setting Run-Item QC Status
 
-Run-library QC status indicates the results of sequencing a specific library aliquot in a specific partition of a
-specific run. See [Run-Library QC Statuses](../type_data#run-library-qc-statuses) for more information. This status can
+Run-Item QC status indicates the results of sequencing a specific library aliquot in a specific partition of a
+specific run. See [Run-Item QC Statuses](../type_data#run-item-qc-statuses) for more information. This status can
 be set in the Library Aliquots table on the Edit Run page. First, select the library aliquots to set the status for,
 then click the "Set QC" button in the table's toolbar. In the dialog that appears, select the status, enter a note if
 you wish, and click "OK" to save.
