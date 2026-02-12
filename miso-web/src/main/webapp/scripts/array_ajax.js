@@ -186,17 +186,12 @@
         SampleArray.setArrayJson(data);
         showSamplesLoading(false);
       },
-      function (xhr, textStatus, errorThrown) {
-        var message = "Request Failed";
-        try {
-            var error = xhr.responseJSON || JSON.parse(xhr.responseText);
-            message = error.detail ? error.detail : error.message;
-        } catch (e) {
-            message = errorThrown || textStatus || message;
-        }
-        $("#warningMessages").html("Error adding item: " + message);
+      function(xhr, textStatus, errorThrown) {
         showSamplesLoading(false);
-      });
+        Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
+      },
+      true
+      );
     };
 
     var checkConsentAndAdd = function () {
