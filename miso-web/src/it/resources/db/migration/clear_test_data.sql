@@ -154,4 +154,6 @@ DELETE FROM MetricSubcategory;
 DELETE FROM Requisition_SupplementalSample;
 DELETE FROM Requisition_SupplementalLibrary;
 DELETE FROM RequisitionPause;
+DELETE FROM ProbeSet;
+DELETE FROM ProbeSetProbe;
 SET FOREIGN_KEY_CHECKS=1;

@@ -592,6 +592,7 @@ public class SampleRestController extends AbstractRestController {
   }
 
   @PutMapping("/{sampleId}/probes")
+  @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode updateProbes(@PathVariable long sampleId, @RequestBody List<ProbeDto> dtos)
       throws IOException {
     Sample sample = RestUtils.retrieve(TYPE_LABEL, sampleId, sampleService);

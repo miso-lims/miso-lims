@@ -188,6 +188,41 @@ Any number of quality control measures may be recorded for a sample. For more in
 
 
 
+## Sample Probes
+
+Sample probes were mainly designed to represent 10X feature barcodes. They can be added to single
+cell tissue processing samples, and are available in detailed sample mode only. Probes are added
+directly to samples, but may also be saved as probe sets. Probe sets are saved collections of
+probes that can easily be applied to additional samples.
+
+### Editing Probes in Bulk
+
+When working with single cell tissue processing samples on the bulk Create/Edit/Propagate Samples
+pages, an "Edit Probes" button will appear above the table. This will allow you to select which
+samples you wish to edit the probes for, and whether you'd like to apply a probe set, define a
+new custom set of probes, or remove any existing probes. When first adding probes, you can select
+multiple samples and the same probes will be added to each sample. After probes are saved on a
+sample, they are considered unique, however, and each sample's probes must be edited individually.
+When editing custom probes, the sample table will switch to show the probe data instead. In this
+view, you have the options to apply the probe changes, cancel changes, and save the probes as a
+probe set. Applying or cancelling the changes will return you to the sample entry view.
+
+### Editing Probes on the Edit Sample Page
+
+The Edit Sample page for single cell tissue processing samples includes a Probes table. Probes that
+have been added to the sample are shown here. Buttons on the table allow you to apply a probe set,
+remove probes, or edit probes. Editing will take you to a bulk entry page, and includes an option
+to add additional probes.
+
+### Working with Probe Sets
+
+As mentioned above, probe sets can be saved while editing the probes on a sample, and can be
+applied to samples from both the bulk and single sample pages. There is also a list page for probe
+sets, found in the Configuration menu. From the list page, you can create new probe sets or click
+the name of an existing one to get to its edit page.
+
+
+
 ## Adding Samples to a Workset
 
 It can sometimes be difficult to find and select a group of samples that you want to work with. To make this easier,

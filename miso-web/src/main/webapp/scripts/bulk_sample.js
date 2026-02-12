@@ -22,7 +22,7 @@ BulkTarget.sample = (function ($) {
 
   var sampleProbeTarget = {
     getColumns: function (config, api) {
-      return BulkTarget.sampleprobe.getColumns(config, api);
+      return BulkTarget.probe.getColumns(config, api);
     },
     getCustomActions: function (config, api) {
       return [
@@ -30,6 +30,23 @@ BulkTarget.sample = (function ($) {
           name: "Apply Probe Changes",
           action: function () {
             switchToSamplesTable(api);
+          },
+        },
+        {
+          name: "Save as Probe Set",
+          action: function () {
+            api.validate(function () {
+              var deferred = $.Deferred();
+              var probes = api.getData();
+              ProbeSet.showSaveProbeSetDialog(
+                probes,
+                function () {
+                  deferred.resolve(true);
+                },
+                deferred.reject
+              );
+              return deferred.promise();
+            });
           },
         },
         {
@@ -1110,10 +1127,7 @@ BulkTarget.sample = (function ($) {
           sampleSubcategory: "Single Cell",
           disabled: true,
           getData: function (object, limitedApi) {
-            if (object.probes && object.probes.length) {
-              return "( " + object.probes.length + " attached)";
-            }
-            return null;
+            return makeProbesLabel(object.probes);
           },
           omit: true,
           description: "Use the Edit Probes button to add/edit",
@@ -1636,6 +1650,13 @@ BulkTarget.sample = (function ($) {
     });
   }
 
+  function makeProbesLabel(probes) {
+    if (probes && probes.length) {
+      return "( " + probes.length + " attached)";
+    }
+    return null;
+  }
+
   function showEditProbesDialog(api) {
     var samples = api.getData();
 
@@ -1669,28 +1690,84 @@ BulkTarget.sample = (function ($) {
       return;
     }
     fields.unshift({
-      label: "Number of probes",
-      property: "count",
-      type: "int",
+      label: "Method",
+      property: "method",
+      type: "select",
+      values: ["Edit custom probes", "Apply probe set", "Remove all probes"],
+      required: true,
     });
 
-    Utils.showDialog("Edit Probes - Select Samples", "Edit", fields, function (results) {
-      if (results.count < 1 || results.count > 1000) {
-        Utils.showOkDialog("Error", ["Number of probes must be between 1 and 1000"]);
-        return;
+    Utils.showDialog("Edit Probes", "Continue", fields, function (results) {
+      var selectedRows = [];
+      var selectedSamples = [];
+      for (var i = 0; i < samples.length; i++) {
+        if (results["includeRow" + i]) {
+          selectedRows.push(i);
+          selectedSamples.push(samples[i]);
+        }
       }
-      var selectedSamples = samples.filter(function (sample, index) {
-        return results["includeRow" + index];
-      });
       if (!selectedSamples.length) {
         Utils.showOkDialog("Error", ["No samples selected"]);
         return;
       }
-      if (!samplesHaveSameProbes(selectedSamples)) {
-        Utils.showOkDialog("Error", [
-          "Selected samples have different probes. Note that if the samples have already been" +
-            " saved with probes, each sample's probes must be edited individually.",
-        ]);
+
+      switch (results.method) {
+        case "Apply probe set":
+          Sample.showAddProbeSetDialog(selectedSamples, function (probes) {
+            selectedSamples.forEach(function (sample) {
+              sample.probes = probes;
+            });
+            api.updateData(
+              selectedRows.map(function (row) {
+                return [row, "probes", makeProbesLabel(probes)];
+              })
+            );
+          });
+          break;
+        case "Edit custom probes":
+          // Custom probes
+          showEditCustomProbesDialog(api, selectedSamples);
+          break;
+        case "Remove all probes":
+          selectedSamples.forEach(function (sample) {
+            sample.probes = [];
+          });
+          api.updateData(
+            selectedRows.map(function (row) {
+              return [row, "probes", makeProbesLabel([])];
+            })
+          );
+          Utils.showOkDialog("Edit Probes", [
+            "All probes have been removed from the selected samples",
+          ]);
+          break;
+        default:
+          throw Error("Unexpected value: " + results.method);
+      }
+    });
+  }
+
+  function showEditCustomProbesDialog(api, selectedSamples) {
+    if (!samplesHaveSameProbes(selectedSamples)) {
+      Utils.showOkDialog("Error", [
+        "Selected samples have different probes. Note that if the samples have already been" +
+          " saved with probes, each sample's probes must be edited individually.",
+      ]);
+      return;
+    }
+
+    var fields = [
+      {
+        label: "Number of probes",
+        property: "count",
+        type: "int",
+        value: selectedSamples[0].probes ? selectedSamples[0].probes.length : null,
+      },
+    ];
+
+    Utils.showDialog("Edit Custom Probes", "Edit", fields, function (results) {
+      if (results.count < 1 || results.count > 1000) {
+        Utils.showOkDialog("Error", ["Number of probes must be between 1 and 1000"]);
         return;
       }
       if (selectedSamples[0].probes && results.count < selectedSamples[0].probes.length) {

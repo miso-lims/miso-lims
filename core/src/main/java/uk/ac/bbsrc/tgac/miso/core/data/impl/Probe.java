@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
@@ -10,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @MappedSuperclass
 public abstract class Probe implements Identifiable, Serializable {
@@ -137,6 +139,17 @@ public abstract class Probe implements Identifiable, Serializable {
 
   public void setTargetGeneName(String targetGeneName) {
     this.targetGeneName = targetGeneName;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(probeId, identifier, name, read, pattern, sequence, featureType, targetGeneId, targetGeneName);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return LimsUtils.equals(this, obj, Probe::getId, Probe::getIdentifier, Probe::getName, Probe::getRead,
+        Probe::getPattern, Probe::getSequence, Probe::getFeatureType, Probe::getTargetGeneId, Probe::getTargetGeneName);
   }
 
 }

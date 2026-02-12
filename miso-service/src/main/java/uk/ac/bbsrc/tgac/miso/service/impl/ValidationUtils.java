@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -26,6 +28,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.HierarchyEntity;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Probe;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Probe.ProbeFeatureType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Probe.Read;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableReference;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.DetailedQcItem;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -150,6 +155,99 @@ public class ValidationUtils {
     allowedUrlSchemes.add("https");
   }
   private static final String INVALID_URL = "URL is not valid";
+
+  private static final String PROBE_PATTERN_REGEX = "^(?:5P|\\^)?[NACGT]*\\(BC\\)[NACGT]*(?:3P|\\$)?$";
+  private static final String SEQUENCE_PATTERN_REGEX = "^[ACGT]+$";
+
+  /**
+   * Checks that probes are valid both individually and as a set. This method does not handle null or
+   * empty sets, so those conditions should be checked first, and this method should only be called if
+   * probes are present. All errors are reported on the "probes" field
+   * 
+   * @param probes collection containing one or more probes
+   * @param errors list to collect errors
+   */
+  public static void validateProbes(Collection<? extends Probe> probes, List<ValidationError> errors) {
+    if (probes == null || probes.isEmpty()) {
+      throw new IllegalArgumentException(
+          "The method should only be called after ensuring that there are probes in the set");
+    }
+
+    Set<String> identifiers = new HashSet<>();
+    Set<String> names = new HashSet<>();
+    Set<String> sequences = new HashSet<>();
+
+    Probe firstProbe = probes.iterator().next();
+    Read read = firstProbe.getRead();
+    String pattern = firstProbe.getPattern();
+    ProbeFeatureType featureType = firstProbe.getFeatureType();
+
+    // We only want to report each of these once
+    boolean multipleReads = false;
+    boolean multiplePatterns = false;
+    boolean multipleFeatureTypes = false;
+    boolean badPattern = false;
+    boolean badSequence = false;
+    boolean targetGeneMissing = false;
+    boolean targetGeneInvalid = false;
+
+    for (Probe probe : probes) {
+      multipleReads |= probe.getRead() != read;
+      multiplePatterns |= !Objects.equals(probe.getPattern(), pattern);
+      multipleFeatureTypes |= probe.getFeatureType() != featureType;
+
+
+      if (identifiers.contains(probe.getIdentifier())) {
+        errors.add(new ValidationError("probes", "Duplicate identifier: " + probe.getIdentifier()));
+      }
+      identifiers.add(probe.getIdentifier());
+
+      if (names.contains(probe.getName())) {
+        errors.add(new ValidationError("probes", "Duplicate name: " + probe.getName()));
+      }
+      names.add(probe.getName());
+
+      if (sequences.contains(probe.getSequence())) {
+        errors.add(new ValidationError("probes", "Duplicate sequence: " + probe.getSequence()));
+      }
+      sequences.add(probe.getSequence());
+
+      badPattern |= !probe.getPattern().matches(PROBE_PATTERN_REGEX);
+      badSequence |= !probe.getSequence().matches(SEQUENCE_PATTERN_REGEX);
+      if (probe.getFeatureType() == ProbeFeatureType.CRISPR) {
+        targetGeneMissing |= probe.getTargetGeneId() == null || probe.getTargetGeneName() == null;
+      } else {
+        targetGeneInvalid |= probe.getTargetGeneId() != null || probe.getTargetGeneName() != null;
+      }
+    }
+
+    if (multipleReads) {
+      errors.add(new ValidationError("probes", "All probes must have the same read"));
+    }
+    if (multiplePatterns) {
+      errors.add(new ValidationError("probes", "All probes must have the same pattern"));
+    }
+    if (multipleFeatureTypes) {
+      errors.add(new ValidationError("probes", "All probes must have the same feature type"));
+    }
+
+    // All below errors should be caught by front end validation, which provides better, row-specific
+    // help.
+    if (badPattern) {
+      errors.add(new ValidationError("probes", "Invalid pattern."));
+    }
+    if (badSequence) {
+      errors.add(new ValidationError("probes", "Invalid sequence."));
+    }
+    if (targetGeneMissing) {
+      errors.add(new ValidationError("probes",
+          "Target Gene ID and name are required for %s probes".formatted(ProbeFeatureType.CRISPR.getLabel())));
+    }
+    if (targetGeneInvalid) {
+      errors.add(new ValidationError("probes",
+          "Target Gene ID and name are only valid for %s probes".formatted(ProbeFeatureType.CRISPR.getLabel())));
+    }
+  }
 
   public static void validateNameOrThrow(Nameable object, NamingScheme namingScheme) {
     ValidationResult val = namingScheme.validateName(object.getName());
