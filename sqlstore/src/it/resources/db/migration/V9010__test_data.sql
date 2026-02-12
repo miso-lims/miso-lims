@@ -361,6 +361,17 @@ INSERT INTO LibraryDesignCode(libraryDesignCodeId, code, description) VALUES
 (2, 'WG', 'Whole Genome'),
 (3, 'WT', 'Whole Transcriptome');
 
+INSERT INTO ProbeSet(probeSetId, name) VALUES
+(1, 'Probe set one'),
+(2, 'Probe set two'),
+(3, 'Something else');
+
+INSERT INTO ProbeSetProbe(probeSetId, probeId, identifier, name, readNumber, pattern, sequence, featureType, targetGeneId, targetGeneName) VALUES
+(1, 1, 'C0006', 'anti-human_CD86', 'R2', '5PNNNNNNNNNN(BC)', 'GTCTTTGTCAGTGCA', 'ANTIBODY_CAPTURE', NULL, NULL),
+(1, 2, 'C0007', 'anti-human_CD274_B7-H1_PD-L1', 'R2', '5PNNNNNNNNNN(BC)', 'GTTGTCCGACAATAC', 'ANTIBODY_CAPTURE', NULL, NULL),
+(1, 3, 'C0020', 'anti-human_CD270_HVEM_TR2', 'R2', '5PNNNNNNNNNN(BC)', 'TGATAGAAACAGACC', 'ANTIBODY_CAPTURE', NULL, NULL),
+(1, 4, 'C0023', 'anti-human_CD155_PVR', 'R2', '5PNNNNNNNNNN(BC)', 'ATCACATCGTTGCCA', 'ANTIBODY_CAPTURE', NULL, NULL);
+
 INSERT INTO MetricSubcategory(subcategoryId, alias, category, libraryDesignCodeId, sortPriority) VALUES
 (1, 'Nucleic Acid Isolation', 'EXTRACTION', NULL, 1),
 (2, 'Fluorometric Quantification (Qubit or Plate Reader)', 'EXTRACTION', NULL, 2),

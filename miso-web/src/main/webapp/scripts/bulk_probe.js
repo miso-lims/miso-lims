@@ -1,9 +1,10 @@
 BulkTarget = window.BulkTarget || {};
-BulkTarget.sampleprobe = (function () {
+BulkTarget.probe = (function () {
   /*
    * Expected config: {
    *   pageMode: string; expected to always be "edit"
-   *   sample: sample
+   *   sampleId: int; only present for sample probes
+   *   probeSetId: int; only present for probe set probes
    * }
    */
 
@@ -11,33 +12,86 @@ BulkTarget.sampleprobe = (function () {
 
   return {
     getSaveUrl: function (config) {
-      return Urls.rest.samples.bulkSaveProbes(config.sampleId);
+      if (config.sampleId) {
+        return Urls.rest.samples.bulkSaveProbes(config.sampleId);
+      } else {
+        return Urls.rest.probeSets.bulkSaveProbes(config.probeSetId);
+      }
     },
-    getSaveProgressUrl: function (operationId) {
-      return Urls.rest.samples.bulkSaveProgress(operationId);
+    getSaveProgressUrl: function (operationId, config) {
+      if (config.sampleId) {
+        return Urls.rest.samples.bulkSaveProgress(operationId);
+      } else {
+        return Urls.rest.probeSets.bulkSaveProgress(operationId);
+      }
     },
     getUserManualUrl: function () {
-      return Urls.external.userManual("samples"); // TODO: update to more specific when available
+      return Urls.external.userManual("samples", "sample-probes");
     },
     getBulkActions: function (config) {
-      return [
-        {
-          name: "Return to Sample Page",
-          action: function () {
-            Utils.page.pageRedirect(Urls.ui.samples.edit(config.sampleId));
+      if (config.sampleId) {
+        return [
+          {
+            name: "Save as Probe Set",
+            action: function (data) {
+              ProbeSet.showSaveProbeSetDialog(data);
+            },
           },
-        },
-      ];
+          {
+            name: "Return to Sample Page",
+            action: function () {
+              Utils.page.pageRedirect(Urls.ui.samples.edit(config.sampleId));
+            },
+          },
+        ];
+      } else {
+        return [
+          {
+            name: "Return to Probe Set Page",
+            action: function () {
+              Utils.page.pageRedirect(Urls.ui.probeSets.edit(config.probeSetId));
+            },
+          },
+        ];
+      }
     },
     getCustomActions: function (config, api) {
-      return [
-        {
-          name: "Cancel Probe Changes",
-          action: function () {
-            Utils.page.pageRedirect(Urls.ui.samples.edit(config.sampleId));
+      if (config.sampleId) {
+        return [
+          {
+            name: "Cancel Probe Changes",
+            action: function () {
+              Utils.page.pageRedirect(Urls.ui.samples.edit(config.sampleId));
+            },
           },
-        },
-      ];
+          {
+            name: "Save as Probe Set",
+            action: function () {
+              api.validate(function () {
+                var deferred = $.Deferred();
+                var probes = api.getData();
+                ProbeSet.showSaveProbeSetDialog(
+                  probes,
+                  function () {
+                    deferred.resolve(true);
+                  },
+                  deferred.reject
+                );
+                return deferred.promise();
+              });
+            },
+          },
+        ];
+      } else {
+        return [
+          {
+            name: "Cancel Probe Changes",
+            action: function () {
+              Utils.page.pageRedirect(Urls.ui.probeSets.edit(config.probeSetId));
+            },
+          },
+        ];
+      }
     },
     getColumns: function (config, api) {
       return [
@@ -138,11 +192,12 @@ BulkTarget.sampleprobe = (function () {
         },
       ];
     },
-    manipulateSavedData: function (samples) {
-      if (samples.length !== 1) {
-        throw Error("Expected 1 sample, but received " + samples.length);
+    manipulateSavedData: function (objects) {
+      // objects will contain the sample or probe set to which the probes belong
+      if (objects.length !== 1) {
+        throw Error("Expected 1 objhect, but received " + objects.length);
       }
-      return samples[0].probes;
+      return objects[0].probes;
     },
   };
 })();

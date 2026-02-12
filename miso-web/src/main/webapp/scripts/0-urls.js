@@ -756,6 +756,24 @@ Urls = (function () {
     printBoxPositions: middleIdUrlFunction(printerRestBase, "/boxpositions"),
   };
 
+  // Probe Sets
+  var probeSetUiBase = "/probeset";
+  ui.probeSets = {
+    create: probeSetUiBase + "/new",
+    edit: idUrlFunction(probeSetUiBase),
+    bulkEditProbes: middleIdUrlFunction(probeSetUiBase, "/probes"),
+  };
+
+  var probeSetRestBase = restBase + "/probesets";
+  rest.probeSets = {
+    create: probeSetRestBase,
+    update: idUrlFunction(probeSetRestBase),
+    bulkDelete: probeSetRestBase + "/bulk-delete",
+    query: probeSetRestBase,
+    bulkSaveProbes: middleIdUrlFunction(probeSetRestBase, "/probes"),
+    bulkSaveProgress: idUrlFunction(probeSetRestBase + "/bulk"),
+  };
+
   // Projects
   var projectUiBase = "/project";
   ui.projects = {

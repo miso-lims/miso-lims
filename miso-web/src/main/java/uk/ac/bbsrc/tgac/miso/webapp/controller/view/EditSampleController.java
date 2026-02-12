@@ -75,7 +75,6 @@ import uk.ac.bbsrc.tgac.miso.dto.SampleTissueProcessingDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
 import uk.ac.bbsrc.tgac.miso.webapp.util.BulkPropagateTableBackend;
@@ -161,11 +160,8 @@ public class EditSampleController {
   }
 
   @GetMapping(value = "/{sampleId}")
-  public ModelAndView setupForm(@PathVariable Long sampleId, ModelMap model) throws IOException {
-    Sample sample = sampleService.get(sampleId);
-    if (sample == null) {
-      throw new NotFoundException("No sample found for ID " + sampleId.toString());
-    }
+  public ModelAndView setupForm(@PathVariable long sampleId, ModelMap model) throws IOException {
+    Sample sample = retrieve(sampleId);
 
     model.put("title", "Sample " + sampleId);
 
@@ -559,7 +555,7 @@ public class EditSampleController {
     private final Sample sample;
 
     public BulkEditProbesBackend(Sample sample, ObjectMapper mapper) {
-      super("sampleprobe", ProbeDto.class, mapper);
+      super("probe", ProbeDto.class, mapper);
       this.sample = sample;
     }
 
@@ -586,8 +582,16 @@ public class EditSampleController {
   @GetMapping("/{sampleId}/probes")
   public ModelAndView getBulkEditProbesPage(@PathVariable long sampleId,
       @RequestParam(required = false) Integer addProbes, ModelMap model) throws IOException {
-    Sample sample = RestUtils.retrieve("Sample", sampleId, sampleService);
+    Sample sample = retrieve(sampleId);
     return new BulkEditProbesBackend(sample, mapper).edit(addProbes, model);
+  }
+
+  private Sample retrieve(long sampleId) throws IOException {
+    Sample sample = sampleService.get(sampleId);
+    if (sample == null) {
+      throw new NotFoundException("No sample found for ID " + sampleId);
+    }
+    return sample;
   }
 
 }
