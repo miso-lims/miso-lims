@@ -534,11 +534,11 @@ only be deleted if the type has not been used by any existing partitions.
 
 
 
-## Run-Library QC Statuses
+## Run-Item QC Statuses
 
 The QC status of the library and library aliquot indicate library preparation QC, whereas run-library QC status
-indicates sequencing QC of a specific library in a specific lane of a specific run. This means that a library prep may
-pass QC, a run may pass QC, the partition may even pass QC, but the data for a particular library in that partition may
+indicates sequencing QC of a specific library in a specific lane of a specific run. Run-Item QC statuses apply to both
+run-libraries and array-run-samples. This means that a library prep may pass QC, a run may pass QC, the partition may even pass QC, but the data for a particular library in that partition may
 still be bad.
 
 By default, there are "Passed" and "Failed" statuses, and if the status has not been set, it shows as "Pending."
