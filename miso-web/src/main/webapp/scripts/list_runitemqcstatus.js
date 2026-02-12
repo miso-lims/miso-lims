@@ -17,7 +17,7 @@ ListTarget.runitemqcstatus = (function () {
         actions.push(
           ListUtils.createBulkDeleteAction(
             pluralLabel,
-            "runitemqcstatus",
+            "runitemqcstatuses",
             Utils.array.get("description")
           )
         );
