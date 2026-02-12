@@ -7,6 +7,19 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.17.0] - 2026-02-12
+
+### Added
+
+* Qc status can be added to Array run.
+* Probes (AKA feature barcodes), which can be added to single cell tissue processing samples (detailed sample)
+* Probe sets for saving common sets of probes for reuse
+
+### Fixed
+
+* Server Error while loading Edit Array Run page if no arrays attached.
+
+
 ## [3.16.0] - 2026-01-29
 
 ### Added

@@ -1,3 +1,10 @@
+-- add_QcColumArrayRun
+ALTER TABLE ArrayRun ADD COLUMN qcPassed BOOLEAN;
+ALTER TABLE ArrayRun ADD COLUMN qcUser bigint;
+ALTER TABLE ArrayRun ADD COLUMN qcDate DATE;
+ALTER TABLE ArrayRun ADD CONSTRAINT fk_arrayRun_qcUser FOREIGN KEY (qcUser) REFERENCES User (userId);
+
+-- sampleProbes
 CREATE TABLE SampleProbe (
   probeId bigint NOT NULL AUTO_INCREMENT,
   sampleId bigint NOT NULL,
@@ -33,3 +40,4 @@ CREATE TABLE ProbeSetProbe (
   PRIMARY KEY (probeId),
   CONSTRAINT fk_probeSetProbe_set FOREIGN KEY (probeSetId) REFERENCES ProbeSet (probeSetId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
