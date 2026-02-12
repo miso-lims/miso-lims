@@ -367,12 +367,10 @@ FormUtils = (function ($) {
     },
 
     makeSopFields: function (object, sops) {
-      if (!Array.isArray(sops)) {
-        throw new Error("makeSopFields expected 'sops' to be an array");
-      }
+      sops = Array.isArray(sops) ? sops : [];
 
       var availableSops = sops.filter(function (sop) {
-        return !sop.archived || (object && object.sopId === sop.id);
+        return !sop.archived || object.sopId === sop.id;
       });
 
       var hasSops = availableSops.length > 0;
@@ -409,9 +407,9 @@ FormUtils = (function ($) {
             return item.sopId ? "View SOP" : null;
           },
           getLink: function (item) {
-            if (!item.sopId) return null;
-            var sop = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.sopId), sops);
-            return sop.url || null;
+            return item.sopId
+              ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.sopId), sops).url
+              : null;
           },
           openNewTab: true,
         },

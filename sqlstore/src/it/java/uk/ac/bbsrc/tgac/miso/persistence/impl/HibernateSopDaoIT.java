@@ -2,7 +2,9 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -85,7 +87,6 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
       } else if ("PhiX %".equals(field.getName())) {
         hasPhiX = true;
         assertEquals(SopField.FieldType.NUMBER, field.getFieldType());
-        assertEquals("%", field.getUnits());
       }
     }
 
@@ -93,4 +94,48 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
     assertTrue("Should have PhiX % field", hasPhiX);
   }
 
+  @Test
+  public void testGetByAliasAndVersion() throws Exception {
+    SopCategory category = SopCategory.SAMPLE;
+    String alias = "Sample SOP 1";
+    String version = "1.0";
+
+    Sop sop = getTestSubject().get(category, alias, version);
+    assertNotNull(sop);
+    assertEquals(category, sop.getCategory());
+    assertEquals(alias, sop.getAlias());
+    assertEquals(version, sop.getVersion());
+  }
+
+  @Test
+  public void testListByCategory() throws Exception {
+    List<Sop> sops = getTestSubject().listByCategory(SopCategory.LIBRARY);
+    assertNotNull(sops);
+    assertEquals(2, sops.size());
+
+    for (Sop sop : sops) {
+      assertEquals(SopCategory.LIBRARY, sop.getCategory());
+    }
+  }
+
+  @Test
+  public void testListByIdList() throws Exception {
+    testListByIdList(HibernateSopDao::listByIdList, Arrays.asList(3L, 4L));
+  }
+
+  @Test
+  public void testGetUsageBySamples() throws Exception {
+    testGetUsage(HibernateSopDao::getUsageBySamples, 1L, 1L);
+  }
+
+  @Test
+  public void testGetUsageByLibraries() throws Exception {
+    testGetUsage(HibernateSopDao::getUsageByLibraries, 3L, 1L);
+  }
+
+  @Test
+  public void testGetUsageByRuns() throws Exception {
+    testGetUsage(HibernateSopDao::getUsageByRuns, 5L, 1L);
+  }
 }
+

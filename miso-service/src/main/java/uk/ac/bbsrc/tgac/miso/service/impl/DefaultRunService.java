@@ -427,13 +427,16 @@ public class DefaultRunService implements RunService {
       }
     }
 
-    if (changed.getSop() != null) {
-      long sopId = changed.getSop().getId();
+    boolean sopChanged = isChanged(Run::getSop, changed, before);
 
-      if (sopId == 0L) {
+    if (sopChanged) {
+
+      if (changed.getSop() != null || !changed.getSop().isSaved()) {
         errors.add(new ValidationError("sopId", "SOP ID is missing"));
       } else {
+        long sopId = changed.getSop().getId();
         Sop persistedSop = sopService.get(sopId);
+
         if (persistedSop == null) {
           errors.add(new ValidationError("sopId", "SOP not found"));
         } else {
@@ -447,8 +450,7 @@ public class DefaultRunService implements RunService {
             valid = false;
           }
 
-          boolean sopChanged = isChanged(Run::getSop, changed, before);
-          if (sopChanged && persistedSop.isArchived()) {
+          if (persistedSop.isArchived()) {
             errors.add(new ValidationError("sopId", "Cannot assign an archived SOP to a Run"));
             valid = false;
           }

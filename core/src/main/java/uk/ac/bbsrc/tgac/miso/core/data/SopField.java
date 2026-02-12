@@ -2,8 +2,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 
-import org.apache.commons.validator.routines.BigDecimalValidator;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,17 +34,16 @@ public class SopField implements Identifiable, Serializable {
   private long id = UNSAVED_ID;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "sopId", nullable = false)
+  @JoinColumn(name = "sopId")
   private Sop sop;
 
-  @Column(nullable = false, length = 255)
+  @Column(length = 255)
   private String name;
 
   @Column(length = 50)
   private String units;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false, length = 20)
   private FieldType fieldType;
 
   @Override
@@ -96,28 +93,9 @@ public class SopField implements Identifiable, Serializable {
     this.fieldType = fieldType;
   }
 
-  public boolean isValidValue(String value) {
-    if (value == null || value.isEmpty()) {
-      return true;
-    }
-
-    if (fieldType == null) {
-      return false;
-    }
-
-    switch (fieldType) {
-      case NUMBER:
-        return BigDecimalValidator.getInstance().validate(value) != null;
-
-      case TEXT:
-      default:
-        return true;
-    }
-  }
-
   @Override
   public int hashCode() {
-    return LimsUtils.hashCodeByIdFirst(this, name, units, fieldType, sop);
+    return LimsUtils.hashCodeByIdFirst(this, name, units, fieldType);
   }
 
   @Override
@@ -125,7 +103,7 @@ public class SopField implements Identifiable, Serializable {
     return LimsUtils.equalsByIdFirst(this, obj,
         SopField::getName,
         SopField::getUnits,
-        SopField::getFieldType,
-        SopField::getSop);
+        SopField::getFieldType);
   }
 }
+
