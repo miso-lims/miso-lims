@@ -132,27 +132,14 @@ public class Sop implements Aliasable, Deletable, Serializable {
   }
 
   public void setSopFields(Set<SopField> sopFields) {
-    new HashSet<>(this.sopFields).forEach(this::removeSopField);
-
+    this.sopFields.clear();
     if (sopFields != null) {
-      sopFields.forEach(this::addSopField);
-    }
-  }
-
-  public void addSopField(SopField field) {
-    if (field == null) {
-      return;
-    }
-    sopFields.add(field);
-    field.setSop(this);
-  }
-
-  public void removeSopField(SopField field) {
-    if (field == null) {
-      return;
-    }
-    if (sopFields.remove(field)) {
-      field.setSop(null);
+      for (SopField field : sopFields) {
+        if (field != null) {
+          field.setSop(this);
+          this.sopFields.add(field);
+        }
+      }
     }
   }
 

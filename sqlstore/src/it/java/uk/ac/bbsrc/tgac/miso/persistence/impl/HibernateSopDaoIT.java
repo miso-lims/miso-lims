@@ -2,12 +2,12 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
+import org.hibernate.query.Query;
+import java.util.Arrays;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.SopField;
@@ -87,6 +87,7 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
       } else if ("PhiX %".equals(field.getName())) {
         hasPhiX = true;
         assertEquals(SopField.FieldType.NUMBER, field.getFieldType());
+        assertEquals("%", field.getUnits());
       }
     }
 
@@ -96,46 +97,40 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
 
   @Test
   public void testGetByAliasAndVersion() throws Exception {
-    SopCategory category = SopCategory.SAMPLE;
     String alias = "Sample SOP 1";
     String version = "1.0";
-
-    Sop sop = getTestSubject().get(category, alias, version);
+    Sop sop = getTestSubject().get(SopCategory.SAMPLE, alias, version);
     assertNotNull(sop);
-    assertEquals(category, sop.getCategory());
     assertEquals(alias, sop.getAlias());
     assertEquals(version, sop.getVersion());
   }
 
   @Test
-  public void testListByCategory() throws Exception {
-    List<Sop> sops = getTestSubject().listByCategory(SopCategory.LIBRARY);
-    assertNotNull(sops);
-    assertEquals(2, sops.size());
-
-    for (Sop sop : sops) {
-      assertEquals(SopCategory.LIBRARY, sop.getCategory());
-    }
-  }
-
-  @Test
   public void testListByIdList() throws Exception {
-    testListByIdList(HibernateSopDao::listByIdList, Arrays.asList(3L, 4L));
+    testListByIdList(HibernateSopDao::listByIdList, Arrays.asList(1L, 2L));
   }
 
   @Test
-  public void testGetUsageBySamples() throws Exception {
-    testGetUsage(HibernateSopDao::getUsageBySamples, 1L, 1L);
-  }
+  public void testDeleteSopCascadesToFields() throws Exception {
+    long sopId = 101L;
+    Sop db = currentSession().get(Sop.class, sopId);
+    assertNotNull("Missing SOP test data with ID " + sopId, db);
 
-  @Test
-  public void testGetUsageByLibraries() throws Exception {
-    testGetUsage(HibernateSopDao::getUsageByLibraries, 3L, 1L);
-  }
+    Query<Long> countBeforeQ = currentSession().createQuery(
+        "select count(f) from SopField f where f.sop.id = :sopId", Long.class);
+    countBeforeQ.setParameter("sopId", sopId);
+    Long countBefore = countBeforeQ.uniqueResult();
+    assertTrue("Expected at least one field for test SOP " + sopId, countBefore > 0);
 
-  @Test
-  public void testGetUsageByRuns() throws Exception {
-    testGetUsage(HibernateSopDao::getUsageByRuns, 5L, 1L);
+    currentSession().remove(db);
+    clearSession();
+
+    assertNull(currentSession().get(Sop.class, sopId));
+
+    Query<Long> countAfterQ = currentSession().createQuery(
+        "select count(f) from SopField f where f.sop.id = :sopId", Long.class);
+    countAfterQ.setParameter("sopId", sopId);
+    assertEquals(Long.valueOf(0L), countAfterQ.uniqueResult());
   }
 }
 

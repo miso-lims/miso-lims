@@ -427,16 +427,13 @@ public class DefaultRunService implements RunService {
       }
     }
 
-    boolean sopChanged = isChanged(Run::getSop, changed, before);
+    if (changed.getSop() != null) {
+      long sopId = changed.getSop().getId();
 
-    if (sopChanged) {
-
-      if (changed.getSop() != null || !changed.getSop().isSaved()) {
+      if (!changed.getSop().isSaved()) {
         errors.add(new ValidationError("sopId", "SOP ID is missing"));
       } else {
-        long sopId = changed.getSop().getId();
         Sop persistedSop = sopService.get(sopId);
-
         if (persistedSop == null) {
           errors.add(new ValidationError("sopId", "SOP not found"));
         } else {
@@ -450,7 +447,8 @@ public class DefaultRunService implements RunService {
             valid = false;
           }
 
-          if (persistedSop.isArchived()) {
+          boolean sopChanged = isChanged(Run::getSop, changed, before);
+          if (sopChanged && persistedSop.isArchived()) {
             errors.add(new ValidationError("sopId", "Cannot assign an archived SOP to a Run"));
             valid = false;
           }
@@ -739,7 +737,7 @@ public class DefaultRunService implements RunService {
         // Nothing to do
         break;
       default:
-        throw new NotImplementedException("Unexpected platform type: " + source.getPlatformType());
+        throw new NotImplementedException();
     }
 
     isMutated |= updateSequencingParameters(target, user, source.getSequencingParameters());

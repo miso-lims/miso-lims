@@ -120,7 +120,7 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
 
     Map<String, SopField> byName = new HashMap<>();
     Map<Long, SopField> beforeById = new HashMap<>();
-    if (beforeChange != null) {
+    if (beforeChange != null && beforeChange.getSopFields() != null) {
       for (SopField beforeField : beforeChange.getSopFields()) {
         beforeById.put(beforeField.getId(), beforeField);
         byName.put(beforeField.getName().toLowerCase(), beforeField);
@@ -129,40 +129,42 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
 
     for (SopField field : fields) {
       String name = field.getName();
-      boolean hasName = name != null && !name.isEmpty();
-
-      if (!hasName) {
+      if (name == null || name.isEmpty()) {
         errors.add(new ValidationError(FIELDS_PROPERTY, "Field name is required"));
-      } else {
-        if (name.length() > SOPFIELD_NAME_MAX) {
-          errors.add(new ValidationError(FIELDS_PROPERTY,
-              "Field name must be at most " + SOPFIELD_NAME_MAX + " characters"));
-        }
+      }
+      if (name.length() > SOPFIELD_NAME_MAX) {
+        errors.add(
+            new ValidationError(FIELDS_PROPERTY, "Field name must be at most " + SOPFIELD_NAME_MAX + " characters"));
+      }
 
-        String key = name.toLowerCase();
-        SopField existingWithName = byName.get(key);
-        if (existingWithName != null) {
-          if (!field.isSaved() || existingWithName.getId() != field.getId()) {
-            errors.add(new ValidationError(FIELDS_PROPERTY, "Field names must be unique"));
-          }
-        } else {
-          byName.put(key, field);
+      String key = name.toLowerCase();
+      SopField existingWithName = byName.get(key);
+      if (existingWithName != null) {
+        if (!field.isSaved() || existingWithName.getId() != field.getId()) {
+          errors.add(new ValidationError(FIELDS_PROPERTY, "Field names must be unique"));
         }
+      } else {
+        byName.put(key, field);
       }
 
       String units = field.getUnits();
       if (units != null && units.length() > SOPFIELD_UNITS_MAX) {
-        errors.add(new ValidationError(FIELDS_PROPERTY,
-            "Units must be at most " + SOPFIELD_UNITS_MAX + " characters"));
+        errors.add(new ValidationError(FIELDS_PROPERTY, "Units must be at most " + SOPFIELD_UNITS_MAX + " characters"));
       }
 
       FieldType fieldType = field.getFieldType();
       if (fieldType == null) {
-        errors.add(ValidationError.forRequired(FIELDS_PROPERTY));
-      } else if (beforeChange != null && field.isSaved()) {
+        errors.add(new ValidationError(FIELDS_PROPERTY, "Field type is required"));
+      }
+
+      if (beforeChange != null && field.isSaved()) {
         SopField before = beforeById.get(field.getId());
-        if (before != null && !before.getFieldType().equals(fieldType)) {
-          errors.add(new ValidationError(FIELDS_PROPERTY, "Field type cannot be changed for existing fields"));
+        if (before != null) {
+          FieldType beforeType = before.getFieldType();
+          FieldType afterType = field.getFieldType();
+          if (!beforeType.equals(afterType)) {
+            errors.add(new ValidationError(FIELDS_PROPERTY, "Field type cannot be changed for existing fields"));
+          }
         }
       }
     }
@@ -185,41 +187,42 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
       return;
     }
 
-    Set<Long> fromSavedIds = new HashSet<>();
-    for (SopField field : fromFields) {
-      if (field.isSaved()) {
-        fromSavedIds.add(field.getId());
+    Set<Long> fromFieldIds = new HashSet<>();
+    for (SopField fromField : fromFields) {
+      if (fromField.isSaved()) {
+        fromFieldIds.add(fromField.getId());
+      }
+    }
+
+    Map<Long, SopField> toFieldById = new HashMap<>();
+    for (SopField toField : toFields) {
+      if (toField.isSaved()) {
+        toFieldById.put(toField.getId(), toField);
       }
     }
 
     for (Iterator<SopField> it = toFields.iterator(); it.hasNext();) {
-      SopField existing = it.next();
-      if (existing.isSaved() && !fromSavedIds.contains(existing.getId())) {
+      SopField toField = it.next();
+      if (toField.isSaved() && !fromFieldIds.contains(toField.getId())) {
         it.remove();
-      }
-    }
-
-    Map<Long, SopField> toById = new HashMap<>();
-    for (SopField existing : toFields) {
-      if (existing.isSaved()) {
-        toById.put(existing.getId(), existing);
       }
     }
 
     for (SopField fromField : fromFields) {
       if (fromField.isSaved()) {
-        SopField existing = toById.get(fromField.getId());
-        if (existing != null) {
-          existing.setName(fromField.getName());
-          existing.setUnits(fromField.getUnits());
+        SopField toField = toFieldById.get(fromField.getId());
+        if (toField != null) {
+          toField.setName(fromField.getName());
+          toField.setUnits(fromField.getUnits());
+          toField.setSop(to);
         }
       } else {
-        SopField created = new SopField();
-        created.setSop(to);
-        created.setName(fromField.getName());
-        created.setUnits(fromField.getUnits());
-        created.setFieldType(fromField.getFieldType());
-        toFields.add(created);
+        SopField newField = new SopField();
+        newField.setSop(to);
+        newField.setName(fromField.getName());
+        newField.setUnits(fromField.getUnits());
+        newField.setFieldType(fromField.getFieldType());
+        toFields.add(newField);
       }
     }
   }
@@ -263,4 +266,3 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
     return transactionTemplate;
   }
 }
-

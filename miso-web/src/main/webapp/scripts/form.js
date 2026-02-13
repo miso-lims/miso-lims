@@ -407,9 +407,9 @@ FormUtils = (function ($) {
             return item.sopId ? "View SOP" : null;
           },
           getLink: function (item) {
-            return item.sopId
-              ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.sopId), sops).url
-              : null;
+            if (!item.sopId) return null;
+            var sop = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.sopId), sops);
+            return sop.url || null;
           },
           openNewTab: true,
         },
