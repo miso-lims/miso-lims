@@ -1,8 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,8 +13,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
@@ -46,8 +52,14 @@ public class Sop implements Aliasable, Deletable, Serializable {
 
   @Enumerated(EnumType.STRING)
   private SopCategory category;
+
   private String url;
+
   private boolean archived = false;
+
+  @OneToMany(mappedBy = "sop", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OrderBy("name")
+  private final Set<SopField> sopFields = new HashSet<>();
 
   @Override
   public long getId() {
@@ -115,6 +127,22 @@ public class Sop implements Aliasable, Deletable, Serializable {
     this.archived = archived;
   }
 
+  public Set<SopField> getSopFields() {
+    return sopFields;
+  }
+
+  public void setSopFields(Set<SopField> sopFields) {
+    this.sopFields.clear();
+    if (sopFields != null) {
+      for (SopField field : sopFields) {
+        if (field != null) {
+          field.setSop(this);
+          this.sopFields.add(field);
+        }
+      }
+    }
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(alias, version, category, url, archived);
@@ -129,5 +157,5 @@ public class Sop implements Aliasable, Deletable, Serializable {
         Sop::getUrl,
         Sop::isArchived);
   }
-
 }
+

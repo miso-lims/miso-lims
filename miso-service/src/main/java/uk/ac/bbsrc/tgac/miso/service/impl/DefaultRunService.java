@@ -1,8 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
-import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -49,6 +46,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -76,9 +75,20 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.generateTemporaryName;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasTemporaryName;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isIlluminaRun;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isLS454Run;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isOxfordNanoporeRun;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isSolidRun;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.persistence.HibernateUtilDao;
 import uk.ac.bbsrc.tgac.miso.persistence.RunStore;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.isChanged;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.isSetAndChanged;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.loadChildEntity;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateNameOrThrow;
 
 @Transactional(rollbackFor = Exception.class)
 @Service
@@ -417,6 +427,41 @@ public class DefaultRunService implements RunService {
       }
     }
 
+    if (changed.getSop() != null) {
+      long sopId = changed.getSop().getId();
+
+      if (!changed.getSop().isSaved()) {
+        errors.add(new ValidationError("sopId", "SOP ID is missing"));
+      } else {
+        Sop persistedSop = sopService.get(sopId);
+        if (persistedSop == null) {
+          errors.add(new ValidationError("sopId", "SOP not found"));
+        } else {
+          boolean valid = true;
+
+          if (persistedSop.getCategory() == null) {
+            errors.add(new ValidationError("sopId", "SOP category is missing"));
+            valid = false;
+          } else if (persistedSop.getCategory() != SopCategory.RUN) {
+            errors.add(new ValidationError("sopId", "Only RUN SOPs may be assigned to a Run"));
+            valid = false;
+          }
+
+          boolean sopChanged = isChanged(Run::getSop, changed, before);
+          if (sopChanged && persistedSop.isArchived()) {
+            errors.add(new ValidationError("sopId", "Cannot assign an archived SOP to a Run"));
+            valid = false;
+          }
+
+          if (valid) {
+            changed.setSop(persistedSop);
+          }
+        }
+      }
+    }
+
+
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
@@ -692,7 +737,7 @@ public class DefaultRunService implements RunService {
         // Nothing to do
         break;
       default:
-        throw new NotImplementedException("Unexpected platform type: " + source.getPlatformType());
+        throw new NotImplementedException();
     }
 
     isMutated |= updateSequencingParameters(target, user, source.getSequencingParameters());

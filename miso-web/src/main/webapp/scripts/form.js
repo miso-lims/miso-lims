@@ -367,20 +367,27 @@ FormUtils = (function ($) {
     },
 
     makeSopFields: function (object, sops) {
+      sops = Array.isArray(sops) ? sops : [];
+
+      var availableSops = sops.filter(function (sop) {
+        return !sop.archived || object.sopId === sop.id;
+      });
+
+      var hasSops = availableSops.length > 0;
+
       return [
         {
           title: "SOP",
           data: "sopId",
           type: "dropdown",
-          source: sops.filter(function (sop) {
-            return !sop.archived || object.sopId === sop.id;
-          }),
+          source: availableSops,
           sortSource: Utils.sorting.standardSort("alias"),
           getItemLabel: function (item) {
             return item.alias + " v." + item.version;
           },
           getItemValue: Utils.array.getId,
-          include: sops && sops.length,
+          include: hasSops,
+          nullLabel: "SELECT",
           onChange: function (newValue, form) {
             var sop = newValue
               ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), sops)
@@ -400,9 +407,9 @@ FormUtils = (function ($) {
             return item.sopId ? "View SOP" : null;
           },
           getLink: function (item) {
-            return item.sopId
-              ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.sopId), sops).url
-              : null;
+            if (!item.sopId) return null;
+            var sop = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.sopId), sops);
+            return sop.url || null;
           },
           openNewTab: true,
         },
