@@ -448,124 +448,22 @@
   };
 
   Box.UpdateLocationsScanDialog = function (scannerName) {
-    var self = new BoxVisual();
-
-    self.show = function (opts) {
-      self.size = opts.size;
-      self.data = opts.data;
-
-      self.getNewPosition = function () {
-        // Ignore all the magic numbers
-        var h = Box.boxJSON.rows * 30 - 100;
-        var w = Box.dialogWidth - 400;
-        return [Math.floor(Math.random() * h) + 100, Math.floor(Math.random() * w) + 100];
-      };
-
-      self.animateMag = function () {
-        var newpos = self.getNewPosition();
-        var oldpos = jQuery("#magnify").offset();
-        var speed = self.getSpeed([oldpos.top, oldpos.left], newpos);
-        jQuery("#magnify").animate(
-          {
-            top: newpos[0],
-            left: newpos[1],
-          },
-          speed,
-          function () {
-            self.animateMag();
-          }
-        );
-      };
-
-      self.getSpeed = function (prev, next) {
-        var x = Math.abs(prev[1] - next[1]);
-        var y = Math.abs(prev[0] - next[0]);
-        var greatest = x > y ? x : y;
-        var speedModifier = 0.1;
-        return Math.ceil(greatest / speedModifier);
-      };
-
-      jQuery("#dialogInfoAbove").html(
-        "<h1>Place box on scanner</h1><br>" +
-          '<img id="magnify" src="/styles/images/magnifying_glass.png" style="position:absolute;"></img>'
-      );
-      jQuery("#dialogInfoBelow").html(
-        "<p>Please place the box on the scanner. The box will be scanned automatically.</p>"
-      );
-      jQuery("#magnify").offset({
-        top: self.getNewPosition()[0],
-        left: self.getNewPosition()[1],
-      });
-      self.animateMag();
-      jQuery("#dialogDialog").dialog({
-        autoOpen: false,
-        title: "Scan",
-        width: Box.dialogWidth,
-        height: Box.dialogHeight,
-        modal: true,
-        resizable: false,
-        position: [jQuery(window).width() / 2 - Box.dialogWidth / 2, 50],
-        buttons: {},
-      });
-
-      // Generate visual
-      self.create({
-        div: "#dialogVisual",
-        size: {
-          rows: self.size.rows,
-          cols: self.size.cols,
-        },
-        data: self.data,
-      });
-      jQuery("#updateSelected, #removeSelected, #emptySelected")
-        .prop("disabled", true)
-        .addClass("disabled");
-      jQuery("#dialogDialog").dialog("open");
-
-      // Initiate Scan
-      Box.scan.scanBox(scannerName);
-    };
-
-    self.getBoxPositionOpts = function (row, col) {
-      return {
-        title: "Empty",
-        selectedImg: "/styles/images/tube_empty_selected.png",
-        unselectedImg: "/styles/images/tube_empty.png",
-      };
-    };
-
-    self.error = function (message) {
-      jQuery("#dialogInfoBelow").html("");
-      jQuery("#dialogInfoAbove").html(
-        '<h1 class="warning">Error: Scanner did not detect a box</h1>' +
-          "<p>" +
-          message +
-          "</p><br>"
-      );
-      jQuery("#dialogVisual").html("");
-      jQuery("#dialogDialog").dialog({
-        autoOpen: false,
-        title: "Scan",
-        width: Box.dialogWidth,
-        modal: true,
-        height: "auto",
-        position: [jQuery(window).width() / 2 - Box.dialogWidth / 2, 50],
-        buttons: {
-          Retry: function () {
-            Box.initScan(scannerName);
-          },
-          Cancel: function () {
-            jQuery("#dialogDialog").dialog("close");
-          },
-        },
-      });
-      jQuery("#dialogDialog").dialog("open");
-    };
-
-    return self;
+    return Box.ScanProgressDialog(scannerName, {
+       scanFn: function (name) {
+           Box.scan.scanBox(name);
+       }
+    });
   };
 
   Box.AssignBarcodesScanProgressDialog = function (scannerName) {
+    return Box.ScanProgressDialog(scannerName, {
+        scanFn: function (name) {
+            Box.scan.scanAssignBarcodes(name);
+        }
+    });
+  };
+
+  Box.ScanProgressDialog = function (scannerName, params) {
     var self = new BoxVisual();
 
     self.show = function (opts) {
@@ -640,7 +538,7 @@
         .addClass("disabled");
       jQuery("#dialogDialog").dialog("open");
 
-      Box.scan.scanAssignBarcodes(scannerName);
+      params.scanFn(scannerName);
     };
 
     self.getBoxPositionOpts = function (row, col) {
