@@ -945,6 +945,12 @@
                     }
                 },
                 {
+                    text: "Rescan",
+                    click: function () {
+                        Box.initScan(scannerName);
+                    }
+                },
+                {
                     text: "Cancel",
                     click: function() {
                         jQuery("#dialogDialog").dialog("close");
