@@ -74,7 +74,7 @@ public class DefaultRunItemQcStatusService extends AbstractSaveService<RunItemQc
       throws IOException {
     if (ValidationUtils.isChanged(RunItemQcStatus::getDescription, object, beforeChange)
         && runItemQcStatusDao.getByDescription(object.getDescription()) != null) {
-      errors.add(ValidationError.forDuplicate("run-Item QC status", "description"));
+      errors.add(ValidationError.forDuplicate("run-item QC status", "description"));
     }
   }
 
