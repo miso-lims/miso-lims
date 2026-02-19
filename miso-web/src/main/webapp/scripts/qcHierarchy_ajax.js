@@ -253,7 +253,7 @@ var QcHierarchy = (function ($) {
         var status = item.qcStatusId
           ? Utils.array.findUniqueOrThrow(
               Utils.array.idPredicate(item.qcStatusId),
-              Constants.runLibraryQcStatuses
+              Constants.runItemQcStatuses
             )
           : null;
         return makeNodeHtml(item, status ? status.description : "Pending", item.qcNote);
@@ -424,7 +424,7 @@ var QcHierarchy = (function ($) {
   function updateRunLibraryQcControls(selectedItem) {
     $(statusInput).append(makeSelectOption(0, "Pending", !selectedItem.qcStatusId));
     $(statusInput).append(
-      Constants.runLibraryQcStatuses.map(function (x) {
+      Constants.runItemQcStatuses.map(function (x) {
         var qcPassed = selectedItem.qcPassed === undefined ? null : selectedItem.qcPassed;
         return makeSelectOption(x.id, x.description, selectedItem.qcStatusId === x.id);
       })

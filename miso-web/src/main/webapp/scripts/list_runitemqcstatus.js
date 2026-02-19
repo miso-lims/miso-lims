@@ -1,10 +1,10 @@
-ListTarget.runlibraryqcstatus = (function () {
-  var pluralLabel = "Run-Library QC Statuses";
+ListTarget.runitemqcstatus = (function () {
+  var pluralLabel = "Run-Item QC Statuses";
 
   return {
     name: pluralLabel,
     getUserManualUrl: function () {
-      return Urls.external.userManual("type_data", "run-library-qc-statuses");
+      return Urls.external.userManual("type_data", "run-item-qc-statuses");
     },
     createUrl: function (config, projectId) {
       throw new Error("Must be provided statically");
@@ -12,12 +12,12 @@ ListTarget.runlibraryqcstatus = (function () {
     getQueryUrl: null,
     showNewOptionSop: true,
     createBulkActions: function (config, projectId) {
-      var actions = BulkTarget.runlibraryqcstatus.getBulkActions(config);
+      var actions = BulkTarget.runitemqcstatus.getBulkActions(config);
       if (config.isAdmin) {
         actions.push(
           ListUtils.createBulkDeleteAction(
             pluralLabel,
-            "runlibraryqcstatuses",
+            "runitemqcstatuses",
             Utils.array.get("description")
           )
         );
@@ -29,7 +29,7 @@ ListTarget.runlibraryqcstatus = (function () {
         ? [
             ListUtils.createStaticAddAction(
               pluralLabel,
-              Urls.ui.runLibraryQcStatuses.bulkCreate,
+              Urls.ui.runItemQcStatuses.bulkCreate,
               true
             ),
           ]

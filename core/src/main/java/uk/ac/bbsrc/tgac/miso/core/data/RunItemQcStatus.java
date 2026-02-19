@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
-public class RunLibraryQcStatus implements Deletable, Serializable {
+public class RunItemQcStatus implements Deletable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -56,7 +56,7 @@ public class RunLibraryQcStatus implements Deletable, Serializable {
 
   @Override
   public String getDeleteType() {
-    return "Run-Library QC Status";
+    return "Run-Item QC Status";
   }
 
   @Override
@@ -72,8 +72,8 @@ public class RunLibraryQcStatus implements Deletable, Serializable {
   @Override
   public boolean equals(Object obj) {
     return LimsUtils.equals(this, obj,
-        RunLibraryQcStatus::getDescription,
-        RunLibraryQcStatus::getQcPassed);
+        RunItemQcStatus::getDescription,
+        RunItemQcStatus::getQcPassed);
   }
 
 }

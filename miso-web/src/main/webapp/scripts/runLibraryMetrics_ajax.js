@@ -88,7 +88,7 @@ var RunLibraryMetrics = (function ($) {
               id: 0,
               description: "Pending",
             },
-          ].concat(Constants.runLibraryQcStatuses),
+          ].concat(Constants.runItemQcStatuses),
           getLabel: Utils.array.get("description"),
         },
         {
@@ -381,7 +381,7 @@ var RunLibraryMetrics = (function ($) {
       case "Run-Library":
         controls.status.append(makeSelectOption(0, "Pending", !qcNode.qcStatusId));
         controls.status.append(
-          Constants.runLibraryQcStatuses.map(function (item) {
+          Constants.runItemQcStatuses.map(function (item) {
             return makeSelectOption(item.id, item.description, qcNode.qcStatusId === item.id);
           })
         );
@@ -414,7 +414,7 @@ var RunLibraryMetrics = (function ($) {
           if (statusId) {
             qcPassed = Utils.array.findUniqueOrThrow(
               Utils.array.idPredicate(statusId),
-              Constants.runLibraryQcStatuses
+              Constants.runItemQcStatuses
             ).qcPassed;
           }
 

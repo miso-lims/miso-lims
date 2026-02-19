@@ -106,7 +106,7 @@ public class RunPartitionAliquot implements Serializable {
 
   @ManyToOne
   @JoinColumn(name = "statusId")
-  private RunLibraryQcStatus qcStatus;
+  private RunItemQcStatus qcStatus;
 
   private String qcNote;
 
@@ -170,11 +170,11 @@ public class RunPartitionAliquot implements Serializable {
     this.purpose = purpose;
   }
 
-  public RunLibraryQcStatus getQcStatus() {
+  public RunItemQcStatus getQcStatus() {
     return qcStatus;
   }
 
-  public void setQcStatus(RunLibraryQcStatus qcStatus) {
+  public void setQcStatus(RunItemQcStatus qcStatus) {
     this.qcStatus = qcStatus;
   }
 

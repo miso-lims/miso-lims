@@ -944,13 +944,13 @@ public class ListTablesIT extends AbstractIT {
   }
 
   @Test
-  public void testListRunLibraryQcStatusesSetup() throws Exception {
-    testPageSetup(ListTarget.RUN_LIBRARY_QC_STATUSES, Sets.newHashSet(Columns.DESCRIPTION, Columns.QC_PASSED));
+  public void testListRunItemQcStatusesSetup() throws Exception {
+    testPageSetup(ListTarget.RUN_ITEM_QC_STATUSES, Sets.newHashSet(Columns.DESCRIPTION, Columns.QC_PASSED));
   }
 
   @Test
-  public void testListRunLibraryQcStatusesColumnSort() throws Exception {
-    testColumnsSort(ListTarget.RUN_LIBRARY_QC_STATUSES);
+  public void testListRunItemQcStatusesColumnSort() throws Exception {
+    testColumnsSort(ListTarget.RUN_ITEM_QC_STATUSES);
   }
 
   @Test
