@@ -110,29 +110,23 @@ var Box = Box || {
   },
 
   startAssignBarcodesScan: function(scannerName){
-      var onPrepareSuccess = function () {
+    Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
+    Box.dialogHeight = Box.boxJSON.rows * 40 + 300;
 
-        jQuery.ajax({
-                url: Urls.rest.boxes.assignBarcodesScan(Box.boxJSON.id),
-                type: "POST",
-                contentType: "application/json; charset=utf8",
-                data: JSON.stringify({ scannerName : scannerName})
-              })
-              .done(function (data) {
-                jQuery("#dialogDialog").dialog("close");
-                Box.assignBarcodesScanDialog.show(data);
-              })
-              .fail( function(response) {
-                jQuery("#dialogDialog").dialog("close");
-                var error = JSON.parse(response.responseText);
-                var message = error.detail ? error.detail : error.message;
-                Utils.showOkDialog("Scan Failed", [message]);
-              });
-      };
+    Box.assignBarcodesScanProgressDialog = Box.AssignBarcodesScanProgressDialog(scannerName);
+    Box.assignBarcodesScanDialog = Box.AssignBarcodesScanDialog(scannerName);
 
-      Box.dialogWidth = Box.boxJSON.cols * 40 + 150;
-      Box.dialogHeight = Box.boxJSON.rows * 40 + 300;
-      Box.assignBarcodesScanDialog = Box.AssignBarcodesScanDialog(scannerName);
+    var onPrepareSuccess = function () {
+
+        Box.assignBarcodesScanProgressDialog.show({
+        size:{
+                rows: Box.boxJSON.rows,
+                cols: Box.boxJSON.cols,
+            },
+            data: Box.boxJSON.items,
+        });
+    };
+
       Box.prepareScannerDialog = Box.PrepareScannerDialog(scannerName, onPrepareSuccess);
       Box.prepareScannerDialog.show();
   },
@@ -240,6 +234,29 @@ Box.scan = {
             ? response.responseText.detail
             : "Scan failed";
         Box.updateLocationsScanDialog.error(error);
+      });
+  },
+
+  scanAssignBarcodes: function (scannerName, onSuccess, onError) {
+    jQuery
+      .ajax({
+        url: Urls.rest.boxes.assignBarcodesScan(Box.boxJSON.id),
+        type: "POST",
+        contentType: "application/json; charset=utf8",
+        data: JSON.stringify({ scannerName : scannerName})
+      })
+      .done(function (data) {
+        jQuery("#magnify").stop();
+        Box.assignBarcodesScanDialog.show(data);
+      })
+      .fail(function (response, textStatus, serverStatus) {
+        jQuery("#magnify").stop();
+        jQuery("#dialogDialog").dialog("close");
+        var error =
+          response && response.responseText && response.responseText.detail
+            ? response.responseText.detail
+            : "Scan failed";
+            Box.assignBarcodesScanProgressDialog.error(error);
       });
   },
 };

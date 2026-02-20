@@ -448,6 +448,22 @@
   };
 
   Box.UpdateLocationsScanDialog = function (scannerName) {
+    return Box.ScanProgressDialog(scannerName, {
+       scanFn: function (name) {
+           Box.scan.scanBox(name);
+       }
+    });
+  };
+
+  Box.AssignBarcodesScanProgressDialog = function (scannerName) {
+    return Box.ScanProgressDialog(scannerName, {
+        scanFn: function (name) {
+            Box.scan.scanAssignBarcodes(name);
+        }
+    });
+  };
+
+  Box.ScanProgressDialog = function (scannerName, params) {
     var self = new BoxVisual();
 
     self.show = function (opts) {
@@ -455,7 +471,6 @@
       self.data = opts.data;
 
       self.getNewPosition = function () {
-        // Ignore all the magic numbers
         var h = Box.boxJSON.rows * 30 - 100;
         var w = Box.dialogWidth - 400;
         return [Math.floor(Math.random() * h) + 100, Math.floor(Math.random() * w) + 100];
@@ -517,13 +532,13 @@
         },
         data: self.data,
       });
+
       jQuery("#updateSelected, #removeSelected, #emptySelected")
         .prop("disabled", true)
         .addClass("disabled");
       jQuery("#dialogDialog").dialog("open");
 
-      // Initiate Scan
-      Box.scan.scanBox(scannerName);
+      params.scanFn(scannerName);
     };
 
     self.getBoxPositionOpts = function (row, col) {
@@ -828,6 +843,12 @@
                     }
                 },
                 {
+                    text: "Rescan",
+                    click: function () {
+                        Box.initScan(scannerName);
+                    }
+                },
+                {
                     text: "Cancel",
                     click: function() {
                         jQuery("#dialogDialog").dialog("close");
@@ -923,6 +944,33 @@
                 unselectedImg: "/styles/images/tube_empty.png"
             };
         }
+    };
+
+    self.error = function () {
+      jQuery("#dialogInfoAbove").html('<h1 class="warning">Error: could not find the scanner</h1>');
+      jQuery("#dialogVisual").html("");
+      jQuery("#dialogInfoBelow").html(
+        "<p>Please ensure that the scanner software is running, " +
+          "and remove the box before retrying.</p>"
+      );
+      jQuery("#dialogDialog").dialog({
+        autoOpen: true,
+        title: "Scan",
+        width: Box.dialogWidth,
+        height: "auto",
+        modal: true,
+        resizable: false,
+        position: [jQuery(window).width() / 2 - Box.dialogWidth / 2, 50],
+        buttons: {
+          Retry: function () {
+            Box.initScan(scannerName);
+          },
+          Cancel: function () {
+            jQuery("#dialogDialog").dialog("close");
+          },
+        },
+      });
+      jQuery("#dialogDialog").dialog("open");
     };
 
     return self;

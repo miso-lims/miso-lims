@@ -29,7 +29,7 @@ public class MockBoxScanner implements BoxScanner {
     @Override
     public BoxScan getScan() throws IntegrationException {
         try{
-            Thread.sleep(1000);
+            Thread.sleep(12000);
         } catch (InterruptedException e){
             Thread.currentThread().interrupt();
         }
