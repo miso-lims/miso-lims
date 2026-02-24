@@ -450,7 +450,7 @@
   Box.UpdateLocationsScanDialog = function (scannerName) {
     return Box.ScanProgressDialog(scannerName, {
         scanFn: function () {
-            Box.scan.scanAssignBarcodes(scannerName);
+            Box.scan.scanBox(scannerName);
         }
     });
   };
