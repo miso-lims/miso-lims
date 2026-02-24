@@ -60,7 +60,7 @@ public class RunLibraryController {
 
   @PostMapping("/metrics")
   public ModelAndView getRunLibraryQcTable(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
-      RunLibraryQcTableRequestDto data = validateRunLibraryQcTableRequest(form, mapper);
+    RunLibraryQcTableRequestDto data = validateRunLibraryQcTableRequest(form, mapper);
 
     List<RunLibraryQCTableRowDto> rows = new ArrayList<>();
     for (RunLibraryQcTableRequestLibraryDto item : data.getLibraryAliquots()) {
@@ -132,7 +132,7 @@ public class RunLibraryController {
   }
 
   private static RunLibraryQcTableRequestDto validateRunLibraryQcTableRequest(Map<String, String> form,
-       ObjectMapper mapper)
+      ObjectMapper mapper)
       throws IOException {
     RunLibraryQcTableRequestDto data = null;
     if (form.containsKey("data")) {
@@ -236,7 +236,7 @@ public class RunLibraryController {
   // metric3.setThresholdType("gt");
   // metric3.setValue(562.6D);
 
-  // RunLibraryQcTableRequestMetricDto metric4 = new RunLibraryQcTableRequestMetricDto()
+  // RunLibraryQcTableRequestMetricDto metric4 = new RunLibraryQcTableRequestMetricDto();
   // metrics2.add(metric4);
   // metric4.setTitle("Another Thing 2");
   // metric4.setThreshold(10000D);
