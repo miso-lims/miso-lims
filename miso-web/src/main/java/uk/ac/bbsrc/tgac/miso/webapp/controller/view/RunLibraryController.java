@@ -59,8 +59,8 @@ public class RunLibraryController {
   private ObjectMapper mapper;
 
   @PostMapping("/metrics")
-  public ModelAndView getRunItemQcTable(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
-    RunLibraryQcTableRequestDto data = validateRunItemQcTableRequest(form, mapper);
+  public ModelAndView getRunLibraryQcTable(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
+      RunLibraryQcTableRequestDto data = validateRunLibraryQcTableRequest(form, mapper);
 
     List<RunLibraryQCTableRowDto> rows = new ArrayList<>();
     for (RunLibraryQcTableRequestLibraryDto item : data.getLibraryAliquots()) {
@@ -131,8 +131,8 @@ public class RunLibraryController {
     return Long.parseLong(m.group(1));
   }
 
-  private static RunLibraryQcTableRequestDto validateRunItemQcTableRequest(Map<String, String> form,
-                                                                           ObjectMapper mapper)
+  private static RunLibraryQcTableRequestDto validateRunLibraryQcTableRequest(Map<String, String> form,
+       ObjectMapper mapper)
       throws IOException {
     RunLibraryQcTableRequestDto data = null;
     if (form.containsKey("data")) {
@@ -191,14 +191,14 @@ public class RunLibraryController {
   // final long run2Id = 4862L;
 
 
-  // RunItemQcTableRequestDto dto = new RunItemQcTableRequestDto();
+  // RunLibraryQcTableRequestDto dto = new RunLibraryQcTableRequestDto();
 
   // dto.setReport("Some Report");
-  // List<RunItemQcTableRequestLibraryDto> aliquots = new ArrayList<>();
+  // List<RunLibraryQcTableRequestLibraryDto> aliquots = new ArrayList<>();
   // dto.setLibraryAliquots(aliquots);
 
-  // RunItemQcTableRequestLibraryDto aliquot = new RunItemQcTableRequestLibraryDto();
-  // RunItemQcTableRequestLibraryDto aliquot2 = new RunItemQcTableRequestLibraryDto();
+  // RunLibraryQcTableRequestLibraryDto aliquot = new RunLibraryQcTableRequestLibraryDto();
+  // RunLibraryQcTableRequestLibraryDto aliquot2 = new RunLibraryQcTableRequestLibraryDto();
   // aliquots.add(aliquot);
   // aliquots.add(aliquot2);
 
@@ -206,44 +206,44 @@ public class RunLibraryController {
   // aliquot.setName(aliquot1Name);
   // aliquot.setRunId(runId);
   // aliquot.setPartition(partitionNumber);
-  // List<RunItemQcTableRequestMetricDto> metrics = new ArrayList<>();
+  // List<RunLibraryQcTableRequestMetricDto> metrics = new ArrayList<>();
   // aliquot.setMetrics(metrics);
 
   // aliquot2.setName(aliquot2Name);
   // aliquot2.setRunId(run2Id);
   // aliquot2.setPartition(partitionNumber);
-  // List<RunItemQcTableRequestMetricDto> metrics2 = new ArrayList<>();
+  // List<RunLibraryQcTableRequestMetricDto> metrics2 = new ArrayList<>();
   // aliquot2.setMetrics(metrics2);
 
-  // RunItemQcTableRequestMetricDto metric1 = new RunItemQcTableRequestMetricDto();
+  // RunLibraryQcTableRequestMetricDto metric1 = new RunLibraryQcTableRequestMetricDto();
   // metrics.add(metric1);
   // metric1.setTitle("Something");
   // metric1.setThreshold(100D);
   // metric1.setThresholdType("gt");
   // metric1.setValue(120D);
 
-  // RunItemQcTableRequestMetricDto metric2 = new RunItemQcTableRequestMetricDto();
+  // RunLibraryQcTableRequestMetricDto metric2 = new RunLibraryQcTableRequestMetricDto();
   // metrics.add(metric2);
   // metric2.setTitle("Another Thing");
   // metric2.setThreshold(100D);
   // metric2.setThresholdType("le");
   // metric2.setValue(120D);
 
-  // RunItemQcTableRequestMetricDto metric3 = new RunItemQcTableRequestMetricDto();
+  // RunLibraryQcTableRequestMetricDto metric3 = new RunLibraryQcTableRequestMetricDto();
   // metrics2.add(metric3);
   // metric3.setTitle("Another Thing");
   // metric3.setThreshold(150D);
   // metric3.setThresholdType("gt");
   // metric3.setValue(562.6D);
 
-  // RunItemQcTableRequestMetricDto metric4 = new RunItemQcTableRequestMetricDto();
+  // RunLibraryQcTableRequestMetricDto metric4 = new RunLibraryQcTableRequestMetricDto()
   // metrics2.add(metric4);
   // metric4.setTitle("Another Thing 2");
   // metric4.setThreshold(10000D);
   // metric4.setThresholdType("gt");
   // metric4.setValue(46363D);
 
-  // RunItemQcTableRequestMetricDto metric5 = new RunItemQcTableRequestMetricDto();
+  // RunLibraryQcTableRequestMetricDto metric5 = new RunLibraryQcTableRequestMetricDto();
   // metrics2.add(metric5);
   // metric5.setTitle("Another Thing 3");
   // metric5.setThreshold(35D);
@@ -252,7 +252,7 @@ public class RunLibraryController {
 
   // Map<String, String> form = new HashMap<>();
   // form.put("data", mapper.writeValueAsString(dto));
-  // return getRunItemQcTable(form, model);
+  // return getRunLibraryQcTable(form, model);
   // }
 
 }
