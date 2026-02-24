@@ -5,8 +5,8 @@ import org.junit.Test;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import org.springframework.security.test.context.support.WithMockUser;
 import static org.junit.Assert.*;
-import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
-import uk.ac.bbsrc.tgac.miso.dto.RunLibraryQcStatusDto;
+import uk.ac.bbsrc.tgac.miso.core.data.RunItemQcStatus;
+import uk.ac.bbsrc.tgac.miso.dto.RunItemQcStatusDto;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -14,19 +14,19 @@ import java.util.Arrays;
 
 
 
-public class RunLibraryQcStatusRestControllerST extends AbstractST {
+public class RunItemQcStatusRestControllerST extends AbstractST {
 
-  private static final String CONTROLLER_BASE = "/rest/runlibraryqcstatuses";
-  private static final Class<RunLibraryQcStatus> entityClass = RunLibraryQcStatus.class;
+  private static final String CONTROLLER_BASE = "/rest/runitemqcstatuses";
+  private static final Class<RunItemQcStatus> entityClass = RunItemQcStatus.class;
 
-  private List<RunLibraryQcStatusDto> makeCreateDtos() {
-    RunLibraryQcStatusDto dto1 = new RunLibraryQcStatusDto();
+  private List<RunItemQcStatusDto> makeCreateDtos() {
+    RunItemQcStatusDto dto1 = new RunItemQcStatusDto();
     dto1.setQcPassed(true);
     dto1.setDescription("one");
 
 
 
-    RunLibraryQcStatusDto dto2 = new RunLibraryQcStatusDto();
+    RunItemQcStatusDto dto2 = new RunItemQcStatusDto();
     dto2.setQcPassed(false);
     dto2.setDescription("two");
 
@@ -37,8 +37,8 @@ public class RunLibraryQcStatusRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkCreateAsync() throws Exception {
     // only admin can create
-    List<RunLibraryQcStatusDto> dtos = makeCreateDtos();
-    List<RunLibraryQcStatus> statuses = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, dtos);
+    List<RunItemQcStatusDto> dtos = makeCreateDtos();
+    List<RunItemQcStatus> statuses = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, dtos);
     assertEquals(dtos.get(0).getDescription(), statuses.get(0).getDescription());
     assertEquals(dtos.get(1).getDescription(), statuses.get(1).getDescription());
 
@@ -55,13 +55,13 @@ public class RunLibraryQcStatusRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // only admin can update
-    RunLibraryQcStatusDto statOne = Dtos.asDto(currentSession().get(entityClass, 1));
-    RunLibraryQcStatusDto statTwo = Dtos.asDto(currentSession().get(entityClass, 2));
+    RunItemQcStatusDto statOne = Dtos.asDto(currentSession().get(entityClass, 1));
+    RunItemQcStatusDto statTwo = Dtos.asDto(currentSession().get(entityClass, 2));
     statOne.setDescription("one");
     statTwo.setDescription("two");
 
-    List<RunLibraryQcStatus> statuses = baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
-        Arrays.asList(statOne, statTwo), RunLibraryQcStatusDto::getId);
+    List<RunItemQcStatus> statuses = baseTestBulkUpdateAsync(CONTROLLER_BASE, entityClass,
+        Arrays.asList(statOne, statTwo), RunItemQcStatusDto::getId);
     assertEquals(statOne.getDescription(), statuses.get(0).getDescription());
     assertEquals(statTwo.getDescription(), statuses.get(1).getDescription());
 
@@ -69,8 +69,8 @@ public class RunLibraryQcStatusRestControllerST extends AbstractST {
 
   @Test
   public void testUpdateFail() throws Exception {
-    RunLibraryQcStatusDto statOne = Dtos.asDto(currentSession().get(entityClass, 1));
-    RunLibraryQcStatusDto statTwo = Dtos.asDto(currentSession().get(entityClass, 2));
+    RunItemQcStatusDto statOne = Dtos.asDto(currentSession().get(entityClass, 1));
+    RunItemQcStatusDto statTwo = Dtos.asDto(currentSession().get(entityClass, 2));
     statOne.setDescription("one");
     statTwo.setDescription("two");
     testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, Arrays.asList(statOne, statTwo));

@@ -33,4 +33,4 @@ LEFT JOIN Run_Partition_LibraryAliquot rpa
   AND rpa.partitionId = part.partitionId
   AND rpa.aliquotId = ld.aliquotId
 LEFT JOIN RunPurpose rp ON rp.purposeId = rpa.purposeId
-LEFT JOIN RunLibraryQcStatus rlqc ON rlqc.statusId = rpa.statusId
+LEFT JOIN RunItemQcStatus rlqc ON rlqc.statusId = rpa.statusId

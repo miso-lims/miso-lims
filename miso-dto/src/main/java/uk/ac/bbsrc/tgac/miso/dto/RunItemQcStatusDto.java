@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-public class RunLibraryQcStatusDto {
+public class RunItemQcStatusDto {
 
   private Long id;
   private String description;

@@ -98,4 +98,4 @@ Body: [
 ]
 ```
 
-`qcStatus` must match the description of an existing run-library QC status in MISO.
+`qcStatus` must match the description of an existing run-item QC status in MISO.

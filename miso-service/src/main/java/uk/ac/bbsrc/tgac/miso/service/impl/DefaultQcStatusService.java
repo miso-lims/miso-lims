@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.RunItemQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -33,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PartitionQcTypeService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.QcStatusService;
-import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunItemQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
@@ -63,7 +63,7 @@ public class DefaultQcStatusService implements QcStatusService {
   @Autowired
   private PartitionQcTypeService partitionQcTypeService;
   @Autowired
-  private RunLibraryQcStatusService runLibraryQcStatusService;
+  private RunItemQcStatusService runItemQcStatusService;
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -166,8 +166,8 @@ public class DefaultQcStatusService implements QcStatusService {
           clearDataReview(runLib);
         } else if (runLib.getQcStatus() == null || runLib.getQcStatus().getId() != update.getQcStatusId().longValue()) {
           // QC status set and changed
-          RunLibraryQcStatus status = runLibraryQcStatusService.get(update.getQcStatusId());
-          throwIfNull("Run-library QC status", status);
+          RunItemQcStatus status = runItemQcStatusService.get(update.getQcStatusId());
+          throwIfNull("Run-Item QC status", status);
           runLib.setQcStatus(status);
           runLib.setQcUser(authorizationManager.getCurrentUser());
           runLib.setQcDate(LocalDate.now(ZoneId.systemDefault()));

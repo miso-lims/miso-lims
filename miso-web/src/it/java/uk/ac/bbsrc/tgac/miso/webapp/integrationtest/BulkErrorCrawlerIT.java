@@ -80,7 +80,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 slugs.add("lab/list");
                 slugs.add("arraymodel/list");
                 slugs.add("partitionqctype/list");
-                slugs.add("runlibraryqcstatus/list");
+                slugs.add("runitemqcstatus/list");
                 slugs.add("scientificname/list");
                 slugs.add("referencegenome/list");
                 slugs.add("pipeline/list");
@@ -209,7 +209,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 slugs.add("lab/bulk/new?quantity=3");
                 slugs.add("arraymodel/bulk/new?quantity=3");
                 slugs.add("partitionqctype/bulk/new?quantity=3");
-                slugs.add("runlibraryqcstatus/bulk/new?quantity=2");
+                slugs.add("runitemqcstatus/bulk/new?quantity=2");
                 slugs.add("scientificname/bulk/new?quantity=3");
                 slugs.add("referencegenome/bulk/new?quantity=3");
                 slugs.add("studytype/bulk/new?quantity=3");
@@ -322,7 +322,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                                 .put("studytype/bulk/edit", unmodifiableMap("ids", "2,4"))
                                 .put("pipeline/bulk/new", unmodifiableMap("quantity", "2"))
                                 .put("pipeline/bulk/edit", unmodifiableMap("ids", "1,2"))
-                                .put("runlibraryqcstatus/bulk/edit", unmodifiableMap("ids", "1,2"))
+                                .put("runitemqcstatus/bulk/edit", unmodifiableMap("ids", "1,2"))
                                 .put("worksetcategory/bulk/edit", unmodifiableMap("ids", "1,2"))
                                 .put("worksetstage/bulk/edit", unmodifiableMap("ids", "1,2"))
                                 .put("workstation/bulk/edit", unmodifiableMap("ids", "1,2"))

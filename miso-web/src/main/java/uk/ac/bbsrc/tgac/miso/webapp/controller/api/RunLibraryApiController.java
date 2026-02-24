@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.RunLibraryQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.RunItemQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNodeType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcStatusUpdate;
 import uk.ac.bbsrc.tgac.miso.core.service.QcStatusService;
-import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunItemQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -42,20 +42,20 @@ public class RunLibraryApiController extends AbstractRestController {
   @Autowired
   private RunService runService;
   @Autowired
-  private RunLibraryQcStatusService runLibraryQcStatusService;
+  private RunItemQcStatusService runItemQcStatusService;
 
   @PostMapping("qc-statuses")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void postSignoffs(@RequestBody List<SignoffRequestItem> signoffs) throws IOException {
     List<QcStatusUpdate> updates = new ArrayList<>();
-    Map<String, RunLibraryQcStatus> statusesByDesc = new HashMap<>();
+    Map<String, RunItemQcStatus> statusesByDesc = new HashMap<>();
     for (SignoffRequestItem signoff : signoffs) {
       validateSignoff(signoff);
       QcStatusUpdate update = new QcStatusUpdate();
       Long partitionId = getPartitionId(signoff.runId(), signoff.laneNumber());
       update.setIds(new Long[] {signoff.runId(), partitionId, signoff.aliquotId()});
       update.setEntityType(QcNodeType.RUN_LIBRARY);
-      RunLibraryQcStatus status = getRunLibraryQcStatus(signoff.qcStatus(), statusesByDesc);
+      RunItemQcStatus status = getRunItemQcStatus(signoff.qcStatus(), statusesByDesc);
       update.setQcStatusId(status.getId());
       update.setQcNote(signoff.qcNote());
       updates.add(update);
@@ -101,12 +101,12 @@ public class RunLibraryApiController extends AbstractRestController {
     throw new RestException("Couldn't identify lane %d for run ID %d".formatted(laneNumber, runId), Status.BAD_REQUEST);
   }
 
-  private RunLibraryQcStatus getRunLibraryQcStatus(String description, Map<String, RunLibraryQcStatus> statusesByDesc)
+  private RunItemQcStatus getRunItemQcStatus(String description, Map<String, RunItemQcStatus> statusesByDesc)
       throws IOException {
     if (statusesByDesc.containsKey(description)) {
       return statusesByDesc.get(description);
     }
-    RunLibraryQcStatus status = runLibraryQcStatusService.getByDescription(description);
+    RunItemQcStatus status = runItemQcStatusService.getByDescription(description);
     if (status == null) {
       throw new RestException("Invalid qcStatus value: " + description, Status.BAD_REQUEST);
     }

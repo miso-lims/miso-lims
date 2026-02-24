@@ -20,7 +20,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
-import uk.ac.bbsrc.tgac.miso.core.service.RunLibraryQcStatusService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunItemQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPurposeService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
@@ -36,7 +36,7 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
   @Autowired
   private RunPurposeService runPurposeService;
   @Autowired
-  private RunLibraryQcStatusService runLibraryQcStatusService;
+  private RunItemQcStatusService runItemQcStatusService;
   @Autowired
   private AuthorizationManager authorizationManager;
 
@@ -73,7 +73,7 @@ public class DefaultRunPartitionAliquotService implements RunPartitionAliquotSer
         get(runPartitionAliquot.getRun(), runPartitionAliquot.getPartition(), runPartitionAliquot.getAliquot());
     loadChildEntity(runPartitionAliquot::setPurpose, runPartitionAliquot.getPurpose(), runPurposeService,
         "runPurposeId");
-    loadChildEntity(runPartitionAliquot::setQcStatus, runPartitionAliquot.getQcStatus(), runLibraryQcStatusService,
+    loadChildEntity(runPartitionAliquot::setQcStatus, runPartitionAliquot.getQcStatus(), runItemQcStatusService,
         "qcStatusId");
     User user = authorizationManager.getCurrentUser();
     updateQcDetails(runPartitionAliquot, managed, RunPartitionAliquot::getQcStatus, RunPartitionAliquot::getQcUser,

@@ -36,7 +36,7 @@ FOR EACH ROW
     DECLARE log_message longtext;
     SET log_message = CONCAT_WS(', ',
       makeChangeMessage('purpose', NULL, (SELECT alias FROM RunPurpose WHERE purposeId = NEW.purposeId)),
-      makeChangeMessage('QC status', NULL, (SELECT description FROM RunLibraryQcStatus WHERE statusId = NEW.statusId)),
+      makeChangeMessage('QC status', NULL, (SELECT description FROM RunItemQcStatus WHERE statusId = NEW.statusId)),
       makeChangeMessage('QC note', NULL, NEW.qcNote),
       makeChangeMessage('QC user', NULL, (SELECT fullName FROM User WHERE userId = NEW.qcUser)),
       makeChangeMessage('QC date', NULL, NEW.qcDate),
@@ -79,7 +79,7 @@ FOR EACH ROW
     DECLARE log_message longtext;
     SET log_message = CONCAT_WS(', ',
       makeChangeMessage('purpose', (SELECT alias FROM RunPurpose WHERE purposeId = OLD.purposeId), (SELECT alias FROM RunPurpose WHERE purposeId = NEW.purposeId)),
-      makeChangeMessage('QC status', (SELECT description FROM RunLibraryQcStatus WHERE statusId = OLD.statusId), (SELECT description FROM RunLibraryQcStatus WHERE statusId = NEW.statusId)),
+      makeChangeMessage('QC status', (SELECT description FROM RunItemQcStatus WHERE statusId = OLD.statusId), (SELECT description FROM RunItemQcStatus WHERE statusId = NEW.statusId)),
       makeChangeMessage('QC note', OLD.qcNote, NEW.qcNote),
       makeChangeMessage('QC user', (SELECT fullName FROM User WHERE userId = OLD.qcUser), (SELECT fullName FROM User WHERE userId = NEW.qcUser)),
       makeChangeMessage('QC date', OLD.qcDate, NEW.qcDate),

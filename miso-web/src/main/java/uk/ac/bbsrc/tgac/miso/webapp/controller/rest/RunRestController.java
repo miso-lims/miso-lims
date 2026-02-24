@@ -157,29 +157,6 @@ public class RunRestController extends AbstractRestController {
     }
   }
 
-  public static class RunLibraryQcStatusUpdateRequest {
-
-    private Boolean qcPassed;
-    private String note;
-
-    public Boolean getQcPassed() {
-      return qcPassed;
-    }
-
-    public void setQcPassed(Boolean qcPassed) {
-      this.qcPassed = qcPassed;
-    }
-
-    public String getNote() {
-      return note;
-    }
-
-    public void setNote(String note) {
-      this.note = note;
-    }
-
-  }
-
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
 
