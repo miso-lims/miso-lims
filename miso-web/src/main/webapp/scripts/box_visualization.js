@@ -449,16 +449,16 @@
 
   Box.UpdateLocationsScanDialog = function (scannerName) {
     return Box.ScanProgressDialog(scannerName, {
-       scanFn: function (name) {
-           Box.scan.scanBox(name);
-       }
+        scanFn: function () {
+            Box.scan.scanAssignBarcodes(scannerName);
+        }
     });
   };
 
   Box.AssignBarcodesScanProgressDialog = function (scannerName) {
     return Box.ScanProgressDialog(scannerName, {
-        scanFn: function (name) {
-            Box.scan.scanAssignBarcodes(name);
+        scanFn: function () {
+            Box.scan.scanAssignBarcodes(scannerName);
         }
     });
   };
@@ -538,7 +538,7 @@
         .addClass("disabled");
       jQuery("#dialogDialog").dialog("open");
 
-      params.scanFn(scannerName);
+      params.scanFn();
     };
 
     self.getBoxPositionOpts = function (row, col) {
@@ -944,33 +944,6 @@
                 unselectedImg: "/styles/images/tube_empty.png"
             };
         }
-    };
-
-    self.error = function () {
-      jQuery("#dialogInfoAbove").html('<h1 class="warning">Error: could not find the scanner</h1>');
-      jQuery("#dialogVisual").html("");
-      jQuery("#dialogInfoBelow").html(
-        "<p>Please ensure that the scanner software is running, " +
-          "and remove the box before retrying.</p>"
-      );
-      jQuery("#dialogDialog").dialog({
-        autoOpen: true,
-        title: "Scan",
-        width: Box.dialogWidth,
-        height: "auto",
-        modal: true,
-        resizable: false,
-        position: [jQuery(window).width() / 2 - Box.dialogWidth / 2, 50],
-        buttons: {
-          Retry: function () {
-            Box.initScan(scannerName);
-          },
-          Cancel: function () {
-            jQuery("#dialogDialog").dialog("close");
-          },
-        },
-      });
-      jQuery("#dialogDialog").dialog("open");
     };
 
     return self;
