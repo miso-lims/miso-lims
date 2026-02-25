@@ -1355,7 +1355,7 @@ BulkTarget.sample = (function ($) {
       );
 
       if (!config.isLibraryReceipt) {
-        columns = columns.concat(BulkUtils.columns.detailedQcStatus());
+        columns = columns.concat(BulkUtils.columns.detailedQcStatus(config.pageMode));
       }
 
       columns.push(

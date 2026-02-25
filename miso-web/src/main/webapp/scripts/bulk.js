@@ -49,8 +49,10 @@ BulkUtils = (function ($) {
    *   getData: optional function(object, limitedApi) returning string; get value from object
    *       instead of mapping normally. This should return the value to display in the cell (for
    *       a dropdown column, return the label rather than the value)
-   *   setData: optional function(object, value, rowIndex, api); set value to object instead of
-   *       doing regular mapping
+   *   setData: optional function(object, value, rowIndex, api, isSave); set value to object
+   *       instead of doing regular mapping. isSave is true only when the data is being updated
+   *       specifically to be saved; this allows control when you want one value to be used on the
+   *       front end and a different value to be saved
    *   include: optional boolean (default: true); determines whether the column is displayed
    *   includeSaved: optional boolean (default: true); if false, the column will be hidden after
    *       save. Will have no effect if 'include' is false
@@ -771,17 +773,31 @@ BulkUtils = (function ($) {
         },
       ],
 
-      detailedQcStatus: function () {
+      detailedQcStatus: function (pageMode) {
+        // id of -1 is used for "Not Ready" here so null can represent nothing selected and force
+        // the user to explicitly choose "Not Ready" if they want. "Not Ready" must be saved as
+        // null though, and null should be loaded as "Not Ready" when editing
         return [
           {
             title: "QC Status",
             type: "dropdown",
             data: "detailedQcStatusId",
+            getData: function (object, limitedApi) {
+              if (!object.detailedQcStatusId) {
+                return pageMode === "edit" ? "Not Ready" : null;
+              } else if (object.detailedQcStatusId === -1) {
+                return "Not Ready";
+              }
+              return Utils.findUniqueOrThrow(
+                Utils.array.idPredicate(object.detailedQcStatusId),
+                Constants.detailedQcStatuses
+              ).description;
+            },
             required: true,
             source: function (data, api) {
               return [
                 {
-                  id: null,
+                  id: -1,
                   description: "Not Ready",
                 },
               ].concat(
@@ -795,7 +811,12 @@ BulkUtils = (function ($) {
             sortSource: Utils.sorting.detailedQcStatusSort,
             getItemLabel: Utils.array.get("description"),
             getItemValue: Utils.array.getId,
-            initial: " ", // user must explicitly choose if not ready (null)
+            setData: function (object, value, rowIndex, api, isSave) {
+              if (isSave && value === -1) {
+                value = null;
+              }
+              object.detailedQcStatusId = value;
+            },
             onChange: function (rowIndex, newValue, api) {
               var status = Constants.detailedQcStatuses.find(function (item) {
                 return item.description === newValue;
@@ -2434,7 +2455,7 @@ BulkUtils = (function ($) {
 
     // Note: below functions not available in processOnChangeListeners' tempApi
     api.getData = function () {
-      updateSourceData(data, hot, columns, api);
+      updateSourceData(data, hot, columns, api, false);
       return data;
     };
 
@@ -2818,7 +2839,7 @@ BulkUtils = (function ($) {
             makeOrderField("order3"),
           ],
           function (results) {
-            updateSourceData(data, hot, columns, api);
+            updateSourceData(data, hot, columns, api, false);
             var sorted = data
               .map(function (dataRow, index) {
                 return {
@@ -3042,7 +3063,7 @@ BulkUtils = (function ($) {
       showLoading(true, false);
       clearMessages();
       validate(hot, columns, function () {
-        updateSourceData(data, hot, columns, api);
+        updateSourceData(data, hot, columns, api, true);
 
         $.when(target.confirmSave ? target.confirmSave(data, config, api) : null)
           .then(function () {
@@ -3246,7 +3267,7 @@ BulkUtils = (function ($) {
     }
   }
 
-  function updateSourceData(data, hot, columns, api) {
+  function updateSourceData(data, hot, columns, api, isSave) {
     var tableData = hot.getData();
     for (var rowIndex = 0; rowIndex < tableData.length; rowIndex++) {
       for (var colIndex = 0; colIndex < columns.length; colIndex++) {
@@ -3279,7 +3300,7 @@ BulkUtils = (function ($) {
           }
         }
         if (column.setData) {
-          column.setData(data[rowIndex], value, rowIndex, api);
+          column.setData(data[rowIndex], value, rowIndex, api, isSave);
         } else {
           Utils.setObjectField(data[rowIndex], column.data, value);
         }
