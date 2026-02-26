@@ -1,1 +1,1 @@
-Matrix Barcode Assignment UI glitches has been fixed.
+Incorrect scanner error shown before scanner properly scanned box for barcode assignment.
