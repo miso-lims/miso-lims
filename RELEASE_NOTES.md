@@ -7,6 +7,18 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.18.0] - 2026-02-26
+
+### Changed
+
+* Box size can now be changed even if there are items in the box, as long as the new size has the same dimensions (rows and columns) as the old size
+
+### Fixed
+
+* Incorrect scanner error shown before scanner properly scanned box for barcode assignment.
+* When QC Status was not set on a bulk sample/library/aliquot table and the table was sorted, QC Status would set itself to "Not Ready" instead of remaining unset
+
+
 ## [3.17.0] - 2026-02-12
 
 ### Added
