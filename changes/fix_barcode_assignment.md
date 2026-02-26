@@ -1,0 +1,1 @@
+Incorrect scanner error shown before scanner properly scanned box for barcode assignment.
