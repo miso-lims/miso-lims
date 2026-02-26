@@ -797,7 +797,7 @@ BulkUtils = (function ($) {
             source: function (data, api) {
               return [
                 {
-                  id: -1,
+                  id: api.isSaved() ? null : -1,
                   description: "Not Ready",
                 },
               ].concat(
