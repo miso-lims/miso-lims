@@ -788,7 +788,7 @@ BulkUtils = (function ($) {
               } else if (object.detailedQcStatusId === -1) {
                 return "Not Ready";
               }
-              return Utils.findUniqueOrThrow(
+              return Utils.array.findUniqueOrThrow(
                 Utils.array.idPredicate(object.detailedQcStatusId),
                 Constants.detailedQcStatuses
               ).description;
