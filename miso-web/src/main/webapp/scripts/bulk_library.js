@@ -921,7 +921,7 @@ BulkTarget.library = (function ($) {
         }
       );
 
-      columns = columns.concat(BulkUtils.columns.detailedQcStatus());
+      columns = columns.concat(BulkUtils.columns.detailedQcStatus(config.pageMode));
       columns.push(BulkUtils.columns.dnaSize);
 
       if (config.showVolume) {
