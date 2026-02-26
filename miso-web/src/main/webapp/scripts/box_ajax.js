@@ -237,7 +237,7 @@ Box.scan = {
       });
   },
 
-  scanAssignBarcodes: function (scannerName, onSuccess, onError) {
+  scanAssignBarcodes: function (scannerName) {
     jQuery
       .ajax({
         url: Urls.rest.boxes.assignBarcodesScan(Box.boxJSON.id),

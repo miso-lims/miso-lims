@@ -1,0 +1,1 @@
+Matrix Barcode Assignment UI glitches has been fixed.

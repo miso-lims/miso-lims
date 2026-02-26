@@ -448,22 +448,22 @@
   };
 
   Box.UpdateLocationsScanDialog = function (scannerName) {
-    return Box.ScanProgressDialog(scannerName, {
-        scanFn: function () {
+    return Box.ScanProgressDialog(scannerName,
+        function () {
             Box.scan.scanBox(scannerName);
         }
-    });
+    );
   };
 
   Box.AssignBarcodesScanProgressDialog = function (scannerName) {
-    return Box.ScanProgressDialog(scannerName, {
-        scanFn: function () {
+    return Box.ScanProgressDialog(scannerName,
+        function () {
             Box.scan.scanAssignBarcodes(scannerName);
         }
-    });
+    );
   };
 
-  Box.ScanProgressDialog = function (scannerName, params) {
+  Box.ScanProgressDialog = function (scannerName, scanFn) {
     var self = new BoxVisual();
 
     self.show = function (opts) {
@@ -538,7 +538,7 @@
         .addClass("disabled");
       jQuery("#dialogDialog").dialog("open");
 
-      params.scanFn();
+      scanFn();
     };
 
     self.getBoxPositionOpts = function (row, col) {
