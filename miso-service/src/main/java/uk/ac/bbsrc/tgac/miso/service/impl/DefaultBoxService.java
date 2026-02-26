@@ -5,12 +5,7 @@ import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -418,8 +413,10 @@ public class DefaultBoxService implements BoxService {
       }
     }
 
-    if (beforeChange != null && isChanged(Box::getSize, box, beforeChange) && !box.getBoxPositions().isEmpty()) {
-      errors.add(new ValidationError("sizeId", "Size can only be changed when the box is empty"));
+    if (beforeChange != null && isChanged(Box::getSize, box, beforeChange) && !box.getBoxPositions().isEmpty()
+        && (!Objects.equals(box.getSize().getRows(), beforeChange.getSize().getRows())
+            || !Objects.equals(box.getSize().getColumns(), beforeChange.getSize().getColumns()))) {
+      errors.add(new ValidationError("sizeId", "Box dimensions can only be changed when the box is empty"));
     }
 
     if (!errors.isEmpty()) {
