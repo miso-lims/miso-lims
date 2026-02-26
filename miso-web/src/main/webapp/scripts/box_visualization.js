@@ -448,6 +448,22 @@
   };
 
   Box.UpdateLocationsScanDialog = function (scannerName) {
+    return Box.ScanProgressDialog(scannerName,
+        function () {
+            Box.scan.scanBox(scannerName);
+        }
+    );
+  };
+
+  Box.AssignBarcodesScanProgressDialog = function (scannerName) {
+    return Box.ScanProgressDialog(scannerName,
+        function () {
+            Box.scan.scanAssignBarcodes(scannerName);
+        }
+    );
+  };
+
+  Box.ScanProgressDialog = function (scannerName, scanFn) {
     var self = new BoxVisual();
 
     self.show = function (opts) {
@@ -455,7 +471,6 @@
       self.data = opts.data;
 
       self.getNewPosition = function () {
-        // Ignore all the magic numbers
         var h = Box.boxJSON.rows * 30 - 100;
         var w = Box.dialogWidth - 400;
         return [Math.floor(Math.random() * h) + 100, Math.floor(Math.random() * w) + 100];
@@ -517,13 +532,13 @@
         },
         data: self.data,
       });
+
       jQuery("#updateSelected, #removeSelected, #emptySelected")
         .prop("disabled", true)
         .addClass("disabled");
       jQuery("#dialogDialog").dialog("open");
 
-      // Initiate Scan
-      Box.scan.scanBox(scannerName);
+      scanFn();
     };
 
     self.getBoxPositionOpts = function (row, col) {
@@ -825,6 +840,12 @@
                                 });
                             }
                         );
+                    }
+                },
+                {
+                    text: "Rescan",
+                    click: function () {
+                        Box.initScan(scannerName);
                     }
                 },
                 {
