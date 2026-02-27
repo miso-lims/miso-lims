@@ -2,6 +2,7 @@ SELECT assayId
   ,alias AS name
   ,description
   ,version
+  ,archived
   ,caseTargetDays
   ,receiptTargetDays
   ,extractionTargetDays
