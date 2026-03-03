@@ -1065,7 +1065,9 @@ BulkTarget.sample = (function ($) {
           include: show["Tissue"],
           includeSaved: targetCategory === "Tissue",
           maxLength: 50,
-          description: "When the sample was taken",
+          regex: Utils.validation.uriComponentRegex,
+          description:
+            "When the sample was taken. The following characters are prohibited: <>&%;/\\",
         },
         {
           title: "Index Family",
