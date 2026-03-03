@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Lab;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -240,6 +243,20 @@ public class DefaultTransferService extends AbstractSaveService<Transfer> implem
       }
       if (!transfer.getPoolTransfers().isEmpty()) {
         errors.add(new ValidationError("items", "Pools cannot be received directly"));
+      }
+    }
+
+    for (TransferSample transferSample : transfer.getSampleTransfers()) {
+      if (!isDetailedSample(transferSample.getItem())) {
+        break;
+      }
+      DetailedSample sample = (DetailedSample) deproxify(transferSample.getItem());
+      if (isIdentitySample(sample)) {
+        errors.add(new ValidationError("items", "%s (%s) cannot be transferred because it is an identity sample"
+            .formatted(sample.getAlias(), sample.getName())));
+      } else if (sample.isSynthetic()) {
+        errors.add(new ValidationError("items", "%s (%s) cannot be transferred because it is a ghost/synthetic sample"
+            .formatted(sample.getAlias(), sample.getName())));
       }
     }
 
