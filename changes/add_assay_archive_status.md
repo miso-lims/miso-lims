@@ -1,0 +1,1 @@
+Archive status is now available for a single assay/version.
