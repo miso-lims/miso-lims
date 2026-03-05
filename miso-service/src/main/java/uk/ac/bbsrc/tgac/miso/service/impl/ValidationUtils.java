@@ -127,6 +127,12 @@ public class ValidationUtils {
     }
   }
 
+  public static void validateUriComponent(String fieldName, String component, Collection<ValidationError> errors) {
+    if (component != null && !component.matches("^[^<>&%;/\\t\\n\\r\\\\]*$")) {
+      errors.add(new ValidationError(fieldName, "Cannot contain the following characters: <>&%;/\\\\"));
+    }
+  }
+
   public static void validateUrl(String fieldName, String maybeUrl, boolean allowEmptyUrl,
       Collection<ValidationError> errors) {
     if (isStringEmptyOrNull(maybeUrl) && allowEmptyUrl)

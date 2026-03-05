@@ -852,8 +852,11 @@ public class DefaultSampleService implements SampleService {
       validateGroupDescription(detailed, errors);
       if (isIdentitySample(detailed) && detailed.getRequisition() != null) {
         errors.add(new ValidationError("requisitionId", "Identity samples cannot be added to requisitions"));
-      } else if (isProcessingSingleCellSample(detailed)) {
-        SampleSingleCell singleCell = (SampleSingleCell) detailed;
+      } else if (isTissueSample(sample)) {
+        SampleTissue tissue = (SampleTissue) sample;
+        validateUriComponent("timepoint", tissue.getTimepoint(), errors);
+      } else if (isProcessingSingleCellSample(sample)) {
+        SampleSingleCell singleCell = (SampleSingleCell) sample;
         if (singleCell.getProbes() != null && !singleCell.getProbes().isEmpty()) {
           validateProbes(singleCell.getProbes(), errors);
         }

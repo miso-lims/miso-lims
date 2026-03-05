@@ -550,6 +550,8 @@ public class DefaultLibraryService implements LibraryService {
       }
     }
 
+    validateUriComponent("kitLot", library.getKitLot(), errors);
+
     if (library.getSpikeIn() != null) {
       if (library.getSpikeInDilutionFactor() == null) {
         errors.add(new ValidationError("spikeInDilutionFactor", "Spike-in dilution factor must be specified"));
