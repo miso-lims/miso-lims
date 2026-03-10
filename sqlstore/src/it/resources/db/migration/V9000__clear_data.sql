@@ -5,7 +5,7 @@ DELETE FROM Array;
 DELETE FROM ArrayChangeLog;
 DELETE FROM ArrayModel;
 DELETE FROM ArrayPosition;
-DELETE FROM ArrayRun_Samples;
+DELETE FROM ArrayRun_Sample;
 DELETE FROM ArrayRun;
 DELETE FROM ArrayRunChangeLog;
 DELETE FROM Assay;
