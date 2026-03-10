@@ -17,9 +17,10 @@ jQuery(document).ready(function() {
   <c:if test="${pageMode eq 'create'}">
     config.instruments = ${arrayScanners};
   </c:if>
-  FormUtils.createForm('arrayrunForm', 'save', ${pageMode eq 'create' ? '{}' : arrayRunJson}, 'arrayrun', config);
+  var arrayRun = ${pageMode eq 'create' ? '{}' : arrayRunJson};
+  FormUtils.createForm('arrayrunForm', 'save', arrayRun, 'arrayrun', config);
   <c:if test="${pageMode eq 'edit'}">
-    SampleArray.updateSamplesTable(${arrayJson});
+    ArrayRunSamples.load(arrayRun.id);
   </c:if>
   Utils.ui.updateHelpLink(FormTarget.arrayrun.getUserManualUrl());
 });

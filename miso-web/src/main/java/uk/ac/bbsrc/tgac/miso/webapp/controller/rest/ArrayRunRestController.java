@@ -22,10 +22,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunSampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -33,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayDto;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayRunDto;
+import uk.ac.bbsrc.tgac.miso.dto.ArrayRunSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
@@ -47,6 +50,9 @@ public class ArrayRunRestController extends AbstractRestController {
 
   @Autowired
   private ArrayService arrayService;
+
+  @Autowired
+  private ArrayRunSampleService arrayRunSampleService;
 
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
@@ -127,6 +133,27 @@ public class ArrayRunRestController extends AbstractRestController {
   @ResponseStatus(HttpStatus.CREATED)
   public @ResponseBody ArrayRunDto save(@RequestBody ArrayRunDto dto) throws IOException {
     return RestUtils.createObject("Array Run", dto, Dtos::to, arrayRunService, Dtos::asDto);
+  }
+
+  @GetMapping(value = "/{arrayRunId}/samples", produces = "application/json")
+  public @ResponseBody List<ArrayRunSampleDto> listSamples(@PathVariable long arrayRunId) throws IOException {
+      RestUtils.retrieve("Array Run", arrayRunId, arrayRunService);
+      List<ArrayRunSampleDto> dtos = arrayRunSampleService.listByRunId(arrayRunId).stream()
+              .map(Dtos::asDto)
+              .collect(Collectors.toList());
+
+      for(int i=0; i< dtos.size(); i++) {
+          dtos.get(i).setId((long) i);
+      }
+      return dtos;
+  }
+
+  @PutMapping(value = "/{arrayRunId}/samples")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void saveSamples(@PathVariable long arrayRunId, @RequestBody List<ArrayRunSampleDto> dtos) throws IOException {
+      RestUtils.retrieve("Array Run", arrayRunId, arrayRunService);
+      List<ArrayRunSample> samples = dtos.stream().map(Dtos::to).collect(Collectors.toList());
+      arrayRunSampleService.save(samples);
   }
 
   @PutMapping(value = "/{arrayRunId}")

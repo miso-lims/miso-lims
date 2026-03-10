@@ -80,6 +80,7 @@ Urls = (function () {
     projectDatatable: idUrlFunction(arrayRunRestBase + "/dt/project"),
     requisitionDatatable: idUrlFunction(arrayRunRestBase + "/dt/requisition"),
     arraySearch: arrayRunRestBase + "/array-search",
+    samples: middleIdUrlFunction(arrayRunRestBase, "/samples")
   };
 
   // Assays

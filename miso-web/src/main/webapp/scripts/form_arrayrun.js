@@ -133,7 +133,7 @@ FormTarget.arrayrun = (function ($) {
                                           label: array.alias,
                                           link: Urls.ui.arrays.edit(array.id),
                                         });
-                                        SampleArray.updateSamplesTable(array);
+                                        ArrayRunSamples.preview(array, object.id);
                                       },
                                     };
                                   })
@@ -160,7 +160,7 @@ FormTarget.arrayrun = (function ($) {
                               label: "",
                               link: null,
                             });
-                            SampleArray.updateSamplesTable(null);
+                            ArrayRunSamples.preview(null, object.id);
                           }
                         );
                       } else {
