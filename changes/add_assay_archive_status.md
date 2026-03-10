@@ -1,1 +1,1 @@
-Archive status is now available for a single assay/version.
+Archive status is now available for assays in pinery.
