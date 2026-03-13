@@ -166,7 +166,7 @@ ListUtils = (function ($) {
     },
     model: {
       term: "model:TEXT",
-      help: "Checks whether the item's model matches",
+      help: "Checks whether the item's instrument model matches",
     },
     archived: {
       term: "is:archived OR not:archived",
