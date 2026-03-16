@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ArrayChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -32,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
+import uk.ac.bbsrc.tgac.miso.persistence.ArrayRunSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.ArrayStore;
 
 @Service
@@ -58,6 +61,9 @@ public class DefaultArrayService implements ArrayService {
 
   @Autowired
   private ChangeLogService changeLogService;
+
+  @Autowired
+  private ArrayRunSampleDao arrayRunSampleDao;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -121,6 +127,7 @@ public class DefaultArrayService implements ArrayService {
     validateChange(array, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     applyChanges(array, managed);
+    cleanupArrayRunSamples(managed);
     return arrayStore.update(managed);
   }
 
@@ -226,6 +233,19 @@ public class DefaultArrayService implements ArrayService {
     changeLog.setUser(authorizationManager.getCurrentUser());
     changeLog.setSummary(String.format("%s removed from %s", sampleName, position));
     changeLogService.create(changeLog);
+  }
+
+  private void cleanupArrayRunSamples(Array array) throws IOException {
+    for (ArrayRun run : arrayRunService.listByArrayId(array.getId())) {
+      for (ArrayRunSample arrayRunSample : arrayRunSampleDao.listByRunId(run.getId())) {
+        Sample expectedSample = array.getSamples().get(arrayRunSample.getPosition());
+        if (expectedSample == null
+            || arrayRunSample.getSample() == null
+            || arrayRunSample.getSample().getId() != expectedSample.getId()) {
+          arrayRunSampleDao.delete(arrayRunSample);
+        }
+      }
+    }
   }
 
   @Override

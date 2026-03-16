@@ -8,9 +8,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
 
 public interface ArrayRunSampleDao {
 
-    ArrayRunSample get(ArrayRun run, String position) throws IOException;
+  ArrayRunSample get(ArrayRun run, String position) throws IOException;
 
-    List<ArrayRunSample> listByRunId(long arrayRunId) throws IOException;
+  List<ArrayRunSample> listByRunId(long arrayRunId) throws IOException;
 
-    void save(ArrayRunSample arrayRunSample) throws IOException;
+  void save(ArrayRunSample arrayRunSample) throws IOException;
+
+  void delete(ArrayRunSample arrayRunSample) throws IOException;
+
+  void deleteByRunId(long arrayRunId) throws IOException;
 }

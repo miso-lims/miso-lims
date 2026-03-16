@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import java.io.IOException;
 import java.util.List;
 
-import org.checkerframework.checker.units.qual.A;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,35 +21,54 @@ import uk.ac.bbsrc.tgac.miso.persistence.ArrayRunSampleDao;
 @Transactional(rollbackFor = Exception.class)
 public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+  @PersistenceContext
+  private EntityManager entityManager;
 
-    private Session currentSession() {
-        return entityManager.unwrap(Session.class);
-    }
+  private Session currentSession() {
+    return entityManager.unwrap(Session.class);
+  }
 
-    @Override
-    public ArrayRunSample get(ArrayRun run, String position) throws IOException {
-        ArrayRunSampleId id = new ArrayRunSampleId();
-        id.setArrayRun(run);
-        id.setPosition(position);
-        ArrayRunSample result = (ArrayRunSample) currentSession().get(ArrayRunSample.class, id);
-        if(result == null){
-            result = new ArrayRunSample(run, position);
-        }
-        return result;
+  @Override
+  public ArrayRunSample get(ArrayRun run, String position) throws IOException {
+    ArrayRunSampleId id = new ArrayRunSampleId();
+    id.setArrayRun(run);
+    id.setPosition(position);
+    ArrayRunSample result = currentSession().get(ArrayRunSample.class, id);
+    if (result == null) {
+      result = new ArrayRunSample(run, position);
     }
+    return result;
+  }
 
-    @Override
-    public List<ArrayRunSample> listByRunId(long arrayRunId) throws IOException {
-        QueryBuilder<ArrayRunSample, ArrayRunSample> builder = new QueryBuilder<>(currentSession(), ArrayRunSample.class, ArrayRunSample.class);
-        Join<ArrayRunSample, ArrayRun> runJoin = builder.getJoin(builder.getRoot(), ArrayRunSample_.arrayRun);
-        builder.addPredicate(builder.getCriteriaBuilder().equal(runJoin.get(ArrayRun_.id), arrayRunId));
-        return builder.getResultList();
-    }
+  @Override
+  public List<ArrayRunSample> listByRunId(long arrayRunId) throws IOException {
+    QueryBuilder<ArrayRunSample, ArrayRunSample> builder =
+        new QueryBuilder<>(currentSession(), ArrayRunSample.class, ArrayRunSample.class);
+    Join<ArrayRunSample, ArrayRun> runJoin = builder.getJoin(builder.getRoot(), ArrayRunSample_.arrayRun);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(runJoin.get(ArrayRun_.id), arrayRunId));
+    return builder.getResultList();
+  }
 
-    @Override
-    public void save(ArrayRunSample arrayRunSample) throws IOException {
-        currentSession().saveOrUpdate(arrayRunSample);
-    }
+  @Override
+  public void save(ArrayRunSample arrayRunSample) throws IOException {
+    currentSession().saveOrUpdate(arrayRunSample);
+  }
+
+  @Override
+  public void delete(ArrayRunSample arrayRunSample) throws IOException {
+    currentSession().createMutationQuery(
+        "delete from ArrayRunSample where arrayRun.id = :runId and array.id = :arrayId and position = :position and sample.id = :sampleId")
+        .setParameter("runId", arrayRunSample.getArrayRun().getId())
+        .setParameter("arrayId", arrayRunSample.getArray().getId())
+        .setParameter("position", arrayRunSample.getPosition())
+        .setParameter("sampleId", arrayRunSample.getSample().getId())
+        .executeUpdate();
+  }
+
+  @Override
+  public void deleteByRunId(long arrayRunId) throws IOException {
+    currentSession().createMutationQuery("delete from ArrayRunSample where arrayRun.id = :runId")
+        .setParameter("runId", arrayRunId)
+        .executeUpdate();
+  }
 }

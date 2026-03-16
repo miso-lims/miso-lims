@@ -374,82 +374,63 @@
         showAjaxErrorDialog(response, textStatus, serverStatus);
       });
   }
-})((window.SampleArray = window.SampleArray || {}), jQuery);
+  function removeRunSampleTableChrome(node) {
+    var previous = node.prev();
+    while (previous.length && (previous.hasClass("ui-toolbar") || previous.hasClass("parsley-error"))) {
+      var toRemove = previous;
+      previous = previous.prev();
+      toRemove.remove();
+    }
+  }
 
-var ArrayRunSamples = (function ($) {
-    function renderTable(data, config) {
-        var table = $("#listingSamplesTable");
-        if(
-            table.length &&
-            $.fn.dataTable &&
-            $.fn.dataTable.fnIsDataTable &&
-            $.fn.dataTable.fnIsDataTable(table[0])
-        ) {
-            table.dataTable().fnDestroy();
-            table.empty();
-            ListState["listingSamplesTable"] = null;
-        }
-        var target = window.ListTarget && ListTarget.arrayrunsample;
-        if(!target){
-            Utils.showOkDialog("Error", ["Array run sample list target not loaded. Please refresh"]);
-            return;
-        }
-        ListUtils.createStaticTable("listingSamplesTable", target, config, data);
-        table.css("width", "100%");
+  SampleArray.updateRunSamplesTable = function (array, arrayRunId) {
+    var table = $("#listingSamplesTable");
+    var wrapper = $("#listingSamplesTable_wrapper");
+    var target = window.ListTarget && ListTarget.arrayrunsample;
+    var id = parseInt(arrayRunId, 10);
+    var config = {};
+    var data;
+
+    if (!table.length || !target) {
+      return;
     }
 
-    function buildPreviewData(array) {
-        if(!array || !array.samples){
-            return [];
-        }
-        return array.samples.map(function (sample, index) {
-            return{
-                id: index,
-                position: sample.coordinates,
-                sampleId: sample.id,
-                sampleName: sample.name,
-                sampleAlias: sample.alias,
-                qcStatusId: null,
-                qcNote: null,
-                qcUserName: "",
-                qcDate: "",
-            };
+    if ($.fn.dataTable && $.fn.dataTable.fnIsDataTable && $.fn.dataTable.fnIsDataTable(table[0])) {
+      table.dataTable().fnDestroy();
+    }
+
+    if (wrapper.length) {
+      removeRunSampleTableChrome(wrapper);
+      wrapper.after('<table id="listingSamplesTable" class="display"></table>');
+      wrapper.remove();
+      table = $("#listingSamplesTable");
+    } else {
+      removeRunSampleTableChrome(table);
+      table.empty();
+    }
+    ListState["listingSamplesTable"] = null;
+
+    if (!isNaN(id)) {
+      config.arrayRunId = id;
+    }
+
+    data = !array || !array.samples
+      ? []
+      : array.samples.map(function (sample, index) {
+          return {
+            id: index,
+            position: sample.coordinates,
+            sampleId: sample.id,
+            sampleName: sample.name,
+            sampleAlias: sample.alias,
+            qcStatusId: null,
+            qcNote: null,
+            qcUserName: "",
+            qcDate: "",
+          };
         });
-    }
 
-    return {
-        load: function (arrayRunId) {
-            var id = parseInt(arrayRunId, 10);
-            if(isNaN(id)) {
-                Utils.showOkDialog("Error", ["Invalid Array Run ID"]);
-                return;
-            }
-
-            $.ajax({
-                url: Urls.rest.arrayRuns.samples(id),
-                type: "GET",
-                dataType: "json",
-            })
-            .done(function(data){
-                renderTable(data, {
-                    arrayRunId: id,
-                });
-            })
-            .fail(function(xhr, textStatus, errorThrown) {
-                Utils.showAjaxErrorDialog(xhr,textStatus,errorThrown);
-            });
-        },
-
-        preview: function (array, arrayRunId) {
-            var id = parseInt(arrayRunId, 10);
-            if(isNaN(id)) {
-                Utils.showOkDialog("Error", ["Invalid Array Run ID"]);
-                return;
-            }
-
-            renderTable(buildPreviewData(array), {
-                arrayRunId: id,
-            });
-        },
-    };
-})(jQuery);
+    ListUtils.createStaticTable("listingSamplesTable", target, config, data);
+    table.css("width", "100%");
+  };
+})((window.SampleArray = window.SampleArray || {}), jQuery);

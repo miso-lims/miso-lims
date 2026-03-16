@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 public class ArrayRunSampleDto {
 
+    // This ID is only for the sake of DataTables selection and doesn't relate to anything in the DB
     private Long id;
     private Long arrayRunId;
     private String position;

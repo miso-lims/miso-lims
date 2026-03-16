@@ -5,6 +5,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
@@ -23,6 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.persistence.ArrayRunSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.ArrayRunStore;
 
 @Service
@@ -48,6 +52,9 @@ public class DefaultArrayRunService implements ArrayRunService {
 
   @Autowired
   private SampleService sampleService;
+
+  @Autowired
+  private ArrayRunSampleDao arrayRunSampleDao;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -113,7 +120,9 @@ public class DefaultArrayRunService implements ArrayRunService {
     loadChildEntities(arrayRun);
     arrayRun.setChangeDetails(authorizationManager.getCurrentUser());
     validateChange(arrayRun, null);
-    return arrayRunStore.create(arrayRun);
+    long id = arrayRunStore.create(arrayRun);
+    syncArrayRunSamples(get(id));
+    return id;
   }
 
   @Override
@@ -121,9 +130,15 @@ public class DefaultArrayRunService implements ArrayRunService {
     loadChildEntities(arrayRun);
     ArrayRun managed = get(arrayRun.getId());
     validateChange(arrayRun, managed);
+    if (managed.getArray() != null
+        && (arrayRun.getArray() == null || managed.getArray().getId() != arrayRun.getArray().getId())) {
+      arrayRunSampleDao.deleteByRunId(managed.getId());
+    }
     applyChanges(arrayRun, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    return arrayRunStore.update(managed);
+    long id = arrayRunStore.update(managed);
+    syncArrayRunSamples(get(id));
+    return id;
   }
 
   @Override
@@ -237,6 +252,19 @@ public class DefaultArrayRunService implements ArrayRunService {
     to.setQcDate(from.getQcDate());
   }
 
+  private void syncArrayRunSamples(ArrayRun run) throws IOException {
+    if (run == null || run.getArray() == null || run.getArray().getSamples() == null) {
+      return;
+    }
+    for (Map.Entry<String, Sample> entry : run.getArray().getSamples().entrySet()) {
+      ArrayRunSample sample = arrayRunSampleDao.get(run, entry.getKey());
+      sample.setArray(run.getArray());
+      sample.setSample(entry.getValue());
+      sample.setLastModifier(authorizationManager.getCurrentUser());
+      arrayRunSampleDao.save(sample);
+    }
+  }
+
   @Override
   public DeletionStore getDeletionStore() {
     return deletionStore;
@@ -245,5 +273,10 @@ public class DefaultArrayRunService implements ArrayRunService {
   @Override
   public void authorizeDeletion(ArrayRun object) throws IOException {
     authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public void beforeDelete(ArrayRun object) throws IOException {
+    arrayRunSampleDao.deleteByRunId(object.getId());
   }
 }

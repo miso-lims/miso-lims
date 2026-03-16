@@ -38,6 +38,20 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
   }
 
   @Override
+  public long create(ArrayRun object) throws IOException {
+    long id = super.create(object);
+    currentSession().flush();
+    return id;
+  }
+
+  @Override
+  public long update(ArrayRun object) throws IOException {
+    long id = super.update(object);
+    currentSession().flush();
+    return id;
+  }
+
+  @Override
   public ArrayRun getByAlias(String alias) throws IOException {
     return getBy(ArrayRun_.ALIAS, alias);
   }

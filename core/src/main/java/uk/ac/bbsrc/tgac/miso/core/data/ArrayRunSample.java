@@ -53,7 +53,8 @@ public class ArrayRunSample implements Serializable {
             this.position = position;
         }
 
-        public boolean equals(Objects obj) {
+        @Override
+        public boolean equals(Object obj) {
             return LimsUtils.equals(this, obj,
                     ArrayRunSampleId::getArrayRun,
                     ArrayRunSampleId::getPosition);
@@ -68,9 +69,12 @@ public class ArrayRunSample implements Serializable {
     private static  final long serialVersionUID = 1L;
 
     @Id
+    @ManyToOne
+    @JoinColumn(name = "arrayRunId")
     private ArrayRun arrayRun;
 
     @Id
+    @Column(name = "position")
     private String position;
 
     @ManyToOne
@@ -178,5 +182,3 @@ public class ArrayRunSample implements Serializable {
         this.lastModifier = lastModifier;
     }
 }
-
-
