@@ -335,6 +335,13 @@ public class HibernateRunDao extends HibernateSaveDao<Run>
   }
 
   @Override
+  public void restrictPaginationByModel(QueryBuilder<?, Run> builder, String query, Consumer<String> errorHandler) {
+    Join<Run, InstrumentImpl> sequencer = builder.getJoin(builder.getRoot(), Run_.sequencer);
+    Join<InstrumentImpl, InstrumentModel> model = builder.getJoin(sequencer, InstrumentImpl_.instrumentModel);
+    builder.addTextRestriction(model.get(InstrumentModel_.alias), query);
+  }
+
+  @Override
   public String getFriendlyName() {
     return "Run";
   }
