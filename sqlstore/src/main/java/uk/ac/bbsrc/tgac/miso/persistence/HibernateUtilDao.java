@@ -20,4 +20,8 @@ public class HibernateUtilDao {
     entityManager.detach(entity);
   }
 
+  public void flush() {
+    entityManager.flush();
+  }
+
 }

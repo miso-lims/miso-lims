@@ -46,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeHolder;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
+import uk.ac.bbsrc.tgac.miso.persistence.HibernateUtilDao;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
 
 @Transactional(rollbackFor = Exception.class)
@@ -65,6 +66,8 @@ public class DefaultProjectService implements ProjectService {
   private AuthorizationManager authorizationManager;
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private HibernateUtilDao hibernateUtilDao;
   @Autowired
   private FileAttachmentService fileAttachmentService;
   @Autowired
@@ -125,20 +128,23 @@ public class DefaultProjectService implements ProjectService {
 
   @Override
   public long update(Project project) throws IOException {
-    Project original = projectStore.get(project.getId());
+    Project managed = projectStore.get(project.getId());
     for (ProjectContact item : project.getContacts()) {
       saveNewContact(item.getContact());
     }
 
     loadChildEntities(project);
-    validateChange(project, original);
-    applyChanges(original, project);
-    for (ProjectContact item : original.getContacts()) {
-      item.setProject(original);
-    }
-    project = original;
-    project.setChangeDetails(authorizationManager.getCurrentUser());
-    return projectStore.update(project);
+    validateChange(project, managed);
+    managed.setChangeDetails(authorizationManager.getCurrentUser());
+    applyChanges(managed, project);
+
+    // Save and flush the project before making contact changes; otherwise, Hibernate saves the ProjectContact first and
+    // the change details haven't been updated when the changelog is generated
+    projectStore.update(managed);
+    hibernateUtilDao.flush();
+
+    applyContactChanges(managed, project);
+    return projectStore.update(managed);
   }
 
   private void saveNewContact(Contact contact) throws IOException {
@@ -243,19 +249,21 @@ public class DefaultProjectService implements ProjectService {
     original.setSamplesExpected(project.getSamplesExpected());
     original.setAdditionalDetails(project.getAdditionalDetails());
     applySetChanges(original.getDeliverables(), project.getDeliverables());
-    applySetChangesContacts(original.getContacts(), project.getContacts());
-    ValidationUtils.applySetChanges(original.getAssays(), project.getAssays());
+    applySetChanges(original.getAssays(), project.getAssays());
   }
 
 
-  public void applySetChangesContacts(List<ProjectContact> to, List<ProjectContact> from) {
-    to.removeIf(
-        toItem -> from.stream().noneMatch(fromItem -> contactsMatch(toItem, fromItem)));
-    from.forEach(fromItem -> {
-      if (to.stream().noneMatch(toItem -> contactsMatch(fromItem, toItem))) {
-        to.add(fromItem);
+  public void applyContactChanges(Project to, Project from) {
+    to.getContacts().removeIf(
+        toItem -> from.getContacts().stream().noneMatch(fromItem -> contactsMatch(toItem, fromItem)));
+    from.getContacts().forEach(fromItem -> {
+      if (to.getContacts().stream().noneMatch(toItem -> contactsMatch(fromItem, toItem))) {
+        to.getContacts().add(fromItem);
       }
     });
+    for (ProjectContact item : to.getContacts()) {
+      item.setProject(to);
+    }
   }
 
   private static boolean contactsMatch(ProjectContact a, ProjectContact b) {
