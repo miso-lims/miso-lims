@@ -33,6 +33,7 @@ public class Assay implements Aliasable, Deletable, Serializable {
   private String version;
 
   private String description;
+  private boolean draft = false;
   private boolean archived = false;
 
   private Integer caseTargetDays;
@@ -102,6 +103,14 @@ public class Assay implements Aliasable, Deletable, Serializable {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public boolean isDraft() {
+    return draft;
+  }
+
+  public void setDraft(boolean draft) {
+    this.draft = draft;
   }
 
   public boolean isArchived() {

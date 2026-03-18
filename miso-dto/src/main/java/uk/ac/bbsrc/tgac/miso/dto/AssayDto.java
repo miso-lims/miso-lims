@@ -13,6 +13,7 @@ public class AssayDto {
   private String alias;
   private String version;
   private String description;
+  private boolean draft;
   private boolean archived;
   private List<AssayTestDto> tests;
   private List<AssayMetricDto> metrics;
@@ -33,6 +34,7 @@ public class AssayDto {
     setString(to::setAlias, from.getAlias());
     setString(to::setVersion, from.getVersion());
     setString(to::setDescription, from.getDescription());
+    setBoolean(to::setDraft, from.isDraft(), false);
     setBoolean(to::setArchived, from.isArchived(), false);
     to.setTests(from.getAssayTests().stream().map(AssayTestDto::from).collect(Collectors.toList()));
     to.setMetrics(from.getAssayMetrics().stream().map(AssayMetricDto::from).collect(Collectors.toList()));
@@ -78,6 +80,14 @@ public class AssayDto {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public boolean isDraft() {
+    return draft;
+  }
+
+  public void setDraft(boolean draft) {
+    this.draft = draft;
   }
 
   public boolean isArchived() {
@@ -182,6 +192,7 @@ public class AssayDto {
     setString(to::setAlias, getAlias());
     setString(to::setVersion, getVersion());
     setString(to::setDescription, getDescription());
+    setBoolean(to::setDraft, isDraft(), false);
     setBoolean(to::setArchived, isArchived(), false);
     if (getTests() != null) {
       getTests().stream().map(AssayTestDto::to).forEach(x -> to.getAssayTests().add(x));

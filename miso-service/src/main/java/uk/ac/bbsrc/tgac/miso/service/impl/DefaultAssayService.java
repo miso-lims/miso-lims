@@ -121,6 +121,7 @@ public class DefaultAssayService extends AbstractSaveService<Assay> implements A
   protected void applyChanges(Assay to, Assay from) throws IOException {
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
+    to.setDraft(from.isDraft());
     to.setArchived(from.isArchived());
     ValidationUtils.applySetChanges(to.getAssayTests(), from.getAssayTests());
     applyMetricChanges(to, from.getAssayMetrics());
