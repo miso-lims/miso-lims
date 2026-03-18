@@ -5,6 +5,7 @@ public class ArrayRunSampleDto {
     // This ID is only for the sake of DataTables selection and doesn't relate to anything in the DB
     private Long id;
     private Long arrayRunId;
+    private Long arrayId;
     private String position;
     private Long sampleId;
     private String sampleName;
@@ -28,6 +29,14 @@ public class ArrayRunSampleDto {
 
     public void setArrayRunId(Long arrayRunId) {
         this.arrayRunId = arrayRunId;
+    }
+
+    public Long getArrayId() {
+        return arrayId;
+    }
+
+    public void setArrayId(Long arrayId) {
+        this.arrayId = arrayId;
     }
 
     public String getPosition() {

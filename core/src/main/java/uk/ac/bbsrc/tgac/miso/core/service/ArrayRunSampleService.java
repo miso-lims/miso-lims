@@ -12,6 +12,10 @@ public interface ArrayRunSampleService {
 
     List<ArrayRunSample> listByRunId(long arrayRunId) throws IOException;
 
+    void delete(ArrayRunSample arrayRunSample) throws IOException;
+
+    void deleteByRunId(long arrayRunId) throws IOException;
+
     void save(ArrayRunSample arrayRunSample) throws IOException;
 
     void save(List<ArrayRunSample> arrayRunSamples) throws IOException;

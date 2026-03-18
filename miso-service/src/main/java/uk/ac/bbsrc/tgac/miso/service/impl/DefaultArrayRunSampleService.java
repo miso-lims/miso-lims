@@ -48,13 +48,23 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
 
   @Override
   public ArrayRunSample get(ArrayRun run, String position) throws IOException {
-    return arrayRunSampleDao.get(run, position);
+    if (run == null || run.getArray() == null || position == null || !run.getArray().isPositionValid(position)) {
+      return null;
+    }
+    Sample sample = run.getArray().getSample(position);
+    if (sample == null) {
+      return null;
+    }
+    return arrayRunSampleDao.get(run, run.getArray(), position, sample);
   }
 
   @Override
   public List<ArrayRunSample> listByRunId(long arrayRunId) throws IOException {
     ArrayRun run = arrayRunService.get(arrayRunId);
-    if (run == null || run.getArray() == null) {
+    if (run == null) {
+      throw new IllegalArgumentException("Array run not found: " + arrayRunId);
+    }
+    if (run.getArray() == null) {
       return Collections.emptyList();
     }
 
@@ -62,10 +72,6 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
     List<ArrayRunSample> existing = arrayRunSampleDao.listByRunId(arrayRunId);
     Map<String, Sample> samples = array.getSamples();
     if (samples == null || samples.isEmpty()) {
-      if (!existing.isEmpty()) {
-        throw new IllegalStateException(
-            String.format("Array run %d has saved samples, but array %d has no samples", arrayRunId, array.getId()));
-      }
       return Collections.emptyList();
     }
 
@@ -77,15 +83,23 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
     for (Map.Entry<String, Sample> entry : samples.entrySet()) {
       ArrayRunSample item = byPosition.get(entry.getKey());
       if (item == null) {
-        item = arrayRunSampleDao.get(run, entry.getKey());
+        item = arrayRunSampleDao.get(run, array, entry.getKey(), entry.getValue());
       }
-      item.setArray(array);
-      item.setSample(entry.getValue());
       results.add(item);
     }
 
     results.sort(Comparator.comparing(ArrayRunSample::getPosition));
     return results;
+  }
+
+  @Override
+  public void delete(ArrayRunSample arrayRunSample) throws IOException {
+    arrayRunSampleDao.delete(arrayRunSample);
+  }
+
+  @Override
+  public void deleteByRunId(long arrayRunId) throws IOException {
+    arrayRunSampleDao.deleteByRunId(arrayRunId);
   }
 
   @Override
@@ -97,54 +111,64 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
 
   @Override
   public void save(ArrayRunSample arrayRunSample) throws IOException {
+    loadChildEntities(arrayRunSample);
+    validateChange(arrayRunSample);
+    Sample expectedSample = arrayRunSample.getArrayRun().getArray().getSample(arrayRunSample.getPosition());
+    ArrayRunSample managed = arrayRunSampleDao.get(arrayRunSample.getArrayRun(), arrayRunSample.getArrayRun().getArray(),
+        arrayRunSample.getPosition(), expectedSample);
+    User user = authorizationManager.getCurrentUser();
+    updateQcDetails(arrayRunSample, managed, ArrayRunSample::getQcStatus, ArrayRunSample::getQcUser,
+        ArrayRunSample::setQcUser, authorizationManager, ArrayRunSample::getQcDate, ArrayRunSample::setQcDate);
+
+    List<ValidationError> errors = new ArrayList<>();
+    validateQcUser(arrayRunSample.getQcStatus(), arrayRunSample.getQcUser(), errors);
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
+    }
+
+    applyChanges(arrayRunSample, managed, user);
+    arrayRunSampleDao.save(managed);
+  }
+
+  private void loadChildEntities(ArrayRunSample arrayRunSample) throws IOException {
     loadChildEntity(arrayRunSample::setArrayRun, arrayRunSample.getArrayRun(), arrayRunService, "arrayRunId");
+    loadChildEntity(arrayRunSample::setQcStatus, arrayRunSample.getQcStatus(), runItemQcStatusService, "qcStatusId");
+  }
+
+  private void validateChange(ArrayRunSample arrayRunSample) {
+    List<ValidationError> errors = new ArrayList<>();
     ArrayRun run = arrayRunSample.getArrayRun();
     Array array = run.getArray();
-    List<ValidationError> errors = new ArrayList<>();
 
     if (array == null) {
-      errors.add(new ValidationError("arrayRunId", "Array Run has no array"));
+      errors.add(new ValidationError("arrayRunId", "Array run has no array"));
     } else {
+      if (arrayRunSample.getArray() == null || arrayRunSample.getArray().getId() != array.getId()) {
+        errors.add(new ValidationError("arrayId", "Array does not match array run"));
+      }
       String position = arrayRunSample.getPosition();
       if (position == null || !array.isPositionValid(position)) {
         errors.add(new ValidationError("position", "Invalid array position"));
       } else {
         Sample expectedSample = array.getSample(position);
         if (expectedSample == null) {
-          errors.add(new ValidationError("position", "No Sample at this position"));
+          errors.add(new ValidationError("position", "No sample at this position"));
         } else if (arrayRunSample.getSample() == null || arrayRunSample.getSample().getId() != expectedSample.getId()) {
           errors.add(new ValidationError("sampleId", "Sample does not match array position"));
         }
       }
     }
 
-    loadChildEntity(arrayRunSample::setQcStatus, arrayRunSample.getQcStatus(), runItemQcStatusService, "qcStatusId");
-
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
+  }
 
-    String position = arrayRunSample.getPosition();
-    Sample expectedSample = array.getSample(position);
-    ArrayRunSample managed = arrayRunSampleDao.get(run, position);
-    managed.setArray(array);
-    managed.setSample(expectedSample);
-
-    User user = authorizationManager.getCurrentUser();
-    updateQcDetails(arrayRunSample, managed, ArrayRunSample::getQcStatus, ArrayRunSample::getQcUser,
-        ArrayRunSample::setQcUser, authorizationManager, ArrayRunSample::getQcDate, ArrayRunSample::setQcDate);
-
-    errors = new ArrayList<>();
-    validateQcUser(arrayRunSample.getQcStatus(), arrayRunSample.getQcUser(), errors);
-    if (!errors.isEmpty()) {
-      throw new ValidationException(errors);
-    }
-
-    managed.setQcStatus(arrayRunSample.getQcStatus());
-    managed.setQcNote(arrayRunSample.getQcNote());
-    managed.setQcUser(arrayRunSample.getQcUser());
-    managed.setQcDate(arrayRunSample.getQcDate());
-    managed.setLastModifier(user);
-    arrayRunSampleDao.save(managed);
+  private void applyChanges(ArrayRunSample from, ArrayRunSample to, User user) {
+    to.setQcStatus(from.getQcStatus());
+    to.setQcNote(from.getQcNote());
+    to.setQcUser(from.getQcUser());
+    to.setQcDate(from.getQcDate());
+    to.setLastModifier(user);
   }
 }

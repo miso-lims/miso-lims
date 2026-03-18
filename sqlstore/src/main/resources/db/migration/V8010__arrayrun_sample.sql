@@ -23,26 +23,3 @@ CREATE TABLE ArrayRun_Sample (
   CONSTRAINT fk_arrayRunSample_lastModifier FOREIGN KEY (lastModifier) REFERENCES User (userId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO ArrayRun_Sample (
-  arrayRunId,
-  position,
-  arrayId,
-  sampleId,
-  statusId,
-  qcNote,
-  qcUser,
-  qcDate,
-  lastModifier
-)
-SELECT
-  ar.arrayRunId,
-  ap.position,
-  ar.arrayId,
-  ap.sampleId,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  ar.lastModifier
-FROM ArrayRun ar
-JOIN ArrayPosition ap ON ap.arrayId = ar.arrayId;

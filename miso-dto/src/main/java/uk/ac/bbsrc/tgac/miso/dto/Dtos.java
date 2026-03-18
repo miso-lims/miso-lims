@@ -3388,6 +3388,7 @@ public class Dtos {
   public static  ArrayRunSampleDto asDto(@Nonnull ArrayRunSample from) {
       ArrayRunSampleDto dto = new ArrayRunSampleDto();
       setId(dto::setArrayRunId, from.getArrayRun());
+      setId(dto::setArrayId, from.getArray());
       setString(dto::setPosition, from.getPosition());
       setId(dto::setSampleId, from.getSample());
       setString(dto::setSampleName, maybeGetProperty(from.getSample(), Sample::getName));
@@ -3444,6 +3445,7 @@ public class Dtos {
   public static ArrayRunSample to(@Nonnull ArrayRunSampleDto from) {
       ArrayRunSample sample = new ArrayRunSample();
       setObject(sample::setArrayRun, ArrayRun::new, from.getArrayRunId());
+      setObject(sample::setArray, Array::new, from.getArrayId());
       setString(sample::setPosition, from.getPosition());
       setObject(sample::setSample, SampleImpl::new, from.getSampleId());
       setObject(sample::setQcStatus, RunItemQcStatus::new, from.getQcStatusId());

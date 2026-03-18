@@ -21,20 +21,23 @@ public class ArrayRunSample implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
-        @ManyToOne
-        @JoinColumn(name = "arrayRunId")
         private ArrayRun arrayRun;
 
-        @Column(name = "position")
+        private Array array;
+
         private String position;
+
+        private Sample sample;
 
         public ArrayRunSampleId() {
 
         }
 
-        public ArrayRunSampleId(ArrayRun arrayRun, String position) {
+        public ArrayRunSampleId(ArrayRun arrayRun, Array array, String position, Sample sample) {
             this.arrayRun = arrayRun;
+            this.array = array;
             this.position = position;
+            this.sample = sample;
         }
 
         public ArrayRun getArrayRun() {
@@ -45,6 +48,14 @@ public class ArrayRunSample implements Serializable {
             this.arrayRun = arrayRun;
         }
 
+        public Array getArray() {
+            return array;
+        }
+
+        public void setArray(Array array) {
+            this.array = array;
+        }
+
         public String getPosition() {
             return position;
         }
@@ -53,16 +64,26 @@ public class ArrayRunSample implements Serializable {
             this.position = position;
         }
 
+        public Sample getSample() {
+            return sample;
+        }
+
+        public void setSample(Sample sample) {
+            this.sample = sample;
+        }
+
         @Override
         public boolean equals(Object obj) {
             return LimsUtils.equals(this, obj,
                     ArrayRunSampleId::getArrayRun,
-                    ArrayRunSampleId::getPosition);
+                    ArrayRunSampleId::getArray,
+                    ArrayRunSampleId::getPosition,
+                    ArrayRunSampleId::getSample);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(getArrayRun(), getPosition());
+            return Objects.hash(getArrayRun(), getArray(), getPosition(), getSample());
         }
     }
 
@@ -74,13 +95,15 @@ public class ArrayRunSample implements Serializable {
     private ArrayRun arrayRun;
 
     @Id
-    @Column(name = "position")
-    private String position;
-
     @ManyToOne
     @JoinColumn(name = "arrayId")
     private Array array;
 
+    @Id
+    @Column(name = "position")
+    private String position;
+
+    @Id
     @ManyToOne(targetEntity = SampleImpl.class)
     @JoinColumn(name = "sampleId")
     private Sample sample;
@@ -105,9 +128,11 @@ public class ArrayRunSample implements Serializable {
 
     }
 
-    public ArrayRunSample(ArrayRun arrayRun, String position) {
+    public ArrayRunSample(ArrayRun arrayRun, Array array, String position, Sample sample) {
         this.arrayRun = arrayRun;
+        this.array = array;
         this.position = position;
+        this.sample = sample;
     }
 
     public ArrayRun getArrayRun() {

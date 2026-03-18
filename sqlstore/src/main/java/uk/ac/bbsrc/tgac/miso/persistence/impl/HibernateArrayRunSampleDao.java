@@ -10,9 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.Join;
+import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample.ArrayRunSampleId;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample_;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun_;
 import uk.ac.bbsrc.tgac.miso.persistence.ArrayRunSampleDao;
@@ -29,13 +31,15 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
   }
 
   @Override
-  public ArrayRunSample get(ArrayRun run, String position) throws IOException {
+  public ArrayRunSample get(ArrayRun run, Array array, String position, Sample sample) throws IOException {
     ArrayRunSampleId id = new ArrayRunSampleId();
     id.setArrayRun(run);
+    id.setArray(array);
     id.setPosition(position);
+    id.setSample(sample);
     ArrayRunSample result = currentSession().get(ArrayRunSample.class, id);
     if (result == null) {
-      result = new ArrayRunSample(run, position);
+      result = new ArrayRunSample(run, array, position, sample);
     }
     return result;
   }

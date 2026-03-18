@@ -24,6 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ArrayChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunSampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
@@ -34,7 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
-import uk.ac.bbsrc.tgac.miso.persistence.ArrayRunSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.ArrayStore;
 
 @Service
@@ -63,7 +63,7 @@ public class DefaultArrayService implements ArrayService {
   private ChangeLogService changeLogService;
 
   @Autowired
-  private ArrayRunSampleDao arrayRunSampleDao;
+  private ArrayRunSampleService arrayRunSampleService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -237,12 +237,12 @@ public class DefaultArrayService implements ArrayService {
 
   private void cleanupArrayRunSamples(Array array) throws IOException {
     for (ArrayRun run : arrayRunService.listByArrayId(array.getId())) {
-      for (ArrayRunSample arrayRunSample : arrayRunSampleDao.listByRunId(run.getId())) {
+      for (ArrayRunSample arrayRunSample : arrayRunSampleService.listByRunId(run.getId())) {
         Sample expectedSample = array.getSamples().get(arrayRunSample.getPosition());
         if (expectedSample == null
             || arrayRunSample.getSample() == null
             || arrayRunSample.getSample().getId() != expectedSample.getId()) {
-          arrayRunSampleDao.delete(arrayRunSample);
+          arrayRunSampleService.delete(arrayRunSample);
         }
       }
     }

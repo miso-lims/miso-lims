@@ -18,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunSampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
@@ -26,7 +27,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.persistence.ArrayRunSampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.ArrayRunStore;
 
 @Service
@@ -54,7 +54,7 @@ public class DefaultArrayRunService implements ArrayRunService {
   private SampleService sampleService;
 
   @Autowired
-  private ArrayRunSampleDao arrayRunSampleDao;
+  private ArrayRunSampleService arrayRunSampleService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -132,7 +132,7 @@ public class DefaultArrayRunService implements ArrayRunService {
     validateChange(arrayRun, managed);
     if (managed.getArray() != null
         && (arrayRun.getArray() == null || managed.getArray().getId() != arrayRun.getArray().getId())) {
-      arrayRunSampleDao.deleteByRunId(managed.getId());
+      arrayRunSampleService.deleteByRunId(managed.getId());
     }
     applyChanges(arrayRun, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
@@ -257,11 +257,12 @@ public class DefaultArrayRunService implements ArrayRunService {
       return;
     }
     for (Map.Entry<String, Sample> entry : run.getArray().getSamples().entrySet()) {
-      ArrayRunSample sample = arrayRunSampleDao.get(run, entry.getKey());
-      sample.setArray(run.getArray());
-      sample.setSample(entry.getValue());
+      ArrayRunSample sample = arrayRunSampleService.get(run, entry.getKey());
+      if (sample == null) {
+        sample = new ArrayRunSample(run, run.getArray(), entry.getKey(), entry.getValue());
+      }
       sample.setLastModifier(authorizationManager.getCurrentUser());
-      arrayRunSampleDao.save(sample);
+      arrayRunSampleService.save(sample);
     }
   }
 
@@ -277,6 +278,6 @@ public class DefaultArrayRunService implements ArrayRunService {
 
   @Override
   public void beforeDelete(ArrayRun object) throws IOException {
-    arrayRunSampleDao.deleteByRunId(object.getId());
+    arrayRunSampleService.deleteByRunId(object.getId());
   }
 }
