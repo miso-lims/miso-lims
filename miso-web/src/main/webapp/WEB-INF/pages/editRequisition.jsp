@@ -11,6 +11,8 @@
         <button id="save" type="button" class="fg-button ui-state-default ui-corner-all">Save</button>
       </h1>
 
+      <div id="warnings"></div>
+
       <form:form id="requisitionForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 
       <br />
@@ -184,6 +186,7 @@
             assayConfig["numberOfRequisitionedItems"] = ${numberOfRequisitionedItems};
           </c:if>
 
+          Warning.generateHeaderWarnings('warnings', WarningTarget.requisition, requisition);
           var form = FormUtils.createForm('requisitionForm', 'save', requisition, 'requisition', config);
           Requisition.setForm(form);
           Utils.ui.updateHelpLink(FormTarget.requisition.getUserManualUrl());
