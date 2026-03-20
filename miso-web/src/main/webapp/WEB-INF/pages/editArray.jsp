@@ -48,44 +48,71 @@
   <br/>
   <h1>Samples</h1>
   <div id="arraySamplesSection">
+    <div class="note">
+      Hold down Ctrl (Windows, Linux) or Command (Mac) to select multiple positions.
+      Click a column header to select the entire column.
+    </div>
     <div id="arraySamplesVisual" class="unselectable" style="float:left;margin:20px;"></div>
-    <div style="float:left;padding:20px;">
+    <div id="singlePositionControls" style="float:left;padding:20px;">
       <table id="selectedPositionInfo">
+        <tr>
+          <td>Selected Position:</td><td><span id="selectedPosition"></span></td>
+        </tr>
+        <tr>
+          <td>Name:</td><td><span id="selectedName"></span></td>
+        </tr>
+        <tr>
+          <td>Alias:</td><td><span id="selectedAlias"></span></td>
+        </tr>
+        <tr>
+          <td>Barcode:</td><td><span id="selectedBarcode"></span></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>
+            <button id="removeSelected" class="ui-state-default" onclick="SampleArray.removeSelected()">Remove Sample</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Search:</td>
+          <td>
+            <input id="searchField" type="text"/>
+            <button id="search" class="ui-state-default" onclick="SampleArray.searchSamples()">Lookup</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Results:</td>
+          <td>
+            <img id="ajaxLoader" src="/styles/images/ajax-loader.gif" class="fg-button hidden"/>
+            <select id="resultSelect"/></select>
+            <button id="updateSelected" class="ui-state-default" onclick="SampleArray.updatePosition()">Update Selected</button>
+          </td>
+        </tr>
+      </table>
+      <ul class="warning" id="warningMessages"></ul>
+    </div>
+    <div id="bulkPositionControls" style="display:none; float:left; padding:10px; margin:20px; border:1px solid darkgrey; max-height:340px; overflow-y:scroll;">
+      <button class="ui-state-default" onclick="SampleArray.removeSelected();">Remove Selected</button>
+      <br/><br/>
+      <table id="bulkUpdateTable">
+        <thead>
           <tr>
-            <td>Selected Position:</td><td><span id="selectedPosition"></span></td>
+            <th>Position</th>
+            <th>Search</th>
           </tr>
-          <tr>
-            <td>Name:</td><td><span id="selectedName"></span></td>
-          </tr>
-          <tr>
-            <td>Alias:</td><td><span id="selectedAlias"></span></td>
-          </tr>
-          <tr>
-            <td>Barcode:</td><td><span id="selectedBarcode"></span></td>
-          </tr>
+        </thead>
+        <tbody>
+          <!-- contents added via js -->
+        </tbody>
+        <tfoot>
           <tr>
             <td></td>
             <td>
-              <button id="removeSelected" class="ui-state-default" onclick="SampleArray.removeSelected()">Remove Sample</button>
+              <button id="bulkUpdate" class="ui-state-default" onclick="SampleArray.bulkUpdatePositions();">Update</button>
             </td>
           </tr>
-          <tr>
-            <td>Search:</td>
-            <td>
-              <input id="searchField" type="text"/>
-              <button id="search" class="ui-state-default" onclick="SampleArray.searchSamples()">Lookup</button>
-            </td>
-          </tr>
-          <tr>
-            <td>Results:</td>
-            <td>
-              <img id="ajaxLoader" src="/styles/images/ajax-loader.gif" class="fg-button hidden"/>
-              <select id="resultSelect"/></select>
-              <button id="updateSelected" class="ui-state-default" onclick="SampleArray.updatePosition()">Update Position</button>
-            </td>
-          </tr>
+        </tfoot>
       </table>
-      <ul class="warning" id="warningMessages"></ul>
     </div>
   </div>
   

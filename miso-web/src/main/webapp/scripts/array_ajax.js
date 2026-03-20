@@ -24,7 +24,7 @@
   };
 
   SampleArray.getColLabel = function (col) {
-    return positionStringifier.getRowLabel(col);
+    return SampleArray.getRowLabel(col);
   };
 
   SampleArray.getPositionString = function (row, col) {
@@ -35,66 +35,54 @@
     var self = new Box.Visual();
 
     self.isMultiSelectEnabled = function () {
-      return false;
+      return true;
     };
 
     self.onSelectionChanged = function (items) {
-      var position = null;
-      if (items.length > 0) {
-        position = items[0].position;
-      }
-      var sample = Utils.array.findFirstOrNull(function (item) {
-        return item.coordinates === position;
-      }, self.data);
+      var positions = items.map(function (item) {
+        return item.position;
+      });
+      var selectedSample = positions.length === 1 ? getItemAtPosition(positions[0]) : null;
 
       clearSampleSearchResults();
+      hideBulkPositionControls();
+      $("#singlePositionControls").show();
 
-      if (sample) {
-        // filled position selected
-        $("#selectedPosition").text(position);
-        $("#selectedName").text(sample.name);
-        if (sample.identificationBarcode) {
-          $("#selectedBarcode").text(sample.identificationBarcode);
+      if (positions.length) {
+        if (positions.length > 1) {
+          $("#singlePositionControls").hide();
+          showBulkPositionControls(positions);
         } else {
-          $("#selectedBarcode").empty();
+          $("#selectedPosition").text(positions[0]);
+          setSelectedSampleDetails(selectedSample);
+          $("#search, #searchField, #resultSelect").prop("disabled", false).removeClass("disabled");
+          $("#removeSelected")
+            .prop("disabled", !selectedSample)
+            .toggleClass("disabled", !selectedSample);
         }
-        $("#selectedAlias").html(
-          Box.utils.hyperlinkifyBoxable(sample.name, sample.id, sample.alias)
-        );
-        $("#selectedName").html(Box.utils.hyperlinkifyBoxable(sample.name, sample.id, sample.name));
-        $("#removeSelected, #searchField, #search").prop("disabled", false).removeClass("disabled");
       } else {
-        // empty position or no position selected
-        if (position) {
-          $("#selectedPosition").text(position);
-        } else {
-          $("#selectedPosition").empty();
-          $("#search, #searchField, #resultSelect, #updateSelected")
-            .prop("disabled", true)
-            .addClass("disabled");
-        }
-        $("#selectedName").empty();
-        $("#selectedAlias").empty();
-        $("#selectedBarcode").empty();
-        $("#updateSelected, #removeSelected").prop("disabled", true).addClass("disabled");
+        $("#selectedPosition").empty();
+        setSelectedSampleDetails(null);
+        $("#search, #searchField, #resultSelect, #updateSelected, #removeSelected")
+          .prop("disabled", true)
+          .addClass("disabled");
       }
+      $("#updateSelected").prop("disabled", true).addClass("disabled");
       $("#warningMessages").html("");
       $("#searchField").val("");
       $("#searchField").select().focus();
     };
 
     self.getRowLabel = function (row) {
-      return row >= 10 ? row : "0" + row;
+      return SampleArray.getRowLabel(row);
     };
 
     self.getColLabel = function (col) {
-      return positionStringifier.getRowLabel(col);
+      return SampleArray.getColLabel(col);
     };
 
     self.getPositionString = function (row, col) {
-      return (
-        "R" + positionStringifier.getRowLabel(row) + "C" + positionStringifier.getColLabel(col)
-      );
+      return SampleArray.getPositionString(row, col);
     };
 
     return self;
@@ -109,22 +97,34 @@
   };
 
   SampleArray.removeSelected = function () {
+    var selectedPositions = getSelectedPositions();
+    if (!selectedPositions.length) {
+      return;
+    }
     showSamplesLoading(true);
-    var selectedPosition = visual.selectedItems[0].position;
 
-    $.ajax({
-      url: Urls.rest.arrays.position(arrayJson.id, selectedPosition),
-      type: "DELETE",
-      dataType: "json",
-    })
-      .done(function (data) {
-        clearSampleSearchResults();
-        SampleArray.setArrayJson(data);
+    var removeNext = function (index) {
+      $.ajax({
+        url: Urls.rest.arrays.position(arrayJson.id, selectedPositions[index]),
+        type: "DELETE",
+        dataType: "json",
       })
-      .fail(function (response, textStatus, serverStatus) {
-        Utils.showOkDialog("Error removing sample", [JSON.parse(response.responseText).detail]);
-        showSamplesLoading(false);
-      });
+        .done(function (data) {
+          if (index + 1 < selectedPositions.length) {
+            removeNext(index + 1);
+          } else {
+            clearSampleSearchResults();
+            SampleArray.setArrayJson(data);
+            showSamplesLoading(false);
+          }
+        })
+        .fail(function (xhr, textStatus, errorThrown) {
+          Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
+          showSamplesLoading(false);
+        });
+    };
+
+    removeNext(0);
   };
 
   SampleArray.searchSamples = function () {
@@ -148,16 +148,15 @@
       .done(function (data) {
         showSampleSearchResults(data);
       })
-      .fail(function (response, textStatus, serverStatus) {
+      .fail(function (xhr, textStatus, errorThrown) {
         clearSampleSearchResults();
-        var error = JSON.parse(response.responseText);
-        var message = error.detail ? error.detail : error.message;
-        Utils.showOkDialog("Search error", [message]);
+        Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
       });
   };
 
   SampleArray.updatePosition = function () {
-    if (visual.selectedItems.length !== 1) {
+    var selectedPositions = getSelectedPositions();
+    if (selectedPositions.length !== 1) {
       $("#warningMessages").html("Please select a single position from the grid, then retry.");
       return;
     } else if ($("#resultSelect").val() == -1) {
@@ -165,71 +164,108 @@
       return;
     }
 
-    var selectedPosition = visual.selectedItems[0].position;
-    var selectedItem = getItemAtPosition(selectedPosition);
+    var sampleId = jQuery("#resultSelect").val();
+    var selectedItems = selectedPositions.map(getItemAtPosition).filter(function (item) {
+      return !!item;
+    });
 
     var addTheItem = function () {
       showSamplesLoading(true);
 
-      var url = Urls.rest.arrays.position(arrayJson.id, selectedPosition) +
-                          "?" +
-                          Utils.page.param({
-                            sampleId: jQuery("#resultSelect").val(),
-                          });
+      var url =
+        Urls.rest.arrays.bulkUpdate(arrayJson.id) +
+        "?" +
+        Utils.page.param({
+          sampleId: sampleId,
+        });
       Utils.ajaxWithDialog(
-      "Update Position",
-      "PUT",
-      url,
-      null,
-      function (data) {
-        clearSampleSearchResults();
-        SampleArray.setArrayJson(data);
-        showSamplesLoading(false);
-      },
-      function(xhr, textStatus, errorThrown) {
-        showSamplesLoading(false);
-        Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
-      },
-      true
+        "Update Position",
+        "PUT",
+        url,
+        selectedPositions,
+        function (data) {
+          clearSampleSearchResults();
+          SampleArray.setArrayJson(data);
+          showSamplesLoading(false);
+        },
+        function (xhr, textStatus, errorThrown) {
+          showSamplesLoading(false);
+          Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
+        },
+        true
       );
     };
 
     var checkConsentAndAdd = function () {
-      var sampleId = $("#resultSelect").val();
       var revoked = Utils.array.findFirstOrNull(function (id) {
         return id == sampleId;
       }, consentRevokedSampleIds);
       if (sampleId && sampleId > 0 && revoked) {
         var lines = ["Donor has revoked consent for the following item."];
-        lines.push("* " + jQuery("#resultSelect").text());
+        lines.push("* " + jQuery("#resultSelect option:selected").text());
         Utils.showConfirmDialog("Warning", "Proceed anyway", lines, addTheItem);
       } else {
         addTheItem();
       }
     };
 
-    if (selectedItem) {
-      if (selectedItem.id == $("#resultSelect").val()) {
-        // setting same item where it already is. No change necessary
-        clearSampleSearchResults();
-        $("#searchField").val("");
-      } else {
-        // if selectedPosition is already filled, confirm before deleting that position
-        Utils.showConfirmDialog(
-          "Replace Sample",
-          "Replace",
-          [
-            selectedItem.alias +
-              " is already located at position " +
-              selectedPosition +
-              ". Replace it?",
-          ],
-          checkConsentAndAdd
-        );
-      }
+    if (
+      selectedItems.length === selectedPositions.length &&
+      selectedItems.every(function (item) {
+        return item.id == sampleId;
+      })
+    ) {
+      clearSampleSearchResults();
+      $("#searchField").val("");
+      return;
+    }
+
+    var replacedItems = selectedItems.filter(function (item) {
+      return item.id != sampleId;
+    });
+    if (replacedItems.length) {
+      var lines = ["The following positions already contain samples:"];
+      replacedItems.forEach(function (item) {
+        lines.push("* " + item.coordinates + ": " + item.alias);
+      });
+      lines.push("Replace them?");
+      Utils.showConfirmDialog("Replace Sample", "Replace", lines, checkConsentAndAdd);
     } else {
       checkConsentAndAdd();
     }
+  };
+
+  SampleArray.bulkUpdatePositions = function () {
+    var inputs = $("#bulkUpdateTable tbody input");
+    if (!inputs.length) {
+      $("#warningMessages").html("Please select one or more positions from the grid, then retry.");
+      return;
+    }
+    var data = [];
+    inputs.each(function (index, input) {
+      data.push({
+        position: $(input).data("position"),
+        searchString: $(input).val() ? $(input).val() : null,
+      });
+    });
+
+    showSamplesLoading(true);
+    Utils.ajaxWithDialog(
+      "Update Positions",
+      "POST",
+      Urls.rest.arrays.bulkUpdateSearch(arrayJson.id),
+      data,
+      function (responseData) {
+        clearSampleSearchResults();
+        SampleArray.setArrayJson(responseData);
+        showSamplesLoading(false);
+      },
+      function (xhr, textStatus, errorThrown) {
+        showSamplesLoading(false);
+        Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
+      },
+      true
+    );
   };
 
   SampleArray.updateSamplesTable = function (array) {
@@ -270,9 +306,104 @@
     showSampleSearchResults();
   }
 
+  function hideBulkPositionControls() {
+    $("#bulkUpdateTable tbody").empty();
+    $("#bulkPositionControls").hide();
+  }
+
+  function showBulkPositionControls(positions) {
+    var body = $("#bulkUpdateTable tbody");
+    body.empty();
+
+    for (var i = 0; i < positions.length; i++) {
+      var position = positions[i];
+      var row = $("<tr>");
+      row.append($("<td>", { text: position }));
+      var inputCell = $("<td>");
+      var input = $('<input type="text" class="bulkUpdateInput"/>');
+      input.data("position", position);
+      if (i < positions.length - 1) {
+        input.keyup(
+          (function () {
+            var nextIndex = i + 1;
+            return function (event) {
+              if (event.which == "13") {
+                $("#bulkUpdateTable tbody input:eq(" + nextIndex + ")").focus();
+              }
+            };
+          })()
+        );
+        input.on(
+          "paste",
+          (function () {
+            var index = i;
+            return function (e) {
+              for (
+                var clipEvent = e;
+                clipEvent.originalEvent && clipEvent.type == "paste";
+                clipEvent = clipEvent.originalEvent
+              );
+              var lines = clipEvent.clipboardData
+                ? clipEvent.clipboardData.getData("Text").split(/\r?\n/)
+                : [];
+              if (lines.length > 1) {
+                for (var next = 0; next < lines.length; next++) {
+                  var inputBox = $("#bulkUpdateTable tbody input:eq(" + next + ")");
+                  inputBox.val(lines[next].replace(/^\s*|\s*$/g, ""));
+                }
+                $("#bulkUpdateTable tbody input:eq(" + next + ")").focus();
+                e.preventDefault();
+                return;
+              }
+              window.setTimeout(function () {
+                $("#bulkUpdateTable tbody input:eq(" + (index + 1) + ")").focus();
+              }, 100);
+            };
+          })()
+        );
+      } else {
+        input.keyup(function (event) {
+          if (event.which == "13") {
+            $("#bulkUpdate").click();
+          }
+        });
+      }
+      inputCell.append(input);
+      row.append(inputCell);
+      body.append(row);
+      if (i === 0) {
+        input.focus();
+      }
+    }
+    $("#bulkPositionControls").show();
+  }
+
+  function getSelectedPositions() {
+    return visual.selectedItems.map(function (item) {
+      return item.position;
+    });
+  }
+
+  function setSelectedSampleDetails(sample) {
+    if (!sample) {
+      $("#selectedName").empty();
+      $("#selectedAlias").empty();
+      $("#selectedBarcode").empty();
+      return;
+    }
+    $("#selectedName").html(Box.utils.hyperlinkifyBoxable(sample.name, sample.id, sample.name));
+    $("#selectedAlias").html(Box.utils.hyperlinkifyBoxable(sample.name, sample.id, sample.alias));
+    if (sample.identificationBarcode) {
+      $("#selectedBarcode").text(sample.identificationBarcode);
+    } else {
+      $("#selectedBarcode").empty();
+    }
+  }
+
   function showSampleSearchResults(results) {
     $("#resultSelect").empty();
     $("#warningMessages").html("");
+    $("#updateSelected").prop("disabled", true).addClass("disabled");
 
     if (!results || !results.length) {
       consentRevokedSampleIds = [];
