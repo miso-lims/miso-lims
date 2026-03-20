@@ -1,0 +1,1 @@
+Multiple positions can be selected and added samples in array.
