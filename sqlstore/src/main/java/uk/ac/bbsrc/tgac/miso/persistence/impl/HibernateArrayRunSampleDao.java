@@ -14,9 +14,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample.ArrayRunSampleId;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample_;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun_;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.persistence.ArrayRunSampleDao;
 
 @Repository
@@ -32,6 +32,21 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
 
   @Override
   public ArrayRunSample get(ArrayRun run, Array array, String position, Sample sample) throws IOException {
+    if (run == null || array == null || sample == null || position == null) {
+      return null;
+    }
+    if (run.getArray() == null || run.getArray().getId() != array.getId()) {
+      return null;
+    }
+    if (!array.isPositionValid(position)) {
+      return null;
+    }
+
+    Sample expectedSample = array.getSample(position);
+    if (expectedSample == null || expectedSample.getId() != sample.getId()) {
+      return null;
+    }
+
     ArrayRunSampleId id = new ArrayRunSampleId();
     id.setArrayRun(run);
     id.setArray(array);

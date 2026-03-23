@@ -120,10 +120,6 @@ public class ArrayRunSample implements Serializable {
 
     private LocalDate qcDate;
 
-    @ManyToOne(targetEntity = UserImpl.class)
-    @JoinColumn(name = "lastModifier")
-    private User lastModifier;
-
     public ArrayRunSample() {
 
     }
@@ -197,13 +193,5 @@ public class ArrayRunSample implements Serializable {
 
     public void setQcDate(LocalDate qcDate) {
         this.qcDate = qcDate;
-    }
-
-    public User getLastModifier() {
-        return lastModifier;
-    }
-
-    public void setLastModifier(User lastModifier) {
-        this.lastModifier = lastModifier;
     }
 }

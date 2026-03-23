@@ -13,13 +13,10 @@ CREATE TABLE ArrayRun_Sample (
   qcNote varchar(255),
   qcUser bigint,
   qcDate date,
-  lastModifier bigint NOT NULL,
   PRIMARY KEY (arrayRunId, arrayId, position, sampleId),
   CONSTRAINT fk_arrayRunSample_arrayRun FOREIGN KEY (arrayRunId, arrayId) REFERENCES ArrayRun (arrayRunId, arrayId),
   CONSTRAINT fk_arrayRunSample_arrayPosition FOREIGN KEY (arrayId, position, sampleId)
     REFERENCES ArrayPosition (arrayId, position, sampleId),
   CONSTRAINT fk_arrayRunSample_status FOREIGN KEY (statusId) REFERENCES RunItemQcStatus (statusId),
-  CONSTRAINT fk_arrayRunSample_qcUser FOREIGN KEY (qcUser) REFERENCES User (userId),
-  CONSTRAINT fk_arrayRunSample_lastModifier FOREIGN KEY (lastModifier) REFERENCES User (userId)
+  CONSTRAINT fk_arrayRunSample_qcUser FOREIGN KEY (qcUser) REFERENCES User (userId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-

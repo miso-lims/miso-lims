@@ -38,24 +38,6 @@ public class HibernateArrayRunDao extends HibernateSaveDao<ArrayRun>
   }
 
   @Override
-  public long create(ArrayRun object) throws IOException {
-    long id = super.create(object);
-    // Flush so the ArrayRun row is written before syncArrayRunSamples inserts
-    // dependent ArrayRun_Sample rows that reference (arrayRunId, arrayId).
-    currentSession().flush();
-    return id;
-  }
-
-  @Override
-  public long update(ArrayRun object) throws IOException {
-    long id = super.update(object);
-    // Flush so any array change on the ArrayRun is persisted before syncing
-    // ArrayRun_Sample rows that depend on the updated (arrayRunId, arrayId) state.
-    currentSession().flush();
-    return id;
-  }
-
-  @Override
   public ArrayRun getByAlias(String alias) throws IOException {
     return getBy(ArrayRun_.ALIAS, alias);
   }

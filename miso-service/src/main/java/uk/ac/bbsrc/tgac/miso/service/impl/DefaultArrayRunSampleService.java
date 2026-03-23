@@ -1,8 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.loadChildEntity;
-import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.updateQcDetails;
-import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.validateQcUser;
+import static uk.ac.bbsrc.tgac.miso.service.impl.ValidationUtils.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunSampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
+import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunItemQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -44,18 +43,14 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
   private RunItemQcStatusService runItemQcStatusService;
 
   @Autowired
+  private ChangeLogService changeLogService;
+
+  @Autowired
   private AuthorizationManager authorizationManager;
 
   @Override
-  public ArrayRunSample get(ArrayRun run, String position) throws IOException {
-    if (run == null || run.getArray() == null || position == null || !run.getArray().isPositionValid(position)) {
-      return null;
-    }
-    Sample sample = run.getArray().getSample(position);
-    if (sample == null) {
-      return null;
-    }
-    return arrayRunSampleDao.get(run, run.getArray(), position, sample);
+  public ArrayRunSample get(ArrayRun run, Array array, String position, Sample sample) throws IOException {
+    return arrayRunSampleDao.get(run, array, position, sample);
   }
 
   @Override
@@ -112,22 +107,36 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
   @Override
   public void save(ArrayRunSample arrayRunSample) throws IOException {
     loadChildEntities(arrayRunSample);
-    validateChange(arrayRunSample);
-    Sample expectedSample = arrayRunSample.getArrayRun().getArray().getSample(arrayRunSample.getPosition());
-    ArrayRunSample managed = arrayRunSampleDao.get(arrayRunSample.getArrayRun(), arrayRunSample.getArrayRun().getArray(),
-        arrayRunSample.getPosition(), expectedSample);
+    ArrayRunSample managed = getManagedRecord(arrayRunSample);
     User user = authorizationManager.getCurrentUser();
+    Long oldQcStatusId = managed.getQcStatus() == null ? null : managed.getQcStatus().getId();
+    String oldQcStatusDescription = managed.getQcStatus() == null ? "Pending" : managed.getQcStatus().getDescription();
+    String oldQcNote = managed.getQcNote();
     updateQcDetails(arrayRunSample, managed, ArrayRunSample::getQcStatus, ArrayRunSample::getQcUser,
         ArrayRunSample::setQcUser, authorizationManager, ArrayRunSample::getQcDate, ArrayRunSample::setQcDate);
+    validateChange(arrayRunSample);
+    applyChanges(arrayRunSample, managed);
+    arrayRunSampleDao.save(managed);
+    createQcChangeLog(managed, oldQcStatusId, oldQcStatusDescription, oldQcNote, user);
+  }
 
-    List<ValidationError> errors = new ArrayList<>();
-    validateQcUser(arrayRunSample.getQcStatus(), arrayRunSample.getQcUser(), errors);
-    if (!errors.isEmpty()) {
-      throw new ValidationException(errors);
+  private ArrayRunSample getManagedRecord(ArrayRunSample arrayRunSample) throws IOException {
+    ArrayRun run = arrayRunSample.getArrayRun();
+    if (run == null || run.getArray() == null) {
+      return new ArrayRunSample();
     }
 
-    applyChanges(arrayRunSample, managed, user);
-    arrayRunSampleDao.save(managed);
+    String position = arrayRunSample.getPosition();
+    if (position == null || !run.getArray().isPositionValid(position)) {
+      return new ArrayRunSample();
+    }
+
+    Sample expectedSample = run.getArray().getSample(position);
+    if (expectedSample == null) {
+      return new ArrayRunSample();
+    }
+
+    return arrayRunSampleDao.get(run, run.getArray(), position, expectedSample);
   }
 
   private void loadChildEntities(ArrayRunSample arrayRunSample) throws IOException {
@@ -158,17 +167,52 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
         }
       }
     }
+    validateQcUser(arrayRunSample.getQcStatus(), arrayRunSample.getQcUser(), errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
   }
 
-  private void applyChanges(ArrayRunSample from, ArrayRunSample to, User user) {
+  private void applyChanges(ArrayRunSample from, ArrayRunSample to) {
     to.setQcStatus(from.getQcStatus());
     to.setQcNote(from.getQcNote());
     to.setQcUser(from.getQcUser());
     to.setQcDate(from.getQcDate());
-    to.setLastModifier(user);
+  }
+
+  private void createQcChangeLog(ArrayRunSample arrayRunSample, Long oldQcStatusId, String oldQcStatusDescription,
+      String oldQcNote, User user) throws IOException {
+    Long newQcStatusId = arrayRunSample.getQcStatus() == null ? null : arrayRunSample.getQcStatus().getId();
+    String newQcStatusDescription = arrayRunSample.getQcStatus() == null ? "Pending"
+        : arrayRunSample.getQcStatus().getDescription();
+    String newQcNote = arrayRunSample.getQcNote();
+
+    boolean statusChanged = !java.util.Objects.equals(oldQcStatusId, newQcStatusId);
+    boolean noteChanged = !java.util.Objects.equals(oldQcNote, newQcNote);
+    if (!statusChanged && !noteChanged) {
+      return;
+    }
+
+    String sampleLabel = arrayRunSample.getSample() == null ? arrayRunSample.getPosition()
+        : arrayRunSample.getSample().getName();
+    String summary;
+    if (statusChanged && noteChanged) {
+      summary = String.format("QC updated for sample %s at %s: status %s -> %s; note %s -> %s", sampleLabel,
+          arrayRunSample.getPosition(), oldQcStatusDescription, newQcStatusDescription, formatNote(oldQcNote),
+          formatNote(newQcNote));
+    } else if (statusChanged) {
+      summary = String.format("QC status updated for sample %s at %s: %s -> %s", sampleLabel,
+          arrayRunSample.getPosition(), oldQcStatusDescription, newQcStatusDescription);
+    } else {
+      summary = String.format("QC note updated for sample %s at %s: %s -> %s", sampleLabel,
+          arrayRunSample.getPosition(), formatNote(oldQcNote), formatNote(newQcNote));
+    }
+
+    changeLogService.create(arrayRunSample.getArrayRun().createChangeLog(summary, "sampleQc", user));
+  }
+
+  private String formatNote(String note) {
+    return note == null ? "none" : note;
   }
 }

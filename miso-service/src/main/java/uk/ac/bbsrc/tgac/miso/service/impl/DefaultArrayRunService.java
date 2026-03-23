@@ -5,7 +5,6 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
-import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunSampleService;
@@ -120,9 +117,7 @@ public class DefaultArrayRunService implements ArrayRunService {
     loadChildEntities(arrayRun);
     arrayRun.setChangeDetails(authorizationManager.getCurrentUser());
     validateChange(arrayRun, null);
-    long id = arrayRunStore.create(arrayRun);
-    syncArrayRunSamples(get(id));
-    return id;
+    return arrayRunStore.create(arrayRun);
   }
 
   @Override
@@ -136,9 +131,7 @@ public class DefaultArrayRunService implements ArrayRunService {
     }
     applyChanges(arrayRun, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
-    long id = arrayRunStore.update(managed);
-    syncArrayRunSamples(get(id));
-    return id;
+    return arrayRunStore.update(managed);
   }
 
   @Override
@@ -162,7 +155,7 @@ public class DefaultArrayRunService implements ArrayRunService {
     List<ValidationError> errors = new ArrayList<>();
 
     ValidationUtils.updateQcDetails(arrayRun, beforeChange, ArrayRun::getQcPassed, ArrayRun::getQcUser,
-            ArrayRun::setQcUser, authorizationManager, ArrayRun::getQcDate, ArrayRun::setQcDate);
+        ArrayRun::setQcUser, authorizationManager, ArrayRun::getQcDate, ArrayRun::setQcDate);
 
     if (arrayRun.isSaved() && beforeChange == null) {
       errors.add(new ValidationError("Array Run not found"));
@@ -250,20 +243,6 @@ public class DefaultArrayRunService implements ArrayRunService {
     to.setQcPassed(from.getQcPassed());
     to.setQcUser(from.getQcUser());
     to.setQcDate(from.getQcDate());
-  }
-
-  private void syncArrayRunSamples(ArrayRun run) throws IOException {
-    if (run == null || run.getArray() == null || run.getArray().getSamples() == null) {
-      return;
-    }
-    for (Map.Entry<String, Sample> entry : run.getArray().getSamples().entrySet()) {
-      ArrayRunSample sample = arrayRunSampleService.get(run, entry.getKey());
-      if (sample == null) {
-        sample = new ArrayRunSample(run, run.getArray(), entry.getKey(), entry.getValue());
-      }
-      sample.setLastModifier(authorizationManager.getCurrentUser());
-      arrayRunSampleService.save(sample);
-    }
   }
 
   @Override
