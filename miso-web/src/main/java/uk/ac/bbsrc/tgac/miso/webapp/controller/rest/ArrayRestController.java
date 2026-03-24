@@ -97,12 +97,8 @@ public class ArrayRestController extends AbstractRestController {
   @DeleteMapping(value = "/{arrayId}/positions/{position}")
   public @ResponseBody ArrayDto removeSample(@PathVariable(name = "arrayId", required = true) long arrayId,
       @PathVariable(name = "position", required = true) String position) throws IOException {
-    Array array = arrayService.get(arrayId);
-    if (array == null) {
-      throw new RestException(ERROR_NOTFOUND, Status.NOT_FOUND);
-    } else if (!array.isPositionValid(position)) {
-      throw new RestException("Invalid array position", Status.BAD_REQUEST);
-    }
+    Array array = getArrayOrThrow(arrayId);
+    validatePositions(array, Collections.singletonList(position));
     if (array.getSample(position) == null) {
       // already empty - do nothing
       return Dtos.asDto(array);
