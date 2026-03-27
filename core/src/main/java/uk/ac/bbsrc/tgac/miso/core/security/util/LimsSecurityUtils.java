@@ -1,22 +1,19 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK MISO project contacts: Robert Davey @
+ * TGAC *********************************************************************
  *
  * This file is part of MISO.
  *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * MISO is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MISO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along with MISO. If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  * *********************************************************************
  */
@@ -38,6 +35,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
+import uk.ac.bbsrc.tgac.miso.core.security.UserDetailsNameAndEmail;
 
 /**
  * Helper class that provides various methods to deal with security authorisation and profiles
@@ -112,6 +110,36 @@ public class LimsSecurityUtils {
     return new org.springframework.security.core.userdetails.User(user.getLoginName(),
         user.getPassword() == null ? "junkToShutUpSpring" : user.getPassword(), user.isActive(), user.isActive(),
         user.isActive(), user.isActive(), auths);
+  }
+
+  public static User fromSamlUser(UserDetails details) {
+    final UserImpl user = new UserImpl();
+
+    updateFromSamlUser(user, details);
+    user.setLoginName(details.getUsername().toLowerCase());
+
+    return user;
+  }
+
+  public static void updateFromSamlUser(User target, UserDetails samlUserDetails) {
+    final List<String> roles = new ArrayList<>();
+    for (final GrantedAuthority ga : samlUserDetails.getAuthorities()) {
+      roles.add(removePrefix(ga.toString(), LimsSecurityUtils.rolePrefix));
+    }
+    target.setRoles(roles.toArray(new String[0]));
+
+    target.setActive(samlUserDetails.isAccountNonExpired());
+    target.setAdmin(roles.contains(MisoAuthority.ROLE_ADMIN.name()));
+    target.setInternal(roles.contains(MisoAuthority.ROLE_INTERNAL.name()));
+
+    target.setPassword(samlUserDetails.getPassword());
+    if (samlUserDetails instanceof UserDetailsNameAndEmail samlUser) {
+      target.setFullName(samlUser.getFullName());
+      target.setEmail(samlUser.getEmail());
+    } else {
+      throw new IllegalArgumentException(
+          "UserDetails does not include full name and email. Check SAML authentication provider config");
+    }
   }
 
 }
