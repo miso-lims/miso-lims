@@ -5,6 +5,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable.EntityType;
 public class BoxableDto {
   private String alias;
 
+  private Long boxId;
+
   private String boxAlias;
 
   private String boxPosition;
@@ -18,8 +20,8 @@ public class BoxableDto {
   private Long sampleClassId;
 
   /**
-   * This is the object's ID (e.g., sampleId, libraryId) used to located it when used in conjunction with the name to determine the type or
-   * the barcode.
+   * This is the object's ID (e.g., sampleId, libraryId) used to located it when used in conjunction
+   * with the name to determine the type or the barcode.
    */
   private Long id;
 
@@ -31,6 +33,10 @@ public class BoxableDto {
 
   public String getAlias() {
     return alias;
+  }
+
+  public Long getBoxId() {
+    return boxId;
   }
 
   public String getBoxAlias() {
@@ -67,6 +73,10 @@ public class BoxableDto {
 
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+
+  public void setBoxId(Long boxId) {
+    this.boxId = boxId;
   }
 
   public void setBoxAlias(String boxAlias) {
