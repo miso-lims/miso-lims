@@ -26,8 +26,10 @@ import org.springframework.security.saml2.provider.service.authentication.OpenSa
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
 import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
+import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
+import org.springframework.security.saml2.provider.service.registration.Saml2MessageBinding;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -48,19 +50,23 @@ public class SamlSecurityConfig {
 
   @Bean
   public RelyingPartyRegistrationRepository relyingPartyRegistrationRepository(
-      @Value("${security.saml.idp.registrationId:miso}") String registrationId,
+      @Value("${security.saml.registrationId:miso}") String registrationId,
       @Value("${security.saml.idp.metadataUrl}") String metadataUrl,
       @Value("${security.saml.sp.entityId:{baseUrl}/saml2/service-provider-metadata/{registrationId}}") String entityId,
       @Value("${security.saml.sp.privateKey}") Resource privateKey,
       @Value("${security.saml.sp.certificate}") Resource certificate) {
 
-    return new InMemoryRelyingPartyRegistrationRepository(
-        RelyingPartyRegistrations.fromMetadataLocation(metadataUrl)
-            .registrationId(registrationId)
-            .entityId(entityId)
-            .assertionConsumerServiceLocation("{baseUrl}/login/saml2/sso/{registrationId}")
-            .signingX509Credentials(c -> c.add(loadSigningCredential(privateKey, certificate)))
-            .build());
+    RelyingPartyRegistration.Builder builder = RelyingPartyRegistrations.fromMetadataLocation(metadataUrl)
+        .registrationId(registrationId)
+        .entityId(entityId)
+        .assertionConsumerServiceLocation("{baseUrl}/login/saml2/sso/{registrationId}")
+        .singleLogoutServiceLocation("{baseUrl}/logout/saml2/slo/{registrationId}")
+        .singleLogoutServiceResponseLocation("{baseUrl}/logout/saml2/slo/{registrationId}")
+        .singleLogoutServiceBinding(Saml2MessageBinding.REDIRECT);
+
+    builder.signingX509Credentials(c -> c.add(loadSigningCredential(privateKey, certificate)));
+
+    return new InMemoryRelyingPartyRegistrationRepository(builder.build());
   }
 
   @Bean
@@ -118,6 +124,7 @@ public class SamlSecurityConfig {
             .successHandler(successHandler)
             .failureHandler(failureHandler)
             .authenticationManager(new ProviderManager(samlAuthenticationProvider)))
+        .saml2Logout(Customizer.withDefaults())
         .saml2Metadata(Customizer.withDefaults())
         .build();
   }

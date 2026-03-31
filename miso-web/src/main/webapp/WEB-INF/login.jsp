@@ -13,19 +13,22 @@
   </script>
 </sec:authorize>
 
-<div id="login-form">
+<div id="login-form" style="text-align:center; padding-top:16px;">
   <c:choose>
     <c:when test="${samlLoginEnabled}">
       <form action="/saml2/authenticate/${samlRegistrationId}" method="GET">
-        <div style="margin:0;padding:0;display:inline">
-          <table>
+        <table>
             <tr>
-              <td align="right">
+              <td align="center" style="padding-bottom:12px;">
+                Please log in to continue.
+              </td>
+            </tr>
+            <tr>
+              <td align="center">
                 <input type="submit" name="login" value="Login with SSO &#187;" tabindex="5"/>
               </td>
             </tr>
           </table>
-        </div>
       </form>
     </c:when>
     <c:otherwise>

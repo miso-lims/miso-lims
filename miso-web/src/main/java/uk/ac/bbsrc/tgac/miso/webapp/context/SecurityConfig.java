@@ -111,6 +111,7 @@ public class SecurityConfig {
         .formLogin(formLogin -> formLogin
             .loginPage("/login").permitAll())
         .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
+        .logout(logout -> logout.logoutSuccessUrl("/login"))
         .build();
   }
 
@@ -140,7 +141,6 @@ public class SecurityConfig {
             .hasRole("INTERNAL"))
         .addFilterBefore(apiKeyFilter, MisoLoginFilter.class)
         .csrf(csrf -> csrf.disable())
-        .logout(logout -> logout.logoutSuccessUrl("/login"))
         .exceptionHandling(handling -> handling.accessDeniedPage("/accessDenied"))
         .securityContext(securityContext -> securityContext
             .requireExplicitSave(true)
