@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,23 +63,17 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
     }
 
     Array array = run.getArray();
-    List<ArrayRunSample> existing = arrayRunSampleDao.listByRunId(arrayRunId);
     Map<String, Sample> samples = array.getSamples();
     if (samples == null || samples.isEmpty()) {
       return Collections.emptyList();
     }
 
-    Map<String, ArrayRunSample> byPosition = existing.stream()
-        .filter(item -> item.getArray() != null && item.getArray().getId() == array.getId())
-        .collect(Collectors.toMap(ArrayRunSample::getPosition, sample -> sample));
-
     List<ArrayRunSample> results = new ArrayList<>(samples.size());
     for (Map.Entry<String, Sample> entry : samples.entrySet()) {
-      ArrayRunSample item = byPosition.get(entry.getKey());
-      if (item == null) {
-        item = arrayRunSampleDao.get(run, array, entry.getKey(), entry.getValue());
+      ArrayRunSample item = arrayRunSampleDao.get(run, array, entry.getKey(), entry.getValue());
+      if (item != null) {
+        results.add(item);
       }
-      results.add(item);
     }
 
     results.sort(Comparator.comparing(ArrayRunSample::getPosition));
@@ -121,19 +114,32 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
   }
 
   private ArrayRunSample getManagedRecord(ArrayRunSample arrayRunSample) throws IOException {
+    List<ValidationError> errors = new ArrayList<>();
+
     ArrayRun run = arrayRunSample.getArrayRun();
-    if (run == null || run.getArray() == null) {
-      return new ArrayRunSample();
+    if (run == null) {
+      errors.add(new ValidationError("arrayRunId", "Invalid array run"));
+    } else if (run.getArray() == null) {
+      errors.add(new ValidationError("arrayRunId", "Array run has no array"));
     }
 
     String position = arrayRunSample.getPosition();
-    if (position == null || !run.getArray().isPositionValid(position)) {
-      return new ArrayRunSample();
+    if (position == null) {
+      errors.add(new ValidationError("position", "Position is required"));
+    } else if (run != null && run.getArray() != null && !run.getArray().isPositionValid(position)) {
+      errors.add(new ValidationError("position", "Invalid array position"));
     }
 
-    Sample expectedSample = run.getArray().getSample(position);
-    if (expectedSample == null) {
-      return new ArrayRunSample();
+    Sample expectedSample = null;
+    if (run != null && run.getArray() != null && position != null && run.getArray().isPositionValid(position)) {
+      expectedSample = run.getArray().getSample(position);
+      if (expectedSample == null) {
+        errors.add(new ValidationError("position", "No sample at this position"));
+      }
+    }
+
+    if (!errors.isEmpty()) {
+      throw new ValidationException(errors);
     }
 
     return arrayRunSampleDao.get(run, run.getArray(), position, expectedSample);

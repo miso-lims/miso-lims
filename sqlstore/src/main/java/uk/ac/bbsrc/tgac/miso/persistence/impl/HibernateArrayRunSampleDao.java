@@ -35,7 +35,12 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
     if (run == null || array == null || sample == null || position == null) {
       return null;
     }
-    if (run.getArray() == null || run.getArray().getId() != array.getId()) {
+
+    ArrayRun persistedRun = currentSession().get(ArrayRun.class, run.getId());
+    if (persistedRun == null || persistedRun.getArray() == null) {
+      return null;
+    }
+    if (persistedRun.getArray().getId() != array.getId()) {
       return null;
     }
     if (!array.isPositionValid(position)) {
@@ -48,13 +53,14 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
     }
 
     ArrayRunSampleId id = new ArrayRunSampleId();
-    id.setArrayRun(run);
+    id.setArrayRun(persistedRun);
     id.setArray(array);
     id.setPosition(position);
     id.setSample(sample);
+
     ArrayRunSample result = currentSession().get(ArrayRunSample.class, id);
     if (result == null) {
-      result = new ArrayRunSample(run, array, position, sample);
+      result = new ArrayRunSample(persistedRun, array, position, sample);
     }
     return result;
   }
