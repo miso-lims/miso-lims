@@ -456,7 +456,9 @@ FormTarget.sample = (function ($) {
               data: "timepoint",
               type: "text",
               maxLength: 50,
-              description: "When the sample was taken",
+              regex: Utils.validation.uriComponentRegex,
+              description:
+                "When the sample was taken. The following characters are prohibited: <>&%;/\\",
             },
           ],
         },

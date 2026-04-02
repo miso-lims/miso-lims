@@ -10,11 +10,10 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 public class HibernateRunDaoSearchIT extends PaginationFilterSinkIT {
 
   private static final EnumSet<SearchType> VALID_SEARCH_TYPES =
-      EnumSet.of(SearchType.QUERY, SearchType.ID, SearchType.IDS,
-          SearchType.PROJECT, SearchType.SEQUENCING_PARAMETERS_NAME, SearchType.HEALTH, SearchType.PLATFORM_TYPE,
-          SearchType.INDEX,
-          SearchType.SEQUENCER, SearchType.CREATED, SearchType.ENTERED, SearchType.UPDATED, SearchType.CREATOR,
-          SearchType.MODIFIER);
+      EnumSet.of(SearchType.QUERY, SearchType.ID, SearchType.IDS, SearchType.PROJECT,
+          SearchType.SEQUENCING_PARAMETERS_NAME, SearchType.HEALTH, SearchType.PLATFORM_TYPE,
+          SearchType.INDEX, SearchType.SEQUENCER, SearchType.CREATED, SearchType.ENTERED, SearchType.UPDATED,
+          SearchType.CREATOR, SearchType.MODIFIER, SearchType.MODEL);
   private static final List<String> SORT_FIELDS = Arrays.asList("alias", "platformType", "status", "endDate");
 
   public HibernateRunDaoSearchIT() {

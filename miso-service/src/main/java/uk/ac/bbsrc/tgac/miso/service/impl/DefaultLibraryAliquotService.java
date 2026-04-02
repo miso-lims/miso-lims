@@ -336,6 +336,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
         && (beforeChange == null || beforeChange.getKitLot() != null)) {
       ValidationError.forRequired("kitLot");
     }
+    validateUriComponent("kitLot", aliquot.getKitLot(), errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
@@ -400,7 +401,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
   }
 
   public void setFileAttachmentService(FileAttachmentService fileAttachmentService) {
-      this.fileAttachmentService = fileAttachmentService;
+    this.fileAttachmentService = fileAttachmentService;
   }
 
   @Override

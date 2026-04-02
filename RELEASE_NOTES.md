@@ -7,6 +7,23 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.19.0] - 2026-03-19
+
+### Added
+
+* Archive status is now available for assay versions in pinery.
+* Advanced search term to find runs by instrument model
+* Draft field for assays
+  * Projects and requisitions that include draft assays will show a warning
+  * The field is included in Pinery assays
+
+### Changed
+
+* Sample timepoints can no longer include the following characters: `<>&%;/\` (detailed sample)
+* Changes to project contacts are now included in the project changelog
+* Identity and ghost/synthetic samples can no longer be added to transfers (detailed sample)
+
+
 ## [3.18.0] - 2026-02-26
 
 ### Changed

@@ -64,4 +64,30 @@ FOR EACH ROW
   FROM Project
   WHERE projectId = OLD.projectId//
 
+DROP TRIGGER IF EXISTS ProjectContactInsert//
+CREATE TRIGGER ProjectContactInsert AFTER INSERT ON Project_Contact
+FOR EACH ROW
+  INSERT INTO ProjectChangeLog(projectId, columnsChanged, userId, message, changeTime)
+  SELECT
+    NEW.projectId,
+    'contacts',
+    lastModifier,
+    CONCAT('Added ', (SELECT name FROM ContactRole WHERE contactRoleId = NEW.contactRoleId), ' contact: ', (SELECT name FROM Contact WHERE contactId = NEW.contactId)),
+    lastModified
+  FROM Project p
+  WHERE p.projectId = NEW.projectId//
+
+DROP TRIGGER IF EXISTS ProjectContactDelete//
+CREATE TRIGGER ProjectContactDelete AFTER DELETE ON Project_Contact
+FOR EACH ROW
+  INSERT INTO ProjectChangeLog(projectId, columnsChanged, userId, message, changeTime)
+  SELECT
+    OLD.projectId,
+    'contacts',
+    lastModifier,
+    CONCAT('Removed ', (SELECT name FROM ContactRole WHERE contactRoleId = OLD.contactRoleId), ' contact: ', (SELECT name FROM Contact WHERE contactId = OLD.contactId)),
+    lastModified
+  FROM Project
+  WHERE projectId = OLD.projectId//
+
 DELIMITER ;

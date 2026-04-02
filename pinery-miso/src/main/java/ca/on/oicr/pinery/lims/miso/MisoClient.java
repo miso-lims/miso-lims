@@ -1558,6 +1558,8 @@ public class MisoClient implements Lims {
     assay.setName(rs.getString("name"));
     assay.setDescription(rs.getString("description"));
     assay.setVersion(rs.getString("version"));
+    assay.setDraft(rs.getBoolean("draft"));
+    assay.setArchived(rs.getBoolean("archived"));
 
     AssayTargets targets = new DefaultAssayTargets();
     targets.setCaseDays(intOrNull(rs, "caseTargetDays"));

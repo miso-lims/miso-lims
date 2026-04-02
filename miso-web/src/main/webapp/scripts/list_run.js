@@ -186,6 +186,7 @@ ListTarget.run = {
       searchTerms["changed"],
       searchTerms["creator"],
       searchTerms["changedby"],
+      searchTerms["model"],
       searchTerms["platform"],
       searchTerms["index"],
       searchTerms["parameters"],

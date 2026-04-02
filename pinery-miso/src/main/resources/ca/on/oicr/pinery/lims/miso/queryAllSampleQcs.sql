@@ -26,5 +26,20 @@ WHERE qc.qcId IN (
   GROUP BY qc.library_libraryId, qc.type
 )
 
+UNION ALL
+
+SELECT qc.qcId, qc.date, la.name sampleId, qt.name, qc.results
+FROM LibraryAliquotQc qc
+JOIN QCType qt ON qt.qcTypeId = qc.type
+JOIN LibraryAliquot la ON la.aliquotId = qc.aliquotId
+WHERE qc.qcId IN (
+  SELECT MAX(qc.qcId) qcId FROM LibraryAliquotQc qc
+  JOIN (
+    SELECT aliquotId, type, MAX(date) maxDate FROM LibraryAliquotQc GROUP BY aliquotId, type
+  ) maxDates ON maxDates.aliquotId = qc.aliquotId AND maxDates.type = qc.type
+  WHERE qc.date = maxDates.maxDate
+  GROUP BY qc.aliquotId, qc.type
+)
+
 -- Order is important; see QcConverter.java
 ORDER BY date DESC, qcId DESC

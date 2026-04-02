@@ -1697,6 +1697,7 @@ public class Dtos {
     BoxableDto dto = new BoxableDto();
     dto.setId(from.getId());
     dto.setAlias(from.getAlias());
+    dto.setBoxId(from.getBoxId());
     dto.setBoxAlias(from.getBoxAlias());
     dto.setBoxPosition(BoxUtils.makeLocationLabel(from));
     dto.setCoordinates(from.getBoxPosition());

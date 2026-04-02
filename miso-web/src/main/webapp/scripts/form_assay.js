@@ -49,6 +49,12 @@ FormTarget.assay = (function () {
               maxLength: 255,
             },
             {
+              title: "Draft",
+              type: "checkbox",
+              data: "draft",
+              disabled: !editable,
+            },
+            {
               title: "Archived",
               type: "checkbox",
               data: "archived",

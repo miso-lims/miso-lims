@@ -852,12 +852,15 @@ public class DefaultSampleService implements SampleService {
     validateDetailedQcStatus(sample, errors);
 
     if (isDetailedSample(sample)) {
-      DetailedSample detailed = (DetailedSample) sample;
+      DetailedSample detailed = (DetailedSample) deproxify(sample);
       validateSubproject(detailed, beforeChange, errors);
       validateReferenceSlide(detailed, errors);
       validateGroupDescription(detailed, errors);
-      if (isIdentitySample(sample) && sample.getRequisition() != null) {
+      if (isIdentitySample(detailed) && detailed.getRequisition() != null) {
         errors.add(new ValidationError("requisitionId", "Identity samples cannot be added to requisitions"));
+      } else if (isTissueSample(sample)) {
+        SampleTissue tissue = (SampleTissue) sample;
+        validateUriComponent("timepoint", tissue.getTimepoint(), errors);
       } else if (isProcessingSingleCellSample(sample)) {
         SampleSingleCell singleCell = (SampleSingleCell) sample;
         if (singleCell.getProbes() != null && !singleCell.getProbes().isEmpty()) {
@@ -878,8 +881,9 @@ public class DefaultSampleService implements SampleService {
       }
     }
 
-    if (sample.getCreationReceiptInfo() != null) {
-      validateReceiptTransfer(sample.getCreationReceiptInfo(), errors);
+    TransferSample receiptSample = sample.getCreationReceiptInfo();
+    if (receiptSample != null) {
+      validateReceiptTransfer(receiptSample, errors);
     }
 
     if (!errors.isEmpty()) {
@@ -912,12 +916,12 @@ public class DefaultSampleService implements SampleService {
     if (isTissuePieceSample(sample)) {
       referenceId = ((SampleTissuePiece) sample).getReferenceSlideId();
     } else if (isStockSample(sample)) {
-      referenceId = ((SampleStock) deproxify(sample)).getReferenceSlideId();
+      referenceId = ((SampleStock) sample).getReferenceSlideId();
     } else {
       return;
     }
     if (referenceId != null) {
-      DetailedSample reference = (DetailedSample) deproxify(get(referenceId));
+      DetailedSample reference = (DetailedSample) get(referenceId);
       if (reference == null) {
         errors.add(new ValidationError("referenceSlideId", "Reference slide not found"));
         return;

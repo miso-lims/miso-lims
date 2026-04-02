@@ -1,0 +1,3 @@
+-- assay_draft
+ALTER TABLE Assay ADD COLUMN draft BOOLEAN NOT NULL DEFAULT FALSE;
+
