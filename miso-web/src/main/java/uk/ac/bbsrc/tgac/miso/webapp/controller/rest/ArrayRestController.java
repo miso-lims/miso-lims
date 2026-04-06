@@ -98,7 +98,7 @@ public class ArrayRestController extends AbstractRestController {
   public @ResponseBody ArrayDto removeSample(@PathVariable(name = "arrayId", required = true) long arrayId,
       @PathVariable(name = "position", required = true) String position) throws IOException {
     Array array = getArrayOrThrow(arrayId);
-    validatePositions(array, Collections.singletonList(position));
+    validatePositions(array, Collections.singletonList(position), Status.NOT_FOUND);
     if (array.getSample(position) == null) {
       // already empty - do nothing
       return Dtos.asDto(array);
@@ -115,23 +115,23 @@ public class ArrayRestController extends AbstractRestController {
   public @ResponseBody ArrayDto addSample(@PathVariable(name = "arrayId", required = true) long arrayId,
       @PathVariable(name = "position", required = true) String position,
       @RequestParam(name = "sampleId", required = true) long sampleId) throws IOException {
-    return addSample(arrayId, sampleId, Collections.singletonList(position));
-  }
+    Array array = arrayService.get(arrayId);
+    if (array == null) {
+      throw new RestException(ERROR_NOTFOUND, Status.NOT_FOUND);
+    } else if (!array.isPositionValid(position)) {
+      throw new RestException("Invalid array position", Status.NOT_FOUND);
+    }
 
-  @PutMapping(value = "/{arrayId}/bulk-update")
-  public @ResponseBody ArrayDto addSample(@PathVariable(name = "arrayId", required = true) long arrayId,
-      @RequestParam(name = "sampleId", required = true) long sampleId,
-      @RequestBody(required = true) List<String> positions) throws IOException {
-    Array array = getArrayOrThrow(arrayId);
-    validatePositions(array, positions);
     Sample sample = sampleService.get(sampleId);
     if (sample == null) {
       throw new RestException("Sample not found", Status.BAD_REQUEST);
     }
 
-    positions.forEach(position -> array.setSample(position, sample));
+    array.setSample(position, sample);
     arrayService.update(array);
-    return Dtos.asDto(arrayService.get(arrayId));
+
+    Array saved = arrayService.get(arrayId);
+    return Dtos.asDto(saved);
   }
 
   public static class BulkUpdateRequestItem {
@@ -155,7 +155,7 @@ public class ArrayRestController extends AbstractRestController {
     }
   }
 
-  @PostMapping(value = "/{arrayId}/bulk-update-search")
+  @PutMapping(value = "/{arrayId}/positions")
   public @ResponseBody ArrayDto bulkUpdatePositions(@PathVariable(name = "arrayId", required = true) long arrayId,
       @RequestBody(required = true) List<BulkUpdateRequestItem> items) throws IOException {
     Array array = getArrayOrThrow(arrayId);
@@ -225,7 +225,7 @@ public class ArrayRestController extends AbstractRestController {
     return array;
   }
 
-  private void validatePositions(Array array, List<String> positions) {
+  private void validatePositions(Array array, List<String> positions, Status invalidStatus) {
     if (positions == null || positions.isEmpty()) {
       throw new RestException("No array positions selected", Status.BAD_REQUEST);
     }
@@ -233,7 +233,7 @@ public class ArrayRestController extends AbstractRestController {
         .filter(position -> !array.isPositionValid(position))
         .collect(Collectors.toList());
     if (!invalidPositions.isEmpty()) {
-      throw new RestException("Invalid array position", Status.BAD_REQUEST);
+      throw new RestException("Invalid array position", invalidStatus);
     }
   }
 

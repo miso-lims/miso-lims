@@ -103,28 +103,46 @@
     }
     showSamplesLoading(true);
 
-    var removeNext = function (index) {
+    if (selectedPositions.length === 1) {
       $.ajax({
-        url: Urls.rest.arrays.position(arrayJson.id, selectedPositions[index]),
+        url: Urls.rest.arrays.position(arrayJson.id, selectedPositions[0]),
         type: "DELETE",
         dataType: "json",
       })
         .done(function (data) {
-          if (index + 1 < selectedPositions.length) {
-            removeNext(index + 1);
-          } else {
-            clearSampleSearchResults();
-            SampleArray.setArrayJson(data);
-            showSamplesLoading(false);
-          }
+          clearSampleSearchResults();
+          SampleArray.setArrayJson(data);
+          showSamplesLoading(false);
         })
         .fail(function (xhr, textStatus, errorThrown) {
           Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
           showSamplesLoading(false);
         });
-    };
+      return;
+    }
 
-    removeNext(0);
+    var data = selectedPositions.map(function (position) {
+      return {
+        position: position,
+        searchString: null,
+      };
+    });
+    Utils.ajaxWithDialog(
+      "Remove Samples",
+      "PUT",
+      Urls.rest.arrays.updatePositions(arrayJson.id),
+      data,
+      function (responseData) {
+        clearSampleSearchResults();
+        SampleArray.setArrayJson(responseData);
+        showSamplesLoading(false);
+      },
+      function (xhr, textStatus, errorThrown) {
+        showSamplesLoading(false);
+        Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
+      },
+      true
+    );
   };
 
   SampleArray.searchSamples = function () {
@@ -173,7 +191,7 @@
       showSamplesLoading(true);
 
       var url =
-        Urls.rest.arrays.bulkUpdate(arrayJson.id) +
+        Urls.rest.arrays.position(arrayJson.id, selectedPositions[0]) +
         "?" +
         Utils.page.param({
           sampleId: sampleId,
@@ -182,7 +200,7 @@
         "Update Position",
         "PUT",
         url,
-        selectedPositions,
+        null,
         function (data) {
           clearSampleSearchResults();
           SampleArray.setArrayJson(data);
@@ -252,8 +270,8 @@
     showSamplesLoading(true);
     Utils.ajaxWithDialog(
       "Update Positions",
-      "POST",
-      Urls.rest.arrays.bulkUpdateSearch(arrayJson.id),
+      "PUT",
+      Urls.rest.arrays.updatePositions(arrayJson.id),
       data,
       function (responseData) {
         clearSampleSearchResults();

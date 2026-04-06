@@ -50,7 +50,7 @@
   <div id="arraySamplesSection">
     <div class="note">
       Hold down Ctrl (Windows, Linux) or Command (Mac) to select multiple positions.
-      Click a column header to select the entire column.
+      Click a row or column header to select the entire row or column.
     </div>
     <div id="arraySamplesVisual" class="unselectable" style="float:left;margin:20px;"></div>
     <div id="singlePositionControls" style="float:left;padding:20px;">
