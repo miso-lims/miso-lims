@@ -1974,7 +1974,7 @@ BulkUtils = (function ($) {
       var storingChanges = true;
       onChangeApi.updateField = function (rowIndex, dataProperty, changes) {
         if (storingChanges && changes.hasOwnProperty("value") && changes.value !== undefined) {
-          var colIndex = getColumnIndex(dataProperty, columns, true);
+          var colIndex = getColumnIndex(dataProperty, columns, isColumnHidden(dataProperty));
           if (colIndex === null) return; // column hidden by config
           dataChanges.push([rowIndex, colIndex, changes.value]);
           // clone object before modification in-case same is being used for multiple fields
@@ -2411,6 +2411,28 @@ BulkUtils = (function ($) {
     return incrementedString;
   }
 
+  function isColumnHidden(dataProperty) {
+    switch (dataProperty) {
+      case "received":
+      case "receiptQcPassed":
+      case "receiptQcNote":
+        return Constants.showReceiptQc === false;
+      case "requisitionAlias":
+      case "requisitionId":
+      case "requisitionAssayIds":
+        return Constants.showRequisition === false;
+      case "detailedQcStatusId":
+      case "detailedQcStatusNote":
+        return Constants.showQcStatus === false;
+      case "identificationBarcode":
+        return Constants.showMatrixBarcode === false;
+      case "discarded":
+        return Constants.showDiscarded === false;
+      default:
+        return false;
+    }
+  }
+
   function getColumnIndex(dataProperty, columns, nullOk) {
     var colIndex = columns.findIndex(function (column) {
       return column.data === dataProperty;
@@ -2440,7 +2462,7 @@ BulkUtils = (function ($) {
 
     api.getValueObject = function (row, dataProperty) {
       // Note: currently only works for columns where the source is set individually per row
-      var colIndex = getColumnIndex(dataProperty, columns, true);
+      var colIndex = getColumnIndex(dataProperty, columns, isColumnHidden(dataProperty));
       if (colIndex === null) return null; // column hidden by config
       var column = columns[colIndex];
       if (column.type !== "dropdown") {
@@ -2452,7 +2474,7 @@ BulkUtils = (function ($) {
     };
 
     api.getSourceData = function (row, dataProperty) {
-      var colIndex = getColumnIndex(dataProperty, columns, true);
+      var colIndex = getColumnIndex(dataProperty, columns, isColumnHidden(dataProperty));
       if (colIndex === null) return null; // column hidden by config
       return hot.getCellMeta(row, colIndex).sourceData;
     };
@@ -2482,7 +2504,7 @@ BulkUtils = (function ($) {
   }
 
   function updateField(hot, columns, rowIndex, dataProperty, options) {
-    var colIndex = getColumnIndex(dataProperty, columns, true);
+    var colIndex = getColumnIndex(dataProperty, columns, isColumnHidden(dataProperty));
     if (colIndex === null) return; // column hidden by config
     var column = columns[colIndex];
     var forceValidate = false;
@@ -2607,7 +2629,7 @@ BulkUtils = (function ($) {
 
       getValueObject: function (row, dataProperty) {
         // Note: currently only works for columns where the source is set individually per row
-        var colIndex = getColumnIndex(dataProperty, columns, true);
+        var colIndex = getColumnIndex(dataProperty, columns, isColumnHidden(dataProperty));
         if (colIndex === null) return null; // column hidden by config
         var column = columns[colIndex];
         if (column.type !== "dropdown") {
@@ -2622,7 +2644,7 @@ BulkUtils = (function ($) {
       },
 
       getSourceData: function (rowIndex, dataProperty) {
-        var colIndex = getColumnIndex(dataProperty, columns, true);
+        var colIndex = getColumnIndex(dataProperty, columns, isColumnHidden(dataProperty));
         if (colIndex === null) return null; // column hidden by config
         var cellMeta = cellMetas.find(function (meta) {
           return meta.row === rowIndex && meta.col === colIndex;
@@ -2631,7 +2653,7 @@ BulkUtils = (function ($) {
       },
 
       updateField: function (rowIndex, dataProperty, options) {
-        var colIndex = getColumnIndex(dataProperty, columns, true);
+        var colIndex = getColumnIndex(dataProperty, columns, tableSaved || isColumnHidden(dataProperty));
         if (colIndex === null) {
           // Column hidden by config or not shown after save - ignore updates
           return;
