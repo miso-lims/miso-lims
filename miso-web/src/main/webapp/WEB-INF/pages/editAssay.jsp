@@ -24,6 +24,10 @@
 <div id="listMetrics"></div>
 <br>
 
+<c:if test="${pageMode ne 'create'}">
+  <miso:changelog item="${assay}" />
+</c:if>
+
 <script type="text/javascript">
   jQuery(document).ready(function () {
     var assay = ${assayDto};

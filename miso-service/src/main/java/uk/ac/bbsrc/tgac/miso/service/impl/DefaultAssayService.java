@@ -23,6 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.AssayDao;
+import uk.ac.bbsrc.tgac.miso.persistence.HibernateUtilDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 
@@ -40,6 +41,8 @@ public class DefaultAssayService extends AbstractSaveService<Assay> implements A
   private AuthorizationManager authorizationManager;
   @Autowired
   private DeletionStore deletionStore;
+  @Autowired
+  private HibernateUtilDao hibernateUtilDao;
 
   @Override
   public DeletionStore getDeletionStore() {
@@ -119,6 +122,12 @@ public class DefaultAssayService extends AbstractSaveService<Assay> implements A
 
   @Override
   protected void applyChanges(Assay to, Assay from) throws IOException {
+    // Save and flush the change details before making any changes; otherwise, Hibernate saves
+    // Assay_Metrics first and the change details haven't been updated when the changelog is generated
+    to.setChangeDetails(authorizationManager.getCurrentUser());
+    assayDao.update(to);
+    hibernateUtilDao.flush();
+
     to.setAlias(from.getAlias());
     to.setDescription(from.getDescription());
     to.setDraft(from.isDraft());
@@ -156,6 +165,14 @@ public class DefaultAssayService extends AbstractSaveService<Assay> implements A
         toItem.setMaximumThreshold(fromItem.getMaximumThreshold());
         toItem.setMinimumThreshold(fromItem.getMinimumThreshold());
       }
+    }
+  }
+
+  @Override
+  protected void beforeSave(Assay object) throws IOException {
+    // change details are updated in applyChanges for updates, so this is only for creation
+    if (!object.isSaved()) {
+      object.setChangeDetails(authorizationManager.getCurrentUser());
     }
   }
 

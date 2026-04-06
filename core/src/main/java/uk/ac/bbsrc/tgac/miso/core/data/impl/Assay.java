@@ -1,8 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.eaglegenomics.simlims.core.User;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -12,13 +17,19 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLoggable;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.AssayChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
-public class Assay implements Aliasable, Deletable, Serializable {
+public class Assay implements Aliasable, ChangeLoggable, Deletable, Serializable {
 
   private static final long serialVersionUID = 1L;
   private static final long UNSAVED_ID = 0L;
@@ -45,6 +56,23 @@ public class Assay implements Aliasable, Deletable, Serializable {
   private Integer analysisReviewTargetDays;
   private Integer releaseApprovalTargetDays;
   private Integer releaseTargetDays;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "creator")
+  private User creator;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date created;
+
+  @ManyToOne(targetEntity = UserImpl.class)
+  @JoinColumn(name = "lastModifier")
+  private User lastModifier;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModified;
+
+  @OneToMany(targetEntity = AssayChangeLog.class, mappedBy = "assay", cascade = CascadeType.REMOVE)
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @OneToMany
   @JoinTable(name = "Assay_AssayTest", joinColumns = {@JoinColumn(name = "assayId")},
@@ -205,6 +233,61 @@ public class Assay implements Aliasable, Deletable, Serializable {
       assayMetrics = new HashSet<>();
     }
     return assayMetrics;
+  }
+
+  @Override
+  public User getCreator() {
+    return creator;
+  }
+
+  @Override
+  public void setCreator(User user) {
+    this.creator = user;
+  }
+
+  @Override
+  public Date getCreationTime() {
+    return created;
+  }
+
+  @Override
+  public void setCreationTime(Date creationTime) {
+    this.created = creationTime;
+  }
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User user) {
+    this.lastModifier = user;
+  }
+
+  @Override
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
+  }
+
+  @Override
+  public ChangeLog createChangeLog(String summary, String columnsChanged, User user) {
+    AssayChangeLog change = new AssayChangeLog();
+    change.setAssay(this);
+    change.setSummary(summary);
+    change.setColumnsChanged(columnsChanged);
+    change.setUser(user);
+    return change;
   }
 
   @Override

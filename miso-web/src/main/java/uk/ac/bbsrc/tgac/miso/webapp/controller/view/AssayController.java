@@ -89,6 +89,7 @@ public class AssayController {
 
   private ModelAndView setupForm(Assay assay, PageMode pageMode, ModelMap model) throws IOException {
     model.put(PageMode.PROPERTY, pageMode.getLabel());
+    model.put("assay", assay);
     model.put("isAdmin", authorizationManager.isAdminUser());
     model.put("assayDto", mapper.writeValueAsString(AssayDto.from(assay)));
     model.put("libraryQualificationMethods",
