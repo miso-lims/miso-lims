@@ -240,6 +240,19 @@ public class ConstantsController {
   @Value("${miso.newOptionSopUrl:#{null}}")
   private String newOptionSopUrl;
 
+  @Value("${miso.display.bulk.receiptQc:true}")
+  private boolean showReceiptQc;
+  @Value("${miso.display.bulk.requisition:true}")
+  private boolean showRequisition;
+  @Value("${miso.display.bulk.qcStatus:true}")
+  private boolean showQcStatus;
+  @Value("${miso.display.bulk.matrixBarcode:true}")
+  private boolean showMatrixBarcode;
+  @Value("${miso.display.bulk.discarded:true}")
+  private boolean showDiscarded;
+  @Value("${miso.display.bulk.defaultDetailedQcStatus:#{null}}")
+  private String defaultDetailedQcStatus;
+
   @Resource
   private Boolean boxScannerEnabled;
 
@@ -279,6 +292,12 @@ public class ConstantsController {
       node.put("automaticBarcodes", autoGenerateIdBarcodes);
       node.put("boxScannerEnabled", boxScannerEnabled);
       node.put("newOptionSopUrl", newOptionSopUrl);
+      node.put("showReceiptQc", showReceiptQc);
+      node.put("showRequisition", showRequisition);
+      node.put("showQcStatus", showQcStatus);
+      node.put("showMatrixBarcode", showMatrixBarcode);
+      node.put("showDiscarded", showDiscarded);
+      node.put("defaultDetailedQcStatus", defaultDetailedQcStatus);
 
       final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 
