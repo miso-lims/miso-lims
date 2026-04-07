@@ -38,7 +38,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
-import uk.ac.bbsrc.tgac.miso.core.security.UserDetailsNameAndEmail;
+import uk.ac.bbsrc.tgac.miso.core.security.ProvisionedUserDetails;
 
 /**
  * Helper class that provides various methods to deal with security authorisation and profiles
@@ -135,8 +135,7 @@ public class LimsSecurityUtils {
     target.setAdmin(roles.contains(MisoAuthority.ROLE_ADMIN.name()));
     target.setInternal(roles.contains(MisoAuthority.ROLE_INTERNAL.name()));
 
-    target.setPassword(samlUserDetails.getPassword());
-    if (samlUserDetails instanceof UserDetailsNameAndEmail samlUser) {
+    if (samlUserDetails instanceof ProvisionedUserDetails samlUser) {
       target.setFullName(samlUser.getFullName());
       target.setEmail(samlUser.getEmail());
     } else {

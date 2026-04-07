@@ -1,1 +1,1 @@
-Added SAML multifactor authentication for MISO.
+Added SAML authentication for MISO.

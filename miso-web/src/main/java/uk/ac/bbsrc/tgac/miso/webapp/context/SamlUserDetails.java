@@ -7,9 +7,9 @@ import java.util.Map;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 
-import uk.ac.bbsrc.tgac.miso.core.security.UserDetailsNameAndEmail;
+import uk.ac.bbsrc.tgac.miso.core.security.ProvisionedUserDetails;
 
-public class SamlUserDetails implements UserDetailsNameAndEmail, Saml2AuthenticatedPrincipal {
+public class SamlUserDetails implements ProvisionedUserDetails, Saml2AuthenticatedPrincipal {
 
   private final String username;
   private final String fullName;
@@ -102,4 +102,3 @@ public class SamlUserDetails implements UserDetailsNameAndEmail, Saml2Authentica
   }
 
 }
-

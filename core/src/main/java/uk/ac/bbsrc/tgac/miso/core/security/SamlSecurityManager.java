@@ -30,7 +30,7 @@ public class SamlSecurityManager implements SecurityManager {
   public void syncUser(UserDetails userDetails) throws IOException {
     User user = LimsSecurityUtils.fromSamlUser(userDetails);
     User dbUser = userService.getByLoginName(user.getLoginName());
-    if (dbUser == null || !dbUser.equals(user)) {
+    if (dbUser == null) {
       userService.create(user);
     } else {
       LimsSecurityUtils.updateFromSamlUser(dbUser, userDetails);

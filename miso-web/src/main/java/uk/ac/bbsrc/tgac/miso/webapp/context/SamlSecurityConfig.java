@@ -50,15 +50,14 @@ public class SamlSecurityConfig {
 
   @Bean
   public RelyingPartyRegistrationRepository relyingPartyRegistrationRepository(
-      @Value("${security.saml.registrationId:miso}") String registrationId,
+      @Value("${security.saml.sp.registrationId:miso}") String registrationId,
       @Value("${security.saml.idp.metadataUrl}") String metadataUrl,
-      @Value("${security.saml.sp.entityId:{baseUrl}/saml2/service-provider-metadata/{registrationId}}") String entityId,
       @Value("${security.saml.sp.privateKey}") Resource privateKey,
       @Value("${security.saml.sp.certificate}") Resource certificate) {
 
     RelyingPartyRegistration.Builder builder = RelyingPartyRegistrations.fromMetadataLocation(metadataUrl)
         .registrationId(registrationId)
-        .entityId(entityId)
+        .entityId("{baseUrl}/saml2/service-provider-metadata/{registrationId}")
         .assertionConsumerServiceLocation("{baseUrl}/login/saml2/sso/{registrationId}")
         .singleLogoutServiceLocation("{baseUrl}/logout/saml2/slo/{registrationId}")
         .singleLogoutServiceResponseLocation("{baseUrl}/logout/saml2/slo/{registrationId}")
@@ -77,7 +76,8 @@ public class SamlSecurityConfig {
       @Value("${security.saml.lastNameAttribute}") String lastNameAttribute,
       @Value("${security.saml.emailAttribute}") String emailAttribute,
       @Value("${security.saml.rolesAttribute}") String rolesAttribute,
-      @Value("${security.saml.stripRolePrefix:}") String stripRolePrefix) {
+      @Value("${security.saml.internalRoleName}") String internalRoleName,
+      @Value("${security.saml.adminRoleName:}") String adminRoleName) {
 
     OpenSaml4AuthenticationProvider provider = new OpenSaml4AuthenticationProvider();
     provider.setResponseAuthenticationConverter(token -> {
@@ -85,16 +85,17 @@ public class SamlSecurityConfig {
           OpenSaml4AuthenticationProvider.createDefaultResponseAuthenticationConverter().convert(token);
 
       Saml2AuthenticatedPrincipal principal = (Saml2AuthenticatedPrincipal) auth.getPrincipal();
-      List<GrantedAuthority> authorities = mapAuthorities(principal, rolesAttribute, stripRolePrefix);
+      List<GrantedAuthority> authorities = mapAuthorities(principal, rolesAttribute, internalRoleName, adminRoleName);
 
       if (authorities.stream().noneMatch(a -> a.getAuthority().equals("ROLE_INTERNAL"))) {
         throw new InsufficientAuthenticationException("User is not authorized for MISO login");
       }
 
       SamlUserDetails userDetails = new SamlUserDetails(
-          required(principal, usernameAttribute).toLowerCase(Locale.ROOT),
-          required(principal, firstNameAttribute) + " " + required(principal, lastNameAttribute),
-          required(principal, emailAttribute),
+          getRequiredAttribute(principal, usernameAttribute).toLowerCase(Locale.ROOT),
+          getRequiredAttribute(principal, firstNameAttribute) + " "
+              + getRequiredAttribute(principal, lastNameAttribute),
+          getRequiredAttribute(principal, emailAttribute),
           authorities,
           principal);
 
@@ -129,7 +130,7 @@ public class SamlSecurityConfig {
         .build();
   }
 
-  private static String required(Saml2AuthenticatedPrincipal principal, String attribute) {
+  private static String getRequiredAttribute(Saml2AuthenticatedPrincipal principal, String attribute) {
     String value = principal.getFirstAttribute(attribute);
     if (value == null || value.isBlank()) {
       throw new IllegalArgumentException("Missing SAML attribute: " + attribute);
@@ -138,22 +139,29 @@ public class SamlSecurityConfig {
   }
 
   private static List<GrantedAuthority> mapAuthorities(
-      Saml2AuthenticatedPrincipal principal, String rolesAttribute, String stripRolePrefix) {
+      Saml2AuthenticatedPrincipal principal, String rolesAttribute, String internalRoleName, String adminRoleName) {
     List<Object> roles = principal.getAttribute(rolesAttribute);
     List<GrantedAuthority> result = new ArrayList<>();
     if (roles == null)
       return result;
 
+    boolean hasInternalRole = false;
+    boolean hasAdminRole = false;
     for (Object role : roles) {
       String value = role.toString();
-      if (!stripRolePrefix.isEmpty() && value.startsWith(stripRolePrefix)) {
-        value = value.substring(stripRolePrefix.length());
+      if (value.equals(internalRoleName)) {
+        hasInternalRole = true;
       }
-      value = value.toUpperCase(Locale.ROOT);
-      if (!value.startsWith("ROLE_")) {
-        value = "ROLE_" + value;
+      if (!adminRoleName.isBlank() && value.equals(adminRoleName)) {
+        hasAdminRole = true;
       }
-      result.add(new SimpleGrantedAuthority(value));
+    }
+
+    if (hasInternalRole) {
+      result.add(new SimpleGrantedAuthority("ROLE_INTERNAL"));
+    }
+    if (hasAdminRole) {
+      result.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
     return result;
   }
@@ -170,4 +178,3 @@ public class SamlSecurityConfig {
   }
 
 }
-

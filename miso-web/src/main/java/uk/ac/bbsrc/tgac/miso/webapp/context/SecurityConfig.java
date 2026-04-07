@@ -119,7 +119,6 @@ public class SecurityConfig {
       throws Exception {
     return http
         .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-            .shouldFilterAllDispatcherTypes(true)
             .dispatcherTypeMatchers(DispatcherType.FORWARD)
             .permitAll()
             .requestMatchers(
@@ -146,9 +145,7 @@ public class SecurityConfig {
             .requireExplicitSave(true)
             .securityContextRepository(new DelegatingSecurityContextRepository(
                 new RequestAttributeSecurityContextRepository(),
-                new HttpSessionSecurityContextRepository())))
-        .sessionManagement(sessions -> sessions
-            .requireExplicitAuthenticationStrategy(true));
+                new HttpSessionSecurityContextRepository())));
   }
 
 }

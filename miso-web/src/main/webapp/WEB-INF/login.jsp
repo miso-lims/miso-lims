@@ -25,7 +25,7 @@
             </tr>
             <tr>
               <td align="center">
-                <input type="submit" name="login" value="Login with SSO &#187;" tabindex="5"/>
+                <input type="submit" name="login" value="Log in with SSO &#187;" tabindex="5"/>
               </td>
             </tr>
           </table>
