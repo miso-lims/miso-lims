@@ -1,0 +1,1 @@
+When importing a spreadsheet into a bulk input table, an error will now be shown if certain read-only data does not match between the table and the spreadsheet. This is mainly intended to catch cases where the table and spreadsheet have not been sorted consistently.

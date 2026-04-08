@@ -20,12 +20,14 @@ BulkTarget.sequencingorder = (function () {
           type: "text",
           data: "pool.name",
           disabled: true,
+          preventImport: true,
         },
         {
           title: "Pool Alias",
           type: "text",
           data: "pool.alias",
           disabled: true,
+          preventImport: true,
         },
         {
           title: "Purpose",

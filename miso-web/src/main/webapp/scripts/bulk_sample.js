@@ -496,18 +496,21 @@ BulkTarget.sample = (function ($) {
               type: "text",
               data: "parentName",
               disabled: true,
+              preventImport: true,
             },
             {
               title: "Parent Alias",
               type: "text",
               data: "parentAlias",
               disabled: true,
+              preventImport: true,
             },
             {
               title: "Parent Location",
               type: "text",
               data: "parentBoxPositionLabel",
               disabled: true,
+              preventImport: true,
               customSorting: [
                 {
                   name: "Parent Location (by rows)",
@@ -528,6 +531,7 @@ BulkTarget.sample = (function ($) {
               type: "text",
               data: "parentSampleClassAlias",
               disabled: true,
+              preventImport: true,
               include: config.pageMode === "propagate",
               getData: function (sample) {
                 return Utils.array.maybeGetProperty(

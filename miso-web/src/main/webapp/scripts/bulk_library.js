@@ -246,6 +246,7 @@ BulkTarget.library = (function ($) {
           data: "parentSampleName",
           include: config.pageMode === "propagate",
           disabled: true,
+          preventImport: true,
         },
         {
           title: "Sample Alias",
@@ -258,12 +259,14 @@ BulkTarget.library = (function ($) {
           },
           include: config.pageMode === "propagate" || config.sampleAliasMaybeRequired,
           disabled: !config.isLibraryReceipt,
+          preventImport: true,
         },
         {
           title: "Sample Location",
           type: "text",
           data: "sampleBoxPositionLabel",
           disabled: true,
+          preventImport: true,
           include: config.pageMode === "propagate",
           customSorting: [
             {
@@ -292,6 +295,7 @@ BulkTarget.library = (function ($) {
         data: Constants.isDetailedSample ? "projectCode" : "projectName",
         include: !config.isLibraryReceipt,
         disabled: true,
+        preventImport: true,
       });
 
       if (config.isLibraryReceipt) {
@@ -406,6 +410,7 @@ BulkTarget.library = (function ($) {
             title: "Tissue Origin",
             type: "text",
             disabled: true,
+            preventImport: true,
             data: "effectiveTissueOriginAlias",
             getData: function (item, api) {
               return (
@@ -419,6 +424,7 @@ BulkTarget.library = (function ($) {
             title: "Tissue Type",
             type: "text",
             disabled: true,
+            preventImport: true,
             data: "effectiveTissueTypeAlias",
             getData: function (item, api) {
               return (

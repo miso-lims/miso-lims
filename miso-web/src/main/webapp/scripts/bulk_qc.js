@@ -71,6 +71,7 @@ BulkTarget.qc = (function () {
           type: "text",
           data: "entityAlias",
           disabled: true,
+          preventImport: true,
         },
         {
           title: "Date",
