@@ -1,9 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.core.data.spreadsheet;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.function.Function;
 
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -43,6 +46,37 @@ public abstract class Column<T> {
         if (date != null) {
           Calendar c = Calendar.getInstance();
           c.setTime(date);
+          cell.setDateValue(c);
+        }
+      }
+    };
+  }
+
+  public static <T> Column<T> forLocalDate(String name, boolean detailedSampleOnly, Function<T, LocalDate> transform) {
+    return new Column<T>(name, Format.DATE, detailedSampleOnly) {
+
+      @Override
+      void appendCsv(StringBuilder builder, T value) {
+        LocalDate date = transform.apply(value);
+        if (date != null) {
+          builder.append(date.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        }
+      }
+
+      @Override
+      void setExcel(XSSFCell cell, T value) {
+        LocalDate date = transform.apply(value);
+        if (date != null) {
+          Calendar c = GregorianCalendar.from(date.atStartOfDay(ZoneId.systemDefault()));
+          cell.setCellValue(c);
+        }
+      }
+
+      @Override
+      void setODF(OdfTableCell cell, T value) {
+        LocalDate date = transform.apply(value);
+        if (date != null) {
+          Calendar c = GregorianCalendar.from(date.atStartOfDay(ZoneId.systemDefault()));
           cell.setDateValue(c);
         }
       }
