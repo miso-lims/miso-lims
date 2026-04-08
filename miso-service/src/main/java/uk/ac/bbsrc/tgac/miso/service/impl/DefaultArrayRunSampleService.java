@@ -7,13 +7,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
@@ -22,7 +19,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunSampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
-import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunItemQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -42,9 +38,6 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
   private RunItemQcStatusService runItemQcStatusService;
 
   @Autowired
-  private ChangeLogService changeLogService;
-
-  @Autowired
   private AuthorizationManager authorizationManager;
 
   @Override
@@ -62,20 +55,7 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
       return Collections.emptyList();
     }
 
-    Array array = run.getArray();
-    Map<String, Sample> samples = array.getSamples();
-    if (samples == null || samples.isEmpty()) {
-      return Collections.emptyList();
-    }
-
-    List<ArrayRunSample> results = new ArrayList<>(samples.size());
-    for (Map.Entry<String, Sample> entry : samples.entrySet()) {
-      ArrayRunSample item = arrayRunSampleDao.get(run, array, entry.getKey(), entry.getValue());
-      if (item != null) {
-        results.add(item);
-      }
-    }
-
+    List<ArrayRunSample> results = arrayRunSampleDao.listByRunId(arrayRunId);
     results.sort(Comparator.comparing(ArrayRunSample::getPosition));
     return results;
   }
@@ -101,16 +81,11 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
   public void save(ArrayRunSample arrayRunSample) throws IOException {
     loadChildEntities(arrayRunSample);
     ArrayRunSample managed = getManagedRecord(arrayRunSample);
-    User user = authorizationManager.getCurrentUser();
-    Long oldQcStatusId = managed.getQcStatus() == null ? null : managed.getQcStatus().getId();
-    String oldQcStatusDescription = managed.getQcStatus() == null ? "Pending" : managed.getQcStatus().getDescription();
-    String oldQcNote = managed.getQcNote();
     updateQcDetails(arrayRunSample, managed, ArrayRunSample::getQcStatus, ArrayRunSample::getQcUser,
         ArrayRunSample::setQcUser, authorizationManager, ArrayRunSample::getQcDate, ArrayRunSample::setQcDate);
     validateChange(arrayRunSample);
     applyChanges(arrayRunSample, managed);
     arrayRunSampleDao.save(managed);
-    createQcChangeLog(managed, oldQcStatusId, oldQcStatusDescription, oldQcNote, user);
   }
 
   private ArrayRunSample getManagedRecord(ArrayRunSample arrayRunSample) throws IOException {
@@ -185,40 +160,5 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
     to.setQcNote(from.getQcNote());
     to.setQcUser(from.getQcUser());
     to.setQcDate(from.getQcDate());
-  }
-
-  private void createQcChangeLog(ArrayRunSample arrayRunSample, Long oldQcStatusId, String oldQcStatusDescription,
-      String oldQcNote, User user) throws IOException {
-    Long newQcStatusId = arrayRunSample.getQcStatus() == null ? null : arrayRunSample.getQcStatus().getId();
-    String newQcStatusDescription = arrayRunSample.getQcStatus() == null ? "Pending"
-        : arrayRunSample.getQcStatus().getDescription();
-    String newQcNote = arrayRunSample.getQcNote();
-
-    boolean statusChanged = !java.util.Objects.equals(oldQcStatusId, newQcStatusId);
-    boolean noteChanged = !java.util.Objects.equals(oldQcNote, newQcNote);
-    if (!statusChanged && !noteChanged) {
-      return;
-    }
-
-    String sampleLabel = arrayRunSample.getSample() == null ? arrayRunSample.getPosition()
-        : arrayRunSample.getSample().getName();
-    String summary;
-    if (statusChanged && noteChanged) {
-      summary = String.format("QC updated for sample %s at %s: status %s -> %s; note %s -> %s", sampleLabel,
-          arrayRunSample.getPosition(), oldQcStatusDescription, newQcStatusDescription, formatNote(oldQcNote),
-          formatNote(newQcNote));
-    } else if (statusChanged) {
-      summary = String.format("QC status updated for sample %s at %s: %s -> %s", sampleLabel,
-          arrayRunSample.getPosition(), oldQcStatusDescription, newQcStatusDescription);
-    } else {
-      summary = String.format("QC note updated for sample %s at %s: %s -> %s", sampleLabel,
-          arrayRunSample.getPosition(), formatNote(oldQcNote), formatNote(newQcNote));
-    }
-
-    changeLogService.create(arrayRunSample.getArrayRun().createChangeLog(summary, "sampleQc", user));
-  }
-
-  private String formatNote(String note) {
-    return note == null ? "none" : note;
   }
 }

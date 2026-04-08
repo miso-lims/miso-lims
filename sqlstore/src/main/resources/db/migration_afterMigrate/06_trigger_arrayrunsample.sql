@@ -25,7 +25,7 @@ BEGIN
       ), ''),
       COALESCE(NEW.qcUser, (SELECT lastModifier FROM ArrayRun WHERE arrayRunId = NEW.arrayRunId)),
       CONCAT(
-        COALESCE((SELECT name FROM Sample WHERE sampleId = NEW.sampleId), NEW.position),
+        (SELECT alias FROM Sample WHERE sampleId = NEW.sampleId),
         ' at ', NEW.position, ' ',
         log_message
       ),
@@ -63,7 +63,7 @@ BEGIN
       ), ''),
       COALESCE(NEW.qcUser, (SELECT lastModifier FROM ArrayRun WHERE arrayRunId = NEW.arrayRunId)),
       CONCAT(
-        COALESCE((SELECT name FROM Sample WHERE sampleId = NEW.sampleId), NEW.position),
+        (SELECT alias FROM Sample WHERE sampleId = NEW.sampleId),
         ' at ', NEW.position, ': ',
         log_message
       ),
