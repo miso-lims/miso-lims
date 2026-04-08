@@ -103,24 +103,6 @@
     }
     showSamplesLoading(true);
 
-    if (selectedPositions.length === 1) {
-      $.ajax({
-        url: Urls.rest.arrays.position(arrayJson.id, selectedPositions[0]),
-        type: "DELETE",
-        dataType: "json",
-      })
-        .done(function (data) {
-          clearSampleSearchResults();
-          SampleArray.setArrayJson(data);
-          showSamplesLoading(false);
-        })
-        .fail(function (xhr, textStatus, errorThrown) {
-          Utils.showAjaxErrorDialog(xhr, textStatus, errorThrown);
-          showSamplesLoading(false);
-        });
-      return;
-    }
-
     var data = selectedPositions.map(function (position) {
       return {
         position: position,

@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -92,23 +91,6 @@ public class ArrayRestController extends AbstractRestController {
       array.setSamples(existing.getSamples());
       return array;
     }), arrayService, Dtos::asDto);
-  }
-
-  @DeleteMapping(value = "/{arrayId}/positions/{position}")
-  public @ResponseBody ArrayDto removeSample(@PathVariable(name = "arrayId", required = true) long arrayId,
-      @PathVariable(name = "position", required = true) String position) throws IOException {
-    Array array = getArrayOrThrow(arrayId);
-    validatePositions(array, Collections.singletonList(position), Status.NOT_FOUND);
-    if (array.getSample(position) == null) {
-      // already empty - do nothing
-      return Dtos.asDto(array);
-    }
-
-    array.setSample(position, null);
-    arrayService.update(array);
-
-    Array saved = arrayService.get(arrayId);
-    return Dtos.asDto(saved);
   }
 
   @PutMapping(value = "/{arrayId}/positions/{position}")
@@ -223,18 +205,6 @@ public class ArrayRestController extends AbstractRestController {
       throw new RestException(ERROR_NOTFOUND, Status.NOT_FOUND);
     }
     return array;
-  }
-
-  private void validatePositions(Array array, List<String> positions, Status invalidStatus) {
-    if (positions == null || positions.isEmpty()) {
-      throw new RestException("No array positions selected", Status.BAD_REQUEST);
-    }
-    List<String> invalidPositions = positions.stream()
-        .filter(position -> !array.isPositionValid(position))
-        .collect(Collectors.toList());
-    if (!invalidPositions.isEmpty()) {
-      throw new RestException("Invalid array position", invalidStatus);
-    }
   }
 
 }
