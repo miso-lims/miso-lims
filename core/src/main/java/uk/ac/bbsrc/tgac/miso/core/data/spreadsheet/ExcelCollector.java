@@ -4,11 +4,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelCollector<T> extends SpreadSheetCollector<T, XSSFWorkbook, XSSFSheet, XSSFRow> {
+
+  private CellStyle dateStyle;
 
   public ExcelCollector(List<Column<T>> columns) {
     super(columns);
@@ -21,7 +25,11 @@ public class ExcelCollector<T> extends SpreadSheetCollector<T, XSSFWorkbook, XSS
 
   @Override
   protected XSSFWorkbook createWorkbook() throws Exception {
-    return new XSSFWorkbook();
+    XSSFWorkbook workbook = new XSSFWorkbook();
+    CellStyle dateStyle = workbook.createCellStyle();
+    dateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat("yyyy-mm-dd"));
+    this.dateStyle = dateStyle;
+    return workbook;
   }
 
   @Override
@@ -31,7 +39,11 @@ public class ExcelCollector<T> extends SpreadSheetCollector<T, XSSFWorkbook, XSS
 
   @Override
   protected void setCell(XSSFWorkbook workbook, XSSFSheet sheet, XSSFRow row, int i, Column<T> column, T item) {
-    column.setExcel(row.createCell(i), item);
+    XSSFCell cell = row.createCell(i);
+    column.setExcel(cell, item);
+    if (column.format() == Column.Format.DATE) {
+      cell.setCellStyle(dateStyle);
+    }
   }
 
   @Override
