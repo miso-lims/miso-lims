@@ -128,6 +128,7 @@ public class SecurityConfig {
                 "/metrics",
                 "/login",
                 "/login/saml2/**",
+                "/logout/saml2/**",
                 "/saml2/**",
                 "/accessDenied",
                 "/error")

@@ -61,7 +61,7 @@ public class SamlSecurityConfig {
         .assertionConsumerServiceLocation("{baseUrl}/login/saml2/sso/{registrationId}")
         .singleLogoutServiceLocation("{baseUrl}/logout/saml2/slo/{registrationId}")
         .singleLogoutServiceResponseLocation("{baseUrl}/logout/saml2/slo/{registrationId}")
-        .singleLogoutServiceBinding(Saml2MessageBinding.REDIRECT);
+        .singleLogoutServiceBinding(Saml2MessageBinding.POST);
 
     builder.signingX509Credentials(c -> c.add(loadSigningCredential(privateKey, certificate)));
 
@@ -117,7 +117,10 @@ public class SamlSecurityConfig {
       ApiKeyAuthenticationFilter apiKeyFilter,
       AuthenticationSuccessHandler successHandler,
       AuthenticationFailureHandler failureHandler,
-      OpenSaml4AuthenticationProvider samlAuthenticationProvider) throws Exception {
+      OpenSaml4AuthenticationProvider samlAuthenticationProvider,
+      @Value("${security.saml.sp.registrationId:miso}") String registrationId) throws Exception {
+
+    String sloUrl = "/logout/saml2/slo/" + registrationId;
 
     return SecurityConfig.setupCommon(http, apiKeyFilter)
         .saml2Login(saml -> saml
@@ -125,7 +128,9 @@ public class SamlSecurityConfig {
             .successHandler(successHandler)
             .failureHandler(failureHandler)
             .authenticationManager(new ProviderManager(samlAuthenticationProvider)))
-        .saml2Logout(Customizer.withDefaults())
+        .saml2Logout(saml -> saml
+            .logoutRequest(logout -> logout.logoutUrl(sloUrl))
+            .logoutResponse(logout -> logout.logoutUrl(sloUrl)))
         .saml2Metadata(Customizer.withDefaults())
         .build();
   }
