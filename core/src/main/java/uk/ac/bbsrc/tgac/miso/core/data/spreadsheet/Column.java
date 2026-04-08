@@ -13,12 +13,16 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public abstract class Column<T> {
 
+  public static enum Format {
+    AUTO, DATE
+  }
+
   public static <T> Column<T> forDate(String name, Function<T, Date> transform) {
     return forDate(name, false, transform);
   }
 
   public static <T> Column<T> forDate(String name, boolean detailedSampleOnly, Function<T, Date> transform) {
-    return new Column<T>(name, detailedSampleOnly) {
+    return new Column<T>(name, Format.DATE, detailedSampleOnly) {
 
       @Override
       void appendCsv(StringBuilder builder, T value) {
@@ -39,7 +43,7 @@ public abstract class Column<T> {
         if (date != null) {
           Calendar c = Calendar.getInstance();
           c.setTime(date);
-          cell.setTimeValue(c);
+          cell.setDateValue(c);
         }
       }
     };
@@ -228,11 +232,17 @@ public abstract class Column<T> {
   }
 
   private final String name;
+  private final Format format;
   private final boolean detailedSampleOnly;
 
   public Column(String name, boolean detailedSampleOnly) {
+    this(name, Format.AUTO, detailedSampleOnly);
+  }
+
+  public Column(String name, Format format, boolean detailedSampleOnly) {
     super();
     this.name = name;
+    this.format = format;
     this.detailedSampleOnly = detailedSampleOnly;
   }
 
@@ -240,6 +250,10 @@ public abstract class Column<T> {
 
   public String name() {
     return name;
+  }
+
+  public Format format() {
+    return format;
   }
 
   public boolean isDetailedSampleOnly() {
