@@ -3,12 +3,16 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Date;
 
 import org.junit.Test;
+
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayMetric;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 public class HibernateAssayDaoIT extends AbstractHibernateSaveDaoTest<Assay, HibernateAssayDao> {
 
@@ -28,6 +32,12 @@ public class HibernateAssayDaoIT extends AbstractHibernateSaveDaoTest<Assay, Hib
     Assay assay = new Assay();
     assay.setAlias("New Assay");
     assay.setVersion("1.0");
+    User user = (User) currentSession().get(UserImpl.class, 1L);
+    Date now = new Date();
+    assay.setCreator(user);
+    assay.setCreationTime(now);
+    assay.setLastModifier(user);
+    assay.setLastModified(now);
     return assay;
   }
 

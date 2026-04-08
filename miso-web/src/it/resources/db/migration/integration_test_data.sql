@@ -502,11 +502,11 @@ INSERT INTO Study (studyId, name, project_projectId, alias, studyTypeId, creator
 (3, 'STU3', 3, 'Study Three', 1, 1, '2020-02-20 11:53:00', 1, '2020-02-20 11:53:00'),
 (400, 'STU400', 400, 'UI Test Study', 1, 1, '2018-04-23 15:08:00', 1, '2018-04-23 15:08:00');
 
-INSERT INTO Assay(assayId, alias, version, archived) VALUES
-(1, 'Main Assay', '1.0', FALSE),
-(2, 'Alternate Assay', '1.0', TRUE),
-(3, 'Alternate Assay', '2.0', FALSE),
-(4, 'Bad Assay', '1.0', FALSE);
+INSERT INTO Assay(assayId, alias, version, archived, creator, created, lastModifier, lastModified) VALUES
+(1, 'Main Assay', '1.0', FALSE, 1, '2026-04-07 08:05:00', 1, '2026-04-07 08:05:00'),
+(2, 'Alternate Assay', '1.0', TRUE, 1, '2026-04-07 08:05:00', 1, '2026-04-07 08:05:00'),
+(3, 'Alternate Assay', '2.0', FALSE, 1, '2026-04-07 08:05:00', 1, '2026-04-07 08:05:00'),
+(4, 'Bad Assay', '1.0', FALSE, 1, '2026-04-07 08:05:00', 1, '2026-04-07 08:05:00');
 
 INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
 (1, 'Container Intact', 'RECEIPT', 'BOOLEAN', NULL),
