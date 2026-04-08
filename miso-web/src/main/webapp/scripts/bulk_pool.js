@@ -23,30 +23,35 @@ BulkTarget.pool = (function ($) {
           title: "Library Aliquot Name",
           type: "text",
           disabled: true,
+          preventImport: true,
           data: "name",
         },
         {
           title: "Alias",
           type: "text",
           disabled: true,
+          preventImport: true,
           data: "alias",
         },
         {
           title: "Box Alias",
           type: "text",
           disabled: true,
+          preventImport: true,
           data: "box.alias",
         },
         {
           title: "Position",
           type: "text",
           disabled: true,
+          preventImport: true,
           data: "boxPosition",
         },
         {
           title: "Size (bp)",
           type: "int",
           disabled: true,
+          preventImport: true,
           data: "dnaSize",
         },
         {
@@ -156,11 +161,7 @@ BulkTarget.pool = (function ($) {
                 "pools",
                 Urls.rest.worksets.removePools(config.worksetId)
               )
-            : BulkUtils.actions.addToWorkset(
-                "pools",
-                "poolIds",
-                Urls.rest.worksets.addPools
-              ),
+            : BulkUtils.actions.addToWorkset("pools", "poolIds", Urls.rest.worksets.addPools),
           {
             name: "Attach Files",
             action: function (items) {
