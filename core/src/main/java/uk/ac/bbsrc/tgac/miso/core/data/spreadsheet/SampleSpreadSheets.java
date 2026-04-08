@@ -114,8 +114,11 @@ public enum SampleSpreadSheets implements Spreadsheet<Sample> {
       Column.forString("Group ID", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupId)), //
       Column.forString("Group Description", true, effectiveGroupIdProperty(GroupIdentifiable::getGroupDescription)), //
       Column.forString("Barcode", Sample::getIdentificationBarcode), //
-      Column.forString("Created By", s -> s.getCreator().getLoginName()), //
-      Column.forDate("Created Date", Sample::getCreationTime)), //
+      Column.forString("Created By", true,
+          detailedSample(DetailedSample.class, s -> s.getCreationDate() == null ? null : s.getCreator().getLoginName(),
+              null)), //
+      Column.forLocalDate("Created Date", true, detailedSample(DetailedSample.class,
+          s -> s.getCreationDate() == null ? null : s.getCreationDate(), null))), //
   PROCESSING_AND_EXTRACTION("Processing & Extraction", //
       Arrays.asList(SampleTissue.CATEGORY_NAME, SampleTissueProcessing.CATEGORY_NAME, SampleStock.CATEGORY_NAME,
           SampleAliquot.CATEGORY_NAME), //
