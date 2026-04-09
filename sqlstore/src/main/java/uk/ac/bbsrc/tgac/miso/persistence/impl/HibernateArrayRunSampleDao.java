@@ -11,12 +11,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample.ArrayRunSampleId;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample_;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun_;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.persistence.ArrayRunSampleDao;
+
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -82,8 +86,8 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
 
     QueryBuilder<ArrayRunSample, ArrayRunSample> builder =
         new QueryBuilder<>(currentSession(), ArrayRunSample.class, ArrayRunSample.class);
-    builder.addPredicate(builder.getCriteriaBuilder().equal(
-        builder.getRoot().get("arrayRun").get("id"), arrayRunId));
+    Join<ArrayRunSample, ArrayRun> runJoin = builder.getJoin(builder.getRoot(), ArrayRunSample_.arrayRun);
+    builder.addPredicate(builder.getCriteriaBuilder().equal(runJoin.get(ArrayRun_.id), arrayRunId));
 
     List<ArrayRunSample> existing = builder.getResultList();
 
@@ -93,9 +97,6 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
       Sample expectedSample = entry.getValue();
 
       ArrayRunSample existingItem = existing.stream()
-          .filter(item -> item.getArrayRun() != null && item.getArrayRun().getId() == persistedRun.getId())
-          .filter(item -> item.getArray() != null && item.getArray().getId() == persistedArray.getId())
-          .filter(item -> item.getSample() != null && item.getSample().getId() == expectedSample.getId())
           .filter(item -> position.equals(item.getPosition()))
           .findFirst()
           .orElse(null);
