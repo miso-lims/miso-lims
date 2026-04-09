@@ -1,3 +1,4 @@
+-- assay_changelog
 CREATE TABLE AssayChangeLog (
   assayChangeLogId bigint NOT NULL AUTO_INCREMENT,
   assayId bigint NOT NULL,
@@ -21,3 +22,4 @@ ALTER TABLE Assay
   ALTER COLUMN created DROP DEFAULT,
   ALTER COLUMN lastModifier DROP DEFAULT,
   ALTER COLUMN lastModified DROP DEFAULT;
+

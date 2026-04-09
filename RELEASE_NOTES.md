@@ -7,6 +7,26 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.20.0] - 2026-04-09
+
+### Added
+
+* assay changelogs
+* Multiple positions can be selected at once for adding/removing samples from the array on the Edit Array page.
+
+### Changed
+
+* Library aliquots in Pinery will now include as sample attributes the same QC types that are included from samples or libraries
+* The Initial Extraction Yields List sample download sheet now only includes the "Created Date" and "Created By" if date of creation is set (previously it was showing the date entered)
+
+### Fixed
+
+* formatting of date columns in download sheets
+* When importing a spreadsheet into a bulk input table, an error will now be shown if certain read-only data does not match between the table and the spreadsheet. This is mainly intended to catch cases where the table and spreadsheet have not been sorted consistently.
+* Error adding entire boxes of items to transfers from the Create/Edit Transfer page
+* Unexpected error when attempting to add some samples to distribution transfers
+
+
 ## [3.19.0] - 2026-03-19
 
 ### Added
