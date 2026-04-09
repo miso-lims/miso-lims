@@ -25,6 +25,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
@@ -91,27 +93,6 @@ public class ArrayRestController extends AbstractRestController {
     }), arrayService, Dtos::asDto);
   }
 
-  @DeleteMapping(value = "/{arrayId}/positions/{position}")
-  public @ResponseBody ArrayDto removeSample(@PathVariable(name = "arrayId", required = true) long arrayId,
-      @PathVariable(name = "position", required = true) String position) throws IOException {
-    Array array = arrayService.get(arrayId);
-    if (array == null) {
-      throw new RestException(ERROR_NOTFOUND, Status.NOT_FOUND);
-    } else if (!array.isPositionValid(position)) {
-      throw new RestException("Invalid array position", Status.BAD_REQUEST);
-    }
-    if (array.getSample(position) == null) {
-      // already empty - do nothing
-      return Dtos.asDto(array);
-    }
-
-    array.setSample(position, null);
-    arrayService.update(array);
-
-    Array saved = arrayService.get(arrayId);
-    return Dtos.asDto(saved);
-  }
-
   @PutMapping(value = "/{arrayId}/positions/{position}")
   public @ResponseBody ArrayDto addSample(@PathVariable(name = "arrayId", required = true) long arrayId,
       @PathVariable(name = "position", required = true) String position,
@@ -120,8 +101,9 @@ public class ArrayRestController extends AbstractRestController {
     if (array == null) {
       throw new RestException(ERROR_NOTFOUND, Status.NOT_FOUND);
     } else if (!array.isPositionValid(position)) {
-      throw new RestException("Invalid array position", Status.BAD_REQUEST);
+      throw new RestException("Invalid array position", Status.NOT_FOUND);
     }
+
     Sample sample = sampleService.get(sampleId);
     if (sample == null) {
       throw new RestException("Sample not found", Status.BAD_REQUEST);
@@ -132,6 +114,60 @@ public class ArrayRestController extends AbstractRestController {
 
     Array saved = arrayService.get(arrayId);
     return Dtos.asDto(saved);
+  }
+
+  public static class BulkUpdateRequestItem {
+    private String position;
+    private String searchString;
+
+    public String getPosition() {
+      return position;
+    }
+
+    public void setPosition(String position) {
+      this.position = position;
+    }
+
+    public String getSearchString() {
+      return searchString;
+    }
+
+    public void setSearchString(String searchString) {
+      this.searchString = searchString;
+    }
+  }
+
+  @PutMapping(value = "/{arrayId}/positions")
+  public @ResponseBody ArrayDto bulkUpdatePositions(@PathVariable(name = "arrayId", required = true) long arrayId,
+      @RequestBody(required = true) List<BulkUpdateRequestItem> items) throws IOException {
+    Array array = getArrayOrThrow(arrayId);
+    ValidationResult validation = new ValidationResult();
+
+    for (BulkUpdateRequestItem item : items) {
+      if (!array.isPositionValid(item.getPosition())) {
+        validation.addError(new ValidationError("Invalid array position: " + item.getPosition()));
+        continue;
+      }
+      if (LimsUtils.isStringEmptyOrNull(item.getSearchString())) {
+        array.setSample(item.getPosition(), null);
+        continue;
+      }
+
+      List<Sample> searchResults = arrayService.getArrayableSamplesBySearch(item.getSearchString());
+      if (searchResults == null || searchResults.isEmpty()) {
+        validation.addError(new ValidationError(
+            "No sample found by searching '" + item.getSearchString() + "' for position " + item.getPosition()));
+      } else if (searchResults.size() > 1) {
+        validation.addError(new ValidationError("Multiple samples matched search '" + item.getSearchString()
+            + "' for position " + item.getPosition()));
+      } else {
+        array.setSample(item.getPosition(), searchResults.get(0));
+      }
+    }
+
+    validation.throwIfInvalid();
+    arrayService.update(array);
+    return Dtos.asDto(arrayService.get(arrayId));
   }
 
   @GetMapping(value = "/sample-search")
@@ -161,6 +197,14 @@ public class ArrayRestController extends AbstractRestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Array", ids, arrayService);
+  }
+
+  private Array getArrayOrThrow(long arrayId) throws IOException {
+    Array array = arrayService.get(arrayId);
+    if (array == null) {
+      throw new RestException(ERROR_NOTFOUND, Status.NOT_FOUND);
+    }
+    return array;
   }
 
 }

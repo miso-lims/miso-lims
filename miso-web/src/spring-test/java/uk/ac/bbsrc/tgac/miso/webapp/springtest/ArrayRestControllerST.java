@@ -28,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayDto;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ArrayRestController.BulkUpdateRequestItem;
 
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.View;
@@ -52,7 +53,7 @@ public class ArrayRestControllerST extends AbstractST {
 
   @Test
   public void testDtResponse() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1,2));
+    testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1, 2));
   }
 
   @Test
@@ -83,10 +84,12 @@ public class ArrayRestControllerST extends AbstractST {
     assertNotNull(updatedArray.getSample("R01C01"));
 
     getMockMvc()
-        .perform(delete(CONTROLLER_BASE + "/1/positions/R01C01").accept(MediaType.APPLICATION_JSON))
+        .perform(put(CONTROLLER_BASE + "/1/positions")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("[{\"position\":\"R01C01\",\"searchString\":null}]")
+            .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-
 
     updatedArray = currentSession().get(controllerClass, 1);
     assertNull(updatedArray.getSample("R01C01"));
@@ -103,6 +106,82 @@ public class ArrayRestControllerST extends AbstractST {
     Array updatedArray = currentSession().get(controllerClass, 1);
     SampleImpl addedSample = currentSession().get(SampleImpl.class, 9);
     assertEquals(updatedArray.getSample("R02C01"), addedSample);
+  }
+
+  @Test
+  public void testBulkAddSamples() throws Exception {
+    Array updatedArray = currentSession().get(controllerClass, 1);
+    assertNull(updatedArray.getSample("R02C01"));
+    assertNull(updatedArray.getSample("R03C01"));
+
+    getMockMvc()
+        .perform(put(CONTROLLER_BASE + "/1/positions")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(makeJsonForGenericList(Arrays.asList(
+                bulkUpdateItem("R02C01", "SAM9"),
+                bulkUpdateItem("R03C01", "SAM11"))))
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+    updatedArray = currentSession().get(controllerClass, 1);
+    assertEquals(currentSession().get(SampleImpl.class, 9), updatedArray.getSample("R02C01"));
+    assertEquals(currentSession().get(SampleImpl.class, 11), updatedArray.getSample("R03C01"));
+  }
+
+  @Test
+  public void testBulkUpdateSamples() throws Exception {
+    Array updatedArray = currentSession().get(controllerClass, 1);
+    assertEquals(currentSession().get(SampleImpl.class, 8), updatedArray.getSample("R01C01"));
+    assertNull(updatedArray.getSample("R02C01"));
+
+    getMockMvc()
+        .perform(put(CONTROLLER_BASE + "/1/positions")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(makeJsonForGenericList(Arrays.asList(
+                bulkUpdateItem("R01C01", "SAM9"),
+                bulkUpdateItem("R02C01", "SAM11"))))
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+    updatedArray = currentSession().get(controllerClass, 1);
+    assertEquals(currentSession().get(SampleImpl.class, 9), updatedArray.getSample("R01C01"));
+    assertEquals(currentSession().get(SampleImpl.class, 11), updatedArray.getSample("R02C01"));
+  }
+
+  @Test
+  public void testBulkRemoveSamples() throws Exception {
+    getMockMvc()
+        .perform(put(CONTROLLER_BASE + "/1/positions")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(makeJsonForGenericList(Arrays.asList(
+                bulkUpdateItem("R02C01", "SAM9"),
+                bulkUpdateItem("R03C01", "SAM11"))))
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+    Array updatedArray = currentSession().get(controllerClass, 1);
+    assertNotNull(updatedArray.getSample("R01C01"));
+    assertNotNull(updatedArray.getSample("R02C01"));
+    assertNotNull(updatedArray.getSample("R03C01"));
+
+    getMockMvc()
+        .perform(put(CONTROLLER_BASE + "/1/positions")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(makeJsonForGenericList(Arrays.asList(
+                bulkUpdateItem("R01C01", null),
+                bulkUpdateItem("R02C01", null),
+                bulkUpdateItem("R03C01", null))))
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+    updatedArray = currentSession().get(controllerClass, 1);
+    assertNull(updatedArray.getSample("R01C01"));
+    assertNull(updatedArray.getSample("R02C01"));
+    assertNull(updatedArray.getSample("R03C01"));
   }
 
   @Test
@@ -132,5 +211,12 @@ public class ArrayRestControllerST extends AbstractST {
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
     testDeleteUnauthorized(controllerClass, 2, CONTROLLER_BASE);
+  }
+
+  private BulkUpdateRequestItem bulkUpdateItem(String position, String searchString) {
+    BulkUpdateRequestItem item = new BulkUpdateRequestItem();
+    item.setPosition(position);
+    item.setSearchString(searchString);
+    return item;
   }
 }

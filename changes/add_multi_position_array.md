@@ -1,0 +1,1 @@
+Multiple positions can be selected at once for adding/removing samples from the array on the Edit Array page.

@@ -46,6 +46,7 @@ Urls = (function () {
     create: arrayRestBase,
     update: idUrlFunction(arrayRestBase),
     datatable: arrayRestBase + "/dt",
+    updatePositions: middleIdUrlFunction(arrayRestBase, "/positions"),
     position: function (arrayId, position) {
       return arrayRestBase + "/" + arrayId + "/positions/" + position;
     },
