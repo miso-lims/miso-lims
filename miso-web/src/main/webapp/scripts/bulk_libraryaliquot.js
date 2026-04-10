@@ -459,6 +459,7 @@ BulkTarget.libraryaliquot = (function ($) {
     },
     confirmSave: function (data) {
       var deferred = jQuery.Deferred();
+      BulkUtils.applyDefaultDetailedQcStatus(data);
 
       var overused = data.filter(function (aliquot, index) {
         return (

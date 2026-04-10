@@ -258,6 +258,26 @@ BulkUtils = (function ($) {
       });
     },
 
+    applyDefaultDetailedQcStatus: function (data) {
+      if (Constants.showQcStatus !== false || !Constants.defaultDetailedQcStatus) {
+        return;
+      }
+      var status = Constants.detailedQcStatuses.find(function (s) {
+        return s.description === Constants.defaultDetailedQcStatus;
+      });
+      if (!status) {
+        return;
+      }
+      data.forEach(function (item) {
+        if (!item.detailedQcStatusId) {
+          item.detailedQcStatusId = status.id;
+        }
+        if (item.sample && !item.sample.detailedQcStatusId) {
+          item.sample.detailedQcStatusId = status.id;
+        }
+      });
+    },
+
     columns: {
       name: {
         title: "Name",
@@ -799,7 +819,7 @@ BulkUtils = (function ($) {
               ).description;
             },
             required: true,
-            initial: Constants.showQcStatus === false ? Constants.defaultDetailedQcStatus : undefined,
+            initial: Constants.defaultDetailedQcStatus || undefined,
             source: function (data, api) {
               return [
                 {
@@ -2412,7 +2432,9 @@ BulkUtils = (function ($) {
   }
 
   function isColumnHidden(dataProperty) {
-    switch (dataProperty) {
+    // Strip "sample." prefix for library receipt page where sample columns are nested
+    var prop = dataProperty.replace(/^sample\./, "");
+    switch (prop) {
       case "received":
       case "receiptQcPassed":
       case "receiptQcNote":

@@ -973,6 +973,7 @@ BulkTarget.library = (function ($) {
 
     confirmSave: function (data, config) {
       var deferred = $.Deferred();
+      BulkUtils.applyDefaultDetailedQcStatus(data);
       if (config.isLibraryReceipt) {
         BulkUtils.checkPausedRequisitions(data, deferred);
       } else {

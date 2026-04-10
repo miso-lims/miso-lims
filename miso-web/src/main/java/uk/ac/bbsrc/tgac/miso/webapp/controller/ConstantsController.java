@@ -250,7 +250,7 @@ public class ConstantsController {
   private boolean showMatrixBarcode;
   @Value("${miso.display.bulk.discarded:true}")
   private boolean showDiscarded;
-  @Value("${miso.display.bulk.defaultDetailedQcStatus:#{null}}")
+  @Value("${miso.defaults.bulk.detailedQcStatus:#{null}}")
   private String defaultDetailedQcStatus;
 
   @Resource
