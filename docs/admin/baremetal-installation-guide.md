@@ -157,9 +157,10 @@ the `/storage/miso/` directory:
 
 ### Security Environment (updating `/storage/miso/security.properties`)
 
-MISO can use either LDAP (`ldap`), Active Directory LDAP (`ad`), or JDBC
-(`jdbc`) as an authentication mechanism. This is set by the `-Dsecurity.method`
-noted in the previous section, and the same value must be set in `security.properties`.
+MISO can use LDAP (`ldap`), Active Directory LDAP (`ad`), JDBC
+(`jdbc`), or SAML single sign-on (`saml`) as an authentication mechanism.
+This is set by the `-Dsecurity.method` noted in the previous section, and the
+same value must be set in `security.properties`.
 
 If you are using JDBC (i.e. storing usernames and passwords in the MISO database), set the security method to `jdbc`. No
 additional configuration is necessary.
@@ -186,6 +187,40 @@ Directory. For example `MISO_ROLE_INTERNAL` gives a clearer indication as to wha
 the group is used for. In this case you will need to set the property
 `security.ldap.stripRolePrefix` to the value `MISO_` to allow MISO to ignore the
 prefix.
+
+For using SAML single sign-on, set the security method to `saml`. Additional
+SAML settings are needed in `security.properties`, including:
+
+* `security.saml.sp.registrationId`
+* `security.saml.idp.metadataUrl`
+* `security.saml.sp.privateKey`
+* `security.saml.sp.certificate`
+* `security.saml.usernameAttribute`
+* `security.saml.firstNameAttribute`
+* `security.saml.lastNameAttribute`
+* `security.saml.emailAttribute`
+* `security.saml.rolesAttribute`
+* `security.saml.internalRoleName`
+* `security.saml.adminRoleName`
+
+The identity provider metadata URL should point to the SAML metadata published
+by your identity provider. The SP private key and certificate are used by MISO
+to sign SAML messages. The attribute properties tell MISO which SAML assertion
+attributes to use for the user's login name, full name, email, and roles.
+
+MISO requires one role for regular users and optionally one for administrators.
+These are configured using `security.saml.internalRoleName` and
+`security.saml.adminRoleName`. The SAML assertion must contain those exact role
+names in the attribute configured by `security.saml.rolesAttribute`.
+
+After configuring SAML, restart Tomcat and open the MISO service provider
+metadata URL at:
+
+`http://localhost:8080/saml2/service-provider-metadata/<registrationId>`
+
+Use that metadata when configuring the SAML client in your identity provider so
+that the assertion consumer and single logout service URLs match the running
+MISO instance.
 
 If using JDBC, once running, you should change the passwords of the `admin` and
 `notification` accounts.
