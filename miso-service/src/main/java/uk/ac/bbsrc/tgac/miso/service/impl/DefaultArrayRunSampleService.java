@@ -88,6 +88,11 @@ public class DefaultArrayRunSampleService implements ArrayRunSampleService {
     arrayRunSampleDao.save(managed);
   }
 
+  @Override
+  public List<ArrayRunSample> listByArrayId(long arrayId) throws IOException {
+    return arrayRunSampleDao.listByArrayId(arrayId);
+  }
+
   private ArrayRunSample getManagedRecord(ArrayRunSample arrayRunSample) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 

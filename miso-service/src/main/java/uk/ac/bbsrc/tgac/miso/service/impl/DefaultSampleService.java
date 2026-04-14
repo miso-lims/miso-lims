@@ -1294,11 +1294,6 @@ public class DefaultSampleService implements SampleService {
     if (arrays > 0) {
       result.addError(ValidationError.forDeletionUsage(object, arrays, Pluralizer.arrays(arrays)));
     }
-    final int arrayRuns = arrayRunService.listBySampleId(object.getId()).size();
-    if (arrayRuns > 0) {
-      result.addError(
-          ValidationError.forDeletionUsage(object, arrayRuns, arrayRuns == 1 ? "array run" : "array runs"));
-    }
     return result;
   }
 

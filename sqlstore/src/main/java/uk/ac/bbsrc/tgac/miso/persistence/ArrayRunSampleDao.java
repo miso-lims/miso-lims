@@ -19,4 +19,7 @@ public interface ArrayRunSampleDao {
   void delete(ArrayRunSample arrayRunSample) throws IOException;
 
   void deleteByRunId(long arrayRunId) throws IOException;
+
+  List<ArrayRunSample> listByArrayId(long arrayId) throws IOException;
+
 }

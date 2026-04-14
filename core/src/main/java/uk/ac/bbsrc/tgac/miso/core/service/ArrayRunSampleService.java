@@ -21,4 +21,6 @@ public interface ArrayRunSampleService {
     void save(ArrayRunSample arrayRunSample) throws IOException;
 
     void save(List<ArrayRunSample> arrayRunSamples) throws IOException;
+
+    List<ArrayRunSample> listByArrayId(long arrayId) throws IOException;
 }

@@ -1,8 +1,5 @@
-ALTER TABLE ArrayRun
-  ADD CONSTRAINT uk_arrayRun_id_array UNIQUE (arrayRunId, arrayId);
-
 ALTER TABLE ArrayPosition
-  ADD CONSTRAINT uk_arrayPosition_array_position_sample UNIQUE (arrayId, position, sampleId);
+  ADD CONSTRAINT uk_arrayPosition_array_position UNIQUE (arrayId, position);
 
 CREATE TABLE ArrayRun_Sample (
   arrayRunId bigint NOT NULL,

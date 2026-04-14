@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
-import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ArrayChangeLog;
@@ -126,8 +125,8 @@ public class DefaultArrayService implements ArrayService {
     Array managed = get(array.getId());
     validateChange(array, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
+    cleanupArrayRunSamples(array);
     applyChanges(array, managed);
-    cleanupArrayRunSamples(managed);
     return arrayStore.update(managed);
   }
 
@@ -236,14 +235,12 @@ public class DefaultArrayService implements ArrayService {
   }
 
   private void cleanupArrayRunSamples(Array array) throws IOException {
-    for (ArrayRun run : arrayRunService.listByArrayId(array.getId())) {
-      for (ArrayRunSample arrayRunSample : arrayRunSampleService.listByRunId(run.getId())) {
-        Sample expectedSample = array.getSamples().get(arrayRunSample.getPosition());
-        if (expectedSample == null
-            || arrayRunSample.getSample() == null
-            || arrayRunSample.getSample().getId() != expectedSample.getId()) {
-          arrayRunSampleService.delete(arrayRunSample);
-        }
+    for (ArrayRunSample arrayRunSample : arrayRunSampleService.listByArrayId(array.getId())) {
+      Sample expectedSample = array.getSample(arrayRunSample.getPosition());
+      if (expectedSample == null
+          || arrayRunSample.getSample() == null
+          || arrayRunSample.getSample().getId() != expectedSample.getId()) {
+        arrayRunSampleService.delete(arrayRunSample);
       }
     }
   }

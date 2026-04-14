@@ -28,8 +28,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
-import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunSampleService;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -145,7 +145,8 @@ public class ArrayRunRestController extends AbstractRestController {
     List<ArrayRunSampleDto> dtos = arrayRunSampleService.listByRunId(arrayRunId).stream()
         .map(Dtos::asDto)
         .collect(Collectors.toList());
-    // Assign a temporary row ID for DataTables selection, ArrayRunSample does not have its own database ID
+    // Assign a temporary row ID for DataTables selection, ArrayRunSample does not have its own database
+    // ID
     for (int i = 0; i < dtos.size(); i++) {
       dtos.get(i).setId((long) i);
     }
@@ -171,8 +172,8 @@ public class ArrayRunRestController extends AbstractRestController {
     }
 
     int filteredTotal = dtos.size();
-    int start = parseIntOrDefault(request.getParameter("iDisplayStart"), 0);
-    int length = parseIntOrDefault(request.getParameter("iDisplayLength"), filteredTotal);
+    int start = parseRequiredInt("iDisplayStart", request.getParameter("iDisplayStart"));
+    int length = parseRequiredInt("iDisplayLength", request.getParameter("iDisplayLength"));
     int fromIndex = Math.min(Math.max(start, 0), filteredTotal);
     int toIndex = length < 0 ? filteredTotal : Math.min(fromIndex + length, filteredTotal);
 
@@ -180,16 +181,16 @@ public class ArrayRunRestController extends AbstractRestController {
     response.setITotalRecords((long) total);
     response.setITotalDisplayRecords((long) filteredTotal);
     response.setAaData(dtos.subList(fromIndex, toIndex));
-    response.setSEcho((long) parseIntOrDefault(request.getParameter("sEcho"), 0));
+    response.setSEcho((long) parseRequiredInt("sEcho", request.getParameter("sEcho")));
     return response;
   }
 
   @PutMapping(value = "/{arrayRunId}/samples")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void saveSamples(@PathVariable long arrayRunId, @RequestBody List<ArrayRunSampleDto> dtos) throws IOException {
-      RestUtils.retrieve("Array Run", arrayRunId, arrayRunService);
-      List<ArrayRunSample> samples = dtos.stream().map(Dtos::to).collect(Collectors.toList());
-      arrayRunSampleService.save(samples);
+    RestUtils.retrieve("Array Run", arrayRunId, arrayRunService);
+    List<ArrayRunSample> samples = dtos.stream().map(Dtos::to).collect(Collectors.toList());
+    arrayRunSampleService.save(samples);
   }
 
   @PutMapping(value = "/{arrayRunId}")
@@ -219,14 +220,14 @@ public class ArrayRunRestController extends AbstractRestController {
     return value != null && value.toLowerCase(Locale.ROOT).contains(search);
   }
 
-  private static int parseIntOrDefault(String value, int defaultValue) {
+  private static int parseRequiredInt(String name, String value) {
     if (value == null) {
-      return defaultValue;
+      throw new IllegalArgumentException("Missing parameter: " + name);
     }
     try {
       return Integer.parseInt(value);
     } catch (NumberFormatException e) {
-      return defaultValue;
+      throw new IllegalArgumentException("Invalid parameter: " + name);
     }
   }
 
