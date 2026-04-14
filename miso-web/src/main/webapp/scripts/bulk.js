@@ -258,7 +258,10 @@ BulkUtils = (function ($) {
       });
     },
 
-    applyDefaultDetailedQcStatus: function (data) {
+    applyDefaultDetailedQcStatus: function (data, config) {
+      if (config && config.pageMode === "edit") {
+        return;
+      }
       if (Constants.showQcStatus !== false || !Constants.defaultDetailedQcStatus) {
         return;
       }

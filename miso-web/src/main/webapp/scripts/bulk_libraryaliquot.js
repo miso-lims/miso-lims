@@ -457,9 +457,9 @@ BulkTarget.libraryaliquot = (function ($) {
         }
       });
     },
-    confirmSave: function (data) {
+    confirmSave: function (data, config) {
       var deferred = jQuery.Deferred();
-      BulkUtils.applyDefaultDetailedQcStatus(data);
+      BulkUtils.applyDefaultDetailedQcStatus(data, config);
 
       var overused = data.filter(function (aliquot, index) {
         return (
