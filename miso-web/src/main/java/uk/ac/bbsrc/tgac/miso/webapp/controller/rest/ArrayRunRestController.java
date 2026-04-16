@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
@@ -41,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.dto.ArrayRunSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
@@ -222,12 +224,12 @@ public class ArrayRunRestController extends AbstractRestController {
 
   private static int parseRequiredInt(String name, String value) {
     if (value == null) {
-      throw new IllegalArgumentException("Missing parameter: " + name);
+      throw new RestException("Missing parameter: " + name, Status.BAD_REQUEST);
     }
     try {
       return Integer.parseInt(value);
     } catch (NumberFormatException e) {
-      throw new IllegalArgumentException("Invalid parameter: " + name);
+      throw new RestException("Invalid parameter: " + name, Status.BAD_REQUEST);
     }
   }
 

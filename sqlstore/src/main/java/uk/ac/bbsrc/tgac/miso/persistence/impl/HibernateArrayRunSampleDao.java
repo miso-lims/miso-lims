@@ -85,12 +85,7 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
       return new ArrayList<>();
     }
 
-    QueryBuilder<ArrayRunSample, ArrayRunSample> builder =
-        new QueryBuilder<>(currentSession(), ArrayRunSample.class, ArrayRunSample.class);
-    Join<ArrayRunSample, ArrayRun> runJoin = builder.getJoin(builder.getRoot(), ArrayRunSample_.arrayRun);
-    builder.addPredicate(builder.getCriteriaBuilder().equal(runJoin.get(ArrayRun_.id), arrayRunId));
-
-    List<ArrayRunSample> existing = builder.getResultList();
+    List<ArrayRunSample> existing = getStoredByRunId(arrayRunId);
 
     List<ArrayRunSample> results = new ArrayList<>(samples.size());
     for (Map.Entry<String, Sample> entry : samples.entrySet()) {
@@ -127,6 +122,7 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
 
     if (managed != null) {
       currentSession().remove(managed);
+      // Flush so this delete is written before the same transaction updates the parent row.
       currentSession().flush();
     }
   }
@@ -136,6 +132,7 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
     for (ArrayRunSample item : getStoredByRunId(arrayRunId)) {
       currentSession().remove(item);
     }
+    // Flush so this delete is written before the same transaction updates the parent row.
     currentSession().flush();
   }
 
