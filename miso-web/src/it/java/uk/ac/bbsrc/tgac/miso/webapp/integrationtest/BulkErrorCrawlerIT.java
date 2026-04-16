@@ -186,6 +186,8 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 slugs.add("user/3");
                 slugs.add("probeset/new");
                 slugs.add("probeset/1");
+                slugs.add("sop/new");
+                slugs.add("sop/1");
 
                 // Bulk pages
                 slugs.add("assaytest/bulk/new?quantity=3");
@@ -243,6 +245,7 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 moreSlugs.add("qctype/new");
                 moreSlugs.add("libraryindexfamily/new");
                 moreSlugs.add("instrument/new");
+                moreSlugs.add("sop/new");
                 moreSlugs.add("admin/users");
                 moreSlugs.add("admin/groups");
                 moreSlugs.add("admin/user/new");
@@ -315,8 +318,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                                 .put("containermodel/bulk/edit", unmodifiableMap("ids", "1,2"))
                                 .put("libraryindex/bulk/edit", unmodifiableMap("ids", "1,2,3,4"))
                                 .put("sampletype/bulk/edit", unmodifiableMap("ids", "1,2"))
-                                .put("sop/bulk/new", unmodifiableMap("quantity", "2"))
-                                .put("sop/bulk/edit", unmodifiableMap("ids", "1,2"))
                                 .put("stain/bulk/edit", unmodifiableMap("ids", "1,2"))
                                 .put("staincategory/bulk/edit", unmodifiableMap("ids", "1,2,3"))
                                 .put("studytype/bulk/edit", unmodifiableMap("ids", "2,4"))

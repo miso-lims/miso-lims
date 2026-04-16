@@ -100,6 +100,4 @@ public class SopControllerST extends AbstractST {
         .perform(get(CONTROLLER_BASE + "/new"))
         .andExpect(status().isUnauthorized());
   }
-  }
-
 }
