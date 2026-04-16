@@ -26,10 +26,11 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.annotation.Nonnull;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
@@ -4446,13 +4447,9 @@ public class Dtos {
     setString(to::setUrl, from.getUrl());
     setBoolean(to::setArchived, from.isArchived(), false);
 
-    if (from.getSopFields() != null && !from.getSopFields().isEmpty()) {
-      to.setFields(from.getSopFields().stream()
-          .map(Dtos::asDto)
-          .collect(Collectors.toList()));
-    } else {
-      to.setFields(Collections.emptyList());
-    }
+    to.setFields(from.getFields().stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList()));
 
     return to;
   }
@@ -4467,13 +4464,7 @@ public class Dtos {
     setBoolean(to::setArchived, from.isArchived(), false);
 
     if (from.getFields() != null && !from.getFields().isEmpty()) {
-      Set<SopField> fields = new HashSet<>();
-      for (SopFieldDto fieldDto : from.getFields()) {
-        SopField field = Dtos.to(fieldDto);
-        field.setSop(to);
-        fields.add(field);
-      }
-      to.setSopFields(fields);
+      to.setFields(from.getFields().stream().map(Dtos::to).collect(Collectors.toSet()));
     }
 
     return to;
@@ -4498,8 +4489,6 @@ public class Dtos {
 
     return to;
   }
-
-
 
   public static LibraryBatchDto asDto(@Nonnull LibraryBatch from) {
     LibraryBatchDto to = new LibraryBatchDto();

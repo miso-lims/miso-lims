@@ -1119,9 +1119,7 @@ Urls = (function () {
   var sopUiBase = "/sop";
   ui.sops = {
     create: sopUiBase + "/new",
-    edit: function (id) {
-      return sopUiBase + "/" + id;
-    },
+    edit: idUrlFunction(sopUiBase),
   };
 
   var sopRestBase = restBase + "/sops";

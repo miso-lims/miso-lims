@@ -1,10 +1,6 @@
 ListTarget.sopfield = (function ($) {
   "use strict";
 
-  var FIELD_NAME_MAX = 255;
-  var FIELD_UNITS_MAX = 50;
-  var ALLOWED_TYPES = ["TEXT", "NUMBER"];
-
   function addFieldDialog() {
     Utils.showDialog(
       "Add SOP Field",
@@ -14,21 +10,21 @@ ListTarget.sopfield = (function ($) {
           label: "Name",
           type: "text",
           property: "name",
-          maxlength: FIELD_NAME_MAX,
+          maxlength: 255,
           required: true,
         },
         {
           label: "Type",
           type: "select",
           property: "fieldType",
-          values: ALLOWED_TYPES,
+          values: ["TEXT", "NUMBER"],
           required: true,
         },
         {
           label: "Units",
           type: "text",
           property: "units",
-          maxlength: FIELD_UNITS_MAX,
+          maxlength: 50,
         },
       ],
       function (result) {
@@ -52,8 +48,6 @@ ListTarget.sopfield = (function ($) {
     createUrl: function () {
       throw new Error("Must be provided statically");
     },
-
-    getQueryUrl: null,
 
     createBulkActions: function (config) {
       if (!config.isAdmin) return [];

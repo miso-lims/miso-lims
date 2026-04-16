@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationException;
+
 @ControllerAdvice("uk.ac.bbsrc.tgac.miso.webapp.controller.view")
 public class ExceptionHandlerAdvice {
 
@@ -31,6 +33,12 @@ public class ExceptionHandlerAdvice {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ModelAndView showClientError(final ClientErrorException e) {
     return fromExceptionMessage("Bad Request", e, true);
+  }
+
+  @ExceptionHandler(AuthorizationException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ModelAndView showUnauthorized(final AuthorizationException e) {
+    return withMessages("Unauthorized", "Access denied", false);
   }
 
   @ExceptionHandler(ServerErrorException.class)

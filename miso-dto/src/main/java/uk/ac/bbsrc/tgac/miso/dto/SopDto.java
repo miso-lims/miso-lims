@@ -4,7 +4,7 @@ import java.util.List;
 
 public class SopDto {
 
-  private long id;
+  private Long id;
   private String alias;
   private String version;
   private String category;
@@ -12,11 +12,11 @@ public class SopDto {
   private boolean archived;
   private List<SopFieldDto> fields;
 
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

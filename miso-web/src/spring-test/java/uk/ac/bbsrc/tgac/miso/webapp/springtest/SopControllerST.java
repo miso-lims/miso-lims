@@ -94,44 +94,19 @@ public class SopControllerST extends AbstractST {
         .andExpect(status().isNotFound());
   }
 
-  /**
-   * NOTE: In ST context, AuthorizationManager.throwIfNonAdmin() is not translated into a
-   * 403/redirect. It bubbles up and becomes a 500. So for "forbidden" tests we assert 5xx + exception
-   * present.
-   */
   @Test
-  public void testNewForbiddenForAnonymous() throws Exception {
-    Exception ex = getMockMvc()
-        .perform(get(CONTROLLER_BASE + "/new"))
-        .andExpect(status().is5xxServerError())
-        .andReturn()
-        .getResolvedException();
-
-    assertNotNull("Expected authorization exception", ex);
-  }
-
-  @Test
-  @WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
   public void testNewForbiddenForNonAdminUser() throws Exception {
-    Exception ex = getMockMvc()
+    getMockMvc()
         .perform(get(CONTROLLER_BASE + "/new"))
-        .andExpect(status().is5xxServerError())
-        .andReturn()
-        .getResolvedException();
-
-    assertNotNull("Expected authorization exception", ex);
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
   @WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
   public void testEditForbiddenForNonAdminUser() throws Exception {
-    Exception ex = getMockMvc()
+    getMockMvc()
         .perform(get(CONTROLLER_BASE + "/1"))
-        .andExpect(status().is5xxServerError())
-        .andReturn()
-        .getResolvedException();
-
-    assertNotNull("Expected authorization exception", ex);
+        .andExpect(status().isUnauthorized());
   }
 
 }

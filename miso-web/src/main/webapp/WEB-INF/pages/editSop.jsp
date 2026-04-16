@@ -13,7 +13,7 @@
 
     <form:form id="sopForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 
-    <div class="sectionDivider noPrint">SOP Fields</div>
+    <h1>SOP Fields</h1>
     <div id="sopForm_fieldsError" class="errorContainer"></div>
 
     <div id="sopFieldsUnsupported" style="display:none;">

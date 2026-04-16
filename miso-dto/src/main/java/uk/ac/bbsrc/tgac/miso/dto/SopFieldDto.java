@@ -2,16 +2,16 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 public class SopFieldDto {
 
-  private long id;
+  private Long id;
   private String name;
   private String units;
   private String fieldType;
 
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

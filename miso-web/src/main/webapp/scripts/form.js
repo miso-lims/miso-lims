@@ -367,13 +367,11 @@ FormUtils = (function ($) {
     },
 
     makeSopFields: function (object, sops) {
-      sops = Array.isArray(sops) ? sops : [];
+      sops = sops || [];
 
       var availableSops = sops.filter(function (sop) {
         return !sop.archived || object.sopId === sop.id;
       });
-
-      var hasSops = availableSops.length > 0;
 
       return [
         {
@@ -386,8 +384,7 @@ FormUtils = (function ($) {
             return item.alias + " v." + item.version;
           },
           getItemValue: Utils.array.getId,
-          include: hasSops,
-          nullLabel: "SELECT",
+          include: !!availableSops.length,
           onChange: function (newValue, form) {
             var sop = newValue
               ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), sops)
@@ -403,13 +400,14 @@ FormUtils = (function ($) {
           data: "sopLink",
           omit: true,
           type: "read-only",
+          include: !!object.sopId || !!availableSops.length,
           getDisplayValue: function (item) {
             return item.sopId ? "View SOP" : null;
           },
           getLink: function (item) {
-            if (!item.sopId) return null;
-            var sop = Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.sopId), sops);
-            return sop.url || null;
+            return item.sopId
+              ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(item.sopId), sops).url
+              : null;
           },
           openNewTab: true,
         },

@@ -4,11 +4,6 @@ CREATE TABLE SopField (
     name VARCHAR(255) NOT NULL,
     units VARCHAR(50),
     fieldType VARCHAR(20) NOT NULL,
-
-    CONSTRAINT fk_sopfield_sop
-        FOREIGN KEY (sopId) REFERENCES Sop(sopId)
-        ON DELETE CASCADE,
-
-    CONSTRAINT uq_sopfield_sop_name
-        UNIQUE KEY (sopId, name)
+    CONSTRAINT fk_sopfield_sop FOREIGN KEY (sopId) REFERENCES Sop(sopId),
+    CONSTRAINT uq_sopfield_sop_name UNIQUE KEY (sopId, name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

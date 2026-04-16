@@ -274,28 +274,24 @@ control type can only be deleted if the option has not been used by any existing
 
 ## Standard Operating Procedures
 
-Standard operating procedures (SOPs) describe the process that was followed to prepare samples or libraries, or to perform a sequencing run. An SOP in MISO has a name, alias and version, and may link to the full SOP stored in an external system.
+Standard operating procedures (SOPs) describe the process that was followed to prepare samples or libraries, or to
+perform a sequencing run. An SOP in MISO has a name and version, and links to the actual SOP in another system.
 
-SOPs are grouped into categories:
-*Library
-*Run
-*Sample
+MISO administrators can add, edit, and delete SOPs using the standard interface. An SOP can only be deleted if
+it has not been used for any existing samples, libraries, or runs.
 
-Each SOP belongs to exactly one category.
+When editing SOPs in MISO, keep in mind that your changes will affect existing items that are already using the SOP.
+When a new version of an SOP is created, the old one should be archived in MISO, and a new one created with the same
+name and the new version. This way, you continue to track which version of an SOP was used to prepare older items.
 
-MISO administrators can add, copy, and delete SOPs using the standard interface. An SOP can only be deleted if it has not been used for any existing samples, libraries, or runs.
+### SOP Fields
 
-When editing SOPs in MISO, keep in mind that changes will affect existing items that are already using the SOP. When a new version of an SOP is created, the old version should be archived in MISO and a new one created with the same alias and an updated version number. This allows MISO to continue tracking which version of an SOP was used to prepare older items.
+SOP fields are used to capture additional SOP-specific information, such as reagent LOT numbers.
+Each field has a name, a data type (text or number), and optional units. When the SOP is added to an
+item, that item gains all of the fields defined by the SOP.
 
-## SOP Fields
-
-SOP fields allow additional data to be captured for SOPs.
-
-SOP fields are only supported for Run category SOPs.
-
-MISO administrators can add and remove SOP fields when editing a Run SOP. Each SOP field has a name, a data type, and optional units. These fields are used to capture run-specific information and are associated with runs that use the SOP.
-
-Library and Sample SOPs do not support SOP fields.
+SOP fields can only be added to run SOPs. Library and sample SOPs do not support SOP fields at this
+time.
 
 
 ## Sample Indices

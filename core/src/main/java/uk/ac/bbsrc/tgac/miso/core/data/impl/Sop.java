@@ -59,7 +59,7 @@ public class Sop implements Aliasable, Deletable, Serializable {
 
   @OneToMany(mappedBy = "sop", cascade = CascadeType.ALL, orphanRemoval = true)
   @OrderBy("name")
-  private Set<SopField> sopFields;
+  private Set<SopField> fields;
 
   @Override
   public long getId() {
@@ -127,15 +127,15 @@ public class Sop implements Aliasable, Deletable, Serializable {
     this.archived = archived;
   }
 
-  public Set<SopField> getSopFields() {
-    if (sopFields == null) {
-      sopFields = new HashSet<>();
+  public Set<SopField> getFields() {
+    if (fields == null) {
+      fields = new HashSet<>();
     }
-    return sopFields;
+    return fields;
   }
 
-  public void setSopFields(Set<SopField> sopFields) {
-    this.sopFields = sopFields;
+  public void setFields(Set<SopField> sopFields) {
+    this.fields = sopFields;
   }
 
   @Override

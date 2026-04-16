@@ -23,8 +23,6 @@ FormTarget.sop = (function ($) {
     },
 
     getSections: function (config, object) {
-      var isEdit = config.pageMode === "edit";
-
       return [
         {
           title: "SOP Information",
@@ -47,14 +45,14 @@ FormTarget.sop = (function ($) {
             {
               title: "Version",
               data: "version",
-              type: isEdit ? "read-only" : "text",
+              type: config.pageMode === "edit" ? "read-only" : "text",
               required: true,
               maxLength: 50,
             },
             {
               title: "Category",
               data: "category",
-              type: isEdit ? "read-only" : "dropdown",
+              type: config.pageMode === "edit" ? "read-only" : "dropdown",
               required: true,
               source: [
                 { name: "Sample", value: "SAMPLE" },
@@ -62,17 +60,13 @@ FormTarget.sop = (function ($) {
                 { name: "Run", value: "RUN" },
               ],
               sortSource: Utils.sorting.standardSort("name"),
-              getItemLabel: function (item) {
-                return item.name;
-              },
-              getItemValue: function (item) {
-                return item.value;
-              },
+              getItemLabel: Utils.array.getName,
+              getItemValue: Utils.array.get("value"),
               onChange: function (value, formObject) {
                 var isRun = value === "RUN";
-                jQuery("#listSopFields").toggle(isRun);
-                jQuery("#sopFieldsUnsupported").toggle(!isRun);
-                jQuery("#sopForm_fieldsError").empty();
+                $("#listSopFields").toggle(isRun);
+                $("#sopFieldsUnsupported").toggle(!isRun);
+                $("#sopForm_fieldsError").empty();
                 if (!isRun) {
                   Sop.setFields([]);
                 }

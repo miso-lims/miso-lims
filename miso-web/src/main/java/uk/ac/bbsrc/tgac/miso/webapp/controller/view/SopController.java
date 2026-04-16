@@ -67,37 +67,34 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
   }
 
   @GetMapping("/new")
-  public ModelAndView create(@RequestParam(name = "baseId", required = false) Long baseId,
-      @RequestParam(name = "copyId", required = false) Long copyId, ModelMap model) throws IOException {
-
+  public ModelAndView create(@RequestParam(name = "baseId", required = false) Long baseId, ModelMap model)
+      throws IOException {
     authorizationManager.throwIfNonAdmin();
 
     Sop sop = new Sop();
-    Long sourceId = baseId != null ? baseId : copyId;
 
-    if (sourceId != null) {
-      Sop source = sopService.get(sourceId);
+    if (baseId != null) {
+      Sop source = sopService.get(baseId);
       if (source == null) {
-        throw new ClientErrorException("SOP with ID %d not found to copy".formatted(sourceId));
+        throw new ClientErrorException("SOP with ID %d not found to copy".formatted(baseId));
       }
       sop.setAlias(source.getAlias());
-      sop.setVersion(source.getVersion());
+      sop.setVersion(source.getVersion() + " COPY");
       sop.setCategory(source.getCategory());
       sop.setUrl(source.getUrl());
       sop.setArchived(source.isArchived());
-      if (source.getSopFields() != null) {
-        for (SopField sourceField : source.getSopFields()) {
+      if (source.getFields() != null) {
+        for (SopField sourceField : source.getFields()) {
           SopField field = new SopField();
           field.setName(sourceField.getName());
           field.setUnits(sourceField.getUnits());
           field.setFieldType(sourceField.getFieldType());
-          sop.getSopFields().add(field);
+          sop.getFields().add(field);
         }
       }
     }
 
     model.put("title", "New SOP");
-    model.addAttribute(PageMode.PROPERTY, PageMode.CREATE.getLabel());
     return setupForm(sop, PageMode.CREATE, model);
   }
 
@@ -111,7 +108,6 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
     }
 
     model.put("title", "SOP " + id);
-    model.addAttribute(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     return setupForm(sop, PageMode.EDIT, model);
   }
 
