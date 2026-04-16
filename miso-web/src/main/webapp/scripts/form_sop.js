@@ -27,32 +27,25 @@ FormTarget.sop = (function ($) {
         {
           title: "SOP Information",
           fields: [
-            {
-              title: "SOP ID",
-              data: "id",
-              type: "read-only",
-              getDisplayValue: function (sop) {
-                return sop.id ? sop.id : "Unsaved";
-              },
-            },
+            FormUtils.makeIdField("SOP"),
             {
               title: "Alias",
               data: "alias",
-              type: "text",
+              type: config.isAdmin ? "text" : "read-only",
               required: true,
               maxLength: 255,
             },
             {
               title: "Version",
               data: "version",
-              type: config.pageMode === "edit" ? "read-only" : "text",
+              type: config.isAdmin && config.pageMode === "create" ? "text" : "read-only",
               required: true,
               maxLength: 50,
             },
             {
               title: "Category",
               data: "category",
-              type: config.pageMode === "edit" ? "read-only" : "dropdown",
+              type: config.isAdmin && config.pageMode === "create" ? "dropdown" : "read-only",
               required: true,
               source: [
                 { name: "Sample", value: "SAMPLE" },
@@ -75,7 +68,11 @@ FormTarget.sop = (function ($) {
             {
               title: "URL",
               data: "url",
-              type: "text",
+              type: config.isAdmin ? "text" : "read-only",
+              getLink: function (object) {
+                return object.url;
+              },
+              openNewTab: true,
               required: true,
               maxLength: 500,
               regex: Utils.validation.uriRegex,
@@ -84,6 +81,7 @@ FormTarget.sop = (function ($) {
               title: "Archived",
               data: "archived",
               type: "checkbox",
+              disabled: !config.isAdmin,
             },
           ],
         },

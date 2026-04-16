@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.Assert.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -67,20 +68,20 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
     Set<SopField> fields = new HashSet<>();
     fields.add(field1);
     fields.add(field2);
-    sop.setSopFields(fields);
+    sop.setFields(fields);
 
     long savedId = getTestSubject().create(sop);
     clearSession();
 
     Sop loaded = currentSession().get(Sop.class, savedId);
     assertNotNull(loaded);
-    assertNotNull(loaded.getSopFields());
-    assertEquals(2, loaded.getSopFields().size());
+    assertNotNull(loaded.getFields());
+    assertEquals(2, loaded.getFields().size());
 
     boolean hasFlowCell = false;
     boolean hasPhiX = false;
 
-    for (SopField field : loaded.getSopFields()) {
+    for (SopField field : loaded.getFields()) {
       if ("Flow Cell Lot".equals(field.getName())) {
         hasFlowCell = true;
         assertEquals(SopField.FieldType.TEXT, field.getFieldType());

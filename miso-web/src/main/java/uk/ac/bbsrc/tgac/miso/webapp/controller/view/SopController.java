@@ -100,8 +100,6 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
 
   @GetMapping("/{id}")
   public ModelAndView edit(@PathVariable long id, ModelMap model) throws IOException {
-    authorizationManager.throwIfNonAdmin();
-
     Sop sop = sopService.get(id);
     if (sop == null) {
       throw new NotFoundException("No SOP found for ID: " + id);

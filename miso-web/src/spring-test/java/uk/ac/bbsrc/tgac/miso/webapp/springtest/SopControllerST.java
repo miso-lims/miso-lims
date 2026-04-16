@@ -59,7 +59,7 @@ public class SopControllerST extends AbstractST {
 
     assertEquals(0L, readLong(response, "$.id"));
     assertEquals(base.getAlias(), JsonPath.read(response, "$.alias"));
-    assertEquals(base.getVersion(), JsonPath.read(response, "$.version"));
+    assertEquals(base.getVersion() + " COPY", JsonPath.read(response, "$.version"));
 
     // If fields exist, IDs must be reset for create-mode copy
     if (JsonPath.read(response, "$.fields") != null) {
@@ -100,13 +100,6 @@ public class SopControllerST extends AbstractST {
         .perform(get(CONTROLLER_BASE + "/new"))
         .andExpect(status().isUnauthorized());
   }
-
-  @Test
-  @WithMockUser(username = "user", password = "user", roles = {"INTERNAL"})
-  public void testEditForbiddenForNonAdminUser() throws Exception {
-    getMockMvc()
-        .perform(get(CONTROLLER_BASE + "/1"))
-        .andExpect(status().isUnauthorized());
   }
 
 }
