@@ -1435,6 +1435,7 @@ BulkTarget.sample = (function ($) {
 
     confirmSave: function (data, config) {
       var deferred = $.Deferred();
+      BulkUtils.applyDefaultDetailedQcStatus(data, config);
       if (Constants.isDetailedSample) {
         data.forEach(function (sample) {
           var sampleClass = Utils.array.findUniqueOrThrow(

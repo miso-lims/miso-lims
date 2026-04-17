@@ -365,6 +365,38 @@ Defaults to `true` if unspecified. Set to `false` to hide the description column
 
 Defaults to `true` if unspecified. Set to `false` to hide the volume column when bulk creating/editing libraries.
 
+### `miso.display.bulk.receiptQc`
+
+Defaults to `true` if unspecified. Set to `false` to hide the Receipt Confirmed, Receipt QC Passed,
+and Receipt QC Note columns on bulk create/edit pages.
+
+### `miso.display.bulk.requisition`
+
+Defaults to `true` if unspecified. Set to `false` to hide the Requisition Alias, Requisition, and
+Assay columns on bulk create/edit pages.
+
+### `miso.display.bulk.qcStatus`
+
+Defaults to `true` if unspecified. Set to `false` to hide the QC Status and QC Note columns on bulk
+create/edit pages. If hidden, consider also setting `miso.defaults.bulk.detailedQcStatus`.
+
+### `miso.display.bulk.matrixBarcode`
+
+Defaults to `true` if unspecified. Set to `false` to hide the Matrix Barcode column on bulk
+create/edit pages.
+
+### `miso.display.bulk.discarded`
+
+Defaults to `true` if unspecified. Set to `false` to hide the Discarded column on bulk create/edit
+pages.
+
+### `miso.defaults.bulk.detailedQcStatus`
+
+Default QC status to apply on bulk create/edit pages. Set to the description of a QC status (e.g.
+"Ready"). When the QC Status column is visible, this pre-selects the value but the user can change
+it. When the QC Status column is hidden via `miso.display.bulk.qcStatus`, this value is applied
+automatically on save.
+
 ## Index Checking
 
 ### `miso.pools.strictIndexChecking`
