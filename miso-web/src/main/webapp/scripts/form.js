@@ -482,6 +482,11 @@ FormUtils = (function ($) {
     setTableData: function (listTarget, config, containerId, data, form) {
       var listId = containerId + "Table";
       if (initializedTables.indexOf(containerId) !== -1) {
+        var previousData = FormUtils.getTableData(containerId);
+        if ((!previousData || !previousData.length) && (!data || !data.length)) {
+          // Avoid clearing an already empty table, mainly to avoid marking changes
+          return;
+        }
         if (form) {
           form.markOtherChanges();
         }
