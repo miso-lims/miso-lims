@@ -186,7 +186,6 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                 slugs.add("user/3");
                 slugs.add("probeset/new");
                 slugs.add("probeset/1");
-                slugs.add("sop/new");
                 slugs.add("sop/1");
 
                 // Bulk pages
@@ -304,7 +303,8 @@ public class BulkErrorCrawlerIT extends AbstractIT {
                                                 (driver, baseUrl) -> BulkQCPage.getForAddLibraryAliquot(driver, baseUrl,
                                                                 Arrays.asList(304L, 305L), 1, 1))
                                 .put("qc/bulk/editFrom/LibraryAliquot",
-                                                (driver, baseUrl) -> BulkQCPage.getForEditLibraryAliquot(driver, baseUrl,
+                                                (driver, baseUrl) -> BulkQCPage.getForEditLibraryAliquot(driver,
+                                                                baseUrl,
                                                                 Arrays.asList(1L), 1))
                                 .build());
 
