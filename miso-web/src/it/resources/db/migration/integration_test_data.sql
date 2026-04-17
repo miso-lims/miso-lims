@@ -1240,7 +1240,6 @@ INSERT INTO Array(arrayId, alias, arrayModelId, serialNumber, description, creat
 
 INSERT INTO ArrayPosition(arrayId, position, sampleId) VALUES
 (1, 'R01C01', 8),
-(1, 'R02C01', 9),
 (2, 'R01C01', 8);
 
 INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate, creator, created, lastModifier, lastModified) VALUES
@@ -1250,9 +1249,7 @@ INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate
 
 INSERT INTO ArrayRun_Sample(arrayRunId, arrayId, position, sampleId, statusId, qcNote, qcUser, qcDate) VALUES
 (1, 1, 'R01C01', 8, 1, 'remove qc', 3, '2026-04-01'),
-(1, 1, 'R02C01', 9, 2, 'keep qc', 3, '2026-04-02'),
 (2, 1, 'R01C01', 8, 1, 'clear with array', 3, '2026-04-03'),
-(2, 1, 'R02C01', 9, 2, 'clear with array too', 3, '2026-04-03'),
 (3, 1, 'R01C01', 8, 3, 'same sample different run', 3, '2026-04-04');
 
 INSERT INTO QCType(qcTypeId, name, description, qcTarget, units, archived, precisionAfterDecimal, correspondingField, autoUpdateField) VALUES

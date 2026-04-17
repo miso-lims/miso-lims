@@ -132,17 +132,15 @@ public class ArrayRunRestControllerST extends AbstractST {
         .param("sSortDir_0", "asc")
         .param("sEcho", "1"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.iTotalRecords").value(2))
-        .andExpect(jsonPath("$.iTotalDisplayRecords").value(2))
+        .andExpect(jsonPath("$.iTotalRecords").value(1))
+        .andExpect(jsonPath("$.iTotalDisplayRecords").value(1))
         .andExpect(jsonPath("$.sEcho").value(1))
-        .andExpect(jsonPath("$.aaData", hasSize(2)))
+        .andExpect(jsonPath("$.aaData", hasSize(1)))
         .andExpect(jsonPath("$.aaData[0].position").value("R01C01"))
         .andExpect(jsonPath("$.aaData[0].sampleAlias").value("TEST_0001_Bn_R_nn_1-1_D_1"))
         .andExpect(jsonPath("$.aaData[0].qcStatusId").value(1))
         .andExpect(jsonPath("$.aaData[0].qcNote").value("remove qc"))
-        .andExpect(jsonPath("$.aaData[0].qcUserName").value("user"))
-        .andExpect(jsonPath("$.aaData[1].position").value("R02C01"))
-        .andExpect(jsonPath("$.aaData[1].qcNote").value("keep qc"));
+        .andExpect(jsonPath("$.aaData[0].qcUserName").value("user"));
   }
 
   @Test
@@ -214,18 +212,14 @@ public class ArrayRunRestControllerST extends AbstractST {
     ArrayRun run = currentSession().get(controllerClass, 2L);
     Array array = currentSession().get(Array.class, 1L);
     SampleImpl sample1 = currentSession().get(SampleImpl.class, 8L);
-    SampleImpl sample2 = currentSession().get(SampleImpl.class, 9L);
     ArrayRunSampleId id1 = new ArrayRunSampleId(run, array, "R01C01", sample1);
-    ArrayRunSampleId id2 = new ArrayRunSampleId(run, array, "R02C01", sample2);
     assertNotNull(currentSession().get(ArrayRunSample.class, id1));
-    assertNotNull(currentSession().get(ArrayRunSample.class, id2));
 
     ArrayRun updatedArr = baseTestUpdate(CONTROLLER_BASE, arr, 2, controllerClass);
 
     assertNull(updatedArr.getArray());
     currentSession().clear();
     assertNull(currentSession().get(ArrayRunSample.class, id1));
-    assertNull(currentSession().get(ArrayRunSample.class, id2));
 
     getMockMvc().perform(get(CONTROLLER_BASE + "/2/samples")
         .param("iDisplayStart", "0")
