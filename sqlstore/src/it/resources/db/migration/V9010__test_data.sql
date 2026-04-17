@@ -1051,6 +1051,10 @@ INSERT INTO ArrayRun(arrayRunId, alias, instrumentId, arrayId, health, startDate
 (1, 'ArrayRun_1', 3, 1, 'Running', '2018-02-02', 1, '2018-02-02 15:40:00', 1, '2018-02-02 15:40:00'),
 (2, 'ArrayRun_2',3,2, 'Running', '2022-06-23',1,'2022-06-23 16:30:00',1,'2022-06-23 16:13:00');
 
+INSERT INTO ArrayRun_Sample(arrayRunId, arrayId, position, sampleId, statusId, qcNote, qcUser, qcDate) VALUES
+(2, 2, 'R02C01', 26, 1, 'keep qc', 1, '2026-04-01'),
+(2, 2, 'R03C01', 27, 2, 'remove qc', 1, '2026-04-02');
+
 INSERT INTO WorkflowProgress(workflowProgressId, workflowName, userId) VALUES
 (1, 'LOAD_SEQUENCER', 3),
 (2, 'LOAD_SEQUENCER', 3);

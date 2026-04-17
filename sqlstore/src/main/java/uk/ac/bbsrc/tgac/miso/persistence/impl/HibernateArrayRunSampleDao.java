@@ -30,6 +30,10 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
   @PersistenceContext
   private EntityManager entityManager;
 
+  public void setEntityManager(EntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
+
   private Session currentSession() {
     return entityManager.unwrap(Session.class);
   }
@@ -122,7 +126,8 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
 
     if (managed != null) {
       currentSession().remove(managed);
-      // Flush so this delete is written before the same transaction updates the parent row.
+      // Flush because callers may delete ArrayRun_Sample rows and then immediately update
+      // ArrayRun or ArrayPosition in the same transaction.
       currentSession().flush();
     }
   }
@@ -132,7 +137,8 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
     for (ArrayRunSample item : getStoredByRunId(arrayRunId)) {
       currentSession().remove(item);
     }
-    // Flush so this delete is written before the same transaction updates the parent row.
+    // Flush because callers may delete ArrayRun_Sample rows and then immediately update
+    // ArrayRun or ArrayPosition in the same transaction.
     currentSession().flush();
   }
 
