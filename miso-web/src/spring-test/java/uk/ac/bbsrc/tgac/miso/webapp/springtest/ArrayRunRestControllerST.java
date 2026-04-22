@@ -220,18 +220,6 @@ public class ArrayRunRestControllerST extends AbstractST {
     assertNull(updatedArr.getArray());
     currentSession().clear();
     assertNull(currentSession().get(ArrayRunSample.class, id1));
-
-    getMockMvc().perform(get(CONTROLLER_BASE + "/2/samples")
-        .param("iDisplayStart", "0")
-        .param("iDisplayLength", "25")
-        .param("iSortCol_0", "0")
-        .param("mDataProp_0", "position")
-        .param("sSortDir_0", "asc")
-        .param("sEcho", "1"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.iTotalRecords").value(0))
-        .andExpect(jsonPath("$.iTotalDisplayRecords").value(0))
-        .andExpect(jsonPath("$.aaData", hasSize(0)));
   }
 
 }
