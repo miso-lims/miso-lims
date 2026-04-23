@@ -10,28 +10,27 @@
 
 <form:form id="arrayrunForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script>
-jQuery(document).ready(function() {
+jQuery(document).ready(function () {
   var config = {
     isAdmin: ${miso:isAdmin()}
   };
   <c:if test="${pageMode eq 'create'}">
     config.instruments = ${arrayScanners};
   </c:if>
-  FormUtils.createForm('arrayrunForm', 'save', ${pageMode eq 'create' ? '{}' : arrayRunJson}, 'arrayrun', config);
-  <c:if test="${pageMode eq 'edit'}">
-    SampleArray.updateSamplesTable(${arrayJson});
-  </c:if>
+  var arrayRun = ${pageMode eq 'create' ? '{}' : arrayRunJson};
+  FormUtils.createForm('arrayrunForm', 'save', arrayRun, 'arrayrun', config);
   Utils.ui.updateHelpLink(FormTarget.arrayrun.getUserManualUrl());
 });
 </script>
 
 <c:if test="${pageMode ne 'create'}">
-    <miso:attachments item="${arrayRun}"/>
+  <miso:attachments item="${arrayRun}"/>
 </c:if>
 
-<br/>
-<h1>Samples</h1>
-<table id="listingSamplesTable" class="display"></table>
+<c:if test="${pageMode eq 'edit'}">
+  <miso:list-section-ajax id="listingSamplesTable" name="Samples" target="arrayrunsample"
+    config="{ arrayRunId: ${arrayRun.id} }"/>
+</c:if>
 
 <c:if test="${pageMode eq 'edit'}">
   <miso:changelog item="${arrayRun}"/>

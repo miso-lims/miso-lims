@@ -2,7 +2,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +22,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunSampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
@@ -33,9 +38,11 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayDto;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayRunDto;
+import uk.ac.bbsrc.tgac.miso.dto.ArrayRunSampleDto;
 import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 @Controller
@@ -47,6 +54,9 @@ public class ArrayRunRestController extends AbstractRestController {
 
   @Autowired
   private ArrayService arrayService;
+
+  @Autowired
+  private ArrayRunSampleService arrayRunSampleService;
 
   @Autowired
   private AdvancedSearchParser advancedSearchParser;
@@ -129,6 +139,62 @@ public class ArrayRunRestController extends AbstractRestController {
     return RestUtils.createObject("Array Run", dto, Dtos::to, arrayRunService, Dtos::asDto);
   }
 
+  @GetMapping(value = "/{arrayRunId}/samples", produces = "application/json")
+  public @ResponseBody DataTablesResponseDto<ArrayRunSampleDto> listSamples(@PathVariable long arrayRunId,
+      HttpServletRequest request) throws IOException {
+    RestUtils.retrieve("Array Run", arrayRunId, arrayRunService);
+
+    List<ArrayRunSampleDto> dtos = arrayRunSampleService.listByRunId(arrayRunId).stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
+    // Assign a temporary row ID for DataTables selection, ArrayRunSample does not have its own database
+    // ID
+    for (int i = 0; i < dtos.size(); i++) {
+      dtos.get(i).setId((long) i);
+    }
+    int total = dtos.size();
+
+    String search = request.getParameter("sSearch");
+    if (search != null && !search.isBlank()) {
+      String normalizedSearch = search.toLowerCase(Locale.ROOT);
+      dtos = dtos.stream()
+          .filter(dto -> containsIgnoreCase(dto.getPosition(), normalizedSearch)
+              || containsIgnoreCase(dto.getSampleName(), normalizedSearch)
+              || containsIgnoreCase(dto.getSampleAlias(), normalizedSearch)
+              || containsIgnoreCase(dto.getQcNote(), normalizedSearch)
+              || containsIgnoreCase(dto.getQcUserName(), normalizedSearch))
+          .collect(Collectors.toList());
+    }
+
+    String sortColIndex = request.getParameter("iSortCol_0");
+    String sortCol = sortColIndex == null ? null : request.getParameter("mDataProp_" + sortColIndex);
+    Comparator<ArrayRunSampleDto> comparator = getArrayRunSampleComparator(sortCol);
+    if (comparator != null) {
+      dtos.sort("desc".equalsIgnoreCase(request.getParameter("sSortDir_0")) ? comparator.reversed() : comparator);
+    }
+
+    int filteredTotal = dtos.size();
+    int start = parseRequiredInt("iDisplayStart", request.getParameter("iDisplayStart"));
+    int length = parseRequiredInt("iDisplayLength", request.getParameter("iDisplayLength"));
+    int fromIndex = Math.min(Math.max(start, 0), filteredTotal);
+    int toIndex = length < 0 ? filteredTotal : Math.min(fromIndex + length, filteredTotal);
+
+    DataTablesResponseDto<ArrayRunSampleDto> response = new DataTablesResponseDto<>();
+    response.setITotalRecords((long) total);
+    response.setITotalDisplayRecords((long) filteredTotal);
+    response.setAaData(dtos.subList(fromIndex, toIndex));
+    response.setSEcho((long) parseRequiredInt("sEcho", request.getParameter("sEcho")));
+    return response;
+  }
+
+  @PutMapping(value = "/{arrayRunId}/samples")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void saveSamples(@PathVariable long arrayRunId, @RequestBody List<ArrayRunSampleDto> dtos) throws IOException {
+    RestUtils.retrieve("Array Run", arrayRunId, arrayRunService);
+    List<ArrayRunSample> samples = dtos.stream().map(Dtos::to).collect(Collectors.toList());
+    arrayRunSampleService.save(samples);
+  }
+
   @PutMapping(value = "/{arrayRunId}")
   public @ResponseBody ArrayRunDto update(@PathVariable(name = "arrayRunId", required = true) long arrayRunId,
       @RequestBody ArrayRunDto dto) throws IOException {
@@ -150,6 +216,41 @@ public class ArrayRunRestController extends AbstractRestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
     RestUtils.bulkDelete("Array Run", ids, arrayRunService);
+  }
+
+  private static boolean containsIgnoreCase(String value, String search) {
+    return value != null && value.toLowerCase(Locale.ROOT).contains(search);
+  }
+
+  private static int parseRequiredInt(String name, String value) {
+    if (value == null) {
+      throw new RestException("Missing parameter: " + name, Status.BAD_REQUEST);
+    }
+    try {
+      return Integer.parseInt(value);
+    } catch (NumberFormatException e) {
+      throw new RestException("Invalid parameter: " + name, Status.BAD_REQUEST);
+    }
+  }
+
+  private static Comparator<ArrayRunSampleDto> getArrayRunSampleComparator(String sortCol) {
+    if (sortCol == null) {
+      return Comparator.comparing(ArrayRunSampleDto::getPosition, Comparator.nullsLast(String::compareTo));
+    }
+    switch (sortCol) {
+      case "position":
+        return Comparator.comparing(ArrayRunSampleDto::getPosition, Comparator.nullsLast(String::compareTo));
+      case "sampleName":
+        return Comparator.comparing(ArrayRunSampleDto::getSampleName, Comparator.nullsLast(String::compareTo));
+      case "sampleAlias":
+        return Comparator.comparing(ArrayRunSampleDto::getSampleAlias, Comparator.nullsLast(String::compareTo));
+      case "qcStatusId":
+        return Comparator.comparing(ArrayRunSampleDto::getQcStatusId, Comparator.nullsLast(Long::compareTo));
+      case "qcNote":
+        return Comparator.comparing(ArrayRunSampleDto::getQcNote, Comparator.nullsLast(String::compareTo));
+      default:
+        return null;
+    }
   }
 
 }

@@ -15,6 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunSampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
@@ -48,6 +49,9 @@ public class DefaultArrayRunService implements ArrayRunService {
 
   @Autowired
   private SampleService sampleService;
+
+  @Autowired
+  private ArrayRunSampleService arrayRunSampleService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -121,6 +125,10 @@ public class DefaultArrayRunService implements ArrayRunService {
     loadChildEntities(arrayRun);
     ArrayRun managed = get(arrayRun.getId());
     validateChange(arrayRun, managed);
+    if (managed.getArray() != null
+        && (arrayRun.getArray() == null || managed.getArray().getId() != arrayRun.getArray().getId())) {
+      arrayRunSampleService.deleteByRunId(managed.getId());
+    }
     applyChanges(arrayRun, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     return arrayRunStore.update(managed);
@@ -147,7 +155,7 @@ public class DefaultArrayRunService implements ArrayRunService {
     List<ValidationError> errors = new ArrayList<>();
 
     ValidationUtils.updateQcDetails(arrayRun, beforeChange, ArrayRun::getQcPassed, ArrayRun::getQcUser,
-            ArrayRun::setQcUser, authorizationManager, ArrayRun::getQcDate, ArrayRun::setQcDate);
+        ArrayRun::setQcUser, authorizationManager, ArrayRun::getQcDate, ArrayRun::setQcDate);
 
     if (arrayRun.isSaved() && beforeChange == null) {
       errors.add(new ValidationError("Array Run not found"));
@@ -245,5 +253,10 @@ public class DefaultArrayRunService implements ArrayRunService {
   @Override
   public void authorizeDeletion(ArrayRun object) throws IOException {
     authorizationManager.throwIfNonAdminOrMatchingOwner(object.getCreator());
+  }
+
+  @Override
+  public void beforeDelete(ArrayRun object) throws IOException {
+    arrayRunSampleService.deleteByRunId(object.getId());
   }
 }

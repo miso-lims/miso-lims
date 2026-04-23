@@ -54,6 +54,7 @@ DELETE FROM Pool_LibraryAliquot;
 DELETE FROM Pool_Note;
 DELETE FROM PoolChangeLog;
 DELETE FROM Pool;
+DELETE FROM ArrayRun_Sample;
 DELETE FROM ArrayRunChangeLog;
 DELETE FROM ArrayRun;
 DELETE FROM ArrayPosition;

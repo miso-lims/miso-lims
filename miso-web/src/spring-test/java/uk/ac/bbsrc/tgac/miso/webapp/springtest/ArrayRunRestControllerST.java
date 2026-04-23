@@ -25,9 +25,14 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
+import uk.ac.bbsrc.tgac.miso.core.data.Array;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample.ArrayRunSampleId;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayRunDto;
+import uk.ac.bbsrc.tgac.miso.dto.ArrayRunSampleDto;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.View;
@@ -115,6 +120,106 @@ public class ArrayRunRestControllerST extends AbstractST {
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testDeleteFail() throws Exception {
     testDeleteUnauthorized(controllerClass, 2, CONTROLLER_BASE);
+  }
+
+  @Test
+  public void testListSamplesWithQc() throws Exception {
+    getMockMvc().perform(get(CONTROLLER_BASE + "/1/samples")
+        .param("iDisplayStart", "0")
+        .param("iDisplayLength", "25")
+        .param("iSortCol_0", "0")
+        .param("mDataProp_0", "position")
+        .param("sSortDir_0", "asc")
+        .param("sEcho", "1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.iTotalRecords").value(1))
+        .andExpect(jsonPath("$.iTotalDisplayRecords").value(1))
+        .andExpect(jsonPath("$.sEcho").value(1))
+        .andExpect(jsonPath("$.aaData", hasSize(1)))
+        .andExpect(jsonPath("$.aaData[0].position").value("R01C01"))
+        .andExpect(jsonPath("$.aaData[0].sampleAlias").value("TEST_0001_Bn_R_nn_1-1_D_1"))
+        .andExpect(jsonPath("$.aaData[0].qcStatusId").value(1))
+        .andExpect(jsonPath("$.aaData[0].qcNote").value("remove qc"))
+        .andExpect(jsonPath("$.aaData[0].qcUserName").value("user"));
+  }
+
+  @Test
+  public void testSaveSamplesSetsQc() throws Exception {
+    ArrayRunSampleDto dto = new ArrayRunSampleDto();
+    dto.setArrayRunId(1L);
+    dto.setArrayId(1L);
+    dto.setPosition("R01C01");
+    dto.setSampleId(8L);
+    dto.setQcStatusId(3L);
+    dto.setQcNote("saved from st");
+
+    getMockMvc().perform(put(CONTROLLER_BASE + "/1/samples")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(makeJsonForGenericList(Arrays.asList(dto)))
+        .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNoContent());
+
+    currentSession().clear();
+
+    ArrayRun run = currentSession().get(ArrayRun.class, 1L);
+    Array array = currentSession().get(Array.class, 1L);
+    SampleImpl sample = currentSession().get(SampleImpl.class, 8L);
+    ArrayRunSample saved =
+        currentSession().get(ArrayRunSample.class, new ArrayRunSampleId(run, array, "R01C01", sample));
+
+    assertNotNull(saved);
+    assertNotNull(saved.getQcStatus());
+    assertEquals(3L, saved.getQcStatus().getId());
+    assertEquals("saved from st", saved.getQcNote());
+    assertNotNull(saved.getQcUser());
+    assertEquals(3L, saved.getQcUser().getId());
+    assertNotNull(saved.getQcDate());
+  }
+
+  @Test
+  public void testListSamplesDifferentRunQc() throws Exception {
+    getMockMvc().perform(get(CONTROLLER_BASE + "/1/samples")
+        .param("iDisplayStart", "0")
+        .param("iDisplayLength", "25")
+        .param("iSortCol_0", "0")
+        .param("mDataProp_0", "position")
+        .param("sSortDir_0", "asc")
+        .param("sEcho", "1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.aaData[0].sampleId").value(8))
+        .andExpect(jsonPath("$.aaData[0].qcStatusId").value(1))
+        .andExpect(jsonPath("$.aaData[0].qcNote").value("remove qc"));
+
+    getMockMvc().perform(get(CONTROLLER_BASE + "/3/samples")
+        .param("iDisplayStart", "0")
+        .param("iDisplayLength", "25")
+        .param("iSortCol_0", "0")
+        .param("mDataProp_0", "position")
+        .param("sSortDir_0", "asc")
+        .param("sEcho", "1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.aaData[0].position").value("R01C01"))
+        .andExpect(jsonPath("$.aaData[0].sampleId").value(8))
+        .andExpect(jsonPath("$.aaData[0].qcStatusId").value(3))
+        .andExpect(jsonPath("$.aaData[0].qcNote").value("same sample different run"));
+  }
+
+  @Test
+  public void testUpdateRemoveArrayClearsSamples() throws Exception {
+    ArrayRunDto arr = Dtos.asDto(currentSession().get(controllerClass, 2));
+    arr.setArrayId(null);
+
+    ArrayRun run = currentSession().get(controllerClass, 2L);
+    Array array = currentSession().get(Array.class, 1L);
+    SampleImpl sample1 = currentSession().get(SampleImpl.class, 8L);
+    ArrayRunSampleId id1 = new ArrayRunSampleId(run, array, "R01C01", sample1);
+    assertNotNull(currentSession().get(ArrayRunSample.class, id1));
+
+    ArrayRun updatedArr = baseTestUpdate(CONTROLLER_BASE, arr, 2, controllerClass);
+
+    assertNull(updatedArr.getArray());
+    currentSession().clear();
+    assertNull(currentSession().get(ArrayRunSample.class, id1));
   }
 
 }

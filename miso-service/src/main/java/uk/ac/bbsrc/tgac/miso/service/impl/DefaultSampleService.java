@@ -64,6 +64,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
@@ -146,6 +148,10 @@ public class DefaultSampleService implements SampleService {
   private StainService stainService;
   @Autowired
   private BoxService boxService;
+  @Autowired
+  private ArrayService arrayService;
+  @Autowired
+  private ArrayRunService arrayRunService;
   @Autowired
   private WorksetService worksetService;
   @Autowired
@@ -1283,6 +1289,10 @@ public class DefaultSampleService implements SampleService {
         result.addError(ValidationError.forDeletionUsage(object, references,
             Pluralizer.samples(references) + " (as reference slide)"));
       }
+    }
+    final int arrays = arrayService.listBySampleId(object.getId()).size();
+    if (arrays > 0) {
+      result.addError(ValidationError.forDeletionUsage(object, arrays, Pluralizer.arrays(arrays)));
     }
     return result;
   }

@@ -27,6 +27,10 @@ page is the same as on the Create Array Run page, and allows you to modify the a
 would like, then click the "Save" button at the top right. If an array has been added to the array run, all of its
 samples are listed in the Samples section below. Under that is another list containing the array run's change log.
 
+The Samples section shows one row for each sample currently present on the attached array. You can select one or more
+rows and use the "Set QC" action to record QC status and an optional QC note for those samples. Hovering over a QC
+status shows who set it and when.
+
 ## Deleting Array Runs
 
 To delete array runs, go to the Array Runs list page, select the array runs that you wish to delete, and click the

@@ -47,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -3483,6 +3484,21 @@ public class Dtos {
     return dto;
   }
 
+  public static ArrayRunSampleDto asDto(@Nonnull ArrayRunSample from) {
+    ArrayRunSampleDto dto = new ArrayRunSampleDto();
+    setId(dto::setArrayRunId, from.getArrayRun());
+    setId(dto::setArrayId, from.getArray());
+    setString(dto::setPosition, from.getPosition());
+    setId(dto::setSampleId, from.getSample());
+    setString(dto::setSampleName, maybeGetProperty(from.getSample(), Sample::getName));
+    setString(dto::setSampleAlias, maybeGetProperty(from.getSample(), Sample::getAlias));
+    setId(dto::setQcStatusId, from.getQcStatus());
+    setString(dto::setQcNote, from.getQcNote());
+    setString(dto::setQcUserName, maybeGetProperty(from.getQcUser(), User::getFullName));
+    setDateString(dto::setQcDate, from.getQcDate());
+    return dto;
+  }
+
   public static List<ArrayDto> asArrayDtos(Collection<Array> arrays) {
     return arrays.stream()
         .map(Dtos::asDto)
@@ -3523,6 +3539,18 @@ public class Dtos {
     setBoolean(run::setQcPassed, from.getQcPassed(), true);
     setDate(run::setLastModified, from.getLastModified());
     return run;
+  }
+
+  public static ArrayRunSample to(@Nonnull ArrayRunSampleDto from) {
+    ArrayRunSample sample = new ArrayRunSample();
+    setObject(sample::setArrayRun, ArrayRun::new, from.getArrayRunId());
+    setObject(sample::setArray, Array::new, from.getArrayId());
+    setString(sample::setPosition, from.getPosition());
+    setObject(sample::setSample, SampleImpl::new, from.getSampleId());
+    setObject(sample::setQcStatus, RunItemQcStatus::new, from.getQcStatusId());
+    setString(sample::setQcNote, from.getQcNote());
+    return sample;
+
   }
 
   public static InstrumentStatusDto asDto(@Nonnull InstrumentStatus from) {

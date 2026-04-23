@@ -18,10 +18,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
+import uk.ac.bbsrc.tgac.miso.core.data.ArrayRunSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ArrayChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunSampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
@@ -58,6 +60,9 @@ public class DefaultArrayService implements ArrayService {
 
   @Autowired
   private ChangeLogService changeLogService;
+
+  @Autowired
+  private ArrayRunSampleService arrayRunSampleService;
 
   @Override
   public AuthorizationManager getAuthorizationManager() {
@@ -120,6 +125,7 @@ public class DefaultArrayService implements ArrayService {
     Array managed = get(array.getId());
     validateChange(array, managed);
     managed.setChangeDetails(authorizationManager.getCurrentUser());
+    cleanupArrayRunSamples(array);
     applyChanges(array, managed);
     return arrayStore.update(managed);
   }
@@ -226,6 +232,17 @@ public class DefaultArrayService implements ArrayService {
     changeLog.setUser(authorizationManager.getCurrentUser());
     changeLog.setSummary(String.format("%s removed from %s", sampleName, position));
     changeLogService.create(changeLog);
+  }
+
+  private void cleanupArrayRunSamples(Array array) throws IOException {
+    for (ArrayRunSample arrayRunSample : arrayRunSampleService.listByArrayId(array.getId())) {
+      Sample expectedSample = array.getSample(arrayRunSample.getPosition());
+      if (expectedSample == null
+          || arrayRunSample.getSample() == null
+          || arrayRunSample.getSample().getId() != expectedSample.getId()) {
+        arrayRunSampleService.delete(arrayRunSample);
+      }
+    }
   }
 
   @Override
