@@ -361,17 +361,17 @@ ListTarget.sample = (function () {
   };
 
   function getCreatableCategories() {
-    return ["Identity", "Tissue", "Tissue Processing", "Stock", "Aliquot"].filter(function (
-      category
-    ) {
-      return Constants.sampleClasses.some(function (sampleClass) {
-        return (
-          !sampleClass.archived &&
-          sampleClass.directCreationAllowed &&
-          sampleClass.sampleCategory === category
-        );
-      });
-    });
+    return ["Identity", "Tissue", "Tissue Processing", "Stock", "Aliquot"].filter(
+      function (category) {
+        return Constants.sampleClasses.some(function (sampleClass) {
+          return (
+            !sampleClass.archived &&
+            sampleClass.directCreationAllowed &&
+            sampleClass.sampleCategory === category
+          );
+        });
+      }
+    );
   }
 
   function samplesUpdateFunction(saveUrl) {
@@ -471,24 +471,32 @@ ListTarget.sample = (function () {
   }
 
   function showFindRelatedIdentitySelectDialog(config) {
-    var actions = config.identities.map(function (identity) {
-      return {
-        name: identity.alias + " (" + identity.externalName + ")",
-        handler: function () {
-          showFindRelatedCategorySelectDialog(config, [identity]);
-        },
-      };
-    });
-    actions.unshift({
-      name: "All identities",
-      handler: function () {
-        showFindRelatedCategorySelectDialog(config, config.identities);
-      },
-    });
-    Utils.showWizardDialog(
-      "Find Related Samples",
-      actions,
-      "Which identity would you like to supplement?"
+    Utils.ajaxWithDialog(
+      "Finding identities",
+      "GET",
+      Urls.rest.requisitions.listIdentities(config.requisitionId),
+      null,
+      function (identities) {
+        var actions = identities.map(function (identity) {
+          return {
+            name: identity.alias + " (" + identity.externalName + ")",
+            handler: function () {
+              showFindRelatedCategorySelectDialog(config, [identity]);
+            },
+          };
+        });
+        actions.unshift({
+          name: "All identities",
+          handler: function () {
+            showFindRelatedCategorySelectDialog(config, identities);
+          },
+        });
+        Utils.showWizardDialog(
+          "Find Related Samples",
+          actions,
+          "Which identity would you like to supplement?"
+        );
+      }
     );
   }
 

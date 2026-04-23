@@ -424,24 +424,32 @@ ListTarget.library = (function () {
   }
 
   function showFindRelatedIdentitySelectDialog(config) {
-    var actions = config.identities.map(function (identity) {
-      return {
-        name: identity.alias + " (" + identity.externalName + ")",
-        handler: function () {
-          showFindRelatedDesignSelectDialog(config, [identity]);
-        },
-      };
-    });
-    actions.unshift({
-      name: "All identities",
-      handler: function () {
-        showFindRelatedDesignSelectDialog(config, config.identities);
-      },
-    });
-    Utils.showWizardDialog(
-      "Find Related Libraries",
-      actions,
-      "Which identity would you like to supplement?"
+    Utils.ajaxWithDialog(
+      "Finding identities",
+      "GET",
+      Urls.rest.requisitions.listIdentities(config.requisitionId),
+      null,
+      function (identities) {
+        var actions = identities.map(function (identity) {
+          return {
+            name: identity.alias + " (" + identity.externalName + ")",
+            handler: function () {
+              showFindRelatedDesignSelectDialog(config, [identity]);
+            },
+          };
+        });
+        actions.unshift({
+          name: "All identities",
+          handler: function () {
+            showFindRelatedDesignSelectDialog(config, identities);
+          },
+        });
+        Utils.showWizardDialog(
+          "Find Related Libraries",
+          actions,
+          "Which identity would you like to supplement?"
+        );
+      }
     );
   }
 
