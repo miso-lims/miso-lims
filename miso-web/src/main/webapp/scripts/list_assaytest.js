@@ -127,7 +127,7 @@ ListTarget.assaytest = (function () {
             var method = Utils.array.findUniqueOrThrow(function (x) {
               return x.value === data;
             }, config.libraryQualificationMethods);
-            if (data === "ALIQUOT") {
+            if (full.libraryQualificationDesignCodeId) {
               var code = Utils.array.findUniqueOrThrow(
                 Utils.array.idPredicate(full.libraryQualificationDesignCodeId),
                 Constants.libraryDesignCodes
