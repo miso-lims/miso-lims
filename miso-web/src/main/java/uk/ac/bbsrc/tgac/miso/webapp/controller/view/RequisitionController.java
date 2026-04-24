@@ -3,13 +3,9 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,26 +19,18 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
-import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
-import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
@@ -57,8 +45,6 @@ public class RequisitionController {
   private SampleService sampleService;
   @Autowired
   private LibraryService libraryService;
-  @Autowired
-  private RunService runService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -119,46 +105,14 @@ public class RequisitionController {
 
     List<Sample> requisitionedSamples =
         sampleService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisition.getId()));
-    List<Sample> supplementalSamples =
-        sampleService.list(0, 0, false, "id", PaginationFilter.supplementalToRequisitionId(requisition.getId()));
-    Set<Long> sampleIds = Stream.concat(requisitionedSamples.stream(), supplementalSamples.stream())
-        .map(Sample::getId)
-        .collect(Collectors.toSet());
-
     List<Library> requisitionedLibraries =
         libraryService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisition.getId()));
-    List<Library> supplementalLibraries =
-        libraryService.list(0, 0, false, "id", PaginationFilter.supplementalToRequisitionId(requisition.getId()));
-    List<Long> preparedLibraryIds = libraryService.listIdsByAncestorSampleIds(sampleIds, requisition.getId());
-    List<Long> libraryIds = Stream.concat(
-        Stream.concat(requisitionedLibraries.stream(), supplementalLibraries.stream())
-            .map(Library::getId),
-        preparedLibraryIds.stream())
-        .toList();
-    if (detailedSampleMode) {
-      ArrayNode identityDtos = mapper.createArrayNode();
-      Stream.concat(requisitionedSamples.stream(), requisitionedLibraries.stream().map(Library::getSample))
-          .map(sample -> LimsUtils.getParent(SampleIdentity.class, (DetailedSample) sample))
-          .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparingLong(Sample::getId))))
-          .forEach(identity -> {
-            ObjectNode dto = identityDtos.addObject();
-            dto.put("id", identity.getId());
-            dto.put("alias", identity.getAlias());
-            dto.put("externalName", identity.getExternalName());
-          });
-      model.put("identityDtos", mapper.writeValueAsString(identityDtos));
-    }
 
     // used to ensure not all assays are available if all requisitioned items' projects have no
     // assigned assays
     model.put("numberOfRequisitionedItems", requisitionedSamples.size() + requisitionedLibraries.size());
     model.put("potentialAssayIds", mapper.writeValueAsString(
         getPotentialAssayIds(requisitionedSamples, requisitionedLibraries, requisition.getAssays())));
-    List<Run> runs = runService.listByLibraryIdList(libraryIds);
-    List<RunDto> runDtos = runs.stream()
-        .map(Dtos::asDto)
-        .collect(Collectors.toList());
-    model.put("runs", runDtos);
 
     return setupForm(requisition, PageMode.EDIT, model);
   }

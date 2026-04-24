@@ -5,8 +5,12 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.parseLocalDate;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,14 +25,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response.Status;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Requisitionable;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
@@ -37,7 +46,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProviderService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingBiFunction;
@@ -45,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.dto.DataTablesResponseDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
 import uk.ac.bbsrc.tgac.miso.dto.RunPartitionAliquotDto;
+import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
@@ -67,9 +79,13 @@ public class RequisitionRestController extends AbstractRestController {
   @Autowired
   private LibraryService libraryService;
   @Autowired
+  private RunService runService;
+  @Autowired
   private RunPartitionAliquotService runPartitionAliquotService;
   @Autowired
   private AsyncOperationManager asyncOperationManager;
+  @Autowired
+  private ObjectMapper mapper;
 
 
 
@@ -277,6 +293,32 @@ public class RequisitionRestController extends AbstractRestController {
         .collect(Collectors.toList());
   }
 
+  @GetMapping("/{requisitionId}/runs")
+  public @ResponseBody List<RunDto> listRuns(@PathVariable long requisitionId) throws IOException {
+    List<Sample> requisitionedSamples =
+        sampleService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisitionId));
+    List<Sample> supplementalSamples =
+        sampleService.list(0, 0, false, "id", PaginationFilter.supplementalToRequisitionId(requisitionId));
+    Set<Long> sampleIds = Stream.concat(requisitionedSamples.stream(), supplementalSamples.stream())
+        .map(Sample::getId)
+        .collect(Collectors.toSet());
+
+    List<Library> requisitionedLibraries =
+        libraryService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisitionId));
+    List<Library> supplementalLibraries =
+        libraryService.list(0, 0, false, "id", PaginationFilter.supplementalToRequisitionId(requisitionId));
+    List<Long> preparedLibraryIds = libraryService.listIdsByAncestorSampleIds(sampleIds, requisitionId);
+    List<Long> libraryIds = Stream.concat(
+        Stream.concat(requisitionedLibraries.stream(), supplementalLibraries.stream())
+            .map(Library::getId),
+        preparedLibraryIds.stream())
+        .toList();
+    List<Run> runs = runService.listByLibraryIdList(libraryIds);
+    return runs.stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList());
+  }
+
   @GetMapping("/{requisitionId}/runlibraries")
   public @ResponseBody List<RunPartitionAliquotDto> listRunLibraries(@PathVariable long requisitionId)
       throws IOException {
@@ -291,6 +333,27 @@ public class RequisitionRestController extends AbstractRestController {
 
     List<RunPartitionAliquot> runLibraries = runPartitionAliquotService.listByLibraryIdList(libraryIds);
     return runLibraries.stream().map(Dtos::asDto).collect(Collectors.toList());
+  }
+
+  @GetMapping("/{requisitionId}/identities")
+  public @ResponseBody ArrayNode listIdentities(@PathVariable long requisitionId)
+      throws IOException {
+    List<Sample> requisitionedSamples =
+        sampleService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisitionId));
+    List<Library> requisitionedLibraries =
+        libraryService.list(0, 0, false, "id", PaginationFilter.requisitionId(requisitionId));
+    ArrayNode identityDtos = mapper.createArrayNode();
+    Stream.concat(requisitionedSamples.stream(),
+        requisitionedLibraries.stream().map(Library::getSample))
+        .map(sample -> LimsUtils.getParent(SampleIdentity.class, (DetailedSample) sample))
+        .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparingLong(Sample::getId))))
+        .forEach(identity -> {
+          ObjectNode dto = identityDtos.addObject();
+          dto.put("id", identity.getId());
+          dto.put("alias", identity.getAlias());
+          dto.put("externalName", identity.getExternalName());
+        });
+    return identityDtos;
   }
 
   public record MoveItemsRequest(Long requisitionId, String requisitionAlias, Long assayId, boolean stopped,
