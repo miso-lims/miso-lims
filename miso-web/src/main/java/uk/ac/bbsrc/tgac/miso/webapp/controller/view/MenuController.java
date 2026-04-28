@@ -41,8 +41,6 @@ public class MenuController {
   private Boolean detailedSample;
   @Value("${miso.genomeFolder:}")
   private String genomeFolder;
-  @Value("${security.method:jdbc}")
-  private String configuredSecurityMethod;
   @Value("${security.saml.sp.registrationId:miso}")
   private String samlRegistrationId;
 
@@ -62,7 +60,7 @@ public class MenuController {
   @RequestMapping("/login")
   public ModelAndView loginPage(ModelMap model,
       @RequestParam(name = "login_error", required = false) Integer loginError) {
-    model.put("samlLoginEnabled", "saml".equals(configuredSecurityMethod));
+    model.put("samlLoginEnabled", "saml".equals(System.getProperty("security.method")));
     model.put("samlRegistrationId", samlRegistrationId);
     return new ModelAndView("/WEB-INF/login.jsp", model);
   }

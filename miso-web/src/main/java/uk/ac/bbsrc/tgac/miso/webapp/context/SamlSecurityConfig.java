@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
@@ -21,6 +21,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.converter.RsaKeyConverters;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.saml2.core.Saml2X509Credential;
 import org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
@@ -33,9 +34,11 @@ import org.springframework.security.saml2.provider.service.registration.Saml2Mes
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.util.StringUtils;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import jakarta.servlet.http.HttpSession;
 import uk.ac.bbsrc.tgac.miso.core.security.SamlSecurityManager;
 import uk.ac.bbsrc.tgac.miso.webapp.context.SecurityMethods.SamlSecurityEnabled;
 
@@ -52,8 +55,8 @@ public class SamlSecurityConfig {
   public RelyingPartyRegistrationRepository relyingPartyRegistrationRepository(
       @Value("${security.saml.sp.registrationId:miso}") String registrationId,
       @Value("${security.saml.idp.metadataUrl}") String metadataUrl,
-      @Value("${security.saml.sp.privateKey}") Resource privateKey,
-      @Value("${security.saml.sp.certificate}") Resource certificate) {
+      @Value("${security.saml.sp.privateKey:}") String privateKeyLocation,
+      @Value("${security.saml.sp.certificate:}") String certificateLocation) {
 
     RelyingPartyRegistration.Builder builder = RelyingPartyRegistrations.fromMetadataLocation(metadataUrl)
         .registrationId(registrationId)
@@ -63,7 +66,16 @@ public class SamlSecurityConfig {
         .singleLogoutServiceResponseLocation("{baseUrl}/logout/saml2/slo/{registrationId}")
         .singleLogoutServiceBinding(Saml2MessageBinding.POST);
 
-    builder.signingX509Credentials(c -> c.add(loadSigningCredential(privateKey, certificate)));
+    if (StringUtils.hasText(privateKeyLocation) || StringUtils.hasText(certificateLocation)) {
+      if (!StringUtils.hasText(privateKeyLocation) || !StringUtils.hasText(certificateLocation)) {
+        throw new IllegalStateException(
+            "Both security.saml.sp.privateKey and security.saml.sp.certificate must be set together");
+      }
+      DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
+      Resource privateKey = resourceLoader.getResource(privateKeyLocation);
+      Resource certificate = resourceLoader.getResource(certificateLocation);
+      builder.signingX509Credentials(c -> c.add(loadSigningCredential(privateKey, certificate)));
+    }
 
     return new InMemoryRelyingPartyRegistrationRepository(builder.build());
   }
@@ -77,7 +89,12 @@ public class SamlSecurityConfig {
       @Value("${security.saml.emailAttribute}") String emailAttribute,
       @Value("${security.saml.rolesAttribute}") String rolesAttribute,
       @Value("${security.saml.internalRoleName}") String internalRoleName,
-      @Value("${security.saml.adminRoleName:}") String adminRoleName) {
+      @Value("${security.saml.adminRoleName}") String adminRoleName) {
+
+    if (!StringUtils.hasText(internalRoleName) || !StringUtils.hasText(adminRoleName)) {
+      throw new IllegalArgumentException(
+          "Both security.saml.internalRoleName and security.saml.adminRoleName must be set");
+    }
 
     OpenSaml4AuthenticationProvider provider = new OpenSaml4AuthenticationProvider();
     provider.setResponseAuthenticationConverter(token -> {
@@ -86,11 +103,6 @@ public class SamlSecurityConfig {
 
       Saml2AuthenticatedPrincipal principal = (Saml2AuthenticatedPrincipal) auth.getPrincipal();
       List<GrantedAuthority> authorities = mapAuthorities(principal, rolesAttribute, internalRoleName, adminRoleName);
-
-      if (authorities.stream().noneMatch(a -> a.getAuthority().equals("ROLE_INTERNAL"))) {
-        throw new InsufficientAuthenticationException("User is not authorized for MISO login");
-      }
-
       SamlUserDetails userDetails = new SamlUserDetails(
           getRequiredAttribute(principal, usernameAttribute).toLowerCase(Locale.ROOT),
           getRequiredAttribute(principal, firstNameAttribute) + " "
@@ -99,10 +111,12 @@ public class SamlSecurityConfig {
           authorities,
           principal);
 
-      try {
-        securityManager.syncUser(userDetails);
-      } catch (Exception e) {
-        throw new InternalAuthenticationServiceException("User sync failed", e);
+      if (hasMisoLoginAuthority(authorities)) {
+        try {
+          securityManager.syncUser(userDetails);
+        } catch (Exception e) {
+          throw new InternalAuthenticationServiceException("User sync failed", e);
+        }
       }
 
       return new Saml2Authentication(userDetails, auth.getSaml2Response(), authorities);
@@ -116,17 +130,31 @@ public class SamlSecurityConfig {
       HttpSecurity http,
       ApiKeyAuthenticationFilter apiKeyFilter,
       AuthenticationSuccessHandler successHandler,
-      AuthenticationFailureHandler failureHandler,
       OpenSaml4AuthenticationProvider samlAuthenticationProvider,
       @Value("${security.saml.sp.registrationId:miso}") String registrationId) throws Exception {
 
     String sloUrl = "/logout/saml2/slo/" + registrationId;
+    AuthenticationFailureHandler samlFailureHandler = (request, response, exception) -> {
+      SecurityContextHolder.clearContext();
+      HttpSession session = request.getSession(false);
+      if (session != null) {
+        session.invalidate();
+      }
+      response.sendRedirect(request.getContextPath() + "/login?login_error=1");
+    };
+    AuthenticationSuccessHandler samlSuccessHandler = (request, response, authentication) -> {
+      if (!hasMisoLoginAuthority(authentication.getAuthorities())) {
+        response.sendRedirect(request.getContextPath() + "/login?login_error=1");
+        return;
+      }
+      successHandler.onAuthenticationSuccess(request, response, authentication);
+    };
 
     return SecurityConfig.setupCommon(http, apiKeyFilter)
         .saml2Login(saml -> saml
             .loginPage("/login")
-            .successHandler(successHandler)
-            .failureHandler(failureHandler)
+            .successHandler(samlSuccessHandler)
+            .failureHandler(samlFailureHandler)
             .authenticationManager(new ProviderManager(samlAuthenticationProvider)))
         .saml2Logout(saml -> saml
             .logoutRequest(logout -> logout.logoutUrl(sloUrl))
@@ -150,25 +178,25 @@ public class SamlSecurityConfig {
     if (roles == null)
       return result;
 
-    boolean hasInternalRole = false;
-    boolean hasAdminRole = false;
     for (Object role : roles) {
       String value = role.toString();
       if (value.equals(internalRoleName)) {
-        hasInternalRole = true;
+        result.add(new SimpleGrantedAuthority("ROLE_INTERNAL"));
       }
-      if (!adminRoleName.isBlank() && value.equals(adminRoleName)) {
-        hasAdminRole = true;
+      if (value.equals(adminRoleName)) {
+        result.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
       }
-    }
-
-    if (hasInternalRole) {
-      result.add(new SimpleGrantedAuthority("ROLE_INTERNAL"));
-    }
-    if (hasAdminRole) {
-      result.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
     return result;
+  }
+
+  private static boolean hasMisoLoginAuthority(Iterable<? extends GrantedAuthority> authorities) {
+    for (GrantedAuthority authority : authorities) {
+      if (authority.getAuthority().equals("ROLE_INTERNAL") || authority.getAuthority().equals("ROLE_ADMIN")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private static Saml2X509Credential loadSigningCredential(Resource key, Resource cert) {
