@@ -706,7 +706,23 @@ var Utils = Utils || {
       if (request.readyState === 4) {
         dialog.dialog("close");
         if (request.status === 200) {
-          var filename = /filename=(.*)$/.exec(request.getResponseHeader("Content-Disposition"))[1];
+          contentDisposition = request.getResponseHeader("Content-Disposition");
+          var filename = null;
+          var match = /filename\*=(?:UTF-8'')?(.*)(?:; ?|$)/.exec(
+            request.getResponseHeader("Content-Disposition")
+          );
+          if (match) {
+            filename = decodeURIComponent(match[1]);
+          } else {
+            match = filename = /filename=(["']?)(.*)\1(?:; ?|$)/.exec(
+              request.getResponseHeader("Content-Disposition")
+            );
+            if (match) {
+              filename = match[2];
+            } else {
+              throw Error("Couldn't determine filename for download");
+            }
+          }
           download(request.response, filename, request.getResponseHeader("Content-Type"));
         } else {
           Utils.showOkDialog("Error", ["Download failed."]);
