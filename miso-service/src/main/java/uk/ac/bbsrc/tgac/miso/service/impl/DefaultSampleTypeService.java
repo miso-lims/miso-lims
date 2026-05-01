@@ -6,8 +6,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.transaction.support.TransactionTemplate;
+
 import uk.ac.bbsrc.tgac.miso.core.data.SampleType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleTypeService;
@@ -73,15 +73,19 @@ public class DefaultSampleTypeService extends AbstractSaveService<SampleType> im
   }
 
   @Override
-  protected void collectValidationErrors(SampleType object, SampleType beforeChange, List<ValidationError> errors) throws IOException {
+  protected void collectValidationErrors(SampleType object, SampleType beforeChange, List<ValidationError> errors)
+      throws IOException {
     if (ValidationUtils.isSetAndChanged(SampleType::getName, object, beforeChange)) {
       if (sampleTypeDao.getByName(object.getName()) != null) {
         errors.add(new ValidationError("name", "There is already a sample type with this name"));
       }
-      long usage = sampleTypeDao.getUsage(beforeChange);
-      if (usage > 0L) {
-        errors.add(new ValidationError("name",
-                "Cannot change name of sample type because it is already in use by " + usage + " " + Pluralizer.samples(usage)));
+      if (beforeChange != null) {
+        long usage = sampleTypeDao.getUsage(beforeChange);
+        if (usage > 0L) {
+          errors.add(new ValidationError("name",
+              "Cannot change name of sample type because it is already in use by %d %s".formatted(usage,
+                  Pluralizer.samples(usage))));
+        }
       }
     }
   }
