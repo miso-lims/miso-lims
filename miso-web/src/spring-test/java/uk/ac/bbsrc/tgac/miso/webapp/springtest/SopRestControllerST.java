@@ -1,131 +1,85 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import org.junit.Test;
+import org.springframework.security.test.context.support.WithMockUser;
 
-import org.springframework.web.servlet.*;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import javax.ws.rs.core.MediaType;
 
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
 import com.jayway.jsonpath.JsonPath;
 
-import static org.hamcrest.Matchers.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import org.springframework.test.web.servlet.MvcResult;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SopDto;
 
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.View;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.springframework.security.test.context.support.WithMockUser;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
-import java.util.Collections;
-
-import static org.junit.Assert.*;
-
-import java.util.List;
 import java.util.Arrays;
-import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
-
+import java.util.List;
 
 public class SopRestControllerST extends AbstractST {
 
   private static final String CONTROLLER_BASE = "/rest/sops";
-  private static final Class<Sop> controllerClass = Sop.class;
+  private static final Class<Sop> entityClass = Sop.class;
 
-  private List<SopDto> makeCreateDtos() {
+  @Test
+  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
+  public void testCreate() throws Exception {
+    SopDto dto = new SopDto();
+    dto.setAlias("test sop");
+    dto.setVersion("1.0");
+    dto.setCategory("SAMPLE");
+    dto.setUrl("http://test.com/sop");
+    dto.setArchived(false);
 
-    SopDto sone = new SopDto();
-    sone.setAlias("sop one");
-    sone.setVersion("1.0");
-    sone.setCategory("SAMPLE");
-    sone.setUrl("http://sops.test.com/test_sop_1");
-    sone.setArchived(false);
+    Sop newSop = baseTestCreate(CONTROLLER_BASE, dto, entityClass, 201);
+    assertEquals("test sop", newSop.getAlias());
+    assertEquals("1.0", newSop.getVersion());
+  }
 
-    SopDto stwo = new SopDto();
-    stwo.setAlias("sop two");
-    stwo.setVersion("1.0");
-    stwo.setCategory("SAMPLE");
-    stwo.setUrl("http://sops.test.com/test_sop_2");
-    stwo.setArchived(false);
+  @Test
+  public void testCreateFail() throws Exception {
+    SopDto dto = new SopDto();
+    dto.setAlias("test sop");
+    dto.setVersion("1.0");
+    dto.setCategory("SAMPLE");
 
-    List<SopDto> dtos = new ArrayList<SopDto>();
-    dtos.add(sone);
-    dtos.add(stwo);
-
-    return dtos;
+    testCreateUnauthorized(CONTROLLER_BASE, dto, entityClass);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
-  public void testBulkCreateAsync() throws Exception {
+  public void testUpdate() throws Exception {
+    SopDto dto = Dtos.asDto(currentSession().get(entityClass, 1L));
+    dto.setAlias("modified sop");
 
-    baseTestBulkCreateAsync(CONTROLLER_BASE, controllerClass, makeCreateDtos());
+    Sop updatedSop = baseTestUpdate(CONTROLLER_BASE, dto, 1, entityClass);
+    assertEquals("modified sop", updatedSop.getAlias());
   }
 
   @Test
-  public void testBulkCreateFail() throws Exception {
-    // SOP creation is for admin only, so this test is expecting failure due to insufficent permission
-    testBulkCreateAsyncUnauthorized(CONTROLLER_BASE, controllerClass, makeCreateDtos());
-  }
+  public void testUpdateFail() throws Exception {
+    SopDto dto = Dtos.asDto(currentSession().get(entityClass, 1L));
+    dto.setAlias("modified sop");
 
-  @Test
-  @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
-  public void testBulkUpdateAsync() throws Exception {
-    // the admin user made these SOPs so only admin can update them
-    SopDto sampleSop = Dtos.asDto(currentSession().get(Sop.class, 1));
-    SopDto librarySop = Dtos.asDto(currentSession().get(Sop.class, 3));
-
-    sampleSop.setAlias("sampler");
-    librarySop.setAlias("libraryer");
-
-    List<SopDto> dtos = new ArrayList<SopDto>();
-    dtos.add(sampleSop);
-    dtos.add(librarySop);
-
-    List<Sop> sops =
-        (List<Sop>) baseTestBulkUpdateAsync(CONTROLLER_BASE, controllerClass, dtos, SopDto::getId);
-    assertEquals("Sop not updated", "sampler", sops.get(0).getAlias());
-    assertEquals("Sop not updated", "libraryer", sops.get(1).getAlias());
+    testUpdateUnauthorized(CONTROLLER_BASE, dto, 1, entityClass);
   }
 
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
-  public void testDeleteSop() throws Exception {
-    testBulkDelete(controllerClass, 5, CONTROLLER_BASE);
+  public void testDelete() throws Exception {
+    testBulkDelete(entityClass, 5, CONTROLLER_BASE);
   }
 
   @Test
   public void testDeleteFail() throws Exception {
-    testDeleteUnauthorized(controllerClass, 5, CONTROLLER_BASE);
-
+    testDeleteUnauthorized(entityClass, 5, CONTROLLER_BASE);
   }
 
   @Test
   public void testDataTableByCategory() throws Exception {
     testDtRequest(CONTROLLER_BASE + "/dt/category/SAMPLE", Arrays.asList(1, 2));
-
     testDtRequest(CONTROLLER_BASE + "/dt/category/LIBRARY", Arrays.asList(3, 4, 5));
-
     testDtRequest(CONTROLLER_BASE + "/dt/category/RUN", Arrays.asList(6));
   }
 }

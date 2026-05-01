@@ -284,6 +284,14 @@ When editing SOPs in MISO, keep in mind that your changes will affect existing i
 When a new version of an SOP is created, the old one should be archived in MISO, and a new one created with the same
 name and the new version. This way, you continue to track which version of an SOP was used to prepare older items.
 
+### SOP Fields
+
+SOP fields are used to capture additional SOP-specific information, such as reagent LOT numbers.
+Each field has a name, a data type (text or number), and optional units. When the SOP is added to an
+item, that item gains all of the fields defined by the SOP.
+
+SOP fields can only be added to run SOPs. Library and sample SOPs do not support SOP fields at this
+time.
 
 
 ## Sample Indices

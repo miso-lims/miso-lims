@@ -47,6 +47,10 @@ public class ValidationError implements Serializable {
     return new ValidationError(property, "This field is required");
   }
 
+  public static ValidationError forMaxLength(String property, int maxLength) {
+    return new ValidationError(property, "Maximum length: %d characters".formatted(maxLength));
+  }
+
   /**
    * Constructs a ValidationError to describe one of possibly several reasons that an object is invalid. If the error applies to a specific
    * field, a different constructor should be used

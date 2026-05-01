@@ -49,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -414,6 +415,16 @@ public class DefaultRunService implements RunService {
                   String.format("Container '%s' is not valid for instrument '%s'", container.getIdentificationBarcode(),
                       changed.getSequencer().getInstrumentModel().getAlias())));
         }
+      }
+    }
+
+    if (changed.getSop() != null) {
+      if (changed.getSop().getCategory() != SopCategory.RUN) {
+        errors.add(new ValidationError("sopId", "Only run SOPs may be assigned to a run"));
+      }
+
+      if (isChanged(Run::getSop, changed, before) && changed.getSop().isArchived()) {
+        errors.add(new ValidationError("sopId", "Cannot assign an archived SOP to a run"));
       }
     }
 

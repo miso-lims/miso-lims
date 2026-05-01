@@ -24,7 +24,14 @@ INSERT INTO Sop(sopId, alias, version, category, url, archived) VALUES
 (2, 'Sample SOP 2', '1.0', 'SAMPLE', 'http://sops.test.com/sample/2/1', FALSE),
 (3, 'Library SOP 1', '1.0', 'LIBRARY', 'http://sops.test.com/library/1/1', FALSE),
 (4, 'Library SOP 1', '2.0', 'LIBRARY', 'http://sops.test.com/library/1/2', FALSE),
-(5, 'Run SOP 1', '1.0', 'RUN', 'http://sops.test.com/run/1/1', FALSE);
+(5, 'Run SOP 1', '1.0', 'RUN', 'http://sops.test.com/run/1/1', FALSE),
+(101, 'Test NovaSeq SOP', '1.0', 'RUN', 'http://test.com/sop', 0);
+
+INSERT INTO SopField (sopId, name, units, fieldType) VALUES
+  (101, 'Flow Cell Lot Number', NULL, 'TEXT'),
+  (101, 'Reagent Cartridge Lot', NULL, 'TEXT'),
+  (101, 'PhiX Spike-in %', '%', 'NUMBER'),
+  (101, 'Library Concentration', 'nM', 'NUMBER');
 
 INSERT INTO ScientificName(scientificNameId, alias) VALUES
 (1, 'Homo sapiens'),

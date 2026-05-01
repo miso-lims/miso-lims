@@ -367,20 +367,24 @@ FormUtils = (function ($) {
     },
 
     makeSopFields: function (object, sops) {
+      sops = sops || [];
+
+      var availableSops = sops.filter(function (sop) {
+        return !sop.archived || object.sopId === sop.id;
+      });
+
       return [
         {
           title: "SOP",
           data: "sopId",
           type: "dropdown",
-          source: sops.filter(function (sop) {
-            return !sop.archived || object.sopId === sop.id;
-          }),
+          source: availableSops,
           sortSource: Utils.sorting.standardSort("alias"),
           getItemLabel: function (item) {
             return item.alias + " v." + item.version;
           },
           getItemValue: Utils.array.getId,
-          include: sops && sops.length,
+          include: !!availableSops.length,
           onChange: function (newValue, form) {
             var sop = newValue
               ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), sops)
@@ -396,6 +400,7 @@ FormUtils = (function ($) {
           data: "sopLink",
           omit: true,
           type: "read-only",
+          include: !!object.sopId || !!availableSops.length,
           getDisplayValue: function (item) {
             return item.sopId ? "View SOP" : null;
           },
@@ -477,6 +482,11 @@ FormUtils = (function ($) {
     setTableData: function (listTarget, config, containerId, data, form) {
       var listId = containerId + "Table";
       if (initializedTables.indexOf(containerId) !== -1) {
+        var previousData = FormUtils.getTableData(containerId);
+        if ((!previousData || !previousData.length) && (!data || !data.length)) {
+          // Avoid clearing an already empty table, mainly to avoid marking changes
+          return;
+        }
         if (form) {
           form.markOtherChanges();
         }

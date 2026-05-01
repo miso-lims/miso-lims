@@ -26,6 +26,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +42,6 @@ import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.type.IndexSequencing;
-import jakarta.annotation.Nonnull;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
@@ -118,6 +119,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
+import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.StainCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -292,6 +294,7 @@ import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.RunPositionDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.SolidRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.UltimaRunDto;
+
 
 @SuppressWarnings("squid:S3776") // make Sonar ignore cognitive complexity warnings for this file
 public class Dtos {
@@ -4465,12 +4468,17 @@ public class Dtos {
 
   public static SopDto asDto(@Nonnull Sop from) {
     SopDto to = new SopDto();
-    setLong(to::setId, from.getId(), false);
+    setLong(to::setId, from.getId(), true);
     setString(to::setAlias, from.getAlias());
     setString(to::setVersion, from.getVersion());
     setString(to::setCategory, maybeGetProperty(from.getCategory(), SopCategory::name));
     setString(to::setUrl, from.getUrl());
     setBoolean(to::setArchived, from.isArchived(), false);
+
+    to.setFields(from.getFields().stream()
+        .map(Dtos::asDto)
+        .collect(Collectors.toList()));
+
     return to;
   }
 
@@ -4482,6 +4490,31 @@ public class Dtos {
     setObject(to::setCategory, from.getCategory(), SopCategory::valueOf);
     setString(to::setUrl, from.getUrl());
     setBoolean(to::setArchived, from.isArchived(), false);
+
+    if (from.getFields() != null && !from.getFields().isEmpty()) {
+      to.setFields(from.getFields().stream().map(Dtos::to).collect(Collectors.toSet()));
+    }
+
+    return to;
+  }
+
+  public static SopFieldDto asDto(@Nonnull SopField from) {
+    SopFieldDto dto = new SopFieldDto();
+    setLong(dto::setId, from.getId(), true);
+    setString(dto::setName, from.getName());
+    setString(dto::setUnits, from.getUnits());
+    setString(dto::setFieldType, maybeGetProperty(from.getFieldType(), SopField.FieldType::name));
+
+    return dto;
+  }
+
+  public static SopField to(@Nonnull SopFieldDto from) {
+    SopField to = new SopField();
+    setLong(to::setId, from.getId(), false);
+    setString(to::setName, from.getName());
+    setString(to::setUnits, from.getUnits());
+    setObject(to::setFieldType, from.getFieldType(), SopField.FieldType::valueOf);
+
     return to;
   }
 

@@ -1121,14 +1121,14 @@ Urls = (function () {
   // SOPs
   var sopUiBase = "/sop";
   ui.sops = {
-    bulkCreate: sopUiBase + "/bulk/new",
-    bulkEdit: sopUiBase + "/bulk/edit",
+    create: sopUiBase + "/new",
+    edit: idUrlFunction(sopUiBase),
   };
 
   var sopRestBase = restBase + "/sops";
   rest.sops = {
-    bulkSave: sopRestBase + "/bulk",
-    bulkSaveProgress: idUrlFunction(sopRestBase + "/bulk"),
+    create: sopRestBase,
+    update: idUrlFunction(sopRestBase),
     categoryDatatable: idUrlFunction(sopRestBase + "/dt/category"),
   };
 
