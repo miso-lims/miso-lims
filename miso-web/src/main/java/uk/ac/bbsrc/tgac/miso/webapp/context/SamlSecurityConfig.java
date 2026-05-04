@@ -39,6 +39,7 @@ import org.springframework.util.StringUtils;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import jakarta.servlet.http.HttpSession;
+import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 import uk.ac.bbsrc.tgac.miso.core.security.SamlSecurityManager;
 import uk.ac.bbsrc.tgac.miso.webapp.context.SecurityMethods.SamlSecurityEnabled;
 
@@ -55,8 +56,8 @@ public class SamlSecurityConfig {
   public RelyingPartyRegistrationRepository relyingPartyRegistrationRepository(
       @Value("${security.saml.sp.registrationId:miso}") String registrationId,
       @Value("${security.saml.idp.metadataUrl}") String metadataUrl,
-      @Value("${security.saml.sp.privateKey:}") String privateKeyLocation,
-      @Value("${security.saml.sp.certificate:}") String certificateLocation) {
+      @Value("${security.saml.sp.privateKey:#{null}}") String privateKeyLocation,
+      @Value("${security.saml.sp.certificate:#{null}}") String certificateLocation) {
 
     RelyingPartyRegistration.Builder builder = RelyingPartyRegistrations.fromMetadataLocation(metadataUrl)
         .registrationId(registrationId)
@@ -72,8 +73,8 @@ public class SamlSecurityConfig {
             "Both security.saml.sp.privateKey and security.saml.sp.certificate must be set together");
       }
       DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
-      Resource privateKey = resourceLoader.getResource(privateKeyLocation);
-      Resource certificate = resourceLoader.getResource(certificateLocation);
+      Resource privateKey = resourceLoader.getResource(normalizeResourceLocation(privateKeyLocation));
+      Resource certificate = resourceLoader.getResource(normalizeResourceLocation(certificateLocation));
       builder.signingX509Credentials(c -> c.add(loadSigningCredential(privateKey, certificate)));
     }
 
@@ -102,6 +103,8 @@ public class SamlSecurityConfig {
           OpenSaml4AuthenticationProvider.createDefaultResponseAuthenticationConverter().convert(token);
 
       Saml2AuthenticatedPrincipal principal = (Saml2AuthenticatedPrincipal) auth.getPrincipal();
+      System.out.println("SAML attributes: " + principal.getAttributes());
+      System.out.println("SAML roles attribute '" + rolesAttribute + "': " + principal.getAttribute(rolesAttribute));
       List<GrantedAuthority> authorities = mapAuthorities(principal, rolesAttribute, internalRoleName, adminRoleName);
       SamlUserDetails userDetails = new SamlUserDetails(
           getRequiredAttribute(principal, usernameAttribute).toLowerCase(Locale.ROOT),
@@ -181,10 +184,10 @@ public class SamlSecurityConfig {
     for (Object role : roles) {
       String value = role.toString();
       if (value.equals(internalRoleName)) {
-        result.add(new SimpleGrantedAuthority("ROLE_INTERNAL"));
+        result.add(new SimpleGrantedAuthority(MisoAuthority.ROLE_INTERNAL.getAuthority()));
       }
       if (value.equals(adminRoleName)) {
-        result.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        result.add(new SimpleGrantedAuthority(MisoAuthority.ROLE_ADMIN.getAuthority()));
       }
     }
     return result;
@@ -192,7 +195,8 @@ public class SamlSecurityConfig {
 
   private static boolean hasMisoLoginAuthority(Iterable<? extends GrantedAuthority> authorities) {
     for (GrantedAuthority authority : authorities) {
-      if (authority.getAuthority().equals("ROLE_INTERNAL") || authority.getAuthority().equals("ROLE_ADMIN")) {
+      if (authority.getAuthority().equals(MisoAuthority.ROLE_INTERNAL.getAuthority())
+          || authority.getAuthority().equals(MisoAuthority.ROLE_ADMIN.getAuthority())) {
         return true;
       }
     }
@@ -208,6 +212,10 @@ public class SamlSecurityConfig {
     } catch (Exception e) {
       throw new IllegalStateException("Failed to load SAML signing credential", e);
     }
+  }
+
+  private static String normalizeResourceLocation(String location) {
+    return location.contains(":") ? location : "file:" + location;
   }
 
 }
