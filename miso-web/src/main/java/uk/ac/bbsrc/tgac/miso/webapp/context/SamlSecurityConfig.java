@@ -103,8 +103,6 @@ public class SamlSecurityConfig {
           OpenSaml4AuthenticationProvider.createDefaultResponseAuthenticationConverter().convert(token);
 
       Saml2AuthenticatedPrincipal principal = (Saml2AuthenticatedPrincipal) auth.getPrincipal();
-      System.out.println("SAML attributes: " + principal.getAttributes());
-      System.out.println("SAML roles attribute '" + rolesAttribute + "': " + principal.getAttribute(rolesAttribute));
       List<GrantedAuthority> authorities = mapAuthorities(principal, rolesAttribute, internalRoleName, adminRoleName);
       SamlUserDetails userDetails = new SamlUserDetails(
           getRequiredAttribute(principal, usernameAttribute).toLowerCase(Locale.ROOT),
