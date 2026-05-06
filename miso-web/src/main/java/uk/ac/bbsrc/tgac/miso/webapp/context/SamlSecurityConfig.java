@@ -20,7 +20,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.converter.RsaKeyConverters;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.saml2.core.Saml2X509Credential;
 import org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider;
@@ -76,6 +75,9 @@ public class SamlSecurityConfig {
       Resource privateKey = resourceLoader.getResource(normalizeResourceLocation(privateKeyLocation));
       Resource certificate = resourceLoader.getResource(normalizeResourceLocation(certificateLocation));
       builder.signingX509Credentials(c -> c.add(loadSigningCredential(privateKey, certificate)));
+    } else {
+      builder.authnRequestsSigned(false)
+          .assertingPartyDetails(party -> party.wantAuthnRequestsSigned(false));
     }
 
     return new InMemoryRelyingPartyRegistrationRepository(builder.build());
@@ -182,10 +184,10 @@ public class SamlSecurityConfig {
     for (Object role : roles) {
       String value = role.toString();
       if (value.equals(internalRoleName)) {
-        result.add(new SimpleGrantedAuthority(MisoAuthority.ROLE_INTERNAL.getAuthority()));
+        result.add(MisoAuthority.ROLE_INTERNAL);
       }
       if (value.equals(adminRoleName)) {
-        result.add(new SimpleGrantedAuthority(MisoAuthority.ROLE_ADMIN.getAuthority()));
+        result.add(MisoAuthority.ROLE_ADMIN);
       }
     }
     return result;
@@ -193,8 +195,7 @@ public class SamlSecurityConfig {
 
   private static boolean hasMisoLoginAuthority(Iterable<? extends GrantedAuthority> authorities) {
     for (GrantedAuthority authority : authorities) {
-      if (authority.getAuthority().equals(MisoAuthority.ROLE_INTERNAL.getAuthority())
-          || authority.getAuthority().equals(MisoAuthority.ROLE_ADMIN.getAuthority())) {
+      if (authority.getAuthority().equals(MisoAuthority.ROLE_INTERNAL.getAuthority())) {
         return true;
       }
     }
