@@ -16,6 +16,21 @@ BulkTarget.sample = (function ($) {
    * }
    */
 
+  var batchRenderQueue = [];
+  var batchRenderTimer = null;
+
+  function setBatchRenderTimer(api) {
+    clearTimeout(batchRenderTimer);
+    batchRenderTimer = setTimeout(function () {
+      var changes = batchRenderQueue.splice(0);
+      api.renderFields(
+        changes.map(function (change)  {
+          return [change.rowIndex, change.columnName, change.value]
+        })
+      )
+    }, 50);
+  }
+
   // stored state when editing probes
   var probeEditingSamples = null;
   var allSamples = null;
@@ -853,11 +868,25 @@ BulkTarget.sample = (function ($) {
                   });
                   setValue = firstReceiptLabel;
                 }
-                api.updateField(rowIndex, "identityId", {
-                  source: potentialIdentities,
+                var change = {
+                  rowIndex: rowIndex,
+                  columnName: "identityId",
+                  potentialIdentities: potentialIdentities,
                   value: setValue,
-                  formatter: potentialIdentities.length > 1 ? "multipleOptions" : null,
-                });
+                  formatter: potentialIdentities.length > 1 ? "multipleOptions" : null
+                }
+                api.updateField(
+                    change.rowIndex,
+                    change.columnName,
+                    {
+                      source: change.potentialIdentities,
+                      value: change.value,
+                      formatter: change.formatter,
+                    },
+                    true);
+
+                batchRenderQueue.push(change);
+                setBatchRenderTimer(api);
               })
               .fail(function (response, textStatus, serverStatus) {
                 var error = JSON.parse(response.responseText);
