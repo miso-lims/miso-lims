@@ -26,13 +26,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Requisitionable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionContact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
+import uk.ac.bbsrc.tgac.miso.core.service.ContactRoleService;
+import uk.ac.bbsrc.tgac.miso.core.service.ContactService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
@@ -69,6 +73,10 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   private TransactionTemplate transactionTemplate;
   @Autowired
   private HibernateUtilDao hibernateUtilDao;
+  @Autowired
+  private ContactService contactService;
+  @Autowired
+  private ContactRoleService contactRoleService;
 
   @Override
   public DeletionStore getDeletionStore() {
@@ -107,10 +115,39 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   }
 
   @Override
+  public long create(Requisition requisition) throws IOException {
+    for (RequisitionContact item : requisition.getContacts()) {
+      saveNewContact(item.getContact());
+      item.setRequisition(requisition);
+    }
+    return super.create(requisition);
+  }
+
+  @Override
+  public long update(Requisition requisition) throws IOException {
+    for (RequisitionContact item : requisition.getContacts()) {
+      saveNewContact(item.getContact());
+    }
+    return super.update(requisition);
+  }
+
+  @Override
   protected void loadChildEntities(Requisition object) throws IOException {
     Set<Assay> loadedAssays = new HashSet<>();
     for (Assay assay : object.getAssays()) {
       ValidationUtils.loadChildEntity(loadedAssays::add, assay, assayService, "assays");
+    }
+    for (RequisitionContact requisitionContact : object.getContacts()) {
+      ValidationUtils.loadChildEntity(
+          requisitionContact::setContact,
+          requisitionContact.getContact(),
+          contactService,
+          "contact");
+      ValidationUtils.loadChildEntity(
+          requisitionContact::setContactRole,
+          requisitionContact.getContactRole(),
+          contactRoleService,
+          "contact");
     }
     object.setAssays(loadedAssays);
   }
@@ -132,6 +169,39 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
       }
     }
     validatePauses(object.getPauses(), errors);
+    validateContacts(object.getContacts(), errors);
+  }
+
+  private void validateContacts(List<RequisitionContact> contacts, List<ValidationError> errors) {
+    for (int i = 0; i < contacts.size(); i++) {
+      for (int j = i + 1; j < contacts.size(); j++) {
+        if (contactsMatch(contacts.get(i), contacts.get(j))) {
+          errors.add(new ValidationError("contact", "The contact '"
+              + contacts.get(i).getContact().getEmail()
+              + "' with the assigned contact role '"
+              + contacts.get(i).getContactRole().getName()
+              + "' is used more than once"));
+        }
+      }
+    }
+  }
+
+  private void saveNewContact(Contact contact) throws IOException {
+    if (contact != null && !contact.isSaved()) {
+      try {
+        long savedId = contactService.create(contact);
+        contact.setId(savedId);
+      } catch (ValidationException e) {
+        List<ValidationError> errors = e.getErrors().stream().map(error -> {
+          String message = error.getMessage();
+          if (!ValidationError.GENERAL_PROPERTY.equals(error.getProperty())) {
+            message = error.getProperty() + ": " + error.getMessage();
+          }
+          return new ValidationError("contact", message);
+        }).collect(Collectors.toList());
+        throw new ValidationException(errors);
+      }
+    }
   }
 
   private void validatePauses(List<RequisitionPause> pauses, List<ValidationError> errors) {
@@ -170,6 +240,25 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
     to.setStopped(from.isStopped());
     to.setStopReason(from.getStopReason());
     applyPauseChanges(to, from);
+    applyContactChanges(to, from);
+  }
+
+  private void applyContactChanges(Requisition to, Requisition from) {
+    to.getContacts().removeIf(
+        toItem -> from.getContacts().stream().noneMatch(fromItem -> contactsMatch(toItem, fromItem)));
+    from.getContacts().forEach(fromItem -> {
+      if (to.getContacts().stream().noneMatch(toItem -> contactsMatch(fromItem, toItem))) {
+        to.getContacts().add(fromItem);
+      }
+    });
+    for (RequisitionContact item : to.getContacts()) {
+      item.setRequisition(to);
+    }
+  }
+
+  private static boolean contactsMatch(RequisitionContact a, RequisitionContact b) {
+    return a.getContact().getId() == b.getContact().getId()
+        && a.getContactRole().getId() == b.getContactRole().getId();
   }
 
   private void applyPauseChanges(Requisition to, Requisition from) throws IOException {

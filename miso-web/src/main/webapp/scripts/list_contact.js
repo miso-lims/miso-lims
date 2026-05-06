@@ -17,6 +17,14 @@ ListTarget.contact = (function ($) {
           },
         ];
       }
+      if (isRequisitionPage(config)) {
+        return [
+          {
+            name: "Remove",
+            action: Requisition.removeContacts,
+          },
+        ];
+      }
       actions.push(
         ListUtils.createBulkDeleteAction("Contacts", "contacts", function (item) {
           return item.name + " <" + item.email + ">";
@@ -26,11 +34,13 @@ ListTarget.contact = (function ($) {
       return actions;
     },
     createStaticActions: function (config, projectId) {
-      if (isProjectPage(config)) {
+      if (isParentPage(config)) {
         return [
           {
             name: "Add",
-            handler: showAddContactDialog,
+            handler: function () {
+              showAddContactDialog(config);
+            },
           },
         ];
       }
@@ -40,11 +50,11 @@ ListTarget.contact = (function ($) {
       var columns = [
         {
           sTitle: "Name",
-          mData: isProjectPage(config) ? "contactName" : "name",
+          mData: isParentPage(config) ? "contactName" : "name",
         },
         {
           sTitle: "Email",
-          mData: isProjectPage(config) ? "contactEmail" : "email",
+          mData: isParentPage(config) ? "contactEmail" : "email",
           mRender: function (data, type, full) {
             if (type === "display") {
               return '<a href="mailto:' + data + '">' + data + "</a>";
@@ -53,7 +63,7 @@ ListTarget.contact = (function ($) {
           },
         },
       ];
-      if (isProjectPage(config)) {
+      if (isParentPage(config)) {
         columns.push({
           sTitle: "Contact Role",
           mData: "contactRole",
@@ -63,13 +73,13 @@ ListTarget.contact = (function ($) {
     },
   };
 
-  function showAddContactDialog() {
+  function showAddContactDialog(config) {
     Contacts.selectContactDialog(false, false, function (contact) {
-      selectContactRoleDialog(contact);
+      selectContactRoleDialog(config, contact);
     });
   }
 
-  function selectContactRoleDialog(contact) {
+  function selectContactRoleDialog(config, contact) {
     var byName = Utils.sorting.standardSort("name");
     var contactRoles = Constants.contactRoles.sort(byName);
     Utils.showWizardDialog(
@@ -86,7 +96,11 @@ ListTarget.contact = (function ($) {
               contactRoleId: contactRole.id,
               contactRole: contactRole.name,
             };
-            Project.addContact(projectContact);
+            if (isProjectPage(config)) {
+              Project.addContact(projectContact);
+            } else if (isRequisitionPage(config)) {
+              Requisition.addContact(projectContact);
+            }
           },
         };
       })
@@ -95,5 +109,13 @@ ListTarget.contact = (function ($) {
 
   function isProjectPage(config) {
     return config.projectId != null && config.projectId >= 0;
+  }
+
+  function isRequisitionPage(config) {
+    return config.requisitionId != null && config.requisitionId >= 0;
+  }
+
+  function isParentPage(config) {
+    return isProjectPage(config) || isRequisitionPage(config);
   }
 })(jQuery);

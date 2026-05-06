@@ -1,9 +1,12 @@
 var Requisition = (function () {
   var assaysListId = "listAssays";
   var pausesListId = "listPauses";
+  var contactsListId = "contacts_section";
 
   var form = null;
   var assaysListConfig = {};
+  var contactsListConfig = {};
+
   /*
    * Expected config: {
    *   numberOfRequisitionedItems: int; edit mode only,
@@ -28,6 +31,24 @@ var Requisition = (function () {
       return FormUtils.getTableData(assaysListId);
     },
 
+    setContactsListConfig: function (config) {
+      contactsListConfig = config;
+    },
+
+    setContacts: function (contacts) {
+      FormUtils.setTableData(
+        ListTarget.contact,
+        contactsListConfig,
+        contactsListId,
+        contacts,
+        form
+      );
+    },
+
+    getContacts: function () {
+      return FormUtils.getTableData(contactsListId);
+    },
+
     addAssay: function (assay) {
       var assays = Requisition.getAssays();
       if (assays.some(Utils.array.idPredicate(assay.id))) {
@@ -45,6 +66,33 @@ var Requisition = (function () {
         });
       });
       Requisition.setAssays(assays);
+    },
+
+    addContact: function (addContact) {
+      var contacts = Requisition.getContacts();
+      addContact["requisitionId"] = contactsListConfig.requisitionId;
+
+      if (
+        contacts.find(function (contact) {
+          return duplicateContact(contact, addContact);
+        })
+      ) {
+        Utils.showOkDialog("Error", [
+          "Duplicate: this contact and role combination is already included",
+        ]);
+      } else {
+        contacts.push(addContact);
+        Requisition.setContacts(contacts);
+      }
+    },
+
+    removeContacts: function (removeContacts) {
+      var contacts = Requisition.getContacts().filter(function (contact) {
+        return !removeContacts.some(function (removal) {
+          return duplicateContact(removal, contact);
+        });
+      });
+      Requisition.setContacts(contacts);
     },
 
     setPauses: function (pauses) {
@@ -87,4 +135,13 @@ var Requisition = (function () {
       Requisition.setPauses(pauses);
     },
   };
+
+  function duplicateContact(contactOne, contactTwo) {
+    return (
+      contactOne.contactId === contactTwo.contactId &&
+      contactOne.contactRoleId === contactTwo.contactRoleId &&
+      contactOne.contactName === contactTwo.contactName &&
+      contactOne.contactEmail === contactTwo.contactEmail
+    );
+  }
 })();
