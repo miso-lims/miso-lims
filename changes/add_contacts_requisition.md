@@ -1,0 +1,1 @@
+Contacts can now be added to requisitions.
