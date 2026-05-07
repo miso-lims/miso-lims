@@ -2,11 +2,16 @@ package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import jakarta.ws.rs.core.MediaType;
+import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition.RunPartitionId;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot.RunPartitionAliquotId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
@@ -23,24 +28,14 @@ import uk.ac.bbsrc.tgac.miso.dto.run.RunDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RunRestController.RunPartitionPurposeRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RunRestController.RunPartitionQCRequest;
 
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
-import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import org.springframework.test.web.servlet.ResultActions;
-
 
 import com.jayway.jsonpath.JsonPath;
 import static org.hamcrest.Matchers.*;
 import org.springframework.security.test.context.support.WithMockUser;
 import static org.junit.Assert.*;
-import java.util.ArrayList;
 
 public class RunRestControllerST extends AbstractST {
   private static final String CONTROLLER_BASE = "/rest/runs";
@@ -364,10 +359,34 @@ public class RunRestControllerST extends AbstractST {
             Arrays.asList("Illumina HiSeq 2500", "RUN1", "HiSeq_Run_1", "IPO1", "LDI1",
                     "TEST_0001_Bn_R_PE_300_WG", "TEST_external_1", ""),
             Arrays.asList("Illumina HiSeq 2500", "RUN1", "HiSeq_Run_1", "IPO501", "LDI304",
-                    "TIB_0001_nn_n_PE_404_WG", "TIB_identity_1", ""),
+                    "DILT_0001_nn_n_PE_304_WG", "DILT_identity_1", ""),
             Arrays.asList("Illumina HiSeq 2500", "RUN1", "HiSeq_Run_1", "IPO501", "LDI504",
-                    "DILT_0001_nn_n_PE_304_WG", "DILT_identity_1", ""));
-    testSpreadsheetContents(CONTROLLER_BASE + "/spreadsheet", req, headers, rows);
+                    "TIB_0001_nn_n_PE_404_WG", "TIB_identity_1", ""));
+    String response = getMockMvc().perform(post(CONTROLLER_BASE + "/spreadsheet")
+        .content(makeJson(req))
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(SpreadSheetFormat.CSV.mediaType()))
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    String[] rawRows = response.split("\n");
+
+    String[] returnedHeaders = rawRows[0].replaceAll("\\r", "").replaceAll("\\n", "").replaceAll("\"", "")
+        .split(",", -1);
+    checkArray(returnedHeaders, headers);
+
+    List<List<String>> actualRows = new ArrayList<>();
+    for (int i = 1; i < rawRows.length; i++) {
+      String row = rawRows[i].replaceAll("\\r", "").replaceAll("\\n", "").replaceAll("\"", "");
+      actualRows.add(Arrays.asList(row.split(",", -1)));
+    }
+
+    assertEquals(rows.size(), actualRows.size());
+    for (List<String> expectedRow : rows) {
+      assertTrue(actualRows.contains(expectedRow));
+    }
   }
 
   @Test

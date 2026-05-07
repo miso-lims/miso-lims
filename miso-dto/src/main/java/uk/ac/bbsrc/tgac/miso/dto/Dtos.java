@@ -2307,11 +2307,11 @@ public class Dtos {
 
   public static List<ContainerDto> asContainerDtos(@Nonnull Collection<SequencerPartitionContainer> containerSubset,
       boolean includeContainerPartitions, boolean includePoolContents) {
-      List<ContainerDto> dtoList = new ArrayList<>();
-      for(SequencerPartitionContainer container: containerSubset) {
-          dtoList.add(asDto(container, includeContainerPartitions, includePoolContents,null));
-      }
-      return dtoList;
+    List<ContainerDto> dtoList = new ArrayList<>();
+    for (SequencerPartitionContainer container : containerSubset) {
+      dtoList.add(asDto(container, includeContainerPartitions, includePoolContents, null));
+    }
+    return dtoList;
   }
 
   public static SequencerPartitionContainer to(@Nonnull ContainerDto from) {
