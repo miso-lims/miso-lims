@@ -1,3 +1,4 @@
+-- arrayrun_sample
 ALTER TABLE ArrayPosition
   ADD CONSTRAINT uk_arrayPosition_array_position UNIQUE (arrayId, position);
 
@@ -19,3 +20,15 @@ CREATE TABLE ArrayRun_Sample (
   CONSTRAINT fk_arrayRunSample_status FOREIGN KEY (statusId) REFERENCES RunItemQcStatus (statusId),
   CONSTRAINT fk_arrayRunSample_qcUser FOREIGN KEY (qcUser) REFERENCES User (userId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- add_sop_fields
+CREATE TABLE SopField (
+    sopFieldId BIGINT AUTO_INCREMENT PRIMARY KEY,
+    sopId BIGINT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    units VARCHAR(50),
+    fieldType VARCHAR(20) NOT NULL,
+    CONSTRAINT fk_sopfield_sop FOREIGN KEY (sopId) REFERENCES Sop(sopId),
+    CONSTRAINT uq_sopfield_sop_name UNIQUE KEY (sopId, name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
