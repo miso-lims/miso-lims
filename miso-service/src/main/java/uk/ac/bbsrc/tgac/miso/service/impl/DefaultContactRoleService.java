@@ -84,9 +84,17 @@ public class DefaultContactRoleService extends AbstractSaveService<ContactRole> 
   @Override
   public ValidationResult validateDeletion(ContactRole object) throws IOException {
     ValidationResult result = new ValidationResult();
-    long usage = contactRoleDao.getUsage(object);
-    if (usage > 0L) {
-      result.addError(ValidationError.forDeletionUsage(object, usage, "project " + Pluralizer.contacts(usage)));
+
+    long projectUsage = contactRoleDao.getProjectUsage(object);
+    if (projectUsage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(
+          object, projectUsage, "project " + Pluralizer.contacts(projectUsage)));
+    }
+
+    long requisitionUsage = contactRoleDao.getRequisitionUsage(object);
+    if (requisitionUsage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(
+          object, requisitionUsage, "requisition " + Pluralizer.contacts(requisitionUsage)));
     }
     return result;
   }

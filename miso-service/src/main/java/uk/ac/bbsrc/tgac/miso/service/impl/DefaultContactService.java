@@ -12,7 +12,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ContactService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
+import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
+import uk.ac.bbsrc.tgac.miso.core.util.Pluralizer;
 import uk.ac.bbsrc.tgac.miso.persistence.ContactStore;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
@@ -56,8 +58,10 @@ public class DefaultContactService extends AbstractSaveService<Contact> implemen
   }
 
   @Override
-  protected void collectValidationErrors(Contact object, Contact beforeChange, List<ValidationError> errors) throws IOException {
-    if (ValidationUtils.isSetAndChanged(Contact::getEmail, object, beforeChange) && contactStore.getByEmail(object.getEmail()) != null) {
+  protected void collectValidationErrors(Contact object, Contact beforeChange, List<ValidationError> errors)
+      throws IOException {
+    if (ValidationUtils.isSetAndChanged(Contact::getEmail, object, beforeChange)
+        && contactStore.getByEmail(object.getEmail()) != null) {
       errors.add(ValidationError.forDuplicate("contact", "email", "email address"));
     }
   }
@@ -83,4 +87,22 @@ public class DefaultContactService extends AbstractSaveService<Contact> implemen
     return contactStore.list();
   }
 
+  @Override
+  public ValidationResult validateDeletion(Contact object) throws IOException {
+    ValidationResult result = new ValidationResult();
+
+    long projectUsage = contactStore.getProjectUsage(object);
+    if (projectUsage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(
+          object, projectUsage, "project " + Pluralizer.contacts(projectUsage)));
+    }
+
+    long requisitionUsage = contactStore.getRequisitionUsage(object);
+    if (requisitionUsage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(
+          object, requisitionUsage, "requisition " + Pluralizer.contacts(requisitionUsage)));
+    }
+
+    return result;
+  }
 }

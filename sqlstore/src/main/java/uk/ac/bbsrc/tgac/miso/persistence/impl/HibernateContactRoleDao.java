@@ -21,9 +21,13 @@ public class HibernateContactRoleDao extends HibernateSaveDao<ContactRole> imple
   }
 
   @Override
-  public long getUsage(ContactRole contactRole) throws IOException {
-    return getUsageBy(ProjectContact.class, "contactRole", contactRole)
-        + getUsageBy(RequisitionContact.class, "contactRole", contactRole);
+  public long getProjectUsage(ContactRole contactRole) throws IOException {
+    return getUsageBy(ProjectContact.class, "contactRole", contactRole);
+  }
+
+  @Override
+  public long getRequisitionUsage(ContactRole contactRole) throws IOException {
+    return getUsageBy(RequisitionContact.class, "contactRole", contactRole);
   }
 
   @Override

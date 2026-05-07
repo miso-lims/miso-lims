@@ -173,17 +173,20 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   }
 
   private void validateContacts(List<RequisitionContact> contacts, List<ValidationError> errors) {
-    for (int i = 0; i < contacts.size(); i++) {
-      for (int j = i + 1; j < contacts.size(); j++) {
-        if (contactsMatch(contacts.get(i), contacts.get(j))) {
-          errors.add(new ValidationError("contact", "The contact '"
-              + contacts.get(i).getContact().getEmail()
-              + "' with the assigned contact role '"
-              + contacts.get(i).getContactRole().getName()
-              + "' is used more than once"));
-        }
+    Set<String> seenContactRoles = new HashSet<>();
+    for (RequisitionContact contact : contacts) {
+      if (!seenContactRoles.add(contactKey(contact))) {
+        errors.add(new ValidationError("contact", "The contact '"
+            + contact.getContact().getEmail()
+            + "' with the assigned contact role '"
+            + contact.getContactRole().getName()
+            + "' is used more than once"));
       }
     }
+  }
+
+  private static String contactKey(RequisitionContact contact) {
+    return contact.getContact().getId() + ":" + contact.getContactRole().getId();
   }
 
   private void saveNewContact(Contact contact) throws IOException {
