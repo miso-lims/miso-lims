@@ -11,11 +11,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition.RunPartitionId;
-import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot.RunPartitionAliquotId;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.RunLibrarySpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -30,7 +25,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RunRestController.RunPartiti
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import org.springframework.test.web.servlet.ResultActions;
 
 import com.jayway.jsonpath.JsonPath;
 import static org.hamcrest.Matchers.*;
@@ -199,9 +193,9 @@ public class RunRestControllerST extends AbstractST {
   public void testAddContainerByBarcode() throws Exception {
     Run run = currentSession().get(entityClass, 5002);
     String position = run.getSequencer().getInstrumentModel().getPositions().stream()
-                    .findFirst()
-                            .map(p -> p.getAlias())
-                                    .orElse("");
+        .findFirst()
+        .map(p -> p.getAlias())
+        .orElse("");
 
     getMockMvc().perform(post(CONTROLLER_BASE + "/5002/add").param("position", position).param("barcode", "EXISTING"))
         .andExpect(status().isNoContent());
@@ -254,7 +248,6 @@ public class RunRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
 
-
     for (long id : partitionIds) {
       RunPartitionId partId = new RunPartitionId();
       partId.setRunId(1L);
@@ -272,10 +265,10 @@ public class RunRestControllerST extends AbstractST {
     dto.setAliquotId(304L);
     dto.setPlatformType("ILLUMINA");
 
-      getMockMvc()
-              .perform(put(CONTROLLER_BASE + "/1/aliquots").content(makeJson(Arrays.asList(dto)))
-                      .contentType(MediaType.APPLICATION_JSON))
-              .andExpect(status().isNoContent());
+    getMockMvc()
+        .perform(put(CONTROLLER_BASE + "/1/aliquots").content(makeJson(Arrays.asList(dto)))
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNoContent());
   }
 
   @Test
@@ -292,13 +285,13 @@ public class RunRestControllerST extends AbstractST {
 
   @Test
   public void testGetPotentialExperimentsExpansions() throws Exception {
-       String response =  getMockMvc().perform(get(CONTROLLER_BASE + "/2/potentialExperimentExpansions"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse().getContentAsString();
+    String response = getMockMvc().perform(get(CONTROLLER_BASE + "/2/potentialExperimentExpansions"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andReturn().getResponse().getContentAsString();
 
-       List<?> items = JsonPath.read(response, "$");
-       assertNotNull(items);
+    List<?> items = JsonPath.read(response, "$");
+    assertNotNull(items);
   }
 
   @Test
@@ -356,12 +349,12 @@ public class RunRestControllerST extends AbstractST {
     List<String> headers = Arrays.asList("Instrument Model", "Run Name", "Run Alias", "Pool Name",
         "Library Aliquot Name", "Library Aliquot Alias", "External Name", "Subproject");
     List<List<String>> rows = Arrays.asList(
-            Arrays.asList("Illumina HiSeq 2500", "RUN1", "HiSeq_Run_1", "IPO1", "LDI1",
-                    "TEST_0001_Bn_R_PE_300_WG", "TEST_external_1", ""),
-            Arrays.asList("Illumina HiSeq 2500", "RUN1", "HiSeq_Run_1", "IPO501", "LDI304",
-                    "DILT_0001_nn_n_PE_304_WG", "DILT_identity_1", ""),
-            Arrays.asList("Illumina HiSeq 2500", "RUN1", "HiSeq_Run_1", "IPO501", "LDI504",
-                    "TIB_0001_nn_n_PE_404_WG", "TIB_identity_1", ""));
+        Arrays.asList("Illumina HiSeq 2500", "RUN1", "HiSeq_Run_1", "IPO1", "LDI1",
+            "TEST_0001_Bn_R_PE_300_WG", "TEST_external_1", ""),
+        Arrays.asList("Illumina HiSeq 2500", "RUN1", "HiSeq_Run_1", "IPO501", "LDI304",
+            "DILT_0001_nn_n_PE_304_WG", "DILT_identity_1", ""),
+        Arrays.asList("Illumina HiSeq 2500", "RUN1", "HiSeq_Run_1", "IPO501", "LDI504",
+            "TIB_0001_nn_n_PE_404_WG", "TIB_identity_1", ""));
     String response = getMockMvc().perform(post(CONTROLLER_BASE + "/spreadsheet")
         .content(makeJson(req))
         .contentType(MediaType.APPLICATION_JSON))
