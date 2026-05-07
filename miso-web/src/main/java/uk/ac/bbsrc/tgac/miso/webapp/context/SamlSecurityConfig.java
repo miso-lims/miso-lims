@@ -55,8 +55,8 @@ public class SamlSecurityConfig {
   public RelyingPartyRegistrationRepository relyingPartyRegistrationRepository(
       @Value("${security.saml.sp.registrationId:miso}") String registrationId,
       @Value("${security.saml.idp.metadataUrl}") String metadataUrl,
-      @Value("${security.saml.sp.privateKey:#{null}}") String privateKeyLocation,
-      @Value("${security.saml.sp.certificate:#{null}}") String certificateLocation) {
+      @Value("${security.saml.sp.privateKey}") String privateKeyLocation,
+      @Value("${security.saml.sp.certificate}") String certificateLocation) {
 
     RelyingPartyRegistration.Builder builder = RelyingPartyRegistrations.fromMetadataLocation(metadataUrl)
         .registrationId(registrationId)
