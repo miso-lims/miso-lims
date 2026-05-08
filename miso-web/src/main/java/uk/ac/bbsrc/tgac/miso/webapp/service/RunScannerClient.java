@@ -23,6 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -356,8 +360,17 @@ public class RunScannerClient {
       ProgressiveResponseDto response = null;
       do {
         try (AutoCloseable timer = serverReadTime.start(entry.getKey())) {
-          response = template.postForObject(entry.getKey() + "/runs/progressive", entry.getValue(),
-              ProgressiveResponseDto.class);
+          HttpHeaders headers = new HttpHeaders();
+          if (!runscannerAuthUsername.isBlank() && !runscannerAuthPassword.isBlank()) {
+            headers.setBasicAuth(runscannerAuthUsername, runscannerAuthPassword);
+          }
+
+          HttpEntity<ProgressiveRequestDto> request = new HttpEntity<>(entry.getValue(), headers);
+
+          ResponseEntity<ProgressiveResponseDto> result = template.exchange(entry.getKey() + "/runs/progressive",
+              HttpMethod.POST, request, ProgressiveResponseDto.class);
+          response = result.getBody();
+
           entry.getValue().update(response);
         } catch (Exception e) {
           log.error("Failed to get runs from " + entry.getKey(), e);
@@ -369,6 +382,12 @@ public class RunScannerClient {
       } while (response != null && response.isMoreAvailable());
     }
   }
+
+  @Value("${miso.runscanner.httpbasicauth:}")
+  private String runscannerAuthUsername;
+
+  @Value("${miso.runscanner.basicpass:}")
+  private String runscannerAuthPassword;
 
   @Value("${miso.runscanner.urls:}")
   public void setUrls(String urls) {
