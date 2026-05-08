@@ -213,10 +213,10 @@ These are configured using `security.saml.internalRoleName` and
 `security.saml.adminRoleName`. The SAML assertion must contain those exact role
 names in the attribute configured by `security.saml.rolesAttribute`.
 
-After configuring SAML, restart Tomcat and open the MISO service provider
-metadata URL at:
+When MISO is running, you can access the MISO service provider
+metadata at:
 
-`http://localhost:8080/saml2/service-provider-metadata/<registrationId>`
+`https://<miso-base-url>/saml2/service-provider-metadata/<registrationId>`
 
 Use that metadata when configuring the SAML client in your identity provider so
 that the assertion consumer and single logout service URLs match the running
