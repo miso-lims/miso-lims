@@ -188,20 +188,9 @@ the group is used for. In this case you will need to set the property
 `security.ldap.stripRolePrefix` to the value `MISO_` to allow MISO to ignore the
 prefix.
 
-For using SAML single sign-on, set the security method to `saml`. Additional
-SAML settings are needed in `security.properties`, including:
-
-* `security.saml.sp.registrationId`
-* `security.saml.idp.metadataUrl`
-* `security.saml.sp.privateKey`
-* `security.saml.sp.certificate`
-* `security.saml.usernameAttribute`
-* `security.saml.firstNameAttribute`
-* `security.saml.lastNameAttribute`
-* `security.saml.emailAttribute`
-* `security.saml.rolesAttribute`
-* `security.saml.internalRoleName`
-* `security.saml.adminRoleName`
+For using SAML single sign-on, set the security method to `saml`. Copy the
+example `security.properties` file and update the SAML settings there for your
+environment.
 
 The identity provider metadata URL should point to the SAML metadata published
 by your identity provider. The SP private key and certificate are used by MISO
