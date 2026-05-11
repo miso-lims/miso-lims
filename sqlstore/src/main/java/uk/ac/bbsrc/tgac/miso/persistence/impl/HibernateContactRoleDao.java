@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ContactRole;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionContact;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionContact_;
 import uk.ac.bbsrc.tgac.miso.persistence.ContactRoleDao;
 
 @Repository
@@ -22,12 +24,12 @@ public class HibernateContactRoleDao extends HibernateSaveDao<ContactRole> imple
 
   @Override
   public long getProjectUsage(ContactRole contactRole) throws IOException {
-    return getUsageBy(ProjectContact.class, "contactRole", contactRole);
+    return getUsageBy(ProjectContact.class, ProjectContact_.contactRole, contactRole);
   }
 
   @Override
   public long getRequisitionUsage(ContactRole contactRole) throws IOException {
-    return getUsageBy(RequisitionContact.class, "contactRole", contactRole);
+    return getUsageBy(RequisitionContact.class, RequisitionContact_.contactRole, contactRole);
   }
 
   @Override
