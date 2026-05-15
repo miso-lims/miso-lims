@@ -7,8 +7,8 @@ your MISO administrators about setting it up.
 
 ## Logging In
 
-You log in to MISO using a username and password. These credentials may come from different places, depending on your
-site configuration.
+You log in to MISO using either a username and password or a single sign-on button, depending on your site
+configuration. The way that MISO identifies you may come from different places.
 
 In some cases, user accounts are stored in the MISO database. When this is the case, MISO administrators are
 responsible for creating new users. Any user is able to edit their own user details and change their password from
@@ -20,6 +20,11 @@ issue tracker, MISO, and other services within your organization. If your site u
 authentication, you will have to have an account in that system, and also have to be included in the correct group(s)
 to access MISO. Your MISO administrators may not be directly responsible for creating these accounts or managing the
 groups, but they should be able to help you get set up.
+
+MISO may also be configured to use SAML single sign-on. In this case, you will log in using the "Log in with SSO"
+button and authenticate with your organization's identity provider instead of entering your password directly into
+MISO. As with LDAP or Active Directory authentication, your account and group membership must already exist in the
+external identity system and include the roles needed to access MISO.
 
 If you require a new account, password reset, or are otherwise unable to log in to MISO, you should talk to your MISO
 administrators.

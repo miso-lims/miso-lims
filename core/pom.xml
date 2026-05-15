@@ -43,6 +43,16 @@
     <dependency>
       <groupId>fr.opensagres</groupId>
       <artifactId>org.odftoolkit.odfdom.converter</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>bouncycastle</groupId>
+          <artifactId>bcprov-jdk14</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>bouncycastle</groupId>
+          <artifactId>bcmail-jdk14</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>jakarta.mail</groupId>

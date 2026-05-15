@@ -195,7 +195,7 @@
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.7</version>
+        <version>1.17.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -555,6 +555,10 @@
       <id>releases.gsi</id>
       <name>OICR GSI Releases repository</name>
       <url>https://artifacts.oicr.on.ca/artifactory/gsi-release</url>
+    </repository>
+        <repository>
+      <id>shibboleth</id>
+      <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
     </repository>
   </repositories>
   <!-- Required Build Plugins -->
