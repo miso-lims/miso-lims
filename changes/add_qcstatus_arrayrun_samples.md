@@ -1,1 +1,0 @@
-Qc Status can be added to array run samples.

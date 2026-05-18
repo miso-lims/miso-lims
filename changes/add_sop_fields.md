@@ -1,1 +1,0 @@
-Run category SOPs can now define custom fields to capture additional run data.

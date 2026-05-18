@@ -6,7 +6,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>3.20.1-SNAPSHOT</version>
+    <version>3.21.1-SNAPSHOT</version>
   </parent>
   <artifactId>core</artifactId>
   <packaging>jar</packaging>
@@ -43,6 +43,16 @@
     <dependency>
       <groupId>fr.opensagres</groupId>
       <artifactId>org.odftoolkit.odfdom.converter</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>bouncycastle</groupId>
+          <artifactId>bcprov-jdk14</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>bouncycastle</groupId>
+          <artifactId>bcmail-jdk14</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>jakarta.mail</groupId>

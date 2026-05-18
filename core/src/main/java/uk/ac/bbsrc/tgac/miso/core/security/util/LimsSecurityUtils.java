@@ -38,6 +38,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
+import uk.ac.bbsrc.tgac.miso.core.security.ProvisionedUserDetails;
 
 /**
  * Helper class that provides various methods to deal with security authorisation and profiles
@@ -112,6 +113,35 @@ public class LimsSecurityUtils {
     return new org.springframework.security.core.userdetails.User(user.getLoginName(),
         user.getPassword() == null ? "junkToShutUpSpring" : user.getPassword(), user.isActive(), user.isActive(),
         user.isActive(), user.isActive(), auths);
+  }
+
+  public static User fromSamlUser(UserDetails details) {
+    final UserImpl user = new UserImpl();
+
+    updateFromSamlUser(user, details);
+    user.setLoginName(details.getUsername().toLowerCase());
+
+    return user;
+  }
+
+  public static void updateFromSamlUser(User target, UserDetails samlUserDetails) {
+    final List<String> roles = new ArrayList<>();
+    for (final GrantedAuthority ga : samlUserDetails.getAuthorities()) {
+      roles.add(removePrefix(ga.toString(), LimsSecurityUtils.rolePrefix));
+    }
+    target.setRoles(roles.toArray(new String[0]));
+
+    target.setActive(samlUserDetails.isAccountNonExpired());
+    target.setAdmin(roles.contains(MisoAuthority.ROLE_ADMIN.name()));
+    target.setInternal(roles.contains(MisoAuthority.ROLE_INTERNAL.name()));
+
+    if (samlUserDetails instanceof ProvisionedUserDetails samlUser) {
+      target.setFullName(samlUser.getFullName());
+      target.setEmail(samlUser.getEmail());
+    } else {
+      throw new IllegalArgumentException(
+          "UserDetails does not include full name and email. Check SAML authentication provider config");
+    }
   }
 
 }

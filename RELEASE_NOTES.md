@@ -7,6 +7,30 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.21.0] - 2026-05-07
+
+### Added
+
+* Qc Status can be added to array run samples.
+* Configuration options to hide columns on bulk edit/create pages. The following `miso.properties`
+  settings can be set to `false` to hide their respective column groups (all default to `true`):
+  * `miso.display.bulk.receiptQc` - Receipt Confirmed, Receipt QC Passed, Receipt QC Note
+  * `miso.display.bulk.requisition` - Requisition Alias, Requisition, Assay
+  * `miso.display.bulk.qcStatus` - QC Status, QC Note
+  * `miso.display.bulk.matrixBarcode` - Matrix Barcode
+  * `miso.display.bulk.discarded` - Discarded
+  * `miso.display.bulk.defaultDetailedQcStatus` - when `qcStatus` is hidden, sets the default QC
+  status value (should match a configured QC status description)
+* Run category SOPs can now define custom fields to capture additional run data.
+
+### Fixed
+
+* Unexpected error when attempting to create new sample types
+* Strange filenames for samplesheets and possibly other file downloads
+* Improved performance of Edit Requisition page load
+* The Library Qualification Method column in Assay Test lists did not show the library design code when specified for Low-Depth Sequencing
+
+
 ## [3.20.0] - 2026-04-09
 
 ### Added

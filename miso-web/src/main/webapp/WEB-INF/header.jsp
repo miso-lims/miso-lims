@@ -76,7 +76,12 @@
         </c:if>
         Logged in as:
         <a href="/myAccount"><b id="currentUser"><sec:authentication property="principal.username"/></b></a>
-        | <a href="<c:url value="/logout"/>">Logout</a>
+        | <form action="<c:url value='/logout'/>" method="post" style="display:inline;">
+            <button type="submit" 
+              style="background:none;border:none;padding:0;margin:0;color:#00f;text-decoration:underline;cursor:pointer;font:inherit;">
+              Logout
+            </button>
+          </form>
       </div>
     </sec:authorize>
   </div>
