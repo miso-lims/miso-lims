@@ -853,11 +853,11 @@ BulkTarget.sample = (function ($) {
                   });
                   setValue = firstReceiptLabel;
                 }
-                  api.updateField(rowIndex, "identityId", {
-                    source: potentialIdentities,
-                    value: setValue,
-                    formatter: potentialIdentities.length > 1 ? "multipleOptions" : null,
-                  }, true);
+                api.updateField(rowIndex, "identityId", {
+                  source: potentialIdentities,
+                  value: setValue,
+                  formatter: potentialIdentities.length > 1 ? "multipleOptions" : null,
+                }, true);
               })
               .fail(function (response, textStatus, serverStatus) {
                 var error = JSON.parse(response.responseText);
