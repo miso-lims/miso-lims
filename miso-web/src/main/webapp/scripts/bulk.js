@@ -186,6 +186,17 @@ BulkUtils = (function ($) {
     },
   };
 
+    var bulkRenderQueue = [];
+    var bulkRenderTimer = null;
+
+    function setBulkRenderTimer(hot) {
+      clearTimeout(bulkRenderTimer);
+      bulkRenderTimer = setTimeout(function () {
+        var changes = bulkRenderQueue.splice(0);
+        hot.setDataAtCell(changes);
+      }, 50);
+    }
+
   return {
     makeTable: function (target, config, data) {
       // No HTML IDs params required as this is only made to work with bulkPage.jsp
@@ -2000,7 +2011,7 @@ BulkUtils = (function ($) {
       extendApi(onChangeApi, hot, columns, config, data);
       var dataChanges = [];
       var storingChanges = true;
-      onChangeApi.updateField = function (rowIndex, dataProperty, changes, skipRender) {
+      onChangeApi.updateField = function (rowIndex, dataProperty, changes, bulkRender) {
         if (storingChanges && changes.hasOwnProperty("value") && changes.value !== undefined) {
           var colIndex = getColumnIndex(dataProperty, columns, isColumnHidden(dataProperty));
           if (colIndex === null) return; // column hidden by config
@@ -2009,7 +2020,7 @@ BulkUtils = (function ($) {
           changes = Object.assign({}, changes);
           changes.value = undefined;
         }
-        updateField(hot, columns, rowIndex, dataProperty, changes, skipRender);
+        updateField(hot, columns, rowIndex, dataProperty, changes, bulkRender);
       };
       changes.forEach(function (change) {
         if (listeners[change[1]]) {
@@ -2509,8 +2520,8 @@ BulkUtils = (function ($) {
       return hot.getCellMeta(row, colIndex).sourceData;
     };
 
-    api.updateField = function (rowIndex, dataProperty, options, skipRender) {
-      updateField(hot, columns, rowIndex, dataProperty, options, skipRender);
+    api.updateField = function (rowIndex, dataProperty, options, bulkRender) {
+      updateField(hot, columns, rowIndex, dataProperty, options, bulkRender);
     };
 
     api.renderFields = function (changes) {
@@ -2541,7 +2552,7 @@ BulkUtils = (function ($) {
     };
   }
 
-  function updateField(hot, columns, rowIndex, dataProperty, options, skipRender) {
+  function updateField(hot, columns, rowIndex, dataProperty, options, bulkRender) {
     var colIndex = getColumnIndex(dataProperty, columns, isColumnHidden(dataProperty));
     if (colIndex === null) return; // column hidden by config
     var column = columns[colIndex];
@@ -2617,8 +2628,13 @@ BulkUtils = (function ($) {
       forceValidate = true;
     }
 
-    if (options.hasOwnProperty("value") && options.value !== undefined && skipRender !== true) {
-      hot.setDataAtCell(rowIndex, colIndex, options.value);
+    if (options.hasOwnProperty("value") && options.value !== undefined) {
+      if (bulkRender === true) {
+        bulkRenderQueue.push([rowIndex, colIndex, options.value]);
+        setBulkRenderTimer(hot);
+      } else {
+        hot.setDataAtCell(rowIndex, colIndex, options.value);
+      }
     } else if (forceValidate) {
       // Note: intended to be a private function, but it works and is more efficient than validating the entire row/column/table
       hot._validateCells(null, [rowIndex], [colIndex]);
