@@ -2524,14 +2524,6 @@ BulkUtils = (function ($) {
       updateField(hot, columns, rowIndex, dataProperty, options, bulkRender);
     };
 
-    api.renderFields = function (changes) {
-      hot.setDataAtCell(
-          changes.map(function (change) {
-            return [change[0], getColumnIndex(change[1], columns), change[2]];
-          })
-      );
-    };
-
     api.updateData = function (changes) {
       // changes = [[row, prop, value]...]
       hot.setDataAtRowProp(changes);
