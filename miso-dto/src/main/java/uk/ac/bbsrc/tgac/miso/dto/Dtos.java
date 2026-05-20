@@ -163,6 +163,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionContact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
@@ -4700,6 +4701,31 @@ public class Dtos {
   public static ProjectContact to(ProjectContactDto from) {
     ProjectContact to = new ProjectContact();
     setObject(to::setProject, ProjectImpl::new, from.getProjectId());
+
+    Contact contact = new Contact();
+    setLong(contact::setId, from.getContactId(), false);
+    setString(contact::setName, from.getContactName());
+    setString(contact::setEmail, from.getContactEmail());
+    to.setContact(contact);
+
+    setObject(to::setContactRole, ContactRole::new, from.getContactRoleId());
+    return to;
+  }
+
+  public static RequisitionContactDto asDto(RequisitionContact from) {
+    RequisitionContactDto to = new RequisitionContactDto();
+    setLong(to::setRequisitionId, from.getRequisition().getId(), false);
+    setLong(to::setContactId, from.getContact().getId(), false);
+    setLong(to::setContactRoleId, from.getContactRole().getId(), false);
+    setString(to::setContactName, from.getContact().getName());
+    setString(to::setContactEmail, from.getContact().getEmail());
+    setString(to::setContactRole, from.getContactRole().getName());
+    return to;
+  }
+
+  public static RequisitionContact to(RequisitionContactDto from) {
+    RequisitionContact to = new RequisitionContact();
+    setObject(to::setRequisition, Requisition::new, from.getRequisitionId());
 
     Contact contact = new Contact();
     setLong(contact::setId, from.getContactId(), false);

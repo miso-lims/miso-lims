@@ -803,7 +803,10 @@ ListUtils = (function ($) {
           var filteredIds = [];
           filteredRows.each(function (index, row) {
             var checkboxId = row.children[0].children[0].id;
-            filteredIds.push(parseInt(checkboxId.match("^" + elementId + "_toggle(\\d+)$")[1]));
+            var match = checkboxId.match("^" + elementId + "_toggle(-?\\d+)$");
+            if (match) {
+              filteredIds.push(parseInt(match[1], 10));
+            }
           });
           callback(
             data.filter(function (item) {

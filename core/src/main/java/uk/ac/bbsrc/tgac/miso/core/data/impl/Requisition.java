@@ -89,6 +89,11 @@ public class Requisition implements Attachable, Deletable, QualityControllable<R
   @OneToMany(targetEntity = RequisitionChangeLog.class, mappedBy = "requisition", cascade = CascadeType.REMOVE)
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
+  @OneToMany(targetEntity = RequisitionContact.class, mappedBy = "requisition", orphanRemoval = true,
+      cascade = CascadeType.ALL)
+  private List<RequisitionContact> contacts = new ArrayList<>();
+
+
   @OneToMany(targetEntity = FileAttachment.class)
   @JoinTable(name = "Requisition_Attachment", joinColumns = {@JoinColumn(name = "requisitionId")},
       inverseJoinColumns = {
@@ -173,6 +178,14 @@ public class Requisition implements Attachable, Deletable, QualityControllable<R
 
   public void setNotes(Collection<Note> notes) {
     this.notes = notes;
+  }
+
+  public List<RequisitionContact> getContacts() {
+    return contacts;
+  }
+
+  public void setContacts(List<RequisitionContact> contacts) {
+    this.contacts = contacts;
   }
 
   public void updateFromQc(QcCorrespondingField correspondingField, BigDecimal value, String units) {
