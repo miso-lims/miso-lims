@@ -1,0 +1,1 @@
+Improved performance when creating samples in bulk.
