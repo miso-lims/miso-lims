@@ -73,11 +73,7 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
   }
 
   protected <V> T getBy(SingularAttribute<T, V> property, V value) {
-    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
-    CriteriaQuery<T> query = builder.createQuery(getResultClass());
-    Root<? extends T> root = query.from(getEntityClass());
-    query.select(root).where(builder.equal(root.get(property), value));
-    List<T> results = currentSession().createQuery(query).getResultList();
+    List<T> results = listBy(property, value);
     return singleResultOrNull(results);
   }
 
@@ -88,6 +84,14 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
     query.select(root).where(builder.equal(root.get(property), value));
     List<T> results = currentSession().createQuery(query).getResultList();
     return singleResultOrNull(results);
+  }
+
+  protected <V> List<T> listBy(SingularAttribute<T, V> property, V value) {
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<T> query = builder.createQuery(getResultClass());
+    Root<? extends T> root = query.from(getEntityClass());
+    query.select(root).where(builder.equal(root.get(property), value));
+    return currentSession().createQuery(query).getResultList();
   }
 
   private T singleResultOrNull(List<T> results) {

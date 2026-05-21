@@ -1,0 +1,162 @@
+package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.core.Response.Status;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheet;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.SampleSheetService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
+import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.util.SampleSheetInput;
+import uk.ac.bbsrc.tgac.miso.core.util.SampleSheets;
+import uk.ac.bbsrc.tgac.miso.dto.SampleSheetDto;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
+
+@Controller
+@RequestMapping("/rest/samplesheets")
+public class SampleSheetRestController extends AbstractRestController {
+
+  @Autowired
+  private SampleSheetService sampleSheetService;
+  @Autowired
+  private InstrumentModelService instrumentModelService;
+  @Autowired
+  private SequencingParametersService sequencingParametersService;
+  @Autowired
+  private SequencingContainerModelService sequencingContainerModelService;
+  @Autowired
+  private PoolService poolService;
+
+  @GetMapping
+  @ResponseBody
+  public List<SampleSheetDto> listByPlatform(@RequestParam String platform) throws IOException {
+    PlatformType platformType = null;
+    try {
+      platformType = PlatformType.valueOf(platform);
+    } catch (IllegalArgumentException e) {
+      throw new RestException("Invalid platform: %s".formatted(platform), Status.BAD_REQUEST);
+    }
+    return sampleSheetService.listByPlatform(platformType).stream().map(SampleSheetDto::from).toList();
+  }
+
+  public record SampleSheetRequest(long instrumentModelId, long containerModelId, Long sequencingParametersId,
+      Map<String, Long> sequencingParametersIdsByInstrumentPosition, ObjectNode customParameters,
+      Map<String, Map<Integer, Long>> poolIdsByInstrumentPositionAndPartition, Map<String, Boolean> includeSections) {
+    // poolIdsByInstrumentPositionAndPartition will contain a single value with key "*" if the
+    // instrument does not support multiple positions per run
+  }
+
+  @PostMapping(value = "/{sampleSheetId}/generate", produces = "application/octet-stream")
+  @ResponseBody
+  public HttpEntity<byte[]> generate(@PathVariable long sampleSheetId, @RequestBody SampleSheetRequest request,
+      HttpServletResponse response) throws IOException {
+    SampleSheet sampleSheet = RestUtils.retrieve("sample sheet", sampleSheetId, sampleSheetService, Status.NOT_FOUND);
+    SampleSheetInput input = validateSampleSheetInput(sampleSheet, request);
+    byte[] outputBytes = SampleSheets.generate(sampleSheet, input);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(new MediaType("text", "csv"));
+    String filename = "samplesheet.csv"; // TODO
+    MisoWebUtils.addAttachmentContentDisposition(response, filename);
+    return new HttpEntity<>(outputBytes, headers);
+  }
+
+  private SampleSheetInput validateSampleSheetInput(SampleSheet sampleSheet, SampleSheetRequest request)
+      throws IOException {
+    SampleSheetInput input = new SampleSheetInput();
+    InstrumentModel model =
+        RestUtils.retrieve("instrument model", request.instrumentModelId(), instrumentModelService, Status.BAD_REQUEST);
+    input.setInstrumentModel(model);
+    if (model.getPlatformType().hasContainerLevelParameters()) {
+      Map<String, SequencingParameters> params = new HashMap<>();
+      for (Entry<String, Long> entry : request.sequencingParametersIdsByInstrumentPosition().entrySet()) {
+        validateInstrumentPosition(model, entry.getKey());
+        SequencingParameters positionParams =
+            RestUtils.retrieve("sequencing parameters", entry.getValue(), sequencingParametersService,
+                Status.BAD_REQUEST);
+        params.put(entry.getKey(), positionParams);
+      }
+      input.setSequencingParametersByInstrumentPosition(params);
+    } else {
+      SequencingParameters params = RestUtils.retrieve("sequencing parameters", request.sequencingParametersId(),
+          sequencingParametersService, Status.BAD_REQUEST);
+      input.setSequencingParameters(params);
+    }
+    input.setCustomParameters(request.customParameters());
+    Map<String, Map<Integer, Pool>> poolLayout = new HashMap<>();
+    SequencingContainerModel containerModel = RestUtils.retrieve("container model", request.containerModelId(),
+        sequencingContainerModelService, Status.BAD_REQUEST);
+    for (Entry<String, Map<Integer, Long>> positionAndMap : request.poolIdsByInstrumentPositionAndPartition()
+        .entrySet()) {
+      if (request.poolIdsByInstrumentPositionAndPartition().size() > 1
+          || !request.poolIdsByInstrumentPositionAndPartition().containsKey("*")) {
+        validateInstrumentPosition(model, positionAndMap.getKey());
+      }
+      Map<Integer, Pool> poolsByPartition = new HashMap<>();
+      poolLayout.put(positionAndMap.getKey(), poolsByPartition);
+      for (Entry<Integer, Long> partitionAndPoolId : positionAndMap.getValue().entrySet()) {
+        if (partitionAndPoolId.getKey() < 1 || partitionAndPoolId.getKey() > containerModel.getPartitionCount()) {
+          throw new RestException("Partition number %d is invalid for the %s container model"
+              .formatted(partitionAndPoolId.getKey(), containerModel.getAlias()), Status.BAD_REQUEST);
+        }
+        Pool pool = RestUtils.retrieve("pool", partitionAndPoolId.getValue(), poolService, Status.BAD_REQUEST);
+        poolsByPartition.put(partitionAndPoolId.getKey(), pool);
+      }
+    }
+    input.setPoolLayout(poolLayout);
+    if (request.includeSections() != null && !request.includeSections().isEmpty()) {
+      request.includeSections().forEach((sectionName, include) -> {
+        if (sampleSheet.getSections().stream().noneMatch(section -> Objects.equals(section.getName(), sectionName)
+            && Objects.equals(section.getOptional(), Boolean.TRUE))) {
+          throw new RestException("Invalid section for include config: %s".formatted(sectionName), Status.BAD_REQUEST);
+        }
+      });
+      input.setIncludeSections(request.includeSections());
+    }
+    return input;
+  }
+
+  private void validateInstrumentPosition(InstrumentModel model, String position) {
+    if (model.getPositions() != null || !model.getPositions().isEmpty()) {
+      for (InstrumentPosition instrumentPosition : model.getPositions()) {
+        if (Objects.equals(instrumentPosition.getAlias(), position)) {
+          return;
+        }
+      }
+    }
+    throw new RestException("Position '%s' is not valid for %s".formatted(position, model.getAlias()),
+        Status.BAD_REQUEST);
+  }
+
+}

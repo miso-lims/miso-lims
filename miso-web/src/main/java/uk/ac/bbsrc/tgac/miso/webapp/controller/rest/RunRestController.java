@@ -73,7 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.core.util.SampleSheet;
+import uk.ac.bbsrc.tgac.miso.core.util.RunSampleSheet;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
@@ -330,17 +330,17 @@ public class RunRestController extends AbstractRestController {
       @PathVariable(name = "sheet") String sheet,
       HttpServletResponse response) throws IOException {
     Run run = runService.get(runId);
-    return getSampleSheetForRun(run, SampleSheet.valueOf(sheet), response);
+    return getSampleSheetForRun(run, RunSampleSheet.valueOf(sheet), response);
   }
 
   @GetMapping(value = "/alias/{runAlias}/samplesheet/{sheet}")
   public HttpEntity<String> getSampleSheetForRunByAlias(@PathVariable(name = "runAlias") String runAlias,
       @PathVariable(name = "sheet") String sheet, HttpServletResponse response) throws IOException {
     Run run = runService.getRunByAlias(runAlias);
-    return getSampleSheetForRun(run, SampleSheet.valueOf(sheet), response);
+    return getSampleSheetForRun(run, RunSampleSheet.valueOf(sheet), response);
   }
 
-  private HttpEntity<String> getSampleSheetForRun(Run run, SampleSheet casavaVersion, HttpServletResponse response)
+  private HttpEntity<String> getSampleSheetForRun(Run run, RunSampleSheet casavaVersion, HttpServletResponse response)
       throws IOException {
     if (run == null) {
       throw new RestException("Run does not exist.", Status.NOT_FOUND);
