@@ -2943,6 +2943,8 @@ public class Dtos {
       case ILLUMINA:
         setIlluminaRunValues((IlluminaNotificationDto) from, (IlluminaRun) to);
         break;
+      case ULTIMA:
+        break;
       default:
         throw new NotImplementedException("Unexpected platform type: " + to.getPlatformType());
     }
