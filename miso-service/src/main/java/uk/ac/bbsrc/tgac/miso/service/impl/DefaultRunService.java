@@ -700,6 +700,7 @@ public class DefaultRunService implements RunService {
       case IONTORRENT:
       case PACBIO:
       case SOLID:
+      case ULTIMA:
         // Nothing to do
         break;
       default:

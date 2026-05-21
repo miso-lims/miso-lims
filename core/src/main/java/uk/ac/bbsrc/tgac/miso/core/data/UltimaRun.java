@@ -22,5 +22,4 @@ public class UltimaRun extends Run {
   public String getDeleteType() {
     return "Ultima Run";
   }
-
 }
