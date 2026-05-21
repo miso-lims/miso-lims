@@ -857,7 +857,7 @@ BulkTarget.sample = (function ($) {
                   source: potentialIdentities,
                   value: setValue,
                   formatter: potentialIdentities.length > 1 ? "multipleOptions" : null,
-                });
+                }, true);
               })
               .fail(function (response, textStatus, serverStatus) {
                 var error = JSON.parse(response.responseText);
