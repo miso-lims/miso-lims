@@ -223,6 +223,8 @@ public class RunScannerClient {
           to.setSequencingParameters(matchingParams.get(0));
         }
         break;
+      case ULTIMA:
+        break;
       default:
         throw new NotImplementedException("Platform not supported: %s".formatted(to.getPlatformType()));
     }
@@ -235,7 +237,7 @@ public class RunScannerClient {
       if (params.getChemistry() != chemistry) {
         return false;
       }
-      // If we are talking to an old Run Scanner that doens't provide read lengths, use the old logic
+      // If we are talking to an old Run Scanner that doesn't provide read lengths, use the old logic
       if (from.getReadLengths() == null) {
         // The read length must match the first read length
         if (Math.abs(params.getReadLength() - from.getReadLength()) < 2) {
