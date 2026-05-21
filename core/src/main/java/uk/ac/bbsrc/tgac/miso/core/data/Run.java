@@ -163,6 +163,9 @@ public abstract class Run
   @JoinColumn(name = "sopId")
   private Sop sop;
 
+  @OneToMany(mappedBy = "run", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<RunSopFieldValue> sopFieldValues = new HashSet<>();
+
   @Enumerated(EnumType.STRING)
   private InstrumentDataManglingPolicy dataManglingPolicy;
 
@@ -541,6 +544,14 @@ public abstract class Run
 
   public void setSop(Sop sop) {
     this.sop = sop;
+  }
+
+  public Set<RunSopFieldValue> getSopFieldValues() {
+    return sopFieldValues;
+  }
+
+  public void setSopFieldValues(Set<RunSopFieldValue> sopFieldValues) {
+    this.sopFieldValues = sopFieldValues;
   }
 
   public InstrumentDataManglingPolicy getDataManglingPolicy() {

@@ -347,7 +347,8 @@ FormTarget.run = (function ($) {
                   return run.dataReviewDate || "n/a";
                 },
               },
-            ]),
+            ])
+            .concat([FormUtils.makeRunSopValueSection(object, config.sops)]),
         },
       ];
     },

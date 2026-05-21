@@ -95,6 +95,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunItemQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.RunSopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquotSingleCell;
@@ -2140,6 +2141,10 @@ public class Dtos {
     setString(dto::setDataReviewer, maybeGetProperty(from.getDataReviewer(), User::getFullName));
     setDateString(dto::setDataReviewDate, from.getDataReviewDate());
     setId(dto::setSopId, from.getSop());
+    dto.setSopFieldValues(from.getSopFieldValues().stream()
+        .collect(Collectors.toMap(
+            value -> value.getSopField().getId(),
+            RunSopFieldValue::getValue)));
     setString(dto::setDataManglingPolicy,
         maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
 
@@ -2211,6 +2216,18 @@ public class Dtos {
     setBoolean(to::setQcPassed, dto.getQcPassed(), true);
     setBoolean(to::setDataReview, dto.getDataReview(), true);
     setObject(to::setSop, Sop::new, dto.getSopId());
+
+    if (dto.getSopFieldValues() != null) {
+      dto.getSopFieldValues().forEach((fieldId, value) -> {
+        RunSopFieldValue fieldValue = new RunSopFieldValue();
+        fieldValue.setRun(to);
+        fieldValue.setSopField(new SopField());
+        fieldValue.getSopField().setId(fieldId);
+        fieldValue.setValue(value);
+        to.getSopFieldValues().add(fieldValue);
+      });
+    }
+
     setObject(to::setDataManglingPolicy, dto.getDataManglingPolicy(), InstrumentDataManglingPolicy::valueOf);
     return to;
   }

@@ -10,9 +10,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Consumer;
@@ -45,10 +48,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.RunSopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
+import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.SequencerPartitionContainerChangeLog;
@@ -316,6 +322,8 @@ public class DefaultRunService implements RunService {
     loadChildEntity(run::setSequencer, run.getSequencer(), instrumentService, "instrumentId");
     loadChildEntity(run::setSequencingKit, run.getSequencingKit(), kitDescriptorService, "sequencingKitId");
     loadChildEntity(run::setDataReviewer, run.getDataReviewer(), userService, "dataReviewer");
+    loadChildEntity(run::setSop, run.getSop(), sopService, "sopId");
+    loadSopFieldValues(run);
     if (run.getRunPositions() != null) {
       for (RunPosition position : run.getRunPositions()) {
         if (position.getContainer().isSaved()) {
@@ -326,7 +334,6 @@ public class DefaultRunService implements RunService {
         }
       }
     }
-    loadChildEntity(run::setSop, run.getSop(), sopService, "sopId");
   }
 
   private void validateChanges(Run before, Run changed) throws IOException {
@@ -428,9 +435,59 @@ public class DefaultRunService implements RunService {
       }
     }
 
+    validateSopFieldValues(changed, errors);
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
+  }
+
+  private void validateSopFieldValues(Run run, List<ValidationError> errors) {
+    if (run.getSopFieldValues() == null || run.getSopFieldValues().isEmpty()) {
+      return;
+    }
+
+    if (run.getSop() == null) {
+      errors.add(new ValidationError("sopId", "SOP must be selected to enter SOP field values"));
+      return;
+    }
+
+    Set<Long> seenSopFieldIds = new HashSet<>();
+
+    for (RunSopFieldValue value : run.getSopFieldValues()) {
+      SopField field = value.getSopField();
+      Long fieldId = field == null ? null : field.getId();
+      String property = fieldId == null ? "sopFieldValues" : "sopFieldValues." + fieldId;
+
+      if (fieldId == null) {
+        errors.add(new ValidationError(property, "SOP field does not belong to the selected SOP"));
+        continue;
+      }
+
+      SopField sopField = run.getSop().getFields().stream()
+          .filter(item -> item.getId() == fieldId)
+          .findFirst()
+          .orElse(null);
+
+      if (sopField == null) {
+        errors.add(new ValidationError(property, "SOP field does not belong to the selected SOP"));
+        continue;
+      }
+
+      if (!seenSopFieldIds.add(fieldId)) {
+        errors.add(new ValidationError(property, "Duplicate SOP field"));
+      }
+
+      if (value.getValue() != null && value.getValue().length() > 255) {
+        errors.add(new ValidationError(property, "Maximum length: 255 characters"));
+      }
+
+      if (!sopField.isValidValue(value.getValue())) {
+        errors.add(new ValidationError(property, "Invalid value for SOP field " + sopField.getName()));
+      }
+
+    }
+
   }
 
   private static void validateSequencingParameters(Run run, PlatformType platformType, List<ValidationError> errors) {
@@ -451,6 +508,29 @@ public class DefaultRunService implements RunService {
                   .formatted(platformType.getContainerName(), platformType.getKey())));
           break;
         }
+      }
+    }
+  }
+
+  private void loadSopFieldValues(Run run) {
+    if (run.getSopFieldValues() == null || run.getSopFieldValues().isEmpty()) {
+      return;
+    }
+
+    for (RunSopFieldValue value : run.getSopFieldValues()) {
+      value.setRun(run);
+
+      if (run.getSop() == null || value.getSopField() == null) {
+        continue;
+      }
+
+      SopField field = run.getSop().getFields().stream()
+          .filter(sopField -> sopField.getId() == value.getSopField().getId())
+          .findFirst()
+          .orElse(null);
+
+      if (field != null) {
+        value.setSopField(field);
       }
     }
   }
@@ -477,7 +557,9 @@ public class DefaultRunService implements RunService {
     target.setDataReview(source.getDataReview());
     target.setDataReviewer(source.getDataReviewer());
     target.setDataReviewDate(source.getDataReviewDate());
+    makeSopChangesChangeLog(target, source);
     target.setSop(source.getSop());
+    applySopFieldValueChanges(target, source);
     target.setDataManglingPolicy(source.getDataManglingPolicy());
     if (isIlluminaRun(target)) {
       applyIlluminaChanges((IlluminaRun) target, (IlluminaRun) source);
@@ -493,6 +575,121 @@ public class DefaultRunService implements RunService {
       target.setMetrics(source.getMetrics());
     }
   }
+
+  private void applySopFieldValueChanges(Run target, Run source) {
+    Map<Long, RunSopFieldValue> sourceByFieldId = new HashMap<>();
+    if (source.getSopFieldValues() != null) {
+      for (RunSopFieldValue sourceValue : source.getSopFieldValues()) {
+        if (sourceValue.getSopField() != null && !isStringBlankOrNull(sourceValue.getValue())) {
+          sourceByFieldId.put(sourceValue.getSopField().getId(), sourceValue);
+        }
+      }
+    }
+
+    Map<Long, RunSopFieldValue> targetByFieldId = new HashMap<>();
+    Iterator<RunSopFieldValue> iterator = target.getSopFieldValues().iterator();
+    while (iterator.hasNext()) {
+      RunSopFieldValue targetValue = iterator.next();
+      long fieldId = targetValue.getSopField().getId();
+      if (sourceByFieldId.containsKey(fieldId)) {
+        targetByFieldId.put(fieldId, targetValue);
+      } else {
+        iterator.remove();
+      }
+    }
+
+    for (RunSopFieldValue sourceValue : sourceByFieldId.values()) {
+      long fieldId = sourceValue.getSopField().getId();
+      RunSopFieldValue targetValue = targetByFieldId.get(fieldId);
+      if (targetValue == null) {
+        targetValue = new RunSopFieldValue();
+        targetValue.setRun(target);
+        targetValue.setSopField(sourceValue.getSopField());
+        target.getSopFieldValues().add(targetValue);
+      }
+      targetValue.setValue(sourceValue.getValue());
+    }
+  }
+
+  private void makeSopChangesChangeLog(Run target, Run source) throws IOException {
+    List<String> messages = new ArrayList<>();
+
+    boolean sopChanged = !Objects.equals(getSopId(target.getSop()), getSopId(source.getSop()));
+    if (sopChanged) {
+      messages.add("SOP changed from " + getSopLabel(target.getSop()) + " to " + getSopLabel(source.getSop()));
+    }
+
+    Map<Long, RunSopFieldValue> beforeValues = getSopFieldValueMap(target);
+    Map<Long, RunSopFieldValue> afterValues = getSopFieldValueMap(source);
+    if (sopChanged) {
+      String beforeSummary = getSopFieldValuesLabel(beforeValues);
+      String afterSummary = getSopFieldValuesLabel(afterValues);
+      if (!beforeSummary.equals(afterSummary)) {
+        messages.add("SOP field values changed from " + beforeSummary + " to " + afterSummary);
+      }
+    } else {
+      Set<Long> fieldIds = new HashSet<>();
+      fieldIds.addAll(beforeValues.keySet());
+      fieldIds.addAll(afterValues.keySet());
+
+      for (Long fieldId : fieldIds) {
+        RunSopFieldValue before = beforeValues.get(fieldId);
+        RunSopFieldValue after = afterValues.get(fieldId);
+        String beforeValue = before == null ? null : before.getValue();
+        String afterValue = after == null ? null : after.getValue();
+        if (!Objects.equals(beforeValue, afterValue)) {
+          RunSopFieldValue value = after == null ? before : after;
+          messages.add("SOP field " + getSopFieldLabel(value) + " changed from "
+              + getSopFieldValueLabel(beforeValue) + " to " + getSopFieldValueLabel(afterValue));
+        }
+      }
+    }
+
+    if (!messages.isEmpty()) {
+      changeLogService.create(target.createChangeLog(String.join("; ", messages), "sop,sopFieldValues",
+          authorizationManager.getCurrentUser()));
+    }
+  }
+
+  private static Map<Long, RunSopFieldValue> getSopFieldValueMap(Run run) {
+    Map<Long, RunSopFieldValue> values = new TreeMap<>();
+    if (run.getSopFieldValues() == null) {
+      return values;
+    }
+    for (RunSopFieldValue value : run.getSopFieldValues()) {
+      if (value.getSopField() != null && !isStringBlankOrNull(value.getValue())) {
+        values.put(value.getSopField().getId(), value);
+      }
+    }
+    return values;
+  }
+
+  private static String getSopFieldValuesLabel(Map<Long, RunSopFieldValue> values) {
+    if (values.isEmpty()) {
+      return "blank";
+    }
+    return values.values().stream()
+        .map(value -> getSopFieldLabel(value) + ": " + getSopFieldValueLabel(value.getValue()))
+        .collect(Collectors.joining(", "));
+  }
+
+  private static String getSopLabel(Sop sop) {
+    return sop == null ? "none" : sop.getAlias() + " v." + sop.getVersion();
+  }
+
+  private static Long getSopId(Sop sop) {
+    return sop == null ? null : sop.getId();
+  }
+
+  private static String getSopFieldLabel(RunSopFieldValue value) {
+    SopField field = value.getSopField();
+    return field.getName() + (field.getUnits() == null ? "" : " (" + field.getUnits() + ")");
+  }
+
+  private static String getSopFieldValueLabel(String value) {
+    return isStringBlankOrNull(value) ? "blank" : "'" + value + "'";
+  }
+
 
   private void applyContainerChanges(Run target, Run source) throws IOException {
     Iterator<RunPosition> iterator = target.getRunPositions().iterator();
