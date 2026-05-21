@@ -7,6 +7,24 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.22.0] - 2026-05-21
+
+### Added
+
+* Contacts can now be added to requisitions.
+* Added SAML authentication for MISO.
+* Allow MISO to read ULTIMA runs from runscanner
+
+### Fixed
+
+* Unexpected error when attempting to save some pool orders
+* Improved performance when creating samples in bulk.
+
+### Upgrade Notes
+
+* Updated Runscanner to 4.5.0
+
+
 ## [3.21.0] - 2026-05-07
 
 ### Added
