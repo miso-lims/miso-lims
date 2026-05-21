@@ -383,10 +383,10 @@ public class RunScannerClient {
     }
   }
 
-  @Value("${miso.runscanner.httpbasicauth:}")
+  @Value("${miso.runscanner.httpBasicAuthUsername:}")
   private String runscannerAuthUsername;
 
-  @Value("${miso.runscanner.basicpass:}")
+  @Value("${miso.runscanner.httpBasicAuthPassword:}")
   private String runscannerAuthPassword;
 
   @Value("${miso.runscanner.urls:}")

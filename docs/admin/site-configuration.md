@@ -309,6 +309,14 @@ a space to separate.
 
 Interval in milliseconds to poll Run Scanner(s). Defaults to `300000` (5 minutes) if unspecified;
 
+### `miso.runscanner.httpBasicAuthUsername`
+
+Username to use for HTTP Basic authentication when connecting to Run Scanner.
+
+### `miso.runscanner.httpBasicAuthPassword`
+
+Password to use for HTTP Basic authentication when connecting to Run Scanner.
+
 ### `miso.boxscanner.servers`
 
 Config for Visionmate or DP5Mirage bulk barcode scanners. Enter in format 
