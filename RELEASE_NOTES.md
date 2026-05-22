@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.22.1] - 2026-05-22
+
+### Fixed
+
+* missed Ultima run catch
+
+
 ## [3.22.0] - 2026-05-21
 
 ### Added
