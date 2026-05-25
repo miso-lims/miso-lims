@@ -6,11 +6,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import jakarta.ws.rs.core.MediaType;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
+import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot.RunPartitionAliquotId;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition.RunPartitionId;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.RunLibrarySpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -53,7 +61,7 @@ public class RunRestControllerST extends AbstractST {
             post(CONTROLLER_BASE + "/parents/Identity").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
 
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.*", hasSize(greaterThanOrEqualTo(1))))
+        .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[0].id").value(1))
         .andExpect(jsonPath("$[0].name").value("SAM1"))
         .andExpect(jsonPath("$[0].identificationBarcode").value("11111"));
@@ -68,7 +76,7 @@ public class RunRestControllerST extends AbstractST {
             post(CONTROLLER_BASE + "/parents/Tissue").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
 
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.*", hasSize(greaterThanOrEqualTo(1))))
+        .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[0].id").value(2))
         .andExpect(jsonPath("$[0].name").value("SAM2"))
         .andExpect(jsonPath("$[0].identificationBarcode").value("22222"));
@@ -84,7 +92,7 @@ public class RunRestControllerST extends AbstractST {
                 .contentType(MediaType.APPLICATION_JSON))
 
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.*", hasSize(greaterThanOrEqualTo(1))))
+        .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0].id").value(5))
         .andExpect(jsonPath("$[0].name").value("SAM5"))
         .andExpect(jsonPath("$[0].identificationBarcode").value("55555"));
@@ -99,7 +107,7 @@ public class RunRestControllerST extends AbstractST {
             post(CONTROLLER_BASE + "/parents/Stock").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
 
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.*", hasSize(greaterThanOrEqualTo(1))))
+        .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[0].id").value(6))
         .andExpect(jsonPath("$[0].name").value("SAM6"))
         .andExpect(jsonPath("$[0].identificationBarcode").value("66666"));
@@ -114,9 +122,9 @@ public class RunRestControllerST extends AbstractST {
             post(CONTROLLER_BASE + "/parents/Aliquot").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
 
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.*", hasSize(greaterThanOrEqualTo(1))))
-        .andExpect(jsonPath("$[0].id").value(304))
-        .andExpect(jsonPath("$[0].name").value("SAM304"));
+        .andExpect(jsonPath("$", hasSize(3)))
+        .andExpect(jsonPath("$[*].id", containsInAnyOrder(8, 304, 504)))
+        .andExpect(jsonPath("$[?(@.id == 304)].name", contains("SAM304")));
   }
 
   @Test
@@ -126,7 +134,7 @@ public class RunRestControllerST extends AbstractST {
         .perform(
             post(CONTROLLER_BASE + "/parents/Library").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.*", hasSize(greaterThanOrEqualTo(1))))
+        .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[0].id").value(304))
         .andExpect(jsonPath("$[0].name").value("LIB304"))
         .andExpect(jsonPath("$[0].description").value("description"));
@@ -141,7 +149,7 @@ public class RunRestControllerST extends AbstractST {
             post(CONTROLLER_BASE + "/parents/Library Aliquot").content(makeJson(ids))
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.*", hasSize(greaterThanOrEqualTo(1))))
+        .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[0].id").value(304))
         .andExpect(jsonPath("$[0].name").value("LDI304"))
         .andExpect(jsonPath("$[0].identificationBarcode").value("300304"));
@@ -156,7 +164,7 @@ public class RunRestControllerST extends AbstractST {
             post(CONTROLLER_BASE + "/parents/Pool").content(makeJson(ids))
                 .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.*", hasSize(greaterThanOrEqualTo(1))))
+        .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0].id").value(1))
         .andExpect(jsonPath("$[0].name").value("IPO1"))
         .andExpect(jsonPath("$[0].identificationBarcode").value("12341"));
@@ -166,8 +174,9 @@ public class RunRestControllerST extends AbstractST {
   public void testGetContainersByRunId() throws Exception {
     getMockMvc().perform(get(CONTROLLER_BASE + "/1/containers"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[*].id").value(1))
-        .andExpect(jsonPath("$[*].identificationBarcode").value("MISEQXX"));
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$[0].identificationBarcode").value("MISEQXX"));
   }
 
   @Test
@@ -190,18 +199,26 @@ public class RunRestControllerST extends AbstractST {
   }
 
   @Test
+  @Transactional
   public void testAddContainerByBarcode() throws Exception {
     Run run = currentSession().get(entityClass, 5002);
-    String position = run.getSequencer().getInstrumentModel().getPositions().stream()
-        .findFirst()
-        .map(p -> p.getAlias())
-        .orElse("");
+    InstrumentPosition position = new InstrumentPosition();
+    position.setAlias("A");
+    position.setInstrumentModel(run.getSequencer().getInstrumentModel());
+    currentSession().persist(position);
+    currentSession().flush();
+    currentSession().clear();
 
-    getMockMvc().perform(post(CONTROLLER_BASE + "/5002/add").param("position", position).param("barcode", "EXISTING"))
+    getMockMvc().perform(post(CONTROLLER_BASE + "/5002/add")
+        .param("position", "A")
+        .param("barcode", "EXISTING"))
         .andExpect(status().isNoContent());
 
     Run updated = currentSession().get(entityClass, 5002);
-    assertTrue(updated.getRunPositions().stream().anyMatch(rp -> rp.getContainer().getId() == 5002L));
+    assertEquals(1, updated.getRunPositions().size());
+    RunPosition runPosition = updated.getRunPositions().iterator().next();
+    assertEquals(5002L, runPosition.getContainer().getId());
+    assertEquals("A", runPosition.getPosition().getAlias());
   }
 
   @Test
@@ -218,8 +235,8 @@ public class RunRestControllerST extends AbstractST {
   @Test
   public void testSetQC() throws Exception {
     RunPartitionQCRequest req = new RunPartitionQCRequest();
-    long partitionId = 2L;
-    req.setQcTypeId(partitionId);
+    long qcTypeId = 2L;
+    req.setQcTypeId(qcTypeId);
     List<Long> partitionIds = Arrays.asList(11L, 12L, 13L, 14L);
     req.setPartitionIds(partitionIds);
     req.setNotes("no notes");
@@ -231,7 +248,7 @@ public class RunRestControllerST extends AbstractST {
       partId.setRunId(1L);
       partId.setPartitionId(id);
       RunPartition part = currentSession().get(RunPartition.class, partId);
-      assertEquals(partitionId, part.getQcType().getId());
+      assertEquals(qcTypeId, part.getQcType().getId());
     }
   }
 
@@ -264,11 +281,23 @@ public class RunRestControllerST extends AbstractST {
     dto.setPartitionId(12L);
     dto.setAliquotId(304L);
     dto.setPlatformType("ILLUMINA");
+    long qcStatusId = 2L;
+    String qcNote = "failed QC";
+    dto.setQcStatusId(qcStatusId);
+    dto.setQcNote(qcNote);
 
     getMockMvc()
         .perform(put(CONTROLLER_BASE + "/1/aliquots").content(makeJson(Arrays.asList(dto)))
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
+
+    RunPartitionAliquotId id = new RunPartitionAliquotId(
+        currentSession().get(entityClass, 1L),
+        currentSession().get(PartitionImpl.class, 12L),
+        currentSession().get(ListLibraryAliquotView.class, 304L));
+    RunPartitionAliquot updated = currentSession().get(RunPartitionAliquot.class, id);
+    assertEquals(qcStatusId, updated.getQcStatus().getId());
+    assertEquals(qcNote, updated.getQcNote());
   }
 
   @Test
