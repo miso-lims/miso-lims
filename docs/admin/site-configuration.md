@@ -311,11 +311,15 @@ Interval in milliseconds to poll Run Scanner(s). Defaults to `300000` (5 minutes
 
 ### `miso.runscanner.httpBasicAuthUsername`
 
-Username to use for HTTP Basic authentication when connecting to Run Scanner.
+Optional. Username for HTTP Basic authentication when accessing Run Scanner through an
+authentication-enabled proxy. Run Scanner does not provide built-in authentication, so this is
+only required when authentication is configured on the proxy.
 
 ### `miso.runscanner.httpBasicAuthPassword`
 
-Password to use for HTTP Basic authentication when connecting to Run Scanner.
+Optional. Password for HTTP Basic authentication when accessing Run Scanner through an
+authentication-enabled proxy. Run Scanner does not provide built-in authentication, so this is
+only required when authentication is configured on the proxy.
 
 ### `miso.boxscanner.servers`
 
