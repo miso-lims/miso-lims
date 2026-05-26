@@ -443,7 +443,15 @@ public class DefaultRunService implements RunService {
   }
 
   private void validateSopFieldValues(Run run, List<ValidationError> errors) {
-    if (run.getSopFieldValues() == null || run.getSopFieldValues().isEmpty()) {
+    if (run.getSopFieldValues() == null) {
+      return;
+    }
+
+    List<RunSopFieldValue> submittedValues = run.getSopFieldValues().stream()
+        .filter(value -> !isStringBlankOrNull(value.getValue()))
+        .collect(Collectors.toList());
+
+    if (submittedValues.isEmpty()) {
       return;
     }
 
@@ -454,7 +462,7 @@ public class DefaultRunService implements RunService {
 
     Set<Long> seenSopFieldIds = new HashSet<>();
 
-    for (RunSopFieldValue value : run.getSopFieldValues()) {
+    for (RunSopFieldValue value : submittedValues) {
       SopField field = value.getSopField();
       Long fieldId = field == null ? null : field.getId();
       String property = fieldId == null ? "sopFieldValues" : "sopFieldValues." + fieldId;
@@ -478,7 +486,7 @@ public class DefaultRunService implements RunService {
         errors.add(new ValidationError(property, "Duplicate SOP field"));
       }
 
-      if (value.getValue() != null && value.getValue().length() > 255) {
+      if (value.getValue().length() > 255) {
         errors.add(new ValidationError(property, "Maximum length: 255 characters"));
       }
 

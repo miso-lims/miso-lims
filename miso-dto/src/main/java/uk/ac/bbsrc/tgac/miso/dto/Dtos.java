@@ -2216,20 +2216,23 @@ public class Dtos {
     setBoolean(to::setQcPassed, dto.getQcPassed(), true);
     setBoolean(to::setDataReview, dto.getDataReview(), true);
     setObject(to::setSop, Sop::new, dto.getSopId());
-
-    if (dto.getSopFieldValues() != null) {
-      dto.getSopFieldValues().forEach((fieldId, value) -> {
-        RunSopFieldValue fieldValue = new RunSopFieldValue();
-        fieldValue.setRun(to);
-        fieldValue.setSopField(new SopField());
-        fieldValue.getSopField().setId(fieldId);
-        fieldValue.setValue(value);
-        to.getSopFieldValues().add(fieldValue);
-      });
-    }
-
+    setRunSopFieldValues(to, dto.getSopFieldValues());
     setObject(to::setDataManglingPolicy, dto.getDataManglingPolicy(), InstrumentDataManglingPolicy::valueOf);
     return to;
+  }
+
+  private static void setRunSopFieldValues(Run run, Map<Long, String> sopFieldValues) {
+    if (sopFieldValues == null) {
+      return;
+    }
+
+    sopFieldValues.forEach((fieldId, value) -> {
+      RunSopFieldValue fieldValue = new RunSopFieldValue();
+      fieldValue.setRun(run);
+      setObject(fieldValue::setSopField, SopField::new, fieldId);
+      fieldValue.setValue(value);
+      run.getSopFieldValues().add(fieldValue);
+    });
   }
 
   private static Run getPlatformRun(RunDto from) {
