@@ -1,0 +1,1 @@
+SOP fields can now be viewed and updated in Run Information.
