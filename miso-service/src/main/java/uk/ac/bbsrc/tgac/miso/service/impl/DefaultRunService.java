@@ -623,10 +623,6 @@ public class DefaultRunService implements RunService {
     List<String> messages = new ArrayList<>();
 
     boolean sopChanged = !Objects.equals(getSopId(target.getSop()), getSopId(source.getSop()));
-    if (sopChanged) {
-      messages.add("SOP changed from " + getSopLabel(target.getSop()) + " to " + getSopLabel(source.getSop()));
-    }
-
     Map<Long, RunSopFieldValue> beforeValues = getSopFieldValueMap(target);
     Map<Long, RunSopFieldValue> afterValues = getSopFieldValueMap(source);
     if (sopChanged) {
@@ -654,7 +650,7 @@ public class DefaultRunService implements RunService {
     }
 
     if (!messages.isEmpty()) {
-      changeLogService.create(target.createChangeLog(String.join("; ", messages), "sop,sopFieldValues",
+      changeLogService.create(target.createChangeLog(String.join("; ", messages), "sopFieldValues",
           authorizationManager.getCurrentUser()));
     }
   }
@@ -679,10 +675,6 @@ public class DefaultRunService implements RunService {
     return values.values().stream()
         .map(value -> getSopFieldLabel(value) + ": " + getSopFieldValueLabel(value.getValue()))
         .collect(Collectors.joining(", "));
-  }
-
-  private static String getSopLabel(Sop sop) {
-    return sop == null ? "none" : sop.getAlias() + " v." + sop.getVersion();
   }
 
   private static Long getSopId(Sop sop) {

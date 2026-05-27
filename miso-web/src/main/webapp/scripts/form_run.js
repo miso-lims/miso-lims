@@ -84,7 +84,11 @@ FormTarget.run = (function ($) {
               },
             },
           ]
-            .concat(FormUtils.makeSopFields(object, config.sops))
+            .concat(
+              FormUtils.makeSopFields(object, config.sops, function (newValue, form) {
+                form.setRunSopFields(newValue);
+              })
+            )
             .concat([
               {
                 title: "Sequencing Parameters",
@@ -348,11 +352,121 @@ FormTarget.run = (function ($) {
                 },
               },
             ])
-            .concat([FormUtils.makeRunSopValueSection(object, config.sops)]),
+            .concat([makeRunSopValueSection(object, config.sops)]),
         },
       ];
     },
   };
+
+  function makeRunSopValueFields(sops, sopId) {
+    if (!sopId) {
+      return [];
+    }
+
+    var sop = sops.filter(Utils.array.idPredicate(Number(sopId)))[0];
+    if (!sop || !sop.fields) {
+      return [];
+    }
+
+    return sop.fields.map(function (field) {
+      return {
+        title: field.name + (field.units ? " (" + field.units + ")" : ""),
+        data: "sopFieldValues." + field.id,
+        type: field.fieldType === "NUMBER" ? "decimal" : "text",
+        maxLength: 255,
+      };
+    });
+  }
+
+  function makeRunSopValueSection(object, sops) {
+    sops = sops || [];
+    object.sopFieldValues = object.sopFieldValues || {};
+
+    return {
+      title: "",
+      data: "runSopFields",
+      type: "special",
+      makeControls: function (form) {
+        var container = $("<div>");
+        var currentSopId = object.sopId ? Number(object.sopId) : null;
+
+        function drawFields(sopId) {
+          var placeholderRow = container.closest("tr");
+          if (!placeholderRow.length) {
+            return;
+          }
+
+          placeholderRow.hide();
+          placeholderRow.siblings(".run-sop-field-row").remove();
+
+          var fields = makeRunSopValueFields(sops, sopId);
+          if (!fields.length) {
+            return;
+          }
+
+          fields.forEach(function (field) {
+            var input = $("<input>")
+              .attr("type", "text")
+              .attr("maxlength", field.maxLength)
+              .addClass("form-control")
+              .val(Utils.getObjectField(object, field.data) || "")
+              .change(function () {
+                Utils.setObjectField(object, field.data, this.value || null);
+                form.markOtherChanges();
+              });
+            if (field.type === "decimal") {
+              input.attr("data-parsley-type", "number");
+            }
+
+            $("<tr>")
+              .addClass("run-sop-field-row")
+              .append($("<td>").addClass("h").text(field.title + ": "))
+              .append($("<td>").append(input))
+              .insertBefore(placeholderRow);
+          });
+        }
+
+        form.setRunSopFields = function (sopId) {
+          sopId = sopId ? Number(sopId) : null;
+          if (sopId === currentSopId) {
+            drawFields(sopId);
+            return;
+          }
+
+          var changeSop = function () {
+            object.sopFieldValues = {};
+            currentSopId = sopId;
+            drawFields(sopId);
+            form.markOtherChanges();
+          };
+
+          if (currentSopId) {
+            Utils.showConfirmDialog(
+              "Change SOP",
+              "Change SOP",
+              [
+                "Changing the SOP will clear all values entered for the current SOP fields.",
+                "Do you want to continue?",
+              ],
+              changeSop,
+              function () {
+                form.updateField("sopId", {
+                  value: currentSopId,
+                });
+              }
+            );
+          } else {
+            changeSop();
+          }
+        };
+
+        setTimeout(function () {
+          drawFields(currentSopId);
+        }, 0);
+        return container;
+      },
+    };
+  }
 
   function getStatus(label) {
     return Utils.array.findUniqueOrThrow(function (item) {
