@@ -198,7 +198,7 @@ public class RunRestControllerST extends AbstractST {
   @Test
   public void testAddContainerByBarcode() throws Exception {
     getMockMvc().perform(post(CONTROLLER_BASE + "/5002/add")
-        .param("position", "A")
+        .param("position", "")
         .param("barcode", "EXISTING"))
         .andExpect(status().isNoContent());
 
@@ -206,7 +206,7 @@ public class RunRestControllerST extends AbstractST {
     assertEquals(1, updated.getRunPositions().size());
     RunPosition runPosition = updated.getRunPositions().iterator().next();
     assertEquals(5002L, runPosition.getContainer().getId());
-    assertEquals("A", runPosition.getPosition().getAlias());
+    assertNull(runPosition.getPosition());
   }
 
   @Test
