@@ -6,11 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import jakarta.ws.rs.core.MediaType;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot.RunPartitionAliquotId;
@@ -199,16 +196,7 @@ public class RunRestControllerST extends AbstractST {
   }
 
   @Test
-  @Transactional
   public void testAddContainerByBarcode() throws Exception {
-    Run run = currentSession().get(entityClass, 5002);
-    InstrumentPosition position = new InstrumentPosition();
-    position.setAlias("A");
-    position.setInstrumentModel(run.getSequencer().getInstrumentModel());
-    currentSession().persist(position);
-    currentSession().flush();
-    currentSession().clear();
-
     getMockMvc().perform(post(CONTROLLER_BASE + "/5002/add")
         .param("position", "A")
         .param("barcode", "EXISTING"))
