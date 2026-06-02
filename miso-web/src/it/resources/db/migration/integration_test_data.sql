@@ -395,7 +395,7 @@ INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, 
   (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER'),
   (4, 'ILLUMINA', 'Illumina iScan', 1, 'ARRAY_SCANNER'),
   (5, 'ILLUMINA', 'Deletable', 1, 'OTHER');
-  
+
 INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, readLength2, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
   (2, 'Rapid Run 2x151', 1, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
