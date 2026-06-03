@@ -1194,7 +1194,7 @@ INSERT INTO SampleSheet(sampleSheetId, name, platformType, parameters, sections)
   {
     "name": "Genome Folder",
     "type": "TEXT",
-    "defaultValue": "Homo_sapiens\\UCSC\\hg19\\Sequence\\WholeGenomeFasta"
+    "defaultValue": "Homo_sapiens\\\\UCSC\\\\hg19\\\\Sequence\\\\WholeGenomeFasta"
   },
   {
     "name": "Custom Read 1 Primer Well",
@@ -1207,10 +1207,6 @@ INSERT INTO SampleSheet(sampleSheetId, name, platformType, parameters, sections)
   {
     "name": "Custom Read 2 Primer Well",
     "type": "TEXT"
-  },
-  {
-    "name": "Date",
-    "type": "DATE"
   }
 ]', '[
   {
@@ -1221,7 +1217,8 @@ INSERT INTO SampleSheet(sampleSheetId, name, platformType, parameters, sections)
         "name": "Index Adapters",
         "sources": [{
             "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "indexFamily"
+            "sourceProperty": "INDEX_FAMILY",
+            "separator": "/"
         }]
       },
       {
@@ -1241,8 +1238,8 @@ INSERT INTO SampleSheet(sampleSheetId, name, platformType, parameters, sections)
       {
         "name": "Date",
         "sources": [{
-          "source": "Date",
-          "dateFormat": "m/d/yyyy"
+          "source": "CURRENT_TIME",
+          "dateFormat": "M/d/yyyy"
         }]
       },
       {
@@ -1294,7 +1291,8 @@ INSERT INTO SampleSheet(sampleSheetId, name, platformType, parameters, sections)
         "sources": [{
           "source": "SEQUENCING_PARAMETERS",
           "sourceProperty": "READ_2_LENGTH"
-        }]
+        }],
+        "omitIfEmpty": true
       }
     ]
   },
@@ -1312,19 +1310,22 @@ INSERT INTO SampleSheet(sampleSheetId, name, platformType, parameters, sections)
         "name": "CustomRead1PrimerMix",
         "sources": [{
           "source": "Custom Read 1 Primer Well"
-        }]
+        }],
+        "omitIfEmpty": true
       },
       {
         "name": "CustomIndexPrimerMix",
         "sources": [{
           "source": "Custom Index Primer Well"
-        }]
+        }],
+        "omitIfEmpty": true
       },
       {
         "name": "CustomRead2PrimerMix",
         "sources": [{
           "source": "Custom Read 2 Primer Well"
-        }]
+        }],
+        "omitIfEmpty": true
       }
     ]
   },
@@ -1342,17 +1343,11 @@ INSERT INTO SampleSheet(sampleSheetId, name, platformType, parameters, sections)
       },
       {
         "name": "Sample_Plate",
-        "sources": [{
-          "source": "LIBRARY_ALIQUOT",
-          "sourceProperty": "BOX_ALIAS"
-        }]
+        "sources": []
       },
       {
         "name": "Sample_Well",
-          "sources": [{
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "BOX_POSITION"
-        }]
+          "sources": []
       },
       {
         "name": "I7_Index_ID",
@@ -1373,14 +1368,16 @@ INSERT INTO SampleSheet(sampleSheetId, name, platformType, parameters, sections)
           "sources": [{
             "source": "LIBRARY_ALIQUOT",
             "sourceProperty": "INDEX_2_NAME"
-        }]
+        }],
+        "omitIfEmpty": true
       },
       {
         "name": "index2",
         "sources": [{
           "source": "LIBRARY_ALIQUOT",
           "sourceProperty": "INDEX_2_SEQUENCE"
-        }]
+        }],
+        "omitIfEmpty": true
       },
       {
         "name": "GenomeFolder",
