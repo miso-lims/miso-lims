@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
+import uk.ac.bbsrc.tgac.miso.core.data.UltimaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.RunChangeLog;
@@ -487,6 +488,8 @@ public class DefaultRunService implements RunService {
       applySolidChanges((SolidRun) target, (SolidRun) source);
     } else if (isOxfordNanoporeRun(target)) {
       applyOxfordNanoporeChanges((OxfordNanoporeRun) target, (OxfordNanoporeRun) source);
+    } else if (isUltimaRun(target)) {
+      applyUltimaChanges((UltimaRun) target, (UltimaRun) source);
     }
     // Source metrics will only be set when coming from Run Scanner
     if (source.getMetrics() != null) {
@@ -556,6 +559,12 @@ public class DefaultRunService implements RunService {
   private void applyOxfordNanoporeChanges(OxfordNanoporeRun target, OxfordNanoporeRun source) {
     target.setMinKnowVersion(isStringEmptyOrNull(source.getMinKnowVersion()) ? null : source.getMinKnowVersion());
     target.setProtocolVersion(isStringEmptyOrNull(source.getProtocolVersion()) ? null : source.getProtocolVersion());
+  }
+
+  private void applyUltimaChanges(UltimaRun target, UltimaRun source) {
+    target.setCompletedFlows(source.getCompletedFlows());
+    target.setExpectedFlows(source.getExpectedFlows());
+    target.setWaferShelf(source.getWaferShelf());
   }
 
   /**
