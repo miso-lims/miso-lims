@@ -2184,7 +2184,12 @@ public class Dtos {
     } else if (from instanceof PacBioRun) {
       return new PacBioRunDto();
     } else if (from instanceof UltimaRun) {
-      return new UltimaRunDto();
+      UltimaRunDto dto = new UltimaRunDto();
+      UltimaRun ultimaRun = (UltimaRun) from;
+      dto.setExpectedFlows(ultimaRun.getExpectedFlows());
+      dto.setCompletedFlows(ultimaRun.getCompletedFlows());
+      dto.setWaferShelf(ultimaRun.getWaferShelf());
+      return dto;
     } else {
       throw new IllegalArgumentException("Unknown run type");
     }
@@ -2250,7 +2255,12 @@ public class Dtos {
     } else if (from instanceof PacBioRunDto) {
       return new PacBioRun();
     } else if (from instanceof UltimaRunDto) {
-      return new UltimaRun();
+      UltimaRun run = new UltimaRun();
+      UltimaRunDto ultimaDto = (UltimaRunDto) from;
+      run.setCompletedFlows(ultimaDto.getCompletedFlows());
+      run.setExpectedFlows(ultimaDto.getExpectedFlows());
+      run.setWaferShelf(ultimaDto.getWaferShelf());
+      return run;
     } else {
       throw new IllegalArgumentException("Unknown run type");
     }

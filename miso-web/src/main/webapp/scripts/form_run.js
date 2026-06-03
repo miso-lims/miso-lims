@@ -224,6 +224,27 @@ FormTarget.run = (function ($) {
                 maxLength: 100,
               },
               {
+                title: "Expected Flows",
+                include: object.platformType === "Ultima",
+                data: "expectedFlows",
+                type: "int",
+                min: "0",
+              },
+              {
+                title: "Completed Flows",
+                include: object.platformType === "Ultima",
+                data: "completedFlows",
+                type: "int",
+                min: "0",
+              },
+              {
+                title: "Wafer Shelf",
+                include: object.platformType === "Ultima",
+                data: "waferShelf",
+                type: "int",
+                min: "0",
+              },
+              {
                 title: "Status",
                 data: "status",
                 type: "dropdown",
