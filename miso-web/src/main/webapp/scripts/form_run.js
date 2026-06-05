@@ -2,6 +2,8 @@ if (typeof FormTarget === "undefined") {
   FormTarget = {};
 }
 FormTarget.run = (function ($) {
+  var sopSectionTitle = "SOP Information";
+
   /*
    * Expected config {
    *   isAdmin: boolean,
@@ -346,14 +348,51 @@ FormTarget.run = (function ($) {
           ]),
         },
         {
-          title: "SOP Information",
-          fields: FormUtils.makeSopFields(object, config.sops, function (newValue, form) {
-            form.setRunSopFields(newValue);
-          }).concat([makeRunSopValueSection(object, config.sops)]),
+          title: sopSectionTitle,
+          fields: makeSopSectionFields(object, config.sops),
         },
       ];
     },
   };
+
+  function makeSopSectionFields(object, sops) {
+    sops = sops || [];
+    object.sopFieldValues = object.sopFieldValues || {};
+
+    return FormUtils.makeSopFields(object, sops, function (newValue, form) {
+      var newSopId = newValue ? Number(newValue) : null;
+      var currentSopId = object.sopId ? Number(object.sopId) : null;
+      if (newSopId === currentSopId) {
+        return;
+      }
+
+      var changeSop = function () {
+        object.sopId = newSopId;
+        object.sopFieldValues = {};
+        form.rewriteSection(sopSectionTitle, makeSopSectionFields(object, sops));
+        form.markOtherChanges();
+      };
+
+      if (currentSopId) {
+        Utils.showConfirmDialog(
+          "Change SOP",
+          "Change SOP",
+          [
+            "Changing the SOP will clear all values entered for the current SOP fields.",
+            "Do you want to continue?",
+          ],
+          changeSop,
+          function () {
+            form.updateField("sopId", {
+              value: currentSopId,
+            });
+          }
+        );
+      } else {
+        changeSop();
+      }
+    }).concat(makeRunSopValueFields(sops, object.sopId));
+  }
 
   function makeRunSopValueFields(sops, sopId) {
     if (!sopId) {
@@ -373,100 +412,6 @@ FormTarget.run = (function ($) {
         maxLength: 255,
       };
     });
-  }
-
-  function makeRunSopValueSection(object, sops) {
-    sops = sops || [];
-    object.sopFieldValues = object.sopFieldValues || {};
-
-    return {
-      title: "",
-      data: "runSopFields",
-      type: "special",
-      makeControls: function (form) {
-        var container = $("<div>");
-        var currentSopId = object.sopId ? Number(object.sopId) : null;
-
-        function drawFields(sopId) {
-          var placeholderRow = container.closest("tr");
-          if (!placeholderRow.length) {
-            return;
-          }
-
-          placeholderRow.hide();
-          placeholderRow.siblings(".run-sop-field-row").remove();
-
-          var fields = makeRunSopValueFields(sops, sopId);
-          if (!fields.length) {
-            return;
-          }
-
-          fields.forEach(function (field) {
-            var input = $("<input>")
-              .attr("type", "text")
-              .attr("maxlength", field.maxLength)
-              .addClass("form-control")
-              .val(Utils.getObjectField(object, field.data) || "")
-              .change(function () {
-                Utils.setObjectField(object, field.data, this.value || null);
-                form.markOtherChanges();
-              });
-            if (field.type === "decimal") {
-              input.attr("data-parsley-type", "number");
-            }
-
-            $("<tr>")
-              .addClass("run-sop-field-row")
-              .append(
-                $("<td>")
-                  .addClass("h")
-                  .text(field.title + ": ")
-              )
-              .append($("<td>").append(input))
-              .insertBefore(placeholderRow);
-          });
-        }
-
-        form.setRunSopFields = function (sopId) {
-          sopId = sopId ? Number(sopId) : null;
-          if (sopId === currentSopId) {
-            drawFields(sopId);
-            return;
-          }
-
-          var changeSop = function () {
-            object.sopFieldValues = {};
-            currentSopId = sopId;
-            drawFields(sopId);
-            form.markOtherChanges();
-          };
-
-          if (currentSopId) {
-            Utils.showConfirmDialog(
-              "Change SOP",
-              "Change SOP",
-              [
-                "Changing the SOP will clear all values entered for the current SOP fields.",
-                "Do you want to continue?",
-              ],
-              changeSop,
-              function () {
-                form.updateField("sopId", {
-                  value: currentSopId,
-                });
-              }
-            );
-          } else {
-            changeSop();
-          }
-        };
-
-        setTimeout(function () {
-          drawFields(currentSopId);
-        }, 0);
-        return container;
-      },
-    };
   }
 
   function getStatus(label) {

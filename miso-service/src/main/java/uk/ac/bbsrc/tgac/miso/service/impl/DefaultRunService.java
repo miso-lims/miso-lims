@@ -465,12 +465,12 @@ public class DefaultRunService implements RunService {
     for (RunSopFieldValue value : submittedValues) {
       SopField field = value.getSopField();
       Long fieldId = field == null ? null : field.getId();
-      String property = fieldId == null ? "sopFieldValues" : "sopFieldValues." + fieldId;
 
       if (fieldId == null) {
-        errors.add(new ValidationError(property, "SOP field does not belong to the selected SOP"));
+        errors.add(new ValidationError("SOP field does not belong to the selected SOP"));
         continue;
       }
+      String property = getSopFieldValueProperty(fieldId);
 
       SopField sopField = run.getSop().getFields().stream()
           .filter(item -> item.getId() == fieldId)
@@ -537,6 +537,7 @@ public class DefaultRunService implements RunService {
           .findFirst()
           .orElse(null);
 
+      // Invalid fields will be handled by validateSopFieldValues.
       if (field != null) {
         value.setSopField(field);
       }
@@ -622,30 +623,22 @@ public class DefaultRunService implements RunService {
   private void makeSopChangesChangeLog(Run target, Run source) throws IOException {
     List<String> messages = new ArrayList<>();
 
-    boolean sopChanged = !Objects.equals(getSopId(target.getSop()), getSopId(source.getSop()));
     Map<Long, RunSopFieldValue> beforeValues = getSopFieldValueMap(target);
     Map<Long, RunSopFieldValue> afterValues = getSopFieldValueMap(source);
-    if (sopChanged) {
-      String beforeSummary = getSopFieldValuesLabel(beforeValues);
-      String afterSummary = getSopFieldValuesLabel(afterValues);
-      if (!beforeSummary.equals(afterSummary)) {
-        messages.add("SOP field values changed from " + beforeSummary + " to " + afterSummary);
-      }
-    } else {
-      Set<Long> fieldIds = new HashSet<>();
-      fieldIds.addAll(beforeValues.keySet());
-      fieldIds.addAll(afterValues.keySet());
 
-      for (Long fieldId : fieldIds) {
-        RunSopFieldValue before = beforeValues.get(fieldId);
-        RunSopFieldValue after = afterValues.get(fieldId);
-        String beforeValue = before == null ? null : before.getValue();
-        String afterValue = after == null ? null : after.getValue();
-        if (!Objects.equals(beforeValue, afterValue)) {
-          RunSopFieldValue value = after == null ? before : after;
-          messages.add("SOP field " + getSopFieldLabel(value) + " changed from "
-              + getSopFieldValueLabel(beforeValue) + " to " + getSopFieldValueLabel(afterValue));
-        }
+    Set<Long> fieldIds = new HashSet<>();
+    fieldIds.addAll(beforeValues.keySet());
+    fieldIds.addAll(afterValues.keySet());
+
+    for (Long fieldId : fieldIds) {
+      RunSopFieldValue before = beforeValues.get(fieldId);
+      RunSopFieldValue after = afterValues.get(fieldId);
+      String beforeValue = before == null ? null : before.getValue();
+      String afterValue = after == null ? null : after.getValue();
+      if (!Objects.equals(beforeValue, afterValue)) {
+        RunSopFieldValue value = after == null ? before : after;
+        messages.add(getSopFieldLabel(value) + " (SOP): " + getSopFieldValueLabel(beforeValue)
+            + " → " + getSopFieldValueLabel(afterValue));
       }
     }
 
@@ -668,26 +661,17 @@ public class DefaultRunService implements RunService {
     return values;
   }
 
-  private static String getSopFieldValuesLabel(Map<Long, RunSopFieldValue> values) {
-    if (values.isEmpty()) {
-      return "blank";
-    }
-    return values.values().stream()
-        .map(value -> getSopFieldLabel(value) + ": " + getSopFieldValueLabel(value.getValue()))
-        .collect(Collectors.joining(", "));
-  }
-
-  private static Long getSopId(Sop sop) {
-    return sop == null ? null : sop.getId();
-  }
-
   private static String getSopFieldLabel(RunSopFieldValue value) {
     SopField field = value.getSopField();
     return field.getName() + (field.getUnits() == null ? "" : " (" + field.getUnits() + ")");
   }
 
+  private static String getSopFieldValueProperty(long fieldId) {
+    return "sopFieldValues_" + fieldId;
+  }
+
   private static String getSopFieldValueLabel(String value) {
-    return isStringBlankOrNull(value) ? "blank" : "'" + value + "'";
+    return isStringBlankOrNull(value) ? "n/a" : value;
   }
 
 

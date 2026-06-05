@@ -687,6 +687,31 @@ FormUtils = (function ($) {
           triggerUpdate(field);
         }
       },
+      rewriteSection: function (title, fields) {
+        var section = findSection(sections, title);
+        section.fields = filterFields(fields);
+
+        var sectionId = makeSectionId(containerId, section);
+        var sectionHeader = $("#" + sectionId + "Header");
+        var sectionBody = $("#" + sectionId);
+        var placeholder = $("<span>");
+
+        if (sectionHeader.length) {
+          placeholder.insertBefore(sectionHeader);
+        } else if (sectionBody.length) {
+          placeholder.insertBefore(sectionBody);
+        } else {
+          $("#" + containerId).append(placeholder);
+        }
+
+        sectionHeader.remove();
+        sectionBody.remove();
+
+        if (section.fields.length) {
+          writeSection($("#" + containerId), section, object, form, placeholder);
+        }
+        placeholder.remove();
+      },
       save: function (postSaveCallback) {
         validateAndSave(
           containerId,
@@ -794,6 +819,19 @@ FormUtils = (function ($) {
       throw new Error("Multiple fields found for data property: " + dataProperty);
     }
     return fields[0];
+  }
+
+  function findSection(sections, title) {
+    var matchingSections = sections.filter(function (section) {
+      return section.title === title;
+    });
+
+    if (!matchingSections.length) {
+      throw new Error("No section found with title: " + title);
+    } else if (matchingSections.length > 1) {
+      throw new Error("Multiple sections found with title: " + title);
+    }
+    return matchingSections[0];
   }
 
   function sortChanges(a, b) {
@@ -959,11 +997,10 @@ FormUtils = (function ($) {
         return !section.hasOwnProperty("include") || section.include;
       })
       .forEach(function (section) {
-        var fields = section.fields.filter(function (field) {
-          return !field.hasOwnProperty("include") || field.include;
-        });
+        var fields = filterFields(section.fields);
         if (fields.length) {
           filtered.push({
+            id: section.id,
             title: section.title,
             fields: fields,
           });
@@ -972,8 +1009,22 @@ FormUtils = (function ($) {
     return filtered;
   }
 
-  function writeSection(container, section, object, form) {
-    container.append($("<h2>").text(section.title));
+  function filterFields(fields) {
+    return fields.filter(function (field) {
+      return !field.hasOwnProperty("include") || field.include;
+    });
+  }
+
+  function writeSection(container, section, object, form, beforeElement) {
+    var sectionId = makeSectionId(container.attr("id"), section);
+    var header = $("<h2>")
+      .attr("id", sectionId + "Header")
+      .text(section.title);
+    if (beforeElement) {
+      header.insertBefore(beforeElement);
+    } else {
+      container.append(header);
+    }
     var tbody = $("<tbody>");
 
     section.fields.forEach(function (field) {
@@ -983,9 +1034,14 @@ FormUtils = (function ($) {
       tbody.append(tr);
     });
 
-    container.append(
-      $("<div>").attr("id", section.id).append($("<table>").addClass("in").append(tbody))
-    );
+    var sectionBody = $("<div>")
+      .attr("id", sectionId)
+      .append($("<table>").addClass("in").append(tbody));
+    if (beforeElement) {
+      sectionBody.insertBefore(beforeElement);
+    } else {
+      container.append(sectionBody);
+    }
 
     var containerId = container.attr("id");
     section.fields.forEach(function (field) {
@@ -1003,6 +1059,10 @@ FormUtils = (function ($) {
         }
       }
     });
+  }
+
+  function makeSectionId(containerId, section) {
+    return section.id || containerId + "_" + section.title.replace(/\W/g, "") + "Section";
   }
 
   function makeFieldLabel(field) {
