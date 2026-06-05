@@ -116,6 +116,9 @@ public class SampleSheets {
             input.getPoolLayout().forEach((instrumentPos, poolsByPartition) -> {
               String realPos = Objects.equals(instrumentPos, DEFAULT_INSTRUMENT_POS) ? null : instrumentPos;
               poolsByPartition.forEach((partitionNumber, pool) -> {
+                if (pool == null) {
+                  return;
+                }
                 pool.getPoolContents().forEach(poolElement -> {
                   StringBuilder sb = new StringBuilder();
                   for (SampleSheetFieldSource source : field.getSources()) {
@@ -135,6 +138,9 @@ public class SampleSheets {
             input.getPoolLayout().forEach((instrumentPos, poolsByPartition) -> {
               String realPos = Objects.equals(instrumentPos, DEFAULT_INSTRUMENT_POS) ? null : instrumentPos;
               poolsByPartition.forEach((partitionNumber, pool) -> {
+                if (pool == null) {
+                  return;
+                }
                 pool.getPoolContents().forEach(poolElement -> {
                   if (!includedAliquotIds.add(poolElement.getAliquot().getId())) {
                     return;
@@ -253,7 +259,7 @@ public class SampleSheets {
         return getMultiValue(source, pools, SampleSheets::getPoolValue);
       case LIBRARY_ALIQUOT:
         List<ListLibraryAliquotView> aliquots = input.getPoolLayout().values().stream()
-            .flatMap(map -> map.values().stream())
+            .flatMap(map -> map.values().stream().filter(Objects::nonNull))
             .flatMap(pool -> pool.getPoolContents() == null ? Stream.empty() : pool.getPoolContents().stream())
             .map(PoolElement::getAliquot)
             .toList();
@@ -288,9 +294,11 @@ public class SampleSheets {
       case PARTITION:
         return getMultiValue(source, poolsByPartition.keySet(), SampleSheets::getPartitionValue);
       case POOL:
-        return getMultiValue(source, poolsByPartition.values(), SampleSheets::getPoolValue);
+        return getMultiValue(source, poolsByPartition.values().stream().filter(Objects::nonNull).toList(),
+            SampleSheets::getPoolValue);
       case LIBRARY_ALIQUOT:
         List<ListLibraryAliquotView> aliquots = poolsByPartition.values().stream()
+            .filter(Objects::nonNull)
             .flatMap(pool -> pool.getPoolContents() == null ? Stream.empty() : pool.getPoolContents().stream())
             .map(PoolElement::getAliquot)
             .toList();

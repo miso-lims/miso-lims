@@ -130,7 +130,10 @@ public class SampleSheetRestController extends AbstractRestController {
           throw new RestException("Partition number %d is invalid for the %s container model"
               .formatted(partitionAndPoolId.getKey(), containerModel.getAlias()), Status.BAD_REQUEST);
         }
-        Pool pool = RestUtils.retrieve("pool", partitionAndPoolId.getValue(), poolService, Status.BAD_REQUEST);
+        Pool pool = null;
+        if (partitionAndPoolId.getValue() != null) {
+          pool = RestUtils.retrieve("pool", partitionAndPoolId.getValue(), poolService, Status.BAD_REQUEST);
+        }
         poolsByPartition.put(partitionAndPoolId.getKey(), pool);
       }
     }
