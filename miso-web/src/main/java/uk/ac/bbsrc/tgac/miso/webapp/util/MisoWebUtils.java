@@ -60,7 +60,6 @@ public class MisoWebUtils {
       try {
         File misoDir = new File(baseStoragePath);
         if (LimsUtils.checkDirectory(misoDir, true)) {
-          LimsUtils.checkDirectory(new File(baseStoragePath, "log"), true);
           LimsUtils.checkDirectory(new File(baseStoragePath, "temp"), true);
           if (LimsUtils.checkDirectory(new File(fileStoragePath), true)) {
             LimsUtils.checkDirectory(new File(fileStoragePath, "submission"), true);
