@@ -1135,7 +1135,7 @@ INSERT INTO SampleSheet(sampleSheetId, name, platformType, parameters, sections)
         "value": "true"
       },
       {
-        "vaue": "false"
+        "value": "false"
       }
     ]
   }

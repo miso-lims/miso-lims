@@ -39,14 +39,14 @@ public enum SequencingParametersProperty {
   MOVIE_TIME("Movie Time") {
     @Override
     public String extract(SequencingParameters sequencingParameters) {
-      return Objects.toString(sequencingParameters.getMovieTime());
+      return Objects.toString(sequencingParameters.getMovieTime(), null);
     }
   },
 
   FLOWS("Flows") {
     @Override
     public String extract(SequencingParameters sequencingParameters) {
-      return Objects.toString(sequencingParameters.getFlows());
+      return Objects.toString(sequencingParameters.getFlows(), null);
     }
   };
 

@@ -151,7 +151,7 @@ public class SampleSheetRestController extends AbstractRestController {
   }
 
   private void validateInstrumentPosition(InstrumentModel model, String position) {
-    if (model.getPositions() != null || !model.getPositions().isEmpty()) {
+    if (model.getPositions() != null && !model.getPositions().isEmpty()) {
       for (InstrumentPosition instrumentPosition : model.getPositions()) {
         if (Objects.equals(instrumentPosition.getAlias(), position)) {
           return;

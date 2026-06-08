@@ -3,7 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet;
 public enum SampleSheetFieldCommonSource {
 
   LIBRARY_ALIQUOT("Library Aliquot"), //
-  POOL("POOL"), //
+  POOL("Pool"), //
   INSTRUMENT_MODEL("Instrument Model"), //
   INSTRUMENT_POSITION("Instrument Position"), //
   PARTITION("Partition"), //
