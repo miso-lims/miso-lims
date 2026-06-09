@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
@@ -67,9 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingOrderSummaryViewService;
-import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
-import uk.ac.bbsrc.tgac.miso.core.util.IlluminaExperiment;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
@@ -130,101 +125,6 @@ public class PoolRestController extends AbstractRestController {
     }
   }
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  public static class SampleSheetRequest {
-    private String customIndexPrimer;
-    private String customRead1Primer;
-    private String customRead2Primer;
-    private String dragenVersion;
-    private String experimentType;
-    private String fastqCompressionFormat;
-    private String genomeFolder;
-    private List<Long> poolIds;
-    private long sequencingParametersId;
-    private String trimUMI;
-
-
-    public String getCustomIndexPrimer() {
-      return customIndexPrimer;
-    }
-
-    public void setCustomRead1Primer(String customRead1Primer) {
-      this.customRead1Primer = customRead1Primer;
-    }
-
-    public String getCustomRead2Primer() {
-      return customRead2Primer;
-    }
-
-    public String getDragenVersion() {
-      return dragenVersion;
-    }
-
-    public String getExperimentType() {
-      return experimentType;
-    }
-
-    public String getFastQCompressionFormat() {
-      return fastqCompressionFormat;
-    }
-
-    public String getGenomeFolder() {
-      return genomeFolder;
-    }
-
-    public List<Long> getPoolIds() {
-      return poolIds;
-    }
-
-    public long getSequencingParametersId() {
-      return sequencingParametersId;
-    }
-
-    public String getTrimUMI() {
-      return trimUMI;
-    }
-
-    public void setCustomIndexPrimer(String customIndexPrimer) {
-      this.customIndexPrimer = customIndexPrimer;
-    }
-
-    public String getCustomRead1Primer() {
-      return customRead1Primer;
-    }
-
-    public void setCustomRead2Primer(String customRead2Primer) {
-      this.customRead2Primer = customRead2Primer;
-    }
-
-    public void setDragenVersion(String dragenVersion) {
-      this.dragenVersion = dragenVersion;
-    }
-
-    public void setExperimentType(String experimentType) {
-      this.experimentType = experimentType;
-    }
-
-    public void setFastqCompressionFormat(String fastqCompressionFormat) {
-      this.fastqCompressionFormat = fastqCompressionFormat;
-    }
-
-    public void setGenomeFolder(String genomeFolder) {
-      this.genomeFolder = genomeFolder;
-    }
-
-    public void setPoolIds(List<Long> poolIds) {
-      this.poolIds = poolIds;
-    }
-
-    public void setSequencingParametersId(long sequencingParametersId) {
-      this.sequencingParametersId = sequencingParametersId;
-    }
-
-    public void setTrimUMI(String trimUMI) {
-      this.trimUMI = trimUMI;
-    }
-  }
-
   private final JQueryDataTableBackend<ListPoolView, PoolDto> jQueryBackend = new JQueryDataTableBackend<>() {
 
     @Override
@@ -253,8 +153,6 @@ public class PoolRestController extends AbstractRestController {
   private ListLibraryAliquotViewService listLibraryAliquotViewService;
   @Autowired
   private SequencingOrderSummaryViewService sequencingOrderCompletionService;
-  @Autowired
-  private SequencingParametersService sequencingParametersService;
   @Autowired
   private SampleService sampleService;
   @Autowired
@@ -657,45 +555,6 @@ public class PoolRestController extends AbstractRestController {
       HttpServletRequest request,
       HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
     return childFinder.list(ids, category);
-  }
-
-  @Value("${miso.pools.samplesheet.novaSeqXSeries:Illumina NovaSeq x Plus}")
-  public String novaSeqXSeriesMapping;
-
-  @PostMapping(value = "/samplesheet")
-  @ResponseBody
-  public HttpEntity<byte[]> samplesheet(@RequestBody SampleSheetRequest request,
-      HttpServletRequest httpRequest,
-      HttpServletResponse response, UriComponentsBuilder uriBuilder) throws IOException {
-    IlluminaExperiment experiment = IlluminaExperiment.valueOf(request.getExperimentType());
-    SequencingParameters parameters = sequencingParametersService.get(request.getSequencingParametersId());
-
-    List<Pool> pools = new ArrayList<>();
-    List<Integer> lanes = new ArrayList<>();
-    var lane = 1;
-    for (Long poolId : request.getPoolIds()) {
-      if (poolId != null) {
-        lanes.add(lane);
-        Pool pool = poolService.get(poolId);
-        pools.add(pool);
-      }
-      lane += 1;
-    }
-    String filename = String.format("%s-%s.csv", experiment.name(),
-        pools.stream().map(Pool::getAlias).collect(Collectors.joining("-")));
-    MisoWebUtils.addAttachmentContentDisposition(response, filename);
-    return new HttpEntity<>(experiment
-        .makeSampleSheet(request.getGenomeFolder(), parameters, request.getCustomRead1Primer(),
-            request.getCustomIndexPrimer(),
-            request.getCustomRead2Primer(),
-            pools,
-            lanes,
-            request.getDragenVersion(),
-            request.getTrimUMI(),
-            request.getFastQCompressionFormat(),
-            novaSeqXSeriesMapping)
-        .getBytes(StandardCharsets.UTF_8));
-
   }
 
   @PostMapping("/bulk")

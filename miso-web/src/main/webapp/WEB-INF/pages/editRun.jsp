@@ -12,7 +12,7 @@
 </h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
   <c:if test="${run.id != 0}">
-    <c:forEach items="<%=uk.ac.bbsrc.tgac.miso.core.util.SampleSheet.values()%>" var="sheet">
+    <c:forEach items="<%=uk.ac.bbsrc.tgac.miso.core.util.RunSampleSheet.values()%>" var="sheet">
       <c:if test="${sheet.allowedFor(run)}">
         <a href="<c:url value='/rest/runs/${run.id}/samplesheet/${sheet.name()}'/>" class="ui-button ui-state-default">Download Sample Sheet (${sheet.alias()})</a>
       </c:if>

@@ -51,9 +51,6 @@ public class PoolRestControllerST extends AbstractST {
       200002, 200003, 200004, 200005, 200006,
       5004, 5005, 5006, 5007, 5101, 5102, 5103, 5104, 5105, 701, 702, 801, 802, 803, 804, 2201);
 
-  @Value("${miso.pools.samplesheet.dragenVersion}")
-  private String dragenVersion;
-
   @Test
   public void testGetById() throws Exception {
     baseTestGetById(CONTROLLER_BASE, 1)
@@ -399,26 +396,6 @@ public class PoolRestControllerST extends AbstractST {
         .andExpect(jsonPath("$[0].id").value(1))
         .andExpect(jsonPath("$[0].name").value("RUN1"))
         .andExpect(jsonPath("$[0].instrumentId").value(1));
-  }
-
-  @Test
-  public void testGetSamplesheet() throws Exception {
-    SampleSheetRequest req = new SampleSheetRequest();
-    req.setPoolIds(Arrays.asList(1L, 501L));
-    req.setExperimentType("CLONE_CHECKING");
-    req.setSequencingParametersId(2L);
-    req.setDragenVersion(dragenVersion);
-
-    String response = getMockMvc()
-        .perform(post(CONTROLLER_BASE + "/samplesheet").content(makeJson(req))
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andReturn().getResponse().getContentAsString();
-
-    List<String> sectionTitles = Arrays.asList("[Header]", "[Reads]", "[Settings]", "[Data]");
-    for (String title : sectionTitles) {
-      assertTrue(response.contains(title));
-    }
   }
 
   @Test

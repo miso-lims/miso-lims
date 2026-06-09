@@ -267,6 +267,12 @@ var Utils = Utils || {
             return;
           }
           input = document.createElement("SELECT");
+          if (field.nullLabel) {
+            var option = document.createElement("OPTION");
+            option.text = field.nullLabel;
+            option.value = -1;
+            input.appendChild(option);
+          }
           field.values.forEach(function (value, index) {
             var option = document.createElement("OPTION");
             option.text = field.getLabel ? field.getLabel(value) : value;
@@ -278,10 +284,15 @@ var Utils = Utils || {
             }
           });
           input.onchange = function () {
-            output[field.property] = field.values[parseInt(input.value)];
+            var selectedIndex = parseInt(input.value);
+            if (selectedIndex === -1) {
+              output[field.property] = null;
+            } else {
+              output[field.property] = field.values[selectedIndex];
+            }
           };
           if (!field.value) {
-            output[field.property] = field.values[0];
+            output[field.property] = field.nullLabel || field.values[0];
           }
           break;
         case "text":
@@ -701,7 +712,7 @@ var Utils = Utils || {
     request.open(data ? "POST" : "GET", url);
     request.responseType = "blob";
     request.setRequestHeader("Content-Type", "application/json; charset=utf8");
-    request.setRequestHeader("Accept", "application/octet-stream");
+    request.setRequestHeader("Accept", "application/octet-stream, application/json");
     request.onreadystatechange = function () {
       if (request.readyState === 4) {
         dialog.dialog("close");

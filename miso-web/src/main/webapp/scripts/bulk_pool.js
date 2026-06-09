@@ -143,7 +143,7 @@ BulkTarget.pool = (function ($) {
         {
           name: "Create Samplesheet",
           action: function (pools) {
-            createSamplesheet(pools, config);
+            createSampleSheet(pools, config);
           },
         },
         BulkUtils.actions.parents(
@@ -332,7 +332,7 @@ BulkTarget.pool = (function ($) {
     },
   };
 
-  function createSamplesheet(pools, config) {
+  function createSampleSheet(pools) {
     var platformTypes = Utils.array.deduplicateString(
       pools.map(function (pool) {
         return pool.platformType;
@@ -342,10 +342,6 @@ BulkTarget.pool = (function ($) {
       Utils.showOkDialog("Error", [
         "Cannot create a sample sheet from pools for different platforms.",
       ]);
-      return;
-    }
-    if (platformTypes[0] != "ILLUMINA") {
-      Utils.showOkDialog("Error", ["Can only create sample sheets for Illumina sequencers."]);
       return;
     }
     var instrumentModels = Constants.instrumentModels.filter(function (model) {
@@ -362,179 +358,273 @@ BulkTarget.pool = (function ($) {
       ]);
       return;
     }
-    function showCreateTwoDialog(modelId, partitionCount, experimentType) {
-      var dialogFields = [
-        {
-          property: "sequencingParameters",
-          label: "Sequencing Parameters",
-          required: true,
-          type: "select",
-          getLabel: Utils.array.getName,
-          values: Constants.sequencingParameters.filter(function (param) {
-            return param.instrumentModelId == modelId;
-          }),
-        },
-        {
-          property: "genomeFolder",
-          type: "text",
-          label: "Genome Folder",
-          value: config.genomeFolder,
-          required: true,
-        },
-        {
-          property: "customRead1Primer",
-          type: "text",
-          label: "Custom Read 1 Primer Well",
-          required: false,
-        },
-        {
-          property: "customIndexPrimer",
-          type: "text",
-          label: "Custom Index Primer Well",
-          required: false,
-        },
-        {
-          property: "customRead2Primer",
-          type: "text",
-          label: "Custom Read 2 Primer Well",
-          required: false,
-        },
-      ];
+    showSampleSheetInstrumentSelectDialog(pools, instrumentModels, platformTypes[0]);
+  }
 
-      var instrument = instrumentModels.find(function (m) {
-        return m.id === modelId;
-      });
-      for (var i = 0; i < partitionCount; i++) {
-        dialogFields.push({
-          property: "pool_" + (i + 1),
-          label:
-            Utils.array.findUniqueOrThrow(function (pt) {
-              return pt.name === instrument.platformType;
-            }, Constants.platformTypes).partitionName +
-            " " +
-            (i + 1),
-          required: false,
-          type: "select",
-          getLabel: Utils.array.getAlias,
-          values: pools.concat([{ value: null, alias: "empty" }]),
-        });
-      }
-
-      if (experimentType.dragen) {
-        dialogFields.push(
-          {
-            property: "dragenVersion",
-            type: "text",
-            label: "DRAGEN Version",
-            value: config.dragenVersion,
-            required: true,
-          },
-          {
-            property: "fastqCompressionFormat",
-            label: "FastQ Compression Format",
-            required: true,
-            type: "select",
-            getLabel: function (type) {
-              return type.description;
-            },
-            values: config.compressionFormats,
-            value: config.compressionFormat,
-          },
-          {
-            property: "trimUMI",
-            type: "select",
-            label: "Trim UMI?",
-            values: ["true", "false"],
-            required: true,
-          }
-        );
-      }
-
-      Utils.showDialog(
-        "Create Samplesheet",
-        "Download",
-        dialogFields,
-        function (result) {
-          var poolIds = [];
-          for (var i = 0; i < partitionCount; i++) {
-            poolIds.push(result["pool_" + (i + 1)]);
-          }
-          Utils.ajaxDownloadWithDialog(Urls.rest.pools.samplesheet, {
-            customRead1Primer: result.customRead1Primer,
-            customIndexPrimer: result.customIndexPrimer,
-            customRead2Primer: result.customRead2Primer,
-            dragenVersion: result.dragenVersion || null,
-            trimUMI: result.trimUMI || null,
-            fastqCompressionFormat: result.fastqCompressionFormat
-              ? result.fastqCompressionFormat.description
-              : null,
-            experimentType: experimentType.name,
-            genomeFolder: result.genomeFolder,
-            sequencingParametersId: result.sequencingParameters.id,
-            poolIds: poolIds.map(Utils.array.getId),
-          });
-        },
-        null
-      );
-    }
-    function showCreateDialog(modelId, partitionCount) {
-      Utils.showDialog(
-        "Create Samplesheet",
-        "Continue",
-        [
-          {
-            property: "experimentType",
-            label: "Type",
-            required: true,
-            type: "select",
-            getLabel: function (type) {
-              return type.description;
-            },
-            values: Constants.illuminaExperimentTypes,
-          },
-        ],
-        function (result) {
-          showCreateTwoDialog(modelId, partitionCount, result.experimentType);
-        },
-        null
-      );
-    }
-    function showContainersDialog(modelId) {
-      Utils.showWizardDialog(
-        "Create Samplesheet",
-        Constants.containerModels
-          .filter(function (m) {
-            return m.instrumentModelIds.indexOf(modelId) !== -1 && !m.archived;
-          })
-          .sort(Utils.sorting.standardSort("alias"))
-          .map(function (model) {
-            return {
-              name: model.alias,
-              handler: function () {
-                showCreateDialog(modelId, model.partitionCount);
-              },
-            };
-          })
-      );
-    }
+  function showSampleSheetInstrumentSelectDialog(pools, instrumentModels, platformType) {
     Utils.showWizardDialog(
-      "Create Samplesheet",
+      "Create Sample Sheet",
       Constants.instrumentModels
         .filter(function (p) {
-          return (
-            p.platformType === platformTypes[0] && p.instrumentType === "SEQUENCER" && p.active
-          );
+          return p.platformType === platformType && p.instrumentType === "SEQUENCER" && p.active;
         })
         .sort(Utils.sorting.standardSort("alias"))
         .map(function (instrumentModel) {
           return {
             name: instrumentModel.alias,
             handler: function () {
-              showContainersDialog(instrumentModel.id);
+              Utils.ajaxWithDialog(
+                "Fetching sample sheets",
+                "GET",
+                Urls.rest.sampleSheets.list +
+                  "?" +
+                  $.param({ platform: instrumentModel.platformType }),
+                null,
+                function (sampleSheets) {
+                  if (sampleSheets.length) {
+                    showSampleSheetSelectDialog(pools, instrumentModel, sampleSheets);
+                  } else {
+                    var platformTypeObject = Utils.array.findUniqueOrThrow(function (x) {
+                      return x.name === platformType;
+                    }, Constants.platformTypes);
+                    Utils.showOkDialog("Error", [
+                      "There are no sample sheets definitions for " + platformTypeObject.key,
+                    ]);
+                  }
+                }
+              );
             },
           };
         })
     );
+  }
+
+  function showSampleSheetSelectDialog(pools, instrumentModel, sampleSheets) {
+    var platformType = Utils.array.findUniqueOrThrow(function (x) {
+      return x.name === instrumentModel.platformType;
+    }, Constants.platformTypes);
+    var fields = [
+      {
+        label: "Sample Sheet",
+        property: "sampleSheet",
+        type: "select",
+        required: true,
+        values: sampleSheets,
+        getLabel: Utils.array.getName,
+      },
+      {
+        label: platformType.containerName + " Model",
+        property: "containerModel",
+        type: "select",
+        required: true,
+        values: Constants.containerModels.filter(function (model) {
+          return model.instrumentModelIds.indexOf(instrumentModel.id) !== -1 && !model.archived;
+        }),
+        getLabel: Utils.array.getAlias,
+      },
+    ];
+    if (instrumentModel.numContainers > 1) {
+      instrumentModel.positions.forEach(function (position) {
+        fields.push({
+          label: "Load position " + position.alias,
+          property: "loadPosition_" + position.alias,
+          type: "checkbox",
+        });
+      });
+    }
+    Utils.showDialog("Create Sample Sheet", "Next", fields, function (input) {
+      var selectedPositions = null;
+      if (instrumentModel.numContainers > 1) {
+        selectedPositions = [];
+        instrumentModel.positions.forEach(function (position) {
+          if (input["loadPosition_" + position.alias]) {
+            selectedPositions.push([position.alias]);
+          }
+        });
+        if (!selectedPositions.length) {
+          Utils.showOkDialog("Error", ["No instrument positions selected."]);
+          return;
+        }
+      }
+      showSampleSheetParametersDialog(
+        pools,
+        input.sampleSheet,
+        platformType,
+        instrumentModel,
+        selectedPositions,
+        input.containerModel
+      );
+    });
+  }
+
+  function showSampleSheetParametersDialog(
+    pools,
+    sampleSheet,
+    platformType,
+    instrumentModel,
+    selectedPositions,
+    containerModel
+  ) {
+    // collect seq params (single or per position), pools per partition, custom sheet params, and optional sections
+    var fields = [];
+    if (platformType.containerLevelParameters) {
+      selectedPositions.forEach(function (position) {
+        fields.push({
+          label: position + " Sequencing Parameters",
+          property: "position_" + position + "_sequencingParameters",
+          required: true,
+          type: "select",
+          values: Constants.sequencingParameters.filter(function (param) {
+            return param.instrumentModelId == instrumentModel.id;
+          }),
+          getLabel: Utils.array.getName,
+        });
+      });
+    } else {
+      fields.push({
+        label: "Sequencing Parameters",
+        property: "sequencingParameters",
+        required: true,
+        type: "select",
+        values: Constants.sequencingParameters.filter(function (param) {
+          return param.instrumentModelId == instrumentModel.id;
+        }),
+        getLabel: Utils.array.getName,
+      });
+    }
+    if (selectedPositions) {
+      selectedPositions.forEach(function (position) {
+        for (var i = 1; i <= containerModel.partitionCount; i++) {
+          fields.push({
+            label: position + " " + platformType.partitionName + " " + i,
+            property: "position_" + position + "_partition_" + i + "_pool",
+            type: "select",
+            values: pools,
+            getLabel: Utils.array.getAlias,
+            nullLabel: "Empty",
+          });
+        }
+      });
+    } else {
+      for (var i = 1; i <= containerModel.partitionCount; i++) {
+        fields.push({
+          label: platformType.partitionName + " " + i,
+          property: "partition_" + i + "_pool",
+          type: "select",
+          values: pools,
+          getLabel: Utils.array.getAlias,
+          nullLabel: "Empty",
+          value: pools.length === 1 ? pools[0].alias : "Empty",
+        });
+      }
+    }
+    if (sampleSheet.parameters) {
+      sampleSheet.parameters.forEach(function (parameter) {
+        var template = {
+          label: parameter.name,
+          property: parameter.name,
+          value: parameter.defaultValue,
+        };
+        switch (parameter.type) {
+          case "TEXT":
+            template.type = "text";
+            break;
+          case "INT":
+            template.type = "int";
+            break;
+          case "DECIMAL":
+            template.type = "float";
+            break;
+          case "DATE":
+            template.type = "date";
+            break;
+          case "DROPDOWN":
+            template.type = "select";
+            template.values = parameter.source;
+            template.getLabel = function (x) {
+              return x.hasOwnProperty("label") ? x.label : x.value;
+            };
+            break;
+          default:
+            throw new Error("Unexpected parameter type: " + parameter.type);
+        }
+        if (parameter.multivalue === null) {
+          fields.push(template);
+        } else if (parameter.multivalue === "INSTRUMENT_POSITION") {
+          selectedPositions.forEach(function (position) {
+            var field = Object.assign({}, template);
+            field.label = position + " " + field.label;
+            field.property = "position_" + position + "_" + field.property;
+            fields.push(field);
+          });
+        } else {
+          throw new Error("Unexpected parameter multivalue type: " + parameter.multivalue);
+        }
+      });
+    }
+    sampleSheet.sections.forEach(function (section) {
+      if (section.optional) {
+        fields.push({
+          label: "Include " + section.name,
+          property: "includeSection_" + section.name,
+          type: "checkbox",
+        });
+      }
+    });
+    Utils.showDialog("Create Sample Sheet", "Generate", fields, function (results) {
+      var data = {
+        instrumentModelId: instrumentModel.id,
+        containerModelId: containerModel.id,
+        customParameters: {},
+        poolIdsByInstrumentPositionAndPartition: {},
+        includeSections: {},
+      };
+      if (platformType.containerLevelParameters) {
+        var paramIdsByPosition = {};
+        selectedPositions.forEach(function (position) {
+          paramIdsByPosition[position] = results["position_" + position + "_sequencingParameters"];
+        });
+        data.sequencingParametersIdsByInstrumentPosition = paramIdsByPosition;
+      } else {
+        data.sequencingParametersId = results.sequencingParameters.id;
+      }
+      if (selectedPositions) {
+        selectedPositions.forEach(function (position) {
+          data.poolIdsByInstrumentPositionAndPartition[position] = {};
+          for (var i = 1; i <= containerModel.partitionCount; i++) {
+            var pool = results["position_" + position + "_partition_" + i + "_pool"];
+            data.poolIdsByInstrumentPositionAndPartition[position][i] = pool ? pool.id : null;
+          }
+        });
+      } else {
+        data.poolIdsByInstrumentPositionAndPartition["*"] = {};
+        for (var i = 1; i <= containerModel.partitionCount; i++) {
+          var pool = results["partition_" + i + "_pool"];
+          data.poolIdsByInstrumentPositionAndPartition["*"][i] = pool ? pool.id : null;
+        }
+      }
+      sampleSheet.parameters.forEach(function (parameter) {
+        if (parameter.multivalue === null) {
+          data.customParameters[parameter.name] =
+            parameter.type === "DROPDOWN"
+              ? results[parameter.name]["value"]
+              : results[parameter.name];
+        } else {
+          data.customParameters[parameter.name] = {};
+          selectedPositions.forEach(function (position) {
+            data.customParameters[parameter.name][position] =
+              results["position_" + position + "_" + parameter.name];
+          });
+        }
+      });
+      sampleSheet.sections.forEach(function (section) {
+        if (section.optional) {
+          var include = results["includeSection_" + section.name];
+          data.includeSections[section.name] = include;
+        }
+      });
+      Utils.ajaxDownloadWithDialog(Urls.rest.sampleSheets.generate(sampleSheet.id), data);
+    });
   }
 
   function switchToPoolsTable(api, config) {
