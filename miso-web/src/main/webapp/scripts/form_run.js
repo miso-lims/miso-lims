@@ -2,8 +2,6 @@ if (typeof FormTarget === "undefined") {
   FormTarget = {};
 }
 FormTarget.run = (function ($) {
-  var sopSectionTitle = "SOP Information";
-
   /*
    * Expected config {
    *   isAdmin: boolean,
@@ -347,72 +345,10 @@ FormTarget.run = (function ($) {
             },
           ]),
         },
-        {
-          title: sopSectionTitle,
-          fields: makeSopSectionFields(object, config.sops),
-        },
+        FormUtils.makeSopSection(object, config.sops),
       ];
     },
   };
-
-  function makeSopSectionFields(object, sops) {
-    sops = sops || [];
-    object.sopFieldValues = object.sopFieldValues || {};
-
-    return FormUtils.makeSopFields(object, sops, function (newValue, form) {
-      var newSopId = newValue ? Number(newValue) : null;
-      var currentSopId = object.sopId ? Number(object.sopId) : null;
-      if (newSopId === currentSopId) {
-        return;
-      }
-
-      var changeSop = function () {
-        object.sopId = newSopId;
-        object.sopFieldValues = {};
-        form.rewriteSection(sopSectionTitle, makeSopSectionFields(object, sops));
-        form.markOtherChanges();
-      };
-
-      if (currentSopId) {
-        Utils.showConfirmDialog(
-          "Change SOP",
-          "Change SOP",
-          [
-            "Changing the SOP will clear all values entered for the current SOP fields.",
-            "Do you want to continue?",
-          ],
-          changeSop,
-          function () {
-            form.updateField("sopId", {
-              value: currentSopId,
-            });
-          }
-        );
-      } else {
-        changeSop();
-      }
-    }).concat(makeRunSopValueFields(sops, object.sopId));
-  }
-
-  function makeRunSopValueFields(sops, sopId) {
-    if (!sopId) {
-      return [];
-    }
-
-    var sop = sops.filter(Utils.array.idPredicate(Number(sopId)))[0];
-    if (!sop || !sop.fields) {
-      return [];
-    }
-
-    return sop.fields.map(function (field) {
-      return {
-        title: field.name + (field.units ? " (" + field.units + ")" : ""),
-        data: "sopFieldValues." + field.id,
-        type: field.fieldType === "NUMBER" ? "decimal" : "text",
-        maxLength: 255,
-      };
-    });
-  }
 
   function getStatus(label) {
     return Utils.array.findUniqueOrThrow(function (item) {

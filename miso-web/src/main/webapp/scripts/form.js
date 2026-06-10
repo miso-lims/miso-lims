@@ -70,6 +70,7 @@ FormUtils = (function ($) {
    *       * 'source' (array of objects or strings)
    *       * 'label' (string)
    *       * 'link' (URL string)
+   *   rewriteSection: function(title, fields) replaces the fields in a section and re-renders it
    *   save: function(postSaveCallback) save the form data. postSaveCallback is a function(data) where data is the object returned from
    *       the save operation
    * }
@@ -417,6 +418,14 @@ FormUtils = (function ($) {
       ];
     },
 
+    makeSopSection: function (object, sops, title) {
+      title = title || "SOP Information";
+      return {
+        title: title,
+        fields: makeSopSectionFields(object, sops, title),
+      };
+    },
+
     makeDnaSizeField: function () {
       return {
         title: "Size (bp)",
@@ -688,8 +697,10 @@ FormUtils = (function ($) {
         }
       },
       rewriteSection: function (title, fields) {
-        var section = findSection(sections, title);
-        section.fields = filterFields(fields);
+        var section = Utils.array.findUniqueOrThrow(function (section) {
+          return section.title === title;
+        }, sections);
+        section.fields = filterIncludedFields(fields);
 
         var sectionId = makeSectionId(containerId, section);
         var sectionHeader = $("#" + sectionId + "Header");
@@ -819,19 +830,6 @@ FormUtils = (function ($) {
       throw new Error("Multiple fields found for data property: " + dataProperty);
     }
     return fields[0];
-  }
-
-  function findSection(sections, title) {
-    var matchingSections = sections.filter(function (section) {
-      return section.title === title;
-    });
-
-    if (!matchingSections.length) {
-      throw new Error("No section found with title: " + title);
-    } else if (matchingSections.length > 1) {
-      throw new Error("Multiple sections found with title: " + title);
-    }
-    return matchingSections[0];
   }
 
   function sortChanges(a, b) {
@@ -997,7 +995,7 @@ FormUtils = (function ($) {
         return !section.hasOwnProperty("include") || section.include;
       })
       .forEach(function (section) {
-        var fields = filterFields(section.fields);
+        var fields = filterIncludedFields(section.fields);
         if (fields.length) {
           filtered.push({
             id: section.id,
@@ -1009,7 +1007,7 @@ FormUtils = (function ($) {
     return filtered;
   }
 
-  function filterFields(fields) {
+  function filterIncludedFields(fields) {
     return fields.filter(function (field) {
       return !field.hasOwnProperty("include") || field.include;
     });
@@ -1063,6 +1061,65 @@ FormUtils = (function ($) {
 
   function makeSectionId(containerId, section) {
     return section.id || containerId + "_" + section.title.replace(/\W/g, "") + "Section";
+  }
+
+  function makeSopSectionFields(object, sops, title) {
+    sops = sops || [];
+    object.sopFieldValues = object.sopFieldValues || {};
+
+    return FormUtils.makeSopFields(object, sops, function (newValue, form) {
+      var newSopId = newValue ? Number(newValue) : null;
+      var currentSopId = object.sopId ? Number(object.sopId) : null;
+      if (newSopId === currentSopId) {
+        return;
+      }
+
+      var changeSop = function () {
+        object.sopId = newSopId;
+        object.sopFieldValues = {};
+        form.rewriteSection(title, makeSopSectionFields(object, sops, title));
+        form.markOtherChanges();
+      };
+
+      if (currentSopId) {
+        Utils.showConfirmDialog(
+          "Change SOP",
+          "Change SOP",
+          [
+            "Changing the SOP will clear all values entered for the current SOP fields.",
+            "Do you want to continue?",
+          ],
+          changeSop,
+          function () {
+            form.updateField("sopId", {
+              value: currentSopId,
+            });
+          }
+        );
+      } else {
+        changeSop();
+      }
+    }).concat(makeSopValueFields(sops, object.sopId));
+  }
+
+  function makeSopValueFields(sops, sopId) {
+    if (!sopId) {
+      return [];
+    }
+
+    var sop = sops.filter(Utils.array.idPredicate(Number(sopId)))[0];
+    if (!sop || !sop.fields) {
+      return [];
+    }
+
+    return sop.fields.map(function (field) {
+      return {
+        title: field.name + (field.units ? " (" + field.units + ")" : ""),
+        data: "sopFieldValues." + field.id,
+        type: field.fieldType === "NUMBER" ? "decimal" : "text",
+        maxLength: 255,
+      };
+    });
   }
 
   function makeFieldLabel(field) {
@@ -1167,16 +1224,16 @@ FormUtils = (function ($) {
   }
 
   function makeReadOnlyInput(inputId, field, value, item) {
-    var isLink = field.getLink && field.getLink(item);
-    var input = $(isLink ? "<a>" : "<span>").attr(
+    var link = field.getLink && field.getLink(item);
+    var input = $(link ? "<a>" : "<span>").attr(
       "id",
       inputId + (field.getDisplayValue ? "Label" : "")
     );
     if (value !== null) {
       input.text(value);
     }
-    if (isLink && Utils.getObjectField(item, field.data)) {
-      input.attr("href", field.getLink(item));
+    if (link) {
+      input.attr("href", link);
       if (field.openNewTab) {
         input.attr("target", "_blank").attr("rel", "noopener noreferrer");
       }

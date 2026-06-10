@@ -467,7 +467,7 @@ public class DefaultRunService implements RunService {
       Long fieldId = field == null ? null : field.getId();
 
       if (fieldId == null) {
-        errors.add(new ValidationError("SOP field does not belong to the selected SOP"));
+        errors.add(new ValidationError(getInvalidSopFieldMessage(value)));
         continue;
       }
       String property = getSopFieldValueProperty(fieldId);
@@ -478,7 +478,7 @@ public class DefaultRunService implements RunService {
           .orElse(null);
 
       if (sopField == null) {
-        errors.add(new ValidationError(property, "SOP field does not belong to the selected SOP"));
+        errors.add(new ValidationError(property, getInvalidSopFieldMessage(value)));
         continue;
       }
 
@@ -664,6 +664,15 @@ public class DefaultRunService implements RunService {
   private static String getSopFieldLabel(RunSopFieldValue value) {
     SopField field = value.getSopField();
     return field.getName() + (field.getUnits() == null ? "" : " (" + field.getUnits() + ")");
+  }
+
+  private static String getInvalidSopFieldMessage(RunSopFieldValue value) {
+    SopField field = value.getSopField();
+    String fieldLabel = field == null ? "unknown" : field.getName();
+    if (isStringBlankOrNull(fieldLabel) && field != null) {
+      fieldLabel = "ID " + field.getId();
+    }
+    return "SOP field '" + fieldLabel + "' does not belong to the selected SOP";
   }
 
   private static String getSopFieldValueProperty(long fieldId) {
