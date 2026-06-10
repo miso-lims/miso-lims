@@ -53,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.SopField;
+import uk.ac.bbsrc.tgac.miso.core.data.UltimaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
@@ -578,6 +579,8 @@ public class DefaultRunService implements RunService {
       applySolidChanges((SolidRun) target, (SolidRun) source);
     } else if (isOxfordNanoporeRun(target)) {
       applyOxfordNanoporeChanges((OxfordNanoporeRun) target, (OxfordNanoporeRun) source);
+    } else if (isUltimaRun(target)) {
+      applyUltimaChanges((UltimaRun) target, (UltimaRun) source);
     }
     // Source metrics will only be set when coming from Run Scanner
     if (source.getMetrics() != null) {
@@ -748,6 +751,12 @@ public class DefaultRunService implements RunService {
     target.setProtocolVersion(isStringEmptyOrNull(source.getProtocolVersion()) ? null : source.getProtocolVersion());
   }
 
+  private void applyUltimaChanges(UltimaRun target, UltimaRun source) {
+    target.setCompletedFlows(source.getCompletedFlows());
+    target.setExpectedFlows(source.getExpectedFlows());
+    target.setWaferShelf(source.getWaferShelf());
+  }
+
   /**
    * If any containers were added or removed from the run, generates and saves a single Run changelog
    * entry and one Container changelog entry for each Container affected. May be called before or
@@ -890,6 +899,7 @@ public class DefaultRunService implements RunService {
       case IONTORRENT:
       case PACBIO:
       case SOLID:
+      case ULTIMA:
         // Nothing to do
         break;
       default:

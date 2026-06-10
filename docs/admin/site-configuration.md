@@ -309,6 +309,18 @@ a space to separate.
 
 Interval in milliseconds to poll Run Scanner(s). Defaults to `300000` (5 minutes) if unspecified;
 
+### `miso.runscanner.httpBasicAuthUsername`
+
+Optional. Username for HTTP Basic authentication when accessing Run Scanner through an
+authentication-enabled proxy. Run Scanner does not provide built-in authentication, so this is
+only required when authentication is configured on the proxy.
+
+### `miso.runscanner.httpBasicAuthPassword`
+
+Optional. Password for HTTP Basic authentication when accessing Run Scanner through an
+authentication-enabled proxy. Run Scanner does not provide built-in authentication, so this is
+only required when authentication is configured on the proxy.
+
 ### `miso.boxscanner.servers`
 
 Config for Visionmate or DP5Mirage bulk barcode scanners. Enter in format 
@@ -419,21 +431,3 @@ Maximum number of mismatches to consider a near-duplicate index warning. Default
 ### `miso.pools.warning.index.mismatches.message`
 
 Warning label to display for near-duplicate indices. Defaults to "Near-Duplicate Indices" if unspecified.
-
-## Samplesheet Configurations
-
-### `miso.genomeFolder`
-
-The genomeFolder to be used when exporting sample sheets
-
-### `miso.pools.samplesheet.dragenVersion`
-
-The version of Illumina DRAGEN to be used when exporting sample sheets
-
-### `miso.pools.samplesheet.novaSeqXSeries`
-
-The instrument model alias that maps to the NovaSeqXSeries instrument
-
-### `miso.pools.samplesheet.compressionFormat`
-
-The fastq compression format to be used when exporting Illumina DRAGEN sample sheets. Currently available formats include "gzip" and "ora". Defaults to "gzip" if unspecified.

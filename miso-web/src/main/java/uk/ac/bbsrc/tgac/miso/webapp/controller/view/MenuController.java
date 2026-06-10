@@ -44,6 +44,8 @@ public class MenuController {
 
   @Value("${miso.genomeFolder:}")
   private String genomeFolder;
+  @Value("${security.saml.sp.registrationId:miso}")
+  private String samlRegistrationId;
 
   @Autowired
   private ApiKeyService apiKeyService;
@@ -62,6 +64,8 @@ public class MenuController {
   @RequestMapping("/login")
   public ModelAndView loginPage(ModelMap model,
       @RequestParam(name = "login_error", required = false) Integer loginError) {
+    model.put("samlLoginEnabled", "saml".equals(System.getProperty("security.method")));
+    model.put("samlRegistrationId", samlRegistrationId);
     return new ModelAndView("/WEB-INF/login.jsp", model);
   }
 

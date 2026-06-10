@@ -115,13 +115,14 @@ BulkUtils = (function ($) {
    *   getValueObject: function(row, dataProperty): get the object represented by the current cell
    *       value (for dropdown columns)
    *   getSourceData: function(rowIndex, dataProperty); get the backing data for a dropdown field
-   *   updateField: function(rowIndex, dataProperty, options). options may include
+   *   updateField: function(rowIndex, dataProperty, options, bulkRender). options may include
    *       * 'value' (string)
    *       * 'source' (array of objects)
    *       * 'required' (boolean)
    *       * 'disabled' (boolean)
    *       * 'formatter' (string)
    *       * 'type' (string; only 'decimal' and 'dropdown' supported)
+   *       bulkRender=true reduces render calls when updateData cannot be used.
    *   updateData: function(changes); update fields in bulk. Use this rather than multiple
    *       updateField calls to improve performance. changes is an array of arrays where the inner
    *       arrays have three elements - rowIndex, dataProperty, and newValue
@@ -185,6 +186,17 @@ BulkUtils = (function ($) {
       return td;
     },
   };
+
+    var bulkRenderQueue = [];
+    var bulkRenderTimer = null;
+
+    function setBulkRenderTimer(hot) {
+      clearTimeout(bulkRenderTimer);
+      bulkRenderTimer = setTimeout(function () {
+        var changes = bulkRenderQueue.splice(0);
+        hot.setDataAtCell(changes);
+      }, 50);
+    }
 
   return {
     makeTable: function (target, config, data) {
@@ -2000,7 +2012,7 @@ BulkUtils = (function ($) {
       extendApi(onChangeApi, hot, columns, config, data);
       var dataChanges = [];
       var storingChanges = true;
-      onChangeApi.updateField = function (rowIndex, dataProperty, changes) {
+      onChangeApi.updateField = function (rowIndex, dataProperty, changes, bulkRender) {
         if (storingChanges && changes.hasOwnProperty("value") && changes.value !== undefined) {
           var colIndex = getColumnIndex(dataProperty, columns, isColumnHidden(dataProperty));
           if (colIndex === null) return; // column hidden by config
@@ -2009,7 +2021,7 @@ BulkUtils = (function ($) {
           changes = Object.assign({}, changes);
           changes.value = undefined;
         }
-        updateField(hot, columns, rowIndex, dataProperty, changes);
+        updateField(hot, columns, rowIndex, dataProperty, changes, bulkRender);
       };
       changes.forEach(function (change) {
         if (listeners[change[1]]) {
@@ -2509,8 +2521,8 @@ BulkUtils = (function ($) {
       return hot.getCellMeta(row, colIndex).sourceData;
     };
 
-    api.updateField = function (rowIndex, dataProperty, options) {
-      updateField(hot, columns, rowIndex, dataProperty, options);
+    api.updateField = function (rowIndex, dataProperty, options, bulkRender) {
+      updateField(hot, columns, rowIndex, dataProperty, options, bulkRender);
     };
 
     api.updateData = function (changes) {
@@ -2533,7 +2545,7 @@ BulkUtils = (function ($) {
     };
   }
 
-  function updateField(hot, columns, rowIndex, dataProperty, options) {
+  function updateField(hot, columns, rowIndex, dataProperty, options, bulkRender) {
     var colIndex = getColumnIndex(dataProperty, columns, isColumnHidden(dataProperty));
     if (colIndex === null) return; // column hidden by config
     var column = columns[colIndex];
@@ -2610,7 +2622,12 @@ BulkUtils = (function ($) {
     }
 
     if (options.hasOwnProperty("value") && options.value !== undefined) {
-      hot.setDataAtCell(rowIndex, colIndex, options.value);
+      if (bulkRender === true) {
+        bulkRenderQueue.push([rowIndex, colIndex, options.value]);
+        setBulkRenderTimer(hot);
+      } else {
+        hot.setDataAtCell(rowIndex, colIndex, options.value);
+      }
     } else if (forceValidate) {
       // Note: intended to be a private function, but it works and is more efficient than validating the entire row/column/table
       hot._validateCells(null, [rowIndex], [colIndex]);

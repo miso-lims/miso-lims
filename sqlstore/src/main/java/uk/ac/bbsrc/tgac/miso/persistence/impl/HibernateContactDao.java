@@ -9,7 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact_;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionContact;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionContact_;
 import uk.ac.bbsrc.tgac.miso.persistence.ContactStore;
+
+
 
 @Repository
 @Transactional(rollbackFor = Exception.class)
@@ -34,6 +40,16 @@ public class HibernateContactDao extends HibernateSaveDao<Contact> implements Co
   @Override
   public Contact getByEmail(String email) throws IOException {
     return getBy(Contact_.EMAIL, email);
+  }
+
+  @Override
+  public long getProjectUsage(Contact contact) throws IOException {
+    return getUsageBy(ProjectContact.class, ProjectContact_.contact, contact);
+  }
+
+  @Override
+  public long getRequisitionUsage(Contact contact) throws IOException {
+    return getUsageBy(RequisitionContact.class, RequisitionContact_.contact, contact);
   }
 
 }

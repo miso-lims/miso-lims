@@ -146,6 +146,28 @@ FOR EACH ROW
   END IF;
   END//
 
+DROP TRIGGER IF EXISTS RunChangeUltima//
+CREATE TRIGGER RunChangeUltima BEFORE UPDATE ON RunUltima
+    FOR EACH ROW
+BEGIN
+    DECLARE log_message longtext;
+    SET log_message = CONCAT_WS(', ',
+                                CASE WHEN (NEW.expectedFlows IS NULL) <> (OLD.expectedFlows IS NULL) OR NEW.expectedFlows <> OLD.expectedFlows THEN CONCAT('expected flows: ', COALESCE(OLD.expectedFlows, 'n/a'), ' → ', COALESCE(NEW.expectedFlows, 'n/a')) END,
+                                CASE WHEN (NEW.waferShelf IS NULL) <> (OLD.waferShelf IS NULL) OR NEW.waferShelf <> OLD.waferShelf THEN CONCAT('wafer shelf: ', COALESCE(OLD.waferShelf, 'n/a'), ' → ', COALESCE(NEW.waferShelf, 'n/a')) END);
+    IF log_message IS NOT NULL AND log_message <> '' THEN
+        INSERT INTO RunChangeLog(runId, columnsChanged, userId, message, changeTime)
+        SELECT
+            NEW.runId,
+            COALESCE(CONCAT_WS(',',
+                               CASE WHEN (NEW.expectedFlows IS NULL) <> (OLD.expectedFlows IS NULL) OR NEW.expectedFlows <> OLD.expectedFlows THEN 'expectedFlows' END,
+                               CASE WHEN (NEW.waferShelf IS NULL) <> (OLD.waferShelf IS NULL) OR NEW.waferShelf <> OLD.waferShelf THEN 'waferShelf' END), ''),
+            lastModifier,
+            log_message,
+            lastModified
+        FROM Run WHERE Run.runId = NEW.runId;
+    END IF;
+END//
+
 DROP TRIGGER IF EXISTS RunInsert//
 CREATE TRIGGER RunInsert AFTER INSERT ON Run
 FOR EACH ROW

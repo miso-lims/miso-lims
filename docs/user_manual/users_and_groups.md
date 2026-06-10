@@ -23,17 +23,17 @@ Be sure to give the user the appropriate permissions. They must be marked as "In
 of the MISO website. Marking the user "Admin" will give them additional privileges within MISO, such as creating new
 users.
 
-If your site is configured to use LDAP or Active Directory for user accounts, then user accounts must be created in
-that separate service before they can be used for logging into MISO.
+If your site is configured to use LDAP, Active Directory, or SAML single sign-on for user accounts, then user accounts
+must be created in that separate service before they can be used for logging into MISO.
 
 
 
 ### Editing Users
 
 User accounts can only be modified in MISO if your site is configured to use the MISO database for user accounts (see
-[Logging In](../site_configuration/#logging-in)). If your site is configured to use LDAP or Active Directory for user
-accounts, you will have to modify users via that separate service. Regular MISO users are only able to edit their own
-user account. MISO administrators are able to edit any user account.
+[Logging In](../site_configuration/#logging-in)). If your site is configured to use LDAP, Active Directory, or SAML
+single sign-on for user accounts, you will have to modify users via that separate service. Regular MISO users are only
+able to edit their own user account. MISO administrators are able to edit any user account.
 
 To get to the Edit User page for your own user account, click on the My Account tab at the top of the screen, then
 click the "Edit" link beside your username in the My Account section. If you are a MISO administrator, then you can get
@@ -46,8 +46,9 @@ Edit User page, make any changes you would like, then click the "Save" button at
 
 Passwords can only be reset in MISO if your site is configured to use the MISO database for user accounts (see
 [Logging In](../site_configuration/#logging-in)). If your site is configured to use LDAP or Active Directory for user
-accounts, you will have to reset passwords via that separate service. Regular MISO users are only able to change their
-own password. MISO administrators are able to reset passwords for any users.
+accounts, you will have to reset passwords via that separate service. If your site uses SAML single sign-on, password
+changes are also handled by the external identity provider rather than MISO. Regular MISO users are only able to
+change their own password. MISO administrators are able to reset passwords for any users.
 
 Password changes/resets are done on the Edit User screen. To get to the Edit User page for your own user account, click
 on the My Account tab at the top of the screen, then click the "Edit" link beside your username in the My Account
@@ -62,8 +63,8 @@ both the "New Password" and the "Confirm New Password" box. The same password mu
 
 Roles control what a user is allowed to do within MISO. If your site is configured to use the MISO database for user
 accounts (see [Logging In](../site_configuration/#logging-in)), MISO administrators can set user roles on the Create
-User and Edit User screens. If your site is configured to use LDAP or Active Directory for user accounts, then roles
-must be assigned within that separate service.
+User and Edit User screens. If your site is configured to use LDAP, Active Directory, or SAML single sign-on for user
+accounts, then roles must be assigned within that separate service.
 
 The roles in MISO are:
 

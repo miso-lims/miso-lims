@@ -6,7 +6,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>3.21.1-SNAPSHOT</version>
+    <version>3.22.2-SNAPSHOT</version>
   </parent>
   <artifactId>sqlstore</artifactId>
   <packaging>jar</packaging>
@@ -54,12 +54,6 @@
     <dependency>
       <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-core</artifactId>
-    </dependency>
-    <dependency>
-      <!-- Required to get Spring logging into Log4j2 -->
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-jcl</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>

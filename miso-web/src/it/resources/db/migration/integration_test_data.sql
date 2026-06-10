@@ -395,7 +395,7 @@ INSERT INTO InstrumentModel (instrumentModelId, platform, alias, numContainers, 
   (3, 'PACBIO', 'PacBio RS II', 1, 'SEQUENCER'),
   (4, 'ILLUMINA', 'Illumina iScan', 1, 'ARRAY_SCANNER'),
   (5, 'ILLUMINA', 'Deletable', 1, 'OTHER');
-  
+
 INSERT INTO SequencingParameters (parametersId, name, instrumentModelId, readLength, readLength2, createdBy, updatedBy, creationDate, lastUpdated, chemistry) VALUES
   (1, 'Custom (see notes)', 3, 0, 0, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', NULL),
   (2, 'Rapid Run 2x151', 1, 151, 151, 1, 1, '2017-09-01 09:00:00', '2017-09-01 09:00:00', 'RAPID_RUN'),
@@ -1410,3 +1410,218 @@ INSERT INTO Sample_Attachment(sampleId, attachmentId) VALUES
 
 -- Keep this at bottom - checked to verify that script has completed and constants all loaded
 INSERT INTO AttachmentCategory(categoryId, alias) VALUES (5, 'last entry');
+INSERT INTO SampleSheet(sampleSheetId, name, platformType, parameters, sections) VALUES
+(1, 'Empty Illumina', 'ILLUMINA', '[]', '[]'),
+(2, 'Empty Ultima', 'ULTIMA', '[]', '[]'),
+(3, 'Clone Checking', 'ILLUMINA', '[
+  {
+    "name": "Genome Folder",
+    "type": "TEXT",
+    "defaultValue": "Homo_sapiens\\\\UCSC\\\\hg19\\\\Sequence\\\\WholeGenomeFasta"
+  },
+  {
+    "name": "Custom Read 1 Primer Well",
+    "type": "TEXT"
+  },
+  {
+    "name": "Custom Index Primer Well",
+    "type": "TEXT"
+  },
+  {
+    "name": "Custom Read 2 Primer Well",
+    "type": "TEXT"
+  }
+]', '[
+  {
+    "name": "Header",
+    "format": "ROWS",
+    "fields": [
+      {
+        "name": "Index Adapters",
+        "sources": [{
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "INDEX_FAMILY",
+            "separator": "/"
+        }]
+      },
+      {
+        "name": "IEMFileVersion",
+        "sources": [{
+          "value": "5"
+        }]
+      },
+      {
+        "name": "Experiment Name",
+        "sources": [{
+          "source": "POOL",
+          "sourceProperty": "ALIAS",
+          "separator": "/"
+        }]
+      },
+      {
+        "name": "Date",
+        "sources": [{
+          "source": "CURRENT_TIME",
+          "dateFormat": "M/d/yyyy"
+        }]
+      },
+      {
+        "name": "Instrument Type",
+        "sources": [{
+          "source": "INSTRUMENT_MODEL"
+        }]
+      },
+      {
+        "name": "Chemistry",
+        "sources": [{
+          "value": "Amplicon"
+        }]
+      },
+      {
+        "name": "Workflow",
+        "sources": [{
+          "value": "GenerateFASTQ"
+        }]
+      },
+      {
+        "name": "Application",
+        "sources": [{
+          "value": "Clone Checking"
+        }]
+      },
+      {
+        "name": "Assay",
+        "sources": [{
+          "value": "Nextera XT"
+        }]
+      }
+    ]
+  },
+  {
+    "name": "Reads",
+    "format": "ROWS",
+    "omitFieldNames": true,
+    "fields": [
+      {
+        "name": "Read 1 Length",
+        "sources": [{
+          "source": "SEQUENCING_PARAMETERS",
+          "sourceProperty": "READ_1_LENGTH"
+        }]
+      },
+      {
+        "name": "Read 2 Length",
+        "sources": [{
+          "source": "SEQUENCING_PARAMETERS",
+          "sourceProperty": "READ_2_LENGTH"
+        }],
+        "omitIfEmpty": true
+      }
+    ]
+  },
+  {
+    "name": "Settings",
+    "format": "ROWS",
+    "fields": [
+      {
+        "name": "Adapter",
+        "sources": [{
+          "value": "CTGTCTCTTATACACATCT"
+        }]
+      },
+      {
+        "name": "CustomRead1PrimerMix",
+        "sources": [{
+          "source": "Custom Read 1 Primer Well"
+        }],
+        "omitIfEmpty": true
+      },
+      {
+        "name": "CustomIndexPrimerMix",
+        "sources": [{
+          "source": "Custom Index Primer Well"
+        }],
+        "omitIfEmpty": true
+      },
+      {
+        "name": "CustomRead2PrimerMix",
+        "sources": [{
+          "source": "Custom Read 2 Primer Well"
+        }],
+        "omitIfEmpty": true
+      }
+    ]
+  },
+  {
+    "name": "Data",
+    "format": "COLUMNS",
+    "multivalue": "LIBRARY_ALIQUOTS",
+    "fields": [
+      {
+        "name": "Sample_ID",
+        "sources": [{
+          "source": "LIBRARY_ALIQUOT",
+          "sourceProperty": "ALIAS"
+        }]
+      },
+      {
+        "name": "Sample_Plate",
+        "sources": []
+      },
+      {
+        "name": "Sample_Well",
+          "sources": []
+      },
+      {
+        "name": "I7_Index_ID",
+          "sources": [{
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "INDEX_1_NAME"
+        }]
+      },
+      {
+        "name": "index",
+          "sources": [{
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "INDEX_1_SEQUENCE"
+        }]
+      },
+      {
+        "name": "I5_Index_ID",
+          "sources": [{
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "INDEX_2_NAME"
+        }],
+        "omitIfEmpty": true
+      },
+      {
+        "name": "index2",
+        "sources": [{
+          "source": "LIBRARY_ALIQUOT",
+          "sourceProperty": "INDEX_2_SEQUENCE"
+        }],
+        "omitIfEmpty": true
+      },
+      {
+        "name": "GenomeFolder",
+        "sources": [{
+          "source": "Genome Folder"
+        }]
+      },
+      {
+        "name": "Sample_Project",
+        "sources": [{
+          "source": "LIBRARY_ALIQUOT",
+          "sourceProperty": "PROJECT_CODE"
+        }]
+      },
+      {
+        "name": "Description",
+        "sources": [{
+          "source": "LIBRARY_ALIQUOT",
+          "sourceProperty": "IDENTIFICATION_BARCODE"
+        }]
+      }
+    ]
+  }
+]');

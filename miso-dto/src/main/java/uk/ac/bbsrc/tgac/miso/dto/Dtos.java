@@ -164,6 +164,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionContact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAliquotImpl;
@@ -263,7 +264,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SampleSpreadSheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.Spreadsheet;
-import uk.ac.bbsrc.tgac.miso.core.data.type.CompressionFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.DilutionFactor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -2188,7 +2188,12 @@ public class Dtos {
     } else if (from instanceof PacBioRun) {
       return new PacBioRunDto();
     } else if (from instanceof UltimaRun) {
-      return new UltimaRunDto();
+      UltimaRunDto dto = new UltimaRunDto();
+      UltimaRun ultimaRun = (UltimaRun) from;
+      dto.setExpectedFlows(ultimaRun.getExpectedFlows());
+      dto.setCompletedFlows(ultimaRun.getCompletedFlows());
+      dto.setWaferShelf(ultimaRun.getWaferShelf());
+      return dto;
     } else {
       throw new IllegalArgumentException("Unknown run type");
     }
@@ -2269,7 +2274,12 @@ public class Dtos {
     } else if (from instanceof PacBioRunDto) {
       return new PacBioRun();
     } else if (from instanceof UltimaRunDto) {
-      return new UltimaRun();
+      UltimaRun run = new UltimaRun();
+      UltimaRunDto ultimaDto = (UltimaRunDto) from;
+      run.setCompletedFlows(ultimaDto.getCompletedFlows());
+      run.setExpectedFlows(ultimaDto.getExpectedFlows());
+      run.setWaferShelf(ultimaDto.getWaferShelf());
+      return run;
     } else {
       throw new IllegalArgumentException("Unknown run type");
     }
@@ -2327,7 +2337,11 @@ public class Dtos {
 
   public static List<ContainerDto> asContainerDtos(@Nonnull Collection<SequencerPartitionContainer> containerSubset,
       boolean includeContainerPartitions, boolean includePoolContents) {
-    return asContainerDtos(containerSubset, includeContainerPartitions, includePoolContents);
+    List<ContainerDto> dtoList = new ArrayList<>();
+    for (SequencerPartitionContainer container : containerSubset) {
+      dtoList.add(asDto(container, includeContainerPartitions, includePoolContents, null));
+    }
+    return dtoList;
   }
 
   public static SequencerPartitionContainer to(@Nonnull ContainerDto from) {
@@ -2961,6 +2975,8 @@ public class Dtos {
         break;
       case ILLUMINA:
         setIlluminaRunValues((IlluminaNotificationDto) from, (IlluminaRun) to);
+        break;
+      case ULTIMA:
         break;
       default:
         throw new NotImplementedException("Unexpected platform type: " + to.getPlatformType());
@@ -3622,13 +3638,6 @@ public class Dtos {
 
   public static SpreadsheetFormatDto asDto(@Nonnull SpreadSheetFormat from) {
     SpreadsheetFormatDto dto = new SpreadsheetFormatDto();
-    dto.setName(from.name());
-    dto.setDescription(from.description());
-    return dto;
-  }
-
-  public static CompressionFormatDto asDto(@Nonnull CompressionFormat from) {
-    CompressionFormatDto dto = new CompressionFormatDto();
     dto.setName(from.name());
     dto.setDescription(from.description());
     return dto;
@@ -4720,6 +4729,31 @@ public class Dtos {
   public static ProjectContact to(ProjectContactDto from) {
     ProjectContact to = new ProjectContact();
     setObject(to::setProject, ProjectImpl::new, from.getProjectId());
+
+    Contact contact = new Contact();
+    setLong(contact::setId, from.getContactId(), false);
+    setString(contact::setName, from.getContactName());
+    setString(contact::setEmail, from.getContactEmail());
+    to.setContact(contact);
+
+    setObject(to::setContactRole, ContactRole::new, from.getContactRoleId());
+    return to;
+  }
+
+  public static RequisitionContactDto asDto(RequisitionContact from) {
+    RequisitionContactDto to = new RequisitionContactDto();
+    setLong(to::setRequisitionId, from.getRequisition().getId(), false);
+    setLong(to::setContactId, from.getContact().getId(), false);
+    setLong(to::setContactRoleId, from.getContactRole().getId(), false);
+    setString(to::setContactName, from.getContact().getName());
+    setString(to::setContactEmail, from.getContact().getEmail());
+    setString(to::setContactRole, from.getContactRole().getName());
+    return to;
+  }
+
+  public static RequisitionContact to(RequisitionContactDto from) {
+    RequisitionContact to = new RequisitionContact();
+    setObject(to::setRequisition, Requisition::new, from.getRequisitionId());
 
     Contact contact = new Contact();
     setLong(contact::setId, from.getContactId(), false);

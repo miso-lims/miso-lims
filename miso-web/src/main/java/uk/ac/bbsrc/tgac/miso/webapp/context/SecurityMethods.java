@@ -52,4 +52,22 @@ public class SecurityMethods {
 
   }
 
+  public static class SamlSecurityEnabled implements Condition {
+
+    @Override
+    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+      return securityMethodIn("saml");
+    }
+
+  }
+
+  public static class NonSamlSecurityEnabled implements Condition {
+
+    @Override
+    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+      return !securityMethodIn("saml");
+    }
+
+  }
+
 }

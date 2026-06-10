@@ -1,0 +1,42 @@
+package uk.ac.bbsrc.tgac.miso.core.security;
+
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
+import uk.ac.bbsrc.tgac.miso.core.service.UserService;
+
+public class SamlSecurityManager implements SecurityManager {
+
+  @Autowired
+  private UserService userService;
+
+  @Override
+  public boolean canCreateNewUser() {
+    return false;
+  }
+
+  @Override
+  public boolean isPasswordMutable() {
+    return false;
+  }
+
+  @Override
+  public void syncUser(UserDetails userDetails) throws IOException {
+    User user = LimsSecurityUtils.fromSamlUser(userDetails);
+    User dbUser = userService.getByLoginName(user.getLoginName());
+    if (dbUser == null) {
+      userService.create(user);
+    } else {
+      LimsSecurityUtils.updateFromSamlUser(dbUser, userDetails);
+      userService.update(dbUser);
+    }
+  }
+
+}
+

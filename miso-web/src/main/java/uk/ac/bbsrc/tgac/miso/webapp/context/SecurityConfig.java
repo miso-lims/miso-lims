@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.context;
 import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -30,6 +31,7 @@ import org.springframework.security.web.context.RequestAttributeSecurityContextR
 
 import jakarta.servlet.DispatcherType;
 import uk.ac.bbsrc.tgac.miso.core.service.ApiKeyService;
+import uk.ac.bbsrc.tgac.miso.webapp.context.SecurityMethods.NonSamlSecurityEnabled;
 
 @Configuration
 @EnableWebSecurity
@@ -54,11 +56,13 @@ public class SecurityConfig {
   }
 
   @Bean
+  @Conditional(NonSamlSecurityEnabled.class)
   public AuthenticationEntryPoint loginUrlEntryPoint() {
     return new LoginUrlAuthenticationEntryPoint("/login");
   }
 
   @Bean
+  @Conditional(NonSamlSecurityEnabled.class)
   public PersistentTokenRepository tokenRepository(DataSource dataSource) {
     JdbcTokenRepositoryImpl repository = new JdbcTokenRepositoryImpl();
     repository.setDataSource(dataSource);
@@ -66,6 +70,7 @@ public class SecurityConfig {
   }
 
   @Bean
+  @Conditional(NonSamlSecurityEnabled.class)
   public RememberMeServices rememberMeServices(UserDetailsService userDetailsService,
       PersistentTokenRepository tokenRepository) {
     PersistentTokenBasedRememberMeServices services = new PersistentTokenBasedRememberMeServices("miso",
@@ -75,6 +80,7 @@ public class SecurityConfig {
   }
 
   @Bean
+  @Conditional(NonSamlSecurityEnabled.class)
   public MisoLoginFilter loginFilter(AuthenticationManager authenticationManager,
       AuthenticationSuccessHandler successHandler, AuthenticationFailureHandler failureHandler,
       RememberMeServices rememberMeServices) {
@@ -97,13 +103,22 @@ public class SecurityConfig {
   }
 
   @Bean
+  @Conditional(NonSamlSecurityEnabled.class)
   public SecurityFilterChain securityFilterChain(HttpSecurity http, MisoLoginFilter loginFilter,
       ApiKeyAuthenticationFilter apiKeyFilter, RememberMeServices rememberMeServices) throws Exception {
+    return setupCommon(http, apiKeyFilter)
+        .addFilter(loginFilter)
+        .formLogin(formLogin -> formLogin
+            .loginPage("/login").permitAll())
+        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
+        .logout(logout -> logout.logoutSuccessUrl("/login"))
+        .build();
+  }
+
+  public static HttpSecurity setupCommon(HttpSecurity http, ApiKeyAuthenticationFilter apiKeyFilter)
+      throws Exception {
     return http
         .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-            // opting into Spring Security 6.0 defaults
-            .shouldFilterAllDispatcherTypes(true)
-            // above can be removed after update to Spring Security 6
             .dispatcherTypeMatchers(DispatcherType.FORWARD)
             .permitAll()
             .requestMatchers(
@@ -112,6 +127,9 @@ public class SecurityConfig {
                 "/scripts/**",
                 "/metrics",
                 "/login",
+                "/login/saml2/**",
+                "/logout/saml2/**",
+                "/saml2/**",
                 "/accessDenied",
                 "/error")
             .permitAll()
@@ -121,24 +139,14 @@ public class SecurityConfig {
             .hasRole("ADMIN")
             .anyRequest()
             .hasRole("INTERNAL"))
-        .addFilter(loginFilter)
         .addFilterBefore(apiKeyFilter, MisoLoginFilter.class)
-        .formLogin(formLogin -> formLogin
-            .loginPage("/login").permitAll())
-        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
         .csrf(csrf -> csrf.disable())
-        .logout(logout -> logout.logoutSuccessUrl("/login"))
         .exceptionHandling(handling -> handling.accessDeniedPage("/accessDenied"))
-        // Opting into Spring Security 6.0 defaults
         .securityContext(securityContext -> securityContext
             .requireExplicitSave(true)
             .securityContextRepository(new DelegatingSecurityContextRepository(
                 new RequestAttributeSecurityContextRepository(),
-                new HttpSessionSecurityContextRepository())))
-        .sessionManagement(sessions -> sessions
-            .requireExplicitAuthenticationStrategy(true))
-        // above can be removed after update to Spring Security 6
-        .build();
+                new HttpSessionSecurityContextRepository())));
   }
 
 }

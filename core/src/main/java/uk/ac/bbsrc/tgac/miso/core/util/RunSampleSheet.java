@@ -14,15 +14,15 @@ import java.util.stream.Stream;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 
-public enum SampleSheet {
+public enum RunSampleSheet {
   BCL2FASTQ("BCL2FASTQ") {
 
     @Override
@@ -121,7 +121,7 @@ public enum SampleSheet {
 
     @Override
     protected Stream<String> getColumns() {
-      return Stream.concat(SampleSheet.CASAVA_1_7.getColumns(), Stream.of("Project"));
+      return Stream.concat(RunSampleSheet.CASAVA_1_7.getColumns(), Stream.of("Project"));
     }
 
     @Override
@@ -141,7 +141,7 @@ public enum SampleSheet {
         List<String> index,
         String userName) {
       return Stream.concat(
-          SampleSheet.CASAVA_1_7.makeColumns(suffixNeeded, model, partitionNumber, partitionBarcode, aliquot, index,
+          RunSampleSheet.CASAVA_1_7.makeColumns(suffixNeeded, model, partitionNumber, partitionBarcode, aliquot, index,
               userName),
           Stream.of(aliquot.getProjectTitle().replaceAll("\\s", "")));
     }
@@ -249,7 +249,7 @@ public enum SampleSheet {
 
   private final String alias;
 
-  private SampleSheet(String alias) {
+  private RunSampleSheet(String alias) {
     this.alias = alias;
   }
 
@@ -309,7 +309,7 @@ public enum SampleSheet {
     Set<String> sequences =
         index.getFamily().hasFakeSequence() ? index.getRealSequences() : Collections.singleton(index.getSequence());
     if (index.getPosition() == 2 && model.getDataManglingPolicy() == InstrumentDataManglingPolicy.I5_RC) {
-      sequences = sequences.stream().map(SampleSheet::reverseComplement).collect(Collectors.toSet());
+      sequences = sequences.stream().map(RunSampleSheet::reverseComplement).collect(Collectors.toSet());
     }
     return sequences;
   }

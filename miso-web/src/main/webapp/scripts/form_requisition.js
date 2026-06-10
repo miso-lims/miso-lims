@@ -75,6 +75,7 @@ FormTarget.requisition = (function () {
     confirmSave: function (object, isDialog, form) {
       object.assayIds = Requisition.getAssays().map(Utils.array.getId);
       object.pauses = Requisition.getPauses();
+      object.contacts = Requisition.getContacts();
     },
   };
 })();

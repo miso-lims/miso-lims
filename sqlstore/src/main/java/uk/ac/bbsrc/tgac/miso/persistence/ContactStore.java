@@ -11,4 +11,8 @@ public interface ContactStore extends BulkSaveDao<Contact> {
 
   public Contact getByEmail(String email) throws IOException;
 
+  long getProjectUsage(Contact contact) throws IOException;
+
+  long getRequisitionUsage(Contact contact) throws IOException;
+
 }

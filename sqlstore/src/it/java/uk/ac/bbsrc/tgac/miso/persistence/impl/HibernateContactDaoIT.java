@@ -62,4 +62,16 @@ public class HibernateContactDaoIT extends AbstractHibernateSaveDaoTest<Contact,
     assertNotNull(results.stream().filter(contact -> contact.getId() == 2L).findFirst().orElse(null));
   }
 
+  @Test
+  public void testGetProjectUsage() throws Exception {
+    Contact contact = (Contact) currentSession().get(Contact.class, 1L);
+    assertEquals(2L, getTestSubject().getProjectUsage(contact));
+  }
+
+  @Test
+  public void testGetRequisitionUsage() throws Exception {
+    Contact contact = (Contact) currentSession().get(Contact.class, 1L);
+    assertEquals(0L, getTestSubject().getRequisitionUsage(contact));
+  }
+
 }

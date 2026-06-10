@@ -1,8 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
@@ -11,7 +9,6 @@ import java.util.function.Function;
 
 import javax.management.MalformedObjectNameException;
 
-import org.apache.logging.log4j.core.config.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -64,17 +61,6 @@ public class MisoAppListener implements ServletContextListener {
     // resolve property file configuration placeholders
     MisoPropertyExporter exporter = (MisoPropertyExporter) context.getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
-
-    // load logging system manually so that we can inject the baseDirectory property
-    // from the miso properties file into the log4j2 properties file
-    System.setProperty("misoBaseDirectory", misoProperties.get("miso.baseDirectory"));
-    String configFilePath = application.getRealPath("/") + "/WEB-INF/log4j2.miso.properties";
-    try {
-      URI uri = new URI(configFilePath);
-      Configurator.reconfigure(uri);
-    } catch (URISyntaxException e) {
-      throw new IllegalStateException("Failed to configure logging", e);
-    }
 
     // Set JVM time zone to configured UI time
     String uiZone = getStringPropertyOrNull("miso.timeCorrection.uiZone", misoProperties);

@@ -107,6 +107,7 @@ DELETE FROM SampleNumberPerProject;
 DELETE FROM SamplePurpose;
 DELETE FROM SampleProbe;
 DELETE FROM SampleQC;
+DELETE FROM SampleSheet;
 DELETE FROM SampleType;
 DELETE FROM SampleValidRelationship;
 DELETE FROM ScientificName;

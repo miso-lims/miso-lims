@@ -20,6 +20,11 @@
       <div id="requisitionForm_assaysError"></div>
       <div id="listAssays"></div>
 
+      <br />
+      <h1>Contacts</h1>
+      <div id="requisitionForm_contactsError"></div>
+      <div id="contacts_section"></div>
+
       <div id="samples">
         <c:choose>
           <c:when test="${pageMode eq 'create'}">
@@ -185,6 +190,10 @@
             requisitionId: requisition.id
           };
 
+          var contactsConfig = {
+            requisitionId: requisition.id
+          };
+
           <c:if test="${pageMode eq 'edit'}">
             assayConfig["potentialAssayIds"] = ${potentialAssayIds};
             assayConfig["numberOfRequisitionedItems"] = ${numberOfRequisitionedItems};
@@ -200,6 +209,9 @@
           Requisition.setAssays(assayIds.map(function (assayId) {
             return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(assayId), Constants.assays);
           }));
+
+          Requisition.setContactsListConfig(contactsConfig);
+          Requisition.setContacts(requisition.contacts || []);
 
           if ('${pageMode}' === 'edit') {
             Requisition.setPauses(requisition.pauses);
