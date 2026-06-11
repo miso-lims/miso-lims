@@ -48,7 +48,7 @@ public class SampleSheetRestControllerST extends AbstractST {
     Map<String, Map<Integer, Long>> poolIdsByInstrumentPositionAndPartition = new HashMap<>();
     poolIdsByInstrumentPositionAndPartition.put("*", new HashMap<>());
     poolIdsByInstrumentPositionAndPartition.get("*").put(1, 1L);
-    SampleSheetRequest request = new SampleSheetRequest(instrumentModelId, containerModelId, sequencingParametersId,
+    SampleSheetRequest request = new SampleSheetRequest(null, instrumentModelId, containerModelId, sequencingParametersId,
         null, customParameters, poolIdsByInstrumentPositionAndPartition, null);
 
     String response = getMockMvc()
