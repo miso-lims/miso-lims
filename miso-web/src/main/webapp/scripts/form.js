@@ -70,6 +70,7 @@ FormUtils = (function ($) {
    *       * 'source' (array of objects or strings)
    *       * 'label' (string)
    *       * 'link' (URL string)
+   *   rewriteSection: function(title, fields) replaces the fields in a section and re-renders it
    *   save: function(postSaveCallback) save the form data. postSaveCallback is a function(data) where data is the object returned from
    *       the save operation
    * }
@@ -366,7 +367,7 @@ FormUtils = (function ($) {
       ];
     },
 
-    makeSopFields: function (object, sops) {
+    makeSopFields: function (object, sops, onSopChange) {
       sops = sops || [];
 
       var availableSops = sops.filter(function (sop) {
@@ -387,12 +388,15 @@ FormUtils = (function ($) {
           include: !!availableSops.length,
           onChange: function (newValue, form) {
             var sop = newValue
-              ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(newValue), sops)
+              ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(Number(newValue)), sops)
               : null;
             form.updateField("sopLink", {
               label: sop ? "View SOP" : null,
               link: sop ? sop.url : null,
             });
+            if (onSopChange) {
+              onSopChange(newValue, form);
+            }
           },
         },
         {
@@ -412,6 +416,14 @@ FormUtils = (function ($) {
           openNewTab: true,
         },
       ];
+    },
+
+    makeSopSection: function (object, sops, title) {
+      title = title || "SOP Information";
+      return {
+        title: title,
+        fields: makeSopSectionFields(object, sops, title),
+      };
     },
 
     makeDnaSizeField: function () {
@@ -683,6 +695,33 @@ FormUtils = (function ($) {
         if (cascade && field.onChange) {
           triggerUpdate(field);
         }
+      },
+      rewriteSection: function (title, fields) {
+        var section = Utils.array.findUniqueOrThrow(function (section) {
+          return section.title === title;
+        }, sections);
+        section.fields = filterIncludedFields(fields);
+
+        var sectionId = makeSectionId(containerId, section);
+        var sectionHeader = $("#" + sectionId + "Header");
+        var sectionBody = $("#" + sectionId);
+        var placeholder = $("<span>");
+
+        if (sectionHeader.length) {
+          placeholder.insertBefore(sectionHeader);
+        } else if (sectionBody.length) {
+          placeholder.insertBefore(sectionBody);
+        } else {
+          $("#" + containerId).append(placeholder);
+        }
+
+        sectionHeader.remove();
+        sectionBody.remove();
+
+        if (section.fields.length) {
+          writeSection($("#" + containerId), section, object, form, placeholder);
+        }
+        placeholder.remove();
       },
       save: function (postSaveCallback) {
         validateAndSave(
@@ -956,11 +995,10 @@ FormUtils = (function ($) {
         return !section.hasOwnProperty("include") || section.include;
       })
       .forEach(function (section) {
-        var fields = section.fields.filter(function (field) {
-          return !field.hasOwnProperty("include") || field.include;
-        });
+        var fields = filterIncludedFields(section.fields);
         if (fields.length) {
           filtered.push({
+            id: section.id,
             title: section.title,
             fields: fields,
           });
@@ -969,8 +1007,22 @@ FormUtils = (function ($) {
     return filtered;
   }
 
-  function writeSection(container, section, object, form) {
-    container.append($("<h2>").text(section.title));
+  function filterIncludedFields(fields) {
+    return fields.filter(function (field) {
+      return !field.hasOwnProperty("include") || field.include;
+    });
+  }
+
+  function writeSection(container, section, object, form, beforeElement) {
+    var sectionId = makeSectionId(container.attr("id"), section);
+    var header = $("<h2>")
+      .attr("id", sectionId + "Header")
+      .text(section.title);
+    if (beforeElement) {
+      header.insertBefore(beforeElement);
+    } else {
+      container.append(header);
+    }
     var tbody = $("<tbody>");
 
     section.fields.forEach(function (field) {
@@ -980,9 +1032,14 @@ FormUtils = (function ($) {
       tbody.append(tr);
     });
 
-    container.append(
-      $("<div>").attr("id", section.id).append($("<table>").addClass("in").append(tbody))
-    );
+    var sectionBody = $("<div>")
+      .attr("id", sectionId)
+      .append($("<table>").addClass("in").append(tbody));
+    if (beforeElement) {
+      sectionBody.insertBefore(beforeElement);
+    } else {
+      container.append(sectionBody);
+    }
 
     var containerId = container.attr("id");
     section.fields.forEach(function (field) {
@@ -999,6 +1056,69 @@ FormUtils = (function ($) {
           Utils.ui.setDisabled("#" + inputId, true);
         }
       }
+    });
+  }
+
+  function makeSectionId(containerId, section) {
+    return section.id || containerId + "_" + section.title.replace(/\W/g, "") + "Section";
+  }
+
+  function makeSopSectionFields(object, sops, title) {
+    sops = sops || [];
+    object.sopFieldValues = object.sopFieldValues || {};
+
+    return FormUtils.makeSopFields(object, sops, function (newValue, form) {
+      var newSopId = newValue ? Number(newValue) : null;
+      var currentSopId = object.sopId ? Number(object.sopId) : null;
+      if (newSopId === currentSopId) {
+        return;
+      }
+
+      var changeSop = function () {
+        object.sopId = newSopId;
+        object.sopFieldValues = {};
+        form.rewriteSection(title, makeSopSectionFields(object, sops, title));
+        form.markOtherChanges();
+      };
+
+      if (currentSopId) {
+        Utils.showConfirmDialog(
+          "Change SOP",
+          "Change SOP",
+          [
+            "Changing the SOP will clear all values entered for the current SOP fields.",
+            "Do you want to continue?",
+          ],
+          changeSop,
+          function () {
+            form.updateField("sopId", {
+              value: currentSopId,
+            });
+          }
+        );
+      } else {
+        changeSop();
+      }
+    }).concat(makeSopValueFields(sops, object.sopId));
+  }
+
+  function makeSopValueFields(sops, sopId) {
+    if (!sopId) {
+      return [];
+    }
+
+    var sop = sops.filter(Utils.array.idPredicate(Number(sopId)))[0];
+    if (!sop || !sop.fields) {
+      return [];
+    }
+
+    return sop.fields.map(function (field) {
+      return {
+        title: field.name + (field.units ? " (" + field.units + ")" : ""),
+        data: "sopFieldValues." + field.id,
+        type: field.fieldType === "NUMBER" ? "decimal" : "text",
+        maxLength: 255,
+      };
     });
   }
 
@@ -1104,16 +1224,16 @@ FormUtils = (function ($) {
   }
 
   function makeReadOnlyInput(inputId, field, value, item) {
-    var isLink = field.getLink && field.getLink(item);
-    var input = $(isLink ? "<a>" : "<span>").attr(
+    var link = field.getLink && field.getLink(item);
+    var input = $(link ? "<a>" : "<span>").attr(
       "id",
       inputId + (field.getDisplayValue ? "Label" : "")
     );
     if (value !== null) {
       input.text(value);
     }
-    if (isLink && Utils.getObjectField(item, field.data)) {
-      input.attr("href", field.getLink(item));
+    if (link) {
+      input.attr("href", link);
       if (field.openNewTab) {
         input.attr("target", "_blank").attr("rel", "noopener noreferrer");
       }
