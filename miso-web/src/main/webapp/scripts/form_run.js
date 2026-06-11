@@ -372,7 +372,47 @@ FormTarget.run = (function ($) {
         },
       ];
     },
+    createSampleSheet: function (run, runPositions) {
+      var platformType = Utils.array.findUniqueOrThrow(function (x) {
+        return x.key === run.platformType;
+      }, Constants.platformTypes);
+      SampleSheet.fetchSampleSheets(platformType.name, function (sampleSheets) {
+        showSampleSheetSelectDialog(run, runPositions, sampleSheets);
+      });
+    },
   };
+
+  function showSampleSheetSelectDialog(run, runPositions, sampleSheets) {
+    var fields = [
+      {
+        label: "Sample Sheet",
+        property: "sampleSheet",
+        type: "select",
+        required: true,
+        values: sampleSheets,
+        getLabel: Utils.array.getName,
+      },
+    ];
+    Utils.showDialog("Create Sample Sheet", "Next", fields, function (input) {
+      showSampleSheetParametersDialog(input.sampleSheet, run, runPositions);
+    });
+  }
+
+  function showSampleSheetParametersDialog(sampleSheet, run, runPositions) {
+    var fields = SampleSheet.makeSampleSheetParameterFields(sampleSheet, runPositions);
+    if (fields && fields.length) {
+      Utils.showDialog("Create Sample Sheet", "Generate", fields, function (results) {
+        var data = SampleSheet.makeSampleSheetParameterData(results, sampleSheet);
+        data.runId = run.id;
+        Utils.ajaxDownloadWithDialog(Urls.rest.sampleSheets.generate(sampleSheet.id), data);
+      });
+    } else {
+      var data = {
+        runId: run.id,
+      };
+      Utils.ajaxDownloadWithDialog(Urls.rest.sampleSheets.generate(sampleSheet.id), data);
+    }
+  }
 
   function getStatus(label) {
     return Utils.array.findUniqueOrThrow(function (item) {

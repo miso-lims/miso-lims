@@ -13,9 +13,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.eaglegenomics.simlims.core.User;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -73,7 +69,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
-import uk.ac.bbsrc.tgac.miso.core.util.RunSampleSheet;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
@@ -323,40 +318,6 @@ public class RunRestController extends AbstractRestController {
       throw new RestException("No run found with alias: " + runAlias, Status.NOT_FOUND);
     }
     return Dtos.asDto(r);
-  }
-
-  @GetMapping(value = "/{runId}/samplesheet/{sheet}")
-  public HttpEntity<String> getSampleSheetForRun(@PathVariable(name = "runId") Long runId,
-      @PathVariable(name = "sheet") String sheet,
-      HttpServletResponse response) throws IOException {
-    Run run = runService.get(runId);
-    return getSampleSheetForRun(run, RunSampleSheet.valueOf(sheet), response);
-  }
-
-  @GetMapping(value = "/alias/{runAlias}/samplesheet/{sheet}")
-  public HttpEntity<String> getSampleSheetForRunByAlias(@PathVariable(name = "runAlias") String runAlias,
-      @PathVariable(name = "sheet") String sheet, HttpServletResponse response) throws IOException {
-    Run run = runService.getRunByAlias(runAlias);
-    return getSampleSheetForRun(run, RunSampleSheet.valueOf(sheet), response);
-  }
-
-  private HttpEntity<String> getSampleSheetForRun(Run run, RunSampleSheet casavaVersion, HttpServletResponse response)
-      throws IOException {
-    if (run == null) {
-      throw new RestException("Run does not exist.", Status.NOT_FOUND);
-    }
-    User user = authorizationManager.getCurrentUser();
-    if (run.getSequencerPartitionContainers().size() != 1) {
-      throw new RestException(
-          "Expected 1 sequencing container for run " + run.getAlias() + ", but found "
-              + run.getSequencerPartitionContainers().size());
-    }
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(new MediaType("text", "csv"));
-    String filename = String.format("RUN%d-%s-SampleSheet.csv", run.getId(), casavaVersion.name());
-    MisoWebUtils.addAttachmentContentDisposition(response, filename);
-
-    return new HttpEntity<>(casavaVersion.createSampleSheet(run, user), headers);
   }
 
   @GetMapping(value = "/dt", produces = "application/json")

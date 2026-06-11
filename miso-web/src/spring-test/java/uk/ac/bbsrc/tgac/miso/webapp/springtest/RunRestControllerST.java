@@ -19,7 +19,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.RunLibrarySpreadsheets;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.util.RunSampleSheet;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RunPartitionAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
@@ -397,53 +396,6 @@ public class RunRestControllerST extends AbstractST {
     for (List<String> expectedRow : rows) {
       assertTrue(actualRows.contains(expectedRow));
     }
-  }
-
-  @Test
-  public void testGetSampleSheetForRun() throws Exception {
-    List<String> headers = Arrays.asList("Sample_ID", "Sample_Name", "I7_Index_ID", "index", "I5_Index_ID", "index2");
-
-    String response = getMockMvc().perform(get(CONTROLLER_BASE + "/1/samplesheet/" + RunSampleSheet.BCL2FASTQ.name()))
-        .andExpect(status().isOk())
-        .andReturn().getResponse().getContentAsString();
-
-    assertTrue(response.contains("[Data]"));
-    response = response.split("\\[Data\\]")[1];
-
-    String[] returnedHeaders = new String[headers.size()];
-    String[] rawRows = response.split("\n");
-
-    for (int i = 0; i < 2; i++) {
-      String s = rawRows[1].replaceAll("\\r", "");
-      s = s.replaceAll("\\n", "");
-      s = s.replaceAll("\"", "");
-      returnedHeaders = s.split(",");
-    }
-    checkArray(returnedHeaders, headers);
-  }
-
-  @Test
-  public void testGetSampleSheetForRunByAlias() throws Exception {
-    List<String> headers = Arrays.asList("Sample_ID", "Sample_Name", "I7_Index_ID", "index", "I5_Index_ID", "index2");
-    String response = getMockMvc()
-        .perform(get(CONTROLLER_BASE + "/alias/HiSeq_Run_1/samplesheet/" + RunSampleSheet.BCL2FASTQ.name()))
-        .andExpect(status().isOk())
-        .andReturn().getResponse().getContentAsString();
-
-    assertTrue(response.contains("[Data]"));
-    response = response.split("\\[Data\\]")[1];
-
-    String[] returnedHeaders = new String[headers.size()];
-    String[] rawRows = response.split("\n");
-
-    for (int i = 0; i < 2; i++) {
-      String s = rawRows[1].replaceAll("\\r", "");
-      s = s.replaceAll("\\n", "");
-      s = s.replaceAll("\"", "");
-      returnedHeaders = s.split(",");
-    }
-    checkArray(returnedHeaders, headers);
-
   }
 
 }

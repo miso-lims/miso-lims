@@ -114,7 +114,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.PrintableField;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
-import uk.ac.bbsrc.tgac.miso.core.util.RunSampleSheet;
 import uk.ac.bbsrc.tgac.miso.dto.AssayDto;
 import uk.ac.bbsrc.tgac.miso.dto.AssayTestDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -352,7 +351,6 @@ public class ConstantsController {
       addJsonArray(mapper, node, "metricSubcategories", metricSubcategoryService.list(), MetricSubcategoryDto::from);
       addJsonArray(mapper, node, "assays", assayService.list(), AssayDto::from);
       addJsonArray(mapper, node, "assayTests", assayTestService.list(), AssayTestDto::from);
-      addJsonArray(mapper, node, "sampleSheetFormats", Arrays.asList(RunSampleSheet.values()), RunSampleSheet::name);
       addJsonArray(mapper, node, "contactRoles", contactRoleService.list(), Dtos::asDto);
 
       Collection<LibraryIndexFamily> indexFamilies = indexFamilyService.list();
