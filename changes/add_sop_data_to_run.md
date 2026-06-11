@@ -1,1 +1,1 @@
-SOP fields can now be viewed and updated in Run Information.
+SOP fields can now be viewed and updated on Edit Run page.
