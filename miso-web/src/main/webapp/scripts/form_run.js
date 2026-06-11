@@ -222,130 +222,151 @@ FormTarget.run = (function ($) {
               maxLength: 100,
             },
             {
-              title: "Status",
-              data: "status",
-              type: "dropdown",
-              source: Constants.healthTypes.filter(function (status) {
-                return status.allowedFromSequencer;
-              }),
-              getItemLabel: function (item) {
-                return item.label;
+                title: "Expected Flows",
+                include: object.platformType === "Ultima",
+                data: "expectedFlows",
+                type: "int",
+                min: "0",
               },
-              getItemValue: function (item) {
-                return item.label;
+              {
+                title: "Completed Flows",
+                include: object.platformType === "Ultima",
+                data: "completedFlows",
+                type: "int",
+                min: "0",
               },
-              onChange: function (newValue, form) {
-                var status = getStatus(newValue);
-                var updates = {
-                  required: status.isDone,
-                  // Editable if run is done and either there's no value set or user is admin
-                  disabled: !status.isDone || (form.get("endDate") && !config.isAdmin),
+              {
+                title: "Wafer Shelf",
+                include: object.platformType === "Ultima",
+                data: "waferShelf",
+                type: "int",
+                min: "0",
+              },
+              {
+                title: "Status",
+                data: "status",
+                type: "dropdown",
+                source: Constants.healthTypes.filter(function (status) {
+                  return status.allowedFromSequencer;
+                }),
+                getItemLabel: function (item) {
+                  return item.label;
+                },
+                getItemValue: function (item) {
+                  return item.label;
+                },
+                onChange: function (newValue, form) {
+                  var status = getStatus(newValue);
+                  var updates = {
+                    required: status.isDone,
+                    // Editable if run is done and either there's no value set or user is admin
+                    disabled: !status.isDone || (form.get("endDate") && !config.isAdmin),
+                  };
+                  if (!status.isDone) {
+                    updates.value = null;
+                  }
+                  form.updateField("endDate", updates);
+                },
+                required: true,
+                // Only editable by admin if run is done
+                disabled: !object.status ? false : getStatus(object.status).isDone && !config.isAdmin,
+              },
+              {
+                title: "Start Date",
+                data: "startDate",
+                type: "date",
+                required: true,
+                disabled: object.startDate && !config.isAdmin,
+              },
+              {
+                title: "Completion Date",
+                data: "endDate",
+                type: "date",
+              },
+              (function () {
+                var qcPassed = FormUtils.makeQcPassedField();
+                qcPassed.onChange = function (newValue, form) {
+                  if (config.isRunReviewer) {
+                    form.updateField("dataReview", {
+                      disabled: newValue === null,
+                      value: newValue !== null && newValue === object.qcPassed ? undefined : null,
+                    });
+                  } else if (newValue === null || newValue !== object.qcPassed) {
+                    form.updateField("dataReview", {
+                      label: "Pending",
+                    });
+                  }
+                  if (newValue === null || newValue !== object.qcPassed) {
+                    form.updateField("dataReviewer", {
+                      label: "n/a",
+                    });
+                    form.updateField("dataReviewDate", {
+                      label: "n/a",
+                    });
+                  }
                 };
-                if (!status.isDone) {
-                  updates.value = null;
-                }
-                form.updateField("endDate", updates);
-              },
-              required: true,
-              // Only editable by admin if run is done
-              disabled: !object.status ? false : getStatus(object.status).isDone && !config.isAdmin,
-            },
-            {
-              title: "Start Date",
-              data: "startDate",
-              type: "date",
-              required: true,
-              disabled: object.startDate && !config.isAdmin,
-            },
-            {
-              title: "Completion Date",
-              data: "endDate",
-              type: "date",
-            },
-            (function () {
-              var qcPassed = FormUtils.makeQcPassedField();
-              qcPassed.onChange = function (newValue, form) {
-                if (config.isRunReviewer) {
-                  form.updateField("dataReview", {
-                    disabled: newValue === null,
-                    value: newValue !== null && newValue === object.qcPassed ? undefined : null,
-                  });
-                } else if (newValue === null || newValue !== object.qcPassed) {
-                  form.updateField("dataReview", {
-                    label: "Pending",
-                  });
-                }
-                if (newValue === null || newValue !== object.qcPassed) {
-                  form.updateField("dataReviewer", {
-                    label: "n/a",
-                  });
-                  form.updateField("dataReviewDate", {
-                    label: "n/a",
-                  });
-                }
-              };
-              return qcPassed;
-            })(),
-            FormUtils.makeQcUserField(),
-            FormUtils.makeQcDateField(),
-            {
-              title: "Data Review",
-              data: "dataReview",
-              type: "dropdown",
-              include: config.isRunReviewer,
-              source: [
-                {
-                  label: "Pass",
-                  value: true,
+                return qcPassed;
+              })(),
+              FormUtils.makeQcUserField(),
+              FormUtils.makeQcDateField(),
+              {
+                title: "Data Review",
+                data: "dataReview",
+                type: "dropdown",
+                include: config.isRunReviewer,
+                source: [
+                  {
+                    label: "Pass",
+                    value: true,
+                  },
+                  {
+                    label: "Fail",
+                    value: false,
+                  },
+                ],
+                convertToBoolean: true,
+                getItemLabel: function (item) {
+                  return item.label;
                 },
-                {
-                  label: "Fail",
-                  value: false,
+                getItemValue: function (item) {
+                  return item.value;
                 },
-              ],
-              convertToBoolean: true,
-              getItemLabel: function (item) {
-                return item.label;
+                nullLabel: "Pending",
               },
-              getItemValue: function (item) {
-                return item.value;
+              {
+                title: "Data Review",
+                data: "dataReview",
+                type: "read-only",
+                getDisplayValue: function (item) {
+                  if (item.dataReview === true) {
+                    return "Pass";
+                  } else if (item.dataReview === false) {
+                    return "Fail";
+                  } else {
+                    return "Pending";
+                  }
+                },
+                include: !config.isRunReviewer,
               },
-              nullLabel: "Pending",
-            },
-            {
-              title: "Data Review",
-              data: "dataReview",
-              type: "read-only",
-              getDisplayValue: function (item) {
-                if (item.dataReview === true) {
-                  return "Pass";
-                } else if (item.dataReview === false) {
-                  return "Fail";
-                } else {
-                  return "Pending";
-                }
+              {
+                title: "Data Reviewer",
+                data: "dataReviewer",
+                type: "read-only",
+                getDisplayValue: function (run) {
+                  return run.dataReviewer || "n/a";
+                },
               },
-              include: !config.isRunReviewer,
-            },
-            {
-              title: "Data Reviewer",
-              data: "dataReviewer",
-              type: "read-only",
-              getDisplayValue: function (run) {
-                return run.dataReviewer || "n/a";
+              {
+                title: "Data Review Date",
+                data: "dataReviewDate",
+                type: "read-only",
+                getDisplayValue: function (run) {
+                  return run.dataReviewDate || "n/a";
+                },
               },
-            },
-            {
-              title: "Data Review Date",
-              data: "dataReviewDate",
-              type: "read-only",
-              getDisplayValue: function (run) {
-                return run.dataReviewDate || "n/a";
-              },
-            },
-          ]),
-        },
-        FormUtils.makeSopSection(object, config.sops),
+            ]),
+          },
+          FormUtils.makeSopSection(object, config.sops),
       ];
     },
   };
