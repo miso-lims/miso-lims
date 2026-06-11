@@ -1,1 +1,0 @@
-Added optional HTTP Basic authentication configuration for connecting to Run Scanner through an authenticating proxy.

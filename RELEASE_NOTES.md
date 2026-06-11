@@ -7,6 +7,25 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.23.0] - 2026-06-11
+
+### Added
+
+* * Automatically set Sequencing Parameters for Ultima Runs from Runscanner data
+  * Ultima Run specific fields added (Wafer Shelf, Completed Flows, Expected Flows)
+* SOP fields can now be viewed and updated on Edit Run page.
+* Added optional HTTP Basic authentication configuration for connecting to Run Scanner through an authenticating proxy.
+
+### Changed
+
+* Minor improvements to sample sheet generation
+
+### Upgrade Notes
+
+* Nothing will be written to `miso_debug.log` anymore. Logging has been simplified to all go through the servlet container (Tomcat), so you can find all output in its logs.
+* The `miso.properties` entries for customizing sample sheet defaults have been removed. Sample sheet formats will soon be customizable, allowing you to change these defaults within MISO instead.
+
+
 ## [3.22.1] - 2026-05-22
 
 ### Fixed
