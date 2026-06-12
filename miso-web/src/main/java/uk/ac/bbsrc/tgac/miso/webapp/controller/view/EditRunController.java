@@ -152,6 +152,14 @@ public class EditRunController {
     }
 
     model.put("runPositions", run.getRunPositions().stream().map(Dtos::asDto).collect(Collectors.toList()));
+    if (run.getRunPositions() == null
+        || run.getRunPositions().size() == 1 && run.getRunPositions().iterator().next().getPosition() == null) {
+      model.put("runPositionAliases", "[]");
+    } else {
+      List<String> runPositionAliases =
+          run.getRunPositions().stream().map(runPos -> runPos.getPosition().getAlias()).toList();
+      model.put("runPositionAliases", mapper.writeValueAsString(runPositionAliases));
+    }
     model.put("runPartitions", getPartitionDtos(run));
     model.put("runAliquots", getRunAliquots(run));
     MisoWebUtils.addIssues(issueTrackerManager, () -> issueTrackerManager.searchIssues(run.getAlias()), model);

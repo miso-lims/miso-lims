@@ -141,7 +141,7 @@ BulkTarget.pool = (function ($) {
           "Download Contents"
         ),
         {
-          name: "Create Samplesheet",
+          name: "Create Sample Sheet",
           action: function (pools) {
             createSampleSheet(pools, config);
           },
@@ -364,38 +364,16 @@ BulkTarget.pool = (function ($) {
   function showSampleSheetInstrumentSelectDialog(pools, instrumentModels, platformType) {
     Utils.showWizardDialog(
       "Create Sample Sheet",
-      Constants.instrumentModels
-        .filter(function (p) {
-          return p.platformType === platformType && p.instrumentType === "SEQUENCER" && p.active;
-        })
-        .sort(Utils.sorting.standardSort("alias"))
-        .map(function (instrumentModel) {
-          return {
-            name: instrumentModel.alias,
-            handler: function () {
-              Utils.ajaxWithDialog(
-                "Fetching sample sheets",
-                "GET",
-                Urls.rest.sampleSheets.list +
-                  "?" +
-                  $.param({ platform: instrumentModel.platformType }),
-                null,
-                function (sampleSheets) {
-                  if (sampleSheets.length) {
-                    showSampleSheetSelectDialog(pools, instrumentModel, sampleSheets);
-                  } else {
-                    var platformTypeObject = Utils.array.findUniqueOrThrow(function (x) {
-                      return x.name === platformType;
-                    }, Constants.platformTypes);
-                    Utils.showOkDialog("Error", [
-                      "There are no sample sheets definitions for " + platformTypeObject.key,
-                    ]);
-                  }
-                }
-              );
-            },
-          };
-        })
+      instrumentModels.sort(Utils.sorting.standardSort("alias")).map(function (instrumentModel) {
+        return {
+          name: instrumentModel.alias,
+          handler: function () {
+            SampleSheet.fetchSampleSheets(instrumentModel.platformType, function (sampleSheets) {
+              showSampleSheetSelectDialog(pools, instrumentModel, sampleSheets);
+            });
+          },
+        };
+      })
     );
   }
 
@@ -518,67 +496,16 @@ BulkTarget.pool = (function ($) {
         });
       }
     }
-    if (sampleSheet.parameters) {
-      sampleSheet.parameters.forEach(function (parameter) {
-        var template = {
-          label: parameter.name,
-          property: parameter.name,
-          value: parameter.defaultValue,
-        };
-        switch (parameter.type) {
-          case "TEXT":
-            template.type = "text";
-            break;
-          case "INT":
-            template.type = "int";
-            break;
-          case "DECIMAL":
-            template.type = "float";
-            break;
-          case "DATE":
-            template.type = "date";
-            break;
-          case "DROPDOWN":
-            template.type = "select";
-            template.values = parameter.source;
-            template.getLabel = function (x) {
-              return x.hasOwnProperty("label") ? x.label : x.value;
-            };
-            break;
-          default:
-            throw new Error("Unexpected parameter type: " + parameter.type);
-        }
-        if (parameter.multivalue === null) {
-          fields.push(template);
-        } else if (parameter.multivalue === "INSTRUMENT_POSITION") {
-          selectedPositions.forEach(function (position) {
-            var field = Object.assign({}, template);
-            field.label = position + " " + field.label;
-            field.property = "position_" + position + "_" + field.property;
-            fields.push(field);
-          });
-        } else {
-          throw new Error("Unexpected parameter multivalue type: " + parameter.multivalue);
-        }
-      });
-    }
-    sampleSheet.sections.forEach(function (section) {
-      if (section.optional) {
-        fields.push({
-          label: "Include " + section.name,
-          property: "includeSection_" + section.name,
-          type: "checkbox",
-        });
-      }
-    });
+    fields = fields.concat(
+      SampleSheet.makeSampleSheetParameterFields(sampleSheet, selectedPositions)
+    );
+
     Utils.showDialog("Create Sample Sheet", "Generate", fields, function (results) {
-      var data = {
-        instrumentModelId: instrumentModel.id,
-        containerModelId: containerModel.id,
-        customParameters: {},
-        poolIdsByInstrumentPositionAndPartition: {},
-        includeSections: {},
-      };
+      var data = SampleSheet.makeSampleSheetParameterData(results, sampleSheet);
+      data.instrumentModelId = instrumentModel.id;
+      data.containerModelId = containerModel.id;
+      data.poolIdsByInstrumentPositionAndPartition = {};
+
       if (platformType.containerLevelParameters) {
         var paramIdsByPosition = {};
         selectedPositions.forEach(function (position) {
@@ -603,26 +530,6 @@ BulkTarget.pool = (function ($) {
           data.poolIdsByInstrumentPositionAndPartition["*"][i] = pool ? pool.id : null;
         }
       }
-      sampleSheet.parameters.forEach(function (parameter) {
-        if (parameter.multivalue === null) {
-          data.customParameters[parameter.name] =
-            parameter.type === "DROPDOWN"
-              ? results[parameter.name]["value"]
-              : results[parameter.name];
-        } else {
-          data.customParameters[parameter.name] = {};
-          selectedPositions.forEach(function (position) {
-            data.customParameters[parameter.name][position] =
-              results["position_" + position + "_" + parameter.name];
-          });
-        }
-      });
-      sampleSheet.sections.forEach(function (section) {
-        if (section.optional) {
-          var include = results["includeSection_" + section.name];
-          data.includeSections[section.name] = include;
-        }
-      });
       Utils.ajaxDownloadWithDialog(Urls.rest.sampleSheets.generate(sampleSheet.id), data);
     });
   }

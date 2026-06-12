@@ -12,12 +12,7 @@
 </h1>
 <div class="right fg-toolbar ui-helper-clearfix paging_full_numbers">
   <c:if test="${run.id != 0}">
-    <c:forEach items="<%=uk.ac.bbsrc.tgac.miso.core.util.RunSampleSheet.values()%>" var="sheet">
-      <c:if test="${sheet.allowedFor(run)}">
-        <a href="<c:url value='/rest/runs/${run.id}/samplesheet/${sheet.name()}'/>" class="ui-button ui-state-default">Download Sample Sheet (${sheet.alias()})</a>
-      </c:if>
-    </c:forEach>
-    <span></span>
+    <button type="button" id="sampleSheetButton" class="fg-button ui-state-default ui-corner-all">Create Sample Sheet</button>
   </c:if>
 </div>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
@@ -31,7 +26,12 @@
 <form:form id="runForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 <script type="text/javascript">
   jQuery(document).ready(function () {
-    FormUtils.createForm('runForm', 'save', ${runDto}, 'run', ${formConfig});
+    var runDto = ${runDto};
+    var runPositionDtos = ${runPositionAliases};
+    FormUtils.createForm('runForm', 'save', runDto, 'run', ${formConfig});
+    jQuery("#sampleSheetButton").on("click", function() {
+      FormTarget.run.createSampleSheet(runDto, runPositionDtos);
+    });
   });
   Utils.ui.updateHelpLink(FormTarget.run.getUserManualUrl());
 </script>

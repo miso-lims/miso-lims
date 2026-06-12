@@ -1,11 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -26,16 +29,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheet;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
+import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleSheetService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheetInput;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheets;
 import uk.ac.bbsrc.tgac.miso.dto.SampleSheetDto;
@@ -57,6 +65,8 @@ public class SampleSheetRestController extends AbstractRestController {
   private SequencingContainerModelService sequencingContainerModelService;
   @Autowired
   private PoolService poolService;
+  @Autowired
+  private RunService runService;
 
   @GetMapping
   @ResponseBody
@@ -70,9 +80,10 @@ public class SampleSheetRestController extends AbstractRestController {
     return sampleSheetService.listByPlatform(platformType).stream().map(SampleSheetDto::from).toList();
   }
 
-  public record SampleSheetRequest(long instrumentModelId, long containerModelId, Long sequencingParametersId,
-      Map<String, Long> sequencingParametersIdsByInstrumentPosition, ObjectNode customParameters,
-      Map<String, Map<Integer, Long>> poolIdsByInstrumentPositionAndPartition, Map<String, Boolean> includeSections) {
+  public record SampleSheetRequest(Long runId, Long instrumentModelId, Long containerModelId,
+      Long sequencingParametersId, Map<String, Long> sequencingParametersIdsByInstrumentPosition,
+      ObjectNode customParameters, Map<String, Map<Integer, Long>> poolIdsByInstrumentPositionAndPartition,
+      Map<String, Boolean> includeSections) {
     // poolIdsByInstrumentPositionAndPartition will contain a single value with key "*" if the
     // instrument does not support multiple positions per run
   }
@@ -87,14 +98,72 @@ public class SampleSheetRestController extends AbstractRestController {
 
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(new MediaType("text", "csv"));
-    String filename = "samplesheet.csv"; // TODO
+    String filename = "%s_%s_samplesheet.csv".formatted(
+        LimsUtils.formatDate(LocalDate.now(ZoneId.systemDefault())),
+        sampleSheet.getName());
     MisoWebUtils.addAttachmentContentDisposition(response, filename);
     return new HttpEntity<>(outputBytes, headers);
   }
 
   private SampleSheetInput validateSampleSheetInput(SampleSheet sampleSheet, SampleSheetRequest request)
       throws IOException {
+    SampleSheetInput input = request.runId() == null ? makeInputFromPools(request) : makeInputFromRun(request.runId());
+
+    input.setCustomParameters(request.customParameters());
+
+    if (request.includeSections() != null && !request.includeSections().isEmpty()) {
+      request.includeSections().forEach((sectionName, include) -> {
+        if (sampleSheet.getSections().stream().noneMatch(section -> Objects.equals(section.getName(), sectionName)
+            && Objects.equals(section.getOptional(), Boolean.TRUE))) {
+          throw new RestException("Invalid section for include config: %s".formatted(sectionName), Status.BAD_REQUEST);
+        }
+      });
+      input.setIncludeSections(request.includeSections());
+    }
+    return input;
+  }
+
+  private SampleSheetInput makeInputFromRun(Long runId) throws IOException {
+    Run run = RestUtils.retrieve("run", runId, runService, Status.BAD_REQUEST);
     SampleSheetInput input = new SampleSheetInput();
+
+    InstrumentModel model = run.getSequencer().getInstrumentModel();
+    input.setInstrumentModel(model);
+    if (model.getPlatformType().hasContainerLevelParameters()) {
+      Map<String, SequencingParameters> params = new HashMap<>();
+      for (RunPosition runPos : run.getRunPositions()) {
+        if (runPos.getContainer() != null) {
+          params.put(runPos.getPosition().getAlias(), runPos.getSequencingParameters());
+        }
+      }
+      input.setSequencingParametersByInstrumentPosition(params);
+    } else {
+      input.setSequencingParameters(run.getSequencingParameters());
+    }
+
+    Map<String, Map<Integer, Pool>> poolLayout = new HashMap<>();
+    if (model.getNumContainers() == 1 && run.getRunPositions().size() == 1) {
+      RunPosition runPos = run.getRunPositions().iterator().next();
+      if (runPos.getContainer() != null) {
+        poolLayout.put("*", runPos.getContainer().getPartitions().stream()
+            .collect(Collectors.toMap(Partition::getPartitionNumber, Partition::getPool)));
+      }
+    } else {
+      for (RunPosition runPos : run.getRunPositions()) {
+        if (runPos.getContainer() != null) {
+          poolLayout.put(runPos.getPosition().getAlias(), runPos.getContainer().getPartitions().stream()
+              .collect(Collectors.toMap(Partition::getPartitionNumber, Partition::getPool)));
+        }
+      }
+    }
+    input.setPoolLayout(poolLayout);
+
+    return input;
+  }
+
+  private SampleSheetInput makeInputFromPools(SampleSheetRequest request) throws IOException {
+    SampleSheetInput input = new SampleSheetInput();
+
     InstrumentModel model =
         RestUtils.retrieve("instrument model", request.instrumentModelId(), instrumentModelService, Status.BAD_REQUEST);
     input.setInstrumentModel(model);
@@ -113,7 +182,7 @@ public class SampleSheetRestController extends AbstractRestController {
           sequencingParametersService, Status.BAD_REQUEST);
       input.setSequencingParameters(params);
     }
-    input.setCustomParameters(request.customParameters());
+
     Map<String, Map<Integer, Pool>> poolLayout = new HashMap<>();
     SequencingContainerModel containerModel = RestUtils.retrieve("container model", request.containerModelId(),
         sequencingContainerModelService, Status.BAD_REQUEST);
@@ -138,15 +207,7 @@ public class SampleSheetRestController extends AbstractRestController {
       }
     }
     input.setPoolLayout(poolLayout);
-    if (request.includeSections() != null && !request.includeSections().isEmpty()) {
-      request.includeSections().forEach((sectionName, include) -> {
-        if (sampleSheet.getSections().stream().noneMatch(section -> Objects.equals(section.getName(), sectionName)
-            && Objects.equals(section.getOptional(), Boolean.TRUE))) {
-          throw new RestException("Invalid section for include config: %s".formatted(sectionName), Status.BAD_REQUEST);
-        }
-      });
-      input.setIncludeSections(request.includeSections());
-    }
+
     return input;
   }
 
