@@ -34,7 +34,8 @@
     var model = ${modelDto};
     var form = FormUtils.createForm('instrumentModelForm', 'save', model, 'instrumentmodel', {
       pageMode: '${pageMode}',
-      isAdmin: ${miso:isAdmin()}
+      isAdmin: ${miso:isAdmin()},
+      sops: ${formConfig}.sops
     });
     InstrumentModel.setAdmin(${miso:isAdmin()});
     InstrumentModel.setForm(form);

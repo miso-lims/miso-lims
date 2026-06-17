@@ -14,9 +14,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -52,6 +54,10 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Deletable, 
 
   @Enumerated(EnumType.STRING)
   private InstrumentDataManglingPolicy dataManglingPolicy;
+
+  @ManyToOne
+  @JoinColumn(name = "defaultRunSopId")
+  private Sop defaultRunSop;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -187,6 +193,14 @@ public class InstrumentModel implements Comparable<InstrumentModel>, Deletable, 
 
   public void setDataManglingPolicy(InstrumentDataManglingPolicy dataManglingPolicy) {
     this.dataManglingPolicy = dataManglingPolicy;
+  }
+
+  public Sop getDefaultRunSop() {
+    return defaultRunSop;
+  }
+
+  public void setDefaultRunSop(Sop defaultRunSop) {
+    this.defaultRunSop = defaultRunSop;
   }
 
   @Override

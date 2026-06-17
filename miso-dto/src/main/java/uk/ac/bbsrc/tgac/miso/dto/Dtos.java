@@ -2675,6 +2675,7 @@ public class Dtos {
         .collect(Collectors.toList()));
     setString(dto::setDataManglingPolicy,
         maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
+    setId(dto::setDefaultRunSopId, from.getDefaultRunSop());
     return dto;
   }
 
@@ -2698,6 +2699,7 @@ public class Dtos {
     }
     setObject(to::setDataManglingPolicy, from.getDataManglingPolicy(),
         str -> InstrumentDataManglingPolicy.valueOf(str));
+    setObject(to::setDefaultRunSop, Sop::new, from.getDefaultRunSopId());
     return to;
   }
 
