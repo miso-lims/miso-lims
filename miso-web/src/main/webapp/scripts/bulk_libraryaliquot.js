@@ -246,7 +246,7 @@ BulkTarget.libraryaliquot = (function ($) {
           data: "parentBoxPositionLabel",
           disabled: true,
           preventImport: true,
-          include: config.pageMode === "propagate",
+          include: config.pageMode === "propagate" && Constants.showParentLocation !== false,
           customSorting: [
             {
               name: "Parent Location (by rows)",
@@ -400,6 +400,7 @@ BulkTarget.libraryaliquot = (function ($) {
           title: "Kit Lot",
           type: "text",
           data: "kitLot",
+          include: Constants.showKitLot !== false,
           maxLength: 255,
           required: config.pageMode === "propagate",
           regex: Utils.validation.uriComponentRegex,
@@ -408,6 +409,7 @@ BulkTarget.libraryaliquot = (function ($) {
           title: "Targeted Sequencing",
           type: "dropdown",
           data: "targetedSequencingId",
+          include: Constants.showTargetedSequencing !== false,
           getData: function (aliquot) {
             if (!aliquot.targetedSequencingId) {
               return null;
@@ -466,6 +468,7 @@ BulkTarget.libraryaliquot = (function ($) {
     confirmSave: function (data, config) {
       var deferred = jQuery.Deferred();
       BulkUtils.applyDefaultDetailedQcStatus(data, config);
+      BulkUtils.applyDefaultKitLot(data, config);
 
       var overused = data.filter(function (aliquot, index) {
         return (

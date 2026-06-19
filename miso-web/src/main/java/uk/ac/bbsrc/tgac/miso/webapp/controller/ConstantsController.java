@@ -251,6 +251,32 @@ public class ConstantsController {
   private boolean showDiscarded;
   @Value("${miso.defaults.bulk.detailedQcStatus:#{null}}")
   private String defaultDetailedQcStatus;
+  @Value("${miso.display.bulk.boxFields:true}")
+  private boolean showBoxFields;
+  @Value("${miso.display.bulk.parentLocation:true}")
+  private boolean showParentLocation;
+  @Value("${miso.display.bulk.workstation:true}")
+  private boolean showWorkstation;
+  @Value("${miso.display.bulk.thermalCycler:true}")
+  private boolean showThermalCycler;
+  @Value("${miso.display.bulk.kitLot:true}")
+  private boolean showKitLot;
+  @Value("${miso.display.bulk.spikeIn:true}")
+  private boolean showSpikeIn;
+  @Value("${miso.display.bulk.targetedSequencing:true}")
+  private boolean showTargetedSequencing;
+  @Value("${miso.display.bulk.parentUsed:true}")
+  private boolean showParentUsed;
+  @Value("${miso.display.bulk.receivedFrom:true}")
+  private boolean showReceivedFrom;
+  @Value("${miso.defaults.bulk.senderLab:#{null}}")
+  private String defaultSenderLab;
+  @Value("${miso.defaults.bulk.recipientGroup:#{null}}")
+  private String defaultRecipientGroup;
+  @Value("${miso.defaults.bulk.kitLot:#{null}}")
+  private String defaultKitLot;
+  @Value("${miso.defaults.bulk.poolQcPassed:#{null}}")
+  private String defaultPoolQcPassed;
   @Value("${miso.required.pool:}")
   private List<RequiredPoolField> requiredPoolFields;
 
@@ -299,6 +325,19 @@ public class ConstantsController {
       node.put("showMatrixBarcode", showMatrixBarcode);
       node.put("showDiscarded", showDiscarded);
       node.put("defaultDetailedQcStatus", defaultDetailedQcStatus);
+      node.put("showBoxFields", showBoxFields);
+      node.put("showParentLocation", showParentLocation);
+      node.put("showWorkstation", showWorkstation);
+      node.put("showThermalCycler", showThermalCycler);
+      node.put("showKitLot", showKitLot);
+      node.put("showSpikeIn", showSpikeIn);
+      node.put("showTargetedSequencing", showTargetedSequencing);
+      node.put("showParentUsed", showParentUsed);
+      node.put("showReceivedFrom", showReceivedFrom);
+      node.put("defaultSenderLab", defaultSenderLab);
+      node.put("defaultRecipientGroup", defaultRecipientGroup);
+      node.put("defaultKitLot", defaultKitLot);
+      node.put("defaultPoolQcPassed", defaultPoolQcPassed);
 
       ArrayNode requiredPoolFieldsNode = node.putArray("requiredPoolFields");
       for (RequiredPoolField field : requiredPoolFields) {
