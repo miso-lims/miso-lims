@@ -1963,6 +1963,7 @@ BulkUtils = (function ($) {
         (!tableSaved || !column.hasOwnProperty("includeSaved") || column.includeSaved)
       );
     });
+    applyRequiredOverrides(target, columns);
     var targetDescription = target.getDescription ? target.getDescription(config) : null;
     addQuickHelp(targetDescription, columns);
 
@@ -2473,6 +2474,18 @@ BulkUtils = (function ($) {
       default:
         return false;
     }
+  }
+
+  function applyRequiredOverrides(target, columns) {
+    if (!target.targetKey) return;
+    var key = "required" + target.targetKey.charAt(0).toUpperCase() + target.targetKey.slice(1) + "Fields";
+    var requiredFields = Constants[key];
+    if (!requiredFields || !requiredFields.length) return;
+    columns.forEach(function (column) {
+      if (requiredFields.indexOf(column.data) !== -1 && !isColumnHidden(column.data)) {
+        column.required = true;
+      }
+    });
   }
 
   function getColumnIndex(dataProperty, columns, nullOk) {

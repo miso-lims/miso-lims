@@ -8,7 +8,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -18,6 +20,8 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +33,7 @@ import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.type.RequiredPoolField;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
@@ -69,6 +74,11 @@ public class DefaultPoolService implements PoolService {
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
+  @Value("${miso.required.pool:#{null}}")
+  private String requiredPoolFieldsConfig;
+
+  private List<RequiredPoolField> requiredPoolFields;
+
   @Autowired
   private TransactionTemplate transactionTemplate;
   @Autowired
@@ -99,6 +109,19 @@ public class DefaultPoolService implements PoolService {
   private BarcodableReferenceService barcodableReferenceService;
   @Autowired
   private HibernateUtilDao hibernateUtilDao;
+
+  @PostConstruct
+  private void initRequiredFields() {
+    if (requiredPoolFieldsConfig == null || requiredPoolFieldsConfig.trim().isEmpty()) {
+      requiredPoolFields = Collections.emptyList();
+    } else {
+      requiredPoolFields = Arrays.stream(requiredPoolFieldsConfig.split(","))
+          .map(String::trim)
+          .filter(s -> !s.isEmpty())
+          .map(RequiredPoolField::valueOf)
+          .collect(Collectors.toList());
+    }
+  }
 
   public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
@@ -325,6 +348,10 @@ public class DefaultPoolService implements PoolService {
     validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
     validateBarcodeUniqueness(pool, beforeChange, barcodableReferenceService, errors);
     validateUnboxableFields(pool, errors);
+
+    for (RequiredPoolField field : requiredPoolFields) {
+      field.collectValidationErrors(pool, errors);
+    }
 
     if (strictPools && !pool.isMergeChild()) {
       validateIndices(pool, beforeChange, errors);

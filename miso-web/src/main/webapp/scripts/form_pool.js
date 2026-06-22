@@ -100,7 +100,16 @@ FormTarget.pool = (function ($) {
               initial: Utils.getCurrentDate(),
             },
             FormUtils.makeQcPassedField(),
-            FormUtils.makeDnaSizeField(),
+            (function () {
+              var field = FormUtils.makeDnaSizeField();
+              if (
+                Constants.requiredPoolFields &&
+                Constants.requiredPoolFields.indexOf("dnaSize") !== -1
+              ) {
+                field.required = true;
+              }
+              return field;
+            })(),
             {
               title: "Volume",
               data: "volume",

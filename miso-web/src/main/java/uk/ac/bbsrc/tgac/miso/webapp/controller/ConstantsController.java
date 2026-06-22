@@ -60,6 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.IlluminaWorkflowType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.MetricCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.RequiredPoolField;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StrStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ThresholdType;
@@ -250,6 +251,8 @@ public class ConstantsController {
   private boolean showDiscarded;
   @Value("${miso.defaults.bulk.detailedQcStatus:#{null}}")
   private String defaultDetailedQcStatus;
+  @Value("${miso.required.pool:#{null}}")
+  private String requiredPoolFieldsConfig;
 
   @Resource
   private Boolean boxScannerEnabled;
@@ -296,6 +299,16 @@ public class ConstantsController {
       node.put("showMatrixBarcode", showMatrixBarcode);
       node.put("showDiscarded", showDiscarded);
       node.put("defaultDetailedQcStatus", defaultDetailedQcStatus);
+
+      ArrayNode requiredPoolFields = node.putArray("requiredPoolFields");
+      if (requiredPoolFieldsConfig != null) {
+        for (String name : requiredPoolFieldsConfig.split(",")) {
+          String trimmed = name.trim();
+          if (!trimmed.isEmpty()) {
+            requiredPoolFields.add(RequiredPoolField.valueOf(trimmed).getFieldName());
+          }
+        }
+      }
 
       final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
 

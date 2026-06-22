@@ -409,6 +409,26 @@ Default QC status to apply on bulk create/edit pages. Set to the description of 
 it. When the QC Status column is hidden via `miso.display.bulk.qcStatus`, this value is applied
 automatically on save.
 
+## Required Fields
+
+Fields can be configured as required per object type. Each property takes a comma-separated list of
+supported field names. Invalid names will cause a startup error. All default to empty (no additional
+required fields).
+
+If a field is hidden via `miso.display.bulk.*`, it will not be enforced as required on bulk pages
+since the user would have no way to provide a value. The back-end validation still applies to all
+save paths, including indirect edits such as adding items to transfers or boxes.
+
+If a previously-optional field is changed to required, existing records that are missing a value for
+that field will fail validation on save. The admin is responsible for backfilling existing records
+before enabling a new required field.
+
+### `miso.required.pool`
+
+Comma-separated list of pool fields to require. Supported values: `SIZE`.
+
+Example: `miso.required.pool:SIZE`
+
 ## Index Checking
 
 ### `miso.pools.strictIndexChecking`
