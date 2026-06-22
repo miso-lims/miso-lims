@@ -98,6 +98,7 @@ BulkTarget.pool = (function ($) {
   };
 
   return {
+    targetKey: "pool",
     getSaveUrl: function () {
       return Urls.rest.pools.bulkSave;
     },
