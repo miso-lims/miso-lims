@@ -1,1 +1,1 @@
-Add button for sop field were not showing in create sop before saving sop. 
+Buttons for managing SOP fields were not showing on the Create SOP page
