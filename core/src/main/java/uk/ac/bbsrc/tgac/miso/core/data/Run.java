@@ -5,8 +5,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -165,6 +167,9 @@ public abstract class Run
 
   @OneToMany(mappedBy = "run", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<RunSopFieldValue> sopFieldValues = new HashSet<>();
+
+  @Transient
+  private Map<String, String> runScannerConsumables = new HashMap<>();
 
   @Enumerated(EnumType.STRING)
   private InstrumentDataManglingPolicy dataManglingPolicy;
@@ -552,6 +557,14 @@ public abstract class Run
 
   public void setSopFieldValues(Set<RunSopFieldValue> sopFieldValues) {
     this.sopFieldValues = sopFieldValues;
+  }
+
+  public Map<String, String> getRunScannerConsumables() {
+    return runScannerConsumables;
+  }
+
+  public void setRunScannerConsumables(Map<String, String> runScannerConsumables) {
+    this.runScannerConsumables = runScannerConsumables;
   }
 
   public InstrumentDataManglingPolicy getDataManglingPolicy() {

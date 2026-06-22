@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -879,6 +880,12 @@ public class DefaultRunService implements RunService {
     isMutated |= updateSequencingKitFromNotification(target, source.getSequencingKit());
     isMutated |= updateDataManglingPolicyFromNotification(target, source.getDataManglingPolicy(), user);
 
+
+    if (isNew) {
+      setDefaultRunSop(target);
+    }
+    isMutated |= updateSopFieldValueFromConsumables(target, source.getRunScannerConsumables(), isNew);
+
     switch (source.getPlatformType()) {
       case ILLUMINA:
         isMutated |= updateIlluminaRunFromNotification((IlluminaRun) source, (IlluminaRun) target);
@@ -914,6 +921,94 @@ public class DefaultRunService implements RunService {
       update(target);
     }
     return isNew;
+  }
+
+  private void setDefaultRunSop(Run target) throws IOException {
+    if (target.getSop() != null
+        || target.getSequencer() == null
+        || target.getSequencer().getInstrumentModel() == null) {
+      return;
+    }
+
+    Sop defaultRunSop = target.getSequencer().getInstrumentModel().getDefaultRunSop();
+    if (defaultRunSop != null && !defaultRunSop.isArchived()) {
+      target.setSop(defaultRunSop);
+    }
+  }
+
+  private boolean updateSopFieldValueFromConsumables(Run target, Map<String, String> consumables,
+      boolean allowOverwrite) {
+    if (consumables == null || consumables.isEmpty() || target.getSop() == null) {
+      return false;
+    }
+
+    Map<String, SopField> sopFieldsByName = target.getSop().getFields().stream()
+        .collect(Collectors.toMap(
+            field -> normalizeConsumableFieldName(field.getName()),
+            field -> field,
+            DefaultRunService::chooseConsumableLotField));
+
+    Map<Long, RunSopFieldValue> existingValueByFieldId = target.getSopFieldValues().stream()
+        .filter(value -> value.getSopField() != null)
+        .collect(Collectors.toMap(
+            value -> value.getSopField().getId(),
+            value -> value,
+            (existing, replacement) -> existing));
+
+    boolean changed = false;
+    for (Map.Entry<String, String> consumable : consumables.entrySet()) {
+      String lotNumber = consumable.getValue();
+      if (isStringBlankOrNull(lotNumber)) {
+        continue;
+      }
+
+      SopField sopField = sopFieldsByName.get(normalizeConsumableFieldName(consumable.getKey()));
+      if (sopField == null || !sopField.isValidValue(lotNumber)) {
+        continue;
+      }
+      RunSopFieldValue existingValue = existingValueByFieldId.get(sopField.getId());
+      if (existingValue != null && !isStringBlankOrNull(existingValue.getValue()) && !allowOverwrite) {
+        continue;
+      }
+
+      if (existingValue == null) {
+        existingValue = new RunSopFieldValue();
+        existingValue.setRun(target);
+        existingValue.setSopField(sopField);
+        target.getSopFieldValues().add(existingValue);
+        existingValueByFieldId.put(sopField.getId(), existingValue);
+      }
+
+      if (!Objects.equals(existingValue.getValue(), lotNumber)) {
+        existingValue.setValue(lotNumber);
+        changed = true;
+      }
+    }
+
+    return changed;
+  }
+
+  private static String normalizeConsumableFieldName(String name) {
+    if (name == null) {
+      return "";
+    }
+      String normalized = name.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]","");
+      return normalized.replaceFirst("(lot|lotnumber|lotnum|lotno)$", "");
+  }
+
+  private static SopField chooseConsumableLotField(SopField existing, SopField replacement){
+      if(isConsumableLotField(replacement) && !isConsumableLotField(existing)) {
+          return replacement;
+      }
+      return existing;
+  }
+
+  private static boolean isConsumableLotField(SopField field) {
+      if(field.getName() == null) {
+          return false;
+      }
+      String normalized = field.getName().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]","");
+      return normalized.matches(".*(lot|lotnumber|lotnum|lotno).*");
   }
 
   private boolean updateMetricsFromNotification(Run source, Run target) {
