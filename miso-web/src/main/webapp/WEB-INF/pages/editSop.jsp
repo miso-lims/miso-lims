@@ -33,12 +33,12 @@
           sopId: sop && sop.id ? sop.id : null
         };
 
+        Sop.setListConfig(config);
         var form = FormUtils.createForm("sopForm", config.isAdmin ? "save" : null, sop, "sop", config);
         Sop.setForm(form);
-        Sop.setListConfig(config);
         Sop.setFields((sop && sop.fields) ? sop.fields : []);
 
-        var category = sop && sop.category;
+        var category = form.get("category");
         var isRun = category === "RUN";
         jQuery("#listSopFields").toggle(isRun);
         jQuery("#sopFieldsUnsupported").toggle(!isRun);
