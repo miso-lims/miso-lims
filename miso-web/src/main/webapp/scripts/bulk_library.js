@@ -922,7 +922,7 @@ BulkTarget.library = (function ($) {
           data: "kitLot",
           maxLength: 255,
           include: !config.isLibraryReceipt && Constants.showKitLot !== false,
-          required: config.pageMode === "propagate",
+          required: config.pageMode === "propagate" && Constants.requireKitLot !== false,
           regex: Utils.validation.uriComponentRegex,
         }
       );
@@ -983,8 +983,11 @@ BulkTarget.library = (function ($) {
     confirmSave: function (data, config) {
       var deferred = $.Deferred();
       BulkUtils.applyDefaultDetailedQcStatus(data, config);
-      BulkUtils.applyDefaultKitLot(data, config);
-      BulkUtils.applyDefaultReceivedFrom(data, config);
+      if (Constants.showReceipt === false) {
+        data.forEach(function (item) {
+          item.receivedTime = null;
+        });
+      }
       if (config.isLibraryReceipt) {
         BulkUtils.checkPausedRequisitions(data, deferred);
       } else {

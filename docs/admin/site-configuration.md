@@ -411,29 +411,18 @@ automatically on save.
 
 ### `miso.defaults.bulk.poolQcPassed`
 
-Default pool QC status to apply when the QC Status column is hidden via
-`miso.display.bulk.qcStatus`. Set to `true` to default to Ready, or `false` to default to Failed.
-This is separate from `miso.defaults.bulk.detailedQcStatus` because pools use a different QC
-mechanism (Ready/Failed/Not Ready) than samples, libraries, and library aliquots.
+Default pool QC status to apply on bulk pool create/edit pages. Set to `true` to default to Ready,
+or `false` to default to Failed. When the QC Status column is visible, this pre-selects the value
+but the user can change it. When the QC Status column is hidden via `miso.display.bulk.qcStatus`,
+this value is applied automatically on save. This is separate from
+`miso.defaults.bulk.detailedQcStatus` because pools use a different QC mechanism (Ready/Failed/Not
+Ready) than samples, libraries, and library aliquots.
 
-### `miso.display.bulk.receivedFrom`
+### `miso.display.bulk.receipt`
 
-Defaults to `true` if unspecified. Set to `false` to hide the Received From and Received By columns
-on bulk receipt pages (library and sample receipt). Received From and Received By are required
-fields, so `miso.defaults.bulk.senderLab` and `miso.defaults.bulk.recipientGroup` must also be set
-when hiding these columns.
-
-### `miso.defaults.bulk.senderLab`
-
-Default Received From value to apply on bulk receipt pages when the column is hidden via
-`miso.display.bulk.receivedFrom`. Set to the alias of a lab (e.g. "External"). Since Received From
-is a required field, this should be set when hiding the column to avoid save errors.
-
-### `miso.defaults.bulk.recipientGroup`
-
-Default Received By value to apply on bulk receipt pages when the column is hidden via
-`miso.display.bulk.receivedFrom`. Set to the name of a group (e.g. "Unspecified (Internal)"). Since
-Received By is a required field, this should be set when hiding the column to avoid save errors.
+Defaults to `true` if unspecified. Set to `false` to hide the Date of Receipt, Time of Receipt,
+Received From, and Received By columns on bulk receipt pages (library and sample receipt). When
+hidden, no receipt transfer is created.
 
 ### `miso.display.bulk.boxFields`
 
@@ -459,13 +448,14 @@ create/edit pages.
 ### `miso.display.bulk.kitLot`
 
 Defaults to `true` if unspecified. Set to `false` to hide the Kit Lot column on bulk library and
-library aliquot create/edit pages. If hidden, consider also setting `miso.defaults.bulk.kitLot`.
+library aliquot create/edit pages. If hidden, also set `miso.required.bulk.kitLot` to `false` to
+avoid save errors.
 
-### `miso.defaults.bulk.kitLot`
+### `miso.required.bulk.kitLot`
 
-Default Kit Lot value to apply on bulk create pages when the Kit Lot column is hidden via
-`miso.display.bulk.kitLot`. Since Kit Lot is a required field, this should be set when hiding the
-column to avoid save errors.
+Defaults to `true` if unspecified. Set to `false` to make the Kit Lot field optional on bulk library
+and library aliquot propagation pages. This is useful when hiding the Kit Lot column via
+`miso.display.bulk.kitLot`.
 
 ### `miso.display.bulk.spikeIn`
 

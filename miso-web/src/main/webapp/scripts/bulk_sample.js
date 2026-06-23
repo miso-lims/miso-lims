@@ -1437,7 +1437,11 @@ BulkTarget.sample = (function ($) {
     confirmSave: function (data, config) {
       var deferred = $.Deferred();
       BulkUtils.applyDefaultDetailedQcStatus(data, config);
-      BulkUtils.applyDefaultReceivedFrom(data, config);
+      if (Constants.showReceipt === false) {
+        data.forEach(function (item) {
+          item.receivedTime = null;
+        });
+      }
       if (Constants.isDetailedSample) {
         data.forEach(function (sample) {
           var sampleClass = Utils.array.findUniqueOrThrow(

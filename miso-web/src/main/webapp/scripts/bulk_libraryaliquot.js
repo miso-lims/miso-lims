@@ -402,7 +402,7 @@ BulkTarget.libraryaliquot = (function ($) {
           data: "kitLot",
           include: Constants.showKitLot !== false,
           maxLength: 255,
-          required: config.pageMode === "propagate",
+          required: config.pageMode === "propagate" && Constants.requireKitLot !== false,
           regex: Utils.validation.uriComponentRegex,
         },
         {
@@ -468,7 +468,6 @@ BulkTarget.libraryaliquot = (function ($) {
     confirmSave: function (data, config) {
       var deferred = jQuery.Deferred();
       BulkUtils.applyDefaultDetailedQcStatus(data, config);
-      BulkUtils.applyDefaultKitLot(data, config);
 
       var overused = data.filter(function (aliquot, index) {
         return (

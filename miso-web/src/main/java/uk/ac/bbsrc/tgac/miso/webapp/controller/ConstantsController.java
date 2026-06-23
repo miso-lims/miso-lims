@@ -267,14 +267,10 @@ public class ConstantsController {
   private boolean showTargetedSequencing;
   @Value("${miso.display.bulk.parentUsed:true}")
   private boolean showParentUsed;
-  @Value("${miso.display.bulk.receivedFrom:true}")
-  private boolean showReceivedFrom;
-  @Value("${miso.defaults.bulk.senderLab:#{null}}")
-  private String defaultSenderLab;
-  @Value("${miso.defaults.bulk.recipientGroup:#{null}}")
-  private String defaultRecipientGroup;
-  @Value("${miso.defaults.bulk.kitLot:#{null}}")
-  private String defaultKitLot;
+  @Value("${miso.display.bulk.receipt:true}")
+  private boolean showReceipt;
+  @Value("${miso.required.bulk.kitLot:true}")
+  private boolean requireKitLot;
   @Value("${miso.defaults.bulk.poolQcPassed:#{null}}")
   private String defaultPoolQcPassed;
   @Value("${miso.required.pool:}")
@@ -333,10 +329,8 @@ public class ConstantsController {
       node.put("showSpikeIn", showSpikeIn);
       node.put("showTargetedSequencing", showTargetedSequencing);
       node.put("showParentUsed", showParentUsed);
-      node.put("showReceivedFrom", showReceivedFrom);
-      node.put("defaultSenderLab", defaultSenderLab);
-      node.put("defaultRecipientGroup", defaultRecipientGroup);
-      node.put("defaultKitLot", defaultKitLot);
+      node.put("showReceipt", showReceipt);
+      node.put("requireKitLot", requireKitLot);
       node.put("defaultPoolQcPassed", defaultPoolQcPassed);
 
       ArrayNode requiredPoolFieldsNode = node.putArray("requiredPoolFields");

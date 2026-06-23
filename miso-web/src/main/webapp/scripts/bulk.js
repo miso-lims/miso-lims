@@ -297,46 +297,6 @@ BulkUtils = (function ($) {
       });
     },
 
-    applyDefaultReceivedFrom: function (data, config) {
-      if (Constants.showReceivedFrom !== false) {
-        return;
-      }
-      var senderLab = null;
-      if (Constants.defaultSenderLab) {
-        senderLab = Constants.labs.find(function (lab) {
-          return lab.alias === Constants.defaultSenderLab;
-        });
-      }
-      var recipientGroup = null;
-      if (Constants.defaultRecipientGroup && config && config.recipientGroups) {
-        recipientGroup = config.recipientGroups.find(function (group) {
-          return group.name === Constants.defaultRecipientGroup;
-        });
-      }
-      data.forEach(function (item) {
-        if (!item.senderLabId && senderLab) {
-          item.senderLabId = senderLab.id;
-        }
-        if (!item.recipientGroupId && recipientGroup) {
-          item.recipientGroupId = recipientGroup.id;
-        }
-      });
-    },
-
-    applyDefaultKitLot: function (data, config) {
-      if (config && config.pageMode === "edit") {
-        return;
-      }
-      if (Constants.showKitLot !== false || !Constants.defaultKitLot) {
-        return;
-      }
-      data.forEach(function (item) {
-        if (!item.kitLot) {
-          item.kitLot = Constants.defaultKitLot;
-        }
-      });
-    },
-
     columns: {
       name: {
         title: "Name",
@@ -375,6 +335,7 @@ BulkUtils = (function ($) {
             title: "Date of Receipt",
             type: "date",
             data: "receivedDate",
+            include: Constants.showReceipt !== false,
             includeSaved: false,
             getData: function (object) {
               return object.receivedTime ? object.receivedTime.split(" ")[0] : null;
@@ -424,6 +385,7 @@ BulkUtils = (function ($) {
             title: "Time of Receipt",
             type: "time",
             data: "receivedTime",
+            include: Constants.showReceipt !== false,
             includeSaved: false,
             getData: function (object) {
               if (!object.receivedTime) {
@@ -442,7 +404,7 @@ BulkUtils = (function ($) {
             title: "Received From",
             type: "dropdown",
             data: "senderLabId",
-            include: Constants.showReceivedFrom !== false,
+            include: Constants.showReceipt !== false,
             includeSaved: false,
             source: Constants.labs.filter(function (lab) {
               return !lab.archived;
@@ -455,7 +417,7 @@ BulkUtils = (function ($) {
             title: "Received By",
             type: "dropdown",
             data: "recipientGroupId",
-            include: Constants.showReceivedFrom !== false,
+            include: Constants.showReceipt !== false,
             includeSaved: false,
             source: config.recipientGroups,
             getItemLabel: Utils.array.getName,
@@ -2545,7 +2507,7 @@ BulkUtils = (function ($) {
         return Constants.showQcStatus === false;
       case "senderLabId":
       case "recipientGroupId":
-        return Constants.showReceivedFrom === false;
+        return Constants.showReceipt === false;
       default:
         return false;
     }
