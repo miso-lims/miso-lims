@@ -38,7 +38,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import ca.on.oicr.gsi.runscanner.dto.Consumable;
 import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
@@ -2143,8 +2142,8 @@ public class Dtos {
     setDateString(dto::setDataReviewDate, from.getDataReviewDate());
     setId(dto::setSopId, from.getSop());
     dto.setSopFieldValues(from.getSopFieldValues().stream()
-                    .filter(value -> value.getSopField() != null)
-                    .filter(value -> !isStringBlankOrNull(value.getValue()))
+        .filter(value -> value.getSopField() != null)
+        .filter(value -> !isStringBlankOrNull(value.getValue()))
         .collect(Collectors.toMap(
             value -> value.getSopField().getId(),
             RunSopFieldValue::getValue)));
@@ -3006,17 +3005,6 @@ public class Dtos {
       to.setWorkflowType(IlluminaWorkflowType.get(from.getWorkflowType()));
     }
     to.setDataManglingPolicy(getDataManglingPolicy(from.getIndexSequencing()));
-    setRunScannerConsumables(from, to);
-  }
-
-  private static void setRunScannerConsumables(@Nonnull IlluminaNotificationDto from, @Nonnull Run to) {
-    if (from.getConsumables() == null) {
-      return;
-    }
-    to.setRunScannerConsumables(from.getConsumables().stream()
-        .filter(consumable -> !isStringEmptyOrNull(consumable.getType()))
-        .filter(consumable -> !isStringEmptyOrNull(consumable.getLotNumber()))
-        .collect(Collectors.toMap(Consumable::getType, Consumable::getLotNumber, (existing, replacement) -> existing)));
   }
 
   private static InstrumentDataManglingPolicy getDataManglingPolicy(IndexSequencing indexSequencing) {

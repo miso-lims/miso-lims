@@ -881,10 +881,10 @@ public class DefaultRunService implements RunService {
     isMutated |= updateDataManglingPolicyFromNotification(target, source.getDataManglingPolicy(), user);
 
 
-    if (isNew) {
-      setDefaultRunSop(target);
+    if (isNew && source.getSop() == null) {
+      target.setSop(source.getSop());
     }
-    isMutated |= updateSopFieldValueFromConsumables(target, source.getRunScannerConsumables(), isNew);
+    isMutated |= updateSopFieldValueFromConsumables(target, source.getSopFieldValues());
 
     switch (source.getPlatformType()) {
       case ILLUMINA:
@@ -936,17 +936,10 @@ public class DefaultRunService implements RunService {
     }
   }
 
-  private boolean updateSopFieldValueFromConsumables(Run target, Map<String, String> consumables,
-      boolean allowOverwrite) {
-    if (consumables == null || consumables.isEmpty() || target.getSop() == null) {
+  private boolean updateSopFieldValueFromConsumables(Run target, Set<RunSopFieldValue> sourceValues) {
+    if (sourceValues == null || sourceValues.isEmpty() || target.getSop() == null) {
       return false;
     }
-
-    Map<String, SopField> sopFieldsByName = target.getSop().getFields().stream()
-        .collect(Collectors.toMap(
-            field -> normalizeConsumableFieldName(field.getName()),
-            field -> field,
-            DefaultRunService::chooseConsumableLotField));
 
     Map<Long, RunSopFieldValue> existingValueByFieldId = target.getSopFieldValues().stream()
         .filter(value -> value.getSopField() != null)
@@ -956,18 +949,22 @@ public class DefaultRunService implements RunService {
             (existing, replacement) -> existing));
 
     boolean changed = false;
-    for (Map.Entry<String, String> consumable : consumables.entrySet()) {
-      String lotNumber = consumable.getValue();
-      if (isStringBlankOrNull(lotNumber)) {
+    for (RunSopFieldValue sourceValue : sourceValues) {
+
+      if (sourceValue.getSopField() == null || isStringBlankOrNull(sourceValue.getValue())) {
         continue;
       }
 
-      SopField sopField = sopFieldsByName.get(normalizeConsumableFieldName(consumable.getKey()));
-      if (sopField == null || !sopField.isValidValue(lotNumber)) {
+      SopField sopField = target.getSop().getFields().stream()
+          .filter(field -> field.getId() == sourceValue.getSopField().getId())
+          .findFirst()
+          .orElse(null);
+      if (sopField == null || !sopField.isValidValue(sourceValue.getValue())) {
         continue;
       }
+
       RunSopFieldValue existingValue = existingValueByFieldId.get(sopField.getId());
-      if (existingValue != null && !isStringBlankOrNull(existingValue.getValue()) && !allowOverwrite) {
+      if (existingValue != null && !isStringBlankOrNull(existingValue.getValue())) {
         continue;
       }
 
@@ -979,8 +976,8 @@ public class DefaultRunService implements RunService {
         existingValueByFieldId.put(sopField.getId(), existingValue);
       }
 
-      if (!Objects.equals(existingValue.getValue(), lotNumber)) {
-        existingValue.setValue(lotNumber);
+      if (!Objects.equals(existingValue.getValue(), sourceValue.getValue())) {
+        existingValue.setValue(sourceValue.getValue());
         changed = true;
       }
     }
@@ -992,23 +989,23 @@ public class DefaultRunService implements RunService {
     if (name == null) {
       return "";
     }
-      String normalized = name.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]","");
-      return normalized.replaceFirst("(lot|lotnumber|lotnum|lotno)$", "");
+    String normalized = name.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
+    return normalized.replaceFirst("(lot|lotnumber|lotnum|lotno)$", "");
   }
 
-  private static SopField chooseConsumableLotField(SopField existing, SopField replacement){
-      if(isConsumableLotField(replacement) && !isConsumableLotField(existing)) {
-          return replacement;
-      }
-      return existing;
+  private static SopField chooseConsumableLotField(SopField existing, SopField replacement) {
+    if (isConsumableLotField(replacement) && !isConsumableLotField(existing)) {
+      return replacement;
+    }
+    return existing;
   }
 
   private static boolean isConsumableLotField(SopField field) {
-      if(field.getName() == null) {
-          return false;
-      }
-      String normalized = field.getName().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]","");
-      return normalized.matches(".*(lot|lotnumber|lotnum|lotno).*");
+    if (field.getName() == null) {
+      return false;
+    }
+    String normalized = field.getName().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
+    return normalized.matches(".*(lot|lotnumber|lotnum|lotno).*");
   }
 
   private boolean updateMetricsFromNotification(Run source, Run target) {
