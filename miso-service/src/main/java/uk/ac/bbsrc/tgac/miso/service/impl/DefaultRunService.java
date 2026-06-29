@@ -881,7 +881,7 @@ public class DefaultRunService implements RunService {
     isMutated |= updateDataManglingPolicyFromNotification(target, source.getDataManglingPolicy(), user);
 
 
-    if (isNew && source.getSop() == null) {
+    if (isNew && source.getSop() != null) {
       target.setSop(source.getSop());
     }
     isMutated |= updateSopFieldValueFromConsumables(target, source.getSopFieldValues());
@@ -921,19 +921,6 @@ public class DefaultRunService implements RunService {
       update(target);
     }
     return isNew;
-  }
-
-  private void setDefaultRunSop(Run target) throws IOException {
-    if (target.getSop() != null
-        || target.getSequencer() == null
-        || target.getSequencer().getInstrumentModel() == null) {
-      return;
-    }
-
-    Sop defaultRunSop = target.getSequencer().getInstrumentModel().getDefaultRunSop();
-    if (defaultRunSop != null && !defaultRunSop.isArchived()) {
-      target.setSop(defaultRunSop);
-    }
   }
 
   private boolean updateSopFieldValueFromConsumables(Run target, Set<RunSopFieldValue> sourceValues) {
@@ -983,29 +970,6 @@ public class DefaultRunService implements RunService {
     }
 
     return changed;
-  }
-
-  private static String normalizeConsumableFieldName(String name) {
-    if (name == null) {
-      return "";
-    }
-    String normalized = name.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
-    return normalized.replaceFirst("(lot|lotnumber|lotnum|lotno)$", "");
-  }
-
-  private static SopField chooseConsumableLotField(SopField existing, SopField replacement) {
-    if (isConsumableLotField(replacement) && !isConsumableLotField(existing)) {
-      return replacement;
-    }
-    return existing;
-  }
-
-  private static boolean isConsumableLotField(SopField field) {
-    if (field.getName() == null) {
-      return false;
-    }
-    String normalized = field.getName().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
-    return normalized.matches(".*(lot|lotnumber|lotnum|lotno).*");
   }
 
   private boolean updateMetricsFromNotification(Run source, Run target) {

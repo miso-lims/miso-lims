@@ -137,6 +137,10 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
     if (object.getDefaultRunSop() != null && object.getDefaultRunSop().getCategory() != SopCategory.RUN) {
       errors.add(new ValidationError("defaultRunSopId", "Only run SOPs may be selected"));
     }
+    if(object.getDefaultRunSop() != null && object.getDefaultRunSop().isArchived() && (beforeChange == null || beforeChange.getDefaultRunSop() == null || beforeChange.getDefaultRunSop().getId() != object.getDefaultRunSop().getId())) {
+        errors.add(new ValidationError("defaultRunSopId", "Archived SOPs may not be selected"));
+    }
+
     if (beforeChange != null) {
       Set<InstrumentPosition> removed = beforeChange.getPositions().stream()
           .filter(beforePos -> object.getPositions().stream().noneMatch(afterPos -> afterPos.getId() == beforePos.getId()))

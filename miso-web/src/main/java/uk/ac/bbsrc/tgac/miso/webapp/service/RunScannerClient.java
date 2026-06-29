@@ -215,7 +215,7 @@ public class RunScannerClient {
 
     private Sop getDefaultRunSop(Run notificationRun) {
         InstrumentModel model = notificationRun.getSequencer().getInstrumentModel();
-        if(model == null || model.getDefaultRunSop() == null || model.getDefaultRunSop().getFields() == null){
+        if(model == null || model.getDefaultRunSop() == null || model.getDefaultRunSop().isArchived()){
             return null;
         }
         return model.getDefaultRunSop();
@@ -273,8 +273,8 @@ public class RunScannerClient {
 
     }
 
-    private Object normalizeConsumableFieldName(String name) {
-        if(name == null) {
+    private String normalizeConsumableFieldName(String name) {
+        if (name == null) {
             return "";
         }
         String normalized = name.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
