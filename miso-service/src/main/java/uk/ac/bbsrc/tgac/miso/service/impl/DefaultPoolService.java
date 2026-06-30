@@ -8,9 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -20,8 +18,6 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,9 +70,7 @@ public class DefaultPoolService implements PoolService {
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
 
-  @Value("${miso.required.pool:#{null}}")
-  private String requiredPoolFieldsConfig;
-
+  @Value("${miso.required.pool:}")
   private List<RequiredPoolField> requiredPoolFields;
 
   @Autowired
@@ -109,19 +103,6 @@ public class DefaultPoolService implements PoolService {
   private BarcodableReferenceService barcodableReferenceService;
   @Autowired
   private HibernateUtilDao hibernateUtilDao;
-
-  @PostConstruct
-  private void initRequiredFields() {
-    if (requiredPoolFieldsConfig == null || requiredPoolFieldsConfig.trim().isEmpty()) {
-      requiredPoolFields = Collections.emptyList();
-    } else {
-      requiredPoolFields = Arrays.stream(requiredPoolFieldsConfig.split(","))
-          .map(String::trim)
-          .filter(s -> !s.isEmpty())
-          .map(RequiredPoolField::valueOf)
-          .collect(Collectors.toList());
-    }
-  }
 
   public void setAutoGenerateIdBarcodes(boolean autoGenerateIdBarcodes) {
     this.autoGenerateIdBarcodes = autoGenerateIdBarcodes;
