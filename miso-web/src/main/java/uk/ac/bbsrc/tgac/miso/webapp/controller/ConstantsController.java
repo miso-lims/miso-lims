@@ -251,8 +251,8 @@ public class ConstantsController {
   private boolean showDiscarded;
   @Value("${miso.defaults.bulk.detailedQcStatus:#{null}}")
   private String defaultDetailedQcStatus;
-  @Value("${miso.required.pool:#{null}}")
-  private String requiredPoolFieldsConfig;
+  @Value("${miso.required.pool:}")
+  private List<RequiredPoolField> requiredPoolFields;
 
   @Resource
   private Boolean boxScannerEnabled;
@@ -300,14 +300,9 @@ public class ConstantsController {
       node.put("showDiscarded", showDiscarded);
       node.put("defaultDetailedQcStatus", defaultDetailedQcStatus);
 
-      ArrayNode requiredPoolFields = node.putArray("requiredPoolFields");
-      if (requiredPoolFieldsConfig != null) {
-        for (String name : requiredPoolFieldsConfig.split(",")) {
-          String trimmed = name.trim();
-          if (!trimmed.isEmpty()) {
-            requiredPoolFields.add(RequiredPoolField.valueOf(trimmed).getFieldName());
-          }
-        }
+      ArrayNode requiredPoolFieldsNode = node.putArray("requiredPoolFields");
+      for (RequiredPoolField field : requiredPoolFields) {
+        requiredPoolFieldsNode.add(field.getFieldName());
       }
 
       final Collection<SampleValidRelationship> relationships = sampleValidRelationshipService.getAll();
