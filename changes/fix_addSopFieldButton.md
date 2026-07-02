@@ -1,1 +1,0 @@
-Buttons for managing SOP fields were not showing on the Create SOP page

@@ -1,3 +1,4 @@
+-- run_sample_sheets
 INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
 ('BCL2FASTQ', 'ILLUMINA', '[]', '[
   {
@@ -138,3 +139,4 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
     ]
   }
 ]');
+

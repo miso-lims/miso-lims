@@ -7,6 +7,31 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.24.0] - 2026-07-02
+
+### Added
+
+* Configuration to make optional fields required per object type
+  * Added `miso.required.pool` property to require specified pool fields
+  * Supported pool field: `SIZE`
+  * Validation enforced on all save paths including bulk, single-edit, and indirect edits
+  * Invalid field names in the configuration cause a startup error
+
+### Changed
+
+* The Edit Run page now uses the same sample sheet generation system as the Pools list
+  * The BCL2FASTQ and Cell Ranger sample sheets have been moved into this system
+  * The CASAVA sample sheets have been removed
+
+### Fixed
+
+* Buttons for managing SOP fields were not showing on the Create SOP page
+
+### Upgrade Notes
+
+* Updated Runscanner to 2.6.1
+
+
 ## [3.23.0] - 2026-06-11
 
 ### Added
