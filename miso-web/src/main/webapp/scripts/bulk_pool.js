@@ -220,7 +220,7 @@ BulkTarget.pool = (function ($) {
               ? "Ready"
               : Constants.defaultPoolQcPassed === false
                 ? "Failed"
-                : undefined,
+                : "Not Ready",
             getItemLabel: Utils.array.get("label"),
             getItemValue: Utils.array.get("value"),
           },

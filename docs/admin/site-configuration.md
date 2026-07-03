@@ -448,14 +448,14 @@ create/edit pages.
 ### `miso.display.bulk.kitLot`
 
 Defaults to `true` if unspecified. Set to `false` to hide the Kit Lot column on bulk library and
-library aliquot create/edit pages. If hidden, also set `miso.required.bulk.kitLot` to `false` to
+library aliquot create/edit pages. If hidden, also set `miso.required.kitLot` to `false` to
 avoid save errors.
 
-### `miso.required.bulk.kitLot`
+### `miso.required.kitLot`
 
-Defaults to `true` if unspecified. Set to `false` to make the Kit Lot field optional on bulk library
-and library aliquot propagation pages. This is useful when hiding the Kit Lot column via
-`miso.display.bulk.kitLot`.
+Defaults to `true` if unspecified. Set to `false` to make the Kit Lot field optional on bulk
+propagation pages and single library/library aliquot edit pages. This is useful when hiding the Kit
+Lot column via `miso.display.bulk.kitLot`.
 
 ### `miso.display.bulk.spikeIn`
 

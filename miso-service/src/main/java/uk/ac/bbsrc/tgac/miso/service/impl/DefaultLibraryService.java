@@ -135,6 +135,8 @@ public class DefaultLibraryService implements LibraryService {
   private TransactionTemplate transactionTemplate;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
+  @Value("${miso.required.kitLot:true}")
+  private boolean requireKitLot;
 
   @Override
   public Library get(long libraryId) throws IOException {
@@ -530,7 +532,7 @@ public class DefaultLibraryService implements LibraryService {
       if (beforeChange.getThermalCycler() != null && library.getThermalCycler() == null) {
         addRequiredError(errors, "thermalCyclerId");
       }
-      if (beforeChange.getKitLot() != null && library.getKitLot() == null) {
+      if (requireKitLot && beforeChange.getKitLot() != null && library.getKitLot() == null) {
         addRequiredError(errors, "kitLot");
       }
       if (beforeChange.getSop() != null && library.getSop() == null) {
@@ -541,7 +543,7 @@ public class DefaultLibraryService implements LibraryService {
           && instrumentService.listByType(InstrumentType.THERMAL_CYCLER).stream().anyMatch(Instrument::isActive)) {
         addRequiredError(errors, "thermalCyclerId");
       }
-      if (library.getKitLot() == null) {
+      if (requireKitLot && library.getKitLot() == null) {
         addRequiredError(errors, "kitLot");
       }
       if (library.getSop() == null
