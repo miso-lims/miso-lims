@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -44,11 +45,13 @@ public interface RunService extends DeleterService<Run>, SaveService<Run>, Pagin
 
   /**
    * Save a scanned run to the database or update the run if it exists.
-   * 
+   *
    * @param run the update from notification server
+   * @param consumableLotNumbersByType lot numbers reported by the notification server, keyed by consumable type
    * @return true if the run is new, false if it already existed
    * @throws MisoNamingException
    */
-  boolean processNotification(Run run) throws IOException, MisoNamingException;
+  boolean processNotification(Run run, Map<String, String> consumableLotNumbersByType)
+      throws IOException, MisoNamingException;
 
 }

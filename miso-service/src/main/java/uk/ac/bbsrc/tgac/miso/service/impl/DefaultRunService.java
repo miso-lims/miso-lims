@@ -846,7 +846,8 @@ public class DefaultRunService implements RunService {
   }
 
   @Override
-  public boolean processNotification(Run source) throws IOException, MisoNamingException {
+  public boolean processNotification(Run source, Map<String, String> consumableLotNumbersByType)
+      throws IOException, MisoNamingException {
     User user = userService.getByLoginName("notification");
     final Run target;
 
@@ -857,6 +858,7 @@ public class DefaultRunService implements RunService {
       target = source.getPlatformType().createRun();
       target.setAlias(source.getAlias());
       target.setSequencer(source.getSequencer());
+      target.setSop(getDefaultRunSop(target));
       isNew = true;
     } else {
       target = runFromDb;
@@ -881,10 +883,7 @@ public class DefaultRunService implements RunService {
     isMutated |= updateDataManglingPolicyFromNotification(target, source.getDataManglingPolicy(), user);
 
 
-    if (isNew && source.getSop() != null) {
-      target.setSop(source.getSop());
-    }
-    isMutated |= updateSopFieldValueFromConsumables(target, source.getSopFieldValues());
+    isMutated |= updateSopFieldValueFromConsumables(target, consumableLotNumbersByType);
 
     switch (source.getPlatformType()) {
       case ILLUMINA:
@@ -923,53 +922,69 @@ public class DefaultRunService implements RunService {
     return isNew;
   }
 
-  private boolean updateSopFieldValueFromConsumables(Run target, Set<RunSopFieldValue> sourceValues) {
-    if (sourceValues == null || sourceValues.isEmpty() || target.getSop() == null) {
+  private boolean updateSopFieldValueFromConsumables(Run target, Map<String, String> consumableLotNumbersByType) {
+    if (consumableLotNumbersByType == null || consumableLotNumbersByType.isEmpty() || target.getSop() == null) {
       return false;
     }
 
+    Map<String, List<SopField>> fieldsByConsumableName = new HashMap<>();
+    for (SopField field : target.getSop().getFields()) {
+      fieldsByConsumableName.computeIfAbsent(normalizeConsumableFieldName(field.getName()), key -> new ArrayList<>())
+          .add(field);
+    }
+
     Map<Long, RunSopFieldValue> existingValueByFieldId = target.getSopFieldValues().stream()
-        .filter(value -> value.getSopField() != null)
-        .collect(Collectors.toMap(
-            value -> value.getSopField().getId(),
-            value -> value,
-            (existing, replacement) -> existing));
+        .collect(Collectors.toMap(value -> value.getSopField().getId(), value -> value));
 
     boolean changed = false;
-    for (RunSopFieldValue sourceValue : sourceValues) {
-
-      if (sourceValue.getSopField() == null || isStringBlankOrNull(sourceValue.getValue())) {
+    for (Map.Entry<String, String> consumable : consumableLotNumbersByType.entrySet()) {
+      List<SopField> matchingFields = fieldsByConsumableName.get(normalizeConsumableFieldName(consumable.getKey()));
+      if (matchingFields == null) {
         continue;
       }
 
-      SopField sopField = target.getSop().getFields().stream()
-          .filter(field -> field.getId() == sourceValue.getSopField().getId())
-          .findFirst()
-          .orElse(null);
-      if (sopField == null || !sopField.isValidValue(sourceValue.getValue())) {
-        continue;
-      }
+      for (SopField sopField : matchingFields) {
+        if (!sopField.isValidValue(consumable.getValue())) {
+          continue;
+        }
 
-      RunSopFieldValue existingValue = existingValueByFieldId.get(sopField.getId());
-      if (existingValue != null && !isStringBlankOrNull(existingValue.getValue())) {
-        continue;
-      }
+        RunSopFieldValue existingValue = existingValueByFieldId.get(sopField.getId());
+        if (existingValue != null && !isStringBlankOrNull(existingValue.getValue())) {
+          continue;
+        }
 
-      if (existingValue == null) {
-        existingValue = new RunSopFieldValue();
-        existingValue.setRun(target);
-        existingValue.setSopField(sopField);
-        target.getSopFieldValues().add(existingValue);
-        existingValueByFieldId.put(sopField.getId(), existingValue);
-      }
+        if (existingValue == null) {
+          existingValue = new RunSopFieldValue();
+          existingValue.setRun(target);
+          existingValue.setSopField(sopField);
+          target.getSopFieldValues().add(existingValue);
+          existingValueByFieldId.put(sopField.getId(), existingValue);
+        }
 
-      if (!Objects.equals(existingValue.getValue(), sourceValue.getValue())) {
-        existingValue.setValue(sourceValue.getValue());
-        changed = true;
+        if (!Objects.equals(existingValue.getValue(), consumable.getValue())) {
+          existingValue.setValue(consumable.getValue());
+          changed = true;
+        }
       }
     }
 
     return changed;
+  }
+
+  private static String normalizeConsumableFieldName(String name) {
+    if (name == null) {
+      return "";
+    }
+    String normalized = name.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
+    return normalized.replaceFirst("(lotnumber|lotno|lotnum|lot)$", "");
+  }
+
+  private static Sop getDefaultRunSop(Run run) {
+    InstrumentModel model = run.getSequencer().getInstrumentModel();
+    if (model == null || model.getDefaultRunSop() == null || model.getDefaultRunSop().isArchived()) {
+      return null;
+    }
+    return model.getDefaultRunSop();
   }
 
   private boolean updateMetricsFromNotification(Run source, Run target) {

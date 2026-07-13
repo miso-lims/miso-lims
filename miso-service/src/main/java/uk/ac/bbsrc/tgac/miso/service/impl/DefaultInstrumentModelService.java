@@ -16,6 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -134,11 +135,15 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
         errors.add(new ValidationError("defaultRunSopId", "Should be empty for non-sequencer models"));
       }
     }
-    if (object.getDefaultRunSop() != null && object.getDefaultRunSop().getCategory() != SopCategory.RUN) {
-      errors.add(new ValidationError("defaultRunSopId", "Only run SOPs may be selected"));
-    }
-    if(object.getDefaultRunSop() != null && object.getDefaultRunSop().isArchived() && (beforeChange == null || beforeChange.getDefaultRunSop() == null || beforeChange.getDefaultRunSop().getId() != object.getDefaultRunSop().getId())) {
+    Sop defaultRunSop = object.getDefaultRunSop();
+    if (defaultRunSop != null) {
+      if (defaultRunSop.getCategory() != SopCategory.RUN) {
+        errors.add(new ValidationError("defaultRunSopId", "Only run SOPs may be selected"));
+      }
+      if (defaultRunSop.isArchived() && (beforeChange == null || beforeChange.getDefaultRunSop() == null
+          || beforeChange.getDefaultRunSop().getId() != defaultRunSop.getId())) {
         errors.add(new ValidationError("defaultRunSopId", "Archived SOPs may not be selected"));
+      }
     }
 
     if (beforeChange != null) {

@@ -2141,12 +2141,9 @@ public class Dtos {
     setString(dto::setDataReviewer, maybeGetProperty(from.getDataReviewer(), User::getFullName));
     setDateString(dto::setDataReviewDate, from.getDataReviewDate());
     setId(dto::setSopId, from.getSop());
-    dto.setSopFieldValues(from.getSopFieldValues().stream()
-        .filter(value -> value.getSopField() != null)
-        .filter(value -> !isStringBlankOrNull(value.getValue()))
-        .collect(Collectors.toMap(
-            value -> value.getSopField().getId(),
-            RunSopFieldValue::getValue)));
+    Map<Long, String> sopFieldValues = new HashMap<>();
+    from.getSopFieldValues().forEach(value -> sopFieldValues.put(value.getSopField().getId(), value.getValue()));
+    dto.setSopFieldValues(sopFieldValues);
     setString(dto::setDataManglingPolicy,
         maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
 
