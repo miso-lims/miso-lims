@@ -84,6 +84,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
+import uk.ac.bbsrc.tgac.miso.core.data.ElementRun;
 import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
 import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
@@ -286,6 +287,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto.OrderAliquotDto;
 import uk.ac.bbsrc.tgac.miso.dto.dashi.QcHierarchyNodeDto;
+import uk.ac.bbsrc.tgac.miso.dto.run.ElementRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.IlluminaRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.IonTorrentRunDto;
 import uk.ac.bbsrc.tgac.miso.dto.run.Ls454RunDto;
@@ -2194,6 +2196,8 @@ public class Dtos {
       dto.setCompletedFlows(ultimaRun.getCompletedFlows());
       dto.setWaferShelf(ultimaRun.getWaferShelf());
       return dto;
+    } else if (from instanceof ElementRun) {
+      return new ElementRunDto();
     } else {
       throw new IllegalArgumentException("Unknown run type");
     }
@@ -2280,6 +2284,8 @@ public class Dtos {
       run.setExpectedFlows(ultimaDto.getExpectedFlows());
       run.setWaferShelf(ultimaDto.getWaferShelf());
       return run;
+    } else if (from instanceof ElementRunDto) {
+      return new ElementRun();
     } else {
       throw new IllegalArgumentException("Unknown run type");
     }
