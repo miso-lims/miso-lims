@@ -316,7 +316,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
           if (isDetailedLibraryAliquot(aliquot) && !isChanged(LibraryAliquot::getAlias, aliquot, beforeChange)) {
             ((DetailedLibraryAliquot) aliquot).setNonStandardAlias(true);
           } else {
-            throw new ValidationException(new ValidationError("alias", aliasValidation.getMessage()));
+            errors.add(new ValidationError("alias", aliasValidation.getMessage()));
           }
         }
       }
@@ -334,7 +334,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
     }
     if (aliquot.getKitDescriptor() != null && aliquot.getKitLot() == null
         && (beforeChange == null || beforeChange.getKitLot() != null)) {
-      ValidationError.forRequired("kitLot");
+      errors.add(ValidationError.forRequired("kitLot"));
     }
     validateUriComponent("kitLot", aliquot.getKitLot(), errors);
 
