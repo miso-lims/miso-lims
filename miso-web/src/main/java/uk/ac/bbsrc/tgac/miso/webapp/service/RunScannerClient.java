@@ -156,8 +156,8 @@ public class RunScannerClient {
           setSequencer(notificationRun, dto.getSequencerName());
           setRunSequencingParameters(notificationRun, dto);
           setContainers(notificationRun, dto);
-          Map<String, String> consumableLotNumbersByType = getConsumableLotNumbersByType(dto);
-          boolean isNew = runService.processNotification(notificationRun, consumableLotNumbersByType);
+          Map<String, String> consumableDataByType = getconsumableDataByType(dto);
+          boolean isNew = runService.processNotification(notificationRun, consumableDataByType);
           (isNew ? saveNew : saveUpdate).inc();
           saveCount.inc();
           badRuns.remove(dto.getRunAlias());
@@ -209,7 +209,7 @@ public class RunScannerClient {
     run.setSequencer(sequencer);
   }
 
-  private Map<String, String> getConsumableLotNumbersByType(NotificationDto dto) {
+  private Map<String, String> getconsumableDataByType(NotificationDto dto) {
     List<Consumable> consumables = getConsumables(dto);
     if (consumables == null || consumables.isEmpty()) {
       return Collections.emptyMap();

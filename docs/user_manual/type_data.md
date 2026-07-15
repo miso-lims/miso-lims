@@ -293,6 +293,13 @@ item, that item gains all of the fields defined by the SOP.
 SOP fields can only be added to run SOPs. Library and sample SOPs do not support SOP fields at this
 time.
 
+If Run Scanner is being used, run SOP field values may be automatically populated based on the
+consumables reported by Run Scanner. For this to work, the SOP field name in MISO must match the
+consumable type reported by Run Scanner. A suffix of "lot number", "lot no", "lot num", or "lot" may
+be added to the field name for clarity; matching is case-insensitive and ignores spaces and special
+characters. For example, a MISO SOP field named "Reagent LOT#" will be matched against a Run Scanner
+consumable type of "Reagent".
+
 
 ## Sample Indices
 

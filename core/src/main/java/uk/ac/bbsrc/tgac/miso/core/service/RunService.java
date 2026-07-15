@@ -47,11 +47,12 @@ public interface RunService extends DeleterService<Run>, SaveService<Run>, Pagin
    * Save a scanned run to the database or update the run if it exists.
    *
    * @param run the update from notification server
-   * @param consumableLotNumbersByType lot numbers reported by the notification server, keyed by consumable type
+   * @param consumableDataByType lot numbers reported by the notification server, keyed by consumable
+   *        type
    * @return true if the run is new, false if it already existed
    * @throws MisoNamingException
    */
-  boolean processNotification(Run run, Map<String, String> consumableLotNumbersByType)
+  boolean processNotification(Run run, Map<String, String> consumableDataByType)
       throws IOException, MisoNamingException;
 
 }

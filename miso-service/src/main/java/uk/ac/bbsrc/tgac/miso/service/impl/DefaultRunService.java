@@ -846,7 +846,7 @@ public class DefaultRunService implements RunService {
   }
 
   @Override
-  public boolean processNotification(Run source, Map<String, String> consumableLotNumbersByType)
+  public boolean processNotification(Run source, Map<String, String> consumableDataByType)
       throws IOException, MisoNamingException {
     User user = userService.getByLoginName("notification");
     final Run target;
@@ -883,7 +883,7 @@ public class DefaultRunService implements RunService {
     isMutated |= updateDataManglingPolicyFromNotification(target, source.getDataManglingPolicy(), user);
 
 
-    isMutated |= updateSopFieldValueFromConsumables(target, consumableLotNumbersByType);
+    isMutated |= updateSopFieldValuesFromConsumables(target, consumableDataByType);
 
     switch (source.getPlatformType()) {
       case ILLUMINA:
@@ -922,8 +922,8 @@ public class DefaultRunService implements RunService {
     return isNew;
   }
 
-  private boolean updateSopFieldValueFromConsumables(Run target, Map<String, String> consumableLotNumbersByType) {
-    if (consumableLotNumbersByType == null || consumableLotNumbersByType.isEmpty() || target.getSop() == null) {
+  private boolean updateSopFieldValuesFromConsumables(Run target, Map<String, String> consumableDataByType) {
+    if (consumableDataByType == null || consumableDataByType.isEmpty() || target.getSop() == null) {
       return false;
     }
 
@@ -937,7 +937,7 @@ public class DefaultRunService implements RunService {
         .collect(Collectors.toMap(value -> value.getSopField().getId(), value -> value));
 
     boolean changed = false;
-    for (Map.Entry<String, String> consumable : consumableLotNumbersByType.entrySet()) {
+    for (Map.Entry<String, String> consumable : consumableDataByType.entrySet()) {
       List<SopField> matchingFields = fieldsByConsumableName.get(normalizeConsumableFieldName(consumable.getKey()));
       if (matchingFields == null) {
         continue;
@@ -961,10 +961,8 @@ public class DefaultRunService implements RunService {
           existingValueByFieldId.put(sopField.getId(), existingValue);
         }
 
-        if (!Objects.equals(existingValue.getValue(), consumable.getValue())) {
-          existingValue.setValue(consumable.getValue());
-          changed = true;
-        }
+        existingValue.setValue(consumable.getValue());
+        changed = true;
       }
     }
 
