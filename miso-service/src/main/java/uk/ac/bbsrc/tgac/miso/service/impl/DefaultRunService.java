@@ -948,6 +948,7 @@ public class DefaultRunService implements RunService {
           continue;
         }
 
+        // Never overwrite existing values
         RunSopFieldValue existingValue = existingValueByFieldId.get(sopField.getId());
         if (existingValue != null && !isStringBlankOrNull(existingValue.getValue())) {
           continue;
