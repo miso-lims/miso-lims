@@ -7,6 +7,17 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.25.0] - 2026-07-16
+
+### Added
+
+* Run SOP field values can be automatically filled based on data from Run Scanner
+
+### Fixed
+
+* Some library aliquot validation messages were not being displayed
+
+
 ## [3.24.0] - 2026-07-02
 
 ### Added

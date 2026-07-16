@@ -1,1 +1,0 @@
-Run SOP field values can be automatically filled based on data from Run Scanner
