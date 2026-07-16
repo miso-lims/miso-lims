@@ -48,6 +48,7 @@ public class InstrumentModelRestControllerST extends AbstractST {
     dto.setNumContainers(1);
     dto.setInstrumentType("SEQUENCER");
     dto.setDataManglingPolicy("NONE");
+    dto.setDefaultRunSopId(6L);
     return dto;
   }
 
@@ -61,6 +62,7 @@ public class InstrumentModelRestControllerST extends AbstractST {
     assertEquals(1, newModel.getNumContainers());
     assertEquals(InstrumentType.SEQUENCER, newModel.getInstrumentType());
     assertEquals(InstrumentDataManglingPolicy.NONE, newModel.getDataManglingPolicy());
+    assertEquals(6L, newModel.getDefaultRunSop().getId());
 
   }
 

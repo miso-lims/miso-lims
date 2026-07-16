@@ -1,10 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.service;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,13 +21,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.PacBioNotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.UltimaNotificationDto;
-import ca.on.oicr.gsi.runscanner.dto.ProgressiveRequestDto;
-import ca.on.oicr.gsi.runscanner.dto.ProgressiveResponseDto;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +37,15 @@ import org.springframework.web.client.RestTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
+import ca.on.oicr.gsi.runscanner.dto.Consumable;
+import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
+import ca.on.oicr.gsi.runscanner.dto.PacBioNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.PacBioNotificationDto.SMRTCellPosition;
+import ca.on.oicr.gsi.runscanner.dto.ProgressiveRequestDto;
+import ca.on.oicr.gsi.runscanner.dto.ProgressiveResponseDto;
+import ca.on.oicr.gsi.runscanner.dto.UltimaNotificationDto;
 import io.prometheus.metrics.core.metrics.Counter;
 import io.prometheus.metrics.core.metrics.Gauge;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
@@ -152,8 +156,8 @@ public class RunScannerClient {
           setSequencer(notificationRun, dto.getSequencerName());
           setRunSequencingParameters(notificationRun, dto);
           setContainers(notificationRun, dto);
-
-          boolean isNew = runService.processNotification(notificationRun);
+          Map<String, String> consumableDataByType = getconsumableDataByType(dto);
+          boolean isNew = runService.processNotification(notificationRun, consumableDataByType);
           (isNew ? saveNew : saveUpdate).inc();
           saveCount.inc();
           badRuns.remove(dto.getRunAlias());
@@ -203,6 +207,32 @@ public class RunScannerClient {
       throw new IllegalArgumentException("No such sequencer: " + sequencerName);
     }
     run.setSequencer(sequencer);
+  }
+
+  private Map<String, String> getconsumableDataByType(NotificationDto dto) {
+    List<Consumable> consumables = getConsumables(dto);
+    if (consumables == null || consumables.isEmpty()) {
+      return Collections.emptyMap();
+    }
+
+    Map<String, String> lotNumbersByType = new HashMap<>();
+    for (Consumable consumable : consumables) {
+      if (isStringBlankOrNull(consumable.getType()) || isStringBlankOrNull(consumable.getLotNumber())) {
+        continue;
+      }
+      lotNumbersByType.put(consumable.getType(), consumable.getLotNumber());
+    }
+    return lotNumbersByType;
+  }
+
+  private List<Consumable> getConsumables(NotificationDto dto) {
+    if (dto instanceof IlluminaNotificationDto) {
+      return ((IlluminaNotificationDto) dto).getConsumables();
+    }
+    if (dto instanceof UltimaNotificationDto) {
+      return ((UltimaNotificationDto) dto).getConsumables();
+    }
+    return Collections.emptyList();
   }
 
   private void setRunSequencingParameters(Run to, NotificationDto from) throws IOException {
@@ -278,10 +308,9 @@ public class RunScannerClient {
   }
 
   private void setUltimaSequencingParameters(Run to, UltimaNotificationDto from,
-                                               Stream<SequencingParameters> instrumentParams) {
-    List<SequencingParameters> matchingParams = instrumentParams.filter(params ->
-      params.getFlows() == from.getExpectedFlows()
-    ).toList();
+      Stream<SequencingParameters> instrumentParams) {
+    List<SequencingParameters> matchingParams =
+        instrumentParams.filter(params -> params.getFlows() == from.getExpectedFlows()).toList();
     if (matchingParams.size() == 1) {
       to.setSequencingParameters(matchingParams.get(0));
     }

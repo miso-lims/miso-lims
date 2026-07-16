@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -845,7 +846,8 @@ public class DefaultRunService implements RunService {
   }
 
   @Override
-  public boolean processNotification(Run source) throws IOException, MisoNamingException {
+  public boolean processNotification(Run source, Map<String, String> consumableDataByType)
+      throws IOException, MisoNamingException {
     User user = userService.getByLoginName("notification");
     final Run target;
 
@@ -856,6 +858,7 @@ public class DefaultRunService implements RunService {
       target = source.getPlatformType().createRun();
       target.setAlias(source.getAlias());
       target.setSequencer(source.getSequencer());
+      target.setSop(getDefaultRunSop(target));
       isNew = true;
     } else {
       target = runFromDb;
@@ -878,6 +881,9 @@ public class DefaultRunService implements RunService {
     isMutated |= updateHealthFromNotification(source, target, user);
     isMutated |= updateSequencingKitFromNotification(target, source.getSequencingKit());
     isMutated |= updateDataManglingPolicyFromNotification(target, source.getDataManglingPolicy(), user);
+
+
+    isMutated |= updateSopFieldValuesFromConsumables(target, consumableDataByType);
 
     switch (source.getPlatformType()) {
       case ILLUMINA:
@@ -914,6 +920,70 @@ public class DefaultRunService implements RunService {
       update(target);
     }
     return isNew;
+  }
+
+  private boolean updateSopFieldValuesFromConsumables(Run target, Map<String, String> consumableDataByType) {
+    if (consumableDataByType == null || consumableDataByType.isEmpty() || target.getSop() == null) {
+      return false;
+    }
+
+    Map<String, List<SopField>> fieldsByConsumableName = new HashMap<>();
+    for (SopField field : target.getSop().getFields()) {
+      fieldsByConsumableName.computeIfAbsent(normalizeConsumableFieldName(field.getName()), key -> new ArrayList<>())
+          .add(field);
+    }
+
+    Map<Long, RunSopFieldValue> existingValueByFieldId = target.getSopFieldValues().stream()
+        .collect(Collectors.toMap(value -> value.getSopField().getId(), value -> value));
+
+    boolean changed = false;
+    for (Map.Entry<String, String> consumable : consumableDataByType.entrySet()) {
+      List<SopField> matchingFields = fieldsByConsumableName.get(normalizeConsumableFieldName(consumable.getKey()));
+      if (matchingFields == null) {
+        continue;
+      }
+
+      for (SopField sopField : matchingFields) {
+        if (!sopField.isValidValue(consumable.getValue())) {
+          continue;
+        }
+
+        // Never overwrite existing values
+        RunSopFieldValue existingValue = existingValueByFieldId.get(sopField.getId());
+        if (existingValue != null && !isStringBlankOrNull(existingValue.getValue())) {
+          continue;
+        }
+
+        if (existingValue == null) {
+          existingValue = new RunSopFieldValue();
+          existingValue.setRun(target);
+          existingValue.setSopField(sopField);
+          target.getSopFieldValues().add(existingValue);
+          existingValueByFieldId.put(sopField.getId(), existingValue);
+        }
+
+        existingValue.setValue(consumable.getValue());
+        changed = true;
+      }
+    }
+
+    return changed;
+  }
+
+  private static String normalizeConsumableFieldName(String name) {
+    if (name == null) {
+      return "";
+    }
+    String normalized = name.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
+    return normalized.replaceFirst("(lotnumber|lotno|lotnum|lot)$", "");
+  }
+
+  private static Sop getDefaultRunSop(Run run) {
+    InstrumentModel model = run.getSequencer().getInstrumentModel();
+    if (model == null || model.getDefaultRunSop() == null || model.getDefaultRunSop().isArchived()) {
+      return null;
+    }
+    return model.getDefaultRunSop();
   }
 
   private boolean updateMetricsFromNotification(Run source, Run target) {

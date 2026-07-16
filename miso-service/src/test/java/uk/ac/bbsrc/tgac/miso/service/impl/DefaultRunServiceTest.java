@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 import org.junit.Before;
@@ -116,7 +117,7 @@ public class DefaultRunServiceTest {
   @Test
   public void testProcessNotificationNoChange() throws Exception {
     Run notificationRun = makeRun();
-    assertFalse(sut.processNotification(notificationRun));
+    assertFalse(sut.processNotification(notificationRun, Collections.emptyMap()));
     Mockito.verify(runStore, Mockito.times(0)).create(Mockito.any());
     Mockito.verify(runStore, Mockito.times(0)).update(Mockito.any());
   }
@@ -126,7 +127,7 @@ public class DefaultRunServiceTest {
     Run notificationRun = makeRun();
     notificationRun.setHealth(HealthType.Running);
 
-    assertFalse(sut.processNotification(notificationRun));
+    assertFalse(sut.processNotification(notificationRun, Collections.emptyMap()));
     Mockito.verify(runStore, Mockito.times(0)).create(Mockito.any());
     Mockito.verify(runStore, Mockito.times(0)).update(Mockito.any());
   }

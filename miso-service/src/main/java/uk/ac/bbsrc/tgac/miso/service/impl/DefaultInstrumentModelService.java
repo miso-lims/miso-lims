@@ -16,12 +16,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
+import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
@@ -41,6 +44,8 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
   private SequencingContainerModelService containerModelService;
   @Autowired
   private SequencingParametersService sequencingParametersService;
+  @Autowired
+  private SopService sopService;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -82,6 +87,8 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
 
   @Override
   protected void loadChildEntities(InstrumentModel object) throws IOException {
+    loadChildEntity(object.getDefaultRunSop(), object::setDefaultRunSop, sopService);
+
     Set<InstrumentPosition> positions = new HashSet<>();
     for (InstrumentPosition pos : object.getPositions()) {
       if (pos.isSaved()) {
@@ -124,7 +131,21 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
       if (object.getDataManglingPolicy() != InstrumentDataManglingPolicy.NONE) {
         errors.add(new ValidationError("dataManglingPolicy", "Should be 'normal' for non-sequencer models"));
       }
+      if (object.getDefaultRunSop() != null) {
+        errors.add(new ValidationError("defaultRunSopId", "Should be empty for non-sequencer models"));
+      }
     }
+    Sop defaultRunSop = object.getDefaultRunSop();
+    if (defaultRunSop != null) {
+      if (defaultRunSop.getCategory() != SopCategory.RUN) {
+        errors.add(new ValidationError("defaultRunSopId", "Only run SOPs may be selected"));
+      }
+      if (defaultRunSop.isArchived() && (beforeChange == null || beforeChange.getDefaultRunSop() == null
+          || beforeChange.getDefaultRunSop().getId() != defaultRunSop.getId())) {
+        errors.add(new ValidationError("defaultRunSopId", "Archived SOPs may not be selected"));
+      }
+    }
+
     if (beforeChange != null) {
       Set<InstrumentPosition> removed = beforeChange.getPositions().stream()
           .filter(beforePos -> object.getPositions().stream().noneMatch(afterPos -> afterPos.getId() == beforePos.getId()))
@@ -161,6 +182,7 @@ public class DefaultInstrumentModelService extends AbstractSaveService<Instrumen
     to.setDescription(from.getDescription());
     to.setNumContainers(from.getNumContainers());
     to.setDataManglingPolicy(from.getDataManglingPolicy());
+    to.setDefaultRunSop(from.getDefaultRunSop());
 
     applyContainerModelChanges(to, from);
   }

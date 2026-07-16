@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.RunPartitionAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
@@ -108,7 +109,13 @@ public class EditRunController {
     }
     Run run = instrument.getInstrumentModel().getPlatformType().createRun();
     run.setSequencer(instrument);
+    run.setSop(getDefaultRunSop(instrument));
     return setupForm(run, model);
+  }
+
+  public Sop getDefaultRunSop(Instrument instrument) {
+      Sop defaultRunSop = instrument.getInstrumentModel().getDefaultRunSop();
+      return defaultRunSop == null || defaultRunSop.isArchived() ? null : defaultRunSop;
   }
 
   @GetMapping("/{runId}")

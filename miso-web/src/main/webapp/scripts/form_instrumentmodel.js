@@ -5,7 +5,8 @@ FormTarget.instrumentmodel = (function ($) {
   /*
    * Expected config {
    *   isAdmin: boolean
-   *   pageMode: string 'create' or 'edit'
+   *   pageMode: string 'create' or 'edit',
+   *   sops: array
    * }
    */
 
@@ -97,6 +98,22 @@ FormTarget.instrumentmodel = (function ($) {
           }, Constants.dataManglingPolicies).label;
         },
       },
+      {
+        title: "Default Run SOP",
+        data: "defaultRunSopId",
+        type: "read-only",
+        include: object.instrumentType === "SEQUENCER",
+        getDisplayValue: function (model) {
+          if (!model.defaultRunSopId) {
+            return "n/a";
+          }
+          var sop = Utils.array.findUniqueOrThrow(
+            Utils.array.idPredicate(model.defaultRunSopId),
+            config.sops || []
+          );
+          return sop.alias + " v." + sop.version;
+        },
+      },
     ];
   }
 
@@ -166,6 +183,9 @@ FormTarget.instrumentmodel = (function ($) {
             form.updateField("dataManglingPolicy", {
               source: Constants.dataManglingPolicies,
             });
+            form.updateField("defaultRunSopId", {
+              disabled: false,
+            });
           } else {
             form.updateField("dataManglingPolicy", {
               source: [
@@ -175,6 +195,10 @@ FormTarget.instrumentmodel = (function ($) {
                 },
               ],
               value: "NONE",
+            });
+            form.updateField("defaultRunSopId", {
+              disabled: true,
+              value: null,
             });
           }
         },
@@ -219,6 +243,21 @@ FormTarget.instrumentmodel = (function ($) {
           return item.value;
         },
         initial: "NONE",
+      },
+      {
+        title: "Default Run SOP",
+        data: "defaultRunSopId",
+        type: "dropdown",
+        include: object.instrumentType === "SEQUENCER" || config.pageMode === "create",
+        disabled: object.instrumentType !== "SEQUENCER",
+        source: (config.sops || []).filter(function (sop) {
+          return !sop.archived || object.defaultRunSopId === sop.id;
+        }),
+        sortSource: Utils.sorting.standardSort("alias"),
+        getItemLabel: function (item) {
+          return item.alias + " v." + item.version;
+        },
+        getItemValue: Utils.array.getId,
       },
     ];
   }

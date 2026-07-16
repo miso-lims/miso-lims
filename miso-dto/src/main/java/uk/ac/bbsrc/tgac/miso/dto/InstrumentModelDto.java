@@ -11,6 +11,7 @@ public class InstrumentModelDto {
   private String platformType;
   private String instrumentType;
   private String dataManglingPolicy;
+  private Long defaultRunSopId;
   private List<InstrumentPositionDto> positions;
   private List<SequencingContainerModelDto> containerModels;
   private boolean active;
@@ -69,6 +70,14 @@ public class InstrumentModelDto {
 
   public void setDataManglingPolicy(String dataManglingPolicy) {
     this.dataManglingPolicy = dataManglingPolicy;
+  }
+
+  public Long getDefaultRunSopId() {
+    return defaultRunSopId;
+  }
+
+  public void setDefaultRunSopId(Long defaultRunSopId) {
+    this.defaultRunSopId = defaultRunSopId;
   }
 
   public List<InstrumentPositionDto> getPositions() {
