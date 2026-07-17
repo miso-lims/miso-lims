@@ -91,7 +91,7 @@ public class StaticMappedNamingSchemeResolverService implements NamingSchemeReso
     libraryAliasValidators.put("v2", V2LibraryAliasValidator.class);
 
     libraryAliquotAliasValidators.put("default", DefaultLibraryAliquotAliasValidator.class);
-    libraryAliquotAliasValidators.put("allowAny", AllowAnythingValidator.class);
+    libraryAliquotAliasValidators.put("allowany", AllowAnythingValidator.class);
     libraryAliquotAliasValidators.put("oicr", OicrLibraryAliasValidator.class);
     libraryAliquotAliasValidators.put("v2", V2LibraryAliquotAliasValidator.class);
 
