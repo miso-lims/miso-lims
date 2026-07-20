@@ -6,7 +6,8 @@ FormTarget.run = (function ($) {
    * Expected config {
    *   isAdmin: boolean,
    *   isRunReviewer: boolean,
-   *   sops: array
+   *   sops: array,
+   *   instruments: array
    * }
    */
 
@@ -366,7 +367,7 @@ FormTarget.run = (function ($) {
               },
             ]),
           },
-          FormUtils.makeSopSection(object, config.sops),
+          FormUtils.makeSopSection(object, config.sops, config.instruments),
       ];
     },
     createSampleSheet: function (run, runPositions) {

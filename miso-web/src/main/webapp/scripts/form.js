@@ -418,11 +418,11 @@ FormUtils = (function ($) {
       ];
     },
 
-    makeSopSection: function (object, sops, title) {
+    makeSopSection: function (object, sops, instruments, title) {
       title = title || "SOP Information";
       return {
         title: title,
-        fields: makeSopSectionFields(object, sops, title),
+        fields: makeSopSectionFields(object, sops, instruments, title),
       };
     },
 
@@ -1063,7 +1063,7 @@ FormUtils = (function ($) {
     return section.id || containerId + "_" + section.title.replace(/\W/g, "") + "Section";
   }
 
-  function makeSopSectionFields(object, sops, title) {
+  function makeSopSectionFields(object, sops, instruments, title) {
     sops = sops || [];
     object.sopFieldValues = object.sopFieldValues || {};
 
@@ -1077,7 +1077,7 @@ FormUtils = (function ($) {
       var changeSop = function () {
         object.sopId = newSopId;
         object.sopFieldValues = {};
-        form.rewriteSection(title, makeSopSectionFields(object, sops, title));
+        form.rewriteSection(title, makeSopSectionFields(object, sops, instruments, title));
         form.markOtherChanges();
       };
 
@@ -1099,10 +1099,10 @@ FormUtils = (function ($) {
       } else {
         changeSop();
       }
-    }).concat(makeSopValueFields(sops, object.sopId));
+    }).concat(makeSopValueFields(sops, object.sopId, instruments));
   }
 
-  function makeSopValueFields(sops, sopId) {
+  function makeSopValueFields(sops, sopId, instruments) {
     if (!sopId) {
       return [];
     }
@@ -1113,6 +1113,20 @@ FormUtils = (function ($) {
     }
 
     return sop.fields.map(function (field) {
+      if (field.fieldType === "INSTRUMENT") {
+        return {
+          title: field.name + (field.units ? " (" + field.units + ")" : ""),
+          data: "sopFieldValues." + field.id,
+          type: "dropdown",
+          nullLabel: "SELECT",
+          source: (instruments || []).filter(function (instrument) {
+            return instrument.instrumentModelId === field.instrumentModelId;
+          }),
+          sortSource: Utils.sorting.standardSort("name"),
+          getItemLabel: Utils.array.getName,
+          getItemValue: Utils.array.getId,
+        };
+      }
       return {
         title: field.name + (field.units ? " (" + field.units + ")" : ""),
         data: "sopFieldValues." + field.id,

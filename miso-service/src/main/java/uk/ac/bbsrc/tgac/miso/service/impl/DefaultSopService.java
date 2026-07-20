@@ -141,6 +141,8 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
 
       if (field.getFieldType() == null) {
         errors.add(new ValidationError(FIELDS_PROPERTY, "Field type is required"));
+      } else if (field.getFieldType() == SopField.FieldType.INSTRUMENT && field.getInstrumentModel() == null) {
+        errors.add(new ValidationError(FIELDS_PROPERTY, "Instrument model is required for instrument fields"));
       }
     }
   }
@@ -196,6 +198,7 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
         newField.setName(fromField.getName());
         newField.setUnits(fromField.getUnits());
         newField.setFieldType(fromField.getFieldType());
+        newField.setInstrumentModel(fromField.getInstrumentModel());
         toFields.add(newField);
       }
     }

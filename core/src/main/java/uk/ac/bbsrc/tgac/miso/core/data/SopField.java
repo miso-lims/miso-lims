@@ -26,7 +26,7 @@ public class SopField implements Identifiable, Serializable {
   private static final long UNSAVED_ID = 0L;
 
   public enum FieldType {
-    TEXT, NUMBER
+    TEXT, NUMBER, INSTRUMENT
   }
 
   @Id
@@ -44,6 +44,10 @@ public class SopField implements Identifiable, Serializable {
 
   @Enumerated(EnumType.STRING)
   private FieldType fieldType;
+
+  @ManyToOne
+  @JoinColumn(name = "instrumentModelId")
+  private InstrumentModel instrumentModel;
 
   @Override
   public long getId() {
@@ -92,6 +96,14 @@ public class SopField implements Identifiable, Serializable {
     this.fieldType = fieldType;
   }
 
+  public InstrumentModel getInstrumentModel() {
+    return instrumentModel;
+  }
+
+  public void setInstrumentModel(InstrumentModel instrumentModel) {
+    this.instrumentModel = instrumentModel;
+  }
+
   public boolean isValidValue(String value) {
     if (value == null || value.isEmpty()) {
       return true;
@@ -106,6 +118,7 @@ public class SopField implements Identifiable, Serializable {
         return BigDecimalValidator.getInstance().validate(value) != null;
 
       case TEXT:
+      case INSTRUMENT:
       default:
         return true;
     }
@@ -113,7 +126,7 @@ public class SopField implements Identifiable, Serializable {
 
   @Override
   public int hashCode() {
-    return LimsUtils.hashCodeByIdFirst(this, name, units, fieldType, sop);
+    return LimsUtils.hashCodeByIdFirst(this, name, units, fieldType, sop, instrumentModel);
   }
 
   @Override
@@ -122,7 +135,8 @@ public class SopField implements Identifiable, Serializable {
         SopField::getName,
         SopField::getUnits,
         SopField::getFieldType,
-        SopField::getSop);
+        SopField::getSop,
+        SopField::getInstrumentModel);
   }
 }
 
