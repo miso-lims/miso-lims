@@ -1,0 +1,1 @@
+New sopField type instrument has been added.
