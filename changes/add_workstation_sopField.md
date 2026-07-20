@@ -1,0 +1,1 @@
+New sopField type workstation has been added.
