@@ -43,6 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionAliquotService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunPartitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.PartitionDto;
@@ -84,6 +85,8 @@ public class EditRunController {
   private ExperimentService experimentService;
   @Autowired
   private SopService sopService;
+  @Autowired
+  private WorkstationService workstationService;
   @Autowired(required = false)
   private IssueTrackerManager issueTrackerManager;
   @Autowired
@@ -196,6 +199,7 @@ public class EditRunController {
     formConfig.put("isAdmin", user.isAdmin());
     formConfig.put("isRunReviewer", user.isRunReviewer() || user.isAdmin());
     MisoWebUtils.addJsonArray(mapper, formConfig, "sops", sopService.listByCategory(SopCategory.RUN), Dtos::asDto);
+    MisoWebUtils.addJsonArray(mapper, formConfig, "workstations", workstationService.list(), Dtos::asDto);
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editRun.jsp", model);

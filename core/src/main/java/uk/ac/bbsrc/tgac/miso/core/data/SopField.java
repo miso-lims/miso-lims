@@ -26,7 +26,7 @@ public class SopField implements Identifiable, Serializable {
   private static final long UNSAVED_ID = 0L;
 
   public enum FieldType {
-    TEXT, NUMBER
+    TEXT, NUMBER, WORKSTATION
   }
 
   @Id
@@ -106,6 +106,7 @@ public class SopField implements Identifiable, Serializable {
         return BigDecimalValidator.getInstance().validate(value) != null;
 
       case TEXT:
+      case WORKSTATION:
       default:
         return true;
     }
