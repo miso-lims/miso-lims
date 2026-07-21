@@ -1,1 +1,1 @@
-New sopField type workstation has been added.
+New SOP field type for recording workstations used
