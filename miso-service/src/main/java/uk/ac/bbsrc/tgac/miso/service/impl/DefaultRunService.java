@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.validator.routines.BigDecimalValidator;
 import org.apache.commons.validator.routines.LongValidator;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -496,14 +497,33 @@ public class DefaultRunService implements RunService {
         errors.add(new ValidationError(property, "Maximum length: 255 characters"));
       }
 
-      boolean valid = sopField.isValidValue(value.getValue())
-          && (sopField.getFieldType() != SopField.FieldType.WORKSTATION || isValidWorkstation(value.getValue()));
-      if (!valid) {
+      if (!isValidSopFieldValue(sopField, value.getValue())) {
         errors.add(new ValidationError(property, "Invalid value for SOP field " + sopField.getName()));
       }
 
     }
 
+  }
+
+  boolean isValidSopFieldValue(SopField sopField, String value) throws IOException {
+    if (isStringBlankOrNull(value)) {
+      return true;
+    }
+    if (sopField.getFieldType() == null) {
+      throw new IllegalStateException("Field type is not set");
+    }
+
+    switch (sopField.getFieldType()) {
+      case NUMBER:
+        return BigDecimalValidator.getInstance().validate(value) != null;
+
+      case WORKSTATION:
+        return isValidWorkstation(value);
+
+      case TEXT:
+      default:
+        return true;
+    }
   }
 
   private boolean isValidWorkstation(String value) throws IOException {
@@ -933,7 +953,8 @@ public class DefaultRunService implements RunService {
     return isNew;
   }
 
-  private boolean updateSopFieldValuesFromConsumables(Run target, Map<String, String> consumableDataByType) {
+  private boolean updateSopFieldValuesFromConsumables(Run target, Map<String, String> consumableDataByType)
+      throws IOException {
     if (consumableDataByType == null || consumableDataByType.isEmpty() || target.getSop() == null) {
       return false;
     }
@@ -955,7 +976,7 @@ public class DefaultRunService implements RunService {
       }
 
       for (SopField sopField : matchingFields) {
-        if (!sopField.isValidValue(consumable.getValue())) {
+        if (!isValidSopFieldValue(sopField, consumable.getValue())) {
           continue;
         }
 

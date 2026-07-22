@@ -288,10 +288,10 @@ name and the new version. This way, you continue to track which version of an SO
 
 SOP fields are used to capture additional SOP-specific information, such as reagent LOT numbers.
 Each field has a name, a data type (text, number, workstation, or instrument), and optional units.
-A workstation field is entered by selecting one of the workstations defined in MISO, rather than
+When the SOP is added to an item, that item gains all of the fields defined by the SOP. A
+workstation field is entered by selecting one of the workstations defined in MISO, rather than
 typing a value. An instrument field also specifies an instrument model when it is created; the
-field is entered by selecting one of the instruments of that model defined in MISO. When the SOP
-is added to an item, that item gains all of the fields defined by the SOP.
+field is entered by selecting one of the instruments of that model defined in MISO.
 
 SOP fields can only be added to run SOPs. Library and sample SOPs do not support SOP fields at this
 time.

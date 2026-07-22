@@ -2,8 +2,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 
-import org.apache.commons.validator.routines.BigDecimalValidator;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -90,26 +88,6 @@ public class SopField implements Identifiable, Serializable {
 
   public void setFieldType(FieldType fieldType) {
     this.fieldType = fieldType;
-  }
-
-  public boolean isValidValue(String value) {
-    if (value == null || value.isEmpty()) {
-      return true;
-    }
-
-    if (fieldType == null) {
-      throw new IllegalStateException("Field type is not set");
-    }
-
-    switch (fieldType) {
-      case NUMBER:
-        return BigDecimalValidator.getInstance().validate(value) != null;
-
-      case TEXT:
-      case WORKSTATION:
-      default:
-        return true;
-    }
   }
 
   @Override
