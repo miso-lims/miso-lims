@@ -17,7 +17,7 @@ ListTarget.sopfield = (function ($) {
           label: "Type",
           type: "select",
           property: "fieldType",
-          values: ["TEXT", "NUMBER"],
+          values: ["TEXT", "NUMBER", "WORKSTATION"],
           required: true,
         },
         {

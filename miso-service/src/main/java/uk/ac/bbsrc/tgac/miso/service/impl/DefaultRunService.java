@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.validator.routines.BigDecimalValidator;
+import org.apache.commons.validator.routines.LongValidator;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +81,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
@@ -144,6 +147,8 @@ public class DefaultRunService implements RunService {
   private FileAttachmentService fileAttachmentService;
   @Autowired
   private SopService sopService;
+  @Autowired
+  private WorkstationService workstationService;
   @Autowired
   private HibernateUtilDao hibernateUtilDao;
 
@@ -444,7 +449,7 @@ public class DefaultRunService implements RunService {
     }
   }
 
-  private void validateSopFieldValues(Run run, List<ValidationError> errors) {
+  private void validateSopFieldValues(Run run, List<ValidationError> errors) throws IOException {
     if (run.getSopFieldValues() == null) {
       return;
     }
@@ -492,12 +497,37 @@ public class DefaultRunService implements RunService {
         errors.add(new ValidationError(property, "Maximum length: 255 characters"));
       }
 
-      if (!sopField.isValidValue(value.getValue())) {
+      if (!isValidSopFieldValue(sopField, value.getValue())) {
         errors.add(new ValidationError(property, "Invalid value for SOP field " + sopField.getName()));
       }
 
     }
 
+  }
+
+  boolean isValidSopFieldValue(SopField sopField, String value) throws IOException {
+    if (isStringBlankOrNull(value)) {
+      return true;
+    }
+    if (sopField.getFieldType() == null) {
+      throw new IllegalStateException("Field type is not set");
+    }
+
+    switch (sopField.getFieldType()) {
+      case NUMBER:
+        return BigDecimalValidator.getInstance().validate(value) != null;
+      case WORKSTATION:
+        return isValidWorkstation(value);
+      case TEXT:
+        return true;
+      default:
+        throw new IllegalArgumentException("Unhandled SOP field type: " + sopField.getFieldType());
+    }
+  }
+
+  private boolean isValidWorkstation(String value) throws IOException {
+    Long workstationId = LongValidator.getInstance().validate(value);
+    return workstationId != null && workstationService.get(workstationId) != null;
   }
 
   private static void validateSequencingParameters(Run run, PlatformType platformType, List<ValidationError> errors) {
@@ -922,7 +952,8 @@ public class DefaultRunService implements RunService {
     return isNew;
   }
 
-  private boolean updateSopFieldValuesFromConsumables(Run target, Map<String, String> consumableDataByType) {
+  private boolean updateSopFieldValuesFromConsumables(Run target, Map<String, String> consumableDataByType)
+      throws IOException {
     if (consumableDataByType == null || consumableDataByType.isEmpty() || target.getSop() == null) {
       return false;
     }
@@ -944,7 +975,7 @@ public class DefaultRunService implements RunService {
       }
 
       for (SopField sopField : matchingFields) {
-        if (!sopField.isValidValue(consumable.getValue())) {
+        if (!isValidSopFieldValue(sopField, consumable.getValue())) {
           continue;
         }
 
