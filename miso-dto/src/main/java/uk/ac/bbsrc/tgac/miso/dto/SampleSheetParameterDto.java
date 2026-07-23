@@ -2,8 +2,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import static uk.ac.bbsrc.tgac.miso.dto.Dtos.*;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-
+import tools.jackson.databind.node.ArrayNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetParameter;
 
 public class SampleSheetParameterDto {

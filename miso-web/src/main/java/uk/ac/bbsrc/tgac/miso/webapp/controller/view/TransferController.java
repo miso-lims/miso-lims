@@ -27,9 +27,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
@@ -83,7 +83,7 @@ public class TransferController {
   @Autowired
   private BoxService boxService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @Value("${miso.smtp.host:#{null}}")
   private String smtpHost;

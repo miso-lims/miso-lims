@@ -4,8 +4,8 @@ import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtil
 
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Maps;
 
@@ -15,7 +15,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.KitDescriptorPage.Field
 
 public class KitDescriptorPageIT extends AbstractIT {
 
-  @Before
+  @BeforeEach
   public void setup() {
     loginAdmin();
   }
@@ -56,7 +56,7 @@ public class KitDescriptorPageIT extends AbstractIT {
     assertFieldValues("post-save", fields, page2);
 
     long savedId = Long.parseLong(page2.getField(Field.ID));
-    KitDescriptor saved = (KitDescriptor) getSession().get(KitDescriptor.class, savedId);
+    KitDescriptor saved = (KitDescriptor) getSession().find(KitDescriptor.class, savedId);
     assertKitDescriptorAttributes(fields, saved);
   }
 
@@ -88,7 +88,7 @@ public class KitDescriptorPageIT extends AbstractIT {
 
     KitDescriptorPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
-    KitDescriptor saved = (KitDescriptor) getSession().get(KitDescriptor.class, 1L);
+    KitDescriptor saved = (KitDescriptor) getSession().find(KitDescriptor.class, 1L);
     assertKitDescriptorAttributes(fields, saved);
   }
 

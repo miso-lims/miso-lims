@@ -1,10 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.ArrayList;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -52,8 +52,8 @@ public class LibrarySpikeInRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // only admin can update these
-    LibrarySpikeInDto one = Dtos.asDto(currentSession().get(LibrarySpikeIn.class, 1));
-    LibrarySpikeInDto three = Dtos.asDto(currentSession().get(LibrarySpikeIn.class, 3));
+    LibrarySpikeInDto one = Dtos.asDto(currentSession().find(LibrarySpikeIn.class, 1));
+    LibrarySpikeInDto three = Dtos.asDto(currentSession().find(LibrarySpikeIn.class, 3));
     one.setAlias("one");
     three.setAlias("three");
 
@@ -75,8 +75,8 @@ public class LibrarySpikeInRestControllerST extends AbstractST {
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
     // only admin can update these
-    LibrarySpikeInDto one = Dtos.asDto(currentSession().get(LibrarySpikeIn.class, 1));
-    LibrarySpikeInDto three = Dtos.asDto(currentSession().get(LibrarySpikeIn.class, 3));
+    LibrarySpikeInDto one = Dtos.asDto(currentSession().find(LibrarySpikeIn.class, 1));
+    LibrarySpikeInDto three = Dtos.asDto(currentSession().find(LibrarySpikeIn.class, 3));
     one.setAlias("one");
     three.setAlias("three");
 

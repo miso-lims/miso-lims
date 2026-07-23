@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow;
 import uk.ac.bbsrc.tgac.miso.core.manager.WorkflowManager;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -26,7 +25,7 @@ public class WorkflowController {
   @Autowired
   WorkflowManager workflowManager;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @RequestMapping("/new/{workflowName}")
   public ModelAndView createWorkflow(@PathVariable String workflowName, ModelMap model) throws IOException {

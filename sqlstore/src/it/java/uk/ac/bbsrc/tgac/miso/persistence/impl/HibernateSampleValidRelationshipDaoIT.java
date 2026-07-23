@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -17,7 +17,7 @@ public class HibernateSampleValidRelationshipDaoIT extends AbstractDAOTest {
 
   private HibernateSampleValidRelationshipDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateSampleValidRelationshipDao();
     sut.setEntityManager(getEntityManager());
@@ -40,8 +40,8 @@ public class HibernateSampleValidRelationshipDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetByClasses() throws Exception {
-    SampleClass parent = (SampleClass) currentSession().get(SampleClassImpl.class, 1L);
-    SampleClass child = (SampleClass) currentSession().get(SampleClassImpl.class, 2L);
+    SampleClass parent = (SampleClass) currentSession().find(SampleClassImpl.class, 1L);
+    SampleClass child = (SampleClass) currentSession().find(SampleClassImpl.class, 2L);
     SampleValidRelationship relationship = sut.getByClasses(parent, child);
     assertNotNull(relationship);
     assertEquals(parent.getId(), relationship.getParent().getId());
@@ -51,14 +51,14 @@ public class HibernateSampleValidRelationshipDaoIT extends AbstractDAOTest {
   @Test
   public void testDelete() throws Exception {
     SampleValidRelationship before =
-        (SampleValidRelationship) currentSession().get(SampleValidRelationshipImpl.class, 4L);
+        (SampleValidRelationship) currentSession().find(SampleValidRelationshipImpl.class, 4L);
     assertNotNull(before);
     sut.delete(before);
 
     clearSession();
 
     SampleValidRelationship after =
-        (SampleValidRelationship) currentSession().get(SampleValidRelationshipImpl.class, 4L);
+        (SampleValidRelationship) currentSession().find(SampleValidRelationshipImpl.class, 4L);
     assertNull(after);
   }
 

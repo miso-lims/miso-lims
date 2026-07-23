@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
 import java.math.BigDecimal;
@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Maps;
 
@@ -28,7 +28,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestUtils;
 
 public class PoolPageIT extends AbstractIT {
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -65,7 +65,7 @@ public class PoolPageIT extends AbstractIT {
     fields.remove(Field.NAME);
     assertFieldValues("post-save", fields, page2);
     long savedId = Long.parseLong(page2.getField(Field.ID));
-    Pool savedPool = (Pool) getSession().get(PoolImpl.class, savedId);
+    Pool savedPool = (Pool) getSession().find(PoolImpl.class, savedId);
     fields.put(Field.NAME, "IPO" + savedId);
     assertPoolAttributes(fields, savedPool);
   }
@@ -103,7 +103,7 @@ public class PoolPageIT extends AbstractIT {
 
     PoolPage page2 = page1.save(false);
     assertFieldValues("post-save", fields, page2);
-    Pool savedPool = (Pool) getSession().get(PoolImpl.class, 120001L);
+    Pool savedPool = (Pool) getSession().find(PoolImpl.class, 120001L);
     assertPoolAttributes(fields, savedPool);
   }
 
@@ -139,7 +139,7 @@ public class PoolPageIT extends AbstractIT {
 
     PoolPage page2 = page1.save(false);
     assertFieldValues("post-save", fields, page2);
-    Pool savedPool = (Pool) getSession().get(PoolImpl.class, 120002L);
+    Pool savedPool = (Pool) getSession().find(PoolImpl.class, 120002L);
     assertPoolAttributes(fields, savedPool);
   }
 
@@ -175,7 +175,7 @@ public class PoolPageIT extends AbstractIT {
 
     PoolPage page2 = page1.save(false);
     assertFieldValues("post-save", fields, page2);
-    Pool savedPool = (Pool) getSession().get(PoolImpl.class, 120003L);
+    Pool savedPool = (Pool) getSession().find(PoolImpl.class, 120003L);
     assertPoolAttributes(fields, savedPool);
   }
 
@@ -199,7 +199,7 @@ public class PoolPageIT extends AbstractIT {
     changes.put(Field.VOLUME, "0.0");
     assertFieldValues("changes post-save", changes, page2);
 
-    Pool savedPool = (Pool) getSession().get(PoolImpl.class, 120004L);
+    Pool savedPool = (Pool) getSession().find(PoolImpl.class, 120004L);
     assertTrue(savedPool.isDiscarded());
     assertEquals(0, savedPool.getVolume().compareTo(BigDecimal.ZERO));
   }
@@ -218,7 +218,7 @@ public class PoolPageIT extends AbstractIT {
 
   // This test fails some of the time on Travis, for no good reason,
   // so it's disabled until we fix it for good.
-  @Ignore
+  @Disabled
   @Test
   public void testAddNote() throws Exception {
     PoolPage page1 = PoolPage.getForEdit(getDriver(), getBaseUrl(), 120001L);
@@ -260,7 +260,7 @@ public class PoolPageIT extends AbstractIT {
     // goal: add one library aliquot by selecting it from the list of available aliquots on the pool page
     PoolPage page1 = PoolPage.getForEdit(getDriver(), getBaseUrl(), 701L);
     assertEquals(0, page1.countAliquots());
-    page1.addAliquots(Arrays.asList("LDI701"));
+    page1.addAliquots(List.of("LDI701"));
 
     PoolPage page2 = page1.save(false);
     assertEquals(1, page2.countAliquots());
@@ -272,7 +272,7 @@ public class PoolPageIT extends AbstractIT {
     PoolPage page1 = PoolPage.getForEdit(getDriver(), getBaseUrl(), 702L);
     assertEquals(1, page1.countAliquots());
 
-    page1.removeAliquotsByName(Arrays.asList("LDI702"));
+    page1.removeAliquotsByName(List.of("LDI702"));
     PoolPage page2 = page1.save(false);
     assertEquals(0, page2.countAliquots());
   }
@@ -286,8 +286,7 @@ public class PoolPageIT extends AbstractIT {
 
   private void testLibraryAliquotTableWarningOnPoolWithError(long id, String warning) {
     PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), id);
-    assertTrue("Library aliquot table fails to show '" + warning + "' warning",
-        page.hasAliquotWarning(warning));
+    assertTrue(page.hasAliquotWarning(warning), "Library aliquot table fails to show '" + warning + "' warning");
   }
 
   @Test
@@ -300,7 +299,7 @@ public class PoolPageIT extends AbstractIT {
 
   public void testHeaderWarningOnPoolWithError(long id, String warning) {
     PoolPage page = PoolPage.getForEdit(getDriver(), getBaseUrl(), id);
-    assertTrue("Page fails to show '" + warning + "' warning", page.getField(Field.WARNINGS).contains(warning));
+    assertTrue(page.getField(Field.WARNINGS).contains(warning), "Page fails to show '" + warning + "' warning");
   }
 
   @Test

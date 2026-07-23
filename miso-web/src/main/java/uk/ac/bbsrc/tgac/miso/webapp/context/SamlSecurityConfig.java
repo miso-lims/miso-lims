@@ -22,9 +22,12 @@ import org.springframework.security.converter.RsaKeyConverters;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.saml2.core.Saml2X509Credential;
-import org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider;
-import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
+import org.springframework.security.saml2.provider.service.authentication.OpenSaml5AuthenticationProvider;
+import org.springframework.security.saml2.provider.service.authentication.OpenSaml5AuthenticationProvider.ResponseAuthenticationConverter;
+import org.springframework.security.saml2.provider.service.authentication.Saml2AssertionAuthentication;
 import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
+import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticationToken;
+import org.springframework.security.saml2.provider.service.authentication.Saml2ResponseAssertionAccessor;
 import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
@@ -77,14 +80,14 @@ public class SamlSecurityConfig {
       builder.signingX509Credentials(c -> c.add(loadSigningCredential(privateKey, certificate)));
     } else {
       builder.authnRequestsSigned(false)
-          .assertingPartyDetails(party -> party.wantAuthnRequestsSigned(false));
+          .assertingPartyMetadata(party -> party.wantAuthnRequestsSigned(false));
     }
 
     return new InMemoryRelyingPartyRegistrationRepository(builder.build());
   }
 
   @Bean
-  public OpenSaml4AuthenticationProvider samlAuthenticationProvider(
+  public OpenSaml5AuthenticationProvider samlAuthenticationProvider(
       SecurityManager securityManager,
       @Value("${security.saml.usernameAttribute}") String usernameAttribute,
       @Value("${security.saml.firstNameAttribute}") String firstNameAttribute,
@@ -99,20 +102,23 @@ public class SamlSecurityConfig {
           "Both security.saml.internalRoleName and security.saml.adminRoleName must be set");
     }
 
-    OpenSaml4AuthenticationProvider provider = new OpenSaml4AuthenticationProvider();
+    OpenSaml5AuthenticationProvider provider = new OpenSaml5AuthenticationProvider();
     provider.setResponseAuthenticationConverter(token -> {
-      Saml2Authentication auth =
-          OpenSaml4AuthenticationProvider.createDefaultResponseAuthenticationConverter().convert(token);
+      Saml2AuthenticationToken authenticationToken = token.getToken();
+      RelyingPartyRegistration registration = authenticationToken.getRelyingPartyRegistration();
+      Saml2Authentication auth = new ResponseAuthenticationConverter().convert(token);
+      Saml2ResponseAssertionAccessor assertionAccessor =
+          (Saml2ResponseAssertionAccessor) auth.getCredentials();
+      List<GrantedAuthority> authorities =
+          mapAuthorities(assertionAccessor, rolesAttribute, internalRoleName, adminRoleName);
 
-      Saml2AuthenticatedPrincipal principal = (Saml2AuthenticatedPrincipal) auth.getPrincipal();
-      List<GrantedAuthority> authorities = mapAuthorities(principal, rolesAttribute, internalRoleName, adminRoleName);
       SamlUserDetails userDetails = new SamlUserDetails(
-          getRequiredAttribute(principal, usernameAttribute).toLowerCase(Locale.ROOT),
-          getRequiredAttribute(principal, firstNameAttribute) + " "
-              + getRequiredAttribute(principal, lastNameAttribute),
-          getRequiredAttribute(principal, emailAttribute),
+          getRequiredAttribute(assertionAccessor, usernameAttribute).toLowerCase(Locale.ROOT),
+          getRequiredAttribute(assertionAccessor, firstNameAttribute) + " "
+              + getRequiredAttribute(assertionAccessor, lastNameAttribute),
+          getRequiredAttribute(assertionAccessor, emailAttribute),
           authorities,
-          principal);
+          assertionAccessor);
 
       if (hasMisoLoginAuthority(authorities)) {
         try {
@@ -122,7 +128,8 @@ public class SamlSecurityConfig {
         }
       }
 
-      return new Saml2Authentication(userDetails, auth.getSaml2Response(), authorities);
+      return new Saml2AssertionAuthentication(userDetails, assertionAccessor, authorities,
+          registration.getRegistrationId());
     });
 
     return provider;
@@ -133,7 +140,7 @@ public class SamlSecurityConfig {
       HttpSecurity http,
       ApiKeyAuthenticationFilter apiKeyFilter,
       AuthenticationSuccessHandler successHandler,
-      OpenSaml4AuthenticationProvider samlAuthenticationProvider,
+      OpenSaml5AuthenticationProvider samlAuthenticationProvider,
       @Value("${security.saml.sp.registrationId:miso}") String registrationId) throws Exception {
 
     String sloUrl = "/logout/saml2/slo/" + registrationId;
@@ -166,8 +173,8 @@ public class SamlSecurityConfig {
         .build();
   }
 
-  private static String getRequiredAttribute(Saml2AuthenticatedPrincipal principal, String attribute) {
-    String value = principal.getFirstAttribute(attribute);
+  private static String getRequiredAttribute(Saml2ResponseAssertionAccessor assertionAccessor, String attribute) {
+    String value = assertionAccessor.getFirstAttribute(attribute);
     if (value == null || value.isBlank()) {
       throw new IllegalArgumentException("Missing SAML attribute: " + attribute);
     }
@@ -175,8 +182,9 @@ public class SamlSecurityConfig {
   }
 
   private static List<GrantedAuthority> mapAuthorities(
-      Saml2AuthenticatedPrincipal principal, String rolesAttribute, String internalRoleName, String adminRoleName) {
-    List<Object> roles = principal.getAttribute(rolesAttribute);
+      Saml2ResponseAssertionAccessor assertionAccessor, String rolesAttribute, String internalRoleName,
+      String adminRoleName) {
+    List<Object> roles = assertionAccessor.getAttribute(rolesAttribute);
     List<GrantedAuthority> result = new ArrayList<>();
     if (roles == null)
       return result;

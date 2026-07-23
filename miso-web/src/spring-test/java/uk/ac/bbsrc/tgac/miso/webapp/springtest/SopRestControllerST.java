@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import javax.ws.rs.core.MediaType;
@@ -50,7 +50,7 @@ public class SopRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testUpdate() throws Exception {
-    SopDto dto = Dtos.asDto(currentSession().get(entityClass, 1L));
+    SopDto dto = Dtos.asDto(currentSession().find(entityClass, 1L));
     dto.setAlias("modified sop");
 
     Sop updatedSop = baseTestUpdate(CONTROLLER_BASE, dto, 1, entityClass);
@@ -59,7 +59,7 @@ public class SopRestControllerST extends AbstractST {
 
   @Test
   public void testUpdateFail() throws Exception {
-    SopDto dto = Dtos.asDto(currentSession().get(entityClass, 1L));
+    SopDto dto = Dtos.asDto(currentSession().find(entityClass, 1L));
     dto.setAlias("modified sop");
 
     testUpdateUnauthorized(CONTROLLER_BASE, dto, 1, entityClass);

@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.web.servlet.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
@@ -21,7 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.dto.PoolOrderDto;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Arrays;
@@ -49,7 +49,7 @@ public class PoolOrderRestControllerST extends AbstractST {
 
   @Test
   public void testUpdate() throws Exception {
-    PoolOrderDto poolOrder = Dtos.asDto(currentSession().get(entityClass, 1));
+    PoolOrderDto poolOrder = Dtos.asDto(currentSession().find(entityClass, 1));
     poolOrder.setAlias("updated");
 
     PoolOrder updated = baseTestUpdate(CONTROLLER_BASE, poolOrder, 1, entityClass);

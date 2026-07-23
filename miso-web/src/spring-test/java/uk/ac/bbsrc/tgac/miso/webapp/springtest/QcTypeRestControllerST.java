@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.dto.QcTypeDto;
 
 import static org.hamcrest.Matchers.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import org.springframework.test.web.servlet.MockMvc;
 
 
@@ -73,7 +73,7 @@ public class QcTypeRestControllerST extends AbstractST {
   public void testUpdate() throws Exception {
     // only admin can update
 
-    QcTypeDto dto = Dtos.asDto(currentSession().get(entityClass, 101));
+    QcTypeDto dto = Dtos.asDto(currentSession().find(entityClass, 101));
     dto.setDescription("updated");
     QcType updated = baseTestUpdate(CONTROLLER_BASE, dto, dto.getId().intValue(), entityClass);
     assertEquals(dto.getDescription(), updated.getDescription());
@@ -82,7 +82,7 @@ public class QcTypeRestControllerST extends AbstractST {
 
   @Test
   public void testUpdateFail() throws Exception {
-    QcTypeDto dto = Dtos.asDto(currentSession().get(entityClass, 101));
+    QcTypeDto dto = Dtos.asDto(currentSession().find(entityClass, 101));
     dto.setDescription("updated");
     testUpdateUnauthorized(CONTROLLER_BASE, dto, dto.getId().intValue(), entityClass);
   }

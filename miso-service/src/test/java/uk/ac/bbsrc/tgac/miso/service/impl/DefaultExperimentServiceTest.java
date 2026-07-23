@@ -1,14 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -32,10 +31,9 @@ import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 
 public class DefaultExperimentServiceTest {
 
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
-
   private final Experiment experiment = new Experiment();
+
+  private AutoCloseable mockito;
 
   @Mock
   private ExperimentStore experimentStore;
@@ -58,9 +56,9 @@ public class DefaultExperimentServiceTest {
   @InjectMocks
   private DefaultExperimentService sut;
 
-  @Before
+  @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     Mockito.when(namingSchemeHolder.getPrimary()).thenReturn(namingScheme);
     Mockito.when(namingScheme.validateName(ArgumentMatchers.any())).thenReturn(ValidationResult.success());
     experiment.setInstrumentModel(new InstrumentModel());
@@ -69,6 +67,11 @@ public class DefaultExperimentServiceTest {
     experiment.getLibrary().setId(3L);
     experiment.setStudy(new StudyImpl());
     experiment.getStudy().setId(5L);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test

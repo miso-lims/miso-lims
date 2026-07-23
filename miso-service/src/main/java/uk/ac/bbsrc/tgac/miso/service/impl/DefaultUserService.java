@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +93,7 @@ public class DefaultUserService implements UserService {
 
     original.setFullName(user.getFullName());
     original.setEmail(user.getEmail());
-    original.setFavouriteWorkflows(user.getFavouriteWorkflows());
+    original.setFavouriteWorkflows(new HashSet<>(user.getFavouriteWorkflows()));
     if (currentUser == null || currentUser.isAdmin()) {
       original.setInternal(user.isInternal());
       original.setRoles(user.getRoles());

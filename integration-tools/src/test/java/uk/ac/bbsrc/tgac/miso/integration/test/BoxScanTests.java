@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.integration.test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
@@ -55,16 +55,16 @@ public abstract class BoxScanTests<T extends BoxScan> {
     BoxScan fullScan = getFullScan();
     Map<String, String> map = fullScan.getBarcodesMap();
     String position = BoxUtils.getPositionString(0, 0);
-    assertEquals(map.get(position), "11111");
-    assertEquals(position, "A01");
+    assertEquals("11111", map.get(position));
+    assertEquals("A01", position);
     try {
       map.put(position, "changed");
     } catch (UnsupportedOperationException e) {
       // ignore exception. This means the map itself is immutable
     }
     map = fullScan.getBarcodesMap();
-    assertEquals(map.get(position), "11111");
-    assertEquals(map.get(position), map.get("A01"));
+    assertEquals("11111", map.get(position));
+    assertEquals(map.get("A01"), map.get(position));
   }
   
   @Test
@@ -72,10 +72,10 @@ public abstract class BoxScanTests<T extends BoxScan> {
     BoxScan fullScan = getFullScan();
     assertTrue(fullScan.isFull());
     assertFalse(fullScan.isEmpty());
-    assertEquals(fullScan.getColumnCount(), 2);
-    assertEquals(fullScan.getRowCount(), 2);
-    assertEquals(fullScan.getMaximumTubeCount(), 4);
-    assertEquals(fullScan.getTubeCount(), 4);
+    assertEquals(2, fullScan.getColumnCount());
+    assertEquals(2, fullScan.getRowCount());
+    assertEquals(4, fullScan.getMaximumTubeCount());
+    assertEquals(4, fullScan.getTubeCount());
     assertFalse(fullScan.hasReadErrors());
   }
   
@@ -84,10 +84,10 @@ public abstract class BoxScanTests<T extends BoxScan> {
     BoxScan emptyScan = getEmptyScan();
     assertFalse(emptyScan.isFull());
     assertTrue(emptyScan.isEmpty());
-    assertEquals(emptyScan.getColumnCount(), 2);
-    assertEquals(emptyScan.getRowCount(), 2);
-    assertEquals(emptyScan.getMaximumTubeCount(), 4);
-    assertEquals(emptyScan.getTubeCount(), 0);
+    assertEquals(2, emptyScan.getColumnCount());
+    assertEquals(2, emptyScan.getRowCount());
+    assertEquals(4, emptyScan.getMaximumTubeCount());
+    assertEquals(0, emptyScan.getTubeCount());
     assertFalse(emptyScan.hasReadErrors());
   }
   
@@ -96,13 +96,13 @@ public abstract class BoxScanTests<T extends BoxScan> {
     BoxScan erredScan = getErredScan();
     assertTrue(erredScan.isFull());
     assertFalse(erredScan.isEmpty());
-    assertEquals(erredScan.getColumnCount(), 2);
-    assertEquals(erredScan.getRowCount(), 2);
-    assertEquals(erredScan.getMaximumTubeCount(), 4);
-    assertEquals(erredScan.getTubeCount(), 4);
+    assertEquals(2, erredScan.getColumnCount());
+    assertEquals(2, erredScan.getRowCount());
+    assertEquals(4, erredScan.getMaximumTubeCount());
+    assertEquals(4, erredScan.getTubeCount());
     assertTrue(erredScan.hasReadErrors());
     List<String> errPositions = erredScan.getReadErrorPositions();
-    assertEquals(errPositions.size(), 2);
+    assertEquals(2, errPositions.size());
     assertTrue("A02".equals(errPositions.get(0)) || "A02".equals(errPositions.get(1)));
     assertTrue("B01".equals(errPositions.get(0)) || "B01".equals(errPositions.get(1)));
   }

@@ -77,7 +77,7 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
     id.setRun(run);
     id.setPartition(partition);
     id.setAliquot(aliquot);
-    RunPartitionAliquot result = (RunPartitionAliquot) currentSession().get(RunPartitionAliquot.class, id);
+    RunPartitionAliquot result = (RunPartitionAliquot) currentSession().find(RunPartitionAliquot.class, id);
     if (result == null) {
       // ensure the relationship exists before constructing the entity
       QueryBuilder<Object[], Run> idBuilder = new QueryBuilder<>(currentSession(), Run.class, Object[].class);
@@ -253,7 +253,8 @@ public class HibernateRunPartitionAliquotDao implements RunPartitionAliquotDao {
   public void deleteForRunContainer(Run run, SequencerPartitionContainer container) throws IOException {
     QueryBuilder<RunPartitionAliquot, RunPartitionAliquot> builder =
         new QueryBuilder<>(currentSession(), RunPartitionAliquot.class, RunPartitionAliquot.class);
-    Join<RunPartitionAliquot, Partition> partition = builder.getJoin(builder.getRoot(), RunPartitionAliquot_.partition);
+    Join<RunPartitionAliquot, PartitionImpl> partition =
+        builder.getJoin(builder.getRoot(), RunPartitionAliquot_.partition);
     builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(RunPartitionAliquot_.run), run));
     builder.addPredicate(builder.getCriteriaBuilder().equal(partition.get("sequencerPartitionContainer"), container));
     List<RunPartitionAliquot> items = builder.getResultList();

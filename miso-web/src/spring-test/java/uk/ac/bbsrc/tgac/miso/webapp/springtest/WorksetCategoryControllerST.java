@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetCategory;
 
 import java.util.Arrays;
 import java.util.List;
 import com.jayway.jsonpath.JsonPath;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WorksetCategoryControllerST extends AbstractST {
     private static final String CONTROLLER_BASE = "/worksetcategory";
@@ -16,7 +16,7 @@ public class WorksetCategoryControllerST extends AbstractST {
         assertEquals(Integer.valueOf(ids.size()), JsonPath.read(resultJson, "$.length()"));
 
         for (int i = 0; i < ids.size(); i++) {
-            WorksetCategory dbObject = currentSession().get(entityClass, ids.get(i));
+            WorksetCategory dbObject = currentSession().find(entityClass, ids.get(i));
             assertEquals(dbObject.getId(), readLong(resultJson, "$[" + i + "].id"));
             assertEquals(dbObject.getAlias(), JsonPath.read(resultJson, "$[" + i + "].alias"));
         }

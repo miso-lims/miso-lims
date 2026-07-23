@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.hibernate.query.Query;
 import java.util.Arrays;
 
@@ -73,7 +73,7 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
     long savedId = getTestSubject().create(sop);
     clearSession();
 
-    Sop loaded = currentSession().get(Sop.class, savedId);
+    Sop loaded = currentSession().find(Sop.class, savedId);
     assertNotNull(loaded);
     assertNotNull(loaded.getFields());
     assertEquals(2, loaded.getFields().size());
@@ -92,8 +92,8 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
       }
     }
 
-    assertTrue("Should have Flow Cell Lot field", hasFlowCell);
-    assertTrue("Should have PhiX % field", hasPhiX);
+    assertTrue(hasFlowCell, "Should have Flow Cell Lot field");
+    assertTrue(hasPhiX, "Should have PhiX % field");
   }
 
   @Test
@@ -136,19 +136,19 @@ public class HibernateSopDaoIT extends AbstractHibernateSaveDaoTest<Sop, Hiberna
   @Test
   public void testDeleteSopCascadesToFields() throws Exception {
     long sopId = 101L;
-    Sop db = currentSession().get(Sop.class, sopId);
-    assertNotNull("Missing SOP test data with ID " + sopId, db);
+    Sop db = currentSession().find(Sop.class, sopId);
+    assertNotNull(db, "Missing SOP test data with ID " + sopId);
 
     Query<Long> countBeforeQ = currentSession().createQuery(
         "select count(f) from SopField f where f.sop.id = :sopId", Long.class);
     countBeforeQ.setParameter("sopId", sopId);
     Long countBefore = countBeforeQ.uniqueResult();
-    assertTrue("Expected at least one field for test SOP " + sopId, countBefore > 0);
+    assertTrue(countBefore > 0, "Expected at least one field for test SOP " + sopId);
 
     currentSession().remove(db);
     clearSession();
 
-    assertNull(currentSession().get(Sop.class, sopId));
+    assertNull(currentSession().find(Sop.class, sopId));
 
     Query<Long> countAfterQ = currentSession().createQuery(
         "select count(f) from SopField f where f.sop.id = :sopId", Long.class);

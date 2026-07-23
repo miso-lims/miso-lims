@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -20,7 +20,7 @@ public class HibernateTissueTypeDaoIT extends AbstractDAOTest {
 
   private HibernateTissueTypeDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateTissueTypeDao();
     sut.setEntityManager(getEntityManager());
@@ -55,13 +55,13 @@ public class HibernateTissueTypeDaoIT extends AbstractDAOTest {
     TissueType tt = new TissueTypeImpl();
     tt.setAlias(alias);
     tt.setDescription("descriptive stuff");
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     tt.setChangeDetails(user);
     long savedId = sut.create(tt);
 
     clearSession();
 
-    TissueType saved = (TissueType) currentSession().get(TissueTypeImpl.class, savedId);
+    TissueType saved = (TissueType) currentSession().find(TissueTypeImpl.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -69,20 +69,20 @@ public class HibernateTissueTypeDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Name";
-    TissueType tt = (TissueType) currentSession().get(TissueTypeImpl.class, id);
+    TissueType tt = (TissueType) currentSession().find(TissueTypeImpl.class, id);
     assertNotEquals(alias, tt.getAlias());
     tt.setAlias(alias);
     sut.update(tt);
 
     clearSession();
 
-    TissueType saved = (TissueType) currentSession().get(TissueTypeImpl.class, id);
+    TissueType saved = (TissueType) currentSession().find(TissueTypeImpl.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    TissueType tt = (TissueType) currentSession().get(TissueTypeImpl.class, 1L);
+    TissueType tt = (TissueType) currentSession().find(TissueTypeImpl.class, 1L);
     assertEquals("Test Type", tt.getAlias());
     assertEquals(5L, sut.getUsage(tt));
   }

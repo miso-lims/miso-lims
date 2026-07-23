@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -16,7 +16,7 @@ public class HibernateLibrarySelectionDaoIT extends AbstractDAOTest {
 
   private HibernateLibrarySelectionDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateLibrarySelectionDao();
     sut.setEntityManager(getEntityManager());
@@ -56,7 +56,7 @@ public class HibernateLibrarySelectionDaoIT extends AbstractDAOTest {
     clearSession();
 
     LibrarySelectionType saved =
-        (LibrarySelectionType) currentSession().get(LibrarySelectionType.class, savedId);
+        (LibrarySelectionType) currentSession().find(LibrarySelectionType.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -65,7 +65,7 @@ public class HibernateLibrarySelectionDaoIT extends AbstractDAOTest {
     long id = 1L;
     String name = "New Name";
     LibrarySelectionType type =
-        (LibrarySelectionType) currentSession().get(LibrarySelectionType.class, id);
+        (LibrarySelectionType) currentSession().find(LibrarySelectionType.class, id);
     assertNotEquals(name, type.getName());
     type.setName(name);
     sut.update(type);
@@ -73,14 +73,14 @@ public class HibernateLibrarySelectionDaoIT extends AbstractDAOTest {
     clearSession();
 
     LibrarySelectionType saved =
-        (LibrarySelectionType) currentSession().get(LibrarySelectionType.class, id);
+        (LibrarySelectionType) currentSession().find(LibrarySelectionType.class, id);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsageByLibraries() throws IOException {
     LibrarySelectionType type =
-        (LibrarySelectionType) currentSession().get(LibrarySelectionType.class, 1L);
+        (LibrarySelectionType) currentSession().find(LibrarySelectionType.class, 1L);
     assertEquals("RT-PCR", type.getName());
     assertEquals(15L, sut.getUsageByLibraries(type));
   }
@@ -88,7 +88,7 @@ public class HibernateLibrarySelectionDaoIT extends AbstractDAOTest {
   @Test
   public void testGetUsageByLibraryDesigns() throws IOException {
     LibrarySelectionType type =
-        (LibrarySelectionType) currentSession().get(LibrarySelectionType.class, 1L);
+        (LibrarySelectionType) currentSession().find(LibrarySelectionType.class, 1L);
     assertEquals(2L, sut.getUsageByLibraryDesigns(type));
   }
 

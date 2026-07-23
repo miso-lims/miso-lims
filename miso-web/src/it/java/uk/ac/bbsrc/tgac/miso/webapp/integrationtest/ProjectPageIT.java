@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.text.DateFormat;
@@ -11,11 +11,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Sets;
 
+import org.openqa.selenium.WebElement;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage.Fields;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage.ProjectTable;
@@ -24,7 +25,7 @@ public class ProjectPageIT extends AbstractIT {
 
   private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -51,8 +52,8 @@ public class ProjectPageIT extends AbstractIT {
     unsaved.put(Fields.PIPELINE, "Special");
     unsaved.put(Fields.ADDITIONAL_DETAILS, "This is a test");
 
-    assertEquals("Project ID is unsaved", unsaved.get(Fields.ID), page.getId());
-    assertEquals("Project name is unsaved", unsaved.get(Fields.NAME), page.getName());
+    assertEquals(unsaved.get(Fields.ID), page.getId(), "Project ID is unsaved");
+    assertEquals(unsaved.get(Fields.NAME), page.getName(), "Project name is unsaved");
     page.setTitle(unsaved.get(Fields.TITLE));
     page.setCode(unsaved.get(Fields.CODE));
     page.setDescription(unsaved.get(Fields.DESCRIPTION));
@@ -63,10 +64,10 @@ public class ProjectPageIT extends AbstractIT {
 
     ProjectPage savedPage = page.clickSave();
 
-    assertNotEquals("Project ID is now a number", unsaved.get(Fields.ID), savedPage.getId());
-    assertNotEquals("Project name is saved", unsaved.get(Fields.NAME), savedPage.getName());
-    assertEquals("Project creation date saved correctly", unsaved.get(Fields.CREATION_DATE),
-        savedPage.getCreationDate());
+    assertNotEquals(unsaved.get(Fields.ID), savedPage.getId(), "Project ID is now a number");
+    assertNotEquals(unsaved.get(Fields.NAME), savedPage.getName(), "Project name is saved");
+    assertEquals(unsaved.get(Fields.CREATION_DATE), savedPage.getCreationDate(),
+        "Project creation date saved correctly");
     assertEquals(unsaved.get(Fields.TITLE), savedPage.getTitle());
     assertEquals(unsaved.get(Fields.CODE), savedPage.getCode());
     assertEquals(unsaved.get(Fields.DESCRIPTION), savedPage.getDescription());
@@ -129,12 +130,12 @@ public class ProjectPageIT extends AbstractIT {
     Set<String> tableIds = Sets.newHashSet(ProjectTable.STUDIES, ProjectTable.SAMPLES, ProjectTable.LIBRARIES,
         ProjectTable.LIBRARY_ALIQUOTS, ProjectTable.POOLS,
         ProjectTable.RUNS);
-    tableIds.forEach(id -> assertNotNull("table " + id + " should exist on page", page.getTable(id)));
+    tableIds.forEach(id -> assertNotNull(page.getTable(id), "table " + id + " should exist on page"));
 
     String errorString = page.getVisibleErrors().stream()
-        .filter(error -> !error.getText().isEmpty())
-        .map(error -> error.getText())
+        .map(WebElement::getText)
+        .filter(text -> !text.isEmpty())
         .collect(Collectors.joining());
-    assertTrue("unexpected errors on project tables: " + errorString, isStringEmptyOrNull(errorString));
+    assertTrue(isStringEmptyOrNull(errorString), "unexpected errors on project tables: " + errorString);
   }
 }

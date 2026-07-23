@@ -15,8 +15,6 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
@@ -48,7 +46,7 @@ public abstract class RelationFinder<M extends Identifiable> {
       this.category = category;
     }
 
-    public final List<D> handle(Collection<M> items) throws IOException, JsonProcessingException {
+    public final List<D> handle(Collection<M> items) throws IOException {
       List<String> errors = new ArrayList<>();
 
       Stream<P> relationStream = Stream.empty();

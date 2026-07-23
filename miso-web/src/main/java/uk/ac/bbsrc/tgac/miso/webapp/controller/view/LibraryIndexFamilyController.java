@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryIndexFamilyService;
@@ -31,7 +30,7 @@ public class LibraryIndexFamilyController
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   public LibraryIndexFamilyController() {
     super("Library Index Families", "libraryindexfamily", "libraryindexfamily");

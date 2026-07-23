@@ -2,8 +2,6 @@ package uk.ac.bbsrc.tgac.miso.integration.dp5mirage;
 
 import static uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils.GetPostParamRequest;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,21 +9,23 @@ import java.net.http.HttpClient;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpResponse;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.BoxScanner;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
-import java.util.Map;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
- * This class integrates the MirageDP5 scanner with MISO, and involves communicating with
- * the scanner software via API.
- * For proper usage, see {@link BoxScanner}
+ * This class integrates the MirageDP5 scanner with MISO, and involves communicating with the
+ * scanner software via API. For proper usage, see {@link BoxScanner}
  */
 
 public class DP5MirageScanner implements BoxScanner {
@@ -37,8 +37,9 @@ public class DP5MirageScanner implements BoxScanner {
       "mirage96sbs");
   protected static final Logger log = LoggerFactory.getLogger(DP5MirageScanner.class);
 
-  public record DP5MirageScanPosition (String barcode, String decodeStatus, int y, int x, int row,
-                              int column) {}
+  public record DP5MirageScanPosition(String barcode, String decodeStatus, int y, int x, int row,
+      int column) {
+  }
 
   /**
    * Constructs a new DP5MirageScanner to communicate with a DP5-headless server and retrieve scan
@@ -59,7 +60,7 @@ public class DP5MirageScanner implements BoxScanner {
   }
 
   @Override
-  public BoxScan getScan() throws IntegrationException{
+  public BoxScan getScan() throws IntegrationException {
     HttpResponse<String> response;
     List<DP5MirageScanPosition> records;
     try {
@@ -72,40 +73,33 @@ public class DP5MirageScanner implements BoxScanner {
       if (response.statusCode() != 200) {
         if (response.statusCode() == 453) {
           throwScanError(String.format("Container is not found. Check that a container with the "
-                  + "container ID: %s is created on the DP5 application", DP5MirageScanner.params.get(
-                      "container_uid")),
+              + "container ID: %s is created on the DP5 application",
+              DP5MirageScanner.params.get(
+                  "container_uid")),
               true);
-        }
-        else if (response.statusCode() == 456) {
+        } else if (response.statusCode() == 456) {
           throwScanError("Scanner type mismatch", false);
-        }
-        else if (response.statusCode() == 459) {
+        } else if (response.statusCode() == 459) {
           throwScanError("The scan is not found",
               false);
-        }
-        else if (response.statusCode() == 461) {
+        } else if (response.statusCode() == 461) {
           throwScanError("The Scanner is not connected. Please check the connection before "
-              + "rescanning",true);
-        }
-        else if (response.statusCode() == 468) {
-          throwScanError("Scan result is not ready" ,false);
-        }
-        else if (response.statusCode() == 477) {
-          throwScanError("Failed to read a barcode" ,false);
-        }
-        else if (response.statusCode() == 478) {
-          throwScanError("Scanner not found" ,true);
-        }
-        else if (response.statusCode() == 488) {
-          throwScanError("Linear Reader is not configured" ,false);
-        }
-        else {
+              + "rescanning", true);
+        } else if (response.statusCode() == 468) {
+          throwScanError("Scan result is not ready", false);
+        } else if (response.statusCode() == 477) {
+          throwScanError("Failed to read a barcode", false);
+        } else if (response.statusCode() == 478) {
+          throwScanError("Scanner not found", true);
+        } else if (response.statusCode() == 488) {
+          throwScanError("Linear Reader is not configured", false);
+        } else {
           throwScanError(String.format("Status code %d", response.statusCode()), false);
         }
       }
 
       // Parse JSON into a JsonNode
-      ObjectMapper mapper = new ObjectMapper();
+      JsonMapper mapper = JsonMapper.builder().build();
       JsonNode rootNode = mapper.readTree(response.body());
 
       // Convert the 'barcodes' array into a list of barcodePositionData records

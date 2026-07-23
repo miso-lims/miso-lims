@@ -1,17 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -29,8 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateStudyDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -38,22 +35,25 @@ public class HibernateStudyDaoIT extends AbstractDAOTest {
   @InjectMocks
   private HibernateStudyDao dao;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
   public void testCreateNull() throws IOException, MisoNamingException {
-    exception.expect(IllegalArgumentException.class);
-    dao.create(null);
+    assertThrows(IllegalArgumentException.class, () -> dao.create(null));
   }
 
   @Test
   public void testUpdateNull() throws IOException, MisoNamingException {
-    exception.expect(IllegalArgumentException.class);
-    dao.update(null);
+    assertThrows(IllegalArgumentException.class, () -> dao.update(null));
   }
 
   @Test
@@ -92,7 +92,7 @@ public class HibernateStudyDaoIT extends AbstractDAOTest {
   @Test
   public void testListByProjectId() throws IOException {
     List<Study> studies = dao.listByProjectId(1L);
-    assertTrue(studies.size() > 0);
+    assertFalse(studies.isEmpty());
   }
 
   @Test
@@ -104,7 +104,7 @@ public class HibernateStudyDaoIT extends AbstractDAOTest {
   @Test
   public void testListAllWithNegativeLimit() throws IOException {
     List<Study> studies = dao.listAllWithLimit(-1L);
-    assertTrue(studies.size() > 0);
+    assertFalse(studies.isEmpty());
   }
 
   private Study makeStudy() {
@@ -135,7 +135,7 @@ public class HibernateStudyDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetUsage() throws Exception {
-    Study study = (Study) currentSession().get(StudyImpl.class, 1L);
+    Study study = (Study) currentSession().find(StudyImpl.class, 1L);
     assertEquals(25L, dao.getUsage(study));
   }
 

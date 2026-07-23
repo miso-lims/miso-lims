@@ -1,47 +1,18 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.web.servlet.*;
 
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
-
-import javax.ws.rs.core.MediaType;
-
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
-import com.jayway.jsonpath.JsonPath;
-
-import static org.hamcrest.Matchers.*;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.BoxSizeDto;
 
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.View;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.security.test.context.support.WithMockUser;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
-import static org.junit.Assert.*;
-import java.util.Collections;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
-import java.util.Arrays;
 import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
-
 
 public class BoxSizeRestControllerST extends AbstractST {
 
@@ -75,13 +46,13 @@ public class BoxSizeRestControllerST extends AbstractST {
     assertEquals(5, sizes.get(0).getRows().intValue());
     assertEquals(5, sizes.get(0).getColumns().intValue());
     assertEquals("STORAGE", sizes.get(0).getBoxType().toString());
-    assertEquals(false, sizes.get(0).getScannable());
+    assertFalse(sizes.get(0).getScannable());
 
 
     assertEquals(6, sizes.get(1).getRows().intValue());
     assertEquals(6, sizes.get(1).getColumns().intValue());
     assertEquals("PLATE", sizes.get(1).getBoxType().toString());
-    assertEquals(false, sizes.get(1).getScannable());
+    assertFalse(sizes.get(1).getScannable());
   }
 
   @Test
@@ -94,8 +65,8 @@ public class BoxSizeRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
-    BoxSizeDto size2 = Dtos.asDto(currentSession().get(entityClass, 2));
-    BoxSizeDto size3 = Dtos.asDto(currentSession().get(entityClass, 3));
+    BoxSizeDto size2 = Dtos.asDto(currentSession().find(entityClass, 2));
+    BoxSizeDto size3 = Dtos.asDto(currentSession().find(entityClass, 3));
 
     size2.setRows(15);
     size3.setRows(17);
@@ -115,8 +86,8 @@ public class BoxSizeRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
-    BoxSizeDto size2 = Dtos.asDto(currentSession().get(entityClass, 2));
-    BoxSizeDto size3 = Dtos.asDto(currentSession().get(entityClass, 3));
+    BoxSizeDto size2 = Dtos.asDto(currentSession().find(entityClass, 2));
+    BoxSizeDto size3 = Dtos.asDto(currentSession().find(entityClass, 3));
 
     size2.setRows(15);
     size3.setRows(17);

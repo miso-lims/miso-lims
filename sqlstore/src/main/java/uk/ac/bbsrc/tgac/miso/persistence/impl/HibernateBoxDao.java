@@ -51,7 +51,7 @@ public class HibernateBoxDao extends HibernateProviderDao<Box>
   @Override
   public Boxable getBoxable(BoxableId id) {
     Class<?> clazz = id.getTargetType().getPersistClass();
-    return (Boxable) currentSession().get(clazz, id.getTargetId());
+    return (Boxable) currentSession().find(clazz, id.getTargetId());
   }
 
   @Override
@@ -156,7 +156,7 @@ public class HibernateBoxDao extends HibernateProviderDao<Box>
 
   @Override
   public BoxableView getBoxableView(BoxableId id) throws IOException {
-    return (BoxableView) currentSession().get(id.getTargetType().getViewClass(), id.getTargetId());
+    return (BoxableView) currentSession().find(id.getTargetType().getViewClass(), id.getTargetId());
   }
 
   @Override

@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -64,8 +64,8 @@ public class PartitionQcTypeRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // the admin user made these PartitionQCTypes so only admin can update them
-    PartitionQCTypeDto pqt1 = Dtos.asDto(currentSession().get(PartitionQCType.class, 1));
-    PartitionQCTypeDto pqt2 = Dtos.asDto(currentSession().get(PartitionQCType.class, 2));
+    PartitionQCTypeDto pqt1 = Dtos.asDto(currentSession().find(PartitionQCType.class, 1));
+    PartitionQCTypeDto pqt2 = Dtos.asDto(currentSession().find(PartitionQCType.class, 2));
 
     pqt1.setDescription("pqt1");
     pqt2.setDescription("pqt2");
@@ -83,8 +83,8 @@ public class PartitionQcTypeRestControllerST extends AbstractST {
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
     // the admin user made these PartitionQcTypes so only admin can update them
-    PartitionQCTypeDto pqt1 = Dtos.asDto(currentSession().get(PartitionQCType.class, 1));
-    PartitionQCTypeDto pqt2 = Dtos.asDto(currentSession().get(PartitionQCType.class, 2));
+    PartitionQCTypeDto pqt1 = Dtos.asDto(currentSession().find(PartitionQCType.class, 1));
+    PartitionQCTypeDto pqt2 = Dtos.asDto(currentSession().find(PartitionQCType.class, 2));
 
     pqt1.setDescription("pqt1");
     pqt2.setDescription("pqt2");

@@ -1,22 +1,20 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -29,8 +27,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.InstrumentStore;
 
 public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -44,20 +41,25 @@ public class HibernateServiceRecordDaoIT extends AbstractDAOTest {
   @InjectMocks
   private HibernateServiceRecordDao dao;
 
-  @Before
+  @BeforeEach
   public void setup() throws IOException {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
 
     emptySR.setId(2L);
     Mockito.when(instrumentDao.get(ArgumentMatchers.anyLong())).thenReturn(emptySR);
   }
 
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
+  }
+
   @Test
   public void testSaveNew() throws IOException {
 
     String title = "New Record 1";
-    Long newId = dao.create(makeServiceRecord(title));
+    long newId = dao.create(makeServiceRecord(title));
 
     ServiceRecord savedRec = dao.get(newId);
     assertEquals(title, savedRec.getTitle());

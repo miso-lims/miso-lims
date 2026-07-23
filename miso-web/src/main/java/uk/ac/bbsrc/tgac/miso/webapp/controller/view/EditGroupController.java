@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.Group;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.service.GroupService;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -29,7 +28,7 @@ public class EditGroupController {
   @Autowired
   private UserService userService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
   public ModelAndView setupForm(ModelMap model) throws IOException {
@@ -51,7 +50,7 @@ public class EditGroupController {
     return setupForm(group, model);
   }
 
-  private ModelAndView setupForm(Group group, ModelMap model) throws JsonProcessingException {
+  private ModelAndView setupForm(Group group, ModelMap model) {
     model.put("group", group);
     model.put("groupDto", mapper.writeValueAsString(Dtos.asDto(group)));
 

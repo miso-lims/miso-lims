@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Arrays;
@@ -148,7 +148,7 @@ public class LibraryAliquotRestControllerST extends AbstractST {
 
   @Test
   public void testUpdate() throws Exception {
-    LibraryAliquot lib = currentSession().get(entityClass, 1);
+    LibraryAliquot lib = currentSession().find(entityClass, 1);
     lib.setAlias("TEST_1111_Bn_R_PE_300_WG");
 
     LibraryAliquot updated = baseTestUpdate(CONTROLLER_BASE, Dtos.asDto(lib, true), 1, entityClass);
@@ -203,8 +203,8 @@ public class LibraryAliquotRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // the admin user made these LibraryAliquots so only admin can update them
-    LibraryAliquotDto libal1 = Dtos.asDto(currentSession().get(entityClass, 1), true);
-    LibraryAliquotDto libal2 = Dtos.asDto(currentSession().get(entityClass, 304), true);
+    LibraryAliquotDto libal1 = Dtos.asDto(currentSession().find(entityClass, 1), true);
+    LibraryAliquotDto libal2 = Dtos.asDto(currentSession().find(entityClass, 304), true);
     libal1.setAlias("TEST_1111_Bn_R_PE_300_WG");
     libal2.setAlias("TEST_2222_Bn_R_PE_300_WG");
 

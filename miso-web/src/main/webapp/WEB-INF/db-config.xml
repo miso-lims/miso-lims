@@ -26,6 +26,7 @@
     <property name="jpaProperties">
       <props>
         <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+        <prop key="hibernate.max_fetch_depth">2</prop>
       </props>
     </property>
   </bean>

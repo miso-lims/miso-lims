@@ -16,10 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jakarta.ws.rs.QueryParam;
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.service.ExperimentService;
 import uk.ac.bbsrc.tgac.miso.core.service.SubmissionService;
@@ -38,7 +36,7 @@ public class EditSubmissionController {
   @Autowired
   private ExperimentService experimentService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @GetMapping(value = "/new")
   public ModelAndView newSubmission(@QueryParam("experimentIds") String experimentIds, ModelMap model)
@@ -57,7 +55,7 @@ public class EditSubmissionController {
     return setupForm(submission, "Submission " + submissionId, model);
   }
 
-  private ModelAndView setupForm(Submission submission, String title, ModelMap model) throws JsonProcessingException {
+  private ModelAndView setupForm(Submission submission, String title, ModelMap model) {
     model.put("title", title);
     model.put("submission", submission);
     model.put("submissionDto", mapper.writeValueAsString(Dtos.asDto(submission)));

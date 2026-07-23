@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOAD_SEQUENCER;
 
 import java.util.Arrays;
@@ -9,9 +9,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
 
-import org.hibernate.Session;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
@@ -47,6 +47,8 @@ public class HibernateProgressDaoIT extends AbstractDAOTest {
   private static final long SAMPLE_ID = 3;
   private static final long POOL_ID = 2;
 
+  private AutoCloseable mockito;
+
   // Progress objects that mirror most of the attributes of the objects in the test database
   private Progress progress1;
   private Progress progress2;
@@ -57,12 +59,17 @@ public class HibernateProgressDaoIT extends AbstractDAOTest {
   @PersistenceContext
   private EntityManager entityManager;
 
-  @Before
+  @BeforeEach
   public void setup() {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
     progress1 = createProgress1();
     progress2 = createProgress2();
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
@@ -106,9 +113,7 @@ public class HibernateProgressDaoIT extends AbstractDAOTest {
    */
   public long save(Progress progress) {
     long id = dao.save(progress).getId();
-    Session session = entityManager.unwrap(Session.class);
-    session.flush();
-    session.clear();
+    clearSession();
     return id;
   }
 
@@ -221,6 +226,6 @@ public class HibernateProgressDaoIT extends AbstractDAOTest {
   }
 
   private User getDefaultUser() {
-    return (User) entityManager.unwrap(Session.class).get(UserImpl.class, USER_ID);
+    return (User) currentSession().find(UserImpl.class, USER_ID);
   }
 }

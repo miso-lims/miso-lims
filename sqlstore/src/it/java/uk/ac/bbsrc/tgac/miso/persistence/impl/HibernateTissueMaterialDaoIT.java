@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -31,7 +31,7 @@ public class HibernateTissueMaterialDaoIT
   public TissueMaterial getCreateItem() {
     TissueMaterial material = new TissueMaterialImpl();
     material.setAlias("New Mat");
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     material.setChangeDetails(user);
     return material;
   }
@@ -44,9 +44,9 @@ public class HibernateTissueMaterialDaoIT
 
   @Test
   public void testGetUsage() throws Exception {
-    TissueMaterial material1 = (TissueMaterial) currentSession().get(TissueMaterialImpl.class, 1L);
+    TissueMaterial material1 = (TissueMaterial) currentSession().find(TissueMaterialImpl.class, 1L);
     assertEquals(0, getTestSubject().getUsage(material1));
-    TissueMaterial material2 = (TissueMaterial) currentSession().get(TissueMaterialImpl.class, 2L);
+    TissueMaterial material2 = (TissueMaterial) currentSession().find(TissueMaterialImpl.class, 2L);
     assertEquals(2, getTestSubject().getUsage(material2));
   }
 

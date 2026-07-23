@@ -33,7 +33,7 @@ public class HibernateAttachableDao implements AttachableStore {
 
   @Override
   public Attachable getManaged(Attachable object) {
-    return (Attachable) currentSession().get(object.getClass(), object.getId());
+    return (Attachable) currentSession().find(object.getClass(), object.getId());
   }
 
   @Override
@@ -43,7 +43,7 @@ public class HibernateAttachableDao implements AttachableStore {
 
   @Override
   public FileAttachment getAttachment(long attachmentId) {
-    return (FileAttachment) currentSession().get(FileAttachment.class, attachmentId);
+    return (FileAttachment) currentSession().find(FileAttachment.class, attachmentId);
   }
 
   @Override

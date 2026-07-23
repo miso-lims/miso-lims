@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
@@ -30,7 +29,7 @@ public class EditStudyController {
   @Autowired
   private StudyService studyService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   public void setProjectService(ProjectService projectService) {
     this.projectService = projectService;

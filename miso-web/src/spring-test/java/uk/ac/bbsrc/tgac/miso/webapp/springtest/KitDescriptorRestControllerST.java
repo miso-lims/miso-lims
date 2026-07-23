@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.web.servlet.*;
 
@@ -21,7 +21,7 @@ import uk.ac.bbsrc.tgac.miso.dto.KitDescriptorDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.KitDescriptorRestController.KitChangeTargetedSequencingRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.KitDescriptorRestController;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.LinkedMultiValueMap;
 import java.util.Arrays;
@@ -72,7 +72,7 @@ public class KitDescriptorRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
-    KitDescriptor changed = currentSession().get(entityClass, 1);
+    KitDescriptor changed = currentSession().find(entityClass, 1);
     Set<TargetedSequencing> seq = changed.getTargetedSequencing();
     assertTrue(seq.size() == 1);
     assertTrue(seq.iterator().next().getId() == 3);
@@ -139,7 +139,7 @@ public class KitDescriptorRestControllerST extends AbstractST {
   public void testUpdate() throws Exception {
     // must be admin to update
 
-    KitDescriptorDto kitdesc = Dtos.asDto(currentSession().get(entityClass, 1));
+    KitDescriptorDto kitdesc = Dtos.asDto(currentSession().find(entityClass, 1));
     kitdesc.setName("updated");
     KitDescriptor updated = baseTestUpdate(CONTROLLER_BASE, kitdesc, 1, entityClass);
     assertEquals("updated", updated.getName());
@@ -149,7 +149,7 @@ public class KitDescriptorRestControllerST extends AbstractST {
   public void testUpdateFail() throws Exception {
     // must be admin to update
 
-    KitDescriptorDto kitdesc = Dtos.asDto(currentSession().get(entityClass, 1));
+    KitDescriptorDto kitdesc = Dtos.asDto(currentSession().find(entityClass, 1));
     kitdesc.setName("updated");
     testUpdateUnauthorized(CONTROLLER_BASE, kitdesc, 1, entityClass);
   }

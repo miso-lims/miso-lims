@@ -6,8 +6,9 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.ObjectPostProcessor;
+import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
@@ -33,11 +34,14 @@ public class AdSecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(ObjectPostProcessor<Object> postProcessor,
+  public AuthenticationManager authenticationManager(HttpSecurity http, ObjectPostProcessor<Object> postProcessor,
       AuthenticationProvider authenticationProvider) throws Exception {
-    return new AuthenticationManagerBuilder(postProcessor)
-        .authenticationProvider(authenticationProvider)
-        .build();
+    AuthenticationManagerBuilder authenticationManagerBuilder =
+        http.getSharedObject(AuthenticationManagerBuilder.class);
+    authenticationManagerBuilder
+        .objectPostProcessor(postProcessor)
+        .authenticationProvider(authenticationProvider);
+    return authenticationManagerBuilder.build();
   }
 
 }

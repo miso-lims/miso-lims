@@ -1,23 +1,19 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdScalarDeserializer;
+import tools.jackson.databind.module.SimpleModule;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
-import java.io.IOException;
 
 public class JsonStringValidator extends SimpleModule {
 
   public JsonStringValidator() {
     addDeserializer(String.class, new StdScalarDeserializer<>(String.class) {
       @Override
-      public String deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-          throws IOException, JacksonException {
+      public String deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) {
         // remove tabs and trim white space
         String string = jsonParser.getValueAsString()
             .replaceAll("[\\t]", " ")
@@ -27,7 +23,7 @@ public class JsonStringValidator extends SimpleModule {
           return null;
         } else if (!string.matches("^[^<>]*$")) {
           // never allow <> in Strings
-          throw new ValidationException(new ValidationError(jsonParser.getCurrentName(),
+          throw new ValidationException(new ValidationError(jsonParser.currentName(),
               "Cannot contain the characters <>"));
         } else {
           return string;

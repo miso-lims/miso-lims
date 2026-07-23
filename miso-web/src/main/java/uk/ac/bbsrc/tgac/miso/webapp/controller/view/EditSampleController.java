@@ -26,10 +26,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.Group;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.ws.rs.BadRequestException;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -121,7 +121,7 @@ public class EditSampleController {
   @Autowired
   private IndexChecker indexChecker;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -399,7 +399,7 @@ public class EditSampleController {
   private final class BulkEditSampleBackend extends BulkEditTableBackend<Sample, SampleDto> {
     private String targetCategory = null;
 
-    private BulkEditSampleBackend(ObjectMapper mapper) {
+    private BulkEditSampleBackend(JsonMapper mapper) {
       super("sample", SampleDto.class, "Samples", mapper);
     }
 
@@ -432,7 +432,7 @@ public class EditSampleController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       config.put(Config.TARGET_CATEGORY, targetCategory);
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
       addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
@@ -446,8 +446,8 @@ public class EditSampleController {
     private final BoxDto newBox;
     private final Set<Group> recipientGroups;
 
-    private BulkPropagateSampleBackend(String targetCategory, Long sopId, BoxDto newBox,
-        Set<Group> recipientGroups, ObjectMapper mapper) {
+    private BulkPropagateSampleBackend(String targetCategory, Long sopId, BoxDto newBox, Set<Group> recipientGroups,
+        JsonMapper mapper) {
       super("sample", SampleDto.class, "Samples", "Samples", mapper);
       this.targetCategory = targetCategory;
       this.sopId = sopId;
@@ -522,7 +522,7 @@ public class EditSampleController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       config.put(Config.SOURCE_CATEGORY, sourceCategory);
       config.put(Config.TARGET_CATEGORY, targetCategory);
       config.putPOJO(Config.SOP_ID, sopId);
@@ -542,8 +542,7 @@ public class EditSampleController {
     private final Set<Group> recipientGroups;
 
     public BulkCreateSampleBackend(Class<? extends SampleDto> dtoClass, SampleDto dto, Integer quantity,
-        Project project,
-        String targetCategory, Set<Group> recipientGroups, ObjectMapper mapper) {
+        Project project, String targetCategory, Set<Group> recipientGroups, JsonMapper mapper) {
       super("sample", dtoClass, "Samples", dto, quantity, mapper);
       this.targetCategory = targetCategory;
       this.project = project;
@@ -552,7 +551,7 @@ public class EditSampleController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       config.put(Config.TARGET_CATEGORY, targetCategory);
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), project -> Dtos.asDto(project, true));
       config.put(Config.DEFAULT_SCI_NAME, defaultSciName);
@@ -574,13 +573,13 @@ public class EditSampleController {
 
     private final Sample sample;
 
-    public BulkEditProbesBackend(Sample sample, ObjectMapper mapper) {
+    public BulkEditProbesBackend(Sample sample, JsonMapper mapper) {
       super("probe", ProbeDto.class, mapper);
       this.sample = sample;
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       config.put("sampleId", sample.getId());
     }
 

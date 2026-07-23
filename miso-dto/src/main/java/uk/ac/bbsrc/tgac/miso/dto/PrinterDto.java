@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class PrinterDto {
   private boolean available;

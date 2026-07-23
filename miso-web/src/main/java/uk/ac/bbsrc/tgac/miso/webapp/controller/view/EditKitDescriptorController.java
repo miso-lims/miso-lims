@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.service.KitDescriptorService;
@@ -30,7 +28,7 @@ public class EditKitDescriptorController {
   @Autowired
   private KitDescriptorService kitService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   public void setKitService(KitDescriptorService kitService) {
     this.kitService = kitService;
@@ -52,7 +50,7 @@ public class EditKitDescriptorController {
     return setupForm(kitDescriptor, model);
   }
 
-  public ModelAndView setupForm(KitDescriptor kitDescriptor, ModelMap model) throws JsonProcessingException {
+  public ModelAndView setupForm(KitDescriptor kitDescriptor, ModelMap model) {
     model.put("kitDescriptor", kitDescriptor);
     model.put("associatedTargetedSequencings", Dtos.asTargetedSequencingDtos(kitDescriptor.getTargetedSequencing()));
 

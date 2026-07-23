@@ -1,13 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -22,10 +20,7 @@ public class HibernateAttachableDaoIT extends AbstractDAOTest {
 
   private HibernateAttachableDao sut;
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
-
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateAttachableDao();
     sut.setEntityManager(getEntityManager());
@@ -33,9 +28,9 @@ public class HibernateAttachableDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetManagedAttachable() throws Exception {
-    Sample sample = (Sample) currentSession().get(SampleImpl.class, 1L);
+    Sample sample = (Sample) currentSession().find(SampleImpl.class, 1L);
     Attachable attachable = sut.getManaged(sample);
-    assertTrue(attachable instanceof Sample);
+    assertInstanceOf(Sample.class, attachable);
     assertEquals(sample.getId(), attachable.getId());
   }
 
@@ -43,16 +38,16 @@ public class HibernateAttachableDaoIT extends AbstractDAOTest {
   public void testSaveAttachable() throws Exception {
     long sampleId = 1L;
     long newAttachmentId = 2L;
-    Sample sample = (Sample) currentSession().get(SampleImpl.class, sampleId);
+    Sample sample = (Sample) currentSession().find(SampleImpl.class, sampleId);
     assertFalse(sample.getAttachments().stream().anyMatch(x -> x.getId() == newAttachmentId));
-    FileAttachment attachment = (FileAttachment) currentSession().get(FileAttachment.class, newAttachmentId);
+    FileAttachment attachment = (FileAttachment) currentSession().find(FileAttachment.class, newAttachmentId);
 
     sample.getAttachments().add(attachment);
     sut.save(sample);
 
     clearSession();
 
-    Sample saved = (Sample) currentSession().get(SampleImpl.class, sampleId);
+    Sample saved = (Sample) currentSession().find(SampleImpl.class, sampleId);
     assertTrue(saved.getAttachments().stream().anyMatch(x -> x.getId() == newAttachmentId));
   }
 
@@ -66,9 +61,9 @@ public class HibernateAttachableDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetUsage() throws Exception {
-    FileAttachment attachment1 = (FileAttachment) currentSession().get(FileAttachment.class, 1L);
+    FileAttachment attachment1 = (FileAttachment) currentSession().find(FileAttachment.class, 1L);
     assertEquals(1L, sut.getUsage(attachment1));
-    FileAttachment attachment3 = (FileAttachment) currentSession().get(FileAttachment.class, 3L);
+    FileAttachment attachment3 = (FileAttachment) currentSession().find(FileAttachment.class, 3L);
     assertEquals(0L, sut.getUsage(attachment3));
   }
 
@@ -76,21 +71,19 @@ public class HibernateAttachableDaoIT extends AbstractDAOTest {
   public void testBadGetUsage() throws Exception {
     FileAttachment fake = new FileAttachment();
     fake.setId(1000000);
-
-    exception.expect(IllegalArgumentException.class);
-    sut.getUsage(fake);
+    assertThrows(IllegalArgumentException.class, () -> sut.getUsage(fake));
   }
 
   @Test
   public void testDeleteAttachment() throws Exception {
     long attachmentId = 3L;
-    FileAttachment attachment = (FileAttachment) currentSession().get(FileAttachment.class, attachmentId);
+    FileAttachment attachment = (FileAttachment) currentSession().find(FileAttachment.class, attachmentId);
     assertNotNull(attachment);
     sut.delete(attachment);
 
     clearSession();
 
-    FileAttachment after = (FileAttachment) currentSession().get(FileAttachment.class, attachmentId);
+    FileAttachment after = (FileAttachment) currentSession().find(FileAttachment.class, attachmentId);
     assertNull(after);
   }
 
@@ -99,7 +92,7 @@ public class HibernateAttachableDaoIT extends AbstractDAOTest {
     FileAttachment attachment = new FileAttachment();
     attachment.setFilename("Test");
     attachment.setPath("/path/to/file");
-    attachment.setCreator((User) currentSession().get(UserImpl.class, 1L));
+    attachment.setCreator((User) currentSession().find(UserImpl.class, 1L));
     attachment.setCreationTime(new Date());
     assertEquals(0L, attachment.getId());
     sut.save(attachment);
@@ -107,7 +100,7 @@ public class HibernateAttachableDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    FileAttachment saved = (FileAttachment) currentSession().get(FileAttachment.class, attachment.getId());
+    FileAttachment saved = (FileAttachment) currentSession().find(FileAttachment.class, attachment.getId());
     assertNotNull(saved);
   }
 

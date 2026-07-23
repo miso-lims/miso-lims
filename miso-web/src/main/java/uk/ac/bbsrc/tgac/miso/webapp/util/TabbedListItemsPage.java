@@ -14,11 +14,9 @@ import java.util.stream.Stream;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
@@ -27,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.WhineyFunction;
 public class TabbedListItemsPage {
 
   public static TabbedListItemsPage createForPlatformType(String targetType,
-      InstrumentModelService instrumentModelService, ObjectMapper mapper) throws IOException {
+      InstrumentModelService instrumentModelService, JsonMapper mapper) throws IOException {
     return new TabbedListItemsPage(targetType, "platformType",
         getPlatformTypes(instrumentModelService), PlatformType::getKey, PlatformType::name, mapper);
   }
@@ -46,21 +44,17 @@ public class TabbedListItemsPage {
   private final String property;
   private final Map<String, String> tabs;
   private final String targetType;
-  private final ObjectMapper mapper;
+  private final JsonMapper mapper;
 
   public <T> TabbedListItemsPage(String targetType, String property, Stream<T> tabItems, Function<T, String> getName,
-      Function<T, Object> getValue, ObjectMapper mapper) {
+      Function<T, Object> getValue, JsonMapper mapper) {
     this(targetType, property, tabItems, Comparator.naturalOrder(), getName, getValue, mapper);
   }
 
   public <T> TabbedListItemsPage(String targetType, String property, Stream<T> tabItems, Comparator<String> tabSorter,
-      Function<T, String> getName, Function<T, Object> getValue, ObjectMapper mapper) {
+      Function<T, String> getName, Function<T, Object> getValue, JsonMapper mapper) {
     this(targetType, property, tabItems.collect(Collectors.toMap(getName, v -> {
-      try {
-        return mapper.writeValueAsString(getValue.apply(v));
-      } catch (JsonProcessingException e) {
-        throw new IllegalStateException("Failed to serialised tab value as JSON", e);
-      }
+      return mapper.writeValueAsString(getValue.apply(v));
     }, (left, right) -> left, () -> tabSorter == null ? new LinkedHashMap<>() : new TreeMap<>(tabSorter))), mapper);
   }
 
@@ -68,11 +62,12 @@ public class TabbedListItemsPage {
    * Create a page which lists items broken into tabs.
    * 
    * @param targetType The ListTarget object group to use.
-   * @param property The name of property to set in the JavaScript configuration to indicate which tab is selected.
-   * @param tabs The tabs to create. The key is a HTML-encoded string for the tab name and the value is a JavaScript-encoded value to set
-   *          the configuration property to.
+   * @param property The name of property to set in the JavaScript configuration to indicate which tab
+   *        is selected.
+   * @param tabs The tabs to create. The key is a HTML-encoded string for the tab name and the value
+   *        is a JavaScript-encoded value to set the configuration property to.
    */
-  public TabbedListItemsPage(String targetType, String property, Map<String, String> tabs, ObjectMapper mapper) {
+  public TabbedListItemsPage(String targetType, String property, Map<String, String> tabs, JsonMapper mapper) {
     this.targetType = targetType;
     this.property = property;
     this.tabs = tabs;
@@ -103,11 +98,12 @@ public class TabbedListItemsPage {
     model.put("property", property);
     model.put("tabs", tabs);
 
-    model.put("data", tabs.keySet().stream().collect(Collectors.toMap(Function.identity(), WhineyFunction.rethrow(key -> {
-      ArrayNode array = mapper.createArrayNode();
-      getter.apply(key).forEach(array::addPOJO);
-      return mapper.writeValueAsString(array);
-    }))));
+    model.put("data",
+        tabs.keySet().stream().collect(Collectors.toMap(Function.identity(), WhineyFunction.rethrow(key -> {
+          ArrayNode array = mapper.createArrayNode();
+          getter.apply(key).forEach(array::addPOJO);
+          return mapper.writeValueAsString(array);
+        }))));
     return new ModelAndView("/WEB-INF/pages/listTabbedStatic.jsp", model);
   }
 
@@ -122,6 +118,5 @@ public class TabbedListItemsPage {
   /**
    * Pass arbitrary configuration data to the front end so that it can display the correct interface.
    */
-  protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-  }
+  protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {}
 }

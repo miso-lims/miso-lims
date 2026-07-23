@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
 import java.math.BigDecimal;
@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Maps;
 
@@ -28,7 +28,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.Note;
 
 public class LibraryPageIT extends AbstractIT {
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -99,7 +99,7 @@ public class LibraryPageIT extends AbstractIT {
     assertNotNull(page2);
     assertFieldValues("changes post-save", changes, page2);
 
-    DetailedLibrary lib = (DetailedLibrary) getSession().get(LibraryImpl.class, 110001L);
+    DetailedLibrary lib = (DetailedLibrary) getSession().find(LibraryImpl.class, 110001L);
     assertDetailedLibraryAttributes(changes, lib);
   }
 
@@ -164,7 +164,7 @@ public class LibraryPageIT extends AbstractIT {
     assertNotNull(page2);
     assertFieldValues("changes post-save", changes, page2);
 
-    DetailedLibrary lib = (DetailedLibrary) getSession().get(LibraryImpl.class, 110002L);
+    DetailedLibrary lib = (DetailedLibrary) getSession().find(LibraryImpl.class, 110002L);
     assertDetailedLibraryAttributes(changes, lib);
   }
 
@@ -227,7 +227,7 @@ public class LibraryPageIT extends AbstractIT {
     assertNotNull(page2);
     assertFieldValues("changes post-save", changes, page2);
 
-    DetailedLibrary lib = (DetailedLibrary) getSession().get(LibraryImpl.class, 110003L);
+    DetailedLibrary lib = (DetailedLibrary) getSession().find(LibraryImpl.class, 110003L);
     assertDetailedLibraryAttributes(changes, lib);
   }
 
@@ -251,7 +251,7 @@ public class LibraryPageIT extends AbstractIT {
     changes.put(Field.VOLUME, "0.0");
     assertFieldValues("changes post-save", changes, page2);
 
-    DetailedLibrary lib = (DetailedLibrary) getSession().get(LibraryImpl.class, 110004L);
+    DetailedLibrary lib = (DetailedLibrary) getSession().find(LibraryImpl.class, 110004L);
     assertTrue(lib.isDiscarded());
     assertEquals(0, lib.getVolume().compareTo(BigDecimal.ZERO));
   }
@@ -377,7 +377,7 @@ public class LibraryPageIT extends AbstractIT {
 
   public void testHeaderWarningOnLibrariesWithError(long id, String warning) {
     LibraryPage page = LibraryPage.get(getDriver(), getBaseUrl(), id);
-    assertTrue("Page fails to show '" + warning + "' warning", page.getField(Field.WARNINGS).contains(warning));
+    assertTrue(page.getField(Field.WARNINGS).contains(warning), "Page fails to show '" + warning + "' warning");
   }
 
   private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE;

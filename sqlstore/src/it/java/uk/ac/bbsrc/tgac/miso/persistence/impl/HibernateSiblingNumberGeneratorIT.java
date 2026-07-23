@@ -1,11 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.hibernate.Session;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -20,7 +18,7 @@ public class HibernateSiblingNumberGeneratorIT extends AbstractDAOTest {
 
   private HibernateSiblingNumberGenerator sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateSiblingNumberGenerator();
     sut.setEntityManager(entityManager);
@@ -29,8 +27,8 @@ public class HibernateSiblingNumberGeneratorIT extends AbstractDAOTest {
   @Test
   public void getNextSiblingNumberTest() throws Exception {
     String partialAlias = "TEST_0001_TISSUE_";
-    DetailedSample s1 = (DetailedSample) entityManager.unwrap(Session.class).get(SampleImpl.class, 16L);
-    DetailedSample s2 = (DetailedSample) entityManager.unwrap(Session.class).get(SampleImpl.class, 17L);
+    DetailedSample s1 = (DetailedSample) currentSession().find(SampleImpl.class, 16L);
+    DetailedSample s2 = (DetailedSample) currentSession().find(SampleImpl.class, 17L);
     assertTrue(s1.getAlias().startsWith(partialAlias));
     assertEquals(Integer.valueOf(1), s1.getSiblingNumber());
     assertTrue(s2.getAlias().startsWith(partialAlias));
@@ -41,8 +39,8 @@ public class HibernateSiblingNumberGeneratorIT extends AbstractDAOTest {
   @Test
   public void getFirstAvailableSiblingNumberTest() throws Exception {
     String partialAlias = "TEST_0001_TISSUE_";
-    DetailedSample s1 = (DetailedSample) entityManager.unwrap(Session.class).get(SampleImpl.class, 16L);
-    DetailedSample s2 = (DetailedSample) entityManager.unwrap(Session.class).get(SampleImpl.class, 17L);
+    DetailedSample s1 = (DetailedSample) currentSession().find(SampleImpl.class, 16L);
+    DetailedSample s2 = (DetailedSample) currentSession().find(SampleImpl.class, 17L);
     assertTrue(s1.getAlias().startsWith(partialAlias));
     assertEquals(Integer.valueOf(1), s1.getSiblingNumber());
     assertTrue(s2.getAlias().startsWith(partialAlias));
@@ -53,8 +51,8 @@ public class HibernateSiblingNumberGeneratorIT extends AbstractDAOTest {
   @Test
   public void testIgnoreNonSiblingPartialMatch() throws Exception {
     String partialAlias = "TEST_0001_TIS";
-    DetailedSample s1 = (DetailedSample) entityManager.unwrap(Session.class).get(SampleImpl.class, 16L);
-    DetailedSample s2 = (DetailedSample) entityManager.unwrap(Session.class).get(SampleImpl.class, 17L);
+    DetailedSample s1 = (DetailedSample) currentSession().find(SampleImpl.class, 16L);
+    DetailedSample s2 = (DetailedSample) currentSession().find(SampleImpl.class, 17L);
     assertTrue(s1.getAlias().startsWith(partialAlias));
     assertEquals(Integer.valueOf(1), s1.getSiblingNumber());
     assertTrue(s2.getAlias().startsWith(partialAlias));

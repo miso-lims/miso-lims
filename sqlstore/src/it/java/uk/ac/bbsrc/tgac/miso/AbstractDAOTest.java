@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.hibernate.Session;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
@@ -19,14 +19,14 @@ import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration("/db-it-context.xml")
 @Transactional
 public abstract class AbstractDAOTest {
 
   public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
-  @BeforeClass
+  @BeforeAll
   public static void setupAbstractClass() {
     TimeZone.setDefault(UTC);
   }
@@ -54,7 +54,7 @@ public abstract class AbstractDAOTest {
     assertNotNull(results);
     assertEquals(ids.size(), results.size());
     for (Long id : ids) {
-      assertTrue(results.stream().anyMatch(x -> x.getId() == id.longValue()));
+      assertTrue(results.stream().anyMatch(x -> x.getId() == id));
     }
   }
 

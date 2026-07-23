@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -32,7 +32,7 @@ public class HibernateTissueOriginDaoIT extends AbstractHibernateSaveDaoTest<Tis
     TissueOrigin origin = new TissueOriginImpl();
     origin.setAlias("TO");
     origin.setDescription("Test Origin");
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     origin.setChangeDetails(user);
     return origin;
   }
@@ -53,9 +53,9 @@ public class HibernateTissueOriginDaoIT extends AbstractHibernateSaveDaoTest<Tis
 
   @Test
   public void testGetUsage() throws Exception {
-    TissueOrigin origin1 = (TissueOrigin) currentSession().get(TissueOriginImpl.class, 1L);
+    TissueOrigin origin1 = (TissueOrigin) currentSession().find(TissueOriginImpl.class, 1L);
     assertEquals(5, getTestSubject().getUsage(origin1));
-    TissueOrigin origin2 = (TissueOrigin) currentSession().get(TissueOriginImpl.class, 2L);
+    TissueOrigin origin2 = (TissueOrigin) currentSession().find(TissueOriginImpl.class, 2L);
     assertEquals(0, getTestSubject().getUsage(origin2));
   }
 

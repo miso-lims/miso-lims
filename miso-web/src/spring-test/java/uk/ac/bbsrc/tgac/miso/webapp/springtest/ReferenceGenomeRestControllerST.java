@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.dto.ReferenceGenomeDto;
 import static org.hamcrest.Matchers.*;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import org.springframework.test.web.servlet.MockMvc;
 
 
@@ -63,8 +63,8 @@ public class ReferenceGenomeRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // only admin can update
-    ReferenceGenomeDto genomeOne = Dtos.asDto(currentSession().get(entityClass, 1));
-    ReferenceGenomeDto genomeTwo = Dtos.asDto(currentSession().get(entityClass, 2));
+    ReferenceGenomeDto genomeOne = Dtos.asDto(currentSession().find(entityClass, 1));
+    ReferenceGenomeDto genomeTwo = Dtos.asDto(currentSession().find(entityClass, 2));
     genomeOne.setAlias("one");
     genomeTwo.setAlias("two");
 
@@ -77,8 +77,8 @@ public class ReferenceGenomeRestControllerST extends AbstractST {
 
   @Test
   public void testUpdateFail() throws Exception {
-    ReferenceGenomeDto genomeOne = Dtos.asDto(currentSession().get(entityClass, 1));
-    ReferenceGenomeDto genomeTwo = Dtos.asDto(currentSession().get(entityClass, 2));
+    ReferenceGenomeDto genomeOne = Dtos.asDto(currentSession().find(entityClass, 1));
+    ReferenceGenomeDto genomeTwo = Dtos.asDto(currentSession().find(entityClass, 2));
     genomeOne.setAlias("one");
     genomeTwo.setAlias("two");
     testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, Arrays.asList(genomeOne, genomeTwo));

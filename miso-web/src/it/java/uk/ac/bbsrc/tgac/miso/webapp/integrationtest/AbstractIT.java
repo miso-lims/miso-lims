@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.util.TimeZone;
@@ -10,10 +10,10 @@ import java.util.logging.Level;
 import javax.sql.DataSource;
 
 import org.hibernate.Session;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -33,11 +33,12 @@ import org.springframework.test.context.ContextConfiguration;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.HomePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LoginPage;
-import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestRunner;
+import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestLoggingExtension;
 
-@RunWith(TestRunner.class)
+@ExtendWith({SpringExtension.class, TestLoggingExtension.class})
 @ContextConfiguration("/it-context.xml")
 public abstract class AbstractIT {
 
@@ -61,13 +62,13 @@ public abstract class AbstractIT {
   private WebDriver driver;
   private static final String baseUrl = System.getProperty("miso.it.baseUrl");
 
-  @BeforeClass
-  public static final void setupAbstractClass() {
+  @BeforeAll
+  public static void setupAbstractClass() {
     TimeZone.setDefault(EASTERN_TIME_ZONE);
     WebDriverManager.chromedriver().setup();
   }
 
-  @Before
+  @BeforeEach
   public final void setupAbstractTest() {
     ChromeOptions opts = new ChromeOptions();
     opts.setHeadless(true);
@@ -102,7 +103,7 @@ public abstract class AbstractIT {
     return true;
   }
 
-  @After
+  @AfterEach
   public final void teardownAbstractTest() {
     if (driver != null) {
       driver.quit();
@@ -152,7 +153,7 @@ public abstract class AbstractIT {
           break;
         }
       }
-      assertTrue("Attempts to refresh constants failed", constantsComplete());
+      assertTrue(constantsComplete(), "Attempts to refresh constants failed");
     }
   }
 

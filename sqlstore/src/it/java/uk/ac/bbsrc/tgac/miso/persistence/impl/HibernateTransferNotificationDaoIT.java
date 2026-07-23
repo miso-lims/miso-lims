@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -31,10 +31,10 @@ public class HibernateTransferNotificationDaoIT
   @Override
   public TransferNotification getCreateItem() {
     TransferNotification notification = new TransferNotification();
-    notification.setTransfer((Transfer) currentSession().get(Transfer.class, 1L));
+    notification.setTransfer((Transfer) currentSession().find(Transfer.class, 1L));
     notification.setRecipientName("You");
     notification.setRecipientEmail("you@example.com");
-    notification.setCreator((User) currentSession().get(UserImpl.class, 1L));
+    notification.setCreator((User) currentSession().find(UserImpl.class, 1L));
     notification.setCreated(new Date());
     return notification;
   }
@@ -48,7 +48,7 @@ public class HibernateTransferNotificationDaoIT
 
   @Test
   public void testListByTransfer() throws Exception {
-    Transfer transfer = (Transfer) currentSession().get(Transfer.class, 1L);
+    Transfer transfer = (Transfer) currentSession().find(Transfer.class, 1L);
     List<TransferNotification> results = getTestSubject().listByTransfer(transfer);
     assertEquals(2, results.size());
     for (TransferNotification notification : results) {
@@ -96,11 +96,11 @@ public class HibernateTransferNotificationDaoIT
 
   @Test
   public void testDelete() throws Exception {
-    TransferNotification notification = (TransferNotification) currentSession().get(TransferNotification.class, 4L);
+    TransferNotification notification = (TransferNotification) currentSession().find(TransferNotification.class, 4L);
     assertNotNull(notification);
     getTestSubject().delete(notification);
     clearSession();
-    assertNull(currentSession().get(TransferNotification.class, 4L));
+    assertNull(currentSession().find(TransferNotification.class, 4L));
   }
 
 }

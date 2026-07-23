@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
@@ -16,7 +16,7 @@ public class HibernateLibrarySpikeInDaoIT extends AbstractDAOTest {
 
   private HibernateLibrarySpikeInDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateLibrarySpikeInDao();
     sut.setEntityManager(getEntityManager());
@@ -64,7 +64,7 @@ public class HibernateLibrarySpikeInDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    LibrarySpikeIn saved = (LibrarySpikeIn) currentSession().get(LibrarySpikeIn.class, savedId);
+    LibrarySpikeIn saved = (LibrarySpikeIn) currentSession().find(LibrarySpikeIn.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -72,20 +72,20 @@ public class HibernateLibrarySpikeInDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Alias";
-    LibrarySpikeIn spikeIn = (LibrarySpikeIn) currentSession().get(LibrarySpikeIn.class, id);
+    LibrarySpikeIn spikeIn = (LibrarySpikeIn) currentSession().find(LibrarySpikeIn.class, id);
     assertNotEquals(alias, spikeIn.getAlias());
     spikeIn.setAlias(alias);
     sut.update(spikeIn);
 
     clearSession();
 
-    LibrarySpikeIn saved = (LibrarySpikeIn) currentSession().get(LibrarySpikeIn.class, id);
+    LibrarySpikeIn saved = (LibrarySpikeIn) currentSession().find(LibrarySpikeIn.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    LibrarySpikeIn spikeIn = (LibrarySpikeIn) currentSession().get(LibrarySpikeIn.class, 1L);
+    LibrarySpikeIn spikeIn = (LibrarySpikeIn) currentSession().find(LibrarySpikeIn.class, 1L);
     assertEquals("ERCC Mix 1", spikeIn.getAlias());
     assertEquals(0L, sut.getUsage(spikeIn));
   }

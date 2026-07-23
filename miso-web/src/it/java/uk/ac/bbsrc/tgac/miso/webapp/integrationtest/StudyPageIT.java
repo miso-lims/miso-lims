@@ -1,20 +1,20 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.StudyPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.StudyPage.Fields;
 
 public class StudyPageIT extends AbstractIT {
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -37,18 +37,18 @@ public class StudyPageIT extends AbstractIT {
     unsaved.put(Fields.DESCRIPTION, "New Study via UI");
     unsaved.put(Fields.STUDY_TYPE, "Other");
 
-    assertEquals("Study ID is unsaved", unsaved.get(Fields.ID), page.getId());
-    assertEquals("Study name is unsaved", unsaved.get(Fields.NAME), page.getName());
-    assertEquals("Project name is set", unsaved.get(Fields.PROJECT), page.getProject());
+    assertEquals(unsaved.get(Fields.ID), page.getId(), "Study ID is unsaved");
+    assertEquals(unsaved.get(Fields.NAME), page.getName(), "Study name is unsaved");
+    assertEquals(unsaved.get(Fields.PROJECT), page.getProject(), "Project name is set");
     page.setAlias(unsaved.get(Fields.ALIAS));
     page.setDescription(unsaved.get(Fields.DESCRIPTION));
     page.setStudyType(unsaved.get(Fields.STUDY_TYPE));
 
     StudyPage saved = page.clickSave();
 
-    assertNotEquals("Study ID is now a number", unsaved.get(Fields.ID), saved.getId());
-    assertNotEquals("Study name is saved", unsaved.get(Fields.NAME), saved.getName());
-    assertEquals("Project name is same", unsaved.get(Fields.PROJECT), saved.getProject());
+    assertNotEquals(unsaved.get(Fields.ID), saved.getId(), "Study ID is now a number");
+    assertNotEquals(unsaved.get(Fields.NAME), saved.getName(), "Study name is saved");
+    assertEquals(unsaved.get(Fields.PROJECT), saved.getProject(), "Project name is same");
     assertEquals(unsaved.get(Fields.ALIAS), saved.getAlias());
     assertEquals(unsaved.get(Fields.DESCRIPTION), saved.getDescription());
     assertEquals(unsaved.get(Fields.STUDY_TYPE), saved.getStudyType());

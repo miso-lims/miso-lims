@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -19,7 +19,7 @@ public class HibernateDetailedQcStatusDaoIT extends AbstractDAOTest {
 
   private HibernateDetailedQcStatusDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateDetailedQcStatusDao();
     sut.setEntityManager(getEntityManager());
@@ -56,14 +56,14 @@ public class HibernateDetailedQcStatusDaoIT extends AbstractDAOTest {
     status.setStatus(null);
     status.setNoteRequired(true);
     status.setArchived(false);
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     status.setChangeDetails(user);
     long savedId = sut.create(status);
 
     clearSession();
 
     DetailedQcStatus saved =
-        (DetailedQcStatus) currentSession().get(DetailedQcStatusImpl.class, savedId);
+        (DetailedQcStatus) currentSession().find(DetailedQcStatusImpl.class, savedId);
     assertEquals(desc, saved.getDescription());
   }
 
@@ -72,7 +72,7 @@ public class HibernateDetailedQcStatusDaoIT extends AbstractDAOTest {
     long id = 1L;
     String desc = "New Desc";
     DetailedQcStatus status =
-        (DetailedQcStatus) currentSession().get(DetailedQcStatusImpl.class, id);
+        (DetailedQcStatus) currentSession().find(DetailedQcStatusImpl.class, id);
     assertNotEquals(desc, status.getDescription());
     status.setDescription(desc);
     sut.update(status);
@@ -80,14 +80,14 @@ public class HibernateDetailedQcStatusDaoIT extends AbstractDAOTest {
     clearSession();
 
     DetailedQcStatus saved =
-        (DetailedQcStatus) currentSession().get(DetailedQcStatusImpl.class, id);
+        (DetailedQcStatus) currentSession().find(DetailedQcStatusImpl.class, id);
     assertEquals(desc, saved.getDescription());
   }
 
   @Test
   public void testGetUsageBySamples() throws IOException {
     DetailedQcStatus status =
-        (DetailedQcStatus) currentSession().get(DetailedQcStatusImpl.class, 1L);
+        (DetailedQcStatus) currentSession().find(DetailedQcStatusImpl.class, 1L);
     assertEquals("Passed", status.getDescription());
     assertEquals(26L, sut.getUsageBySamples(status));
   }
@@ -95,7 +95,7 @@ public class HibernateDetailedQcStatusDaoIT extends AbstractDAOTest {
   @Test
   public void testGetUsageByLibraries() throws IOException {
     DetailedQcStatus status =
-        (DetailedQcStatus) currentSession().get(DetailedQcStatusImpl.class, 1L);
+        (DetailedQcStatus) currentSession().find(DetailedQcStatusImpl.class, 1L);
     assertEquals("Passed", status.getDescription());
     assertEquals(15L, sut.getUsageByLibraries(status));
   }
@@ -103,7 +103,7 @@ public class HibernateDetailedQcStatusDaoIT extends AbstractDAOTest {
   @Test
   public void testGetUsageByLibraryAliquots() throws IOException {
     DetailedQcStatus status =
-        (DetailedQcStatus) currentSession().get(DetailedQcStatusImpl.class, 1L);
+        (DetailedQcStatus) currentSession().find(DetailedQcStatusImpl.class, 1L);
     assertEquals("Passed", status.getDescription());
     assertEquals(0L, sut.getUsageByLibraryAliquots(status));
   }

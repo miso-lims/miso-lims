@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
@@ -21,7 +21,7 @@ public class HibernateLibraryTemplateDaoIT extends AbstractDAOTest {
 
   private HibernateLibraryTemplateDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateLibraryTemplateDao();
     sut.setEntityManager(entityManager);
@@ -60,7 +60,7 @@ public class HibernateLibraryTemplateDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    LibraryTemplate saved = (LibraryTemplate) currentSession().get(LibraryTemplate.class, savedId);
+    LibraryTemplate saved = (LibraryTemplate) currentSession().find(LibraryTemplate.class, savedId);
     assertNotNull(saved);
     assertEquals(alias, saved.getAlias());
   }
@@ -69,14 +69,14 @@ public class HibernateLibraryTemplateDaoIT extends AbstractDAOTest {
   public void testUpdate() throws Exception {
     long id = 2L;
     String newAlias = "asdf";
-    LibraryTemplate before = (LibraryTemplate) currentSession().get(LibraryTemplate.class, id);
+    LibraryTemplate before = (LibraryTemplate) currentSession().find(LibraryTemplate.class, id);
     assertNotEquals(newAlias, before.getAlias());
     before.setAlias(newAlias);
     sut.update(before);
 
     clearSession();
 
-    LibraryTemplate after = (LibraryTemplate) currentSession().get(LibraryTemplate.class, id);
+    LibraryTemplate after = (LibraryTemplate) currentSession().find(LibraryTemplate.class, id);
     assertEquals(newAlias, after.getAlias());
   }
 

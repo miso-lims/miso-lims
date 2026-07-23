@@ -1,22 +1,22 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.*;
 import org.springframework.test.context.web.WebAppConfiguration;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.collections.map.MultiValueMap;
 import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -42,7 +42,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import jakarta.transaction.Transactional;
 import java.util.Date;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Arrays;
@@ -98,12 +98,12 @@ public class ProjectRestControllerST extends AbstractST {
   @Test
   public void testUpdate() throws Exception {
 
-    Project proj = currentSession().get(ProjectImpl.class, 1);
+    Project proj = currentSession().find(ProjectImpl.class, 1);
     ProjectDto dto = Dtos.asDto(proj, true);
     dto.setTitle("changed testing project");
 
     ProjectImpl updatedProj = baseTestUpdate(CONTROLLER_BASE, dto, 1, controllerClass);
-    assertEquals("Update didn't go through", "changed testing project", updatedProj.getTitle());
+    assertEquals("changed testing project", updatedProj.getTitle(), "Update didn't go through");
   }
 
   @Test

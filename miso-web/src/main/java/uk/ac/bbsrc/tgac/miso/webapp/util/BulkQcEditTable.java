@@ -3,9 +3,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.util;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
@@ -17,7 +16,7 @@ public class BulkQcEditTable extends BulkQcTable {
   private final int addControls;
 
   public BulkQcEditTable(QcTarget qcTarget, QualityControlService qcService, InstrumentService instrumentService,
-      int addControls, ObjectMapper mapper) {
+      int addControls, JsonMapper mapper) {
     super(qcTarget, false, qcService, instrumentService, "Edit", mapper);
     this.addControls = addControls;
   }
@@ -28,7 +27,7 @@ public class BulkQcEditTable extends BulkQcTable {
   }
 
   @Override
-  protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+  protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
     super.writeConfiguration(mapper, config);
     config.put("addControls", addControls);
     config.put("pageMode", "edit");

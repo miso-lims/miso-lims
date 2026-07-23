@@ -7,15 +7,15 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.*;
 import com.jayway.jsonpath.JsonPath;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -82,13 +82,13 @@ public class WorksetRestControllerST extends AbstractST {
 
     @Test
     public void testUpdateWorkset() throws Exception{
-        Workset workset = currentSession().get(Workset.class, 2L);
+        Workset workset = currentSession().find(Workset.class, 2L);
         WorksetDto dto = Dtos.asDto(workset);
         dto.setAlias("Updated Alias");
 
         baseTestUpdate(CONTROLLER_BASE, dto, 2, entityClass);
 
-        Workset updated = currentSession().get(Workset.class, 2);
+        Workset updated = currentSession().find(Workset.class, 2);
         assertEquals("Updated Alias", updated.getAlias());
     }
 
@@ -102,7 +102,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         currentSession().clear();
 
-        Workset workset = currentSession().get(Workset.class, 2L);
+        Workset workset = currentSession().find(Workset.class, 2L);
         assertEquals(2, workset.getWorksetSamples().size());
         assertTrue(workset.getWorksetSamples().stream().anyMatch(ws -> ws.getItem().getId() == 100001L));
     }
@@ -117,7 +117,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         currentSession().clear();
 
-        Workset workset = currentSession().get(Workset.class, 2L);
+        Workset workset = currentSession().find(Workset.class, 2L);
         assertEquals(1, workset.getWorksetLibraries().size());
         assertTrue(workset.getWorksetLibraries().stream().anyMatch(ws -> ws.getItem().getId() ==100001L));
     }
@@ -132,7 +132,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         currentSession().clear();
 
-        Workset workset = currentSession().get(Workset.class, 2L);
+        Workset workset = currentSession().find(Workset.class, 2L);
         assertEquals(1, workset.getWorksetLibraryAliquots().size());
         assertTrue(workset.getWorksetLibraryAliquots().stream().anyMatch(ws -> ws.getItem().getId() == 120001L));
     }
@@ -147,7 +147,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         currentSession().clear();
 
-        Workset workset = currentSession().get(Workset.class, 2L);
+        Workset workset = currentSession().find(Workset.class, 2L);
         assertEquals(1, workset.getWorksetPools().size());
         assertTrue(workset.getWorksetPools().stream().anyMatch(ws -> ws.getItem().getId() == 120001L));
     }
@@ -163,7 +163,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         currentSession().clear();
 
-        Workset workset = currentSession().get(Workset.class, 1L);
+        Workset workset = currentSession().find(Workset.class, 1L);
         assertEquals(2, workset.getWorksetSamples().size());
         assertFalse(workset.getWorksetSamples().stream().anyMatch(ws -> ws.getItem().getId() == 100001L));
     }
@@ -179,7 +179,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         currentSession().clear();
 
-        Workset workset = currentSession().get(Workset.class, 1L);
+        Workset workset = currentSession().find(Workset.class, 1L);
         assertEquals(2, workset.getWorksetLibraries().size());
         assertFalse(workset.getWorksetLibraries().stream().anyMatch(ws -> ws.getItem().getId() == 100001L));
 
@@ -196,7 +196,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         currentSession().clear();
 
-        Workset workset = currentSession().get(Workset.class, 1L);
+        Workset workset = currentSession().find(Workset.class, 1L);
         assertEquals(1, workset.getWorksetLibraryAliquots().size());
         assertFalse(workset.getWorksetLibraryAliquots().stream().anyMatch(ws -> ws.getItem().getId() == 120001L));
     }
@@ -212,7 +212,7 @@ public class WorksetRestControllerST extends AbstractST {
 
         currentSession().clear();
 
-        Workset workset = currentSession().get(Workset.class, 1L);
+        Workset workset = currentSession().find(Workset.class, 1L);
         assertEquals(1, workset.getWorksetPools().size());
         assertFalse(workset.getWorksetPools().stream().anyMatch(ws -> ws.getItem().getId() == 120001L));
     }
@@ -238,8 +238,8 @@ public class WorksetRestControllerST extends AbstractST {
     @Test
     public void testMergeWorksets() throws Exception {
 
-        Workset ws1 = currentSession().get(Workset.class, 1L);
-        Workset ws2 = currentSession().get(Workset.class, 2L);
+        Workset ws1 = currentSession().find(Workset.class, 1L);
+        Workset ws2 = currentSession().find(Workset.class, 2L);
         assertNotNull(ws1);
         assertNotNull(ws2);
 
@@ -247,8 +247,8 @@ public class WorksetRestControllerST extends AbstractST {
         ws1.getWorksetSamples().forEach(wsSample -> expectedSampleIds.add(wsSample.getItem().getId()));
         ws2.getWorksetSamples().forEach(wsSample -> expectedSampleIds.add(wsSample.getItem().getId()));
 
-        assertFalse("Workset 1 has no samples", ws1.getWorksetSamples().isEmpty());
-        assertFalse("Workset 2 has no samples", ws2.getWorksetSamples().isEmpty());
+        assertFalse(ws1.getWorksetSamples().isEmpty(), "Workset 1 has no samples");
+        assertFalse(ws2.getWorksetSamples().isEmpty(), "Workset 2 has no samples");
 
         String alias = "Merged";
 
@@ -267,7 +267,7 @@ public class WorksetRestControllerST extends AbstractST {
         String body = result.getResponse().getContentAsString();
         Integer mergedId = JsonPath.read(body, "$.id");
 
-        Workset merged = currentSession().get(Workset.class, mergedId.longValue());
+        Workset merged = currentSession().find(Workset.class, mergedId.longValue());
         assertNotNull(merged);
         assertEquals(alias, merged.getAlias());
 
@@ -278,8 +278,8 @@ public class WorksetRestControllerST extends AbstractST {
 
     @Test
     public void testMoveSamples() throws Exception {
-        Workset source = currentSession().get(Workset.class, 1L);
-        Workset target = currentSession().get(Workset.class, 2L);
+        Workset source = currentSession().find(Workset.class, 1L);
+        Workset target = currentSession().find(Workset.class, 2L);
         List<Long> sampleIds = Arrays.asList(100001L);
 
         MoveItemsDto dto = new MoveItemsDto();
@@ -293,8 +293,8 @@ public class WorksetRestControllerST extends AbstractST {
 
         currentSession().clear();
 
-        Workset updatedSource = currentSession().get(Workset.class, 1L);
-        Workset updatedTarget = currentSession().get(Workset.class, 2L);
+        Workset updatedSource = currentSession().find(Workset.class, 1L);
+        Workset updatedTarget = currentSession().find(Workset.class, 2L);
 
         assertEquals(2, updatedSource.getWorksetSamples().size());
         assertEquals(2, updatedTarget.getWorksetSamples().size());
@@ -304,8 +304,8 @@ public class WorksetRestControllerST extends AbstractST {
 
     @Test
     public void testMoveLibraries() throws Exception {
-        Workset source = currentSession().get(Workset.class, 1L);
-        Workset target = currentSession().get(Workset.class, 2L);
+        Workset source = currentSession().find(Workset.class, 1L);
+        Workset target = currentSession().find(Workset.class, 2L);
         List<Long> libraryIds = Arrays.asList(100001L);
 
         MoveItemsDto dto = new MoveItemsDto();
@@ -319,8 +319,8 @@ public class WorksetRestControllerST extends AbstractST {
 
         currentSession().clear();
 
-        Workset updatedSource = currentSession().get(Workset.class, 1L);
-        Workset updatedTarget = currentSession().get(Workset.class, 2L);
+        Workset updatedSource = currentSession().find(Workset.class, 1L);
+        Workset updatedTarget = currentSession().find(Workset.class, 2L);
 
         assertEquals(2, updatedSource.getWorksetLibraries().size());
         assertEquals(1, updatedTarget.getWorksetLibraries().size());
@@ -330,8 +330,8 @@ public class WorksetRestControllerST extends AbstractST {
 
     @Test
     public void testMoveLibraryAliquots() throws Exception {
-        Workset source = currentSession().get(Workset.class, 1L);
-        Workset target = currentSession().get(Workset.class, 2L);
+        Workset source = currentSession().find(Workset.class, 1L);
+        Workset target = currentSession().find(Workset.class, 2L);
         List<Long> aliquotIds = Arrays.asList(120001L);
 
         MoveItemsDto dto = new MoveItemsDto();
@@ -345,8 +345,8 @@ public class WorksetRestControllerST extends AbstractST {
 
         currentSession().clear();
 
-        Workset updatedSource = currentSession().get(Workset.class, 1L);
-        Workset updatedTarget = currentSession().get(Workset.class, 2L);
+        Workset updatedSource = currentSession().find(Workset.class, 1L);
+        Workset updatedTarget = currentSession().find(Workset.class, 2L);
 
         assertEquals(1, updatedSource.getWorksetLibraryAliquots().size());
         assertEquals(1, updatedTarget.getWorksetLibraryAliquots().size());
@@ -356,8 +356,8 @@ public class WorksetRestControllerST extends AbstractST {
 
     @Test
     public void testMovePools() throws Exception {
-        Workset source = currentSession().get(Workset.class, 1L);
-        Workset target = currentSession().get(Workset.class, 2L);
+        Workset source = currentSession().find(Workset.class, 1L);
+        Workset target = currentSession().find(Workset.class, 2L);
         List<Long> poolIds = Arrays.asList(120001L);
 
         MoveItemsDto dto = new MoveItemsDto();
@@ -371,8 +371,8 @@ public class WorksetRestControllerST extends AbstractST {
 
         currentSession().clear();
 
-        Workset updatedSource = currentSession().get(Workset.class, 1L);
-        Workset updatedTarget = currentSession().get(Workset.class, 2L);
+        Workset updatedSource = currentSession().find(Workset.class, 1L);
+        Workset updatedTarget = currentSession().find(Workset.class, 2L);
 
         assertEquals(1, updatedSource.getWorksetPools().size());
         assertEquals(1, updatedTarget.getWorksetPools().size());

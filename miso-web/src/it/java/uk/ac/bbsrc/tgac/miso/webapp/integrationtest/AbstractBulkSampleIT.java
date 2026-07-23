@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import jakarta.persistence.criteria.Join;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
@@ -63,7 +63,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   protected static final long singleCellStockClassId = 26;
   protected static final long singleCellAliquotClassId = 27;
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -99,7 +99,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
     builder.addPredicate(builder.getCriteriaBuilder().isNotNull(join.get(Transfer_.senderLab)));
     TransferSample receipt = builder.getSingleResultOrNull();
 
-    assertNotNull("A receipt transfer should be created", receipt);
+    assertNotNull(receipt, "A receipt transfer should be created");
 
     assertEntityAttribute(SamColumns.RECEIVE_DATE, attributes, receipt,
         s -> s == null ? "" : LimsUtils.formatDate(s.getTransfer().getTransferTime()));
@@ -126,7 +126,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
 
   protected void assertDetailedSampleAttributes(Map<String, String> attributes, DetailedSample sample) {
     if (!sample.getSampleClass().getSampleCategory().equals(SampleIdentity.CATEGORY_NAME)) {
-      assertNotNull("parent is not null", sample.getParent());
+      assertNotNull(sample.getParent(), "parent is not null");
     }
     assertEntityAttribute(SamColumns.GROUP_ID, attributes, sample, s -> s.getGroupId() == null ? "" : s.getGroupId());
     assertEntityAttribute(SamColumns.GROUP_DESCRIPTION, attributes, sample,
@@ -180,7 +180,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
         s -> emptyIfNull(s.getTargetCellRecovery()));
     assertEntityAttribute(SamColumns.LOADING_CELL_CONC, attributes, sample,
         s -> emptyIfNull(s.getLoadingCellConcentration()));
-    assertEntityAttribute(SamColumns.DIGESTION, attributes, sample, s -> s.getDigestion());
+    assertEntityAttribute(SamColumns.DIGESTION, attributes, sample, SampleSingleCell::getDigestion);
   }
 
   protected void assertAnalyteAttributes(Map<String, String> attributes, DetailedSample sample) {
@@ -215,7 +215,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAllForIdentity(Map<String, String> identity, Long sampleId, boolean newlyCreated) {
-    SampleIdentity target = (SampleIdentity) getSession().get(SampleIdentityImpl.class, sampleId);
+    SampleIdentity target = (SampleIdentity) getSession().find(SampleIdentityImpl.class, sampleId);
 
     assertPlainSampleAttributes(identity, target, newlyCreated);
     assertDetailedSampleAttributes(identity, target);
@@ -223,7 +223,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAllForTissue(Map<String, String> slide, Long sampleId, boolean newlyCreated) {
-    SampleTissue target = (SampleTissue) getSession().get(SampleTissueImpl.class, sampleId);
+    SampleTissue target = (SampleTissue) getSession().find(SampleTissueImpl.class, sampleId);
 
     assertPlainSampleAttributes(slide, target, newlyCreated);
     assertDetailedSampleAttributes(slide, target);
@@ -231,7 +231,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAllForSlide(Map<String, String> slide, Long sampleId, boolean newlyCreated) {
-    SampleSlide target = (SampleSlide) getSession().get(SampleSlideImpl.class, sampleId);
+    SampleSlide target = (SampleSlide) getSession().find(SampleSlideImpl.class, sampleId);
 
     assertPlainSampleAttributes(slide, target, newlyCreated);
     assertDetailedSampleAttributes(slide, target);
@@ -244,7 +244,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAllForLcmTube(Map<String, String> lcmTube, Long sampleId, boolean newlyCreated) {
-    SampleTissuePiece target = (SampleTissuePiece) getSession().get(SampleTissuePieceImpl.class, sampleId);
+    SampleTissuePiece target = (SampleTissuePiece) getSession().find(SampleTissuePieceImpl.class, sampleId);
 
     assertPlainSampleAttributes(lcmTube, target, newlyCreated);
     assertDetailedSampleAttributes(lcmTube, target);
@@ -257,7 +257,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAllForSingleCell(Map<String, String> singleCell, long sampleId, boolean newlyCreated) {
-    SampleSingleCell target = (SampleSingleCell) getSession().get(SampleSingleCellImpl.class, sampleId);
+    SampleSingleCell target = (SampleSingleCell) getSession().find(SampleSingleCellImpl.class, sampleId);
 
     assertPlainSampleAttributes(singleCell, target, newlyCreated);
     assertDetailedSampleAttributes(singleCell, target);
@@ -271,7 +271,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
 
   protected void assertAllForTissueProcessing(Map<String, String> tproc, Long sampleId, boolean newlyCreated) {
     SampleTissueProcessing target =
-        (SampleTissueProcessing) getSession().get(SampleTissueProcessingImpl.class, sampleId);
+        (SampleTissueProcessing) getSession().find(SampleTissueProcessingImpl.class, sampleId);
 
     assertPlainSampleAttributes(tproc, target, newlyCreated);
     assertDetailedSampleAttributes(tproc, target);
@@ -283,7 +283,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAllForStock(Map<String, String> stock, Long sampleId, boolean newlyCreated) {
-    SampleStock target = (SampleStock) getSession().get(SampleStockImpl.class, sampleId);
+    SampleStock target = (SampleStock) getSession().find(SampleStockImpl.class, sampleId);
 
     assertPlainSampleAttributes(stock, target, newlyCreated);
     assertDetailedSampleAttributes(stock, target);
@@ -300,7 +300,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAllForRnaStock(Map<String, String> stock, Long sampleId, boolean newlyCreated) {
-    SampleStockRna target = (SampleStockRna) getSession().get(SampleStockImpl.class, sampleId);
+    SampleStockRna target = (SampleStockRna) getSession().find(SampleStockImpl.class, sampleId);
 
     assertPlainSampleAttributes(stock, target, newlyCreated);
     assertDetailedSampleAttributes(stock, target);
@@ -318,7 +318,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAllForSingleCellStock(Map<String, String> stock, Long sampleId, boolean newlyCreated) {
-    SampleStockSingleCell target = (SampleStockSingleCell) getSession().get(SampleStockSingleCellImpl.class, sampleId);
+    SampleStockSingleCell target = (SampleStockSingleCell) getSession().find(SampleStockSingleCellImpl.class, sampleId);
 
     assertPlainSampleAttributes(stock, target, newlyCreated);
     assertDetailedSampleAttributes(stock, target);
@@ -339,7 +339,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAllForAliquot(Map<String, String> aliquot, Long sampleId, boolean newlyCreated) {
-    SampleAliquot target = (SampleAliquot) getSession().get(SampleAliquotImpl.class, sampleId);
+    SampleAliquot target = (SampleAliquot) getSession().find(SampleAliquotImpl.class, sampleId);
 
     assertPlainSampleAttributes(aliquot, target, newlyCreated);
     assertDetailedSampleAttributes(aliquot, target);
@@ -356,7 +356,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
   }
 
   protected void assertAllForRnaAliquot(Map<String, String> aliquot, Long sampleId, boolean newlyCreated) {
-    SampleAliquotRna target = (SampleAliquotRna) getSession().get(SampleAliquotRnaImpl.class, sampleId);
+    SampleAliquotRna target = (SampleAliquotRna) getSession().find(SampleAliquotRnaImpl.class, sampleId);
     assertNotNull(target);
 
     assertPlainSampleAttributes(aliquot, target, newlyCreated);
@@ -376,7 +376,7 @@ public abstract class AbstractBulkSampleIT extends AbstractIT {
 
   protected void assertAllForSingleCellAliquot(Map<String, String> aliquot, Long sampleId, boolean newlyCreated) {
     SampleAliquotSingleCell target =
-        (SampleAliquotSingleCell) getSession().get(SampleAliquotSingleCellImpl.class, sampleId);
+        (SampleAliquotSingleCell) getSession().find(SampleAliquotSingleCellImpl.class, sampleId);
 
     assertPlainSampleAttributes(aliquot, target, newlyCreated);
     assertDetailedSampleAttributes(aliquot, target);

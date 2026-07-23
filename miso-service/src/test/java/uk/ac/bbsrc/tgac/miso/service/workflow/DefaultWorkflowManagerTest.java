@@ -1,16 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.service.workflow;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -37,8 +36,7 @@ public class DefaultWorkflowManagerTest {
 
   private static final String INVALID_INPUT = "invalid";
 
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @Mock
   private BarcodableProgressStepFactory barcodableProgressStepFactory;
@@ -52,19 +50,26 @@ public class DefaultWorkflowManagerTest {
   @InjectMocks
   private DefaultWorkflowManager sut;
 
-  @Before
+  @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     when(progressStepFactoryMap.get(FactoryType.INTEGER)).thenReturn(integerProgressStepFactory);
     when(progressStepFactoryMap.get(FactoryType.BARCODABLE)).thenReturn(barcodableProgressStepFactory);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
   public void testMakeProgressStepWithInteger() throws IOException {
     Set<InputType> inputTypes = Sets.newHashSet(InputType.INTEGER);
-    when(integerProgressStepFactory.create(INTEGER_INPUT, inputTypes)).thenReturn(makeIntegerProgressStep(INTEGER_INPUT_EXPECTED));
+    when(integerProgressStepFactory.create(INTEGER_INPUT, inputTypes))
+        .thenReturn(makeIntegerProgressStep(INTEGER_INPUT_EXPECTED));
 
-    assertEquals(INTEGER_INPUT_EXPECTED, ((IntegerProgressStep) sut.makeProgressStep(INTEGER_INPUT, inputTypes)).getInput());
+    assertEquals(INTEGER_INPUT_EXPECTED,
+        ((IntegerProgressStep) sut.makeProgressStep(INTEGER_INPUT, inputTypes)).getInput());
   }
 
   private IntegerProgressStep makeIntegerProgressStep(int input) {
@@ -101,7 +106,8 @@ public class DefaultWorkflowManagerTest {
       sut.makeProgressStep(INVALID_INPUT, inputTypes);
       fail("ValidationException not thrown");
     } catch (ValidationException e) {
-      assertEquals(String.format("No Pool or Integer found matching '%s'", INVALID_INPUT), e.getErrors().get(0).getMessage());
+      assertEquals(String.format("No Pool or Integer found matching '%s'", INVALID_INPUT),
+          e.getErrors().get(0).getMessage());
     }
   }
 
@@ -109,8 +115,10 @@ public class DefaultWorkflowManagerTest {
   public void testMakeProgressStepFallsBackToInteger() throws IOException {
     Set<InputType> inputTypes = Sets.newHashSet(InputType.INTEGER, InputType.POOL);
     when(barcodableProgressStepFactory.create(INTEGER_INPUT, inputTypes)).thenReturn(null);
-    when(integerProgressStepFactory.create(INTEGER_INPUT, inputTypes)).thenReturn(makeIntegerProgressStep(INTEGER_INPUT_EXPECTED));
+    when(integerProgressStepFactory.create(INTEGER_INPUT, inputTypes))
+        .thenReturn(makeIntegerProgressStep(INTEGER_INPUT_EXPECTED));
 
-    assertEquals(INTEGER_INPUT_EXPECTED, ((IntegerProgressStep) sut.makeProgressStep(INTEGER_INPUT, inputTypes)).getInput());
+    assertEquals(INTEGER_INPUT_EXPECTED,
+        ((IntegerProgressStep) sut.makeProgressStep(INTEGER_INPUT, inputTypes)).getInput());
   }
 }

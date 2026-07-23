@@ -1,14 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -147,16 +146,16 @@ public class DtosTest {
   public void testConvertToUtilDate_Illumina() throws ParseException {
     NotificationDto dto = fullyPopulatedIlluminaNotificationDto("RUN_B");
     Run run = Dtos.to(dto);
-    assertThat(DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneId.systemDefault()).format(dto.getStartDate()),
-        is(LimsUtils.formatDate(run.getStartDate())));
+    assertEquals(LimsUtils.formatDate(run.getStartDate()),
+        DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneId.systemDefault()).format(dto.getStartDate()));
   }
 
   @Test
   public void testConvertToUtilDate_PacBio() throws ParseException {
     NotificationDto dto = fullyPopulatedPacBioNotificationDto("RUN_B");
     Run run = Dtos.to(dto);
-    assertThat(DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneId.systemDefault()).format(dto.getStartDate()),
-        is(LimsUtils.formatDate(run.getStartDate())));
+    assertEquals(LimsUtils.formatDate(run.getStartDate()),
+        DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneId.systemDefault()).format(dto.getStartDate()));
   }
 
   static IlluminaNotificationDto fullyPopulatedIlluminaNotificationDto(String sequencerName) {

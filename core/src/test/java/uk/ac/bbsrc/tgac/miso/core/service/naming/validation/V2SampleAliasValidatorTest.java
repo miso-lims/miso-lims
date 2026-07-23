@@ -1,15 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.validation;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class V2SampleAliasValidatorTest {
 
   private V2SampleAliasValidator sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new V2SampleAliasValidator();
   }

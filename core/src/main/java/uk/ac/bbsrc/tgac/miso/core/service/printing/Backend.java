@@ -24,9 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.util.TransmissionUtils;
 
 /**
@@ -36,7 +36,7 @@ public enum Backend {
   BRADY_FTP("host", "pin") {
     @Override
     public boolean print(byte[] content, JsonNode configuration, User user) {
-      return sendFtpFile(configuration.get("host").asText(), "root", configuration.get("pin").asText(), "/execute",
+      return sendFtpFile(configuration.get("host").asString(), "root", configuration.get("pin").asString(), "/execute",
           Arrays.hashCode(content) + ".LBL", content);
     }
   },
@@ -78,8 +78,8 @@ public enum Backend {
     @SuppressWarnings({"squid:S3457"})
     @Override
     public boolean print(byte[] content, JsonNode configuration, User user) {
-      String host = configuration.get("host").asText();
-      String queue = configuration.get("queue").asText();
+      String host = configuration.get("host").asString();
+      String queue = configuration.get("queue").asString();
       // We need a three digit job id.
       int id = Arrays.hashCode(content);
       if (id < 0) {
@@ -131,7 +131,7 @@ public enum Backend {
 
     @Override
     public boolean print(byte[] content, JsonNode configuration, User user) {
-      String host = configuration.get("host").asText();
+      String host = configuration.get("host").asString();
       int port = configuration.get("port").asInt();
       try (Socket socket = new Socket(host, port)) {
         socket.getOutputStream().write(content);
@@ -146,7 +146,7 @@ public enum Backend {
   ZEBRA_FTP("host", "password") {
     @Override
     public boolean print(byte[] content, JsonNode configuration, User user) {
-      return sendFtpFile(configuration.get("host").asText(), "admin", configuration.get("password").asText(),
+      return sendFtpFile(configuration.get("host").asString(), "admin", configuration.get("password").asText(),
           null, Arrays.hashCode(content) + ".ZPL", content);
     }
 
@@ -219,14 +219,9 @@ public enum Backend {
    * @return
    */
   public boolean print(byte[] context, String configuration, User user) {
-    ObjectMapper mapper = new ObjectMapper();
+    JsonMapper mapper = JsonMapper.builder().build();
     JsonNode node;
-    try {
-      node = mapper.readTree(configuration);
-      return print(context, node, user);
-    } catch (IOException e) {
-      log.error("Invalid printer configuration", e);
-      return false;
-    }
+    node = mapper.readTree(configuration);
+    return print(context, node, user);
   }
 }

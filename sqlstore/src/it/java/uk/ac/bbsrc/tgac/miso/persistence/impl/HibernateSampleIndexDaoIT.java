@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 
@@ -27,7 +27,7 @@ public class HibernateSampleIndexDaoIT extends AbstractHibernateSaveDaoTest<Samp
   public SampleIndex getCreateItem() {
     SampleIndex index = new SampleIndex();
     index.setName("Test Index");
-    SampleIndexFamily family = (SampleIndexFamily) currentSession().get(SampleIndexFamily.class, 1L);
+    SampleIndexFamily family = (SampleIndexFamily) currentSession().find(SampleIndexFamily.class, 1L);
     index.setFamily(family);
     return index;
   }
@@ -47,7 +47,7 @@ public class HibernateSampleIndexDaoIT extends AbstractHibernateSaveDaoTest<Samp
   public void testGetByFamilyAndName() throws Exception {
     long familyId = 2L;
     String name = "Index 2-002";
-    SampleIndexFamily family = (SampleIndexFamily) currentSession().get(SampleIndexFamily.class, familyId);
+    SampleIndexFamily family = (SampleIndexFamily) currentSession().find(SampleIndexFamily.class, familyId);
     SampleIndex index = getTestSubject().getByFamilyAndName(family, name);
     assertNotNull(index);
     assertEquals(name, index.getName());

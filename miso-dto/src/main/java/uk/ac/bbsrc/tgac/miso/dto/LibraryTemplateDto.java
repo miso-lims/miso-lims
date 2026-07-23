@@ -13,11 +13,11 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = DetailedLibraryTemplateDto.class, name = "Detailed"),
-    @JsonSubTypes.Type(value = LibraryTemplateDto.class, name = "Plain") })
+    @JsonSubTypes.Type(value = LibraryTemplateDto.class, name = "Plain")})
 @JsonTypeName(value = "Plain")
 public class LibraryTemplateDto {
 
-  private Long libraryTemplateId;
+  private Long id;
   private String alias;
   private List<Long> projectIds;
   private String defaultVolume;
@@ -34,11 +34,11 @@ public class LibraryTemplateDto {
   private Map<String, Long> indexTwoIds;
 
   public Long getId() {
-    return libraryTemplateId;
+    return id;
   }
 
-  public void setId(long libraryTemplateId) {
-    this.libraryTemplateId = libraryTemplateId;
+  public void setId(Long id) {
+    this.id = id;
   }
 
   public String getAlias() {

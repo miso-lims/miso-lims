@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -12,13 +12,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Lists;
@@ -36,8 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException expectedException = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -47,11 +44,16 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
 
   private final User emptyUser = new UserImpl();
 
-  @Before
+  @BeforeEach
   public void setUp() throws MisoNamingException {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
     emptyUser.setId(1L);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
@@ -80,8 +82,7 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetLibraryAliquotByBarcodeNull() throws IOException {
-    expectedException.expect(IOException.class);
-    dao.getByBarcode(null);
+    assertThrows(IOException.class, () -> dao.getByBarcode(null));
   }
 
   @Test
@@ -213,7 +214,7 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
     ld.setCreationTime(now);
     ld.setName("nom de plume");
     ld.setAlias("TEST");
-    Long newId = dao.create(ld);
+    long newId = dao.create(ld);
     final LibraryAliquot saved = dao.get(newId);
     assertNotNull(saved);
     assertEquals(new BigDecimal("12.5"), saved.getConcentration());
@@ -272,7 +273,7 @@ public class HibernateLibraryAliquotDaoIT extends AbstractDAOTest {
     List<LibraryAliquot> aliquots = dao.listByPoolIds(poolIds);
     assertEquals(expectedAliquotIds.size(), aliquots.size());
     for (Long expectedId : expectedAliquotIds) {
-      assertTrue(aliquots.stream().anyMatch(aliquot -> aliquot.getId() == expectedId.longValue()));
+      assertTrue(aliquots.stream().anyMatch(aliquot -> aliquot.getId() == expectedId));
     }
   }
 

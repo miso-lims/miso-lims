@@ -39,17 +39,17 @@ public abstract class HibernateQcStore<T extends QC> implements QcTargetStore {
 
   @Override
   public T get(long id) throws IOException {
-    return qcClass.cast(currentSession().get(qcClass, id));
+    return qcClass.cast(currentSession().find(qcClass, id));
   }
 
   @Override
   public QualityControlEntity getEntity(long id) throws IOException {
-    return entityClass.cast(currentSession().get(entityClass, id));
+    return entityClass.cast(currentSession().find(entityClass, id));
   }
 
   @Override
   public Collection<T> listForEntity(long id) throws IOException {
-    return entityClass.cast(currentSession().get(entityClass, id)).getQCs();
+    return entityClass.cast(currentSession().find(entityClass, id)).getQCs();
   }
 
   @Override

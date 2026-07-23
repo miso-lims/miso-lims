@@ -23,8 +23,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoreVersion;
@@ -52,7 +51,7 @@ public class EditSequencerPartitionContainerController {
   @Autowired
   private IndexChecker indexChecker;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   /**
    * Translates foreign keys to entity objects with only the ID set, to be used in service layer to

@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -9,14 +9,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
 
@@ -46,8 +43,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateBoxDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -55,10 +51,15 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   @InjectMocks
   private HibernateBoxDao dao;
 
-  @Before
+  @BeforeEach
   public void setup() throws IOException, MisoNamingException {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
@@ -92,7 +93,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     assertNotNull(boxes);
     assertEquals(2, boxes.size());
     for (Long id : ids) {
-      assertTrue(boxes.stream().anyMatch(x -> x.getId() == id.longValue()));
+      assertTrue(boxes.stream().anyMatch(x -> x.getId() == id));
     }
   }
 
@@ -119,7 +120,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   @Test
   public void testRemoveBoxableViewFromBox() throws Exception {
     Sample s =
-        (Sample) entityManager.unwrap(Session.class).get(SampleImpl.class, 15L);
+        (Sample) currentSession().find(SampleImpl.class, 15L);
     Box box = dao.get(1);
     BoxPosition bp = box.getBoxPositions().get("A01");
     assertNotNull(bp);
@@ -127,26 +128,24 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     BoxableView item = makeBoxableView(s);
     dao.removeBoxableFromBox(item);
 
-    entityManager.unwrap(Session.class).flush();
-    entityManager.unwrap(Session.class).clear();
+    clearSession();
 
     Box again = dao.get(1);
     assertFalse(again.getBoxPositions().containsKey("A01"));
   }
 
   @Test
-  public void testRemoveBoxableViewUnneccessary() throws Exception {
+  public void testRemoveBoxableViewUnnecessary() throws Exception {
     Sample before =
-        (Sample) entityManager.unwrap(Session.class).get(SampleImpl.class, 1L);
+        (Sample) currentSession().find(SampleImpl.class, 1L);
     assertNull(before.getBox());
     BoxableView item = makeBoxableView(before);
     dao.removeBoxableFromBox(item);
 
-    entityManager.unwrap(Session.class).flush();
-    entityManager.unwrap(Session.class).clear();
+    clearSession();
 
     Sample after =
-        (Sample) entityManager.unwrap(Session.class).get(SampleImpl.class, 1L);
+        (Sample) currentSession().find(SampleImpl.class, 1L);
     assertNull(after.getBox());
   }
 
@@ -181,7 +180,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
   public void testSave() throws Exception {
     Box box = new BoxImpl();
     UserImpl user = new UserImpl();
-    user.setId(1l);
+    user.setId(1L);
     Date now = new Date();
     box.setCreator(user);
     box.setCreationTime(now);
@@ -195,10 +194,10 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     BoxSize boxSize = new BoxSize();
     boxSize.setColumns(2);
     boxSize.setRows(3);
-    boxSize.setId(1l);
+    boxSize.setId(1L);
     box.setSize(boxSize);
     BoxUse boxuse =
-        (BoxUse) entityManager.unwrap(Session.class).get(BoxUse.class, 1L);
+        (BoxUse) currentSession().find(BoxUse.class, 1L);
     box.setUse(boxuse);
 
     long boxId = dao.save(box);
@@ -231,8 +230,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     box.getBoxPositions().put(toPos, toBp);
     dao.save(box);
 
-    entityManager.unwrap(Session.class).flush();
-    entityManager.unwrap(Session.class).clear();
+    clearSession();
 
     Box again = dao.get(boxId);
     assertNull(again.getBoxPositions().get(fromPos));
@@ -265,8 +263,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     toBox.getBoxPositions().put(toPos, toBp);
     dao.save(toBox);
 
-    entityManager.unwrap(Session.class).flush();
-    entityManager.unwrap(Session.class).clear();
+    clearSession();
 
     Box saved = dao.get(toBoxId);
     assertNotNull(saved);
@@ -356,14 +353,12 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetBySearchNull() {
-    exception.expect(NullPointerException.class);
-    dao.getBySearch(null);
+    assertThrows(NullPointerException.class, () -> dao.getBySearch(null));
   }
 
   @Test
   public void testGetByPartialSearchNull() {
-    exception.expect(NullPointerException.class);
-    dao.getByPartialSearch(null, true);
+    assertThrows(NullPointerException.class, () -> dao.getByPartialSearch(null, true));
   }
 
   @Test
@@ -413,8 +408,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetBoxableViewsBySearchNull() throws Exception {
-    exception.expect(NullPointerException.class);
-    dao.getBoxableViewsBySearch(null);
+    assertThrows(NullPointerException.class, () -> dao.getBoxableViewsBySearch(null));
   }
 
   @Test
@@ -461,22 +455,20 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSearchByDistributedInvalid() throws IOException {
-    exception.expect(RuntimeException.class);
-    testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-02-24"), LimsUtils.parseDate("2021-02-24"),
-        DateType.DISTRIBUTED));
+    assertThrows(RuntimeException.class,
+        () -> testSearch(PaginationFilter.date(LimsUtils.parseDate("2021-02-24"), LimsUtils.parseDate("2021-02-24"),
+            DateType.DISTRIBUTED)));
   }
 
   @Test
   public void testSearchByProjectInvalid() throws IOException {
-    exception.expect(RuntimeException.class);
-    testSearch(PaginationFilter.project(1L));
+    assertThrows(RuntimeException.class, () -> testSearch(PaginationFilter.project(1L)));
   }
 
   /**
    * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
    * 
    * @param filter the search filter
-   * @throws IOException
    */
   private void testSearch(PaginationFilter filter) throws IOException {
     // verify Hibernate mappings by ensuring that no exception is thrown
@@ -502,8 +494,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     box.getBoxPositions().put(insertPos, bp);
     dao.save(box);
 
-    entityManager.unwrap(Session.class).flush();
-    entityManager.unwrap(Session.class).clear();
+    clearSession();
 
     Box saved = dao.get(1L);
     assertEquals(3, saved.getBoxPositions().size());
@@ -520,8 +511,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     box.getBoxPositions().remove(removePos);
     dao.save(box);
 
-    entityManager.unwrap(Session.class).flush();
-    entityManager.unwrap(Session.class).clear();
+    clearSession();
 
     Box saved = dao.get(1L);
     assertEquals(1, saved.getBoxPositions().size());
@@ -543,8 +533,7 @@ public class HibernateBoxDaoIT extends AbstractDAOTest {
     item.setDiscarded(true);
     dao.saveBoxable(item);
 
-    entityManager.unwrap(Session.class).flush();
-    entityManager.unwrap(Session.class).clear();
+    clearSession();
 
     Boxable saved = dao.getBoxable(new BoxableId(EntityType.SAMPLE, 15L));
     assertTrue(saved.isDiscarded());

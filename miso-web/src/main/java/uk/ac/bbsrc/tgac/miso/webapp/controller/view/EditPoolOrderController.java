@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
@@ -38,7 +36,7 @@ public class EditPoolOrderController {
   @Autowired
   private IndexChecker indexChecker;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @GetMapping("/new")
   public ModelAndView create(@RequestParam(name = "aliquotIds", required = false) String aliquotIds, ModelMap model)
@@ -71,7 +69,7 @@ public class EditPoolOrderController {
     return orderPage(order, model);
   }
 
-  private ModelAndView orderPage(PoolOrder order, ModelMap model) throws JsonProcessingException {
+  private ModelAndView orderPage(PoolOrder order, ModelMap model) {
     PoolOrderDto dto = Dtos.asDto(order, indexChecker);
     model.put("poolOrder", order);
     model.put("orderDto", mapper.writeValueAsString(dto));

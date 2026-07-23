@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -11,8 +11,8 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.annotations.TimeZoneStorage;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
@@ -35,7 +35,7 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
 
   private HibernateArrayRunDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateArrayRunDao();
     sut.setEntityManager(entityManager);
@@ -45,13 +45,13 @@ public class HibernateArrayRunDaoIT extends AbstractDAOTest {
   public void testSaveNew() throws Exception {
     ArrayRun run = new ArrayRun();
     run.setAlias("TestArrayRun");
-    Instrument inst = (Instrument) entityManager.unwrap(Session.class).get(InstrumentImpl.class, 3L);
+    Instrument inst = (Instrument) currentSession().find(InstrumentImpl.class, 3L);
     run.setInstrument(inst);
     run.setHealth(HealthType.Running);
     Date now = new Date();
     LocalDate today = LocalDate.now();
     run.setStartDate(today);
-    User user = (User) entityManager.unwrap(Session.class).get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     run.setCreator(user);
     run.setCreationTime(now);
     run.setLastModifier(user);

@@ -25,7 +25,7 @@ public class HibernateContainerQcDao extends HibernateQcStore<ContainerQC> imple
   public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units)
       throws IOException {
     SequencerPartitionContainer container =
-        (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, id);
+        (SequencerPartitionContainer) currentSession().find(SequencerPartitionContainerImpl.class, id);
     correspondingField.updateField(container, value, units);
     currentSession().merge(container);
   }

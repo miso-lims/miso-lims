@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -67,8 +67,8 @@ public class LibraryTypeRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // only admin can update these
-    LibraryTypeDto one = Dtos.asDto(currentSession().get(entityClass, 1));
-    LibraryTypeDto two = Dtos.asDto(currentSession().get(entityClass, 2));
+    LibraryTypeDto one = Dtos.asDto(currentSession().find(entityClass, 1));
+    LibraryTypeDto two = Dtos.asDto(currentSession().find(entityClass, 2));
     one.setAbbreviation("ON");
     two.setAbbreviation("TW");
 
@@ -89,8 +89,8 @@ public class LibraryTypeRestControllerST extends AbstractST {
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
     // only admin can update these
-    LibraryTypeDto one = Dtos.asDto(currentSession().get(entityClass, 1));
-    LibraryTypeDto two = Dtos.asDto(currentSession().get(entityClass, 2));
+    LibraryTypeDto one = Dtos.asDto(currentSession().find(entityClass, 1));
+    LibraryTypeDto two = Dtos.asDto(currentSession().find(entityClass, 2));
     one.setAbbreviation("ON");
     two.setAbbreviation("TW");
 

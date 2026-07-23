@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Maps;
 
@@ -18,7 +18,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.InstrumentPage.Field;
 
 public class InstrumentPageIT extends AbstractIT {
 
-  @Before
+  @BeforeEach
   public void setup() {
     loginAdmin();
   }
@@ -110,7 +110,7 @@ public class InstrumentPageIT extends AbstractIT {
     assertNotNull(page2);
     assertFieldValues("changes post-save", changes, page2);
 
-    Instrument sr = (Instrument) getSession().get(InstrumentImpl.class, 100L);
+    Instrument sr = (Instrument) getSession().find(InstrumentImpl.class, 100L);
     assertInstrumentAttributes(changes, sr);
   }
 

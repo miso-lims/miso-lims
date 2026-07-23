@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -34,14 +33,13 @@ import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.type.IndexSequencing;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
@@ -2737,6 +2735,7 @@ public class Dtos {
   public static ProjectDto asDto(@Nonnull Project from) {
     ProjectDto dto = new ProjectDto();
     dto.setId(from.getId());
+    setLong(dto::setId, from.getId(), true);
     dto.setName(from.getName());
     setDateString(dto::setCreationDate, from.getCreationTime());
     dto.setTitle(from.getTitle());
@@ -3129,7 +3128,7 @@ public class Dtos {
     return dto;
   }
 
-  public static PrinterDto asDto(@Nonnull Printer from, @Nonnull ObjectMapper mapper) {
+  public static PrinterDto asDto(@Nonnull Printer from, @Nonnull JsonMapper mapper) {
     PrinterDto dto = new PrinterDto();
     dto.setId(from.getId());
     dto.setAvailable(from.isEnabled());
@@ -3138,16 +3137,12 @@ public class Dtos {
     dto.setDriver(from.getDriver().name());
     dto.setHeight(from.getHeight());
     dto.setWidth(from.getWidth());
-    try {
-      dto.setLayout(mapper.readValue(from.getLayout(), ArrayNode.class));
-    } catch (IOException e) {
-      log.error("Corrupt printer contents", e);
-    }
+    dto.setLayout(mapper.readValue(from.getLayout(), ArrayNode.class));
     dto.setName(from.getName());
     return dto;
   }
 
-  public static Printer to(@Nonnull PrinterDto dto, @Nonnull ObjectMapper mapper) throws JsonProcessingException {
+  public static Printer to(@Nonnull PrinterDto dto, @Nonnull JsonMapper mapper) {
     Printer to = new Printer();
     to.setId(dto.getId());
     to.setBackend(Backend.valueOf(dto.getBackend()));

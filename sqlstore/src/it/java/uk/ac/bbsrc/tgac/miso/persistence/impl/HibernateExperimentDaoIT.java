@@ -3,13 +3,13 @@
  */
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -27,7 +27,7 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
 
   private HibernateExperimentDao dao;
 
-  @Before
+  @BeforeEach
   public void setup() throws Exception {
     dao = new HibernateExperimentDao();
     dao.setEntityManager(getEntityManager());
@@ -46,9 +46,9 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
     String name = "TEMPORARY_XXX";
     Experiment experiment = new Experiment();
     experiment.setName(name);
-    InstrumentModel model = (InstrumentModel) currentSession().get(InstrumentModel.class, 16L);
+    InstrumentModel model = (InstrumentModel) currentSession().find(InstrumentModel.class, 16L);
     experiment.setInstrumentModel(model);
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     user.setId(1L);
 
     experiment.setChangeDetails(user);
@@ -57,7 +57,7 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    Experiment saved = (Experiment) currentSession().get(Experiment.class, savedId);
+    Experiment saved = (Experiment) currentSession().find(Experiment.class, savedId);
     assertNotNull(saved);
     assertEquals(name, saved.getName());
   }
@@ -66,19 +66,19 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
   public void testUpdate() throws Exception {
     long id = 4L;
     String newAlias = "New Alias";
-    Experiment original = (Experiment) currentSession().get(Experiment.class, id);
+    Experiment original = (Experiment) currentSession().find(Experiment.class, id);
     assertNotEquals(newAlias, original.getAlias());
     original.setAlias(newAlias);
     dao.update(original);
 
     clearSession();
 
-    Experiment saved = (Experiment) currentSession().get(Experiment.class, id);
+    Experiment saved = (Experiment) currentSession().find(Experiment.class, id);
     assertEquals(newAlias, saved.getAlias());
   }
 
   /**
-   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#listAll()}.
+   * Test method for {@link uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateExperimentDao#list()}.
    */
   @Test
   public void testList() throws IOException {
@@ -122,7 +122,7 @@ public class HibernateExperimentDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetUsage() throws Exception {
-    Experiment experiment = (Experiment) currentSession().get(Experiment.class, 1L);
+    Experiment experiment = (Experiment) currentSession().find(Experiment.class, 1L);
     assertEquals(2L, dao.getUsage(experiment));
   }
 

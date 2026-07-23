@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
@@ -39,7 +38,7 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
   private AuthorizationManager authorizationManager;
 
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   public SopController() {
     super("SOPs", "sop", "sop");
@@ -58,7 +57,7 @@ public class SopController extends AbstractTypeDataController<Sop, SopDto> {
         mapper) {
 
       @Override
-      protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
         config.put("isAdmin", authorizationManager.isAdminUser());
       }
     };

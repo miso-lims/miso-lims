@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import com.jayway.jsonpath.JsonPath;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EditArrayControllerST extends AbstractST {
 
@@ -15,7 +15,7 @@ public class EditArrayControllerST extends AbstractST {
   private static final Class<Array> entityClass = Array.class;
 
   private void assertDbVsModelObjects(String resultJson, int id) {
-    Array dbObject = currentSession().get(entityClass, id);
+    Array dbObject = currentSession().find(entityClass, id);
     assertEquals(dbObject.getId(), readLong(resultJson, "$.id"));
     assertEquals(dbObject.getAlias(), JsonPath.read(resultJson, "$.alias"));
   }

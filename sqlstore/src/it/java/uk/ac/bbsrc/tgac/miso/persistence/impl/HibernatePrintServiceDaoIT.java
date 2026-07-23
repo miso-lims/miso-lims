@@ -1,17 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Collection;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -21,20 +19,25 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 
 public class HibernatePrintServiceDaoIT extends AbstractDAOTest {
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
 
-  private final String NEW_NAME = "The new name";
+  private static final String NEW_NAME = "The new name";
+
+  private AutoCloseable mockito;
 
   @PersistenceContext
   private EntityManager entityManager;
   @InjectMocks
   private HibernatePrinterDao dao;
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test

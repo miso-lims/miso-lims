@@ -25,13 +25,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import io.prometheus.metrics.core.metrics.Gauge;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.Version;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaChemistry;
@@ -228,7 +227,7 @@ public class ConstantsController {
   private ContactRoleService contactRoleService;
 
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
@@ -279,7 +278,7 @@ public class ConstantsController {
   @Resource
   private Boolean boxScannerEnabled;
 
-  private static void createMap(ObjectMapper mapper, ObjectNode node, String name, Map<String, List<String>> map) {
+  private static void createMap(JsonMapper mapper, ObjectNode node, String name, Map<String, List<String>> map) {
     ObjectNode mapNode = node.putObject(name);
     for (String key : map.keySet()) {
       addJsonArray(mapper, mapNode, key, map.get(key), Function.identity());

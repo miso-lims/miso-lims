@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.HeaderFooterPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.HomePage;
@@ -13,7 +13,7 @@ public class LoginIT extends AbstractIT {
 
   private LoginPage page;
 
-  @Before
+  @BeforeEach
   public void setup() {
     page = LoginPage.get(getDriver(), getBaseUrl());
     assertNotNull(page);
@@ -24,7 +24,7 @@ public class LoginIT extends AbstractIT {
     HeaderFooterPage page = LoginPage.get(getDriver(), getBaseUrl());
     String text = page.getFooterText();
     assertNotNull(text);
-    assertTrue("Version number in footer", text.matches(".*Version: .*\\d+\\.\\d+\\.\\d+.*"));
+    assertTrue(text.matches(".*Version: .*\\d+\\.\\d+\\.\\d+.*"), "Version number in footer");
   }
 
   @Test

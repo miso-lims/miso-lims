@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.assertAttribute;
 
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Maps;
 
@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.FreezerPage.Field;
 
 public class FreezerPageIT extends AbstractIT {
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -33,7 +33,7 @@ public class FreezerPageIT extends AbstractIT {
 
     FreezerPage page2 = page1.save();
     long savedId = Long.parseLong(page2.getField(Field.ID));
-    StorageLocation saved = (StorageLocation) getSession().get(StorageLocation.class, savedId);
+    StorageLocation saved = (StorageLocation) getSession().find(StorageLocation.class, savedId);
     assertFreezerAttributes(fields, saved);
   }
 

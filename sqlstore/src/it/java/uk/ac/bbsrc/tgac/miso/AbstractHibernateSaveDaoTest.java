@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyBiFunction;
@@ -68,7 +68,7 @@ public abstract class AbstractHibernateSaveDaoTest<T extends Identifiable, D ext
     return sut;
   }
 
-  @Before
+  @BeforeEach
   public void setup() {
     this.sut = constructTestSubject();
   }
@@ -131,7 +131,7 @@ public abstract class AbstractHibernateSaveDaoTest<T extends Identifiable, D ext
   }
 
   private T getItem(long id) throws IOException {
-    return (T) currentSession().get(implClass, id);
+    return (T) currentSession().find(implClass, id);
   }
 
   protected void testListByIdList(WhineyBiFunction<D, Collection<Long>, List<T>> testMethod, Collection<Long> ids)

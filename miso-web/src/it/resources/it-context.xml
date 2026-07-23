@@ -6,7 +6,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+  <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer" />
 
   <bean id="entityManagerFactory"
     class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
@@ -21,8 +21,8 @@
     <property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
     <property name="jpaProperties">
       <props>
-        <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
         <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+        <prop key="hibernate.max_fetch_depth">2</prop>
       </props>
     </property>
   </bean>

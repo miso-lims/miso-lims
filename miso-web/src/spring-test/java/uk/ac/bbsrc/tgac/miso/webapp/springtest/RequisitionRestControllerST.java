@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import javax.ws.rs.core.MediaType;
@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalLibrary.Requi
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionSupplementalSample.RequisitionSupplementalSampleId;
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RequisitionRestController.*;
 import java.util.List;
 import java.util.function.Function;
@@ -76,7 +76,7 @@ public class RequisitionRestControllerST extends AbstractST {
   // template test for requsition sample and library testing
   private <T> boolean isContained(long requisitionId, long entityId, Class<T> entityType,
       Function<T, Requisition> getRequisition) {
-    Requisition entityReq = getRequisition.apply(entityType.cast(currentSession().get(entityType, entityId)));
+    Requisition entityReq = getRequisition.apply(entityType.cast(currentSession().find(entityType, entityId)));
 
     if (entityReq == null) { // null entity req means no req associated with that entity, so no requsiition contains
                              // that entity
@@ -121,7 +121,7 @@ public class RequisitionRestControllerST extends AbstractST {
 
   @Test
   public void testUpdate() throws Exception {
-    RequisitionDto dto = RequisitionDto.from(currentSession().get(entityClass, 1));
+    RequisitionDto dto = RequisitionDto.from(currentSession().find(entityClass, 1));
     dto.setAlias("updated");
 
     Requisition updated = baseTestUpdate(CONTROLLER_BASE, dto, 1, entityClass);
@@ -170,11 +170,11 @@ public class RequisitionRestControllerST extends AbstractST {
     Long targetId = 4L;
     RequisitionSupplementalSampleId id = new RequisitionSupplementalSampleId();
     id.setRequisitionId(reqId);
-    id.setSample(currentSession().get(SampleImpl.class, targetId));
+    id.setSample(currentSession().find(SampleImpl.class, targetId));
     Class<RequisitionSupplementalSample> targetClass = RequisitionSupplementalSample.class;
 
     // the sample should not be a part of this requisition as a supplemental sample at this point
-    assertNull(currentSession().get(targetClass, id));
+    assertNull(currentSession().find(targetClass, id));
 
 
 
@@ -183,7 +183,7 @@ public class RequisitionRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
 
-    RequisitionSupplementalSample sample = currentSession().get(targetClass, id);
+    RequisitionSupplementalSample sample = currentSession().find(targetClass, id);
     assertNotNull(sample);
     assertEquals(reqId, sample.getRequisitionId());
 
@@ -200,10 +200,10 @@ public class RequisitionRestControllerST extends AbstractST {
 
     RequisitionSupplementalSampleId id = new RequisitionSupplementalSampleId();
     id.setRequisitionId(reqId);
-    id.setSample(currentSession().get(SampleImpl.class, targetId));
+    id.setSample(currentSession().find(SampleImpl.class, targetId));
 
 
-    RequisitionSupplementalSample sample = currentSession().get(targetClass, id);
+    RequisitionSupplementalSample sample = currentSession().find(targetClass, id);
     assertNotNull(sample);
     assertEquals(reqId, sample.getRequisitionId());
 
@@ -213,7 +213,7 @@ public class RequisitionRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
 
-    assertNull(currentSession().get(targetClass, id));
+    assertNull(currentSession().find(targetClass, id));
   }
 
   @Test
@@ -244,10 +244,10 @@ public class RequisitionRestControllerST extends AbstractST {
 
     RequisitionSupplementalLibraryId id = new RequisitionSupplementalLibraryId();
     id.setRequisitionId(reqId);
-    id.setLibrary(currentSession().get(LibraryImpl.class, targetId));
+    id.setLibrary(currentSession().find(LibraryImpl.class, targetId));
 
 
-    assertNull(currentSession().get(targetClass, id));
+    assertNull(currentSession().find(targetClass, id));
 
     getMockMvc()
         .perform(
@@ -257,7 +257,7 @@ public class RequisitionRestControllerST extends AbstractST {
 
 
 
-    RequisitionSupplementalLibrary lib = currentSession().get(targetClass, id);
+    RequisitionSupplementalLibrary lib = currentSession().find(targetClass, id);
     assertNotNull(lib);
     assertEquals(reqId, lib.getRequisitionId());
   }
@@ -271,10 +271,10 @@ public class RequisitionRestControllerST extends AbstractST {
 
     RequisitionSupplementalLibraryId id = new RequisitionSupplementalLibraryId();
     id.setRequisitionId(reqId);
-    id.setLibrary(currentSession().get(LibraryImpl.class, targetId));
+    id.setLibrary(currentSession().find(LibraryImpl.class, targetId));
 
 
-    RequisitionSupplementalLibrary lib = currentSession().get(targetClass, id);
+    RequisitionSupplementalLibrary lib = currentSession().find(targetClass, id);
     assertNotNull(lib);
     assertEquals(reqId, lib.getRequisitionId());
 
@@ -284,7 +284,7 @@ public class RequisitionRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
 
-    assertNull(currentSession().get(targetClass, id));
+    assertNull(currentSession().find(targetClass, id));
 
   }
 
@@ -331,7 +331,7 @@ public class RequisitionRestControllerST extends AbstractST {
     String response = pollingResponse(CONTROLLER_BASE + "/bulk/" + id);
 
     for (Long targetId : reqs) {
-      Requisition resumed = currentSession().get(entityClass, targetId);
+      Requisition resumed = currentSession().find(entityClass, targetId);
       RequisitionPause pause = resumed.getPauses().get(resumed.getPauses().size() - 1); // get most recent pause
       assertEquals(resumeDate, pause.getEndDate().toString());
     }

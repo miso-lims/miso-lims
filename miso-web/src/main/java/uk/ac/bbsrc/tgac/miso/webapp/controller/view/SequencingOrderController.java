@@ -15,9 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
@@ -34,7 +33,7 @@ public class SequencingOrderController {
   @Autowired
   private IndexChecker indexChecker;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @PostMapping("/bulk/new")
   public ModelAndView bulkCreateOrders(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
@@ -56,7 +55,7 @@ public class SequencingOrderController {
       }
 
       @Override
-      protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
         // no config necessary
       }
     };

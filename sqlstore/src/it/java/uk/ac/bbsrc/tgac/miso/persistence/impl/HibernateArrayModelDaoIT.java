@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
@@ -16,7 +16,7 @@ public class HibernateArrayModelDaoIT extends AbstractDAOTest {
 
   private HibernateArrayModelDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateArrayModelDao();
     sut.setEntityManager(getEntityManager());
@@ -56,7 +56,7 @@ public class HibernateArrayModelDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    ArrayModel saved = (ArrayModel) currentSession().get(ArrayModel.class, savedId);
+    ArrayModel saved = (ArrayModel) currentSession().find(ArrayModel.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -64,20 +64,20 @@ public class HibernateArrayModelDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Name";
-    ArrayModel arrayModel = (ArrayModel) currentSession().get(ArrayModel.class, id);
+    ArrayModel arrayModel = (ArrayModel) currentSession().find(ArrayModel.class, id);
     assertNotEquals(alias, arrayModel.getAlias());
     arrayModel.setAlias(alias);
     sut.update(arrayModel);
 
     clearSession();
 
-    ArrayModel saved = (ArrayModel) currentSession().get(ArrayModel.class, id);
+    ArrayModel saved = (ArrayModel) currentSession().find(ArrayModel.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    ArrayModel arrayModel = (ArrayModel) currentSession().get(ArrayModel.class, 1L);
+    ArrayModel arrayModel = (ArrayModel) currentSession().find(ArrayModel.class, 1L);
     assertEquals("Test BeadChip", arrayModel.getAlias());
     assertEquals(2L, sut.getUsage(arrayModel));
   }

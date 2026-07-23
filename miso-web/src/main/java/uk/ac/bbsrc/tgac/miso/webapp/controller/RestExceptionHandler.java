@@ -4,21 +4,19 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.util.NestedServletException;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response.Status;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.BulkValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestUtils;
@@ -55,19 +53,14 @@ public class RestExceptionHandler {
    * @return a representation of the error to return to the client
    */
   public static ObjectNode handleException(HttpServletRequest request, HttpServletResponse response,
-      Exception exception, ObjectMapper mapper) {
+      Exception exception, JsonMapper mapper) {
     ObjectNode error = mapper.createObjectNode();
     error.put("requestUrl", request.getRequestURL().toString());
     String detailMessage = exception.getLocalizedMessage();
     Status status = null;
 
     ResponseStatus rs = AnnotationUtils.findAnnotation(exception.getClass(), ResponseStatus.class);
-    if (exception instanceof NestedServletException) {
-      NestedServletException nested = (NestedServletException) exception;
-      if (nested.getCause() instanceof Exception) {
-        return handleException(request, response, (Exception) nested.getCause(), mapper);
-      }
-    } else if (exception instanceof HttpMessageNotReadableException) {
+    if (exception instanceof HttpMessageNotReadableException) {
       Throwable rootCause = ((HttpMessageNotReadableException) exception).getRootCause();
       if (rootCause instanceof ValidationException) {
         return handleException(request, response, (Exception) rootCause, mapper);
@@ -92,7 +85,7 @@ public class RestExceptionHandler {
       addDataMap(error, valException.getErrorsByField());
       error.put("dataFormat", "validation");
     } else if (ExceptionUtils.getRootCause(exception) instanceof IOException
-        && StringUtils.containsIgnoreCase(ExceptionUtils.getRootCauseMessage(exception), "Broken pipe")) {
+        && Strings.CI.contains(ExceptionUtils.getRootCauseMessage(exception), "Broken pipe")) {
       response.setStatus(Status.SERVICE_UNAVAILABLE.getStatusCode());
       return null;
     } else {

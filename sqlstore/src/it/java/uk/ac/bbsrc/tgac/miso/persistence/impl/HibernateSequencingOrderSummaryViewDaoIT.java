@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.util.EnumSet;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
@@ -23,7 +23,7 @@ public class HibernateSequencingOrderSummaryViewDaoIT extends AbstractDAOTest {
 
   private HibernateSequencingOrderSummaryViewDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateSequencingOrderSummaryViewDao();
     sut.setEntityManager(entityManager);

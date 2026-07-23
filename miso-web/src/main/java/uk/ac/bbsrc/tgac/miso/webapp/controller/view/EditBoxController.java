@@ -22,10 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import jakarta.annotation.Resource;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
@@ -47,7 +46,7 @@ public class EditBoxController {
   @Autowired
   private BoxService boxService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   public void setBoxService(BoxService boxService) {
     this.boxService = boxService;
@@ -114,19 +113,19 @@ public class EditBoxController {
   }
 
   private final class BulkCreateBoxBackend extends BulkCreateTableBackend<BoxDto> {
-    public BulkCreateBoxBackend(Integer quantity, ObjectMapper mapper) {
+    public BulkCreateBoxBackend(Integer quantity, JsonMapper mapper) {
       super("box", BoxDto.class, "Boxes", new BoxDto(), quantity, mapper);
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       // No configuration required
     }
   }
 
   private final class BulkEditBoxBackend extends BulkEditTableBackend<Box, BoxDto> {
 
-    private BulkEditBoxBackend(ObjectMapper mapper) {
+    private BulkEditBoxBackend(JsonMapper mapper) {
       super("box", BoxDto.class, "Boxes", mapper);
     }
 
@@ -141,7 +140,7 @@ public class EditBoxController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) {
       config.put(PageMode.PROPERTY, PageMode.EDIT.getLabel());
     }
   }

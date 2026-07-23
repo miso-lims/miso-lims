@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.jayway.jsonpath.JsonPath;
 import static org.hamcrest.Matchers.*;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RunRestControllerST extends AbstractST {
   private static final String CONTROLLER_BASE = "/rest/runs";
@@ -201,7 +201,7 @@ public class RunRestControllerST extends AbstractST {
         .param("barcode", "EXISTING"))
         .andExpect(status().isNoContent());
 
-    Run updated = currentSession().get(entityClass, 5002);
+    Run updated = currentSession().find(entityClass, 5002);
     assertEquals(1, updated.getRunPositions().size());
     RunPosition runPosition = updated.getRunPositions().iterator().next();
     assertEquals(5002L, runPosition.getContainer().getId());
@@ -215,7 +215,7 @@ public class RunRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
 
-    Run updated = currentSession().get(entityClass, 1);
+    Run updated = currentSession().find(entityClass, 1);
     assertFalse(updated.getSequencerPartitionContainers().stream().anyMatch(x -> x.getId() == 1L));
   }
 
@@ -234,7 +234,7 @@ public class RunRestControllerST extends AbstractST {
       RunPartitionId partId = new RunPartitionId();
       partId.setRunId(1L);
       partId.setPartitionId(id);
-      RunPartition part = currentSession().get(RunPartition.class, partId);
+      RunPartition part = currentSession().find(RunPartition.class, partId);
       assertEquals(qcTypeId, part.getQcType().getId());
     }
   }
@@ -256,7 +256,7 @@ public class RunRestControllerST extends AbstractST {
       RunPartitionId partId = new RunPartitionId();
       partId.setRunId(1L);
       partId.setPartitionId(id);
-      RunPartition part = currentSession().get(RunPartition.class, partId);
+      RunPartition part = currentSession().find(RunPartition.class, partId);
       assertEquals(runPurposeId, part.getPurpose().getId());
     }
   }
@@ -279,10 +279,10 @@ public class RunRestControllerST extends AbstractST {
         .andExpect(status().isNoContent());
 
     RunPartitionAliquotId id = new RunPartitionAliquotId(
-        currentSession().get(entityClass, 1L),
-        currentSession().get(PartitionImpl.class, 12L),
-        currentSession().get(ListLibraryAliquotView.class, 304L));
-    RunPartitionAliquot updated = currentSession().get(RunPartitionAliquot.class, id);
+        currentSession().find(entityClass, 1L),
+        currentSession().find(PartitionImpl.class, 12L),
+        currentSession().find(ListLibraryAliquotView.class, 304L));
+    RunPartitionAliquot updated = currentSession().find(RunPartitionAliquot.class, id);
     assertEquals(qcStatusId, updated.getQcStatus().getId());
     assertEquals(qcNote, updated.getQcNote());
   }
@@ -337,7 +337,7 @@ public class RunRestControllerST extends AbstractST {
   @Test
   public void testUpdate() throws Exception {
 
-    RunDto dto = Dtos.asDto(currentSession().get(entityClass, 1));
+    RunDto dto = Dtos.asDto(currentSession().find(entityClass, 1));
     dto.setAlias("updated");
 
     IlluminaRun updated = baseTestUpdate(CONTROLLER_BASE, dto, 1, entityClass);

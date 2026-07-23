@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
@@ -25,14 +24,14 @@ public class ListSequencingOrdersController {
 
     private final String slug;
 
-    public OrderListPage(String slug, ObjectMapper mapper) throws IOException {
+    public OrderListPage(String slug, JsonMapper mapper) throws IOException {
       super("sequencingordercompletion", "platform", getPlatformTypes(instrumentModelService), PlatformType::getKey,
           PlatformType::name, mapper);
       this.slug = slug;
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       config.put("slug", slug);
     }
 
@@ -43,7 +42,7 @@ public class ListSequencingOrdersController {
   @Autowired
   private InstrumentModelService instrumentModelService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @GetMapping("/outstanding")
   public ModelAndView listActive(ModelMap model) throws IOException {

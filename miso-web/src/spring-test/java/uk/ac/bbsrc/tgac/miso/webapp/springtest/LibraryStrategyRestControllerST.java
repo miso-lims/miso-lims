@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -58,8 +58,8 @@ public class LibraryStrategyRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // only admin can update these
-    LibraryStrategyTypeDto one = Dtos.asDto(currentSession().get(LibraryStrategyType.class, 1));
-    LibraryStrategyTypeDto three = Dtos.asDto(currentSession().get(LibraryStrategyType.class, 3));
+    LibraryStrategyTypeDto one = Dtos.asDto(currentSession().find(LibraryStrategyType.class, 1));
+    LibraryStrategyTypeDto three = Dtos.asDto(currentSession().find(LibraryStrategyType.class, 3));
     one.setName("one");
     three.setName("three");
 
@@ -78,8 +78,8 @@ public class LibraryStrategyRestControllerST extends AbstractST {
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
     // only admin can update these
-    LibraryStrategyTypeDto one = Dtos.asDto(currentSession().get(LibraryStrategyType.class, 1));
-    LibraryStrategyTypeDto three = Dtos.asDto(currentSession().get(LibraryStrategyType.class, 3));
+    LibraryStrategyTypeDto one = Dtos.asDto(currentSession().find(LibraryStrategyType.class, 1));
+    LibraryStrategyTypeDto three = Dtos.asDto(currentSession().find(LibraryStrategyType.class, 3));
     one.setName("one");
     three.setName("three");
 

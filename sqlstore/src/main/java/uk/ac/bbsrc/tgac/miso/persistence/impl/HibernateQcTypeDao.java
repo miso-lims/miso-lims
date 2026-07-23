@@ -6,7 +6,15 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.*;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryAliquotQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QC_;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControl;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun_;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType_;
 import uk.ac.bbsrc.tgac.miso.persistence.QualityControlTypeStore;
@@ -40,7 +48,7 @@ public class HibernateQcTypeDao extends HibernateSaveDao<QcType> implements Qual
 
   @Override
   public QcControl getControl(long id) throws IOException {
-    return (QcControl) currentSession().get(QcControl.class, id);
+    return (QcControl) currentSession().find(QcControl.class, id);
   }
 
   @Override
@@ -80,7 +88,7 @@ public class HibernateQcTypeDao extends HibernateSaveDao<QcType> implements Qual
       case Sample:
         return new LongQueryBuilder<>(currentSession(), SampleQcControlRun.class);
       case LibraryAliquot:
-         return  new LongQueryBuilder<>(currentSession(), LibraryAliquotQcControlRun.class);
+        return new LongQueryBuilder<>(currentSession(), LibraryAliquotQcControlRun.class);
       default:
         throw new IllegalArgumentException(
             "Unhandled QC target: " + control.getQcType().getQcTarget() == null ? "null"

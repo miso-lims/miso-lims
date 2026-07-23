@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,22 +7,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pair;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelCanvas.FontStyle;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-public class PrintableTextDeserializer extends JsonDeserializer<PrintableText> {
+public class PrintableTextDeserializer extends ValueDeserializer<PrintableText> {
 
   private static final class LiteralText implements PrintableText {
     private final String text;
@@ -34,11 +30,11 @@ public class PrintableTextDeserializer extends JsonDeserializer<PrintableText> {
 
     @Override
     public JsonNode asJson() {
-      return JsonNodeFactory.instance.textNode(text);
+      return JsonNodeFactory.instance.stringNode(text);
     }
 
     @Override
-    public void asJson(JsonGenerator generator) throws IOException, JsonProcessingException {
+    public void asJson(JsonGenerator generator) {
       generator.writeString(text);
     }
 
@@ -75,7 +71,7 @@ public class PrintableTextDeserializer extends JsonDeserializer<PrintableText> {
     }
 
     @Override
-    public void asJson(JsonGenerator generator) throws IOException, JsonProcessingException {
+    public void asJson(JsonGenerator generator) {
       generator.writeStartArray();
       for (final PrintableText field : fields) {
         field.asJson(generator);
@@ -101,8 +97,8 @@ public class PrintableTextDeserializer extends JsonDeserializer<PrintableText> {
   }
 
   private PrintableText deserialize(JsonNode node) {
-    if (node.isTextual()) {
-      return new LiteralText(node.asText());
+    if (node.isString()) {
+      return new LiteralText(node.asString());
     }
     if (node.isArray()) {
       final List<PrintableText> fields = new ArrayList<>();
@@ -112,7 +108,7 @@ public class PrintableTextDeserializer extends JsonDeserializer<PrintableText> {
       return new PrintableGroup(fields);
     }
     if (node.isObject() && node.has("use")) {
-      final PrintableField field = PrintableField.valueOf(node.get("use").asText());
+      final PrintableField field = PrintableField.valueOf(node.get("use").asString());
       return field == null ? PrintableText.NULL : field;
     }
     if (node.isObject()) {
@@ -130,9 +126,8 @@ public class PrintableTextDeserializer extends JsonDeserializer<PrintableText> {
   }
 
   @Override
-  public PrintableText deserialize(JsonParser parser, DeserializationContext context) throws IOException, JsonProcessingException {
-    final ObjectCodec oc = parser.getCodec();
-    final JsonNode node = oc.readTree(parser);
+  public PrintableText deserialize(JsonParser parser, DeserializationContext context) {
+    final JsonNode node = context.readTree(parser);
     return deserialize(node);
   }
 

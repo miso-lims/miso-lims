@@ -1,12 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +22,23 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 public class HibernateTargetedSequencingDaoIT extends AbstractDAOTest {
 
+  private AutoCloseable mockito;
+
   @PersistenceContext
   private EntityManager entityManager;
 
   @InjectMocks
   private HibernateTargetedSequencingDao dao;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
@@ -56,7 +64,7 @@ public class HibernateTargetedSequencingDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetUsage() throws Exception {
-    TargetedSequencing tarSeq = (TargetedSequencing) currentSession().get(TargetedSequencing.class, 1L);
+    TargetedSequencing tarSeq = (TargetedSequencing) currentSession().find(TargetedSequencing.class, 1L);
     assertEquals("HALO_IBP", tarSeq.getAlias());
     assertEquals(1L, dao.getUsage(tarSeq));
   }
@@ -66,14 +74,14 @@ public class HibernateTargetedSequencingDaoIT extends AbstractDAOTest {
     TargetedSequencing tarSeq = new TargetedSequencing();
     tarSeq.setAlias("New_TarSeq");
     tarSeq.setDescription("For test");
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     assertNotNull(user);
     tarSeq.setChangeDetails(user);
     long savedId = dao.create(tarSeq);
 
     clearSession();
 
-    TargetedSequencing saved = (TargetedSequencing) currentSession().get(TargetedSequencing.class, savedId);
+    TargetedSequencing saved = (TargetedSequencing) currentSession().find(TargetedSequencing.class, savedId);
     assertNotNull(saved);
     assertEquals(tarSeq.getAlias(), saved.getAlias());
     assertEquals(tarSeq.getDescription(), saved.getDescription());
@@ -82,7 +90,7 @@ public class HibernateTargetedSequencingDaoIT extends AbstractDAOTest {
   @Test
   public void testUpdate() throws Exception {
     String description = "changed description";
-    TargetedSequencing tarSeq = (TargetedSequencing) currentSession().get(TargetedSequencing.class, 2L);
+    TargetedSequencing tarSeq = (TargetedSequencing) currentSession().find(TargetedSequencing.class, 2L);
     assertNotNull(tarSeq);
     assertNotEquals(description, tarSeq.getDescription());
     tarSeq.setDescription(description);
@@ -90,7 +98,7 @@ public class HibernateTargetedSequencingDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    TargetedSequencing saved = (TargetedSequencing) currentSession().get(TargetedSequencing.class, 2L);
+    TargetedSequencing saved = (TargetedSequencing) currentSession().find(TargetedSequencing.class, 2L);
     assertEquals(description, saved.getDescription());
   }
 

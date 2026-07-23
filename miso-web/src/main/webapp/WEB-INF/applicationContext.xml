@@ -57,14 +57,10 @@
 
   <mvc:annotation-driven>
     <mvc:message-converters>
-      <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-        <property name="objectMapper" ref="objectMapper" />
+      <bean class="org.springframework.http.converter.json.JacksonJsonHttpMessageConverter">
+        <constructor-arg ref="jsonMapper" />
       </bean>
     </mvc:message-converters>
   </mvc:annotation-driven>
-  <mvc:resources mapping="/scripts/**" location="/scripts/"></mvc:resources>
-  <mvc:resources mapping="/styles/**" location="/styles/"></mvc:resources>
-  <mvc:resources mapping="/favicon.ico" location="/favicon.ico"></mvc:resources>
-  <mvc:resources mapping="/index.html" location="/index.html"></mvc:resources>
 
 </beans>

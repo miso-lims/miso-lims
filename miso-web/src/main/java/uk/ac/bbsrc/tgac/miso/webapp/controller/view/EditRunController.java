@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -96,7 +96,7 @@ public class EditRunController {
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   public void setRunService(RunService runService) {
     this.runService = runService;
@@ -117,8 +117,8 @@ public class EditRunController {
   }
 
   public Sop getDefaultRunSop(Instrument instrument) {
-      Sop defaultRunSop = instrument.getInstrumentModel().getDefaultRunSop();
-      return defaultRunSop == null || defaultRunSop.isArchived() ? null : defaultRunSop;
+    Sop defaultRunSop = instrument.getInstrumentModel().getDefaultRunSop();
+    return defaultRunSop == null || defaultRunSop.isArchived() ? null : defaultRunSop;
   }
 
   @GetMapping("/{runId}")

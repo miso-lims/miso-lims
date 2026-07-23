@@ -23,10 +23,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response.Status;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;

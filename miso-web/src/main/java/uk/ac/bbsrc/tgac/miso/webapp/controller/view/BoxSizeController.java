@@ -12,10 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize.BoxType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -54,7 +53,7 @@ public class BoxSizeController extends AbstractTypeDataController<BoxSize, BoxSi
   }
 
   @Override
-  protected void addHotConfig(ObjectNode config, ObjectMapper mapper) throws IOException {
+  protected void addHotConfig(ObjectNode config, JsonMapper mapper) throws IOException {
     ArrayNode boxTypes = config.putArray("boxTypes");
     for (BoxType boxType : BoxType.values()) {
       ObjectNode dto = boxTypes.addObject();
