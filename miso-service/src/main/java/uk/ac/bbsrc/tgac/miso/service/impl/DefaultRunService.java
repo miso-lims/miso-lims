@@ -516,13 +516,12 @@ public class DefaultRunService implements RunService {
     switch (sopField.getFieldType()) {
       case NUMBER:
         return BigDecimalValidator.getInstance().validate(value) != null;
-
       case WORKSTATION:
         return isValidWorkstation(value);
-
       case TEXT:
-      default:
         return true;
+      default:
+        throw new IllegalArgumentException("Unhandled SOP field type: " + sopField.getFieldType());
     }
   }
 
