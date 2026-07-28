@@ -94,6 +94,14 @@ public class SopField implements Identifiable, Serializable {
     this.fieldType = fieldType;
   }
 
+  public InstrumentModel getInstrumentModel() {
+    return instrumentModel;
+  }
+
+  public void setInstrumentModel(InstrumentModel instrumentModel) {
+    this.instrumentModel = instrumentModel;
+  }
+
   @Override
   public int hashCode() {
     return LimsUtils.hashCodeByIdFirst(this, name, units, fieldType, sop, instrumentModel);
