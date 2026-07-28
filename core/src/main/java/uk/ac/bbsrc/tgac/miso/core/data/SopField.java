@@ -2,8 +2,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.Serializable;
 
-import org.apache.commons.validator.routines.BigDecimalValidator;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -26,7 +24,7 @@ public class SopField implements Identifiable, Serializable {
   private static final long UNSAVED_ID = 0L;
 
   public enum FieldType {
-    TEXT, NUMBER, INSTRUMENT
+    TEXT, NUMBER, INSTRUMENT, WORKSTATION
   }
 
   @Id
@@ -94,34 +92,6 @@ public class SopField implements Identifiable, Serializable {
 
   public void setFieldType(FieldType fieldType) {
     this.fieldType = fieldType;
-  }
-
-  public InstrumentModel getInstrumentModel() {
-    return instrumentModel;
-  }
-
-  public void setInstrumentModel(InstrumentModel instrumentModel) {
-    this.instrumentModel = instrumentModel;
-  }
-
-  public boolean isValidValue(String value) {
-    if (value == null || value.isEmpty()) {
-      return true;
-    }
-
-    if (fieldType == null) {
-      throw new IllegalStateException("Field type is not set");
-    }
-
-    switch (fieldType) {
-      case NUMBER:
-        return BigDecimalValidator.getInstance().validate(value) != null;
-
-      case TEXT:
-      case INSTRUMENT:
-      default:
-        return true;
-    }
   }
 
   @Override

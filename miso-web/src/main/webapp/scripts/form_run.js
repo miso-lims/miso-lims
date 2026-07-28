@@ -8,6 +8,7 @@ FormTarget.run = (function ($) {
    *   isRunReviewer: boolean,
    *   sops: array,
    *   instruments: array
+   *   workstations: array
    * }
    */
 
@@ -367,7 +368,7 @@ FormTarget.run = (function ($) {
               },
             ]),
           },
-          FormUtils.makeSopSection(object, config.sops, config.instruments),
+          FormUtils.makeSopSection(object, config.sops, config.workstations, config.instruments),
       ];
     },
     createSampleSheet: function (run, runPositions) {
