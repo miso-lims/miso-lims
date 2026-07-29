@@ -21,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
@@ -48,6 +49,8 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
   private DeletionStore deletionStore;
   @Autowired
   private TransactionTemplate transactionTemplate;
+  @Autowired
+  private InstrumentModelService instrumentModelService;
 
   @Override
   public DeletionStore getDeletionStore() {
@@ -77,6 +80,42 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
   @Override
   protected void authorizeUpdate(Sop object) throws IOException {
     authorizationManager.throwIfNonAdmin();
+  }
+
+  @Override
+  protected void loadChildEntities(Sop object) throws IOException {
+    if (object.getFields() == null || object.getFields().isEmpty()) {
+      return;
+    }
+
+    Map<Long, SopField> existingFieldsById = new HashMap<>();
+    if (object.isSaved()) {
+      Sop existing = sopDao.get(object.getId());
+      if (existing != null) {
+        for (SopField field : existing.getFields()) {
+          existingFieldsById.put(field.getId(), field);
+        }
+      }
+    }
+
+    Set<SopField> loadedFields = new HashSet<>();
+    for (SopField field : object.getFields()) {
+      if (field.isSaved()) {
+        SopField managedField = existingFieldsById.get(field.getId());
+        if (managedField == null) {
+          throw new ValidationException(
+              new ValidationError(FIELDS_PROPERTY, "The submitted field ID does not match an existing field"));
+        }
+        loadedFields.add(managedField);
+      } else {
+        if (field.getInstrumentModel() != null) {
+          field.setInstrumentModel(instrumentModelService.get(field.getInstrumentModel().getId()));
+        }
+        loadedFields.add(field);
+      }
+    }
+    object.getFields().clear();
+    object.getFields().addAll(loadedFields);
   }
 
   @Override
@@ -141,8 +180,12 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
 
       if (field.getFieldType() == null) {
         errors.add(new ValidationError(FIELDS_PROPERTY, "Field type is required"));
-      } else if (field.getFieldType() == SopField.FieldType.INSTRUMENT && field.getInstrumentModel() == null) {
-        errors.add(new ValidationError(FIELDS_PROPERTY, "Instrument model is required for instrument fields"));
+      } else if (field.getFieldType() == SopField.FieldType.INSTRUMENT) {
+        if (field.getInstrumentModel() == null) {
+          errors.add(new ValidationError(FIELDS_PROPERTY, "Instrument model is required for instrument fields"));
+        }
+      } else if (field.getInstrumentModel() != null) {
+        errors.add(new ValidationError(FIELDS_PROPERTY, "Instrument model must not be set for non-instrument fields"));
       }
     }
   }

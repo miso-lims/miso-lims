@@ -1,1 +1,1 @@
-New sopField type instrument has been added.
+New SOP field type for recording instruments used

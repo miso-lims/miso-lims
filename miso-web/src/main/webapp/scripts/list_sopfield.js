@@ -27,6 +27,7 @@ ListTarget.sopfield = (function ($) {
           values: Constants.instrumentModels,
           getLabel: Utils.array.getAlias,
           nullLabel: "N/A",
+          required: true,
           showIf: function (output) {
             return output.fieldType === "INSTRUMENT";
           },
@@ -44,7 +45,10 @@ ListTarget.sopfield = (function ($) {
           name: result.name,
           fieldType: result.fieldType,
           units: result.units || null,
-          instrumentModelId: result.instrumentModel ? result.instrumentModel.id : null,
+          instrumentModelId:
+            result.fieldType === "INSTRUMENT" && result.instrumentModel && result.instrumentModel.id
+              ? result.instrumentModel.id
+              : null,
         });
       }
     );

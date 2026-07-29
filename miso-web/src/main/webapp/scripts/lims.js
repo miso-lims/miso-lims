@@ -477,7 +477,8 @@ var Utils = Utils || {
       click: function () {
         var missingFields = fields
           .filter(function (field) {
-            return field.required && !output[field.property];
+            var visible = !field.showIf || field.showIf(output);
+            return visible && field.required && !output[field.property];
           })
           .map(function (field) {
             return field.label;
