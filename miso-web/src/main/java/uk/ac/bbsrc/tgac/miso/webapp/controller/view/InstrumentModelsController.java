@@ -40,6 +40,7 @@ public class InstrumentModelsController {
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {
+    model.put("title", "Instrument Models");
     return new ListItemsPageWithAuthorization("instrumentmodel", authorizationManager, mapper).list(model);
   }
 
