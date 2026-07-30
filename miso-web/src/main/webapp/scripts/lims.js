@@ -853,6 +853,7 @@ var Utils = Utils || {
   },
 
   saveWithProgressDialog: function (
+    title,
     requestMethod,
     saveUrl,
     data,
@@ -886,7 +887,7 @@ var Utils = Utils || {
       autoOpen: true,
       height: 400,
       width: 350,
-      title: "Adding",
+      title: title,
       modal: true,
       buttons: {},
       closeOnEscape: false,
