@@ -26,7 +26,7 @@ ListTarget.sopfield = (function ($) {
           property: "instrumentModel",
           values: Constants.instrumentModels,
           getLabel: Utils.array.getAlias,
-          nullLabel: "N/A",
+          nullLabel: "Select",
           required: true,
           showIf: function (output) {
             return output.fieldType === "INSTRUMENT";

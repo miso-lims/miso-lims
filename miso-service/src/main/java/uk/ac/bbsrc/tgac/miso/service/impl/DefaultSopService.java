@@ -108,9 +108,8 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
         }
         loadedFields.add(managedField);
       } else {
-        if (field.getInstrumentModel() != null) {
-          field.setInstrumentModel(instrumentModelService.get(field.getInstrumentModel().getId()));
-        }
+        ValidationUtils.loadChildEntity(field::setInstrumentModel, field.getInstrumentModel(), instrumentModelService,
+            FIELDS_PROPERTY);
         loadedFields.add(field);
       }
     }
