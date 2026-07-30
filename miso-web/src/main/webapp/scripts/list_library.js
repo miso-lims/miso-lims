@@ -52,6 +52,7 @@ ListTarget.library = (function () {
             {
               name: "Remove",
               action: librariesUpdateFunction(
+                "Removing Requisitioned Libraries",
                 Urls.rest.requisitions.removeLibraries(config.requisitionId)
               ),
             },
@@ -128,6 +129,7 @@ ListTarget.library = (function () {
                     return;
                   }
                   librariesUpdateFunction(
+                    "Adding Requisitioned Libraries",
                     Urls.rest.requisitions.addLibraries(config.requisitionId)
                   )(data);
                 }
@@ -350,7 +352,7 @@ ListTarget.library = (function () {
     },
   };
 
-  function librariesUpdateFunction(saveUrl) {
+  function librariesUpdateFunction(title, saveUrl) {
     return function (items) {
       var callback = function (update) {
         switch (update.status) {
@@ -369,6 +371,7 @@ ListTarget.library = (function () {
         }
       };
       Utils.saveWithProgressDialog(
+        title,
         "POST",
         saveUrl,
         items.map(Utils.array.getId),

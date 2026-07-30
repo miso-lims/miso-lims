@@ -187,16 +187,16 @@ BulkUtils = (function ($) {
     },
   };
 
-    var bulkRenderQueue = [];
-    var bulkRenderTimer = null;
+  var bulkRenderQueue = [];
+  var bulkRenderTimer = null;
 
-    function setBulkRenderTimer(hot) {
-      clearTimeout(bulkRenderTimer);
-      bulkRenderTimer = setTimeout(function () {
-        var changes = bulkRenderQueue.splice(0);
-        hot.setDataAtCell(changes);
-      }, 50);
-    }
+  function setBulkRenderTimer(hot) {
+    clearTimeout(bulkRenderTimer);
+    bulkRenderTimer = setTimeout(function () {
+      var changes = bulkRenderQueue.splice(0);
+      hot.setDataAtCell(changes);
+    }, 50);
+  }
 
   return {
     makeTable: function (target, config, data) {
@@ -1823,6 +1823,7 @@ BulkUtils = (function ($) {
       }
     };
     Utils.saveWithProgressDialog(
+      "Resuming Requisitions",
       "POST",
       Urls.rest.requisitions.bulkResume,
       {
@@ -2478,7 +2479,8 @@ BulkUtils = (function ($) {
 
   function applyRequiredOverrides(target, columns) {
     if (!target.targetKey) return;
-    var key = "required" + target.targetKey.charAt(0).toUpperCase() + target.targetKey.slice(1) + "Fields";
+    var key =
+      "required" + target.targetKey.charAt(0).toUpperCase() + target.targetKey.slice(1) + "Fields";
     var requiredFields = Constants[key];
     if (!requiredFields || !requiredFields.length) return;
     columns.forEach(function (column) {
@@ -2713,7 +2715,11 @@ BulkUtils = (function ($) {
       },
 
       updateField: function (rowIndex, dataProperty, options) {
-        var colIndex = getColumnIndex(dataProperty, columns, tableSaved || isColumnHidden(dataProperty));
+        var colIndex = getColumnIndex(
+          dataProperty,
+          columns,
+          tableSaved || isColumnHidden(dataProperty)
+        );
         if (colIndex === null) {
           // Column hidden by config or not shown after save - ignore updates
           return;

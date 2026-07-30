@@ -52,6 +52,7 @@ ListTarget.sample = (function () {
             {
               name: "Remove",
               action: samplesUpdateFunction(
+                "Removing Requisitioned Samples",
                 Urls.rest.requisitions.removeSamples(config.requisitionId)
               ),
             },
@@ -130,9 +131,10 @@ ListTarget.sample = (function () {
                   if (!validateSamples(data)) {
                     return;
                   }
-                  samplesUpdateFunction(Urls.rest.requisitions.addSamples(config.requisitionId))(
-                    data
-                  );
+                  samplesUpdateFunction(
+                    "Adding Requisitioned Samples",
+                    Urls.rest.requisitions.addSamples(config.requisitionId)
+                  )(data);
                 }
               );
             },
@@ -374,7 +376,7 @@ ListTarget.sample = (function () {
     );
   }
 
-  function samplesUpdateFunction(saveUrl) {
+  function samplesUpdateFunction(title, saveUrl) {
     return function (items) {
       var callback = function (update) {
         switch (update.status) {
@@ -393,6 +395,7 @@ ListTarget.sample = (function () {
         }
       };
       Utils.saveWithProgressDialog(
+        title,
         "POST",
         saveUrl,
         items.map(Utils.array.getId),
