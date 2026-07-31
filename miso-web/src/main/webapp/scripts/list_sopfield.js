@@ -49,6 +49,12 @@ ListTarget.sopfield = (function ($) {
             result.fieldType === "INSTRUMENT" && result.instrumentModel && result.instrumentModel.id
               ? result.instrumentModel.id
               : null,
+          instrumentModelAlias:
+            result.fieldType === "INSTRUMENT" &&
+            result.instrumentModel &&
+            result.instrumentModel.alias
+              ? result.instrumentModel.alias
+              : null,
         });
       }
     );
