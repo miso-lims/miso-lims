@@ -24,7 +24,7 @@ public class SopField implements Identifiable, Serializable {
   private static final long UNSAVED_ID = 0L;
 
   public enum FieldType {
-    TEXT, NUMBER, WORKSTATION
+    TEXT, NUMBER, INSTRUMENT, WORKSTATION
   }
 
   @Id
@@ -42,6 +42,10 @@ public class SopField implements Identifiable, Serializable {
 
   @Enumerated(EnumType.STRING)
   private FieldType fieldType;
+
+  @ManyToOne
+  @JoinColumn(name = "instrumentModelId")
+  private InstrumentModel instrumentModel;
 
   @Override
   public long getId() {
@@ -90,9 +94,17 @@ public class SopField implements Identifiable, Serializable {
     this.fieldType = fieldType;
   }
 
+  public InstrumentModel getInstrumentModel() {
+    return instrumentModel;
+  }
+
+  public void setInstrumentModel(InstrumentModel instrumentModel) {
+    this.instrumentModel = instrumentModel;
+  }
+
   @Override
   public int hashCode() {
-    return LimsUtils.hashCodeByIdFirst(this, name, units, fieldType, sop);
+    return LimsUtils.hashCodeByIdFirst(this, name, units, fieldType, sop, instrumentModel);
   }
 
   @Override
@@ -101,7 +113,8 @@ public class SopField implements Identifiable, Serializable {
         SopField::getName,
         SopField::getUnits,
         SopField::getFieldType,
-        SopField::getSop);
+        SopField::getSop,
+        SopField::getInstrumentModel);
   }
 }
 

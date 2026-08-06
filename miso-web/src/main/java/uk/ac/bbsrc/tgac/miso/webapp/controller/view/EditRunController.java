@@ -199,6 +199,7 @@ public class EditRunController {
     formConfig.put("isAdmin", user.isAdmin());
     formConfig.put("isRunReviewer", user.isRunReviewer() || user.isAdmin());
     MisoWebUtils.addJsonArray(mapper, formConfig, "sops", sopService.listByCategory(SopCategory.RUN), Dtos::asDto);
+    MisoWebUtils.addJsonArray(mapper, formConfig, "instruments", instrumentService.list(), Dtos::asDto);
     MisoWebUtils.addJsonArray(mapper, formConfig, "workstations", workstationService.list(), Dtos::asDto);
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 

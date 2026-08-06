@@ -43,6 +43,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
@@ -518,6 +519,8 @@ public class DefaultRunService implements RunService {
         return BigDecimalValidator.getInstance().validate(value) != null;
       case WORKSTATION:
         return isValidWorkstation(value);
+      case INSTRUMENT:
+        return isValidInstrument(sopField, value);
       case TEXT:
         return true;
       default:
@@ -528,6 +531,16 @@ public class DefaultRunService implements RunService {
   private boolean isValidWorkstation(String value) throws IOException {
     Long workstationId = LongValidator.getInstance().validate(value);
     return workstationId != null && workstationService.get(workstationId) != null;
+  }
+
+  private boolean isValidInstrument(SopField sopField, String value) throws IOException {
+    Long instrumentId = LongValidator.getInstance().validate(value);
+    if (instrumentId == null || sopField.getInstrumentModel() == null) {
+      return false;
+    }
+    Instrument instrument = instrumentService.get(instrumentId);
+    return instrument != null
+        && instrument.getInstrumentModel().getId() == sopField.getInstrumentModel().getId();
   }
 
   private static void validateSequencingParameters(Run run, PlatformType platformType, List<ValidationError> errors) {

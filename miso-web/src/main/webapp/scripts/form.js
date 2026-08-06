@@ -418,11 +418,11 @@ FormUtils = (function ($) {
       ];
     },
 
-    makeSopSection: function (object, sops, workstations, title) {
+    makeSopSection: function (object, sops, workstations, instruments, title) {
       title = title || "SOP Information";
       return {
         title: title,
-        fields: makeSopSectionFields(object, sops, workstations, title),
+        fields: makeSopSectionFields(object, sops, workstations, instruments, title),
       };
     },
 
@@ -1063,7 +1063,7 @@ FormUtils = (function ($) {
     return section.id || containerId + "_" + section.title.replace(/\W/g, "") + "Section";
   }
 
-  function makeSopSectionFields(object, sops, workstations, title) {
+  function makeSopSectionFields(object, sops, workstations, instruments, title) {
     sops = sops || [];
     object.sopFieldValues = object.sopFieldValues || {};
 
@@ -1077,7 +1077,7 @@ FormUtils = (function ($) {
       var changeSop = function () {
         object.sopId = newSopId;
         object.sopFieldValues = {};
-        form.rewriteSection(title, makeSopSectionFields(object, sops, workstations, title));
+        form.rewriteSection(title, makeSopSectionFields(object, sops, workstations, instruments, title));
         form.markOtherChanges();
       };
 
@@ -1099,10 +1099,10 @@ FormUtils = (function ($) {
       } else {
         changeSop();
       }
-    }).concat(makeSopValueFields(sops, object.sopId, workstations));
+    }).concat(makeSopValueFields(sops, object.sopId, workstations, instruments));
   }
 
-  function makeSopValueFields(sops, sopId, workstations) {
+  function makeSopValueFields(sops, sopId, workstations, instruments) {
     if (!sopId) {
       return [];
     }
@@ -1113,6 +1113,20 @@ FormUtils = (function ($) {
     }
 
     return sop.fields.map(function (field) {
+      if (field.fieldType === "INSTRUMENT") {
+        return {
+          title: field.name + (field.units ? " (" + field.units + ")" : ""),
+          data: "sopFieldValues." + field.id,
+          type: "dropdown",
+          nullLabel: "SELECT",
+          source: (instruments || []).filter(function (instrument) {
+            return instrument.instrumentModelId === field.instrumentModelId;
+          }),
+          sortSource: Utils.sorting.standardSort("name"),
+          getItemLabel: Utils.array.getName,
+          getItemValue: Utils.array.getId,
+        };
+      }
       if (field.fieldType === "WORKSTATION") {
         return {
           title: field.name + (field.units ? " (" + field.units + ")" : ""),
@@ -1125,6 +1139,7 @@ FormUtils = (function ($) {
           getItemValue: Utils.array.getId,
         };
       }
+
       return {
         title: field.name + (field.units ? " (" + field.units + ")" : ""),
         data: "sopFieldValues." + field.id,

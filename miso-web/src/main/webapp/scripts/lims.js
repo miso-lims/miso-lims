@@ -257,6 +257,12 @@ var Utils = Utils || {
     }
 
     var output = {};
+    var conditionalFields = [];
+    var updateVisibility = function () {
+      conditionalFields.forEach(function (item) {
+        item.p.style.display = item.showIf(output) ? "" : "none";
+      });
+    };
     fields.forEach(function (field) {
       var p = document.createElement("P");
       var input;
@@ -425,6 +431,16 @@ var Utils = Utils || {
         default:
           throw new Error("Unknown field type: " + field.type);
       }
+      if (field.showIf) {
+        conditionalFields.push({ p: p, showIf: field.showIf });
+      }
+      if (input.onchange) {
+        var originalOnchange = input.onchange;
+        input.onchange = function () {
+          originalOnchange();
+          updateVisibility();
+        };
+      }
       if (input.tagName === "INPUT" && input.type === "text" && field.series) {
         input.classList.add(field.series + "InputSeries");
         input.addEventListener("paste", function (event) {
@@ -452,6 +468,7 @@ var Utils = Utils || {
       p.appendChild(input);
       dialogArea.appendChild(p);
     });
+    updateVisibility();
 
     var buttons = {};
     buttons[okButton] = {
@@ -460,7 +477,8 @@ var Utils = Utils || {
       click: function () {
         var missingFields = fields
           .filter(function (field) {
-            return field.required && !output[field.property];
+            var visible = !field.showIf || field.showIf(output);
+            return visible && field.required && !output[field.property];
           })
           .map(function (field) {
             return field.label;

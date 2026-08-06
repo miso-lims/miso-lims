@@ -4534,6 +4534,8 @@ public class Dtos {
     setString(dto::setName, from.getName());
     setString(dto::setUnits, from.getUnits());
     setString(dto::setFieldType, maybeGetProperty(from.getFieldType(), SopField.FieldType::name));
+    setId(dto::setInstrumentModelId, from.getInstrumentModel());
+    setString(dto::setInstrumentModelAlias, maybeGetProperty(from.getInstrumentModel(), InstrumentModel::getAlias));
 
     return dto;
   }
@@ -4544,6 +4546,7 @@ public class Dtos {
     setString(to::setName, from.getName());
     setString(to::setUnits, from.getUnits());
     setObject(to::setFieldType, from.getFieldType(), SopField.FieldType::valueOf);
+    setObject(to::setInstrumentModel, InstrumentModel::new, from.getInstrumentModelId());
 
     return to;
   }

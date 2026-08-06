@@ -6,6 +6,8 @@ public class SopFieldDto {
   private String name;
   private String units;
   private String fieldType;
+  private Long instrumentModelId;
+  private String instrumentModelAlias;
 
   public Long getId() {
     return id;
@@ -37,5 +39,21 @@ public class SopFieldDto {
 
   public void setFieldType(String fieldType) {
     this.fieldType = fieldType;
+  }
+
+  public Long getInstrumentModelId() {
+    return instrumentModelId;
+  }
+
+  public void setInstrumentModelId(Long instrumentModelId) {
+    this.instrumentModelId = instrumentModelId;
+  }
+
+  public String getInstrumentModelAlias() {
+    return instrumentModelAlias;
+  }
+
+  public void setInstrumentModelAlias(String instrumentModelAlias) {
+    this.instrumentModelAlias = instrumentModelAlias;
   }
 }

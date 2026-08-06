@@ -17,8 +17,20 @@ ListTarget.sopfield = (function ($) {
           label: "Type",
           type: "select",
           property: "fieldType",
-          values: ["TEXT", "NUMBER", "WORKSTATION"],
+          values: ["TEXT", "NUMBER", "INSTRUMENT", "WORKSTATION"],
           required: true,
+        },
+        {
+          label: "Instrument Model",
+          type: "select",
+          property: "instrumentModel",
+          values: Constants.instrumentModels,
+          getLabel: Utils.array.getAlias,
+          nullLabel: "Select",
+          required: true,
+          showIf: function (output) {
+            return output.fieldType === "INSTRUMENT";
+          },
         },
         {
           label: "Units",
@@ -33,6 +45,16 @@ ListTarget.sopfield = (function ($) {
           name: result.name,
           fieldType: result.fieldType,
           units: result.units || null,
+          instrumentModelId:
+            result.fieldType === "INSTRUMENT" && result.instrumentModel && result.instrumentModel.id
+              ? result.instrumentModel.id
+              : null,
+          instrumentModelAlias:
+            result.fieldType === "INSTRUMENT" &&
+            result.instrumentModel &&
+            result.instrumentModel.alias
+              ? result.instrumentModel.alias
+              : null,
         });
       }
     );
@@ -78,6 +100,9 @@ ListTarget.sopfield = (function ($) {
         {
           sTitle: "Type",
           mData: "fieldType",
+          mRender: function (data, type, full) {
+            return data + (full.instrumentModelAlias ? " (" + full.instrumentModelAlias + ")" : "");
+          },
         },
         {
           sTitle: "Units",
