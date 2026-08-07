@@ -105,6 +105,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockRna;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
@@ -551,6 +552,9 @@ public class Dtos {
     dto.setLibraryCount(libraryCount);
     setId(dto::setSequencingControlTypeId, from.getSequencingControlType());
     setId(dto::setSopId, from.getSop());
+    Map<Long, String> sopFieldValues = new HashMap<>();
+    from.getSopFieldValues().forEach(value -> sopFieldValues.put(value.getSopField().getId(), value.getValue()));
+    dto.setSopFieldValues(sopFieldValues);
 
     return dto;
 
@@ -978,8 +982,23 @@ public class Dtos {
     }
     setObject(to::setSequencingControlType, SequencingControlType::new, from.getSequencingControlTypeId());
     setObject(to::setSop, Sop::new, from.getSopId());
+    setSampleSopFieldValues(to, from.getSopFieldValues());
     to.setCreationReceiptInfo(toReceiptTransfer(from, to));
     return to;
+  }
+
+  private static void setSampleSopFieldValues(Sample sample, Map<Long, String> sopFieldValues) {
+    if (sopFieldValues == null) {
+      return;
+    }
+
+    sopFieldValues.forEach((fieldId, value) -> {
+      SampleSopFieldValue fieldValue = new SampleSopFieldValue();
+      fieldValue.setSample(sample);
+      setObject(fieldValue::setSopField, SopField::new, fieldId);
+      fieldValue.setValue(value);
+      sample.getSopFieldValues().add(fieldValue);
+    });
   }
 
   private static <T extends AbstractBoxableDto, U extends AbstractBoxable> AbstractBoxPosition makeBoxablePosition(

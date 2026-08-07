@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -92,6 +93,7 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
   private Long sequencingControlTypeId;
   private int libraryCount = 0;
   private Long sopId;
+  private Map<Long, String> sopFieldValues;
   private String worksetAddedTime;
   private Boolean requisitionStopped;
   private Boolean requisitionPaused;
@@ -457,6 +459,14 @@ public class SampleDto extends AbstractBoxableDto implements ReceivableDto<Sampl
 
   public void setSopId(Long sopId) {
     this.sopId = sopId;
+  }
+
+  public Map<Long, String> getSopFieldValues() {
+    return sopFieldValues;
+  }
+
+  public void setSopFieldValues(Map<Long, String> sopFieldValues) {
+    this.sopFieldValues = sopFieldValues;
   }
 
   public String getWorksetAddedTime() {

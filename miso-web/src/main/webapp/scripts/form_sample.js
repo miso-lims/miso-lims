@@ -6,7 +6,9 @@ FormTarget.sample = (function ($) {
    * Expected config {
    *   detailedSample: boolean,
    *   projects: array,
-   *   sops: array
+   *   sops: array,
+   *   instruments: array,
+   *   workstations: array
    * }
    */
 
@@ -217,14 +219,16 @@ FormTarget.sample = (function ($) {
                 nullLabel: "n/a",
                 include: !Constants.isDetailedSample || object.sampleCategory === "Aliquot",
               },
-            ])
-            .concat(
-              !Constants.isDetailedSample ||
-                (object.sampleCategory !== "Identity" && object.sampleCategory !== "Tissue")
-                ? FormUtils.makeSopFields(object, config.sops)
-                : []
-            ),
+            ]),
         },
+        Object.assign(
+          FormUtils.makeSopSection(object, config.sops, config.workstations, config.instruments),
+          {
+            include:
+              !Constants.isDetailedSample ||
+              (object.sampleCategory !== "Identity" && object.sampleCategory !== "Tissue"),
+          }
+        ),
         {
           title: "Identity",
           include: config.detailedSample && object.sampleCategory === "Identity",

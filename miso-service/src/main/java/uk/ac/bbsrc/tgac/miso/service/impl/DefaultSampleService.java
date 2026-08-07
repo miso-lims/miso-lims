@@ -12,16 +12,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.validator.routines.BigDecimalValidator;
+import org.apache.commons.validator.routines.LongValidator;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +44,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -46,17 +53,20 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
+import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Probe;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleProbe;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
@@ -71,6 +81,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
@@ -85,6 +96,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.StainService;
 import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -172,6 +184,10 @@ public class DefaultSampleService implements SampleService {
   private BarcodableReferenceService barcodableReferenceService;
   @Autowired
   private ChangeLogService changeLogService;
+  @Autowired
+  private WorkstationService workstationService;
+  @Autowired
+  private InstrumentService instrumentService;
   @Autowired
   private TransactionTemplate transactionTemplate;
   @Autowired
@@ -730,6 +746,7 @@ public class DefaultSampleService implements SampleService {
     loadChildEntity(sample::setSequencingControlType, sample.getSequencingControlType(), sequencingControlTypeService,
         "sequencingControlTypeId");
     loadChildEntity(sample::setSop, sample.getSop(), sopService, "sopId");
+    loadSopFieldValues(sample);
     loadChildEntity(sample::setDetailedQcStatus, sample.getDetailedQcStatus(), detailedQcStatusService,
         "detailedQcStatusId");
     loadChildEntity(sample::setRequisition, sample.getRequisition(), requisitionService, "requisitionId");
@@ -782,6 +799,30 @@ public class DefaultSampleService implements SampleService {
         if (st.getLab() != null && st.getLab().isSaved()) {
           st.setLab(labService.get(st.getLab().getId()));
         }
+      }
+    }
+  }
+
+  private void loadSopFieldValues(Sample sample) {
+    if (sample.getSopFieldValues() == null || sample.getSopFieldValues().isEmpty()) {
+      return;
+    }
+
+    for (SampleSopFieldValue value : sample.getSopFieldValues()) {
+      value.setSample(sample);
+
+      if (sample.getSop() == null || value.getSopField() == null) {
+        continue;
+      }
+
+      SopField field = sample.getSop().getFields().stream()
+          .filter(sopField -> sopField.getId() == value.getSopField().getId())
+          .findFirst()
+          .orElse(null);
+
+      // Invalid fields will be handled by validateSopFieldValues.
+      if (field != null) {
+        value.setSopField(field);
       }
     }
   }
@@ -886,9 +927,118 @@ public class DefaultSampleService implements SampleService {
       validateReceiptTransfer(receiptSample, errors);
     }
 
+    if (sample.getSop() != null && sample.getSop().getCategory() != SopCategory.SAMPLE) {
+      errors.add(new ValidationError("sopId", "Only sample SOPs may be assigned to a sample"));
+    }
+    validateSopFieldValues(sample, errors);
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
+  }
+
+  private void validateSopFieldValues(Sample sample, List<ValidationError> errors) throws IOException {
+    if (sample.getSopFieldValues() == null) {
+      return;
+    }
+
+    List<SampleSopFieldValue> submittedValues = sample.getSopFieldValues().stream()
+        .filter(value -> !isStringBlankOrNull(value.getValue()))
+        .collect(Collectors.toList());
+
+    if (submittedValues.isEmpty()) {
+      return;
+    }
+
+    if (sample.getSop() == null) {
+      errors.add(new ValidationError("sopId", "SOP must be selected to enter SOP field values"));
+      return;
+    }
+
+    Set<Long> seenSopFieldIds = new HashSet<>();
+
+    for (SampleSopFieldValue value : submittedValues) {
+      SopField field = value.getSopField();
+      Long fieldId = field == null ? null : field.getId();
+
+      if (fieldId == null) {
+        errors.add(new ValidationError(getInvalidSopFieldMessage(value)));
+        continue;
+      }
+      String property = getSopFieldValueProperty(fieldId);
+
+      SopField sopField = sample.getSop().getFields().stream()
+          .filter(item -> item.getId() == fieldId)
+          .findFirst()
+          .orElse(null);
+
+      if (sopField == null) {
+        errors.add(new ValidationError(property, getInvalidSopFieldMessage(value)));
+        continue;
+      }
+
+      if (!seenSopFieldIds.add(fieldId)) {
+        errors.add(new ValidationError(property, "Duplicate SOP field"));
+      }
+
+      if (value.getValue().length() > 255) {
+        errors.add(new ValidationError(property, "Maximum length: 255 characters"));
+      }
+
+      if (!isValidSopFieldValue(sopField, value.getValue())) {
+        errors.add(new ValidationError(property, "Invalid value for SOP field " + sopField.getName()));
+      }
+    }
+  }
+
+  boolean isValidSopFieldValue(SopField sopField, String value) throws IOException {
+    if (isStringBlankOrNull(value)) {
+      return true;
+    }
+    if (sopField.getFieldType() == null) {
+      throw new IllegalStateException("Field type is not set");
+    }
+
+    switch (sopField.getFieldType()) {
+      case NUMBER:
+        return BigDecimalValidator.getInstance().validate(value) != null;
+      case WORKSTATION:
+        return isValidWorkstation(value);
+      case INSTRUMENT:
+        return isValidInstrument(sopField, value);
+      case TEXT:
+        return true;
+      default:
+        throw new IllegalArgumentException("Unhandled SOP field type: " + sopField.getFieldType());
+    }
+  }
+
+  private boolean isValidWorkstation(String value) throws IOException {
+    Long workstationId = LongValidator.getInstance().validate(value);
+    return workstationId != null && workstationService.get(workstationId) != null;
+  }
+
+  private boolean isValidInstrument(SopField sopField, String value) throws IOException {
+    Long instrumentId = LongValidator.getInstance().validate(value);
+    if (instrumentId == null || sopField.getInstrumentModel() == null) {
+      return false;
+    }
+    Instrument instrument = instrumentService.get(instrumentId);
+    return instrument != null
+        && instrument.getInstrumentModel().getId() == sopField.getInstrumentModel().getId();
+  }
+
+  private static String getInvalidSopFieldMessage(SampleSopFieldValue value) {
+    SopField field = value.getSopField();
+    String fieldLabel = field == null ? "unknown" : field.getName();
+    if (isStringBlankOrNull(fieldLabel) && field != null) {
+      fieldLabel = "ID " + field.getId();
+    }
+    return "SOP field '" + fieldLabel + "' does not belong to the selected SOP";
+  }
+
+  private static String getSopFieldValueProperty(long fieldId) {
+    return "sopFieldValues_" + fieldId;
   }
 
   private void validateSubproject(DetailedSample detailed, Sample beforeChange, List<ValidationError> errors)
@@ -968,7 +1118,9 @@ public class DefaultSampleService implements SampleService {
     target.setLocationBarcode(source.getLocationBarcode());
     target.setRequisition(source.getRequisition());
     target.setSequencingControlType(source.getSequencingControlType());
+    makeSopChangesChangeLog(target, source);
     target.setSop(source.getSop());
+    applySopFieldValueChanges(target, source);
     target.setDetailedQcStatus(source.getDetailedQcStatus());
     target.setDetailedQcStatusNote(nullifyStringIfBlank(source.getDetailedQcStatusNote()));
     target.setQcUser(source.getQcUser());
@@ -1003,6 +1155,91 @@ public class DefaultSampleService implements SampleService {
       }
     }
     target.setProject(source.getProject());
+  }
+
+  private void applySopFieldValueChanges(Sample target, Sample source) {
+    Map<Long, SampleSopFieldValue> sourceByFieldId = new HashMap<>();
+    if (source.getSopFieldValues() != null) {
+      for (SampleSopFieldValue sourceValue : source.getSopFieldValues()) {
+        if (sourceValue.getSopField() != null && !isStringBlankOrNull(sourceValue.getValue())) {
+          sourceByFieldId.put(sourceValue.getSopField().getId(), sourceValue);
+        }
+      }
+    }
+
+    Map<Long, SampleSopFieldValue> targetByFieldId = new HashMap<>();
+    Iterator<SampleSopFieldValue> iterator = target.getSopFieldValues().iterator();
+    while (iterator.hasNext()) {
+      SampleSopFieldValue targetValue = iterator.next();
+      long fieldId = targetValue.getSopField().getId();
+      if (sourceByFieldId.containsKey(fieldId)) {
+        targetByFieldId.put(fieldId, targetValue);
+      } else {
+        iterator.remove();
+      }
+    }
+
+    for (SampleSopFieldValue sourceValue : sourceByFieldId.values()) {
+      long fieldId = sourceValue.getSopField().getId();
+      SampleSopFieldValue targetValue = targetByFieldId.get(fieldId);
+      if (targetValue == null) {
+        targetValue = new SampleSopFieldValue();
+        targetValue.setSample(target);
+        targetValue.setSopField(sourceValue.getSopField());
+        target.getSopFieldValues().add(targetValue);
+      }
+      targetValue.setValue(sourceValue.getValue());
+    }
+  }
+
+  private void makeSopChangesChangeLog(Sample target, Sample source) throws IOException {
+    List<String> messages = new ArrayList<>();
+
+    Map<Long, SampleSopFieldValue> beforeValues = getSopFieldValueMap(target);
+    Map<Long, SampleSopFieldValue> afterValues = getSopFieldValueMap(source);
+
+    Set<Long> fieldIds = new HashSet<>();
+    fieldIds.addAll(beforeValues.keySet());
+    fieldIds.addAll(afterValues.keySet());
+
+    for (Long fieldId : fieldIds) {
+      SampleSopFieldValue before = beforeValues.get(fieldId);
+      SampleSopFieldValue after = afterValues.get(fieldId);
+      String beforeValue = before == null ? null : before.getValue();
+      String afterValue = after == null ? null : after.getValue();
+      if (!Objects.equals(beforeValue, afterValue)) {
+        SampleSopFieldValue value = after == null ? before : after;
+        messages.add(getSopFieldLabel(value) + " (SOP): " + getSopFieldValueLabel(beforeValue)
+            + " → " + getSopFieldValueLabel(afterValue));
+      }
+    }
+
+    if (!messages.isEmpty()) {
+      changeLogService.create(target.createChangeLog(String.join("; ", messages), "sopFieldValues",
+          authorizationManager.getCurrentUser()));
+    }
+  }
+
+  private static Map<Long, SampleSopFieldValue> getSopFieldValueMap(Sample sample) {
+    Map<Long, SampleSopFieldValue> values = new TreeMap<>();
+    if (sample.getSopFieldValues() == null) {
+      return values;
+    }
+    for (SampleSopFieldValue value : sample.getSopFieldValues()) {
+      if (value.getSopField() != null && !isStringBlankOrNull(value.getValue())) {
+        values.put(value.getSopField().getId(), value);
+      }
+    }
+    return values;
+  }
+
+  private static String getSopFieldLabel(SampleSopFieldValue value) {
+    SopField field = value.getSopField();
+    return field.getName() + (field.getUnits() == null ? "" : " (" + field.getUnits() + ")");
+  }
+
+  private static String getSopFieldValueLabel(String value) {
+    return isStringBlankOrNull(value) ? "n/a" : value;
   }
 
   private void applyIdentityChanges(SampleIdentity target, SampleIdentity source) throws IOException {

@@ -149,8 +149,8 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
     if (fields == null || fields.isEmpty()) {
       return;
     }
-    if (sop.getCategory() != SopCategory.RUN) {
-      errors.add(new ValidationError(FIELDS_PROPERTY, "Only Run SOPs may have fields"));
+    if (sop.getCategory() != SopCategory.RUN && sop.getCategory() != SopCategory.SAMPLE) {
+      errors.add(new ValidationError(FIELDS_PROPERTY, "Only Run and Sample SOPs may have fields"));
       return;
     }
 

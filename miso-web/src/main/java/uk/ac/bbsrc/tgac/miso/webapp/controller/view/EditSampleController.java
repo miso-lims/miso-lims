@@ -47,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
@@ -55,6 +56,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RunService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.service.SopService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.IndexChecker;
@@ -108,6 +110,10 @@ public class EditSampleController {
   @Autowired
   private SopService sopService;
   @Autowired
+  private InstrumentService instrumentService;
+  @Autowired
+  private WorkstationService workstationService;
+  @Autowired
   private QcNodeService qcNodeService;
   @Autowired
   private AuthorizationManager authorizationManager;
@@ -152,6 +158,8 @@ public class EditSampleController {
   private static class Config {
     private static final String PROJECTS = "projects";
     private static final String SOPS = "sops";
+    private static final String INSTRUMENTS = "instruments";
+    private static final String WORKSTATIONS = "workstations";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
     private static final String SOURCE_CATEGORY = "sourceCategory";
     private static final String TARGET_CATEGORY = "targetCategory";
@@ -209,6 +217,8 @@ public class EditSampleController {
         Dtos::asDto);
     MisoWebUtils.addJsonArray(mapper, formConfig, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE),
         Dtos::asDto);
+    MisoWebUtils.addJsonArray(mapper, formConfig, Config.INSTRUMENTS, instrumentService.list(), Dtos::asDto);
+    MisoWebUtils.addJsonArray(mapper, formConfig, Config.WORKSTATIONS, workstationService.list(), Dtos::asDto);
     model.put("formConfig", mapper.writeValueAsString(formConfig));
 
     return new ModelAndView("/WEB-INF/pages/editSample.jsp", model);
