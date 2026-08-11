@@ -98,9 +98,7 @@ public class SampleSheetRestController extends AbstractRestController {
 
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(new MediaType("text", "csv"));
-    String filename = "%s_%s_samplesheet.csv".formatted(
-        LimsUtils.formatDate(LocalDate.now(ZoneId.systemDefault())),
-        sampleSheet.getName());
+    String filename = generateSampleSheetFilename(sampleSheet, input);
     MisoWebUtils.addAttachmentContentDisposition(response, filename);
     return new HttpEntity<>(outputBytes, headers);
   }
@@ -221,6 +219,22 @@ public class SampleSheetRestController extends AbstractRestController {
     }
     throw new RestException("Position '%s' is not valid for %s".formatted(position, model.getAlias()),
         Status.BAD_REQUEST);
+  }
+
+  private static String generateSampleSheetFilename(SampleSheet sampleSheet, SampleSheetInput input) {
+    String firstPoolAlias = input.getPoolLayout().entrySet().stream()
+        .sorted(Map.Entry.comparingByKey())
+        .flatMap(outerEntry -> outerEntry.getValue().entrySet().stream()
+            .sorted(Map.Entry.comparingByKey())
+            .map(Map.Entry::getValue))
+        .filter(Objects::nonNull)
+        .map(Pool::getAlias)
+        .findFirst()
+        .orElse(null);
+
+    return "%s_%s_samplesheet.csv".formatted(
+        LimsUtils.formatDate(LocalDate.now(ZoneId.systemDefault())),
+        firstPoolAlias != null ? firstPoolAlias : sampleSheet.getName());
   }
 
 }
