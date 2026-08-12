@@ -428,7 +428,7 @@ BulkUtils = (function ($) {
             title: "Receipt Confirmed",
             type: "dropdown",
             data: "received",
-            include: Constants.showReceiptQc !== false,
+            include: Constants.showReceipt !== false && Constants.showReceiptQc !== false,
             includeSaved: false,
             source: [
               {
@@ -456,7 +456,7 @@ BulkUtils = (function ($) {
             title: "Receipt QC Passed",
             type: "dropdown",
             data: "receiptQcPassed",
-            include: Constants.showReceiptQc !== false,
+            include: Constants.showReceipt !== false && Constants.showReceiptQc !== false,
             includeSaved: false,
             source: [
               {
@@ -489,7 +489,7 @@ BulkUtils = (function ($) {
             title: "Receipt QC Note",
             type: "text",
             data: "receiptQcNote",
-            include: Constants.showReceiptQc !== false,
+            include: Constants.showReceipt !== false && Constants.showReceiptQc !== false,
             includeSaved: false,
           },
         ];
@@ -2469,7 +2469,7 @@ BulkUtils = (function ($) {
       case "received":
       case "receiptQcPassed":
       case "receiptQcNote":
-        return Constants.showReceiptQc === false;
+        return Constants.showReceipt === false || Constants.showReceiptQc === false;
       case "requisitionAlias":
       case "requisitionId":
       case "requisitionAssayIds":
@@ -2505,6 +2505,8 @@ BulkUtils = (function ($) {
         return Constants.showParentUsed === false;
       case "qcPassed":
         return Constants.showQcStatus === false;
+      case "receivedDate":
+      case "receivedTime":
       case "senderLabId":
       case "recipientGroupId":
         return Constants.showReceipt === false;

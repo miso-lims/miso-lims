@@ -216,9 +216,9 @@ BulkTarget.pool = (function ($) {
                 value: null,
               },
             ],
-            initial: Constants.defaultPoolQcPassed === "true"
+            initial: Constants.defaultPoolQcPassed === true
               ? "Ready"
-              : Constants.defaultPoolQcPassed === "false"
+              : Constants.defaultPoolQcPassed === false
                 ? "Failed"
                 : undefined,
             getItemLabel: Utils.array.get("label"),
@@ -240,10 +240,10 @@ BulkTarget.pool = (function ($) {
     },
     confirmSave: function (data, config, api) {
       var deferred = $.Deferred();
-      if (Constants.showQcStatus === false && Constants.defaultPoolQcPassed != null) {
+      if (config.pageMode === "create" && Constants.showQcStatus === false && Constants.defaultPoolQcPassed != null) {
         data.forEach(function (item) {
           if (item.qcPassed === undefined || item.qcPassed === null) {
-            item.qcPassed = Constants.defaultPoolQcPassed === "true";
+            item.qcPassed = Constants.defaultPoolQcPassed;
           }
         });
       }
