@@ -1,1 +1,0 @@
-New SOP field type for recording instruments used
