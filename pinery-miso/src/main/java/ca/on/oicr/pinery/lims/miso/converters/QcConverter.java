@@ -1,16 +1,20 @@
 package ca.on.oicr.pinery.lims.miso.converters;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Sets;
 
 import ca.on.oicr.pinery.api.Attribute;
+import ca.on.oicr.pinery.api.Qc;
 import ca.on.oicr.pinery.api.Sample;
 import ca.on.oicr.pinery.lims.DefaultAttribute;
+import ca.on.oicr.pinery.lims.DefaultQc;
 
 public enum QcConverter {
 
@@ -70,9 +74,46 @@ public enum QcConverter {
 
   }
 
+  /**
+   * Adds every QC row as an entry in the sample's qcs collection, with no filtering to a curated
+   * subset of types and no collapsing to the latest value.
+   */
+  public static void addToQcs(ResultSet rs, Sample sample) throws SQLException {
+    Qc qc = new DefaultQc();
+    qc.setName(rs.getString("qcType"));
+    Date date = rs.getDate("date");
+    if (date != null) {
+      qc.setDate(date.toLocalDate());
+    }
+    qc.setResult(extractQcResultString(rs));
+    qc.setUnits(rs.getString("units"));
+
+    if (sample.getQcs() == null) {
+      sample.setQcs(new ArrayList<>());
+    }
+    sample.getQcs().add(qc);
+  }
+
   private static boolean alreadyIncluded(QcConverter converter, Sample sample) {
     return sample.getAttributes() != null
         && sample.getAttributes().stream().anyMatch(attr -> converter.attributeName.equals(attr.getName()));
+  }
+
+  /**
+   * Formats a QC result for the generic qcs collection without assuming the value falls in any
+   * particular range (unlike {@link #extractBigDecimalString(ResultSet)}, which is only safe for
+   * the pre-vetted decimal fields it was written for).
+   */
+  private static String extractQcResultString(ResultSet rs) throws SQLException {
+    BigDecimal value = rs.getBigDecimal("results");
+    if (rs.wasNull()) {
+      return null;
+    }
+    BigDecimal stripped = value.stripTrailingZeros();
+    if (stripped.scale() < 0) {
+      stripped = stripped.setScale(0);
+    }
+    return stripped.toPlainString();
   }
 
   private static String extractBigDecimalString(ResultSet rs) throws SQLException {
