@@ -17,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
+import uk.ac.bbsrc.tgac.miso.core.data.ElementRun;
 import uk.ac.bbsrc.tgac.miso.core.data.UltimaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OxfordNanoporeContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -73,6 +74,12 @@ public enum PlatformType {
     @Override
     public Run createRun() {
       return new UltimaRun();
+    }
+  }, //
+  ELEMENT("Element", "Flow Cell", "Lane", "Lanes", null, false) {
+    @Override
+    public Run createRun() {
+      return new ElementRun();
     }
   };
 

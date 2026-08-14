@@ -55,8 +55,8 @@ BulkTarget.sequencingparameters = (function () {
         {
           title: "Read 1 Length",
           description:
-            "For Illumina instruments, read 1 length should be greater than zero. For other platforms, read" +
-            " lengths should be set to zero.",
+            "For Illumina and Element instruments, read 1 length should be greater than zero. For other" +
+            " platforms, read lengths should be set to zero.",
           type: "int",
           data: "read1Length",
           required: true,
@@ -65,8 +65,8 @@ BulkTarget.sequencingparameters = (function () {
         {
           title: "Read 2 Length",
           description:
-            "For Illumina instruments, read 2 should be set to zero for single end, or greater than zero for" +
-            " paired end. For other platforms, read lengths should be set to zero.",
+            "For Illumina and Element instruments, read 2 should be set to zero for single end, or greater" +
+            " than zero for paired end. For other platforms, read lengths should be set to zero.",
           type: "int",
           data: "read2Length",
           required: true,

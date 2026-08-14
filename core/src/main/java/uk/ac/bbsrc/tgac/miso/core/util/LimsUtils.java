@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.ElementRun;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.UltimaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
@@ -331,6 +332,10 @@ public class LimsUtils {
 
   public static boolean isUltimaRun(Run run) {
     return run instanceof UltimaRun;
+  }
+
+  public static boolean isElementRun(Run run) {
+    return run instanceof ElementRun;
   }
 
   public static boolean isOxfordNanoporeContainer(SequencerPartitionContainer container) {

@@ -17,7 +17,8 @@ import uk.ac.bbsrc.tgac.miso.dto.ContainerDto;
     @JsonSubTypes.Type(value = OxfordNanoporeRunDto.class, name = "OxfordNanopore"),
     @JsonSubTypes.Type(value = PacBioRunDto.class, name = "PacBio"),
     @JsonSubTypes.Type(value = SolidRunDto.class, name = "Solid"),
-    @JsonSubTypes.Type(value = UltimaRunDto.class, name = "Ultima")})
+    @JsonSubTypes.Type(value = UltimaRunDto.class, name = "Ultima"),
+    @JsonSubTypes.Type(value = ElementRunDto.class, name = "Element")})
 @JsonTypeName(value = "Base")
 public class RunDto {
   private Long id;
