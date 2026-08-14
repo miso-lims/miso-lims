@@ -11,7 +11,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Root;
-
 import uk.ac.bbsrc.tgac.miso.core.data.RunSopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.RunSopFieldValue_;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSopFieldValue;
@@ -41,7 +40,7 @@ public class HibernateWorkstationDao extends HibernateSaveDao<Workstation> imple
   }
 
   @Override
-  public long getUsageBySopFieldValues(Workstation workstation) throws IOException {
+  public long getUsageByRunSopFieldValues(Workstation workstation) throws IOException {
     CriteriaBuilder builder = currentSession().getCriteriaBuilder();
     CriteriaQuery<Long> query = builder.createQuery(Long.class);
     Root<RunSopFieldValue> root = query.from(RunSopFieldValue.class);

@@ -217,6 +217,15 @@ public class DefaultInstrumentService implements InstrumentService {
     if (qcUsage > 0L) {
       result.addError(ValidationError.forDeletionUsage(object, qcUsage, Pluralizer.qcs(qcUsage)));
     }
+    long runSopFieldUsage = instrumentDao.getUsageByRunSopFieldValues(object);
+    if (runSopFieldUsage > 0L) {
+      result.addError(ValidationError.forDeletionUsage(object, runSopFieldUsage, Pluralizer.runs(runSopFieldUsage)));
+    }
+    long sampleSopFieldUsage = instrumentDao.getUsageBySampleSopFieldValues(object);
+    if (sampleSopFieldUsage > 0L) {
+      result.addError(
+          ValidationError.forDeletionUsage(object, sampleSopFieldUsage, Pluralizer.samples(sampleSopFieldUsage)));
+    }
     return result;
   }
 

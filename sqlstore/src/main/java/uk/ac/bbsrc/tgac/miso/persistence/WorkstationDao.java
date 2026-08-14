@@ -10,7 +10,7 @@ public interface WorkstationDao extends BulkSaveDao<Workstation> {
 
   long getUsage(Workstation workstation) throws IOException;
 
-  long getUsageBySopFieldValues(Workstation workstation) throws IOException;
+  long getUsageByRunSopFieldValues(Workstation workstation) throws IOException;
 
   long getUsageBySampleSopFieldValues(Workstation workstation) throws IOException;
 

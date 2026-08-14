@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.io.Serializable;
 import java.util.Objects;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
@@ -16,7 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 @Entity
 @Table(name = "SampleSopFieldValue")
 @IdClass(SampleSopFieldValueId.class)
-public class SampleSopFieldValue implements Serializable {
+public class SampleSopFieldValue extends SopFieldValue {
 
   public static class SampleSopFieldValueId implements Serializable {
     public static final long serialVersionUID = 1L;
@@ -48,12 +47,12 @@ public class SampleSopFieldValue implements Serializable {
         return false;
       }
       SampleSopFieldValueId other = (SampleSopFieldValueId) obj;
-      return sample.equals(other.sample) && sopField.equals(other.sopField);
+      return Objects.equals(sample, other.sample) && Objects.equals(sopField, other.sopField);
     }
 
     @Override
     public int hashCode() {
-      return sample.hashCode() ^ sopField.hashCode();
+      return Objects.hash(sample, sopField);
     }
 
   }
@@ -65,36 +64,12 @@ public class SampleSopFieldValue implements Serializable {
   @JoinColumn(name = "sampleId")
   private Sample sample;
 
-  @Id
-  @ManyToOne
-  @JoinColumn(name = "sopFieldId")
-  private SopField sopField;
-
-  @Column(length = 255)
-  private String value;
-
   public Sample getSample() {
     return sample;
   }
 
   public void setSample(Sample sample) {
     this.sample = sample;
-  }
-
-  public SopField getSopField() {
-    return sopField;
-  }
-
-  public void setSopField(SopField sopField) {
-    this.sopField = sopField;
-  }
-
-  public String getValue() {
-    return value;
-  }
-
-  public void setValue(String value) {
-    this.value = value;
   }
 
   @Override
@@ -106,12 +81,12 @@ public class SampleSopFieldValue implements Serializable {
       return false;
     }
     SampleSopFieldValue other = (SampleSopFieldValue) obj;
-    return Objects.equals(sample, other.sample) && Objects.equals(sopField, other.sopField);
+    return Objects.equals(sample, other.sample) && Objects.equals(getSopField(), other.getSopField());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(sample, sopField);
+    return Objects.hash(sample, getSopField());
   }
 
 }

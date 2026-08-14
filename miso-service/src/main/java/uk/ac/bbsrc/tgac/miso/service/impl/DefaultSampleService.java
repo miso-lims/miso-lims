@@ -12,22 +12,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.validator.routines.BigDecimalValidator;
-import org.apache.commons.validator.routines.LongValidator;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +38,6 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
-import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
@@ -59,7 +52,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissuePiece;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
-import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Probe;
@@ -804,27 +796,11 @@ public class DefaultSampleService implements SampleService {
   }
 
   private void loadSopFieldValues(Sample sample) {
-    if (sample.getSopFieldValues() == null || sample.getSopFieldValues().isEmpty()) {
+    if (sample.getSopFieldValues() == null) {
       return;
     }
-
-    for (SampleSopFieldValue value : sample.getSopFieldValues()) {
-      value.setSample(sample);
-
-      if (sample.getSop() == null || value.getSopField() == null) {
-        continue;
-      }
-
-      SopField field = sample.getSop().getFields().stream()
-          .filter(sopField -> sopField.getId() == value.getSopField().getId())
-          .findFirst()
-          .orElse(null);
-
-      // Invalid fields will be handled by validateSopFieldValues.
-      if (field != null) {
-        value.setSopField(field);
-      }
-    }
+    sample.getSopFieldValues().forEach(value -> value.setSample(sample));
+    ValidationUtils.loadSopFieldValues(sample.getSop(), sample.getSopFieldValues());
   }
 
   private void validateHierarchy(DetailedSample sample) throws IOException {
@@ -938,107 +914,8 @@ public class DefaultSampleService implements SampleService {
   }
 
   private void validateSopFieldValues(Sample sample, List<ValidationError> errors) throws IOException {
-    if (sample.getSopFieldValues() == null) {
-      return;
-    }
-
-    List<SampleSopFieldValue> submittedValues = sample.getSopFieldValues().stream()
-        .filter(value -> !isStringBlankOrNull(value.getValue()))
-        .collect(Collectors.toList());
-
-    if (submittedValues.isEmpty()) {
-      return;
-    }
-
-    if (sample.getSop() == null) {
-      errors.add(new ValidationError("sopId", "SOP must be selected to enter SOP field values"));
-      return;
-    }
-
-    Set<Long> seenSopFieldIds = new HashSet<>();
-
-    for (SampleSopFieldValue value : submittedValues) {
-      SopField field = value.getSopField();
-      Long fieldId = field == null ? null : field.getId();
-
-      if (fieldId == null) {
-        errors.add(new ValidationError(getInvalidSopFieldMessage(value)));
-        continue;
-      }
-      String property = getSopFieldValueProperty(fieldId);
-
-      SopField sopField = sample.getSop().getFields().stream()
-          .filter(item -> item.getId() == fieldId)
-          .findFirst()
-          .orElse(null);
-
-      if (sopField == null) {
-        errors.add(new ValidationError(property, getInvalidSopFieldMessage(value)));
-        continue;
-      }
-
-      if (!seenSopFieldIds.add(fieldId)) {
-        errors.add(new ValidationError(property, "Duplicate SOP field"));
-      }
-
-      if (value.getValue().length() > 255) {
-        errors.add(new ValidationError(property, "Maximum length: 255 characters"));
-      }
-
-      if (!isValidSopFieldValue(sopField, value.getValue())) {
-        errors.add(new ValidationError(property, "Invalid value for SOP field " + sopField.getName()));
-      }
-    }
-  }
-
-  boolean isValidSopFieldValue(SopField sopField, String value) throws IOException {
-    if (isStringBlankOrNull(value)) {
-      return true;
-    }
-    if (sopField.getFieldType() == null) {
-      throw new IllegalStateException("Field type is not set");
-    }
-
-    switch (sopField.getFieldType()) {
-      case NUMBER:
-        return BigDecimalValidator.getInstance().validate(value) != null;
-      case WORKSTATION:
-        return isValidWorkstation(value);
-      case INSTRUMENT:
-        return isValidInstrument(sopField, value);
-      case TEXT:
-        return true;
-      default:
-        throw new IllegalArgumentException("Unhandled SOP field type: " + sopField.getFieldType());
-    }
-  }
-
-  private boolean isValidWorkstation(String value) throws IOException {
-    Long workstationId = LongValidator.getInstance().validate(value);
-    return workstationId != null && workstationService.get(workstationId) != null;
-  }
-
-  private boolean isValidInstrument(SopField sopField, String value) throws IOException {
-    Long instrumentId = LongValidator.getInstance().validate(value);
-    if (instrumentId == null || sopField.getInstrumentModel() == null) {
-      return false;
-    }
-    Instrument instrument = instrumentService.get(instrumentId);
-    return instrument != null
-        && instrument.getInstrumentModel().getId() == sopField.getInstrumentModel().getId();
-  }
-
-  private static String getInvalidSopFieldMessage(SampleSopFieldValue value) {
-    SopField field = value.getSopField();
-    String fieldLabel = field == null ? "unknown" : field.getName();
-    if (isStringBlankOrNull(fieldLabel) && field != null) {
-      fieldLabel = "ID " + field.getId();
-    }
-    return "SOP field '" + fieldLabel + "' does not belong to the selected SOP";
-  }
-
-  private static String getSopFieldValueProperty(long fieldId) {
-    return "sopFieldValues_" + fieldId;
+    ValidationUtils.validateSopFieldValues(sample.getSop(), sample.getSopFieldValues(), workstationService,
+        instrumentService, errors);
   }
 
   private void validateSubproject(DetailedSample detailed, Sample beforeChange, List<ValidationError> errors)
@@ -1158,88 +1035,13 @@ public class DefaultSampleService implements SampleService {
   }
 
   private void applySopFieldValueChanges(Sample target, Sample source) {
-    Map<Long, SampleSopFieldValue> sourceByFieldId = new HashMap<>();
-    if (source.getSopFieldValues() != null) {
-      for (SampleSopFieldValue sourceValue : source.getSopFieldValues()) {
-        if (sourceValue.getSopField() != null && !isStringBlankOrNull(sourceValue.getValue())) {
-          sourceByFieldId.put(sourceValue.getSopField().getId(), sourceValue);
-        }
-      }
-    }
-
-    Map<Long, SampleSopFieldValue> targetByFieldId = new HashMap<>();
-    Iterator<SampleSopFieldValue> iterator = target.getSopFieldValues().iterator();
-    while (iterator.hasNext()) {
-      SampleSopFieldValue targetValue = iterator.next();
-      long fieldId = targetValue.getSopField().getId();
-      if (sourceByFieldId.containsKey(fieldId)) {
-        targetByFieldId.put(fieldId, targetValue);
-      } else {
-        iterator.remove();
-      }
-    }
-
-    for (SampleSopFieldValue sourceValue : sourceByFieldId.values()) {
-      long fieldId = sourceValue.getSopField().getId();
-      SampleSopFieldValue targetValue = targetByFieldId.get(fieldId);
-      if (targetValue == null) {
-        targetValue = new SampleSopFieldValue();
-        targetValue.setSample(target);
-        targetValue.setSopField(sourceValue.getSopField());
-        target.getSopFieldValues().add(targetValue);
-      }
-      targetValue.setValue(sourceValue.getValue());
-    }
+    ValidationUtils.applySopFieldValueChanges(target.getSopFieldValues(), source.getSopFieldValues(),
+        SampleSopFieldValue::new, fieldValue -> fieldValue.setSample(target));
   }
 
   private void makeSopChangesChangeLog(Sample target, Sample source) throws IOException {
-    List<String> messages = new ArrayList<>();
-
-    Map<Long, SampleSopFieldValue> beforeValues = getSopFieldValueMap(target);
-    Map<Long, SampleSopFieldValue> afterValues = getSopFieldValueMap(source);
-
-    Set<Long> fieldIds = new HashSet<>();
-    fieldIds.addAll(beforeValues.keySet());
-    fieldIds.addAll(afterValues.keySet());
-
-    for (Long fieldId : fieldIds) {
-      SampleSopFieldValue before = beforeValues.get(fieldId);
-      SampleSopFieldValue after = afterValues.get(fieldId);
-      String beforeValue = before == null ? null : before.getValue();
-      String afterValue = after == null ? null : after.getValue();
-      if (!Objects.equals(beforeValue, afterValue)) {
-        SampleSopFieldValue value = after == null ? before : after;
-        messages.add(getSopFieldLabel(value) + " (SOP): " + getSopFieldValueLabel(beforeValue)
-            + " → " + getSopFieldValueLabel(afterValue));
-      }
-    }
-
-    if (!messages.isEmpty()) {
-      changeLogService.create(target.createChangeLog(String.join("; ", messages), "sopFieldValues",
-          authorizationManager.getCurrentUser()));
-    }
-  }
-
-  private static Map<Long, SampleSopFieldValue> getSopFieldValueMap(Sample sample) {
-    Map<Long, SampleSopFieldValue> values = new TreeMap<>();
-    if (sample.getSopFieldValues() == null) {
-      return values;
-    }
-    for (SampleSopFieldValue value : sample.getSopFieldValues()) {
-      if (value.getSopField() != null && !isStringBlankOrNull(value.getValue())) {
-        values.put(value.getSopField().getId(), value);
-      }
-    }
-    return values;
-  }
-
-  private static String getSopFieldLabel(SampleSopFieldValue value) {
-    SopField field = value.getSopField();
-    return field.getName() + (field.getUnits() == null ? "" : " (" + field.getUnits() + ")");
-  }
-
-  private static String getSopFieldValueLabel(String value) {
-    return isStringBlankOrNull(value) ? "n/a" : value;
+    ValidationUtils.makeSopChangesChangeLog(target, target.getSopFieldValues(), source.getSopFieldValues(),
+        changeLogService, authorizationManager.getCurrentUser());
   }
 
   private void applyIdentityChanges(SampleIdentity target, SampleIdentity source) throws IOException {

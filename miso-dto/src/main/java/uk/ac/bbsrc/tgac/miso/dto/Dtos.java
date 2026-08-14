@@ -122,6 +122,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.SopField;
+import uk.ac.bbsrc.tgac.miso.core.data.SopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.StainCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -552,9 +553,7 @@ public class Dtos {
     dto.setLibraryCount(libraryCount);
     setId(dto::setSequencingControlTypeId, from.getSequencingControlType());
     setId(dto::setSopId, from.getSop());
-    Map<Long, String> sopFieldValues = new HashMap<>();
-    from.getSopFieldValues().forEach(value -> sopFieldValues.put(value.getSopField().getId(), value.getValue()));
-    dto.setSopFieldValues(sopFieldValues);
+    dto.setSopFieldValues(asSopFieldValueMap(from.getSopFieldValues()));
 
     return dto;
 
@@ -982,23 +981,32 @@ public class Dtos {
     }
     setObject(to::setSequencingControlType, SequencingControlType::new, from.getSequencingControlTypeId());
     setObject(to::setSop, Sop::new, from.getSopId());
-    setSampleSopFieldValues(to, from.getSopFieldValues());
+    Sample sample = to;
+    setSopFieldValues(to.getSopFieldValues(), SampleSopFieldValue::new, fieldValue -> fieldValue.setSample(sample),
+        from.getSopFieldValues());
     to.setCreationReceiptInfo(toReceiptTransfer(from, to));
     return to;
   }
 
-  private static void setSampleSopFieldValues(Sample sample, Map<Long, String> sopFieldValues) {
+  private static <T extends SopFieldValue> void setSopFieldValues(Collection<T> to, Supplier<T> constructor,
+      Consumer<T> setOwner, Map<Long, String> sopFieldValues) {
     if (sopFieldValues == null) {
       return;
     }
 
     sopFieldValues.forEach((fieldId, value) -> {
-      SampleSopFieldValue fieldValue = new SampleSopFieldValue();
-      fieldValue.setSample(sample);
+      T fieldValue = constructor.get();
+      setOwner.accept(fieldValue);
       setObject(fieldValue::setSopField, SopField::new, fieldId);
       fieldValue.setValue(value);
-      sample.getSopFieldValues().add(fieldValue);
+      to.add(fieldValue);
     });
+  }
+
+  private static Map<Long, String> asSopFieldValueMap(Collection<? extends SopFieldValue> sopFieldValues) {
+    Map<Long, String> map = new HashMap<>();
+    sopFieldValues.forEach(value -> map.put(value.getSopField().getId(), value.getValue()));
+    return map;
   }
 
   private static <T extends AbstractBoxableDto, U extends AbstractBoxable> AbstractBoxPosition makeBoxablePosition(
@@ -2160,9 +2168,7 @@ public class Dtos {
     setString(dto::setDataReviewer, maybeGetProperty(from.getDataReviewer(), User::getFullName));
     setDateString(dto::setDataReviewDate, from.getDataReviewDate());
     setId(dto::setSopId, from.getSop());
-    Map<Long, String> sopFieldValues = new HashMap<>();
-    from.getSopFieldValues().forEach(value -> sopFieldValues.put(value.getSopField().getId(), value.getValue()));
-    dto.setSopFieldValues(sopFieldValues);
+    dto.setSopFieldValues(asSopFieldValueMap(from.getSopFieldValues()));
     setString(dto::setDataManglingPolicy,
         maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
 
@@ -2239,23 +2245,10 @@ public class Dtos {
     setBoolean(to::setQcPassed, dto.getQcPassed(), true);
     setBoolean(to::setDataReview, dto.getDataReview(), true);
     setObject(to::setSop, Sop::new, dto.getSopId());
-    setRunSopFieldValues(to, dto.getSopFieldValues());
+    setSopFieldValues(to.getSopFieldValues(), RunSopFieldValue::new, fieldValue -> fieldValue.setRun(to),
+        dto.getSopFieldValues());
     setObject(to::setDataManglingPolicy, dto.getDataManglingPolicy(), InstrumentDataManglingPolicy::valueOf);
     return to;
-  }
-
-  private static void setRunSopFieldValues(Run run, Map<Long, String> sopFieldValues) {
-    if (sopFieldValues == null) {
-      return;
-    }
-
-    sopFieldValues.forEach((fieldId, value) -> {
-      RunSopFieldValue fieldValue = new RunSopFieldValue();
-      fieldValue.setRun(run);
-      setObject(fieldValue::setSopField, SopField::new, fieldId);
-      fieldValue.setValue(value);
-      run.getSopFieldValues().add(fieldValue);
-    });
   }
 
   private static Run getPlatformRun(RunDto from) {
