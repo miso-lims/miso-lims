@@ -209,7 +209,7 @@ FormTarget.libraryaliquot = (function ($) {
                 type: "text",
                 maxLength: 100,
                 regex: Utils.validation.uriComponentRegex,
-                required: Constants.requireKitLot !== false,
+                required: Constants.requireKitLot !== false && !!object.kitLot,
               },
               {
                 title: "Targeted Sequencing",
