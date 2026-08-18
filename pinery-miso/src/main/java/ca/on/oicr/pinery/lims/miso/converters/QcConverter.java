@@ -99,11 +99,6 @@ public enum QcConverter {
         && sample.getAttributes().stream().anyMatch(attr -> converter.attributeName.equals(attr.getName()));
   }
 
-  /**
-   * Formats a QC result for the generic qcs collection without assuming the value falls in any
-   * particular range (unlike {@link #extractBigDecimalString(ResultSet)}, which is only safe for
-   * the pre-vetted decimal fields it was written for).
-   */
   private static String extractQcResultString(ResultSet rs) throws SQLException {
     BigDecimal value = rs.getBigDecimal("results");
     if (rs.wasNull()) {
