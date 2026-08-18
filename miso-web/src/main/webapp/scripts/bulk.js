@@ -335,6 +335,7 @@ BulkUtils = (function ($) {
             title: "Date of Receipt",
             type: "date",
             data: "receivedDate",
+            include: Constants.showReceipt !== false,
             includeSaved: false,
             getData: function (object) {
               return object.receivedTime ? object.receivedTime.split(" ")[0] : null;
@@ -384,6 +385,7 @@ BulkUtils = (function ($) {
             title: "Time of Receipt",
             type: "time",
             data: "receivedTime",
+            include: Constants.showReceipt !== false,
             includeSaved: false,
             getData: function (object) {
               if (!object.receivedTime) {
@@ -402,6 +404,7 @@ BulkUtils = (function ($) {
             title: "Received From",
             type: "dropdown",
             data: "senderLabId",
+            include: Constants.showReceipt !== false,
             includeSaved: false,
             source: Constants.labs.filter(function (lab) {
               return !lab.archived;
@@ -414,6 +417,7 @@ BulkUtils = (function ($) {
             title: "Received By",
             type: "dropdown",
             data: "recipientGroupId",
+            include: Constants.showReceipt !== false,
             includeSaved: false,
             source: config.recipientGroups,
             getItemLabel: Utils.array.getName,
@@ -424,7 +428,7 @@ BulkUtils = (function ($) {
             title: "Receipt Confirmed",
             type: "dropdown",
             data: "received",
-            include: Constants.showReceiptQc !== false,
+            include: Constants.showReceipt !== false && Constants.showReceiptQc !== false,
             includeSaved: false,
             source: [
               {
@@ -452,7 +456,7 @@ BulkUtils = (function ($) {
             title: "Receipt QC Passed",
             type: "dropdown",
             data: "receiptQcPassed",
-            include: Constants.showReceiptQc !== false,
+            include: Constants.showReceipt !== false && Constants.showReceiptQc !== false,
             includeSaved: false,
             source: [
               {
@@ -485,7 +489,7 @@ BulkUtils = (function ($) {
             title: "Receipt QC Note",
             type: "text",
             data: "receiptQcNote",
-            include: Constants.showReceiptQc !== false,
+            include: Constants.showReceipt !== false && Constants.showReceiptQc !== false,
             includeSaved: false,
           },
         ];
@@ -517,6 +521,7 @@ BulkUtils = (function ($) {
             title: "Box Search",
             type: "text",
             data: "boxSearch",
+            include: Constants.showBoxFields !== false,
             includeSaved: false,
             omit: true,
             sortable: false,
@@ -586,6 +591,7 @@ BulkUtils = (function ($) {
             title: "Box Alias",
             type: "dropdown",
             data: "box",
+            include: Constants.showBoxFields !== false,
             source: function (data, api) {
               if (data.box) {
                 var cache = api.getCache("boxes");
@@ -623,6 +629,7 @@ BulkUtils = (function ($) {
             title: "Position",
             type: "dropdown",
             data: "boxPosition",
+            include: Constants.showBoxFields !== false,
             // source is initialized in box onChange
             source: [],
             customSorting: [
@@ -803,6 +810,7 @@ BulkUtils = (function ($) {
           title: "Parent ng Used",
           type: "decimal",
           data: "ngUsed",
+          include: Constants.showParentUsed !== false,
           precision: 16,
           scale: 10,
           min: 0,
@@ -811,6 +819,7 @@ BulkUtils = (function ($) {
           title: "Parent Vol. Used",
           type: "decimal",
           data: "volumeUsed",
+          include: Constants.showParentUsed !== false,
           precision: 16,
           scale: 10,
           min: 0,
@@ -2460,7 +2469,7 @@ BulkUtils = (function ($) {
       case "received":
       case "receiptQcPassed":
       case "receiptQcNote":
-        return Constants.showReceiptQc === false;
+        return Constants.showReceipt === false || Constants.showReceiptQc === false;
       case "requisitionAlias":
       case "requisitionId":
       case "requisitionAssayIds":
@@ -2472,6 +2481,35 @@ BulkUtils = (function ($) {
         return Constants.showMatrixBarcode === false;
       case "discarded":
         return Constants.showDiscarded === false;
+      case "boxSearch":
+      case "box":
+      case "boxPosition":
+        return Constants.showBoxFields === false;
+      case "sampleBoxPositionLabel":
+      case "parentBoxPositionLabel":
+        return Constants.showParentLocation === false;
+      case "workstationId":
+        return Constants.showWorkstation === false;
+      case "thermalCyclerId":
+        return Constants.showThermalCycler === false;
+      case "kitLot":
+        return Constants.showKitLot === false;
+      case "spikeInId":
+      case "spikeInDilutionFactor":
+      case "spikeInVolume":
+        return Constants.showSpikeIn === false;
+      case "targetedSequencingId":
+        return Constants.showTargetedSequencing === false;
+      case "ngUsed":
+      case "volumeUsed":
+        return Constants.showParentUsed === false;
+      case "qcPassed":
+        return Constants.showQcStatus === false;
+      case "receivedDate":
+      case "receivedTime":
+      case "senderLabId":
+      case "recipientGroupId":
+        return Constants.showReceipt === false;
       default:
         return false;
     }

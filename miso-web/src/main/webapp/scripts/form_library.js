@@ -437,6 +437,7 @@ FormTarget.library = (function ($) {
                     type: "text",
                     maxLength: 100,
                     regex: Utils.validation.uriComponentRegex,
+                    required: Constants.requireKitLot !== false && !!object.kitLot,
                   },
                   {
                     title: "Spike-In",
