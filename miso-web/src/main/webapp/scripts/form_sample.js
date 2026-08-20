@@ -221,14 +221,6 @@ FormTarget.sample = (function ($) {
               },
             ]),
         },
-        Object.assign(
-          FormUtils.makeSopSection(object, config.sops, config.workstations, config.instruments),
-          {
-            include:
-              !Constants.isDetailedSample ||
-              (object.sampleCategory !== "Identity" && object.sampleCategory !== "Tissue"),
-          }
-        ),
         {
           title: "Identity",
           include: config.detailedSample && object.sampleCategory === "Identity",
@@ -703,6 +695,14 @@ FormTarget.sample = (function ($) {
             },
           ],
         },
+        Object.assign(
+          FormUtils.makeSopSection(object, config.sops, config.workstations, config.instruments),
+          {
+            include:
+              !Constants.isDetailedSample ||
+              (object.sampleCategory !== "Identity" && object.sampleCategory !== "Tissue"),
+          }
+        ),
       ];
     },
     confirmSave: function (object, isDialog, form) {

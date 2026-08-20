@@ -438,16 +438,12 @@ public class DefaultRunService implements RunService {
       }
     }
 
-    validateSopFieldValues(changed, errors);
+    ValidationUtils.validateSopFieldValues(changed.getSop(), changed.getSopFieldValues(), workstationService,
+        instrumentService, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
-  }
-
-  private void validateSopFieldValues(Run run, List<ValidationError> errors) throws IOException {
-    ValidationUtils.validateSopFieldValues(run.getSop(), run.getSopFieldValues(), workstationService,
-        instrumentService, errors);
   }
 
   private static void validateSequencingParameters(Run run, PlatformType platformType, List<ValidationError> errors) {
@@ -502,9 +498,11 @@ public class DefaultRunService implements RunService {
     target.setDataReview(source.getDataReview());
     target.setDataReviewer(source.getDataReviewer());
     target.setDataReviewDate(source.getDataReviewDate());
-    makeSopChangesChangeLog(target, source);
+    ValidationUtils.makeSopChangesChangeLog(target, target.getSopFieldValues(), source.getSopFieldValues(),
+        changeLogService, authorizationManager.getCurrentUser());
     target.setSop(source.getSop());
-    applySopFieldValueChanges(target, source);
+    ValidationUtils.applySopFieldValueChanges(target.getSopFieldValues(), source.getSopFieldValues(),
+        RunSopFieldValue::new, fieldValue -> fieldValue.setRun(target));
     target.setDataManglingPolicy(source.getDataManglingPolicy());
     if (isIlluminaRun(target)) {
       applyIlluminaChanges((IlluminaRun) target, (IlluminaRun) source);
@@ -521,16 +519,6 @@ public class DefaultRunService implements RunService {
     if (source.getMetrics() != null) {
       target.setMetrics(source.getMetrics());
     }
-  }
-
-  private void applySopFieldValueChanges(Run target, Run source) {
-    ValidationUtils.applySopFieldValueChanges(target.getSopFieldValues(), source.getSopFieldValues(),
-        RunSopFieldValue::new, fieldValue -> fieldValue.setRun(target));
-  }
-
-  private void makeSopChangesChangeLog(Run target, Run source) throws IOException {
-    ValidationUtils.makeSopChangesChangeLog(target, target.getSopFieldValues(), source.getSopFieldValues(),
-        changeLogService, authorizationManager.getCurrentUser());
   }
 
   private void applyContainerChanges(Run target, Run source) throws IOException {

@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.RunSopFieldValue.RunSopFieldValueId;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 
 @Entity
@@ -74,19 +75,12 @@ public class RunSopFieldValue extends SopFieldValue {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null || getClass() != obj.getClass()) {
-      return false;
-    }
-    RunSopFieldValue other = (RunSopFieldValue) obj;
-    return Objects.equals(run, other.run) && Objects.equals(getSopField(), other.getSopField());
+    return super.equals(obj) && LimsUtils.equals(this, obj, RunSopFieldValue::getRun);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(run, getSopField());
+    return Objects.hash(super.hashCode(), run);
   }
 
 }

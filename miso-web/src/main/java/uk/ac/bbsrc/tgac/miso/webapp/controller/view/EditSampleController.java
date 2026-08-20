@@ -158,6 +158,7 @@ public class EditSampleController {
   private static class Config {
     private static final String PROJECTS = "projects";
     private static final String SOPS = "sops";
+    private static final String SOP_ID = "sopId";
     private static final String INSTRUMENTS = "instruments";
     private static final String WORKSTATIONS = "workstations";
     private static final String DEFAULT_SCI_NAME = "defaultSciName";
@@ -311,13 +312,14 @@ public class EditSampleController {
     String replicates = getStringInput("replicates", form, true);
     String targetCategory = getStringInput("targetCategory", form, isDetailedSampleEnabled());
     Long boxId = getLongInput("boxId", form, false);
+    Long sopId = getLongInput("sopId", form, false);
 
     if (isDetailedSampleEnabled()) {
       confirmClassesExist(targetCategory);
     }
 
     Set<Group> recipientGroups = authorizationManager.getCurrentUser().getGroups();
-    BulkPropagateSampleBackend bulkPropagateSampleBackend = new BulkPropagateSampleBackend(targetCategory,
+    BulkPropagateSampleBackend bulkPropagateSampleBackend = new BulkPropagateSampleBackend(targetCategory, sopId,
         (boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null), recipientGroups, mapper);
     return bulkPropagateSampleBackend.propagate(parentIds, replicates, model);
   }
@@ -439,13 +441,15 @@ public class EditSampleController {
   private final class BulkPropagateSampleBackend extends BulkPropagateTableBackend<Sample, SampleDto> {
     private String sourceCategory;
     private final String targetCategory;
+    private final Long sopId;
     private final BoxDto newBox;
     private final Set<Group> recipientGroups;
 
-    private BulkPropagateSampleBackend(String targetCategory, BoxDto newBox, Set<Group> recipientGroups,
-        ObjectMapper mapper) {
+    private BulkPropagateSampleBackend(String targetCategory, Long sopId, BoxDto newBox,
+        Set<Group> recipientGroups, ObjectMapper mapper) {
       super("sample", SampleDto.class, "Samples", "Samples", mapper);
       this.targetCategory = targetCategory;
+      this.sopId = sopId;
       this.newBox = newBox;
       this.recipientGroups = recipientGroups;
     }
@@ -491,6 +495,7 @@ public class EditSampleController {
           dto.setEffectiveRequisitionAlias((requisition.getAlias()));
           dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
         }
+        dto.setSopId(sopId);
         return dto;
       } else {
         throw new IllegalArgumentException("Cannot create plain samples from other plain samples!");
@@ -518,10 +523,13 @@ public class EditSampleController {
     protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
       config.put(Config.SOURCE_CATEGORY, sourceCategory);
       config.put(Config.TARGET_CATEGORY, targetCategory);
+      config.putPOJO(Config.SOP_ID, sopId);
       config.putPOJO(Config.BOX, newBox);
       addJsonArray(mapper, config, Config.RECIPIENT_GROUPS, recipientGroups, Dtos::asDto);
       addJsonArray(mapper, config, Config.PROJECTS, projectService.list(), Dtos::asDto);
       addJsonArray(mapper, config, Config.SOPS, sopService.listByCategory(SopCategory.SAMPLE), Dtos::asDto);
+      addJsonArray(mapper, config, Config.INSTRUMENTS, instrumentService.list(), Dtos::asDto);
+      addJsonArray(mapper, config, Config.WORKSTATIONS, workstationService.list(), Dtos::asDto);
     }
   }
 

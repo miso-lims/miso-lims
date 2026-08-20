@@ -13,6 +13,10 @@ BulkTarget.sample = (function ($) {
    *   projects: all projects
    *   sortLibraryPropagate: string; column for default sort when propagating libraries
    *   sops: array
+   *   sopId: optional; the SOP chosen in the propagate dialog. When set with pageMode "propagate",
+   *       one column per SOP field is added to the table
+   *   instruments: array; dropdown source for INSTRUMENT-type SOP fields
+   *   workstations: array; dropdown source for WORKSTATION-type SOP fields
    * }
    */
 
@@ -175,12 +179,13 @@ BulkTarget.sample = (function ($) {
                 : getCommonChildCategories(classes).map(function (category) {
                     return {
                       name: category,
-                      action: function (replicates, newBoxId) {
+                      action: function (replicates, newBoxId, sopId) {
                         Utils.page.post(Urls.ui.samples.bulkPropagate, {
                           boxId: newBoxId,
                           parentIds: idsString,
                           replicates: replicates,
                           targetCategory: category,
+                          sopId: sopId,
                         });
                       },
                     };
@@ -237,13 +242,28 @@ BulkTarget.sample = (function ($) {
                         getLabel: Utils.array.getName,
                       }
                     : null,
+                  config.sops && config.sops.length
+                    ? {
+                        property: "sop",
+                        type: "select",
+                        label: "SOP",
+                        values: config.sops,
+                        getLabel: function (sop) {
+                          return sop.alias + " v." + sop.version;
+                        },
+                      }
+                    : null,
                   ListUtils.createBoxField,
                 ].filter(function (x) {
                   return !!x;
                 }),
                 function (result) {
                   var loadPage = function (boxId, replicates) {
-                    (result.target || targets[0]).action(replicates, boxId);
+                    (result.target || targets[0]).action(
+                      replicates,
+                      boxId,
+                      result.sop ? result.sop.id : null
+                    );
                   };
                   var createBox = function (sampleCount, replicates) {
                     Utils.createBoxDialog(
@@ -953,6 +973,9 @@ BulkTarget.sample = (function ($) {
         (targetCategory !== "Identity" && targetCategory !== "Tissue")
       ) {
         columns.push(BulkUtils.columns.sop(config.sops));
+        if (config.pageMode === "propagate" && config.sopId) {
+          columns = columns.concat(makeSopFieldColumns(config));
+        }
       }
 
       if (Constants.isDetailedSample && !config.isLibraryReceipt) {
@@ -1606,6 +1629,47 @@ BulkTarget.sample = (function ($) {
       col.sampleSubcategory = sampleSubcategory;
     }
     return col;
+  }
+
+  function makeSopFieldColumns(config) {
+    var sop = (config.sops || []).filter(Utils.array.idPredicate(Number(config.sopId)))[0];
+    if (!sop || !sop.fields) {
+      return [];
+    }
+
+    return sop.fields.map(function (field) {
+      if (field.fieldType === "INSTRUMENT") {
+        return {
+          title: field.name + (field.units ? " (" + field.units + ")" : ""),
+          type: "dropdown",
+          data: "sopFieldValues." + field.id,
+          source: (config.instruments || []).filter(function (instrument) {
+            return instrument.instrumentModelId === field.instrumentModelId;
+          }),
+          sortSource: Utils.sorting.standardSort("name"),
+          getItemLabel: Utils.array.getName,
+          getItemValue: Utils.array.getId,
+        };
+      }
+      if (field.fieldType === "WORKSTATION") {
+        return {
+          title: field.name + (field.units ? " (" + field.units + ")" : ""),
+          type: "dropdown",
+          data: "sopFieldValues." + field.id,
+          source: config.workstations || [],
+          sortSource: Utils.sorting.standardSort("alias"),
+          getItemLabel: Utils.array.getAlias,
+          getItemValue: Utils.array.getId,
+        };
+      }
+
+      return {
+        title: field.name + (field.units ? " (" + field.units + ")" : ""),
+        type: field.fieldType === "NUMBER" ? "decimal" : "text",
+        data: "sopFieldValues." + field.id,
+        maxLength: 255,
+      };
+    });
   }
 
   function getSampleClassOptions(targetSampleClass, targetCategory, parentSampleClassId) {

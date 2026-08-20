@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSopFieldValue.SampleSopFieldValueId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Entity
 @Table(name = "SampleSopFieldValue")
@@ -74,19 +75,12 @@ public class SampleSopFieldValue extends SopFieldValue {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null || getClass() != obj.getClass()) {
-      return false;
-    }
-    SampleSopFieldValue other = (SampleSopFieldValue) obj;
-    return Objects.equals(sample, other.sample) && Objects.equals(getSopField(), other.getSopField());
+    return super.equals(obj) && LimsUtils.equals(this, obj, SampleSopFieldValue::getSample);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(sample, getSopField());
+    return Objects.hash(super.hashCode(), sample);
   }
 
 }

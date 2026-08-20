@@ -906,16 +906,12 @@ public class DefaultSampleService implements SampleService {
     if (sample.getSop() != null && sample.getSop().getCategory() != SopCategory.SAMPLE) {
       errors.add(new ValidationError("sopId", "Only sample SOPs may be assigned to a sample"));
     }
-    validateSopFieldValues(sample, errors);
+    ValidationUtils.validateSopFieldValues(sample.getSop(), sample.getSopFieldValues(), workstationService,
+        instrumentService, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
-  }
-
-  private void validateSopFieldValues(Sample sample, List<ValidationError> errors) throws IOException {
-    ValidationUtils.validateSopFieldValues(sample.getSop(), sample.getSopFieldValues(), workstationService,
-        instrumentService, errors);
   }
 
   private void validateSubproject(DetailedSample detailed, Sample beforeChange, List<ValidationError> errors)
@@ -995,9 +991,12 @@ public class DefaultSampleService implements SampleService {
     target.setLocationBarcode(source.getLocationBarcode());
     target.setRequisition(source.getRequisition());
     target.setSequencingControlType(source.getSequencingControlType());
-    makeSopChangesChangeLog(target, source);
+    ValidationUtils.makeSopChangesChangeLog(target, target.getSopFieldValues(), source.getSopFieldValues(),
+        changeLogService, authorizationManager.getCurrentUser());
     target.setSop(source.getSop());
-    applySopFieldValueChanges(target, source);
+    Sample sopFieldValueOwner = target;
+    ValidationUtils.applySopFieldValueChanges(target.getSopFieldValues(), source.getSopFieldValues(),
+        SampleSopFieldValue::new, fieldValue -> fieldValue.setSample(sopFieldValueOwner));
     target.setDetailedQcStatus(source.getDetailedQcStatus());
     target.setDetailedQcStatusNote(nullifyStringIfBlank(source.getDetailedQcStatusNote()));
     target.setQcUser(source.getQcUser());
@@ -1032,16 +1031,6 @@ public class DefaultSampleService implements SampleService {
       }
     }
     target.setProject(source.getProject());
-  }
-
-  private void applySopFieldValueChanges(Sample target, Sample source) {
-    ValidationUtils.applySopFieldValueChanges(target.getSopFieldValues(), source.getSopFieldValues(),
-        SampleSopFieldValue::new, fieldValue -> fieldValue.setSample(target));
-  }
-
-  private void makeSopChangesChangeLog(Sample target, Sample source) throws IOException {
-    ValidationUtils.makeSopChangesChangeLog(target, target.getSopFieldValues(), source.getSopFieldValues(),
-        changeLogService, authorizationManager.getCurrentUser());
   }
 
   private void applyIdentityChanges(SampleIdentity target, SampleIdentity source) throws IOException {
