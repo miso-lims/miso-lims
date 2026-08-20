@@ -73,6 +73,7 @@ BulkTarget.sample = (function ($) {
   };
 
   var originalProjectIdsBySampleId = {};
+  var originalSopIdsBySampleId = {};
   var originalEffectiveGroupIdsByRow = {};
   var parentLocationsByRow = null;
   var metricCategories = [];
@@ -409,6 +410,7 @@ BulkTarget.sample = (function ($) {
         }
         if (config.pageMode === "edit") {
           originalProjectIdsBySampleId[sample.id] = sample.projectId;
+          originalSopIdsBySampleId[sample.id] = sample.sopId;
         } else {
           if (Constants.isDetailedSample) {
             if (sample.relatedSlides && sample.relatedSlides.length === 1) {
@@ -873,11 +875,16 @@ BulkTarget.sample = (function ($) {
                   });
                   setValue = firstReceiptLabel;
                 }
-                api.updateField(rowIndex, "identityId", {
-                  source: potentialIdentities,
-                  value: setValue,
-                  formatter: potentialIdentities.length > 1 ? "multipleOptions" : null,
-                }, true);
+                api.updateField(
+                  rowIndex,
+                  "identityId",
+                  {
+                    source: potentialIdentities,
+                    value: setValue,
+                    formatter: potentialIdentities.length > 1 ? "multipleOptions" : null,
+                  },
+                  true
+                );
               })
               .fail(function (response, textStatus, serverStatus) {
                 var error = JSON.parse(response.responseText);
@@ -972,9 +979,15 @@ BulkTarget.sample = (function ($) {
         !Constants.isDetailedSample ||
         (targetCategory !== "Identity" && targetCategory !== "Tissue")
       ) {
-        columns.push(BulkUtils.columns.sop(config.sops));
-        if (config.pageMode === "propagate" && config.sopId) {
-          columns = columns.concat(makeSopFieldColumns(config));
+        var sopColumn = BulkUtils.columns.sop(config.sops);
+        if (config.pageMode === "propagate") {
+          sopColumn.disabled = true;
+          columns.push(sopColumn);
+          if (config.sopId) {
+            columns = columns.concat(makeSopFieldColumns(config));
+          }
+        } else {
+          columns.push(sopColumn);
         }
       }
 
@@ -1537,6 +1550,22 @@ BulkTarget.sample = (function ($) {
           " affected"
         );
       });
+    var sopChanges = data.filter(function (sample) {
+      if (sample.sopId === originalSopIdsBySampleId[sample.id]) {
+        return false;
+      }
+      return (
+        sample.sopFieldValues &&
+        Object.keys(sample.sopFieldValues).some(function (fieldId) {
+          var value = sample.sopFieldValues[fieldId];
+          return value !== null && value !== undefined && value !== "";
+        })
+      );
+    });
+    var sopWarnings = sopChanges.map(function (sample) {
+      return "• " + (sample.alias || sample.parentAlias);
+    });
+
     var messages = [];
     if (consentWarnings.length) {
       messages.push("The following project changes may violate consent:");
@@ -1546,13 +1575,25 @@ BulkTarget.sample = (function ($) {
       messages.push("The following project changes affect existing libraries:");
       messages = messages.concat(libraryWarnings);
     }
+    if (sopWarnings.length) {
+      messages.push(
+        "Changing the SOP for the following samples will clear their existing SOP field" +
+          " values. SOP field values can only be entered on the individual sample's edit page:"
+      );
+      messages = messages.concat(sopWarnings);
+    }
     if (messages.length) {
       messages.push("Are you sure you wish to save?");
       Utils.showConfirmDialog(
-        "Project Changes",
+        "Confirm Changes",
         "Save",
         messages,
-        deferred.resolve,
+        function () {
+          sopChanges.forEach(function (sample) {
+            sample.sopFieldValues = {};
+          });
+          deferred.resolve();
+        },
         deferred.reject
       );
     } else {

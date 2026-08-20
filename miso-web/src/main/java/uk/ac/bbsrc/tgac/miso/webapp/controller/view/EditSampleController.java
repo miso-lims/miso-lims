@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -496,6 +497,7 @@ public class EditSampleController {
           dto.setRequisitionAssayIds(requisition.getAssays().stream().map(Assay::getId).toList());
         }
         dto.setSopId(sopId);
+        dto.setSopFieldValues(new HashMap<>());
         return dto;
       } else {
         throw new IllegalArgumentException("Cannot create plain samples from other plain samples!");

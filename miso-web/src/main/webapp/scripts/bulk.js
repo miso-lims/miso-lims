@@ -928,12 +928,6 @@ BulkUtils = (function ($) {
           },
           getItemValue: Utils.array.getId,
           required: !!required,
-          initOnChange: false,
-          onChange: function (rowIndex, newValue, api) {
-            if (api.getData) {
-              api.getData()[rowIndex].sopFieldValues = {};
-            }
-          },
         };
       },
 
