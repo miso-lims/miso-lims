@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -143,20 +142,26 @@ public class SampleSheetRestController extends AbstractRestController {
     if (model.getNumContainers() == 1 && run.getRunPositions().size() == 1) {
       RunPosition runPos = run.getRunPositions().iterator().next();
       if (runPos.getContainer() != null) {
-        poolLayout.put("*", runPos.getContainer().getPartitions().stream()
-            .collect(Collectors.toMap(Partition::getPartitionNumber, Partition::getPool)));
+        poolLayout.put("*", makePoolsByPartition(runPos));
       }
     } else {
       for (RunPosition runPos : run.getRunPositions()) {
         if (runPos.getContainer() != null) {
-          poolLayout.put(runPos.getPosition().getAlias(), runPos.getContainer().getPartitions().stream()
-              .collect(Collectors.toMap(Partition::getPartitionNumber, Partition::getPool)));
+          poolLayout.put(runPos.getPosition().getAlias(), makePoolsByPartition(runPos));
         }
       }
     }
     input.setPoolLayout(poolLayout);
 
     return input;
+  }
+
+  private static Map<Integer, Pool> makePoolsByPartition(RunPosition runPos) {
+    Map<Integer, Pool> poolsByPartition = new HashMap<>();
+    for (Partition partition : runPos.getContainer().getPartitions()) {
+      poolsByPartition.put(partition.getPartitionNumber(), partition.getPool());
+    }
+    return poolsByPartition;
   }
 
   private SampleSheetInput makeInputFromPools(SampleSheetRequest request) throws IOException {
