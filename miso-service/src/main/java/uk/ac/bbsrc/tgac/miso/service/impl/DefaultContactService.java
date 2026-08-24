@@ -88,6 +88,11 @@ public class DefaultContactService extends AbstractSaveService<Contact> implemen
   }
 
   @Override
+  public Contact getByEmail(String email) throws IOException {
+    return contactStore.getByEmail(email);
+  }
+
+  @Override
   public ValidationResult validateDeletion(Contact object) throws IOException {
     ValidationResult result = new ValidationResult();
 
