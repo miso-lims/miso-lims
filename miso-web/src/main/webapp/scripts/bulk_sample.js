@@ -252,6 +252,10 @@ BulkTarget.sample = (function ($) {
                         getLabel: function (sop) {
                           return sop.alias + " v." + sop.version;
                         },
+                        showIf: function (output) {
+                          var target = output.target || (targets.length === 1 ? targets[0] : null);
+                          return !target || target.name !== "Tissue";
+                        },
                       }
                     : null,
                   ListUtils.createBoxField,
@@ -1578,7 +1582,7 @@ BulkTarget.sample = (function ($) {
     if (sopWarnings.length) {
       messages.push(
         "Changing the SOP for the following samples will clear their existing SOP field" +
-          " values. SOP field values can only be entered on the individual sample's edit page:"
+          " values. SOP field values can only be edited on the individual Edit Sample page."
       );
       messages = messages.concat(sopWarnings);
     }
@@ -1704,9 +1708,22 @@ BulkTarget.sample = (function ($) {
         };
       }
 
+      var type;
+
+      switch (field.fieldType) {
+        case "NUMBER":
+          type = "decimal";
+          break;
+        case "TEXT":
+          type = "text";
+          break;
+        default:
+          throw Error("Unhandled field type: " + field.fieldType);
+      }
+
       return {
         title: field.name + (field.units ? " (" + field.units + ")" : ""),
-        type: field.fieldType === "NUMBER" ? "decimal" : "text",
+        type: type,
         data: "sopFieldValues." + field.id,
         maxLength: 255,
       };
