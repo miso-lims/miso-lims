@@ -11,12 +11,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Consumer;
@@ -25,8 +23,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.validator.routines.BigDecimalValidator;
-import org.apache.commons.validator.routines.LongValidator;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +39,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
@@ -443,104 +438,12 @@ public class DefaultRunService implements RunService {
       }
     }
 
-    validateSopFieldValues(changed, errors);
+    ValidationUtils.validateSopFieldValues(changed.getSop(), changed.getSopFieldValues(), workstationService,
+        instrumentService, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
-  }
-
-  private void validateSopFieldValues(Run run, List<ValidationError> errors) throws IOException {
-    if (run.getSopFieldValues() == null) {
-      return;
-    }
-
-    List<RunSopFieldValue> submittedValues = run.getSopFieldValues().stream()
-        .filter(value -> !isStringBlankOrNull(value.getValue()))
-        .collect(Collectors.toList());
-
-    if (submittedValues.isEmpty()) {
-      return;
-    }
-
-    if (run.getSop() == null) {
-      errors.add(new ValidationError("sopId", "SOP must be selected to enter SOP field values"));
-      return;
-    }
-
-    Set<Long> seenSopFieldIds = new HashSet<>();
-
-    for (RunSopFieldValue value : submittedValues) {
-      SopField field = value.getSopField();
-      Long fieldId = field == null ? null : field.getId();
-
-      if (fieldId == null) {
-        errors.add(new ValidationError(getInvalidSopFieldMessage(value)));
-        continue;
-      }
-      String property = getSopFieldValueProperty(fieldId);
-
-      SopField sopField = run.getSop().getFields().stream()
-          .filter(item -> item.getId() == fieldId)
-          .findFirst()
-          .orElse(null);
-
-      if (sopField == null) {
-        errors.add(new ValidationError(property, getInvalidSopFieldMessage(value)));
-        continue;
-      }
-
-      if (!seenSopFieldIds.add(fieldId)) {
-        errors.add(new ValidationError(property, "Duplicate SOP field"));
-      }
-
-      if (value.getValue().length() > 255) {
-        errors.add(new ValidationError(property, "Maximum length: 255 characters"));
-      }
-
-      if (!isValidSopFieldValue(sopField, value.getValue())) {
-        errors.add(new ValidationError(property, "Invalid value for SOP field " + sopField.getName()));
-      }
-
-    }
-
-  }
-
-  boolean isValidSopFieldValue(SopField sopField, String value) throws IOException {
-    if (isStringBlankOrNull(value)) {
-      return true;
-    }
-    if (sopField.getFieldType() == null) {
-      throw new IllegalStateException("Field type is not set");
-    }
-
-    switch (sopField.getFieldType()) {
-      case NUMBER:
-        return BigDecimalValidator.getInstance().validate(value) != null;
-      case WORKSTATION:
-        return isValidWorkstation(value);
-      case INSTRUMENT:
-        return isValidInstrument(sopField, value);
-      case TEXT:
-        return true;
-      default:
-        throw new IllegalArgumentException("Unhandled SOP field type: " + sopField.getFieldType());
-    }
-  }
-
-  private boolean isValidWorkstation(String value) throws IOException {
-    Long workstationId = LongValidator.getInstance().validate(value);
-    return workstationId != null && workstationService.get(workstationId) != null;
-  }
-
-  private boolean isValidInstrument(SopField sopField, String value) throws IOException {
-    Long instrumentId = LongValidator.getInstance().validate(value);
-    if (instrumentId == null || sopField.getInstrumentModel() == null) {
-      return false;
-    }
-    Instrument instrument = instrumentService.get(instrumentId);
-    return instrument != null
-        && instrument.getInstrumentModel().getId() == sopField.getInstrumentModel().getId();
   }
 
   private static void validateSequencingParameters(Run run, PlatformType platformType, List<ValidationError> errors) {
@@ -566,27 +469,11 @@ public class DefaultRunService implements RunService {
   }
 
   private void loadSopFieldValues(Run run) {
-    if (run.getSopFieldValues() == null || run.getSopFieldValues().isEmpty()) {
+    if (run.getSopFieldValues() == null) {
       return;
     }
-
-    for (RunSopFieldValue value : run.getSopFieldValues()) {
-      value.setRun(run);
-
-      if (run.getSop() == null || value.getSopField() == null) {
-        continue;
-      }
-
-      SopField field = run.getSop().getFields().stream()
-          .filter(sopField -> sopField.getId() == value.getSopField().getId())
-          .findFirst()
-          .orElse(null);
-
-      // Invalid fields will be handled by validateSopFieldValues.
-      if (field != null) {
-        value.setSopField(field);
-      }
-    }
+    run.getSopFieldValues().forEach(value -> value.setRun(run));
+    ValidationUtils.loadSopFieldValues(run.getSop(), run.getSopFieldValues());
   }
 
   private void applyChanges(Run target, Run source) throws IOException {
@@ -611,9 +498,11 @@ public class DefaultRunService implements RunService {
     target.setDataReview(source.getDataReview());
     target.setDataReviewer(source.getDataReviewer());
     target.setDataReviewDate(source.getDataReviewDate());
-    makeSopChangesChangeLog(target, source);
+    ValidationUtils.makeSopChangesChangeLog(target, target.getSopFieldValues(), source.getSopFieldValues(),
+        changeLogService, authorizationManager.getCurrentUser());
     target.setSop(source.getSop());
-    applySopFieldValueChanges(target, source);
+    ValidationUtils.applySopFieldValueChanges(target.getSopFieldValues(), source.getSopFieldValues(),
+        RunSopFieldValue::new, fieldValue -> fieldValue.setRun(target));
     target.setDataManglingPolicy(source.getDataManglingPolicy());
     if (isIlluminaRun(target)) {
       applyIlluminaChanges((IlluminaRun) target, (IlluminaRun) source);
@@ -631,105 +520,6 @@ public class DefaultRunService implements RunService {
       target.setMetrics(source.getMetrics());
     }
   }
-
-  private void applySopFieldValueChanges(Run target, Run source) {
-    Map<Long, RunSopFieldValue> sourceByFieldId = new HashMap<>();
-    if (source.getSopFieldValues() != null) {
-      for (RunSopFieldValue sourceValue : source.getSopFieldValues()) {
-        if (sourceValue.getSopField() != null && !isStringBlankOrNull(sourceValue.getValue())) {
-          sourceByFieldId.put(sourceValue.getSopField().getId(), sourceValue);
-        }
-      }
-    }
-
-    Map<Long, RunSopFieldValue> targetByFieldId = new HashMap<>();
-    Iterator<RunSopFieldValue> iterator = target.getSopFieldValues().iterator();
-    while (iterator.hasNext()) {
-      RunSopFieldValue targetValue = iterator.next();
-      long fieldId = targetValue.getSopField().getId();
-      if (sourceByFieldId.containsKey(fieldId)) {
-        targetByFieldId.put(fieldId, targetValue);
-      } else {
-        iterator.remove();
-      }
-    }
-
-    for (RunSopFieldValue sourceValue : sourceByFieldId.values()) {
-      long fieldId = sourceValue.getSopField().getId();
-      RunSopFieldValue targetValue = targetByFieldId.get(fieldId);
-      if (targetValue == null) {
-        targetValue = new RunSopFieldValue();
-        targetValue.setRun(target);
-        targetValue.setSopField(sourceValue.getSopField());
-        target.getSopFieldValues().add(targetValue);
-      }
-      targetValue.setValue(sourceValue.getValue());
-    }
-  }
-
-  private void makeSopChangesChangeLog(Run target, Run source) throws IOException {
-    List<String> messages = new ArrayList<>();
-
-    Map<Long, RunSopFieldValue> beforeValues = getSopFieldValueMap(target);
-    Map<Long, RunSopFieldValue> afterValues = getSopFieldValueMap(source);
-
-    Set<Long> fieldIds = new HashSet<>();
-    fieldIds.addAll(beforeValues.keySet());
-    fieldIds.addAll(afterValues.keySet());
-
-    for (Long fieldId : fieldIds) {
-      RunSopFieldValue before = beforeValues.get(fieldId);
-      RunSopFieldValue after = afterValues.get(fieldId);
-      String beforeValue = before == null ? null : before.getValue();
-      String afterValue = after == null ? null : after.getValue();
-      if (!Objects.equals(beforeValue, afterValue)) {
-        RunSopFieldValue value = after == null ? before : after;
-        messages.add(getSopFieldLabel(value) + " (SOP): " + getSopFieldValueLabel(beforeValue)
-            + " → " + getSopFieldValueLabel(afterValue));
-      }
-    }
-
-    if (!messages.isEmpty()) {
-      changeLogService.create(target.createChangeLog(String.join("; ", messages), "sopFieldValues",
-          authorizationManager.getCurrentUser()));
-    }
-  }
-
-  private static Map<Long, RunSopFieldValue> getSopFieldValueMap(Run run) {
-    Map<Long, RunSopFieldValue> values = new TreeMap<>();
-    if (run.getSopFieldValues() == null) {
-      return values;
-    }
-    for (RunSopFieldValue value : run.getSopFieldValues()) {
-      if (value.getSopField() != null && !isStringBlankOrNull(value.getValue())) {
-        values.put(value.getSopField().getId(), value);
-      }
-    }
-    return values;
-  }
-
-  private static String getSopFieldLabel(RunSopFieldValue value) {
-    SopField field = value.getSopField();
-    return field.getName() + (field.getUnits() == null ? "" : " (" + field.getUnits() + ")");
-  }
-
-  private static String getInvalidSopFieldMessage(RunSopFieldValue value) {
-    SopField field = value.getSopField();
-    String fieldLabel = field == null ? "unknown" : field.getName();
-    if (isStringBlankOrNull(fieldLabel) && field != null) {
-      fieldLabel = "ID " + field.getId();
-    }
-    return "SOP field '" + fieldLabel + "' does not belong to the selected SOP";
-  }
-
-  private static String getSopFieldValueProperty(long fieldId) {
-    return "sopFieldValues_" + fieldId;
-  }
-
-  private static String getSopFieldValueLabel(String value) {
-    return isStringBlankOrNull(value) ? "n/a" : value;
-  }
-
 
   private void applyContainerChanges(Run target, Run source) throws IOException {
     Iterator<RunPosition> iterator = target.getRunPositions().iterator();
@@ -989,7 +779,8 @@ public class DefaultRunService implements RunService {
       }
 
       for (SopField sopField : matchingFields) {
-        if (!isValidSopFieldValue(sopField, consumable.getValue())) {
+        if (!ValidationUtils.isValidSopFieldValue(sopField, consumable.getValue(), workstationService,
+            instrumentService)) {
           continue;
         }
 
