@@ -61,9 +61,11 @@ public abstract class OicrBaseLibraryAliasGenerator<T, R> implements NameGenerat
         return generateOxfordNanoporeLibraryAlias(detailedItem);
       case ULTIMA:
         return generateUltimaLibraryAlias(detailedItem);
+      case ELEMENT:
+        return generateIlluminaLibraryAlias(detailedItem);
       default:
         throw new MisoNamingException(
-            "Alias generation is only available for Illumina, PacBio, Oxford Nanopore, and Ultima Libraries");
+            "Alias generation is only available for Illumina, PacBio, Oxford Nanopore, Ultima, and Element Libraries");
     }
   }
 

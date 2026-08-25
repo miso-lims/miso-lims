@@ -409,6 +409,69 @@ Default QC status to apply on bulk create/edit pages. Set to the description of 
 it. When the QC Status column is hidden via `miso.display.bulk.qcStatus`, this value is applied
 automatically on save.
 
+### `miso.defaults.bulk.poolQcPassed`
+
+Default pool QC status to apply on bulk pool create pages. Set to `true` to default to Ready,
+or `false` to default to Failed. When the QC Status column is visible, this pre-selects the value
+but the user can change it. When the QC Status column is hidden via `miso.display.bulk.qcStatus`,
+this value is applied automatically on save (create only, not edit). This is separate from
+`miso.defaults.bulk.detailedQcStatus` because pools use a different QC mechanism (Ready/Failed/Not
+Ready) than samples, libraries, and library aliquots.
+
+### `miso.display.bulk.receipt`
+
+Defaults to `true` if unspecified. Set to `false` to hide all receipt columns (Date of Receipt, Time
+of Receipt, Received From, Received By, Receipt Confirmed, Receipt QC Passed, and Receipt QC Note)
+on bulk receipt pages (library and sample receipt). When hidden, no receipt transfer is created.
+
+### `miso.display.bulk.boxFields`
+
+Defaults to `true` if unspecified. Set to `false` to hide the Box Search, Box Alias, and Position
+columns on all bulk create/edit pages.
+
+### `miso.display.bulk.parentLocation`
+
+Defaults to `true` if unspecified. Set to `false` to hide parent/sample location columns on bulk
+create/edit pages. This hides Sample Location on libraries and Parent Location on samples and
+library aliquots.
+
+### `miso.display.bulk.workstation`
+
+Defaults to `true` if unspecified. Set to `false` to hide the Workstation column on bulk library
+create/edit pages.
+
+### `miso.display.bulk.thermalCycler`
+
+Defaults to `true` if unspecified. Set to `false` to hide the Thermal Cycler column on bulk library
+create/edit pages.
+
+### `miso.display.bulk.kitLot`
+
+Defaults to `true` if unspecified. Set to `false` to hide the Kit Lot column on bulk library and
+library aliquot create/edit pages. If hidden, also set `miso.required.kitLot` to `false` to
+avoid save errors.
+
+### `miso.required.kitLot`
+
+Defaults to `true` if unspecified. Set to `false` to make the Kit Lot field optional on bulk
+propagation pages and single library/library aliquot edit pages. This is useful when hiding the Kit
+Lot column via `miso.display.bulk.kitLot`.
+
+### `miso.display.bulk.spikeIn`
+
+Defaults to `true` if unspecified. Set to `false` to hide the Spike-In, Spike-In Dilution Factor,
+and Spike-In Volume columns on bulk library create/edit pages.
+
+### `miso.display.bulk.targetedSequencing`
+
+Defaults to `true` if unspecified. Set to `false` to hide the Targeted Sequencing column on bulk
+library aliquot create/edit pages.
+
+### `miso.display.bulk.parentUsed`
+
+Defaults to `true` if unspecified. Set to `false` to hide the Parent ng Used and Parent Vol. Used
+columns on bulk library aliquot create/edit pages.
+
 ## Required Fields
 
 Fields can be configured as required per object type. Each property takes a comma-separated list of

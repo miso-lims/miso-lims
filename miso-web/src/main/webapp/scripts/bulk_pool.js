@@ -201,6 +201,7 @@ BulkTarget.pool = (function ($) {
             title: "QC Status",
             type: "dropdown",
             data: "qcPassed",
+            include: Constants.showQcStatus !== false,
             source: [
               {
                 label: "Ready",
@@ -215,6 +216,11 @@ BulkTarget.pool = (function ($) {
                 value: null,
               },
             ],
+            initial: Constants.defaultPoolQcPassed === true
+              ? "Ready"
+              : Constants.defaultPoolQcPassed === false
+                ? "Failed"
+                : "Not Ready",
             getItemLabel: Utils.array.get("label"),
             getItemValue: Utils.array.get("value"),
           },
@@ -234,6 +240,13 @@ BulkTarget.pool = (function ($) {
     },
     confirmSave: function (data, config, api) {
       var deferred = $.Deferred();
+      if (config.pageMode === "create" && Constants.showQcStatus === false && Constants.defaultPoolQcPassed != null) {
+        data.forEach(function (item) {
+          if (item.qcPassed === undefined || item.qcPassed === null) {
+            item.qcPassed = Constants.defaultPoolQcPassed;
+          }
+        });
+      }
 
       if (config.aliquotsToPool) {
         // ensure Pool aliases are unique, so we can sort the aliquots correctly

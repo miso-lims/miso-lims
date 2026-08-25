@@ -267,7 +267,7 @@ BulkTarget.library = (function ($) {
           data: "sampleBoxPositionLabel",
           disabled: true,
           preventImport: true,
-          include: config.pageMode === "propagate",
+          include: config.pageMode === "propagate" && Constants.showParentLocation !== false,
           customSorting: [
             {
               name: "Sample Location (by rows)",
@@ -483,7 +483,7 @@ BulkTarget.library = (function ($) {
           title: "Workstation",
           type: "dropdown",
           data: "workstationId",
-          include: !config.isLibraryReceipt,
+          include: !config.isLibraryReceipt && Constants.showWorkstation !== false,
           source: config.workstations,
           sortSource: Utils.sorting.standardSort("alias"),
           getItemLabel: Utils.array.getAlias,
@@ -493,7 +493,7 @@ BulkTarget.library = (function ($) {
           title: "Thermal Cycler",
           type: "dropdown",
           data: "thermalCyclerId",
-          include: !config.isLibraryReceipt,
+          include: !config.isLibraryReceipt && Constants.showThermalCycler !== false,
           source: config.thermalCyclers,
           sortSource: Utils.sorting.standardSort("name"),
           getItemLabel: Utils.array.getName,
@@ -921,8 +921,8 @@ BulkTarget.library = (function ($) {
           type: "text",
           data: "kitLot",
           maxLength: 255,
-          include: !config.isLibraryReceipt,
-          required: config.pageMode === "propagate",
+          include: !config.isLibraryReceipt && Constants.showKitLot !== false,
+          required: config.pageMode === "propagate" && Constants.requireKitLot !== false,
           regex: Utils.validation.uriComponentRegex,
         }
       );
@@ -943,6 +943,7 @@ BulkTarget.library = (function ($) {
           title: "Spike-In",
           type: "dropdown",
           data: "spikeInId",
+          include: Constants.showSpikeIn !== false,
           source: Constants.spikeIns,
           sortSource: Utils.sorting.standardSort("alias"),
           getItemLabel: Utils.array.getAlias,
@@ -963,12 +964,14 @@ BulkTarget.library = (function ($) {
           title: "Spike-In Dilution Factor",
           type: "dropdown",
           data: "spikeInDilutionFactor",
+          include: Constants.showSpikeIn !== false,
           source: Constants.dilutionFactors,
         },
         {
           title: "Spike-In Volume",
           type: "decimal",
           data: "spikeInVolume",
+          include: Constants.showSpikeIn !== false,
           precision: 14,
           scale: 10,
         }
@@ -980,6 +983,11 @@ BulkTarget.library = (function ($) {
     confirmSave: function (data, config) {
       var deferred = $.Deferred();
       BulkUtils.applyDefaultDetailedQcStatus(data, config);
+      if (Constants.showReceipt === false) {
+        data.forEach(function (item) {
+          item.receivedTime = null;
+        });
+      }
       if (config.isLibraryReceipt) {
         BulkUtils.checkPausedRequisitions(data, deferred);
       } else {

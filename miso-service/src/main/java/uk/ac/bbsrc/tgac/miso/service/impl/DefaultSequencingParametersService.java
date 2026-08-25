@@ -122,7 +122,8 @@ public class DefaultSequencingParametersService extends AbstractSaveService<Sequ
     if (params.getReadLength2() < 0) {
       errors.add(new ValidationError("read2Length", "Read lengths cannot be negative."));
     }
-    if (params.getInstrumentModel().getPlatformType() != PlatformType.ILLUMINA) {
+    if (params.getInstrumentModel().getPlatformType() != PlatformType.ILLUMINA
+        && params.getInstrumentModel().getPlatformType() != PlatformType.ELEMENT) {
       if (params.getReadLength() != 0) {
         errors.add(new ValidationError("read1Length",
             String.format("Read lengths must be 0 for %s instruments.",

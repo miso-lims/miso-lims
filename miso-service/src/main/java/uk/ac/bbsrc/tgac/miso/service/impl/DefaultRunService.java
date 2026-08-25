@@ -735,6 +735,7 @@ public class DefaultRunService implements RunService {
             ((OxfordNanoporeRun) target).getProtocolVersion(),
             ((OxfordNanoporeRun) target)::setProtocolVersion);
         break;
+      case ELEMENT:
       case IONTORRENT:
       case PACBIO:
       case SOLID:

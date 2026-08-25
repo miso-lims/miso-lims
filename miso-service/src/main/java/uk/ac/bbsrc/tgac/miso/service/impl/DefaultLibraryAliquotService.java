@@ -80,6 +80,8 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
   private LibraryStore libraryStore;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
   private Boolean autoGenerateIdBarcodes;
+  @Value("${miso.required.kitLot:true}")
+  private boolean requireKitLot;
   @Autowired
   private TransactionTemplate transactionTemplate;
   @Autowired
@@ -332,7 +334,7 @@ public class DefaultLibraryAliquotService implements LibraryAliquotService {
     if (isDetailedLibraryAliquot(aliquot)) {
       validateGroupDescription((DetailedLibraryAliquot) aliquot, errors);
     }
-    if (aliquot.getKitDescriptor() != null && aliquot.getKitLot() == null
+    if (requireKitLot && aliquot.getKitDescriptor() != null && aliquot.getKitLot() == null
         && (beforeChange == null || beforeChange.getKitLot() != null)) {
       errors.add(ValidationError.forRequired("kitLot"));
     }

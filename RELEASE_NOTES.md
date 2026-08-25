@@ -7,6 +7,23 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.26.0] - 2026-08-13
+
+### Added
+
+* New SOP field type for recording workstations used
+* New SOP field type for recording instruments used
+
+### Changed
+
+* Sample sheet filenames now include the alias of the first pool instead of the name of the sample sheet
+
+### Fixed
+
+* Incorrect titles for progress dialogs shown while removing requisitioned items and while resuming requisitions
+* Title of Instrument Models list page
+
+
 ## [3.25.0] - 2026-07-16
 
 ### Added
