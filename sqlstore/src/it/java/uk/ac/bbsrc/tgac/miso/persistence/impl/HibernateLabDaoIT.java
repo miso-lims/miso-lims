@@ -1,14 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
@@ -27,7 +27,7 @@ public class HibernateLabDaoIT extends AbstractDAOTest {
 
   private HibernateLabDao dao;
 
-  @Before
+  @BeforeEach
   public void setup() {
     dao = new HibernateLabDao();
     dao.setEntityManager(entityManager);

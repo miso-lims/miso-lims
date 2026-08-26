@@ -1,16 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
@@ -58,8 +58,8 @@ public class SampleClassRestControllerST extends AbstractST {
 
     SampleValidRelationship createdRel = created.getParentRelationships().iterator().next();
     assertNotNull(createdRel.getParent());
-    assertEquals("parent ID mismatch", IDENTITY_CLASS_ID, createdRel.getParent().getId());
-    assertFalse("relationship archived should be false", createdRel.isArchived());
+    assertEquals(IDENTITY_CLASS_ID, createdRel.getParent().getId(), "parent ID mismatch");
+    assertFalse(createdRel.isArchived(), "relationship archived should be false");
   }
 
   @Test
@@ -81,7 +81,7 @@ public class SampleClassRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testUpdateSuccess() throws Exception {
-    SampleClassImpl existing = (SampleClassImpl) currentSession().get(ENTITY_CLASS, (long) UPDATE_CLASS_ID);
+    SampleClassImpl existing = (SampleClassImpl) currentSession().find(ENTITY_CLASS, (long) UPDATE_CLASS_ID);
     assertNotNull(existing);
 
     int parentCountBefore = existing.getParentRelationships().size();
@@ -96,27 +96,27 @@ public class SampleClassRestControllerST extends AbstractST {
     assertNotNull(returned);
 
     assertEquals("Updated gDNA Aliquot Class", returned.getAlias());
-    assertEquals("category changed", existing.getSampleCategory(), returned.getSampleCategory());
-    assertEquals("subcategory changed", existing.getSampleSubcategory(), returned.getSampleSubcategory());
-    assertEquals("suffix changed", existing.getSuffix(), returned.getSuffix());
-    assertEquals("archived changed", existing.isArchived(), returned.isArchived());
-    assertEquals("directCreationAllowed changed", existing.isDirectCreationAllowed(),
-        returned.isDirectCreationAllowed());
+    assertEquals(existing.getSampleCategory(), returned.getSampleCategory(), "category changed");
+    assertEquals(existing.getSampleSubcategory(), returned.getSampleSubcategory(), "subcategory changed");
+    assertEquals(existing.getSuffix(), returned.getSuffix(), "suffix changed");
+    assertEquals(existing.isArchived(), returned.isArchived(), "archived changed");
+    assertEquals(existing.isDirectCreationAllowed(), returned.isDirectCreationAllowed(),
+        "directCreationAllowed changed");
 
-    assertNotNull("parent relationships is null", returned.getParentRelationships());
-    assertFalse("parent relationships is empty", returned.getParentRelationships().isEmpty());
-    assertEquals("parent relationships count changed", parentCountBefore, returned.getParentRelationships().size());
+    assertNotNull(returned.getParentRelationships(), "parent relationships is null");
+    assertFalse(returned.getParentRelationships().isEmpty(), "parent relationships is empty");
+    assertEquals(parentCountBefore, returned.getParentRelationships().size(), "parent relationships count changed");
 
     Set<Long> parentIdsAfter = returned.getParentRelationships().stream()
         .map(rel -> rel.getParent().getId())
         .collect(Collectors.toSet());
 
-    assertEquals("parent relationships changed", parentIdsBefore, parentIdsAfter);
+    assertEquals(parentIdsBefore, parentIdsAfter, "parent relationships changed");
   }
 
   @Test
   public void testUpdateUnauthorized() throws Exception {
-    SampleClassImpl existing = (SampleClassImpl) currentSession().get(ENTITY_CLASS, (long) UPDATE_CLASS_ID);
+    SampleClassImpl existing = (SampleClassImpl) currentSession().find(ENTITY_CLASS, (long) UPDATE_CLASS_ID);
     assertNotNull(existing);
 
     SampleClassDto dto = Dtos.asDto(existing);

@@ -24,7 +24,7 @@ public class HibernatePoolQCDao extends HibernateQcStore<PoolQC> implements Pool
   @Override
   public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units)
       throws IOException {
-    Pool pool = (Pool) currentSession().get(PoolImpl.class, id);
+    Pool pool = (Pool) currentSession().find(PoolImpl.class, id);
     correspondingField.updateField(pool, value, units);
     currentSession().merge(pool);
   }

@@ -30,7 +30,7 @@ public class HibernateSampleNumberPerProjectDao extends HibernateProviderDao<Sam
 
   @Override
   public SampleNumberPerProject getSampleNumberPerProject(Long id) {
-    return (SampleNumberPerProject) currentSession().get(SampleNumberPerProjectImpl.class, id);
+    return (SampleNumberPerProject) currentSession().find(SampleNumberPerProjectImpl.class, id);
   }
 
   @Override

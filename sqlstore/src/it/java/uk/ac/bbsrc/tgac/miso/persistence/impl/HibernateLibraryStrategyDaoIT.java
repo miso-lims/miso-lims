@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -16,7 +16,7 @@ public class HibernateLibraryStrategyDaoIT extends AbstractDAOTest {
 
   private HibernateLibraryStrategyDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateLibraryStrategyDao();
     sut.setEntityManager(getEntityManager());
@@ -56,7 +56,7 @@ public class HibernateLibraryStrategyDaoIT extends AbstractDAOTest {
     clearSession();
 
     LibraryStrategyType saved =
-        (LibraryStrategyType) currentSession().get(LibraryStrategyType.class, savedId);
+        (LibraryStrategyType) currentSession().find(LibraryStrategyType.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -65,7 +65,7 @@ public class HibernateLibraryStrategyDaoIT extends AbstractDAOTest {
     long id = 1L;
     String name = "New Name";
     LibraryStrategyType type =
-        (LibraryStrategyType) currentSession().get(LibraryStrategyType.class, id);
+        (LibraryStrategyType) currentSession().find(LibraryStrategyType.class, id);
     assertNotEquals(name, type.getName());
     type.setName(name);
     sut.update(type);
@@ -73,14 +73,14 @@ public class HibernateLibraryStrategyDaoIT extends AbstractDAOTest {
     clearSession();
 
     LibraryStrategyType saved =
-        (LibraryStrategyType) currentSession().get(LibraryStrategyType.class, id);
+        (LibraryStrategyType) currentSession().find(LibraryStrategyType.class, id);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsageByLibraries() throws IOException {
     LibraryStrategyType type =
-        (LibraryStrategyType) currentSession().get(LibraryStrategyType.class, 1L);
+        (LibraryStrategyType) currentSession().find(LibraryStrategyType.class, 1L);
     assertEquals("WGS", type.getName());
     assertEquals(15L, sut.getUsageByLibraries(type));
   }
@@ -88,7 +88,7 @@ public class HibernateLibraryStrategyDaoIT extends AbstractDAOTest {
   @Test
   public void testGetUsageByLibraryDesigns() throws IOException {
     LibraryStrategyType type =
-        (LibraryStrategyType) currentSession().get(LibraryStrategyType.class, 1L);
+        (LibraryStrategyType) currentSession().find(LibraryStrategyType.class, 1L);
     assertEquals("WGS", type.getName());
     assertEquals(2L, sut.getUsageByLibraryDesigns(type));
   }

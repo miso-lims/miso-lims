@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -20,7 +20,7 @@ public class HibernatePoolOrderDaoIT extends AbstractDAOTest {
 
   private HibernatePoolOrderDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernatePoolOrderDao();
     sut.setEntityManager(getEntityManager());
@@ -49,16 +49,16 @@ public class HibernatePoolOrderDaoIT extends AbstractDAOTest {
     Date now = new Date();
     order.setCreationTime(now);
     order.setLastModified(now);
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     order.setCreator(user);
     order.setLastModifier(user);
-    RunPurpose purpose = (RunPurpose) currentSession().get(RunPurpose.class, 1L);
+    RunPurpose purpose = (RunPurpose) currentSession().find(RunPurpose.class, 1L);
     order.setPurpose(purpose);
     long savedId = sut.create(order);
 
     clearSession();
 
-    PoolOrder saved = (PoolOrder) currentSession().get(PoolOrder.class, savedId);
+    PoolOrder saved = (PoolOrder) currentSession().find(PoolOrder.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -66,14 +66,14 @@ public class HibernatePoolOrderDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Alias";
-    PoolOrder order = (PoolOrder) currentSession().get(PoolOrder.class, id);
+    PoolOrder order = (PoolOrder) currentSession().find(PoolOrder.class, id);
     assertNotEquals(alias, order.getAlias());
     order.setAlias(alias);
     sut.update(order);
 
     clearSession();
 
-    PoolOrder saved = (PoolOrder) currentSession().get(PoolOrder.class, id);
+    PoolOrder saved = (PoolOrder) currentSession().find(PoolOrder.class, id);
     assertEquals(alias, saved.getAlias());
   }
 

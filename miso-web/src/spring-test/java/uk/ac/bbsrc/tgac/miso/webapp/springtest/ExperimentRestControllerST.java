@@ -1,39 +1,29 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.web.servlet.*;
 
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
-
-
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.ArrayList;
 
 import javax.ws.rs.core.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import com.jayway.jsonpath.JsonPath;
 
 import static org.hamcrest.Matchers.*;
 
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
-import uk.ac.bbsrc.tgac.miso.core.data.KitImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto;
 import uk.ac.bbsrc.tgac.miso.dto.KitConsumableDto;
 import uk.ac.bbsrc.tgac.miso.dto.KitDescriptorDto;
 import uk.ac.bbsrc.tgac.miso.dto.ExperimentDto.RunPartitionDto;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-
 
 public class ExperimentRestControllerST extends AbstractST {
 
@@ -54,7 +44,7 @@ public class ExperimentRestControllerST extends AbstractST {
         .perform(post(CONTROLLER_BASE + "/2/addkit").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
-    Experiment added = currentSession().get(entityClass, 2);
+    Experiment added = currentSession().find(entityClass, 2);
     assertEquals(1, added.getKits().size());
     assertEquals(dto.getId().longValue(), added.getKits().iterator().next().getId());
     assertEquals(dto.getLotNumber(), added.getKits().iterator().next().getLotNumber());
@@ -66,7 +56,7 @@ public class ExperimentRestControllerST extends AbstractST {
     getMockMvc().perform(post(CONTROLLER_BASE + "/2/add").param("runId", "1").param("partitionId", "11"))
         .andExpect(status().isOk());
 
-    Experiment exp2 = currentSession().get(entityClass, 2);
+    Experiment exp2 = currentSession().find(entityClass, 2);
     assertEquals(1L, exp2.getRunPartitions().get(0).getRun().getId());
     assertEquals(11L, exp2.getRunPartitions().get(0).getPartition().getId());
   }
@@ -97,10 +87,10 @@ public class ExperimentRestControllerST extends AbstractST {
   public void testCreate() throws Exception {
     ExperimentDto dto = new ExperimentDto();
     dto.setTitle("title");
-    dto.setInstrumentModel(Dtos.asDto(currentSession().get(InstrumentModel.class, 2)));
-    dto.setLibrary(Dtos.asDto(currentSession().get(LibraryImpl.class, 1), false));
+    dto.setInstrumentModel(Dtos.asDto(currentSession().find(InstrumentModel.class, 2)));
+    dto.setLibrary(Dtos.asDto(currentSession().find(LibraryImpl.class, 1), false));
     dto.setPartitions(new ArrayList<RunPartitionDto>());
-    dto.setStudy(Dtos.asDto(currentSession().get(StudyImpl.class, 3)));
+    dto.setStudy(Dtos.asDto(currentSession().find(StudyImpl.class, 3)));
     Experiment exp = baseTestCreate(CONTROLLER_BASE, dto, entityClass, 200);
 
     assertEquals(dto.getTitle(), exp.getTitle());
@@ -113,7 +103,7 @@ public class ExperimentRestControllerST extends AbstractST {
 
   @Test
   public void testUpdate() throws Exception {
-    Experiment exp = currentSession().get(entityClass, 3);
+    Experiment exp = currentSession().find(entityClass, 3);
 
     ExperimentDto dto = Dtos.asDto(exp);
     dto.setTitle("updated");

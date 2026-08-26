@@ -1,11 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -34,6 +35,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.SiblingNumberGenerator;
 
 public class V2SampleAliasGeneratorTest {
 
+  private AutoCloseable mockito;
+
   @Mock
   private SampleNumberPerProjectService sampleNumberPerProjectService;
 
@@ -43,9 +46,14 @@ public class V2SampleAliasGeneratorTest {
   @InjectMocks
   private V2SampleAliasGenerator sut;
 
-  @Before
+  @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test

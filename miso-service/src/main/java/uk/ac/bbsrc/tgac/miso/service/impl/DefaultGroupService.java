@@ -79,7 +79,7 @@ public class DefaultGroupService implements GroupService {
   public void updateMembers(Group group) throws IOException {
     authorizationManager.throwIfNonAdmin();
     Group managed = get(group.getId());
-    managed.setUsers(group.getUsers());
+    ValidationUtils.applySetChanges(managed.getUsers(), group.getUsers());
     securityStore.saveGroup(managed);
   }
 

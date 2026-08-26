@@ -1,15 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -25,7 +25,7 @@ public class AttachmentControllerST extends AbstractST {
 
   @Test
   public void testUploadAndDownloadSuccess() throws Exception {
-    ProjectImpl before = currentSession().get(ProjectImpl.class, PROJECT_1);
+    ProjectImpl before = currentSession().find(ProjectImpl.class, PROJECT_1);
     assertNotNull(before);
     assertTrue(before.getAttachments().isEmpty());
 
@@ -39,7 +39,7 @@ public class AttachmentControllerST extends AbstractST {
       .andExpect(status().isNoContent());
 
     currentSession().clear();
-    ProjectImpl after = currentSession().get(ProjectImpl.class, PROJECT_1);
+    ProjectImpl after = currentSession().find(ProjectImpl.class, PROJECT_1);
     assertNotNull(after);
     assertEquals(1, after.getAttachments().size());
 
@@ -61,8 +61,8 @@ public class AttachmentControllerST extends AbstractST {
 
   @Test
   public void testSharedUploadAndDownloadSuccess() throws Exception {
-    ProjectImpl before1 = currentSession().get(ProjectImpl.class, PROJECT_1);
-    ProjectImpl before2 = currentSession().get(ProjectImpl.class, PROJECT_2);
+    ProjectImpl before1 = currentSession().find(ProjectImpl.class, PROJECT_1);
+    ProjectImpl before2 = currentSession().find(ProjectImpl.class, PROJECT_2);
     assertNotNull(before1);
     assertNotNull(before2);
     assertTrue(before1.getAttachments().isEmpty());
@@ -79,8 +79,8 @@ public class AttachmentControllerST extends AbstractST {
       .andExpect(status().isNoContent());
 
     currentSession().clear();
-    ProjectImpl after1 = currentSession().get(ProjectImpl.class, PROJECT_1);
-    ProjectImpl after2 = currentSession().get(ProjectImpl.class, PROJECT_2);
+    ProjectImpl after1 = currentSession().find(ProjectImpl.class, PROJECT_1);
+    ProjectImpl after2 = currentSession().find(ProjectImpl.class, PROJECT_2);
     assertNotNull(after1);
     assertNotNull(after2);
     assertEquals(1, after1.getAttachments().size());

@@ -7,7 +7,7 @@
                            http://www.springframework.org/schema/tx/spring-tx-3.2.xsd"
   default-autowire="byName">
 
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+  <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer" />
 
   <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <property name="url" value="${miso.it.mysql.url}" />
@@ -28,6 +28,7 @@
     <property name="jpaProperties">
       <props>
         <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+        <prop key="hibernate.max_fetch_depth">2</prop>
       </props>
     </property>
   </bean>

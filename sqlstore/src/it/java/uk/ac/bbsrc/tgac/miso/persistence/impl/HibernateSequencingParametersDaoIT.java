@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -19,7 +19,7 @@ public class HibernateSequencingParametersDaoIT extends AbstractDAOTest {
 
   private HibernateSequencingParametersDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateSequencingParametersDao();
     sut.setEntityManager(getEntityManager());
@@ -36,7 +36,7 @@ public class HibernateSequencingParametersDaoIT extends AbstractDAOTest {
   @Test
   public void testGetByNameAndInstrumentModel() throws Exception {
     String name = "HiSeq Params 1";
-    InstrumentModel model = (InstrumentModel) currentSession().get(InstrumentModel.class, 16L);
+    InstrumentModel model = (InstrumentModel) currentSession().find(InstrumentModel.class, 16L);
     SequencingParameters params = sut.getByNameAndInstrumentModel(name, model);
     assertNotNull(params);
     assertEquals(name, params.getName());
@@ -52,7 +52,7 @@ public class HibernateSequencingParametersDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListByInstrumentModel() throws Exception {
-    InstrumentModel model = (InstrumentModel) currentSession().get(InstrumentModel.class, 16L);
+    InstrumentModel model = (InstrumentModel) currentSession().find(InstrumentModel.class, 16L);
     List<SequencingParameters> list = sut.listByInstrumentModel(model);
     assertNotNull(list);
     assertEquals(2, list.size());
@@ -74,15 +74,15 @@ public class HibernateSequencingParametersDaoIT extends AbstractDAOTest {
     params.setName("New Params");
     params.setReadLength(50);
     params.setReadLength2(50);
-    InstrumentModel model = (InstrumentModel) currentSession().get(InstrumentModel.class, 16L);
+    InstrumentModel model = (InstrumentModel) currentSession().find(InstrumentModel.class, 16L);
     params.setInstrumentModel(model);
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     params.setChangeDetails(user);
     long savedId = sut.create(params);
 
     clearSession();
 
-    SequencingParameters saved = (SequencingParameters) currentSession().get(SequencingParameters.class, savedId);
+    SequencingParameters saved = (SequencingParameters) currentSession().find(SequencingParameters.class, savedId);
     assertNotNull(saved);
     assertEquals(params.getName(), saved.getName());
   }
@@ -91,7 +91,7 @@ public class HibernateSequencingParametersDaoIT extends AbstractDAOTest {
   public void testUpdate() throws Exception {
     long id = 1L;
     String name = "changed name";
-    SequencingParameters params = (SequencingParameters) currentSession().get(SequencingParameters.class, id);
+    SequencingParameters params = (SequencingParameters) currentSession().find(SequencingParameters.class, id);
     assertNotNull(params);
     assertNotEquals(name, params.getName());
     params.setName(name);
@@ -99,26 +99,26 @@ public class HibernateSequencingParametersDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    SequencingParameters saved = (SequencingParameters) currentSession().get(SequencingParameters.class, id);
+    SequencingParameters saved = (SequencingParameters) currentSession().find(SequencingParameters.class, id);
     assertNotNull(saved);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsageByRuns() throws Exception {
-    SequencingParameters params = (SequencingParameters) currentSession().get(SequencingParameters.class, 1L);
+    SequencingParameters params = (SequencingParameters) currentSession().find(SequencingParameters.class, 1L);
     assertEquals(1L, sut.getUsageByRuns(params));
   }
 
   @Test
   public void testGetUsageByPoolOrders() throws Exception {
-    SequencingParameters params = (SequencingParameters) currentSession().get(SequencingParameters.class, 2L);
+    SequencingParameters params = (SequencingParameters) currentSession().find(SequencingParameters.class, 2L);
     assertEquals(1L, sut.getUsageByPoolOrders(params));
   }
 
   @Test
   public void testGetUsageBySequencingOrders() throws Exception {
-    SequencingParameters params = (SequencingParameters) currentSession().get(SequencingParameters.class, 1L);
+    SequencingParameters params = (SequencingParameters) currentSession().find(SequencingParameters.class, 1L);
     assertEquals(2L, sut.getUsageBySequencingOrders(params));
   }
 

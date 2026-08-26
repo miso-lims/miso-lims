@@ -20,7 +20,7 @@ public class StorageLocationDto {
   public static StorageLocationDto from(@Nonnull StorageLocation from, boolean includeChildLocations,
       boolean recursive) {
     StorageLocationDto dto = new StorageLocationDto();
-    dto.setId(from.getId());
+    setLong(dto::setId, from.getId(), true);
     if (from.getParentLocation() != null) {
       dto.setParentLocationId(from.getParentLocation().getId());
     }
@@ -59,7 +59,7 @@ public class StorageLocationDto {
     return dto;
   }
 
-  private long id;
+  private Long id;
   private Long parentLocationId;
   private Long freezerId;
   private String locationUnit;
@@ -78,11 +78,11 @@ public class StorageLocationDto {
   private Long labelId;
   private boolean outOfService;
 
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -225,7 +225,7 @@ public class StorageLocationDto {
 
   public StorageLocation to() {
     StorageLocation location = new StorageLocation();
-    location.setId(getId());
+    setLong(location::setId, getId(), false);
     location.setAlias(getAlias());
     if (!LimsUtils.isStringEmptyOrNull(getIdentificationBarcode())) {
       location.setIdentificationBarcode(getIdentificationBarcode());

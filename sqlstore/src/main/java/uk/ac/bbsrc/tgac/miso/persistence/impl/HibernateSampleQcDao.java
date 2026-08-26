@@ -23,7 +23,7 @@ public class HibernateSampleQcDao extends HibernateQcStore<SampleQC> implements 
   @Override
   public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units)
       throws IOException {
-    SampleImpl sample = (SampleImpl) currentSession().get(SampleImpl.class, id);
+    SampleImpl sample = (SampleImpl) currentSession().find(SampleImpl.class, id);
     sample.updateFromQc(correspondingField, value, units);
     currentSession().merge(sample);
   }

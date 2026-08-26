@@ -1,10 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.MetricSubcategory;
@@ -50,7 +50,7 @@ public class HibernateMetricSubcategoryDaoIT
 
   @Test
   public void testGetUsage() throws Exception {
-    MetricSubcategory item = (MetricSubcategory) currentSession().get(MetricSubcategory.class, 3L);
+    MetricSubcategory item = (MetricSubcategory) currentSession().find(MetricSubcategory.class, 3L);
     assertEquals(1L, getTestSubject().getUsage(item));
   }
 

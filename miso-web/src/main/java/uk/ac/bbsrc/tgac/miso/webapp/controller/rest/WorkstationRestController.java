@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -49,13 +48,13 @@ public class WorkstationRestController extends AbstractRestController {
   @PostMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkCreateAsync(@RequestBody List<WorkstationDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkCreate("Workstation", dtos, Dtos::to, workstationService, true);
+    return asyncOperationManager.startAsyncBulkCreate("Workstation", dtos, Dtos::to, workstationService, false);
   }
 
   @PutMapping("/bulk")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkUpdateAsync(@RequestBody List<WorkstationDto> dtos) throws IOException {
-    return asyncOperationManager.startAsyncBulkUpdate("Workstation", dtos, Dtos::to, workstationService, true);
+    return asyncOperationManager.startAsyncBulkUpdate("Workstation", dtos, Dtos::to, workstationService, false);
   }
 
   @GetMapping("/bulk/{uuid}")

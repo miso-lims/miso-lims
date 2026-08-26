@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNode;
@@ -15,7 +15,7 @@ public class HibernateQcNodeDaoIT extends AbstractDAOTest {
 
   private HibernateQcNodeDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateQcNodeDao();
     sut.setEntityManager(getEntityManager());

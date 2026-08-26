@@ -4,8 +4,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.web.servlet.tags.RequestContextAwareTag;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.Attachable;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
@@ -22,7 +21,7 @@ public class AttachmentsTag extends RequestContextAwareTag {
   @Override
   protected int doStartTagInternal() throws Exception {
     Attachable attachable = (Attachable) this.item;
-    ObjectMapper mapper = TagUtils.getObjectMapper(pageContext);
+    JsonMapper mapper = TagUtils.getJsonMapper(pageContext);
 
     String projectConfig = projectId == null ? "" : (", projectId: " + projectId);
     String collapseConfig = collapseId == null ? "" : (", collapseId: '" + collapseId + "'");

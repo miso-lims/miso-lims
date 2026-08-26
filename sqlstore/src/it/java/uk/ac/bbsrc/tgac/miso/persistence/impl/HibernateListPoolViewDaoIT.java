@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.Matchers.contains;
 
 import java.io.IOException;
@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.mockito.InjectMocks;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
@@ -30,22 +30,23 @@ public class HibernateListPoolViewDaoIT extends AbstractDAOTest {
     @InjectMocks
     private HibernateListPoolViewDao sut;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         sut = new HibernateListPoolViewDao();
         sut.setEntityManager(entityManager);
     }
 
     public void assertWorksetHasPools(long worksetId, long... expectedPoolIds) {
-        Workset workset = (Workset) currentSession().get(Workset.class, worksetId);
+        Workset workset = (Workset) currentSession().find(Workset.class, worksetId);
 
         List<Long> actualPoolIds = new ArrayList<>();
         for(WorksetPool wp: workset.getWorksetPools()){
             actualPoolIds.add(wp.getItem().getId());
         }
-        assertEquals("Expected pool count for worksetId " + worksetId + " =  " + expectedPoolIds.length+ "and actual pool count is " + actualPoolIds.size() , expectedPoolIds.length, actualPoolIds.size());
+        assertEquals(expectedPoolIds.length, actualPoolIds.size(),
+            "Expected pool count for worksetId " + worksetId + " =  " + expectedPoolIds.length+ "and actual pool count is " + actualPoolIds.size());
         for(Long expectedId: expectedPoolIds){
-            assertTrue("Expected poolID "+ expectedId + " for worksetID " + worksetId + " but it was not in " + actualPoolIds, actualPoolIds.contains(expectedId));
+            assertTrue(actualPoolIds.contains(expectedId), "Expected poolID "+ expectedId + " for worksetID " + worksetId + " but it was not in " + actualPoolIds);
         }
     }
 

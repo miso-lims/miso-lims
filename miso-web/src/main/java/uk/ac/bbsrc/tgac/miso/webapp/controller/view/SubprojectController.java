@@ -1,7 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -10,6 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
@@ -18,9 +22,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SubprojectDto;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
-
-import java.io.IOException;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/subproject")
@@ -63,7 +64,7 @@ public class SubprojectController extends AbstractTypeDataController<Subproject,
   }
 
   @Override
-  protected void addBaseConfig(ObjectNode config, ObjectMapper mapper) throws IOException {
+  protected void addBaseConfig(ObjectNode config, JsonMapper mapper) throws IOException {
     MisoWebUtils.addJsonArray(mapper, config, "projects", projectService.list(), Dtos::asDto);
   }
 

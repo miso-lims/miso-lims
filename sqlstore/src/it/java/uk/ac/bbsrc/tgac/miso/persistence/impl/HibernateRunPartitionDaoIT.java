@@ -1,18 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.Session;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -33,15 +29,12 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 
 public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
-
   private HibernateRunPartitionDao dao;
 
   @PersistenceContext
   EntityManager entityManager;
 
-  @Before
+  @BeforeEach
   public void setup() throws IOException, MisoNamingException {
     dao = new HibernateRunPartitionDao();
     dao.setEntityManager(entityManager);
@@ -51,10 +44,10 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
   public void testCreate() throws Exception {
     long runId = 2L;
     long partitionId = 2L;
-    PartitionQCType type = (PartitionQCType) currentSession().get(PartitionQCType.class, 1L);
-    RunPurpose purpose = (RunPurpose) currentSession().get(RunPurpose.class, 1L);
+    PartitionQCType type = (PartitionQCType) currentSession().find(PartitionQCType.class, 1L);
+    RunPurpose purpose = (RunPurpose) currentSession().find(RunPurpose.class, 1L);
     RunPartition qc = new RunPartition();
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     qc.setRunId(runId);
     qc.setPartitionId(partitionId);
     qc.setQcType(type);
@@ -70,9 +63,9 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGet() throws Exception {
-    Run run = (Run) entityManager.unwrap(Session.class).get(Run.class, 1L);
+    Run run = (Run) currentSession().find(Run.class, 1L);
     assertNotNull(run);
-    Partition partition = (Partition) currentSession().get(PartitionImpl.class, 1L);
+    Partition partition = (Partition) currentSession().find(PartitionImpl.class, 1L);
     assertNotNull(partition);
     RunPartition qc = dao.get(run.getId(), partition.getId());
     assertNotNull(qc);
@@ -82,8 +75,8 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
 
   @Test
   public void testUpdate() throws Exception {
-    Run run = (Run) entityManager.unwrap(Session.class).get(Run.class, 1L);
-    Partition partition = (Partition) currentSession().get(PartitionImpl.class, 1L);
+    Run run = (Run) currentSession().find(Run.class, 1L);
+    Partition partition = (Partition) currentSession().find(PartitionImpl.class, 1L);
     RunPartition qc = dao.get(run.getId(), partition.getId());
     assertNotNull(qc);
     qc.setNotes("change is inevitable");
@@ -97,7 +90,7 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
 
   @Test
   public void testDeleteForRun() throws Exception {
-    Run run = (Run) currentSession().get(Run.class, 1L);
+    Run run = (Run) currentSession().find(Run.class, 1L);
     List<RunPartition> before = getByRunId(run.getId());
     assertEquals(8, before.size());
     dao.deleteForRun(run);
@@ -117,9 +110,9 @@ public class HibernateRunPartitionDaoIT extends AbstractDAOTest {
 
   @Test
   public void testDeleteForRunContainer() throws Exception {
-    Run run = (Run) currentSession().get(Run.class, 2L);
+    Run run = (Run) currentSession().find(Run.class, 2L);
     SequencerPartitionContainer container =
-        (SequencerPartitionContainer) currentSession().get(SequencerPartitionContainerImpl.class, 2L);
+        (SequencerPartitionContainer) currentSession().find(SequencerPartitionContainerImpl.class, 2L);
     List<RunPartition> before = getByRunAndContainer(run, container);
     assertEquals(8, before.size());
     dao.deleteForRunContainer(run, container);

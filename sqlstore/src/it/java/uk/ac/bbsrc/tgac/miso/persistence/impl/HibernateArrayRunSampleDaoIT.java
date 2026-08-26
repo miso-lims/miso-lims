@@ -1,17 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
@@ -29,7 +29,7 @@ public class HibernateArrayRunSampleDaoIT extends AbstractDAOTest {
 
   private HibernateArrayRunSampleDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateArrayRunSampleDao();
     sut.setEntityManager(entityManager);
@@ -37,11 +37,11 @@ public class HibernateArrayRunSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSaveNew() throws Exception {
-    ArrayRun run = currentSession().get(ArrayRun.class, 1L);
-    Array array = currentSession().get(Array.class, 1L);
-    SampleImpl sample = currentSession().get(SampleImpl.class, 19L);
-    RunItemQcStatus status = currentSession().get(RunItemQcStatus.class, 3L);
-    UserImpl user = currentSession().get(UserImpl.class, 1L);
+    ArrayRun run = currentSession().find(ArrayRun.class, 1L);
+    Array array = currentSession().find(Array.class, 1L);
+    SampleImpl sample = currentSession().find(SampleImpl.class, 19L);
+    RunItemQcStatus status = currentSession().find(RunItemQcStatus.class, 3L);
+    UserImpl user = currentSession().find(UserImpl.class, 1L);
     ArrayRunSample row = new ArrayRunSample(run, array, "R01C01", sample);
     row.setQcStatus(status);
     row.setQcNote("new qc");
@@ -51,7 +51,7 @@ public class HibernateArrayRunSampleDaoIT extends AbstractDAOTest {
     sut.save(row);
     clearSession();
 
-    ArrayRunSample saved = currentSession().get(ArrayRunSample.class, new ArrayRunSampleId(run, array, "R01C01", sample));
+    ArrayRunSample saved = currentSession().find(ArrayRunSample.class, new ArrayRunSampleId(run, array, "R01C01", sample));
     assertNotNull(saved);
     assertEquals(3L, saved.getQcStatus().getId());
     assertEquals("new qc", saved.getQcNote());
@@ -61,12 +61,12 @@ public class HibernateArrayRunSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSaveExisting() throws Exception {
-    ArrayRun run = currentSession().get(ArrayRun.class, 2L);
-    Array array = currentSession().get(Array.class, 2L);
-    SampleImpl sample = currentSession().get(SampleImpl.class, 26L);
-    RunItemQcStatus status = currentSession().get(RunItemQcStatus.class, 2L);
-    UserImpl user = currentSession().get(UserImpl.class, 1L);
-    ArrayRunSample row = currentSession().get(ArrayRunSample.class, new ArrayRunSampleId(run, array, "R02C01", sample));
+    ArrayRun run = currentSession().find(ArrayRun.class, 2L);
+    Array array = currentSession().find(Array.class, 2L);
+    SampleImpl sample = currentSession().find(SampleImpl.class, 26L);
+    RunItemQcStatus status = currentSession().find(RunItemQcStatus.class, 2L);
+    UserImpl user = currentSession().find(UserImpl.class, 1L);
+    ArrayRunSample row = currentSession().find(ArrayRunSample.class, new ArrayRunSampleId(run, array, "R02C01", sample));
     assertNotNull(row);
 
     row.setQcStatus(status);
@@ -77,7 +77,7 @@ public class HibernateArrayRunSampleDaoIT extends AbstractDAOTest {
     sut.save(row);
     clearSession();
 
-    ArrayRunSample saved = currentSession().get(ArrayRunSample.class, new ArrayRunSampleId(run, array, "R02C01", sample));
+    ArrayRunSample saved = currentSession().find(ArrayRunSample.class, new ArrayRunSampleId(run, array, "R02C01", sample));
     assertNotNull(saved);
     assertEquals(2L, saved.getQcStatus().getId());
     assertEquals("updated qc", saved.getQcNote());
@@ -87,9 +87,9 @@ public class HibernateArrayRunSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGet() throws Exception {
-    ArrayRun run = currentSession().get(ArrayRun.class, 2L);
-    Array array = currentSession().get(Array.class, 2L);
-    SampleImpl sample = currentSession().get(SampleImpl.class, 26L);
+    ArrayRun run = currentSession().find(ArrayRun.class, 2L);
+    Array array = currentSession().find(Array.class, 2L);
+    SampleImpl sample = currentSession().find(SampleImpl.class, 26L);
 
     ArrayRunSample result = sut.get(run, array, "R02C01", sample);
 
@@ -101,9 +101,9 @@ public class HibernateArrayRunSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetNone() throws Exception {
-    ArrayRun run = currentSession().get(ArrayRun.class, 1L);
-    Array array = currentSession().get(Array.class, 1L);
-    SampleImpl wrongSample = currentSession().get(SampleImpl.class, 26L);
+    ArrayRun run = currentSession().find(ArrayRun.class, 1L);
+    Array array = currentSession().find(Array.class, 1L);
+    SampleImpl wrongSample = currentSession().find(SampleImpl.class, 26L);
 
     ArrayRunSample result = sut.get(run, array, "R01C01", wrongSample);
 
@@ -127,21 +127,21 @@ public class HibernateArrayRunSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testDelete() throws Exception {
-    ArrayRun run = currentSession().get(ArrayRun.class, 2L);
-    Array array = currentSession().get(Array.class, 2L);
-    SampleImpl removedSample = currentSession().get(SampleImpl.class, 27L);
-    SampleImpl keptSample = currentSession().get(SampleImpl.class, 26L);
+    ArrayRun run = currentSession().find(ArrayRun.class, 2L);
+    Array array = currentSession().find(Array.class, 2L);
+    SampleImpl removedSample = currentSession().find(SampleImpl.class, 27L);
+    SampleImpl keptSample = currentSession().find(SampleImpl.class, 26L);
     ArrayRunSampleId removedId = new ArrayRunSampleId(run, array, "R03C01", removedSample);
     ArrayRunSampleId keptId = new ArrayRunSampleId(run, array, "R02C01", keptSample);
 
-    ArrayRunSample row = currentSession().get(ArrayRunSample.class, removedId);
+    ArrayRunSample row = currentSession().find(ArrayRunSample.class, removedId);
     assertNotNull(row);
 
     sut.delete(row);
     clearSession();
 
-    assertNull(currentSession().get(ArrayRunSample.class, removedId));
-    ArrayRunSample kept = currentSession().get(ArrayRunSample.class, keptId);
+    assertNull(currentSession().find(ArrayRunSample.class, removedId));
+    ArrayRunSample kept = currentSession().find(ArrayRunSample.class, keptId);
     assertNotNull(kept);
     assertEquals("keep qc", kept.getQcNote());
     assertEquals(1L, kept.getQcStatus().getId());

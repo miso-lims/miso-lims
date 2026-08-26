@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
@@ -45,7 +44,7 @@ public class EditProjectController {
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
   @Autowired
   private DeliverableService deliverableService;
 

@@ -1,15 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.validation;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -31,6 +31,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.TissueTypeService;
 
 public class OicrLibraryAliasValidatorTest {
 
+  private AutoCloseable mockito;
+
   @Mock
   private TissueOriginService tissueOriginService;
   @Mock
@@ -43,38 +45,43 @@ public class OicrLibraryAliasValidatorTest {
   @InjectMocks
   private OicrLibraryAliasValidator sut;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     Mockito.when(tissueOriginService.list()).thenReturn(makeTissueOrigins());
     Mockito.when(tissueTypeService.list()).thenReturn(makeTissueTypes());
     Mockito.when(libraryTypeService.list()).thenReturn(makeLibraryTypes());
     Mockito.when(libraryDesignCodeService.list()).thenReturn(makeDesignCodes());
   }
 
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
+  }
+
   @Test
   public void test_alias_01() throws Exception {
-    assertThat(sut.validate("BART_1273_Br_P_PE_300_WG").isValid(), is(true));
+    assertTrue(sut.validate("BART_1273_Br_P_PE_300_WG").isValid());
   }
 
   @Test
   public void test_alias_02() throws Exception {
-    assertThat(sut.validate("AOE_1234567_Br_P_PE_1K_WG").isValid(), is(true));
+    assertTrue(sut.validate("AOE_1234567_Br_P_PE_1K_WG").isValid());
   }
 
   @Test
   public void test_alias_03() throws Exception {
-    assertThat(sut.validate("MOUSE_123_Br_R_SE_1K_WG").isValid(), is(true));
+    assertTrue(sut.validate("MOUSE_123_Br_R_SE_1K_WG").isValid());
   }
 
   @Test
   public void test_alias_04() throws Exception {
-    assertThat(sut.validate("MOUSE_1C3_Br_R_SE_1K_WG").isValid(), is(true));
+    assertTrue(sut.validate("MOUSE_1C3_Br_R_SE_1K_WG").isValid());
   }
 
   @Test
   public void test_alias_05() throws Exception {
-    assertThat(sut.validate("MOUSE_1R45_Br_R_SE_1K_WG").isValid(), is(true));
+    assertTrue(sut.validate("MOUSE_1R45_Br_R_SE_1K_WG").isValid());
   }
 
   @Test
@@ -90,7 +97,7 @@ public class OicrLibraryAliasValidatorTest {
   }
 
   private static List<TissueOrigin> makeTissueOrigins() {
-    return makeList(new String[] { "Br", "Ly", "Pa" }, alias -> {
+    return makeList(new String[] {"Br", "Ly", "Pa"}, alias -> {
       TissueOrigin o = new TissueOriginImpl();
       o.setAlias(alias);
       return o;
@@ -98,7 +105,7 @@ public class OicrLibraryAliasValidatorTest {
   }
 
   private static List<TissueType> makeTissueTypes() {
-    return makeList(new String[] { "P", "R" }, alias -> {
+    return makeList(new String[] {"P", "R"}, alias -> {
       TissueType tt = new TissueTypeImpl();
       tt.setAlias(alias);
       return tt;
@@ -106,12 +113,13 @@ public class OicrLibraryAliasValidatorTest {
   }
 
   private static List<LibraryType> makeLibraryTypes() {
-    return Lists.newArrayList(makeLibraryType("PE", PlatformType.ILLUMINA), makeLibraryType("SE", PlatformType.ILLUMINA),
+    return Lists.newArrayList(makeLibraryType("PE", PlatformType.ILLUMINA),
+        makeLibraryType("SE", PlatformType.ILLUMINA),
         makeLibraryType("LIG", PlatformType.OXFORDNANOPORE), makeLibraryType("1D2", PlatformType.OXFORDNANOPORE));
   }
 
   private static List<LibraryDesignCode> makeDesignCodes() {
-    return makeList(new String[] { "MR", "WG" }, alias -> {
+    return makeList(new String[] {"MR", "WG"}, alias -> {
       LibraryDesignCode ldc = new LibraryDesignCode();
       ldc.setCode(alias);
       return ldc;
@@ -120,7 +128,7 @@ public class OicrLibraryAliasValidatorTest {
 
   private static <T> List<T> makeList(String[] aliases, Function<String, T> constructor) {
     return Arrays.stream(aliases)
-        .map(alias -> constructor.apply(alias))
+        .map(constructor)
         .collect(Collectors.toList());
   }
 

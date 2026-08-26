@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -10,8 +10,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -57,7 +57,7 @@ public abstract class AbstractHibernateQcDaoTest<T extends QC, U extends Hiberna
     this.qcControlId = qcControlId;
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     dao = constructTestSubject();
     dao.setEntityManager(getEntityManager());
@@ -93,10 +93,10 @@ public abstract class AbstractHibernateQcDaoTest<T extends QC, U extends Hiberna
 
   @Test
   public void testCreate() throws IOException {
-    V entity = entityClass.cast(currentSession().get(entityClass, entityWithOneQcId));
+    V entity = entityClass.cast(currentSession().find(entityClass, entityWithOneQcId));
     T qc = makeQc(entity);
-    User user = (User) currentSession().get(UserImpl.class, 1L);
-    QcType qcType = (QcType) currentSession().get(QcType.class, qcTypeId);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
+    QcType qcType = (QcType) currentSession().find(QcType.class, qcTypeId);
     qc.setType(qcType);
     qc.setResults(new BigDecimal("987"));
     qc.setCreator(user);
@@ -106,7 +106,7 @@ public abstract class AbstractHibernateQcDaoTest<T extends QC, U extends Hiberna
 
     clearSession();
 
-    T saved = qcClass.cast(currentSession().get(qcClass, id));
+    T saved = qcClass.cast(currentSession().find(qcClass, id));
     assertNotNull(saved);
     assertEquals(entity.getQcTarget(), saved.getEntity().getQcTarget());
     assertEquals(entity.getId(), saved.getEntity().getId());
@@ -119,7 +119,7 @@ public abstract class AbstractHibernateQcDaoTest<T extends QC, U extends Hiberna
   @Test
   public void testUpdate() throws Exception {
     BigDecimal newValue = new BigDecimal(12345);
-    T before = qcClass.cast(currentSession().get(qcClass, qcWithControlId));
+    T before = qcClass.cast(currentSession().find(qcClass, qcWithControlId));
     assertNotEquals(0, newValue.compareTo(before.getResults()));
 
     before.setResults(newValue);
@@ -127,26 +127,26 @@ public abstract class AbstractHibernateQcDaoTest<T extends QC, U extends Hiberna
 
     clearSession();
 
-    T after = qcClass.cast(currentSession().get(qcClass, qcWithControlId));
+    T after = qcClass.cast(currentSession().find(qcClass, qcWithControlId));
     assertEquals(0, newValue.compareTo(after.getResults()));
   }
 
   @Test
   public void testDeleteControlRun() throws Exception {
-    QcControlRun control = (QcControlRun) currentSession().get(controlRunClass, qcControlId);
+    QcControlRun control = (QcControlRun) currentSession().find(controlRunClass, qcControlId);
     assertNotNull(control);
     dao.deleteControlRun(control);
 
     clearSession();
 
-    assertNull(currentSession().get(controlRunClass, qcControlId));
+    assertNull(currentSession().find(controlRunClass, qcControlId));
   }
 
   @Test
   public void testCreateControlRun() throws Exception {
-    T qc = qcClass.cast(currentSession().get(qcClass, qcWithControlId));
+    T qc = qcClass.cast(currentSession().find(qcClass, qcWithControlId));
     QcControlRun controlRun = makeControlRun(qc);
-    QcControl control = (QcControl) currentSession().get(QcControl.class, controlTypeId);
+    QcControl control = (QcControl) currentSession().find(QcControl.class, controlTypeId);
     controlRun.setControl(control);
     String lot = "TESTLOT";
     controlRun.setLot(lot);
@@ -155,7 +155,7 @@ public abstract class AbstractHibernateQcDaoTest<T extends QC, U extends Hiberna
 
     clearSession();
 
-    QcControlRun saved = (QcControlRun) currentSession().get(controlRunClass, savedId);
+    QcControlRun saved = (QcControlRun) currentSession().find(controlRunClass, savedId);
     assertNotNull(saved);
     assertEquals(lot, saved.getLot());
   }
@@ -164,20 +164,20 @@ public abstract class AbstractHibernateQcDaoTest<T extends QC, U extends Hiberna
 
   @Test
   public void testUpdateControlRun() throws Exception {
-    QcControlRun before = (QcControlRun) currentSession().get(controlRunClass, qcControlId);
+    QcControlRun before = (QcControlRun) currentSession().find(controlRunClass, qcControlId);
     boolean originalValue = before.isQcPassed();
     before.setQcPassed(!originalValue);
     dao.updateControlRun(before);
 
     clearSession();
 
-    QcControlRun after = (QcControlRun) currentSession().get(controlRunClass, qcControlId);
+    QcControlRun after = (QcControlRun) currentSession().find(controlRunClass, qcControlId);
     assertNotEquals(originalValue, after.isQcPassed());
   }
 
   @Test
   public void testUpdateEntity() throws Exception {
-    V before = entityClass.cast(currentSession().get(entityClass, entityWithOneQcId));
+    V before = entityClass.cast(currentSession().find(entityClass, entityWithOneQcId));
     BigDecimal newConcentration = new BigDecimal("23.45");
     BigDecimal beforeConcentration = getConcentration(before);
     if (beforeConcentration != null) {
@@ -187,7 +187,7 @@ public abstract class AbstractHibernateQcDaoTest<T extends QC, U extends Hiberna
 
     clearSession();
 
-    V after = entityClass.cast(currentSession().get(entityClass, entityWithOneQcId));
+    V after = entityClass.cast(currentSession().find(entityClass, entityWithOneQcId));
     assertEquals(0, newConcentration.compareTo(getConcentration(after)));
   }
 

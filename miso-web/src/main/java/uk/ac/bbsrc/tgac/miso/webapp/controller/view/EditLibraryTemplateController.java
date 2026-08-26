@@ -12,13 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
@@ -30,7 +32,11 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryTemplateIndexDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.ClientErrorException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
-import uk.ac.bbsrc.tgac.miso.webapp.util.*;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkCreateTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkEditTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.BulkTableBackend;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
+import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
 
 @Controller
 @RequestMapping("/librarytemplate")
@@ -41,7 +47,7 @@ public class EditLibraryTemplateController {
   @Autowired
   private ProjectService projectService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSample;
@@ -52,19 +58,19 @@ public class EditLibraryTemplateController {
 
   private final class BulkCreateLibraryTemplateBackend extends BulkCreateTableBackend<LibraryTemplateDto> {
 
-    public BulkCreateLibraryTemplateBackend(LibraryTemplateDto dto, Integer quantity, ObjectMapper mapper) {
+    public BulkCreateLibraryTemplateBackend(LibraryTemplateDto dto, Integer quantity, JsonMapper mapper) {
       super("librarytemplate", LibraryTemplateDto.class, "Library Templates", dto, quantity, mapper);
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       // No config required
     }
   }
 
   private final class BulkEditLibraryTemplateBackend extends BulkEditTableBackend<LibraryTemplate, LibraryTemplateDto> {
 
-    public BulkEditLibraryTemplateBackend(ObjectMapper mapper) {
+    public BulkEditLibraryTemplateBackend(JsonMapper mapper) {
       super("librarytemplate", LibraryTemplateDto.class, "Library Templates", mapper);
     }
 
@@ -79,7 +85,7 @@ public class EditLibraryTemplateController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) {
       // No config required
     }
   };
@@ -129,7 +135,7 @@ public class EditLibraryTemplateController {
     return libraryTemplatePage(template, model);
   }
 
-  private ModelAndView libraryTemplatePage(LibraryTemplate template, ModelMap model) throws JsonProcessingException {
+  private ModelAndView libraryTemplatePage(LibraryTemplate template, ModelMap model) {
     LibraryTemplateDto dto = Dtos.asDto(template);
     model.put("template", template);
     model.put("templateDto", mapper.writeValueAsString(dto));
@@ -142,14 +148,14 @@ public class EditLibraryTemplateController {
 
     private final LibraryTemplate libraryTemplate;
 
-    public BulkCreateTemplateIndicesBackend(LibraryTemplate libraryTemplate, Integer quantity, ObjectMapper mapper) {
+    public BulkCreateTemplateIndicesBackend(LibraryTemplate libraryTemplate, Integer quantity, JsonMapper mapper) {
       super("librarytemplate_index", LibraryTemplateIndexDto.class, "Library Template Indices",
           new LibraryTemplateIndexDto(), quantity, mapper);
       this.libraryTemplate = libraryTemplate;
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       config.set("libraryTemplate", mapper.valueToTree(Dtos.asDto(libraryTemplate)));
       config.set("indexFamily", mapper.valueToTree(Dtos.asDto(libraryTemplate.getIndexFamily())));
     }
@@ -167,13 +173,13 @@ public class EditLibraryTemplateController {
 
     private final LibraryTemplate libraryTemplate;
 
-    public BulkEditTemplateIndicesBackend(LibraryTemplate libraryTemplate, ObjectMapper mapper) {
+    public BulkEditTemplateIndicesBackend(LibraryTemplate libraryTemplate, JsonMapper mapper) {
       super("librarytemplate_index", LibraryTemplateIndexDto.class, mapper);
       this.libraryTemplate = libraryTemplate;
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       config.set("libraryTemplate", mapper.valueToTree(Dtos.asDto(libraryTemplate)));
       config.set("indexFamily", mapper.valueToTree(Dtos.asDto(libraryTemplate.getIndexFamily())));
     }

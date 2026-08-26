@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
 import com.jayway.jsonpath.JsonPath;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProbeSet;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProbeSetProbe;
 import uk.ac.bbsrc.tgac.miso.dto.ProbeDto;
@@ -36,7 +36,7 @@ public class ProbeSetRestControllerST extends AbstractST {
 
   @Test
   public void testUpdate() throws Exception {
-    ProbeSetDto dto = ProbeSetDto.from(currentSession().get(ProbeSet.class, 1L));
+    ProbeSetDto dto = ProbeSetDto.from(currentSession().find(ProbeSet.class, 1L));
     dto.setName("Updated set name");
     List<ProbeDto> probeDtos = new ArrayList<>(dto.getProbes());
     probeDtos.removeIf(probe -> Objects.equals("sp2", probe.getIdentifier()));
@@ -55,7 +55,7 @@ public class ProbeSetRestControllerST extends AbstractST {
 
   @Test
   public void testUpdateProbes() throws Exception {
-    ProbeSetDto dto = ProbeSetDto.from(currentSession().get(ProbeSet.class, 1L));
+    ProbeSetDto dto = ProbeSetDto.from(currentSession().find(ProbeSet.class, 1L));
     List<ProbeDto> probeDtos = new ArrayList<>(dto.getProbes());
     probeDtos.remove(0);
     ProbeDto updateProbe = probeDtos.get(0);
@@ -74,7 +74,7 @@ public class ProbeSetRestControllerST extends AbstractST {
     String response = pollingResponserHelper("put", probeDtos, submitUrl, pollUrl, 202);
     assertEquals("completed", JsonPath.read(response, "$.status"));
 
-    ProbeSet updatedSet = currentSession().get(ProbeSet.class, 1L);
+    ProbeSet updatedSet = currentSession().find(ProbeSet.class, 1L);
     Set<ProbeSetProbe> updatedProbes = updatedSet.getProbes();
     assertEquals(2, updatedProbes.size());
     assertTrue(updatedProbes.stream().anyMatch(probe -> Objects.equals("Updated", probe.getName())));

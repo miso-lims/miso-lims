@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.web.servlet.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.dto.GroupDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -36,14 +36,14 @@ public class GroupRestControllerST extends AbstractST {
     List<Long> ids = new ArrayList<Long>();
     ids.add(1L);
     ids.add(4L);
-    int initial = currentSession().get(entityClass, 2).getUsers().size();
+    int initial = currentSession().find(entityClass, 2).getUsers().size();
 
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/2/users").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
-    Group expanded = currentSession().get(entityClass, 2);
+    Group expanded = currentSession().find(entityClass, 2);
     assertEquals(3, expanded.getUsers().size());
     assertEquals(ids.size(), expanded.getUsers().size() - initial);
   }
@@ -67,14 +67,14 @@ public class GroupRestControllerST extends AbstractST {
     List<Long> ids = new ArrayList<Long>();
     ids.add(3L);
     ids.add(1L);
-    Group shrunk = currentSession().get(entityClass, 1);
+    Group shrunk = currentSession().find(entityClass, 1);
     assertEquals(2, shrunk.getUsers().size());
     getMockMvc()
         .perform(
             post(CONTROLLER_BASE + "/1/users/remove").content(makeJson(ids)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
-    shrunk = currentSession().get(entityClass, 1);
+    shrunk = currentSession().find(entityClass, 1);
     assertEquals(0, shrunk.getUsers().size());
   }
 
@@ -120,7 +120,7 @@ public class GroupRestControllerST extends AbstractST {
     // must be admin to change an Group
 
 
-    GroupDto group = Dtos.asDto(currentSession().get(entityClass, 1));
+    GroupDto group = Dtos.asDto(currentSession().find(entityClass, 1));
 
     group.setName("modified");
     Group updatedGroup = baseTestUpdate(CONTROLLER_BASE, group, 1, entityClass);
@@ -129,7 +129,7 @@ public class GroupRestControllerST extends AbstractST {
 
   @Test
   public void testUpdateFail() throws Exception {
-    GroupDto group = Dtos.asDto(currentSession().get(entityClass, 1));
+    GroupDto group = Dtos.asDto(currentSession().find(entityClass, 1));
 
     group.setName("modified");
     testUpdateUnauthorized(CONTROLLER_BASE, group, 1, entityClass);

@@ -1,28 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import junit.framework.AssertionFailedError;
 
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName;
 
 class WorkflowTestUtils {
-  static <T extends Throwable> void assertThrows(Class<T> expectedType, Runnable runnable) {
-    try {
-      runnable.run();
-      throw new AssertionFailedError(String.format("Expected exception %s was not thrown", expectedType.toString()));
-    } catch (Throwable actualException) {
-      if (!expectedType.isInstance(actualException)) {
-        throw new AssertionFailedError(String.format("Expected exception %s was not thrown", expectedType.toString()));
-      }
-    }
-  }
 
   /**
    * Match Progress objects based on workflowName, stepNumber, and input fields

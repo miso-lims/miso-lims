@@ -1,10 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
@@ -29,7 +29,7 @@ public class HibernateDeliverableDaoIT extends AbstractHibernateSaveDaoTest<Deli
     Deliverable deliverable = new Deliverable();
     deliverable.setName("New Deliverable");
 
-    DeliverableCategory category = (DeliverableCategory) currentSession().get(DeliverableCategory.class, 1L);
+    DeliverableCategory category = (DeliverableCategory) currentSession().find(DeliverableCategory.class, 1L);
     deliverable.setCategory(category);
 
     return deliverable;
@@ -51,7 +51,7 @@ public class HibernateDeliverableDaoIT extends AbstractHibernateSaveDaoTest<Deli
 
   @Test
   public void testGetUsage() throws Exception {
-    Deliverable deliverable = (Deliverable) currentSession().get(Deliverable.class, 1L);
+    Deliverable deliverable = (Deliverable) currentSession().find(Deliverable.class, 1L);
     assertEquals(1L, getTestSubject().getUsage(deliverable));
   }
 

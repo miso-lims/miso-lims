@@ -1,15 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -23,7 +21,7 @@ public class HibernateAttachmentCategoryDaoIT extends AbstractDAOTest {
 
   private HibernateAttachmentCategoryDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateAttachmentCategoryDao();
     sut.setEntityManager(entityManager);
@@ -73,34 +71,32 @@ public class HibernateAttachmentCategoryDaoIT extends AbstractDAOTest {
     sut.create(cat);
     assertTrue(cat.isSaved());
 
-    entityManager.unwrap(Session.class).flush();
-    entityManager.unwrap(Session.class).clear();
+    clearSession();
 
     AttachmentCategory saved =
-        (AttachmentCategory) entityManager.unwrap(Session.class).get(AttachmentCategory.class, cat.getId());
+        (AttachmentCategory) currentSession().find(AttachmentCategory.class, cat.getId());
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testUpdate() throws IOException {
     String alias = "changed";
-    AttachmentCategory cat = (AttachmentCategory) entityManager.unwrap(Session.class).get(AttachmentCategory.class, 1L);
+    AttachmentCategory cat = (AttachmentCategory) currentSession().find(AttachmentCategory.class, 1L);
     assertNotEquals(alias, cat.getAlias());
     cat.setAlias(alias);
     assertTrue(cat.isSaved());
     sut.update(cat);
 
-    entityManager.unwrap(Session.class).flush();
-    entityManager.unwrap(Session.class).clear();
+    clearSession();
 
     AttachmentCategory saved =
-        (AttachmentCategory) entityManager.unwrap(Session.class).get(AttachmentCategory.class, cat.getId());
+        (AttachmentCategory) currentSession().find(AttachmentCategory.class, cat.getId());
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() {
-    AttachmentCategory cat = (AttachmentCategory) entityManager.unwrap(Session.class).get(AttachmentCategory.class, 1L);
+    AttachmentCategory cat = (AttachmentCategory) currentSession().find(AttachmentCategory.class, 1L);
     assertNotNull(cat);
     long usage = sut.getUsage(cat);
     assertEquals(3L, usage);

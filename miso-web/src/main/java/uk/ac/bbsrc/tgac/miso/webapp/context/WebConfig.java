@@ -9,13 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.bind.support.SessionAttributeStore;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import com.fasterxml.jackson.core.json.JsonWriteFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.core.json.JsonWriteFeature;
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 import uk.ac.bbsrc.tgac.miso.core.manager.ProgressStepFactory;
@@ -23,7 +24,16 @@ import uk.ac.bbsrc.tgac.miso.core.service.BarcodableService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore;
 
 @Configuration
-public class WebConfig extends WebMvcConfigurationSupport {
+@EnableWebMvc
+public class WebConfig implements WebMvcConfigurer {
+
+  @Override
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    registry.addResourceHandler("/scripts/**").addResourceLocations("/scripts/");
+    registry.addResourceHandler("/styles/**").addResourceLocations("/styles/");
+    registry.addResourceHandler("/favicon.ico").addResourceLocations("/");
+    registry.addResourceHandler("/index.html").addResourceLocations("/");
+  }
 
   @Bean
   public SessionAttributeStore sessionAttributeStore() {
@@ -63,13 +73,15 @@ public class WebConfig extends WebMvcConfigurationSupport {
         .collect(Collectors.toMap(ProgressStepFactory::getFactoryType, Function.identity()));
   }
 
-  @Bean(name = "objectMapper")
-  public ObjectMapper objectMapper() {
-    ObjectMapper mapper = Jackson2ObjectMapperBuilder.json()
-        .modulesToInstall(new JsonStringValidator())
+  @Bean(name = "jsonMapper")
+  public JsonMapper jsonMapper() {
+    JsonFactory factory = JsonFactory.builder()
+        .characterEscapes(new JsonCharacterEscapes())
+        .configure(JsonWriteFeature.ESCAPE_NON_ASCII, true)
         .build();
-    mapper.getFactory().setCharacterEscapes(new JsonCharacterEscapes())
-        .configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true);
-    return mapper;
+
+    return JsonMapper.builder(factory)
+        .addModule(new JsonStringValidator())
+        .build();
   }
 }

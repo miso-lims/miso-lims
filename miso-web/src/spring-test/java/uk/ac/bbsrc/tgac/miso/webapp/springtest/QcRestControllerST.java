@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
@@ -25,7 +25,7 @@ import uk.ac.bbsrc.tgac.miso.dto.QcDto;
 import static org.hamcrest.Matchers.*;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import org.springframework.test.web.servlet.MockMvc;
 
 
@@ -139,8 +139,8 @@ public class QcRestControllerST extends AbstractST {
 
     @Test
     public void testBulkSampleUpdateAsync() throws Exception {
-        QcDto dto1 = Dtos.asDto(currentSession().get(sampleEntityClass, 1));
-        QcDto dto2 = Dtos.asDto(currentSession().get(sampleEntityClass, 2));
+        QcDto dto1 = Dtos.asDto(currentSession().find(sampleEntityClass, 1));
+        QcDto dto2 = Dtos.asDto(currentSession().find(sampleEntityClass, 2));
 
         dto1.setDescription("updated one");
         dto2.setDescription("updated two");
@@ -153,7 +153,7 @@ public class QcRestControllerST extends AbstractST {
 
     @Test
     public void testBulkLibraryUpdateAsync() throws Exception {
-        QcDto dto = Dtos.asDto(currentSession().get(libraryEntityClass, 1));
+        QcDto dto = Dtos.asDto(currentSession().find(libraryEntityClass, 1));
 
         dto.setDescription("updated one library");
 
@@ -164,7 +164,7 @@ public class QcRestControllerST extends AbstractST {
 
     @Test
     public void testBulkPoolUpdateAsync() throws Exception {
-        QcDto dto = Dtos.asDto(currentSession().get(poolEntityClass, 1));
+        QcDto dto = Dtos.asDto(currentSession().find(poolEntityClass, 1));
 
         dto.setDescription("updated one pool");
 
@@ -175,7 +175,7 @@ public class QcRestControllerST extends AbstractST {
 
     @Test
     public void testBulkRequisitionUpdateAsync() throws Exception {
-        QcDto dto = Dtos.asDto(currentSession().get(requisitionEntityClass, 1));
+        QcDto dto = Dtos.asDto(currentSession().find(requisitionEntityClass, 1));
 
         dto.setDescription("updated one requisition");
 
@@ -187,55 +187,55 @@ public class QcRestControllerST extends AbstractST {
     @Test
     @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
     public void testSampleDelete() throws Exception {
-        assertNotNull(currentSession().get(sampleEntityClass, 1));
+        assertNotNull(currentSession().find(sampleEntityClass, 1));
 
         getMockMvc()
             .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Sample").content(makeJson(Arrays.asList(1L)))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
-        assertNull(currentSession().get(sampleEntityClass, 1));
+        assertNull(currentSession().find(sampleEntityClass, 1));
     }
 
     @Test
     @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
     public void testLibraryDelete() throws Exception {
-        assertNotNull(currentSession().get(libraryEntityClass, 1));
+        assertNotNull(currentSession().find(libraryEntityClass, 1));
 
         getMockMvc()
                 .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Library").content(makeJson(Arrays.asList(1L)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-        assertNull(currentSession().get(libraryEntityClass, 1));
+        assertNull(currentSession().find(libraryEntityClass, 1));
     }
 
     @Test
     @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
     public void testPoolDelete() throws Exception {
-        assertNotNull(currentSession().get(poolEntityClass, 1));
+        assertNotNull(currentSession().find(poolEntityClass, 1));
 
 
         getMockMvc()
                 .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Pool").content(makeJson(Arrays.asList(1L)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-        assertNull(currentSession().get(poolEntityClass, 1));
+        assertNull(currentSession().find(poolEntityClass, 1));
     }
 
     @Test
     @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
     public void testRequisitionDelete() throws Exception {
-        assertNotNull(currentSession().get(requisitionEntityClass, 1));
+        assertNotNull(currentSession().find(requisitionEntityClass, 1));
         getMockMvc()
                 .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Requisition").content(makeJson(Arrays.asList(1L)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-        assertNull(currentSession().get(requisitionEntityClass, 1));
+        assertNull(currentSession().find(requisitionEntityClass, 1));
     }
 
 
     @Test
     public void testSampleDeleteFail() throws Exception {
-        assertNotNull(currentSession().get(sampleEntityClass, 1));
+        assertNotNull(currentSession().find(sampleEntityClass, 1));
 
         getMockMvc()
             .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Sample").content(makeJson(Arrays.asList(1L)))
@@ -245,7 +245,7 @@ public class QcRestControllerST extends AbstractST {
 
     @Test
     public void testLibraryDeleteFail() throws Exception {
-        assertNotNull(currentSession().get(libraryEntityClass, 1));
+        assertNotNull(currentSession().find(libraryEntityClass, 1));
 
         getMockMvc()
                 .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Library").content(makeJson(Arrays.asList(1L)))
@@ -255,7 +255,7 @@ public class QcRestControllerST extends AbstractST {
 
     @Test
     public void testPoolDeleteFail() throws Exception {
-        assertNotNull(currentSession().get(poolEntityClass, 1));
+        assertNotNull(currentSession().find(poolEntityClass, 1));
 
         getMockMvc()
                 .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Pool").content(makeJson(Arrays.asList(1L)))
@@ -265,7 +265,7 @@ public class QcRestControllerST extends AbstractST {
 
     @Test
     public void testRequisitionDeleteFail() throws Exception {
-        assertNotNull(currentSession().get(requisitionEntityClass, 1));
+        assertNotNull(currentSession().find(requisitionEntityClass, 1));
 
         getMockMvc()
                 .perform(post(CONTROLLER_BASE + "/bulk-delete").param("qcTarget", "Requisition").content(makeJson(Arrays.asList(1L)))

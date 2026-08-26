@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
@@ -20,7 +20,7 @@ public class HibernateListLibraryAliquotViewDaoIT extends AbstractDAOTest {
 
   private HibernateListLibraryAliquotViewDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateListLibraryAliquotViewDao();
     sut.setEntityManager(entityManager);

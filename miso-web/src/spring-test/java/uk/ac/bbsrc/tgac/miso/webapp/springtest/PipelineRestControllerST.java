@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -48,8 +48,8 @@ public class PipelineRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
-    PipelineDto p1 = Dtos.asDto(currentSession().get(entityClass, 1));
-    PipelineDto p2 = Dtos.asDto(currentSession().get(entityClass, 2));
+    PipelineDto p1 = Dtos.asDto(currentSession().find(entityClass, 1));
+    PipelineDto p2 = Dtos.asDto(currentSession().find(entityClass, 2));
 
     p1.setAlias("p1");
     p2.setAlias("p2");
@@ -69,8 +69,8 @@ public class PipelineRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateFail() throws Exception {
-    PipelineDto p1 = Dtos.asDto(currentSession().get(entityClass, 1));
-    PipelineDto p2 = Dtos.asDto(currentSession().get(entityClass, 2));
+    PipelineDto p1 = Dtos.asDto(currentSession().find(entityClass, 1));
+    PipelineDto p2 = Dtos.asDto(currentSession().find(entityClass, 2));
 
     p1.setAlias("p1");
     p2.setAlias("p2");

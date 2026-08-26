@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
@@ -18,7 +18,7 @@ public class DefaultLibraryAliquotServiceTest {
   private final String description = "test description";
   private final boolean archived = true;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     service = new DefaultLibraryAliquotService();
     aliquot = new DetailedLibraryAliquot();

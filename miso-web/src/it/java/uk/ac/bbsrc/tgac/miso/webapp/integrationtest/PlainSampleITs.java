@@ -1,9 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -11,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Sets;
 
@@ -73,11 +72,11 @@ public class PlainSampleITs extends AbstractIT {
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals(sampleColumns.size(), headings.size());
-    sampleColumns.forEach(col -> assertTrue("Check for column: '" + col + "'", headings.contains(col)));
+    sampleColumns.forEach(col -> assertTrue(headings.contains(col), "Check for column: '" + col + "'"));
     assertEquals(2, table.getRowCount());
 
     Set<String> sampleTypes = table.getDropdownOptions(SamColumns.SAMPLE_TYPE, 0);
-    assertFalse("Sample Types dropdown did not render; is table broken?", sampleTypes.isEmpty());
+    assertFalse(sampleTypes.isEmpty(), "Sample Types dropdown did not render; is table broken?");
     assertTrue(sampleTypes.contains("GENOMIC"));
     assertTrue(sampleTypes.contains("METATRANSCRIPTOMIC"));
   }
@@ -108,9 +107,9 @@ public class PlainSampleITs extends AbstractIT {
     HandsOnTable savedTable = page.getTable();
 
     Long savedId = Long.valueOf(savedTable.getText(SamColumns.NAME, 0).substring(3));
-    Sample saved = (Sample) getSession().get(SampleImpl.class, savedId);
-    assertTrue("Sample name generation", saved.getName().contains("SAM"));
-    assertTrue("Sample barcode generation", !isStringEmptyOrNull(saved.getIdentificationBarcode()));
+    Sample saved = (Sample) getSession().find(SampleImpl.class, savedId);
+    assertTrue(saved.getName().contains("SAM"), "Sample name generation");
+    assertFalse(isStringEmptyOrNull(saved.getIdentificationBarcode()), "Sample barcode generation");
   }
 
   @Test
@@ -119,16 +118,16 @@ public class PlainSampleITs extends AbstractIT {
     // (dropdowns do not render properly when table is broken)
     login();
     BulkLibraryPage page =
-        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L), Arrays.asList(1));
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), List.of(1L), List.of(1));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals(libraryColumns.size(), headings.size());
-    libraryColumns.forEach(col -> assertTrue("Check for column: '" + col + "'", headings.contains(col)));
+    libraryColumns.forEach(col -> assertTrue(headings.contains(col), "Check for column: '" + col + "'"));
     assertEquals(1, table.getRowCount());
 
     Set<String> platforms = table.getDropdownOptions(LibColumns.PLATFORM, 0);
-    assertFalse("Platform dropdown did not render; confirm one active sequencer exists and that table is not broken",
-        platforms.isEmpty());
+    assertFalse(platforms.isEmpty(),
+        "Platform dropdown did not render; confirm one active sequencer exists and that table is not broken");
     assertTrue(platforms.contains("Illumina"));
     Set<String> spikeIns = table.getDropdownOptions(LibColumns.SPIKE_IN, 0);
     assertFalse(spikeIns.isEmpty());
@@ -148,7 +147,7 @@ public class PlainSampleITs extends AbstractIT {
     // Goal: ensure one library can be saved
     login();
     BulkLibraryPage page =
-        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L), Arrays.asList(1));
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), List.of(1L), List.of(1));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -170,9 +169,9 @@ public class PlainSampleITs extends AbstractIT {
     HandsOnTable savedTable = page.getTable();
 
     Long savedId = Long.valueOf(savedTable.getText(LibColumns.NAME, 0).substring(3));
-    Library saved = (Library) getSession().get(LibraryImpl.class, savedId);
-    assertTrue("Library name generation", saved.getName().contains("LIB"));
-    assertTrue("Library barcode generation", !isStringEmptyOrNull(saved.getIdentificationBarcode()));
+    Library saved = (Library) getSession().find(LibraryImpl.class, savedId);
+    assertTrue(saved.getName().contains("LIB"), "Library name generation");
+    assertFalse(isStringEmptyOrNull(saved.getIdentificationBarcode()), "Library barcode generation");
   }
 
   @Test
@@ -207,10 +206,10 @@ public class PlainSampleITs extends AbstractIT {
     HandsOnTable savedTable = page.getTable();
 
     Long savedId = Long.valueOf(savedTable.getText(LibColumns.NAME, 0).substring(3));
-    Library saved = (Library) getSession().get(LibraryImpl.class, savedId);
-    assertTrue("Library name generation", saved.getName().contains("LIB"));
-    assertTrue("Library barcode generation", !isStringEmptyOrNull(saved.getIdentificationBarcode()));
-    assertTrue("Library alias generation", !isStringEmptyOrNull(saved.getAlias()));
+    Library saved = (Library) getSession().find(LibraryImpl.class, savedId);
+    assertTrue(saved.getName().contains("LIB"), "Library name generation");
+    assertFalse(isStringEmptyOrNull(saved.getIdentificationBarcode()), "Library barcode generation");
+    assertFalse(isStringEmptyOrNull(saved.getAlias()), "Library alias generation");
   }
 
   @Test
@@ -219,11 +218,11 @@ public class PlainSampleITs extends AbstractIT {
     // field
     // (date field cannot be entered when table is broken)
     login();
-    BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L));
+    BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForPropagate(getDriver(), getBaseUrl(), List.of(1L));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals(libraryAliquotColumns.size(), headings.size());
-    libraryAliquotColumns.forEach(col -> assertTrue("Check for column: '" + col + "'", headings.contains(col)));
+    libraryAliquotColumns.forEach(col -> assertTrue(headings.contains(col), "Check for column: '" + col + "'"));
     assertEquals(1, table.getRowCount());
 
     String creationDate = "2017-10-11";
@@ -235,7 +234,7 @@ public class PlainSampleITs extends AbstractIT {
   public void testCreateOnePlainLibraryAliquot() {
     // Goal: ensure one library aliquot can be saved
     login();
-    BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(1L));
+    BulkLibraryAliquotPage page = BulkLibraryAliquotPage.getForPropagate(getDriver(), getBaseUrl(), List.of(1L));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -249,9 +248,9 @@ public class PlainSampleITs extends AbstractIT {
     HandsOnTable savedTable = page.getTable();
 
     Long savedId = Long.valueOf(savedTable.getText(LibraryAliquotColumns.NAME, 0).substring(3));
-    LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, savedId);
-    assertTrue("Library aliquot name generation", saved.getName().contains("LDI"));
-    assertTrue("Library aliquot barcode generation", !isStringEmptyOrNull(saved.getIdentificationBarcode()));
+    LibraryAliquot saved = (LibraryAliquot) getSession().find(LibraryAliquot.class, savedId);
+    assertTrue(saved.getName().contains("LDI"), "Library aliquot name generation");
+    assertFalse(isStringEmptyOrNull(saved.getIdentificationBarcode()), "Library aliquot barcode generation");
   }
 
   @Test
@@ -293,10 +292,7 @@ public class PlainSampleITs extends AbstractIT {
 
   @Test
   public void testNoErrorsOnAdminPages() {
-    Set<String> slugs = new HashSet<>();
-    slugs.add("admin/users");
-    slugs.add("admin/groups");
-    final Set<String> urlSlugs = Collections.unmodifiableSet(slugs);
+    final Set<String> urlSlugs = Set.of("admin/users", "admin/groups");
 
     loginAdmin();
     long errors = urlSlugs.stream()

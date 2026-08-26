@@ -3,7 +3,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.context;
 import java.io.IOException;
 
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.ApiKeyService;
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
   private static final RequestMatcher NEGATED_URI_MATCHER =
-      new NegatedRequestMatcher(new AntPathRequestMatcher("/api/**"));
+      new NegatedRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher("/api/**"));
   private static final String HEADER_NAME = "X-API-KEY";
 
   private ApiKeyService apiKeyService;

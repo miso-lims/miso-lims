@@ -1,15 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.node.JsonNodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pair;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelCanvas.FontStyle;
@@ -25,7 +22,7 @@ public interface PrintableText {
     }
 
     @Override
-    public void asJson(JsonGenerator generator) throws IOException, JsonProcessingException {
+    public void asJson(JsonGenerator generator) {
       generator.writeNull();
     }
 
@@ -47,7 +44,7 @@ public interface PrintableText {
 
   JsonNode asJson();
 
-  void asJson(JsonGenerator generator) throws IOException, JsonProcessingException;
+  void asJson(JsonGenerator generator);
 
   Pair<LabelCanvas.FontStyle, String> line(Barcodable barcodable);
 

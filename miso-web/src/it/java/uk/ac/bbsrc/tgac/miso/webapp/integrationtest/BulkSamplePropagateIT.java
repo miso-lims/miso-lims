@@ -1,13 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
@@ -20,14 +17,14 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
 
   private BulkSamplePage getPropagatePage(List<Long> parentIds, Integer quantity, String sampleCategory) {
-    return BulkSamplePage.getForPropagate(getDriver(), getBaseUrl(), parentIds, Arrays.asList(quantity),
+    return BulkSamplePage.getForPropagate(getDriver(), getBaseUrl(), parentIds, Collections.singletonList(quantity),
         sampleCategory);
   }
 
   @Test
   public void testPropagateTissueFromIdentity() {
     // goal: ensure one tissue can be propagated from one identity
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4441L), 1, SampleTissue.CATEGORY_NAME);
+    BulkSamplePage page = getPropagatePage(List.of(4441L), 1, SampleTissue.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -55,13 +52,13 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "Identity");
     attrs.put(SamColumns.SAMPLE_CLASS, "Tissue");
 
-    attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, table.getText(k, 0), "pre-save"));
     assertTrue(page.save(false));
     HandsOnTable savedTable = page.getTable();
 
     attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, savedTable.getText(k, 0), "Checking value of column '" + k + "'"));
     // verify attributes against what got saved to the database
     assertAllForTissue(attrs, getIdForRow(savedTable, 0), true);
   }
@@ -69,7 +66,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   @Test
   public void testPropagateTissuePieceFromSlide() {
     // goal: ensure one curls can be propagated from one slide
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4443L), 1, SampleTissueProcessing.CATEGORY_NAME);
+    BulkSamplePage page = getPropagatePage(List.of(4443L), 1, SampleTissueProcessing.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -92,13 +89,13 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "Slide");
     attrs.put(SamColumns.SAMPLE_CLASS, "Tissue Piece");
 
-    attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, table.getText(k, 0), "pre-save"));
     assertTrue(page.save(false));
     HandsOnTable savedTable = page.getTable();
 
     attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, savedTable.getText(k, 0), "Checking value of column '" + k + "'"));
     // verify attributes against what got saved to the database
     assertAllForTissueProcessing(attrs, getIdForRow(savedTable, 0), true);
   }
@@ -106,7 +103,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   @Test
   public void testPropagateSlideFromTissue() {
     // goal: ensure one slide can be propagated from one tissue
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, SampleTissueProcessing.CATEGORY_NAME);
+    BulkSamplePage page = getPropagatePage(List.of(4442L), 1, SampleTissueProcessing.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -130,13 +127,13 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "Tissue");
     attrs.put(SamColumns.SAMPLE_CLASS, "Slide");
 
-    attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, table.getText(k, 0), "pre-save"));
     assertTrue(page.save(false));
     HandsOnTable savedTable = page.getTable();
 
     attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, savedTable.getText(k, 0), "Checking value of column '" + k + "'"));
     // verify attributes against what got saved to the database
     assertAllForTissueProcessing(attrs, getIdForRow(savedTable, 0), true);
   }
@@ -144,7 +141,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   @Test
   public void testPropagateCdnaStockFromTissue() {
     // goal: ensure one cDNA stock can be propagated from one tissue
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, SampleStock.CATEGORY_NAME);
+    BulkSamplePage page = getPropagatePage(List.of(4442L), 1, SampleStock.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -168,13 +165,13 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "Tissue");
     attrs.put(SamColumns.SAMPLE_CLASS, "cDNA (stock)");
 
-    attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, table.getText(k, 0), "pre-save"));
     assertTrue(page.save(false));
     HandsOnTable savedTable = page.getTable();
 
     attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, savedTable.getText(k, 0), "Checking value of column '" + k + "'"));
     // verify attributes against what got saved to the database
     assertAllForStock(attrs, getIdForRow(savedTable, 0), true);
   }
@@ -182,7 +179,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   @Test
   public void testPropagateRnaStockFromTissue() {
     // goal: ensure one whole RNA stock can be propagated from one tissue
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4442L), 1, SampleStock.CATEGORY_NAME);
+    BulkSamplePage page = getPropagatePage(List.of(4442L), 1, SampleStock.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -207,13 +204,13 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "Tissue");
     attrs.put(SamColumns.SAMPLE_CLASS, "whole RNA (stock)");
 
-    attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, table.getText(k, 0), "pre-save"));
     assertTrue(page.save(false));
     HandsOnTable savedTable = page.getTable();
 
     attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, savedTable.getText(k, 0), "Checking value of column '" + k + "'"));
     // verify attributes against what got saved to the database
     assertAllForRnaStock(attrs, getIdForRow(savedTable, 0), true);
   }
@@ -221,7 +218,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   @Test
   public void testPropagateLcmTubeFromSlide() {
     // goal: ensure one LCM Tube can be propagated from one slide
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4443L), 1, SampleTissueProcessing.CATEGORY_NAME);
+    BulkSamplePage page = getPropagatePage(List.of(4443L), 1, SampleTissueProcessing.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -244,13 +241,13 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "Slide");
     attrs.put(SamColumns.SAMPLE_CLASS, "Tissue Piece");
 
-    attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, table.getText(k, 0), "pre-save"));
     assertTrue(page.save(false));
     HandsOnTable savedTable = page.getTable();
 
     attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, savedTable.getText(k, 0), "Checking value of column '" + k + "'"));
     // verify attributes against what got saved to the database
     assertAllForTissueProcessing(attrs, getIdForRow(savedTable, 0), true);
   }
@@ -258,7 +255,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   @Test
   public void testPropagateGdnaStockFromLcmTube() {
     // goal: ensure one gDNA stock can be propagated from one LCM Tube
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4444L), 1, SampleStock.CATEGORY_NAME);
+    BulkSamplePage page = getPropagatePage(List.of(4444L), 1, SampleStock.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -281,11 +278,11 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "Tissue Piece");
     attrs.put(SamColumns.SAMPLE_CLASS, "gDNA (stock)");
 
-    attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, table.getText(k, 0), "pre-save"));
     assertTrue(page.save(false));
     HandsOnTable savedTable = page.getTable();
 
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, savedTable.getText(k, 0), "Checking value of column '" + k + "'"));
     attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
     // verify attributes against what got saved to the database
@@ -295,7 +292,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   @Test
   public void testPropagateCdnaAliquotFromStock() {
     // goal: ensure one cDNA aliquot can be propagated from one cDNA stock
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4445L), 1, SampleAliquot.CATEGORY_NAME);
+    BulkSamplePage page = getPropagatePage(List.of(4445L), 1, SampleAliquot.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -315,13 +312,13 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.PARENT_ALIAS, "PROP_0001_nn_n_1-1_D_S1");
     attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "cDNA (stock)");
 
-    attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, table.getText(k, 0), "pre-save"));
     assertTrue(page.save(false));
     HandsOnTable savedTable = page.getTable();
 
     attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, savedTable.getText(k, 0), "Checking value of column '" + k + "'"));
     // verify attributes against what got saved to the database
     assertAllForAliquot(attrs, getIdForRow(savedTable, 0), true);
   }
@@ -329,7 +326,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   @Test
   public void testPropagateWholeRnaAliquotFromStock() {
     // goal: ensure one whole RNA aliquot can be propagated from one whole RNA stock
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4446L), 1, SampleAliquot.CATEGORY_NAME);
+    BulkSamplePage page = getPropagatePage(List.of(4446L), 1, SampleAliquot.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -350,13 +347,13 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "whole RNA (stock)");
     attrs.put(SamColumns.SAMPLE_CLASS, "whole RNA (aliquot)");
 
-    attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, table.getText(k, 0), "pre-save"));
     assertTrue(page.save(false));
     HandsOnTable savedTable = page.getTable();
 
     attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, savedTable.getText(k, 0), "Checking value of column '" + k + "'"));
     // verify attributes against what got saved to the database
     assertAllForRnaAliquot(attrs, getIdForRow(savedTable, 0), true);
   }
@@ -364,7 +361,7 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
   @Test
   public void testPropagateMrnaFromAliquot() {
     // goal: ensure one mRNA can be propagated from one whole RNA aliquot
-    BulkSamplePage page = getPropagatePage(Arrays.asList(4447L), 1, SampleAliquot.CATEGORY_NAME);
+    BulkSamplePage page = getPropagatePage(List.of(4447L), 1, SampleAliquot.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = new LinkedHashMap<>();
@@ -385,13 +382,13 @@ public class BulkSamplePropagateIT extends AbstractBulkSampleIT {
     attrs.put(SamColumns.PARENT_SAMPLE_CLASS, "whole RNA (aliquot)");
     attrs.put(SamColumns.SAMPLE_CLASS, "mRNA");
 
-    attrs.forEach((k, v) -> assertEquals("pre-save", v, table.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, table.getText(k, 0), "pre-save"));
     assertTrue(page.save(false));
     HandsOnTable savedTable = page.getTable();
 
     attrs.put(SamColumns.ALIAS, savedTable.getText(SamColumns.ALIAS, 0));
     attrs.put(SamColumns.NAME, savedTable.getText(SamColumns.NAME, 0));
-    attrs.forEach((k, v) -> assertEquals("Checking value of column '" + k + "'", v, savedTable.getText(k, 0)));
+    attrs.forEach((k, v) -> assertEquals(v, savedTable.getText(k, 0), "Checking value of column '" + k + "'"));
     // verify attributes against what got saved to the database
     assertAllForRnaAliquot(attrs, getIdForRow(savedTable, 0), true);
   }

@@ -8,7 +8,7 @@ public class IlluminaRunDto extends RunDto {
   private String workflowType;
   private Integer numCycles;
   private Integer calledCycles;
-  private Integer ImagedCycles;
+  private Integer imagedCycles;
   private Integer scoredCycles;
   private Boolean pairedEnd;
   private String basesMask;
@@ -38,11 +38,11 @@ public class IlluminaRunDto extends RunDto {
   }
 
   public Integer getImagedCycles() {
-    return ImagedCycles;
+    return imagedCycles;
   }
 
   public void setImagedCycles(Integer imagedCycles) {
-    ImagedCycles = imagedCycles;
+    this.imagedCycles = imagedCycles;
   }
 
   public Integer getScoredCycles() {

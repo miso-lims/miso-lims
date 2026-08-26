@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -60,8 +60,8 @@ public class MetricSubcategoryRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // the admin user made these MetricSubcategorys so only admin can update them
-    MetricSubcategoryDto m1 = MetricSubcategoryDto.from(currentSession().get(MetricSubcategory.class, 1));
-    MetricSubcategoryDto m2 = MetricSubcategoryDto.from(currentSession().get(MetricSubcategory.class, 2));
+    MetricSubcategoryDto m1 = MetricSubcategoryDto.from(currentSession().find(MetricSubcategory.class, 1));
+    MetricSubcategoryDto m2 = MetricSubcategoryDto.from(currentSession().find(MetricSubcategory.class, 2));
 
     m1.setAlias("m1");
     m2.setAlias("m2");
@@ -79,8 +79,8 @@ public class MetricSubcategoryRestControllerST extends AbstractST {
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
     // the admin user made these MetricSubcategorys so only admin can update them
-    MetricSubcategoryDto m1 = MetricSubcategoryDto.from(currentSession().get(MetricSubcategory.class, 1));
-    MetricSubcategoryDto m2 = MetricSubcategoryDto.from(currentSession().get(MetricSubcategory.class, 2));
+    MetricSubcategoryDto m1 = MetricSubcategoryDto.from(currentSession().find(MetricSubcategory.class, 1));
+    MetricSubcategoryDto m2 = MetricSubcategoryDto.from(currentSession().find(MetricSubcategory.class, 2));
     m1.setAlias("m1");
     m2.setAlias("m2");
 

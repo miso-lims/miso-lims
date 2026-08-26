@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.RunPurposeDto;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,8 +36,8 @@ public class RunPurposeRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateAsync() throws Exception {
-    RunPurposeDto purposeOne = Dtos.asDto(currentSession().get(entityClass, 1));
-    RunPurposeDto purposeTwo = Dtos.asDto(currentSession().get(entityClass, 2));
+    RunPurposeDto purposeOne = Dtos.asDto(currentSession().find(entityClass, 1));
+    RunPurposeDto purposeTwo = Dtos.asDto(currentSession().find(entityClass, 2));
     purposeOne.setAlias("one");
     purposeTwo.setAlias("two");
 

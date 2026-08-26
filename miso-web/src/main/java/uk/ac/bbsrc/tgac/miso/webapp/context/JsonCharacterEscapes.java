@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
-import com.fasterxml.jackson.core.SerializableString;
-import com.fasterxml.jackson.core.io.CharacterEscapes;
+import tools.jackson.core.SerializableString;
+import tools.jackson.core.io.CharacterEscapes;
 
 public class JsonCharacterEscapes extends CharacterEscapes {
 

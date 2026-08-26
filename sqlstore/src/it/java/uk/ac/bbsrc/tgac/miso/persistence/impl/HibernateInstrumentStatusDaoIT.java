@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.instrumentstatus.InstrumentStatus;
@@ -17,7 +17,7 @@ public class HibernateInstrumentStatusDaoIT extends AbstractDAOTest {
 
   private HibernateInstrumentStatusDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateInstrumentStatusDao();
     sut.setEntityManager(getEntityManager());

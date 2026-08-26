@@ -11,27 +11,18 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentModelService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
 
-/**
- * uk.ac.bbsrc.tgac.miso.webapp.controller
- * <p/>
- * Info
- * 
- * @author Rob Davey
- * @since 0.0.2
- */
 @Controller
 public class ListPoolsController {
 
   @Autowired
   private InstrumentModelService instrumentModelService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @ModelAttribute("title")
   public String title() {
@@ -49,7 +40,7 @@ public class ListPoolsController {
   public class TabbedListPoolsPage extends TabbedListItemsPage {
 
     public <T> TabbedListPoolsPage(String targetType, String property, Stream<T> tabItems, Function<T, String> getName,
-        Function<T, Object> getValue, ObjectMapper mapper) {
+        Function<T, Object> getValue, JsonMapper mapper) {
       super(targetType, property, tabItems, getName, getValue, mapper);
     }
   }

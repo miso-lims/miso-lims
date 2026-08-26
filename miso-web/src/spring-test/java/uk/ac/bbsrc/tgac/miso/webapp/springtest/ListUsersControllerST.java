@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import javax.ws.rs.core.MediaType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -21,7 +21,7 @@ public class ListUsersControllerST extends AbstractST {
     String json = testStaticListPage(USERS_ENDPOINT, "data");
 
     int jsonUserCount = JsonPath.<Integer>read(json, "$.length()");
-    assertTrue("Expected at least 3 users in test data", jsonUserCount >= 3);
+    assertTrue(jsonUserCount >= 3, "Expected at least 3 users in test data");
 
     for (int i = 0; i < 3; i++) {
       String jsonPath = "$[" + i + "]";

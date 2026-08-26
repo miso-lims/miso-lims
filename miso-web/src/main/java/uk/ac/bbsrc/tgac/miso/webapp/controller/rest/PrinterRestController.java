@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response.Status;
@@ -198,7 +196,7 @@ public class PrinterRestController extends AbstractRestController {
 
         @Override
         protected PrinterDto asDto(Printer model) {
-          return Dtos.asDto(model, getObjectMapper());
+          return Dtos.asDto(model, getJsonMapper());
         }
 
         @Override
@@ -270,7 +268,7 @@ public class PrinterRestController extends AbstractRestController {
   @ResponseBody
   @ResponseStatus(code = HttpStatus.CREATED)
   public PrinterDto create(@RequestBody PrinterDto dto) throws IOException {
-    Printer printer = Dtos.to(dto, getObjectMapper());
+    Printer printer = Dtos.to(dto, getJsonMapper());
     return get(printerService.create(printer));
   }
 
@@ -296,7 +294,7 @@ public class PrinterRestController extends AbstractRestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ResponseBody
   public void duplicate(@PathVariable("printerId") Long printerId, @RequestBody DuplicateRequest request)
-      throws JsonParseException, JsonMappingException, IOException {
+      throws IOException {
     Printer printer = printerService.get(printerId);
     if (printer == null) {
       throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
@@ -320,13 +318,13 @@ public class PrinterRestController extends AbstractRestController {
     if (printer == null) {
       throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
     }
-    return Dtos.asDto(printer, getObjectMapper());
+    return Dtos.asDto(printer, getJsonMapper());
   }
 
   @GetMapping(value = "{printerId}/layout", headers = {"Content-type=application/json"})
   @ResponseBody
   public List<LabelElement> getLayout(@PathVariable("printerId") Long printerId)
-      throws JsonParseException, JsonMappingException, IOException {
+      throws IOException {
     Printer printer = printerService.get(printerId);
     if (printer == null) {
       throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);
@@ -338,7 +336,7 @@ public class PrinterRestController extends AbstractRestController {
   @ResponseBody
   public List<PrinterDto> list() throws IOException {
     return printerService.list(0, 0, true, "id").stream()
-        .map(printer -> Dtos.asDto(printer, getObjectMapper()))
+        .map(printer -> Dtos.asDto(printer, getJsonMapper()))
         .collect(Collectors.toList());
   }
 
@@ -362,7 +360,7 @@ public class PrinterRestController extends AbstractRestController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ResponseBody
   public void setLayout(@PathVariable("printerId") Long printerId, @RequestBody List<LabelElement> layout)
-      throws JsonParseException, JsonMappingException, IOException {
+      throws IOException {
     Printer printer = printerService.get(printerId);
     if (printer == null) {
       throw new RestException("No printer found with ID: " + printerId, Status.NOT_FOUND);

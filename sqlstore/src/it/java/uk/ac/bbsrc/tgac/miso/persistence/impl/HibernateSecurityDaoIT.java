@@ -1,17 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
@@ -28,8 +26,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 public class HibernateSecurityDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @Autowired
   @Spy
@@ -40,10 +37,15 @@ public class HibernateSecurityDaoIT extends AbstractDAOTest {
   @InjectMocks
   private HibernateSecurityDao dao;
 
-  @Before
+  @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
@@ -51,9 +53,9 @@ public class HibernateSecurityDaoIT extends AbstractDAOTest {
     User user = dao.getUserById(1L);
     assertNotNull(user);
     assertEquals(1L, user.getId());
-    assertEquals(true, user.isActive());
+    assertTrue(user.isActive());
     assertEquals("admin", user.getFullName());
-    assertEquals(true, user.isInternal());
+    assertTrue(user.isInternal());
     assertEquals("admin", user.getLoginName());
     assertEquals("admin@admin", user.getEmail());
   }
@@ -65,8 +67,7 @@ public class HibernateSecurityDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetUserByIdNull() throws IOException {
-    exception.expect(Exception.class);
-    assertNull(dao.getUserById(null));
+    assertThrows(Exception.class, () -> dao.getUserById(null));
   }
 
   @Test
@@ -103,14 +104,14 @@ public class HibernateSecurityDaoIT extends AbstractDAOTest {
     user.setLoginName("testuser");
     user.setPassword("password");
     user.setRoles(new String[] {"ROLE_INTERNAL"});
-    Collection<Group> groups = new HashSet<>();
+    Set<Group> groups = new HashSet<>();
     groups.add(dao.getGroupById(1L));
-    user.setGroups(null);
+    user.setGroups(groups);
     long savedId = dao.saveUser(user);
 
     clearSession();
 
-    User saved = (User) currentSession().get(UserImpl.class, savedId);
+    User saved = (User) currentSession().find(UserImpl.class, savedId);
     assertNotNull(saved);
     assertEquals(fullName, saved.getFullName());
   }
@@ -143,8 +144,7 @@ public class HibernateSecurityDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetGroupByIdNull() throws IOException {
-    exception.expect(Exception.class);
-    dao.getGroupById(null);
+    assertThrows(Exception.class, () -> dao.getGroupById(null));
   }
 
   @Test
@@ -161,8 +161,7 @@ public class HibernateSecurityDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetGroupByNameNull() throws IOException {
-    exception.expect(NullPointerException.class);
-    dao.getGroupByName(null);
+    assertThrows(NullPointerException.class, () -> dao.getGroupByName(null));
   }
 
   @Test
@@ -183,7 +182,7 @@ public class HibernateSecurityDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    Group saved = (Group) currentSession().get(Group.class, savedId);
+    Group saved = (Group) currentSession().find(Group.class, savedId);
     assertNotNull(saved);
     assertEquals(name, saved.getName());
   }

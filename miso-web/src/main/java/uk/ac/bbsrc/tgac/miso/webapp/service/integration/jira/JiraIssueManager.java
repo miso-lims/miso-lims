@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 
@@ -28,6 +26,8 @@ import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 
 import io.prometheus.metrics.core.metrics.Gauge;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -52,7 +52,7 @@ public class JiraIssueManager implements IssueTrackerManager {
       .register();
 
   private final DateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-  private final ObjectMapper mapper = new ObjectMapper();
+  private final JsonMapper mapper = JsonMapper.builder().build();
 
   private String oAuthConsumerKey;
   private String oAuthConsumerSecret;
@@ -155,24 +155,24 @@ public class JiraIssueManager implements IssueTrackerManager {
 
   private Issue makeIssue(JsonNode json) {
     Issue issue = new Issue();
-    String key = json.get("key").textValue();
+    String key = json.get("key").stringValue();
     issue.setKey(key);
     JsonNode fields = json.get("fields");
-    issue.setSummary(fields.get("summary").textValue());
+    issue.setSummary(fields.get("summary").stringValue());
     issue.setUrl(baseTrackerUrl + "/browse/" + key);
     JsonNode status = fields.get("status");
-    issue.setStatus(status.get("name").textValue());
+    issue.setStatus(status.get("name").stringValue());
     issue.setAssignee("(Unassigned)");
     if (fields.has("assignee")) {
       JsonNode assignee = fields.get("assignee");
       if (assignee != null && assignee.has("displayName")) {
-        issue.setAssignee(assignee.get("displayName").textValue());
+        issue.setAssignee(assignee.get("displayName").stringValue());
       }
     }
     try {
-      issue.setLastUpdated(iso8601Format.parse(fields.get("updated").textValue()));
+      issue.setLastUpdated(iso8601Format.parse(fields.get("updated").stringValue()));
     } catch (ParseException e) {
-      throw new IllegalArgumentException("Invalid date format: " + fields.get("updated").textValue(), e);
+      throw new IllegalArgumentException("Invalid date format: " + fields.get("updated").stringValue(), e);
     }
     return issue;
   }

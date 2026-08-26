@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
 import uk.ac.bbsrc.tgac.miso.dto.AssayTestDto;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest.PermittedSamples;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -77,8 +77,8 @@ public class AssayTestRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // admin perms needed to update
-    AssayTestDto one = AssayTestDto.from(currentSession().get(entityClass, 1));
-    AssayTestDto two = AssayTestDto.from(currentSession().get(entityClass, 2));
+    AssayTestDto one = AssayTestDto.from(currentSession().find(entityClass, 1));
+    AssayTestDto two = AssayTestDto.from(currentSession().find(entityClass, 2));
 
     one.setAlias("one");
     two.setAlias("two");
@@ -95,8 +95,8 @@ public class AssayTestRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
-    AssayTestDto one = AssayTestDto.from(currentSession().get(entityClass, 1));
-    AssayTestDto two = AssayTestDto.from(currentSession().get(entityClass, 2));
+    AssayTestDto one = AssayTestDto.from(currentSession().find(entityClass, 1));
+    AssayTestDto two = AssayTestDto.from(currentSession().find(entityClass, 2));
 
     one.setAlias("one");
     two.setAlias("two");

@@ -3,9 +3,10 @@ package uk.ac.bbsrc.tgac.miso.webapp.util;
 import java.io.IOException;
 import java.util.Collections;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
+
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Create a Handsontable for creating a particular entity type that has no parent
@@ -18,7 +19,7 @@ public abstract class BulkCreateTableBackend<Dto> extends BulkTableBackend<Dto> 
   private final Integer quantity;
 
   public BulkCreateTableBackend(String targetType, Class<? extends Dto> dtoClass, String name, Dto dto,
-      Integer quantity, ObjectMapper mapper) {
+      Integer quantity, JsonMapper mapper) {
     super(targetType, dtoClass, mapper);
     this.name = name;
     this.dto = dto;

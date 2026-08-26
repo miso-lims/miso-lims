@@ -69,12 +69,12 @@ public class HibernateSequencerPartitionContainerDao extends HibernateSaveDao<Se
 
   @Override
   public Partition getPartitionById(long partitionId) {
-    return (Partition) currentSession().get(PartitionImpl.class, partitionId);
+    return (Partition) currentSession().find(PartitionImpl.class, partitionId);
   }
 
   @Override
   public PoreVersion getPoreVersion(long id) {
-    return (PoreVersion) currentSession().get(PoreVersion.class, id);
+    return (PoreVersion) currentSession().find(PoreVersion.class, id);
   }
 
   @Override

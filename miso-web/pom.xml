@@ -121,11 +121,11 @@
       <artifactId>aspectjweaver</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
+      <groupId>tools.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
+      <groupId>tools.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
     </dependency>
     <dependency>
@@ -206,6 +206,16 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-saml2-service-provider</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
@@ -272,6 +282,11 @@
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest</artifactId>
       <version>3.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -629,12 +644,6 @@
               <excludes>
                 <exclude>**/PlainSampleITs.java</exclude>
               </excludes>
-              <properties>
-                <property>
-                  <name>listener</name>
-                  <value>uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestListener</value>
-                </property>
-              </properties>
             </configuration>
           </plugin>
         </plugins>
@@ -876,12 +885,6 @@
               <includes>
                 <include>**/PlainSampleITs.java</include>
               </includes>
-              <properties>
-                <property>
-                  <name>listener</name>
-                  <value>uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.TestListener</value>
-                </property>
-              </properties>
             </configuration>
           </plugin>
         </plugins>

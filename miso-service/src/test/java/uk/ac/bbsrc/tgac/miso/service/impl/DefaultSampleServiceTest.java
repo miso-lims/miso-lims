@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.hasTemporaryName;
 
 import java.io.IOException;
@@ -9,10 +9,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
@@ -73,8 +72,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateProjectDao;
 
 public class DefaultSampleServiceTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @Mock
   private SampleStore sampleStore;
@@ -122,9 +120,9 @@ public class DefaultSampleServiceTest {
 
   private Set<SampleValidRelationship> relationships;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     sut.setAutoGenerateIdBarcodes(false);
     relationships = new HashSet<>();
     Mockito.when(namingSchemeHolder.getPrimary()).thenReturn(namingScheme);
@@ -134,33 +132,36 @@ public class DefaultSampleServiceTest {
     Mockito.when(namingScheme.generateNameFor(ArgumentMatchers.any(Sample.class))).thenReturn("SAM1");
   }
 
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
+  }
+
   @Test
   public void temporarySampleNameTest() throws Exception {
     Sample sample = new SampleImpl();
     sample.setName(LimsUtils.generateTemporaryName());
-    assertTrue("Temporary sample names must return true.", hasTemporaryName(sample));
+    assertTrue(hasTemporaryName(sample), "Temporary sample names must return true.");
   }
 
   @Test
   public void notTemporarySampleNameTest() throws Exception {
     Sample sample = new SampleImpl();
     sample.setName("RealSampleName");
-    assertFalse("Real sample names must return false.", hasTemporaryName(sample));
+    assertFalse(hasTemporaryName(sample), "Real sample names must return false.");
   }
 
   @Test
   public void nullSampleNameTest() throws Exception {
     Sample sample = new SampleImpl();
     sample.setName(null);
-    assertFalse("Non-temporary sample names must return false.", hasTemporaryName(sample));
+    assertFalse(hasTemporaryName(sample), "Non-temporary sample names must return false.");
   }
 
   @Test
   public void nullSampleObjectNameTest() throws Exception {
-    Sample sample = null;
-    assertFalse(
-        "A null sample object does not contain a temporary name so must return false.",
-        hasTemporaryName(sample));
+    assertFalse(hasTemporaryName(null),
+        "A null sample object does not contain a temporary name so must return false.");
   }
 
   @Test
@@ -179,21 +180,21 @@ public class DefaultSampleServiceTest {
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleStore).create(createdCapture.capture());
     Sample created = createdCapture.getValue();
-    assertEquals("shell project should be replaced by real project", expectedProject.getTitle(),
-        created.getProject().getTitle());
-    assertNotNull("modification details should be added", created.getLastModifier());
-    assertEquals("modification details should be added", expectedLastModifier.getId(),
-        created.getLastModifier().getId());
-    assertTrue("expected a plain sample", LimsUtils.isPlainSample(created));
+    assertEquals(expectedProject.getTitle(), created.getProject().getTitle(),
+        "shell project should be replaced by real project");
+    assertNotNull(created.getLastModifier(), "modification details should be added");
+    assertEquals(expectedLastModifier.getId(), created.getLastModifier().getId(),
+        "modification details should be added");
+    assertTrue(LimsUtils.isPlainSample(created), "expected a plain sample");
 
     // name generators get called after initial save
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleStore).update(updatedCapture.capture());
     Sample updated = updatedCapture.getValue();
-    assertEquals("name should be generated", expectedName, updated.getName());
-    assertEquals("alias should not be generated", expectedAlias, updated.getAlias());
-    assertNull("identificationBarcode should not be generated", updated.getIdentificationBarcode());
-    assertTrue("expected a plain sample", LimsUtils.isPlainSample(updated));
+    assertEquals(expectedName, updated.getName(), "name should be generated");
+    assertEquals(expectedAlias, updated.getAlias(), "alias should not be generated");
+    assertNull(updated.getIdentificationBarcode(), "identificationBarcode should not be generated");
+    assertTrue(LimsUtils.isPlainSample(updated), "expected a plain sample");
   }
 
   @Test
@@ -209,7 +210,7 @@ public class DefaultSampleServiceTest {
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleStore).update(updatedCapture.capture());
     Sample updated = updatedCapture.getValue();
-    assertEquals("alias should be generated", expectedAlias, updated.getAlias());
+    assertEquals(expectedAlias, updated.getAlias(), "alias should be generated");
   }
 
   @Test
@@ -217,7 +218,7 @@ public class DefaultSampleServiceTest {
     Sample sample = new SampleImpl();
     sample.setAlias("alias");
     mockShellProjectWithRealLookup(sample);
-    assertNull("identificationBarcode should be null before save for test", sample.getIdentificationBarcode());
+    assertNull(sample.getIdentificationBarcode(), "identificationBarcode should be null before save for test");
     sut.setAutoGenerateIdBarcodes(true);
     Mockito.when(sampleStore.get(Mockito.anyLong())).thenReturn(sample);
     sut.create(sample);
@@ -225,7 +226,7 @@ public class DefaultSampleServiceTest {
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleStore).update(updatedCapture.capture());
     Sample updated = updatedCapture.getValue();
-    assertNotNull("identificationBarcode should be generated", updated.getIdentificationBarcode());
+    assertNotNull(updated.getIdentificationBarcode(), "identificationBarcode should be generated");
   }
 
   @Test
@@ -235,7 +236,7 @@ public class DefaultSampleServiceTest {
     child.setParent(new SampleIdentityImpl());
     child.getParent().setId(parent.getId());
 
-    Long newId = 89L;
+    long newId = 89L;
     DetailedSample postSave = makeUnsavedChildTissue();
     postSave.setId(newId);
     postSave.setParent(parent);
@@ -249,9 +250,9 @@ public class DefaultSampleServiceTest {
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleStore).create(createdCapture.capture());
     Sample created = createdCapture.getValue();
-    assertTrue("Expected a TissueSample", LimsUtils.isTissueSample(created));
-    assertNotNull("Child sample should have parent", ((SampleTissue) created).getParent());
-    assertEquals("Unexpected parent ID", parent.getId(), ((SampleTissue) created).getParent().getId());
+    assertTrue(LimsUtils.isTissueSample(created), "Expected a TissueSample");
+    assertNotNull(((SampleTissue) created).getParent(), "Child sample should have parent");
+    assertEquals(parent.getId(), ((SampleTissue) created).getParent().getId(), "Unexpected parent ID");
   }
 
   @Test
@@ -261,11 +262,11 @@ public class DefaultSampleServiceTest {
 
     SampleIdentity shellParent = new SampleIdentityImpl();
     shellParent.setExternalName(parent.getExternalName());
-    Long shellParentId = 88L;
+    long shellParentId = 88L;
     shellParent.setId(shellParentId);
     child.setParent(shellParent);
 
-    Long newId = 89L;
+    long newId = 89L;
     SampleTissue postSave = makeUnsavedChildTissue();
     postSave.setId(newId);
     postSave.setParent(parent);
@@ -280,9 +281,9 @@ public class DefaultSampleServiceTest {
     ArgumentCaptor<Sample> createdCapture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleStore).create(createdCapture.capture());
     Sample created = createdCapture.getValue();
-    assertTrue("Expected a TissueSample", LimsUtils.isTissueSample(created));
-    assertNotNull("Child sample should have parent", ((SampleTissue) created).getParent());
-    assertEquals("Unexpected parent ID", parent.getId(), ((SampleTissue) created).getParent().getId());
+    assertTrue(LimsUtils.isTissueSample(created), "Expected a TissueSample");
+    assertNotNull(((SampleTissue) created).getParent(), "Child sample should have parent");
+    assertEquals(parent.getId(), ((SampleTissue) created).getParent().getId(), "Unexpected parent ID");
   }
 
   @Test
@@ -292,8 +293,7 @@ public class DefaultSampleServiceTest {
     sample.getSampleClass().setSampleCategory(SampleTissue.CATEGORY_NAME);
     Mockito.when(sampleClassService.listByCategory(Mockito.eq(SampleIdentity.CATEGORY_NAME)))
         .thenReturn(Lists.newArrayList(sample.getSampleClass()));
-    exception.expect(IllegalArgumentException.class);
-    sut.create(sample);
+    assertThrows(IllegalArgumentException.class, () -> sut.create(sample));
   }
 
   @Test
@@ -312,7 +312,7 @@ public class DefaultSampleServiceTest {
     Mockito.when(sampleStore.create(Mockito.any(Sample.class))).thenReturn(parent.getId());
     mockValidRelationship(parent.getSampleClass(), sample.getSampleClass());
 
-    Long newId = 31L;
+    long newId = 31L;
     Mockito.when(sampleStore.create(sample)).thenReturn(newId);
     Mockito.when(sampleStore.get(newId)).thenReturn(sample);
 
@@ -333,8 +333,8 @@ public class DefaultSampleServiceTest {
     // linked to finalChild
     Sample finalParent = updatedCapture.getAllValues().get(0);
     Sample finalChild = updatedCapture.getAllValues().get(1);
-    assertNotNull("Child sample should have parent", ((SampleTissue) finalChild).getParent());
-    assertEquals("Unexpected parent ID", ((SampleTissue) finalChild).getParent().getId(), finalParent.getId());
+    assertNotNull(((SampleTissue) finalChild).getParent(), "Child sample should have parent");
+    assertEquals(((SampleTissue) finalChild).getParent().getId(), finalParent.getId(), "Unexpected parent ID");
   }
 
   @Test
@@ -428,18 +428,19 @@ public class DefaultSampleServiceTest {
     ArgumentCaptor<Sample> updatedCapture = ArgumentCaptor.forClass(Sample.class);
     Mockito.verify(sampleStore).update(updatedCapture.capture());
     Sample result = updatedCapture.getValue();
-    assertEquals("Sample sampleType should be modifiable", updated.getSampleType(), result.getSampleType());
-    assertEquals("Sample description should be modifiable", updated.getDescription(), result.getDescription());
-    assertEquals("Sample sampleType should be modifiable", updated.getSampleType(), result.getSampleType());
-    assertEquals("Sample detailedQcStatus should be modifiable", updated.getDetailedQcStatus(),
-        result.getDetailedQcStatus());
-    assertEquals("Sample scientificName should be modifiable", updated.getScientificName(), result.getScientificName());
-    assertEquals("Sample taxonIdentifier should be modifiable", updated.getTaxonIdentifier(),
-        result.getTaxonIdentifier());
-    assertEquals("Sample volume should be modifiable", updated.getVolume(), result.getVolume());
-    assertEquals("Sample project should be modifiable", updated.getProject().getId(), result.getProject().getId());
+    assertEquals(updated.getSampleType(), result.getSampleType(), "Sample sampleType should be modifiable");
+    assertEquals(updated.getDescription(), result.getDescription(), "Sample description should be modifiable");
+    assertEquals(updated.getSampleType(), result.getSampleType(), "Sample sampleType should be modifiable");
+    assertEquals(updated.getDetailedQcStatus(), result.getDetailedQcStatus(),
+        "Sample detailedQcStatus should be modifiable");
+    assertEquals(updated.getScientificName(), result.getScientificName(),
+        "Sample scientificName should be modifiable");
+    assertEquals(updated.getTaxonIdentifier(), result.getTaxonIdentifier(),
+        "Sample taxonIdentifier should be modifiable");
+    assertEquals(updated.getVolume(), result.getVolume(), "Sample volume should be modifiable");
+    assertEquals(updated.getProject().getId(), result.getProject().getId(), "Sample project should be modifiable");
 
-    assertEquals("Sample name should NOT be modifiable", old.getName(), result.getName());
+    assertEquals(old.getName(), result.getName(), "Sample name should NOT be modifiable");
   }
 
   private ReferenceGenome humanReferenceGenome() {
@@ -479,8 +480,8 @@ public class DefaultSampleServiceTest {
     Mockito.when(sut.getIdentitiesByExternalNameOrAliasAndProject(ArgumentMatchers.anyString(),
         ArgumentMatchers.anyLong(), ArgumentMatchers.anyBoolean()))
         .thenReturn(Collections.singletonList(id1));
-    exception.expect(ValidationException.class);
-    sut.confirmExternalNameUniqueForProjectIfRequired("String1,String3", newSample);
+    assertThrows(ValidationException.class,
+        () -> sut.confirmExternalNameUniqueForProjectIfRequired("String1,String3", newSample));
   }
 
   @Test
@@ -497,8 +498,8 @@ public class DefaultSampleServiceTest {
         .thenReturn(Collections.singletonList(id1));
     Sample newSample = new SampleImpl();
     newSample.setProject(project);
-    exception.expect(ValidationException.class);
-    sut.confirmExternalNameUniqueForProjectIfRequired("String1", newSample);
+    assertThrows(ValidationException.class,
+        () -> sut.confirmExternalNameUniqueForProjectIfRequired("String1", newSample));
   }
 
   @Test
@@ -641,7 +642,6 @@ public class DefaultSampleServiceTest {
    * 
    * @param sample the Sample to add shell project to
    * @return the "real" project that will be returned by the mock projectStore
-   * @throws IOException
    */
   private Project mockShellProjectWithRealLookup(Sample sample) throws IOException {
     Project shell = new ProjectImpl();
@@ -685,10 +685,9 @@ public class DefaultSampleServiceTest {
   @Test
   public void testValidateRelationshipForSimpleSample() throws Exception {
     Sample child = new SampleImpl(); // Simple sample has no DetailedSample attributes.
-    Sample parent = null; // Simple sample has no parent.
     assertTrue(
-        "Simple sample with a null parent and null DetailedSample is a valid relationship",
-        sut.isValidRelationship(parent, child));
+        sut.isValidRelationship(null, child), // Simple sample has no parent.
+        "Simple sample with a null parent and null DetailedSample is a valid relationship");
   }
 
 }

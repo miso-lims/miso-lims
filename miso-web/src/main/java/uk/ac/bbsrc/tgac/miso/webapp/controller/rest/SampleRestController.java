@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isProcessingSingleCellSample;
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isTissueProcessingSample;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,16 +32,27 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.core.Response.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
+import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.IdentityView;
@@ -114,7 +124,7 @@ public class SampleRestController extends AbstractRestController {
   private AdvancedSearchParser advancedSearchParser;
 
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   public Boolean isDetailedSampleEnabled() {
     return detailedSample;
@@ -349,13 +359,13 @@ public class SampleRestController extends AbstractRestController {
       @RequestBody JsonNode json, HttpServletResponse response) throws IOException {
     final JsonNode searchTerms = json.get("identitiesSearches");
     Project project =
-        (json.get("project") == null ? null : projectService.getProjectByCode(json.get("project").asText()));
+        (json.get("project") == null ? null : projectService.getProjectByCode(json.get("project").asString()));
     if (!searchTerms.isArray() || searchTerms.size() == 0) {
       throw new RestException("Please provide external name or alias for identity lookup", Status.BAD_REQUEST);
     }
     List<String> externalNames = new ArrayList<>();
     for (int i = 0; i < searchTerms.size(); i++) {
-      externalNames.add(searchTerms.get(i).asText());
+      externalNames.add(searchTerms.get(i).asString());
     }
     List<IdentityView> results = sampleService.getIdentities(externalNames, exactMatch, project);
     return results.stream().map(Dtos::asDto).collect(Collectors.toList());

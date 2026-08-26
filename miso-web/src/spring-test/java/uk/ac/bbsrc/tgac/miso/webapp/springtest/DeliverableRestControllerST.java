@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.web.servlet.*;
 
@@ -21,7 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.dto.DeliverableDto;
 
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.Collections;
 
 import java.util.List;
@@ -70,8 +70,8 @@ public class DeliverableRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
-    Deliverable del1 = currentSession().get(entityClass, 1);
-    Deliverable del2 = currentSession().get(entityClass, 2);
+    Deliverable del1 = currentSession().find(entityClass, 1);
+    Deliverable del2 = currentSession().find(entityClass, 2);
     del1.setName("deliver 1");
     del2.setName("deliver 2");
 
@@ -91,8 +91,8 @@ public class DeliverableRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateFail() throws Exception {
-    Deliverable del1 = currentSession().get(entityClass, 1);
-    Deliverable del2 = currentSession().get(entityClass, 2);
+    Deliverable del1 = currentSession().find(entityClass, 1);
+    Deliverable del2 = currentSession().find(entityClass, 2);
     del1.setName("deliver 1");
     del2.setName("deliver 2");
 

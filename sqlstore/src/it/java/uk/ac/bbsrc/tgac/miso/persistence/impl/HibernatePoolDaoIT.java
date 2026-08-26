@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -10,14 +10,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -49,7 +46,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     if (!expected.isDiscarded()) {
       assertEquals(expected.getVolume(), actual.getVolume());
     } else {
-      assertTrue(actual.getVolume().compareTo(BigDecimal.ZERO) == 0);
+      assertEquals(0, actual.getVolume().compareTo(BigDecimal.ZERO));
     }
     assertEquals(expected.getQcPassed(), actual.getQcPassed());
     assertEquals(expected.getDescription(), actual.getDescription());
@@ -87,8 +84,7 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     return rtn;
   }
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -96,10 +92,15 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
   @InjectMocks
   private HibernatePoolDao dao;
 
-  @Before
+  @BeforeEach
   public void setup() {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
@@ -139,13 +140,12 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetByBarcodeNull() throws Exception {
-    exception.expect(NullPointerException.class);
-    dao.getByBarcode(null);
+    assertThrows(NullPointerException.class, () -> dao.getByBarcode(null));
   }
 
   @Test
   public void testList() throws IOException {
-    assertTrue(dao.list().size() > 0);
+    assertEquals(10, dao.list().size());
   }
 
   @Test
@@ -270,8 +270,8 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListIlluminaOffsetBadLimit() throws IOException {
-    exception.expect(IOException.class);
-    dao.list(5, -3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA));
+    assertThrows(IOException.class,
+        () -> dao.list(5, -3, true, "id", PaginationFilter.platformType(PlatformType.ILLUMINA)));
   }
 
   @Test
@@ -299,15 +299,14 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     Pool pool = dao.get(3L);
     int originalSize = pool.getPoolContents().size();
     pool.getPoolContents().removeIf(pd -> pd.getAliquot().getId() == 10L);
-    assertEquals("LDI8 should be removed from collection", originalSize - 1, pool.getPoolContents().size());
+    assertEquals(originalSize - 1, pool.getPoolContents().size(), "LDI8 should be removed from collection");
     dao.update(pool);
 
-    entityManager.unwrap(Session.class).flush();
-    entityManager.unwrap(Session.class).clear();
+    clearSession();
 
     Pool saved = dao.get(3L);
     int savedSize = saved.getPoolContents().size();
-    assertEquals("LDI8 should not be present in saved collection", originalSize - 1, savedSize);
+    assertEquals(originalSize - 1, savedSize, "LDI8 should not be present in saved collection");
   }
 
   @Test
@@ -315,37 +314,35 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
     Pool pool = dao.get(1L);
     int originalSize = pool.getPoolContents().size();
     ListLibraryAliquotView ldi =
-        (ListLibraryAliquotView) entityManager.unwrap(Session.class).get(ListLibraryAliquotView.class, 14L);
+        (ListLibraryAliquotView) currentSession().find(ListLibraryAliquotView.class, 14L);
     PoolElement element = new PoolElement(pool, ldi);
     pool.getPoolContents().add(element);
     dao.update(pool);
 
-    entityManager.unwrap(Session.class).flush();
-    entityManager.unwrap(Session.class).clear();
+    clearSession();
 
     Pool saved = dao.get(1L);
     int savedSize = saved.getPoolContents().size();
-    assertEquals("LDI14 should present in saved collection", originalSize + 1, savedSize);
+    assertEquals(originalSize + 1, savedSize, "LDI14 should present in saved collection");
   }
 
   @Test
   public void testEditProportions() throws IOException {
     Pool pool = dao.get(1L);
-    assertFalse("Test pool should contain aliquots", pool.getPoolContents().isEmpty());
+    assertFalse(pool.getPoolContents().isEmpty(), "Test pool should contain aliquots");
     pool.getPoolContents().forEach(pd -> {
-      assertEquals(String.format("Original proportion of %s should be 1", pd.getAliquot().getName()), 1,
-          pd.getProportion());
+      assertEquals(1, pd.getProportion(),
+          String.format("Original proportion of %s should be 1", pd.getAliquot().getName()));
       pd.setProportion(3);
     });
     dao.update(pool);
 
-    entityManager.unwrap(Session.class).flush();
-    entityManager.unwrap(Session.class).clear();
+    clearSession();
 
     Pool saved = dao.get(1L);
     saved.getPoolContents().forEach(pd -> {
-      assertEquals(String.format("Saved proportion of %s should be 3", pd.getAliquot().getName()), 3,
-          pd.getProportion());
+      assertEquals(3, pd.getProportion(),
+          String.format("Saved proportion of %s should be 3", pd.getAliquot().getName()));
     });
   }
 
@@ -361,13 +358,13 @@ public class HibernatePoolDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetPartitionCount() throws Exception {
-    Pool pool = (Pool) currentSession().get(PoolImpl.class, 1L);
+    Pool pool = (Pool) currentSession().find(PoolImpl.class, 1L);
     assertEquals(1L, dao.getPartitionCount(pool));
   }
 
   @Test
   public void testGetPartitionCountNone() throws Exception {
-    Pool pool = (Pool) currentSession().get(PoolImpl.class, 3L);
+    Pool pool = (Pool) currentSession().find(PoolImpl.class, 3L);
     assertEquals(0L, dao.getPartitionCount(pool));
   }
 

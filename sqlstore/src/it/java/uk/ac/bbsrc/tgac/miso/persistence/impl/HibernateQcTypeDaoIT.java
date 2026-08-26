@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Collection;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -24,7 +24,7 @@ public class HibernateQcTypeDaoIT extends AbstractDAOTest {
 
   private HibernateQcTypeDao dao;
 
-  @Before
+  @BeforeEach
   public void setup() throws IOException {
     dao = new HibernateQcTypeDao();
     dao.setEntityManager(entityManager);
@@ -73,28 +73,28 @@ public class HibernateQcTypeDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    QcType saved = (QcType) currentSession().get(QcType.class, savedId);
+    QcType saved = (QcType) currentSession().find(QcType.class, savedId);
     assertNotNull(saved);
     assertEquals(qcType.getName(), saved.getName());
   }
 
   @Test
   public void testUpdate() throws Exception {
-    QcType original = (QcType) currentSession().get(QcType.class, 1L);
+    QcType original = (QcType) currentSession().find(QcType.class, 1L);
     assertNotNull(original);
     String newName = "Wild Guess";
     assertNotEquals(newName, original.getName());
     original.setName(newName);
     dao.update(original);
 
-    QcType saved = (QcType) currentSession().get(QcType.class, 1L);
+    QcType saved = (QcType) currentSession().find(QcType.class, 1L);
     assertNotNull(saved);
     assertEquals(newName, saved.getName());
   }
 
   @Test
   public void testGetUsage() throws Exception {
-    QcType qcType = (QcType) currentSession().get(QcType.class, 3L);
+    QcType qcType = (QcType) currentSession().find(QcType.class, 3L);
     assertNotNull(qcType);
     assertEquals(15L, dao.getUsage(qcType));
   }
@@ -110,17 +110,17 @@ public class HibernateQcTypeDaoIT extends AbstractDAOTest {
   public void testCreateControl() throws Exception {
     QcControl control = new QcControl();
     control.setAlias("Shiny New Control");
-    QcType qcType = (QcType) currentSession().get(QcType.class, 1L);
+    QcType qcType = (QcType) currentSession().find(QcType.class, 1L);
     control.setQcType(qcType);
     long savedId = dao.createControl(control);
 
     clearSession();
 
-    QcControl saved = (QcControl) currentSession().get(QcControl.class, savedId);
+    QcControl saved = (QcControl) currentSession().find(QcControl.class, savedId);
     assertNotNull(saved);
     assertEquals(control.getAlias(), saved.getAlias());
 
-    QcType savedQcType = (QcType) currentSession().get(QcType.class, 1L);
+    QcType savedQcType = (QcType) currentSession().find(QcType.class, 1L);
     assertNotNull(savedQcType);
     assertEquals(1, savedQcType.getControls().size());
     assertEquals(control.getAlias(), savedQcType.getControls().iterator().next().getAlias());
@@ -128,27 +128,27 @@ public class HibernateQcTypeDaoIT extends AbstractDAOTest {
 
   @Test
   public void testDeleteControl() throws Exception {
-    QcControl control = (QcControl) currentSession().get(QcControl.class, 3L);
+    QcControl control = (QcControl) currentSession().find(QcControl.class, 3L);
     assertNotNull(control);
     dao.deleteControl(control);
 
     clearSession();
 
-    QcControl deleted = (QcControl) currentSession().get(QcControl.class, 3L);
+    QcControl deleted = (QcControl) currentSession().find(QcControl.class, 3L);
     assertNull(deleted);
   }
 
   @Test
   public void testGetControlUsage() throws Exception {
-    QcControl control = (QcControl) currentSession().get(QcControl.class, 1L);
+    QcControl control = (QcControl) currentSession().find(QcControl.class, 1L);
     assertNotNull(control);
     assertEquals(2L, dao.getControlUsage(control));
   }
 
   @Test
   public void testGetKitUsage() throws Exception {
-    QcType qcType = (QcType) currentSession().get(QcType.class, 7L);
-    KitDescriptor kit = (KitDescriptor) currentSession().get(KitDescriptor.class, 3L);
+    QcType qcType = (QcType) currentSession().find(QcType.class, 7L);
+    KitDescriptor kit = (KitDescriptor) currentSession().find(KitDescriptor.class, 3L);
     assertNotNull(qcType);
     assertNotNull(kit);
     assertEquals(1L, dao.getKitUsage(qcType, kit));

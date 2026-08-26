@@ -32,11 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
@@ -833,22 +832,12 @@ public class DefaultRunService implements RunService {
       return true;
     }
 
-    // Use separate ObjectMapper to allow <>& characters, which may be used in metrics
-    ObjectMapper metricsMapper = new ObjectMapper();
+    // Use separate JsonMapper to allow <>& characters, which may be used in metrics
+    JsonMapper metricsMapper = JsonMapper.builder().build();
     ArrayNode sourceMetrics;
-    try {
-      sourceMetrics = metricsMapper.readValue(source.getMetrics(), ArrayNode.class);
-    } catch (IOException e) {
-      log.error("Impossible junk metrics were passed in for run " + target.getId(), e);
-      return false;
-    }
+    sourceMetrics = metricsMapper.readValue(source.getMetrics(), ArrayNode.class);
     ArrayNode targetMetrics;
-    try {
-      targetMetrics = metricsMapper.readValue(target.getMetrics(), ArrayNode.class);
-    } catch (IOException e) {
-      log.error("The database is full of garbage metrics for run " + target.getId(), e);
-      return false;
-    }
+    targetMetrics = metricsMapper.readValue(target.getMetrics(), ArrayNode.class);
     Map<String, JsonNode> sourceMetricsMap = parseMetrics(sourceMetrics);
     Map<String, JsonNode> targetMetricsMap = parseMetrics(targetMetrics);
     boolean changed = false;
@@ -861,13 +850,8 @@ public class DefaultRunService implements RunService {
     if (changed) {
       ArrayNode combinedMetrics = metricsMapper.createArrayNode();
       combinedMetrics.addAll(targetMetricsMap.values());
-      try {
-        target.setMetrics(metricsMapper.writeValueAsString(combinedMetrics));
-        return true;
-      } catch (JsonProcessingException e) {
-        log.error("Failed to save data just unserialised.", e);
-        return false;
-      }
+      target.setMetrics(metricsMapper.writeValueAsString(combinedMetrics));
+      return true;
     }
     return false;
   }
@@ -876,7 +860,7 @@ public class DefaultRunService implements RunService {
     Map<String, JsonNode> results = new TreeMap<>();
     for (JsonNode node : metrics) {
       if (node.isObject()) {
-        results.put(node.get("type").textValue(), node);
+        results.put(node.get("type").stringValue(), node);
       }
     }
     return results;

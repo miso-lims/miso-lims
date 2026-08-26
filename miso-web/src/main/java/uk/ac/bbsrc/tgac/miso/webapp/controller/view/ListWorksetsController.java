@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetCategory;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetCategoryService;
@@ -24,7 +24,7 @@ public class ListWorksetsController {
   @Autowired
   private WorksetCategoryService worksetCategoryService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @ModelAttribute("title")
   public String title() {

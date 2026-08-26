@@ -5,8 +5,9 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.ObjectPostProcessor;
+import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -37,13 +38,15 @@ public class JdbcSecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(ObjectPostProcessor<Object> postProcessor,
+  public AuthenticationManager authenticationManager(HttpSecurity http, ObjectPostProcessor<Object> postProcessor,
       UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) throws Exception {
-    return new AuthenticationManagerBuilder(postProcessor)
+    AuthenticationManagerBuilder authenticationManagerBuilder =
+        http.getSharedObject(AuthenticationManagerBuilder.class);
+    authenticationManagerBuilder
+        .objectPostProcessor(postProcessor)
         .userDetailsService(userDetailsService)
-        .passwordEncoder(passwordEncoder)
-        .and()
-        .build();
+        .passwordEncoder(passwordEncoder);
+    return authenticationManagerBuilder.build();
   }
 
 }

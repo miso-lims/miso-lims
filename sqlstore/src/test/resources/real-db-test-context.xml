@@ -20,6 +20,7 @@
     <property name="jpaProperties">
       <props>
         <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+        <prop key="hibernate.max_fetch_depth">2</prop>
       </props>
     </property>
   </bean>
@@ -34,7 +35,7 @@
     class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
   <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
 
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
     <property name="location" value="classpath:real-db-test.properties" />
   </bean>
 

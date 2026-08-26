@@ -29,10 +29,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
@@ -92,7 +92,7 @@ public class EditPoolController {
   @Autowired
   private PoolOrderService poolOrderService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   public void setRunService(RunService runService) {
     this.runService = runService;
@@ -174,7 +174,7 @@ public class EditPoolController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) {
       // no config required
     }
   };
@@ -193,7 +193,7 @@ public class EditPoolController {
     private final Boolean strictPools;
 
     public BulkMergePoolsBackend(BoxDto newBox, PoolService poolService, IndexChecker indexChecker, Boolean strictPools,
-        ObjectMapper mapper) {
+        JsonMapper mapper) {
       super("pool", PoolDto.class, mapper);
       this.poolService = poolService;
       this.newBox = newBox;
@@ -272,7 +272,7 @@ public class EditPoolController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       config.putPOJO(Config.BOX, newBox);
     }
 

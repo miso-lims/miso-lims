@@ -60,7 +60,7 @@ public abstract class HibernateProviderDao<T> implements ProviderDao<T> {
 
   @Override
   public T get(long id) throws IOException {
-    return entityClass.cast(currentSession().get(entityClass, id));
+    return entityClass.cast(currentSession().find(entityClass, id));
   }
 
   @Override

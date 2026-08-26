@@ -6,17 +6,16 @@ import java.util.stream.Stream;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 
 public class ListItemsPage {
   private final String targetType;
-  private final ObjectMapper mapper;
+  private final JsonMapper mapper;
 
-  public ListItemsPage(String targetType, ObjectMapper mapper) {
+  public ListItemsPage(String targetType, JsonMapper mapper) {
     this.targetType = targetType;
     this.mapper = mapper;
   }
@@ -28,7 +27,7 @@ public class ListItemsPage {
   }
 
   public final <T> ModelAndView list(ModelMap model, Stream<T> data) throws IOException {
-    ObjectMapper mapper = prepare(model);
+    JsonMapper mapper = prepare(model);
     ArrayNode array = mapper.createArrayNode();
     data.forEach(array::addPOJO);
     model.put("data", mapper.writeValueAsString(array));
@@ -46,7 +45,7 @@ public class ListItemsPage {
     return listByProject(project.getId(), model);
   }
 
-  private ObjectMapper prepare(ModelMap model) throws IOException {
+  private JsonMapper prepare(ModelMap model) throws IOException {
     ObjectNode config = mapper.createObjectNode();
     writeConfiguration(mapper, config);
     model.put("config", mapper.writeValueAsString(config));
@@ -57,6 +56,5 @@ public class ListItemsPage {
   /**
    * Pass arbitrary configuration data to the front end so that it can display the correct interface.
    */
-  protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
-  }
+  protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {}
 }

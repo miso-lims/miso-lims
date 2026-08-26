@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso;
 
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  * that extends AbstractDAOTest if they are useful tests to keep.
  * </p>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration("/real-db-test-context.xml")
 @Transactional
 public abstract class RealDbTest {

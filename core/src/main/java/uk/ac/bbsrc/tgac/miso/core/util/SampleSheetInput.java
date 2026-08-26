@@ -2,8 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;

@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.util.Map;
@@ -20,9 +20,9 @@ public class FormPageTestUtils {
     fields.forEach((key, val) -> {
       String fieldValue = page.getField(key);
       if (val == null) {
-        assertTrue(String.format(formatString, key.toString()) + " expected null, is " + fieldValue, isStringEmptyOrNull(fieldValue));
+        assertTrue(isStringEmptyOrNull(fieldValue), String.format(formatString, key.toString()) + " expected null, is " + fieldValue);
       } else {
-        assertEquals(String.format(formatString, key.toString()), val, fieldValue);
+        assertEquals(val, fieldValue, String.format(formatString, key.toString()));
       }
     });
   }
@@ -33,9 +33,9 @@ public class FormPageTestUtils {
     }
     String expected = expectedValues.get(field);
     if (expected == null) {
-      assertTrue(String.format("persisted attribute expected empty '%s', actual %s", field, actual), isStringEmptyOrNull(actual));
+      assertTrue(isStringEmptyOrNull(actual), String.format("persisted attribute expected empty '%s', actual %s", field, actual));
     } else {
-      assertEquals(String.format("persisted attribute '%s'", field), expected, actual);
+      assertEquals(expected, actual, String.format("persisted attribute '%s'", field));
     }
   }
 

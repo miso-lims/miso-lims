@@ -5,7 +5,7 @@ public class ArrayModelDto {
   private Long id;
   private String alias;
   private Integer rows;
-  private Integer Columns;
+  private Integer columns;
 
   public Long getId() {
     return id;
@@ -32,11 +32,11 @@ public class ArrayModelDto {
   }
 
   public Integer getColumns() {
-    return Columns;
+    return columns;
   }
 
   public void setColumns(Integer columns) {
-    Columns = columns;
+    this.columns = columns;
   }
 
 }

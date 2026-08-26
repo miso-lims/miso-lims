@@ -66,7 +66,7 @@ public class UserImpl implements User {
       joinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId"))
   @Column(name = "favouriteWorkflow")
   @Enumerated(EnumType.STRING)
-  private Set<WorkflowName> favouriteWorkflows = new HashSet<>();
+  private Set<WorkflowName> favouriteWorkflows;
 
   @ManyToMany(targetEntity = Group.class)
   @Fetch(FetchMode.SUBSELECT)
@@ -207,6 +207,9 @@ public class UserImpl implements User {
 
   @Override
   public Set<WorkflowName> getFavouriteWorkflows() {
+    if (favouriteWorkflows == null) {
+      favouriteWorkflows = new HashSet<>();
+    }
     return favouriteWorkflows;
   }
 

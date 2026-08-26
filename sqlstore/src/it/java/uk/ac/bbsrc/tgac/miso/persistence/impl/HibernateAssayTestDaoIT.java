@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
@@ -26,11 +26,11 @@ public class HibernateAssayTestDaoIT extends AbstractHibernateSaveDaoTest<AssayT
   public AssayTest getCreateItem() {
     AssayTest test = new AssayTest();
     test.setAlias("Test test");
-    TissueType tissueType = (TissueType) currentSession().get(TissueTypeImpl.class, 1L);
+    TissueType tissueType = (TissueType) currentSession().find(TissueTypeImpl.class, 1L);
     test.setTissueType(tissueType);
-    SampleClass extractionClass = (SampleClass) currentSession().get(SampleClassImpl.class, 3L);
+    SampleClass extractionClass = (SampleClass) currentSession().find(SampleClassImpl.class, 3L);
     test.setExtractionClass(extractionClass);
-    LibraryDesignCode code = (LibraryDesignCode) currentSession().get(LibraryDesignCode.class, 2L);
+    LibraryDesignCode code = (LibraryDesignCode) currentSession().find(LibraryDesignCode.class, 2L);
     test.setLibraryDesignCode(code);
     test.setLibraryQualificationMethod(AssayTest.LibraryQualificationMethod.LOW_DEPTH_SEQUENCING);
     test.setPermittedSamples(PermittedSamples.ALL);

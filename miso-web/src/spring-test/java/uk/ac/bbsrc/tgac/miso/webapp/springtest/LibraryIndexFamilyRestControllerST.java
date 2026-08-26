@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
@@ -9,7 +9,7 @@ import uk.ac.bbsrc.tgac.miso.dto.LibraryIndexFamilyDto;
 import uk.ac.bbsrc.tgac.miso.dto.LibraryIndexDto;
 
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -56,7 +56,7 @@ public class LibraryIndexFamilyRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testUpdate() throws Exception {
     // only admin can update these
-    LibraryIndexFamilyDto single = Dtos.asDto(currentSession().get(LibraryIndexFamily.class, 1));
+    LibraryIndexFamilyDto single = Dtos.asDto(currentSession().find(LibraryIndexFamily.class, 1));
     single.setName("single");
 
     LibraryIndexFamily updated = baseTestUpdate(CONTROLLER_BASE, single, 1, entityClass);
@@ -66,7 +66,7 @@ public class LibraryIndexFamilyRestControllerST extends AbstractST {
   @Test
   public void testBulkUpdateFail() throws Exception {
     // only admin can update these
-    LibraryIndexFamilyDto single = Dtos.asDto(currentSession().get(LibraryIndexFamily.class, 1));
+    LibraryIndexFamilyDto single = Dtos.asDto(currentSession().find(LibraryIndexFamily.class, 1));
     single.setName("single");
 
     testUpdateUnauthorized(CONTROLLER_BASE, single, 1, entityClass);

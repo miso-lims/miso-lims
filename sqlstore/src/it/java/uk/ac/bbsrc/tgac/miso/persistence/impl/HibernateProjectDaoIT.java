@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -35,7 +35,7 @@ public class HibernateProjectDaoIT extends AbstractHibernateSaveDaoTest<Project,
   @Override
   public Project getCreateItem() {
     Project project = new ProjectImpl();
-    Pipeline pipeline = (Pipeline) currentSession().get(Pipeline.class, 1L);
+    Pipeline pipeline = (Pipeline) currentSession().find(Pipeline.class, 1L);
     project.setTitle("test title");
     project.setPipeline(pipeline);
     project.setStatus(StatusType.ACTIVE);

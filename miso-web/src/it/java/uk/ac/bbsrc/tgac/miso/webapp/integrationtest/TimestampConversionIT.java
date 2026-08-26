@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -11,8 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.LibraryPage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.TransferPage;
@@ -21,7 +21,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.DataTable;
 
 public class TimestampConversionIT extends AbstractIT {
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -34,8 +34,8 @@ public class TimestampConversionIT extends AbstractIT {
         (Object[]) getSession().createNativeQuery("SELECT @@session.time_zone, @@system_time_zone", Object[].class)
             .uniqueResult();
 
-    assertEquals("Session should default to system time zone", "SYSTEM", (String) results[0]);
-    assertEquals("System time zone should be UTC", "UTC", (String) results[1]);
+    assertEquals("SYSTEM", (String) results[0], "Session should default to system time zone");
+    assertEquals("UTC", (String) results[1], "System time zone should be UTC");
   }
 
   @Test
@@ -62,8 +62,8 @@ public class TimestampConversionIT extends AbstractIT {
     DataTable changes = page.getChangeLogTable();
     for (String changeTimeString : changes.getColumnValues("Time")) {
       Date changeTime = formatter.parse(changeTimeString);
-      assertTrue("Existing changes should be more than 5 minutes in the past",
-          now.getTime() - changeTime.getTime() > 300000);
+      assertTrue(now.getTime() - changeTime.getTime() > 300000,
+          "Existing changes should be more than 5 minutes in the past");
     }
 
     page.setField(LibraryPage.Field.DESCRIPTION, "updated description");
@@ -72,8 +72,8 @@ public class TimestampConversionIT extends AbstractIT {
     DataTable changes2 = page2.getChangeLogTable();
     String latestString = changes2.getColumnValues("Time").stream().max(String::compareTo).orElse(null);
     Date latest = formatter.parse(latestString);
-    assertTrue("New change should show approximately current time",
-        Math.abs(latest.getTime() - now.getTime()) < 300000L);
+    assertTrue(Math.abs(latest.getTime() - now.getTime()) < 300000L,
+        "New change should show approximately current time");
   }
 
 }

@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.Group;
 
@@ -18,7 +18,7 @@ public class HibernateListTransferViewDaoIT extends AbstractDAOTest {
 
   private HibernateListTransferViewDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateListTransferViewDao();
     sut.setEntityManager(getEntityManager());

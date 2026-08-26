@@ -1,6 +1,6 @@
 package ca.on.oicr.pinery.lims.miso;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.time.ZoneId;
@@ -9,15 +9,15 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.google.common.collect.Sets;
 
@@ -33,7 +33,7 @@ import ca.on.oicr.pinery.api.SampleProject;
 import ca.on.oicr.pinery.api.Type;
 import ca.on.oicr.pinery.api.User;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration("/test-context.xml")
 public abstract class AbstractMisoClientIT {
 
@@ -52,7 +52,7 @@ public abstract class AbstractMisoClientIT {
    */
   protected abstract String getAdditionalDataFilename();
 
-  @Before
+  @BeforeEach
   public void setup() {
     Resource baseData = new FileSystemResource(getScript(BASE_SCRIPT));
     String script2 = getAdditionalDataFilename();

@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayModelService;
@@ -39,7 +38,7 @@ public class EditArrayController {
   @Autowired
   private ArrayRunService arrayRunService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @RequestMapping("/new")
   public ModelAndView newArray(ModelMap model) throws IOException {

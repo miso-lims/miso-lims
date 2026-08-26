@@ -1,17 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -31,7 +30,7 @@ public class BulkLibraryQCIT extends AbstractIT {
   private static final Set<String> qcColumns = Sets.newHashSet(QcColumns.LIBRARY_ALIAS, QcColumns.DATE, QcColumns.TYPE,
       QcColumns.INSTRUMENT, QcColumns.KIT, QcColumns.KIT_LOT, QcColumns.RESULT, QcColumns.UNITS, QcColumns.DESCRIPTION);
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -51,12 +50,12 @@ public class BulkLibraryQCIT extends AbstractIT {
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(qcColumns);
 
-    BulkQCPage page = getEditPage(Arrays.asList(2201L));
+    BulkQCPage page = getEditPage(List.of(2201L));
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals(expectedHeadings.size(), headings.size());
     for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+      assertTrue(headings.contains(col), "Check for column: '" + col + "'");
     }
     assertEquals(1, table.getRowCount());
   }
@@ -67,12 +66,12 @@ public class BulkLibraryQCIT extends AbstractIT {
     Set<String> expectedHeadings = Sets.newHashSet();
     expectedHeadings.addAll(qcColumns);
 
-    BulkQCPage page = getAddPage(Arrays.asList(2201L), 1);
+    BulkQCPage page = getAddPage(List.of(2201L), 1);
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     assertEquals(expectedHeadings.size(), headings.size());
     for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+      assertTrue(headings.contains(col), "Check for column: '" + col + "'");
     }
     assertEquals(1, table.getRowCount());
   }
@@ -80,7 +79,7 @@ public class BulkLibraryQCIT extends AbstractIT {
   @Test
   public void testAddQc() throws Exception {
     // Goal: ensure a library QC can be added
-    BulkQCPage page = getAddPage(Arrays.asList(2201L), 1);
+    BulkQCPage page = getAddPage(List.of(2201L), 1);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -103,7 +102,7 @@ public class BulkLibraryQCIT extends AbstractIT {
   @Test
   public void testEditQc() throws Exception {
     // Goal: ensure a library QC can be edited
-    BulkQCPage page = getEditPage(Arrays.asList(2201L));
+    BulkQCPage page = getEditPage(List.of(2201L));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -126,7 +125,7 @@ public class BulkLibraryQCIT extends AbstractIT {
   @Test
   public void testAutoUpdateVolume() throws Exception {
     // Goal: ensure that volume and volume units are updated by the QC
-    BulkQCPage page = getAddPage(Arrays.asList(2201L), 1);
+    BulkQCPage page = getAddPage(List.of(2201L), 1);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -145,20 +144,17 @@ public class BulkLibraryQCIT extends AbstractIT {
     LibraryQC saved = getLatestQc();
     assertQCAttributes(attrs, saved);
 
-    assertEquals(
-        String.format("Expected volume to be updated to %s, instead got %f", "10.43", saved.getLibrary().getVolume()),
-        0,
-        saved.getLibrary().getVolume().compareTo(new BigDecimal("10.43")));
-    assertEquals(
+    assertEquals(0, saved.getLibrary().getVolume().compareTo(new BigDecimal("10.43")),
+        String.format("Expected volume to be updated to %s, instead got %f", "10.43", saved.getLibrary().getVolume()));
+    assertEquals(VolumeUnit.MICROLITRES, saved.getLibrary().getVolumeUnits(),
         String.format("Expected volume units to be updated to %s, instead got %s", VolumeUnit.MICROLITRES.getUnits(),
-            saved.getLibrary().getVolumeUnits().getUnits()),
-        VolumeUnit.MICROLITRES, saved.getLibrary().getVolumeUnits());
+            saved.getLibrary().getVolumeUnits().getUnits()));
   }
 
   @Test
   public void testAutoUpdateConcentration() throws Exception {
     // Goal: ensure that volume and volume units are updated by the QC
-    BulkQCPage page = getAddPage(Arrays.asList(2201L), 1);
+    BulkQCPage page = getAddPage(List.of(2201L), 1);
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -177,16 +173,13 @@ public class BulkLibraryQCIT extends AbstractIT {
     LibraryQC saved = getLatestQc();
     assertQCAttributes(attrs, saved);
 
-    assertEquals(
+    assertEquals(0, saved.getLibrary().getConcentration().compareTo(new BigDecimal("24.78")),
         String.format("Expected concentration to be updated to %s, instead got %f", "24.78",
-            saved.getLibrary().getConcentration()),
-        0,
-        saved.getLibrary().getConcentration().compareTo(new BigDecimal("24.78")));
-    assertEquals(
+            saved.getLibrary().getConcentration()));
+    assertEquals(ConcentrationUnit.NANOMOLAR, saved.getLibrary().getConcentrationUnits(),
         String.format("Expected concentration units to be updated to %s, instead got %s",
             ConcentrationUnit.NANOMOLAR.getUnits(),
-            saved.getLibrary().getConcentrationUnits().getUnits()),
-        ConcentrationUnit.NANOMOLAR, saved.getLibrary().getConcentrationUnits());
+            saved.getLibrary().getConcentrationUnits().getUnits()));
   }
 
   private void fillRow(HandsOnTable table, int rowNum, Map<String, String> attributes) {
@@ -197,10 +190,10 @@ public class BulkLibraryQCIT extends AbstractIT {
     String formatString = hintMessage + " row %d column '%s' value";
     attributes.forEach((key, val) -> {
       if (isStringEmptyOrNull(val)) {
-        assertTrue(String.format(formatString, rowNum, key) + " expected empty",
-            isStringEmptyOrNull(table.getText(key, rowNum)));
+        assertTrue(isStringEmptyOrNull(table.getText(key, rowNum)),
+            String.format(formatString, rowNum, key) + " expected empty");
       } else {
-        assertEquals(String.format(formatString, rowNum, key), val, table.getText(key, rowNum));
+        assertEquals(val, table.getText(key, rowNum), String.format(formatString, rowNum, key));
       }
     });
   }
@@ -218,10 +211,10 @@ public class BulkLibraryQCIT extends AbstractIT {
       String objectAttribute = getter.apply(object);
       String tableAttribute = cleanNullValues(column, attributes.get(column));
       if (tableAttribute == null) {
-        assertTrue(String.format("persisted attribute expected empty '%s'", column),
-            isStringEmptyOrNull(objectAttribute));
+        assertTrue(isStringEmptyOrNull(objectAttribute),
+            String.format("persisted attribute expected empty '%s'", column));
       } else {
-        assertEquals(String.format("persisted attribute '%s'", column), tableAttribute, objectAttribute);
+        assertEquals(tableAttribute, objectAttribute, String.format("persisted attribute '%s'", column));
       }
     }
   }

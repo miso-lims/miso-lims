@@ -17,10 +17,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
@@ -48,7 +46,7 @@ public class RequisitionController {
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @Value("${miso.detailed.sample.enabled}")
   private Boolean detailedSampleMode;
@@ -57,13 +55,13 @@ public class RequisitionController {
 
     private final AuthorizationManager authorizationManager;
 
-    public ListRequisitionsPage(AuthorizationManager authorizationManager, ObjectMapper mapper) {
+    public ListRequisitionsPage(AuthorizationManager authorizationManager, JsonMapper mapper) {
       super("requisition", mapper);
       this.authorizationManager = authorizationManager;
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       config.put("isAdmin", authorizationManager.isAdminUser());
     }
   }
@@ -117,8 +115,7 @@ public class RequisitionController {
     return setupForm(requisition, PageMode.EDIT, model);
   }
 
-  private ModelAndView setupForm(Requisition requisition, PageMode pageMode, ModelMap model)
-      throws JsonProcessingException {
+  private ModelAndView setupForm(Requisition requisition, PageMode pageMode, ModelMap model) {
     model.put(PageMode.PROPERTY, pageMode.getLabel());
     model.put("requisition", requisition);
     model.put("requisitionDto", mapper.writeValueAsString(RequisitionDto.from(requisition)));

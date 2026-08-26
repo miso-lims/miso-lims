@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.integration.test.visionmate;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.test.BoxScannerTests;
@@ -21,7 +21,7 @@ public class VisionMateScannerTests extends BoxScannerTests<VisionMateScanner> {
   
   private static Thread serverThread;
   
-  @BeforeClass
+  @BeforeAll
   public static void setup() throws IntegrationException {
     int port = Integer.parseInt(System.getProperty("miso.test.visionmate.port"));
     server = new MockScannerServer(port);

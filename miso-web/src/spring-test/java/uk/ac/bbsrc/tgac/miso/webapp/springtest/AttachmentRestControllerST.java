@@ -1,50 +1,19 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.web.servlet.*;
 
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
-
-import javax.ws.rs.core.MediaType;
-
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
-import com.jayway.jsonpath.JsonPath;
 
-import static org.hamcrest.Matchers.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import org.springframework.test.web.servlet.MvcResult;
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.FileAttachment;
-import uk.ac.bbsrc.tgac.miso.dto.AttachmentDto;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 
 
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.View;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.security.test.context.support.WithMockUser;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
-import static org.junit.Assert.*;
-import java.util.Collections;
-
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
-
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AttachmentRestControllerST extends AbstractST {
 
@@ -52,12 +21,12 @@ public class AttachmentRestControllerST extends AbstractST {
 
   @Test
   public void testLinkFile() throws Exception {
-    Sample from = currentSession().get(SampleImpl.class, 1);
+    Sample from = currentSession().find(SampleImpl.class, 1);
     assertEquals(1, from.getAttachments().size());
     FileAttachment file = from.getAttachments().get(0);
     assertEquals(1, file.getId());
 
-    Sample to = currentSession().get(SampleImpl.class, 2);
+    Sample to = currentSession().find(SampleImpl.class, 2);
     assertFalse(to.getAttachments().stream().anyMatch(x -> x.getId() == 1));
 
 
@@ -68,14 +37,14 @@ public class AttachmentRestControllerST extends AbstractST {
         .param("attachmentId", "1"))
         .andExpect(status().isNoContent());
 
-    Sample saved = currentSession().get(SampleImpl.class, 2); // need to refetch sample 2 to see the update
+    Sample saved = currentSession().find(SampleImpl.class, 2); // need to refetch sample 2 to see the update
     assertTrue(saved.getAttachments().stream().anyMatch(x -> x.getId() == 1));
   }
 
   @Test
   public void testBulkLinkFile() throws Exception {
-    Sample sam2 = currentSession().get(SampleImpl.class, 2);
-    Sample sam3 = currentSession().get(SampleImpl.class, 3);
+    Sample sam2 = currentSession().find(SampleImpl.class, 2);
+    Sample sam3 = currentSession().find(SampleImpl.class, 3);
 
 
     assertFalse(sam2.getAttachments().stream().anyMatch(x -> x.getId() == 1));
@@ -90,8 +59,8 @@ public class AttachmentRestControllerST extends AbstractST {
         .andExpect(status().isNoContent());
 
     // need to refetch samples 2 and 3 to see the updates
-    Sample savedtwo = currentSession().get(SampleImpl.class, 2);
-    Sample savedthree = currentSession().get(SampleImpl.class, 3);
+    Sample savedtwo = currentSession().find(SampleImpl.class, 2);
+    Sample savedthree = currentSession().find(SampleImpl.class, 3);
 
 
     assertTrue(savedtwo.getAttachments().stream().anyMatch(x -> x.getId() == 1));
@@ -101,10 +70,10 @@ public class AttachmentRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testDeleteAttachment() throws Exception {
-    assertTrue(currentSession().get(SampleImpl.class, 1).getAttachments().stream().anyMatch(x -> x.getId() == 1));
+    assertTrue(currentSession().find(SampleImpl.class, 1).getAttachments().stream().anyMatch(x -> x.getId() == 1));
     getMockMvc().perform(delete(CONTROLLER_BASE + "/sample/1/1"))
         .andExpect(status().isNoContent());
-    assertFalse(currentSession().get(SampleImpl.class, 1).getAttachments().stream().anyMatch(x -> x.getId() == 1));
+    assertFalse(currentSession().find(SampleImpl.class, 1).getAttachments().stream().anyMatch(x -> x.getId() == 1));
   }
 
   @Test

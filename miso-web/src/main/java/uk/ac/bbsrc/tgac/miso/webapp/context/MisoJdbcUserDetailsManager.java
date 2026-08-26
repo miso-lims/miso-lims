@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import java.sql.Blob;
@@ -38,21 +15,14 @@ import org.springframework.security.provisioning.JdbcUserDetailsManager;
 
 import uk.ac.bbsrc.tgac.miso.core.security.MisoAuthority;
 
-/**
- * uk.ac.bbsrc.tgac.miso.sqlstore.manager
- * <p/>
- * Info
- *
- * @author Rob Davey
- * @since 0.0.2
- */
 public class MisoJdbcUserDetailsManager extends JdbcUserDetailsManager {
 
   protected static final Logger log = LoggerFactory.getLogger(MisoJdbcUserDetailsManager.class);
 
   @Override
   protected List<GrantedAuthority> loadUserAuthorities(String username) {
-    return (getJdbcTemplate().query(getAuthoritiesByUsernameQuery(), new String[] { username },
+    return (getJdbcTemplate().query(getAuthoritiesByUsernameQuery(), new String[] {username},
+        new int[] {java.sql.Types.VARCHAR},
         new ResultSetExtractor<List<GrantedAuthority>>() {
           @Override
           public List<GrantedAuthority> extractData(ResultSet rs) throws SQLException {
@@ -75,8 +45,10 @@ public class MisoJdbcUserDetailsManager extends JdbcUserDetailsManager {
             }
 
             try {
-              if (rs.getBoolean("admin")) roleList.add(MisoAuthority.ROLE_ADMIN);
-              if (rs.getBoolean("internal")) roleList.add(MisoAuthority.ROLE_INTERNAL);
+              if (rs.getBoolean("admin"))
+                roleList.add(MisoAuthority.ROLE_ADMIN);
+              if (rs.getBoolean("internal"))
+                roleList.add(MisoAuthority.ROLE_INTERNAL);
             } catch (SQLException e) {
               log.error("Couldn't retrieve a user property to convert to a role", e);
             }

@@ -1,16 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable.EntityType;
 import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
@@ -99,10 +96,10 @@ public final class TypeAlternate implements PrintableText {
   }
 
   @Override
-  public void asJson(JsonGenerator generator) throws IOException, JsonProcessingException {
+  public void asJson(JsonGenerator generator) {
     generator.writeStartObject();
     for (final Map.Entry<EntityType, PrintableText> entry : options.entrySet()) {
-      generator.writeFieldName(entry.getKey().name());
+      generator.writeName(entry.getKey().name());
       entry.getValue().asJson(generator);
     }
     generator.writeEndObject();

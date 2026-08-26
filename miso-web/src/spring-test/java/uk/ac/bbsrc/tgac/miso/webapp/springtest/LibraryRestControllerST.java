@@ -1,66 +1,38 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.web.servlet.*;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.ws.rs.core.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
-import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDeletionDao;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
-import com.jayway.jsonpath.JsonPath;
-import java.io.BufferedReader;
-import java.io.FileReader;
-
-import javassist.bytecode.ExceptionTable;
 
 import static org.hamcrest.Matchers.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import org.springframework.test.web.servlet.MvcResult;
 
 import uk.ac.bbsrc.tgac.miso.dto.DetailedLibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 
 import uk.ac.bbsrc.tgac.miso.dto.LibraryDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.LibraryRestController.FindRelatedRequest;
 
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.View;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import java.util.Collections;
-
-import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
 
 
 public class LibraryRestControllerST extends AbstractST {
@@ -112,9 +84,9 @@ public class LibraryRestControllerST extends AbstractST {
     assertEquals(1L, detailed.getLibraryStrategyType().getId());
     assertEquals(7L, detailed.getLibraryDesignCode().getId());
     assertEquals(false, detailed.getPaired());
-    assertEquals(false, detailed.isDiscarded());
-    assertEquals(false, detailed.isLowQuality());
-    assertEquals(false, detailed.getUmis());
+    assertFalse(detailed.isDiscarded());
+    assertFalse(detailed.isLowQuality());
+    assertFalse(detailed.getUmis());
     assertEquals(3L, detailed.getSop().getId());
     assertEquals(1L, detailed.getKitDescriptor().getId());
     assertEquals("KITLOTONE", detailed.getKitLot());
@@ -124,7 +96,7 @@ public class LibraryRestControllerST extends AbstractST {
 
   @Test
   public void testUpdate() throws Exception {
-    LibraryDto updated = Dtos.asDto(currentSession().get(entityClass, 1), true);
+    LibraryDto updated = Dtos.asDto(currentSession().find(entityClass, 1), true);
 
     updated.setDescription("updated");
 
@@ -140,7 +112,7 @@ public class LibraryRestControllerST extends AbstractST {
 
   @Test
   public void testDatatableByProj() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/project/3", Arrays.asList(1));
+    testDtRequest(CONTROLLER_BASE + "/dt/project/3", List.of(1));
   }
 
   @Test
@@ -157,7 +129,7 @@ public class LibraryRestControllerST extends AbstractST {
 
   @Test
   public void testDatatableSupplementalLibrariesByReq() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/requisition-supplemental/2", Arrays.asList(205));
+    testDtRequest(CONTROLLER_BASE + "/dt/requisition-supplemental/2", List.of(205));
 
   }
 
@@ -257,15 +229,15 @@ public class LibraryRestControllerST extends AbstractST {
 
   @Test
   public void testBulkCreate() throws Exception {
-    List<LibraryImpl> libs = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, Arrays.asList(makeCreateDto()));
+    List<LibraryImpl> libs = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, List.of(makeCreateDto()));
     assertEquals(1, libs.size());
     assertCreatedLibrary(libs.get(0));
   }
 
   @Test
   public void testBulkUpdate() throws Exception {
-    LibraryDto lib1 = Dtos.asDto(currentSession().get(LibraryImpl.class, 1), false);
-    LibraryDto lib204 = Dtos.asDto(currentSession().get(LibraryImpl.class, 204), false);
+    LibraryDto lib1 = Dtos.asDto(currentSession().find(LibraryImpl.class, 1), false);
+    LibraryDto lib204 = Dtos.asDto(currentSession().find(LibraryImpl.class, 204), false);
     lib1.setDescription("one");
     lib204.setDescription("two hundred four");
 

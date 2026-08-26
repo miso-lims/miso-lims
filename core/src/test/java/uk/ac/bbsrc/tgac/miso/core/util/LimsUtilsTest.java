@@ -1,10 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
@@ -15,7 +15,7 @@ public class LimsUtilsTest {
   @Test
   public void testInstanceOfSampleTissueProcessing() throws Exception {
     SampleSlide slide = new SampleSlideImpl();
-    assertTrue("Slide is a type of Tissue Processing", LimsUtils.isTissueProcessingSample(slide));
+    assertTrue(LimsUtils.isTissueProcessingSample(slide), "Slide is a type of Tissue Processing");
   }
 
   @Test

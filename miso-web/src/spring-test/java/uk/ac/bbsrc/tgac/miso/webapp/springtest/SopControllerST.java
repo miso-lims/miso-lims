@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.hasKey;
@@ -9,7 +9,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import com.jayway.jsonpath.JsonPath;
@@ -46,8 +46,8 @@ public class SopControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testCopy() throws Exception {
     long sourceId = 1L;
-    Sop base = currentSession().get(entityClass, sourceId);
-    assertNotNull("Missing SOP test data with ID " + sourceId, base);
+    Sop base = currentSession().find(entityClass, sourceId);
+    assertNotNull(base, "Missing SOP test data with ID " + sourceId);
 
     String response = getMockMvc()
         .perform(get(CONTROLLER_BASE + "/new")
@@ -74,8 +74,8 @@ public class SopControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testEdit() throws Exception {
     long id = 1L;
-    Sop db = currentSession().get(entityClass, id);
-    assertNotNull("Missing SOP test data with ID " + id, db);
+    Sop db = currentSession().find(entityClass, id);
+    assertNotNull(db, "Missing SOP test data with ID " + id);
 
     Map<String, Object> model = baseTestEditModel(CONTROLLER_BASE + "/" + id);
     assertEquals("SOP " + id, model.get("title"));

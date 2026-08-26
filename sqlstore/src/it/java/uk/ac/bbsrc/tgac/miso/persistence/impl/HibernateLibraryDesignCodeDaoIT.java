@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -16,7 +16,7 @@ public class HibernateLibraryDesignCodeDaoIT extends AbstractDAOTest {
 
   private HibernateLibraryDesignCodeDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateLibraryDesignCodeDao();
     sut.setEntityManager(getEntityManager());
@@ -67,7 +67,7 @@ public class HibernateLibraryDesignCodeDaoIT extends AbstractDAOTest {
     clearSession();
 
     LibraryDesignCode saved =
-        (LibraryDesignCode) currentSession().get(LibraryDesignCode.class, savedId);
+        (LibraryDesignCode) currentSession().find(LibraryDesignCode.class, savedId);
     assertEquals(code, saved.getCode());
   }
 
@@ -76,7 +76,7 @@ public class HibernateLibraryDesignCodeDaoIT extends AbstractDAOTest {
     long id = 1L;
     String code = "NU";
     LibraryDesignCode designCode =
-        (LibraryDesignCode) currentSession().get(LibraryDesignCode.class, id);
+        (LibraryDesignCode) currentSession().find(LibraryDesignCode.class, id);
     assertNotEquals(code, designCode.getCode());
     designCode.setCode(code);
     sut.update(designCode);
@@ -84,14 +84,14 @@ public class HibernateLibraryDesignCodeDaoIT extends AbstractDAOTest {
     clearSession();
 
     LibraryDesignCode saved =
-        (LibraryDesignCode) currentSession().get(LibraryDesignCode.class, id);
+        (LibraryDesignCode) currentSession().find(LibraryDesignCode.class, id);
     assertEquals(code, saved.getCode());
   }
 
   @Test
   public void testGetUsageByLibraries() throws IOException {
     LibraryDesignCode designCode =
-        (LibraryDesignCode) currentSession().get(LibraryDesignCode.class, 1L);
+        (LibraryDesignCode) currentSession().find(LibraryDesignCode.class, 1L);
     assertEquals("TT", designCode.getCode());
     assertEquals(1L, sut.getUsageByLibraries(designCode));
   }
@@ -99,7 +99,7 @@ public class HibernateLibraryDesignCodeDaoIT extends AbstractDAOTest {
   @Test
   public void testGetUsageByLibraryDesigns() throws IOException {
     LibraryDesignCode designCode =
-        (LibraryDesignCode) currentSession().get(LibraryDesignCode.class, 1L);
+        (LibraryDesignCode) currentSession().find(LibraryDesignCode.class, 1L);
     assertEquals("TT", designCode.getCode());
     assertEquals(2L, sut.getUsageByLibraryDesigns(designCode));
   }

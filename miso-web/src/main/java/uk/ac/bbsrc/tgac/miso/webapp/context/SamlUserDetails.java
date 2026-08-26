@@ -5,25 +5,25 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
+import org.springframework.security.saml2.provider.service.authentication.Saml2ResponseAssertionAccessor;
 
 import uk.ac.bbsrc.tgac.miso.core.security.ProvisionedUserDetails;
 
-public class SamlUserDetails implements ProvisionedUserDetails, Saml2AuthenticatedPrincipal {
+public class SamlUserDetails implements ProvisionedUserDetails, Saml2ResponseAssertionAccessor {
 
   private final String username;
   private final String fullName;
   private final String email;
   private final Collection<? extends GrantedAuthority> authorities;
-  private final Saml2AuthenticatedPrincipal samlPrincipal;
+  private final Saml2ResponseAssertionAccessor assertionAccessor;
 
   public SamlUserDetails(String username, String fullName, String email,
-      Collection<? extends GrantedAuthority> authorities, Saml2AuthenticatedPrincipal samlPrincipal) {
+      Collection<? extends GrantedAuthority> authorities, Saml2ResponseAssertionAccessor assertionAccessor) {
     this.username = username;
     this.fullName = fullName;
     this.email = email;
     this.authorities = authorities;
-    this.samlPrincipal = samlPrincipal;
+    this.assertionAccessor = assertionAccessor;
   }
 
   @Override
@@ -52,11 +52,6 @@ public class SamlUserDetails implements ProvisionedUserDetails, Saml2Authenticat
   }
 
   @Override
-  public String getName() {
-    return username;
-  }
-
-  @Override
   public boolean isAccountNonExpired() {
     return true;
   }
@@ -78,27 +73,32 @@ public class SamlUserDetails implements ProvisionedUserDetails, Saml2Authenticat
 
   @Override
   public <A> List<A> getAttribute(String name) {
-    return samlPrincipal.getAttribute(name);
+    return assertionAccessor.getAttribute(name);
   }
 
   @Override
   public Map<String, List<Object>> getAttributes() {
-    return samlPrincipal.getAttributes();
+    return assertionAccessor.getAttributes();
   }
 
   @Override
   public <A> A getFirstAttribute(String name) {
-    return samlPrincipal.getFirstAttribute(name);
-  }
-
-  @Override
-  public String getRelyingPartyRegistrationId() {
-    return samlPrincipal.getRelyingPartyRegistrationId();
+    return assertionAccessor.getFirstAttribute(name);
   }
 
   @Override
   public List<String> getSessionIndexes() {
-    return samlPrincipal.getSessionIndexes();
+    return assertionAccessor.getSessionIndexes();
+  }
+
+  @Override
+  public String getNameId() {
+    return assertionAccessor.getNameId();
+  }
+
+  @Override
+  public String getResponseValue() {
+    return assertionAccessor.getResponseValue();
   }
 
 }

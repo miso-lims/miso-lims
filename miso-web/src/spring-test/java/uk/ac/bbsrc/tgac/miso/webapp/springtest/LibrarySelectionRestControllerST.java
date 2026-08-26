@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -58,8 +58,8 @@ public class LibrarySelectionRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // only admin can update these
-    LibrarySelectionTypeDto one = Dtos.asDto(currentSession().get(LibrarySelectionType.class, 1));
-    LibrarySelectionTypeDto three = Dtos.asDto(currentSession().get(LibrarySelectionType.class, 3));
+    LibrarySelectionTypeDto one = Dtos.asDto(currentSession().find(LibrarySelectionType.class, 1));
+    LibrarySelectionTypeDto three = Dtos.asDto(currentSession().find(LibrarySelectionType.class, 3));
     one.setName("one");
     three.setName("three");
 
@@ -78,8 +78,8 @@ public class LibrarySelectionRestControllerST extends AbstractST {
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
     // only admin can update these
-    LibrarySelectionTypeDto one = Dtos.asDto(currentSession().get(LibrarySelectionType.class, 1));
-    LibrarySelectionTypeDto three = Dtos.asDto(currentSession().get(LibrarySelectionType.class, 3));
+    LibrarySelectionTypeDto one = Dtos.asDto(currentSession().find(LibrarySelectionType.class, 1));
+    LibrarySelectionTypeDto three = Dtos.asDto(currentSession().find(LibrarySelectionType.class, 3));
     one.setName("one");
     three.setName("three");
 

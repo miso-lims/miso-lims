@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -31,7 +31,7 @@ public class HibernateSamplePurposeDaoIT
   public SamplePurpose getCreateItem() {
     SamplePurpose purpose = new SamplePurposeImpl();
     purpose.setAlias("New Purpose");
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     purpose.setChangeDetails(user);
     return purpose;
   }
@@ -44,9 +44,9 @@ public class HibernateSamplePurposeDaoIT
 
   @Test
   public void testGetUsage() throws Exception {
-    SamplePurpose purpose1 = (SamplePurpose) currentSession().get(SamplePurposeImpl.class, 1L);
+    SamplePurpose purpose1 = (SamplePurpose) currentSession().find(SamplePurposeImpl.class, 1L);
     assertEquals(3, getTestSubject().getUsage(purpose1));
-    SamplePurpose purpose2 = (SamplePurpose) currentSession().get(SamplePurposeImpl.class, 2L);
+    SamplePurpose purpose2 = (SamplePurpose) currentSession().find(SamplePurposeImpl.class, 2L);
     assertEquals(0, getTestSubject().getUsage(purpose2));
   }
 

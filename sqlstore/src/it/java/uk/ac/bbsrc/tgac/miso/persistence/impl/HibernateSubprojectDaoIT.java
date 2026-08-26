@@ -1,10 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -35,11 +35,11 @@ public class HibernateSubprojectDaoIT extends AbstractHibernateSaveDaoTest<Subpr
     Subproject subproject = new SubprojectImpl();
     subproject.setAlias("Exciting");
     subproject.setPriority(true);
-    Project project = (Project) currentSession().get(ProjectImpl.class, 2L);
+    Project project = (Project) currentSession().find(ProjectImpl.class, 2L);
     subproject.setParentProject(project);
-    ReferenceGenome reference = (ReferenceGenome) currentSession().get(ReferenceGenomeImpl.class, 1L);
+    ReferenceGenome reference = (ReferenceGenome) currentSession().find(ReferenceGenomeImpl.class, 1L);
     subproject.setReferenceGenome(reference);
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     subproject.setChangeDetails(user);
     return subproject;
   }
@@ -52,9 +52,9 @@ public class HibernateSubprojectDaoIT extends AbstractHibernateSaveDaoTest<Subpr
 
   @Test
   public void testGetUsage() throws Exception {
-    Subproject subproject1 = (Subproject) currentSession().get(SubprojectImpl.class, 1L);
+    Subproject subproject1 = (Subproject) currentSession().find(SubprojectImpl.class, 1L);
     assertEquals(1, getTestSubject().getUsage(subproject1));
-    Subproject subproject3 = (Subproject) currentSession().get(SubprojectImpl.class, 3L);
+    Subproject subproject3 = (Subproject) currentSession().find(SubprojectImpl.class, 3L);
     assertEquals(0, getTestSubject().getUsage(subproject3));
   }
 
@@ -71,7 +71,7 @@ public class HibernateSubprojectDaoIT extends AbstractHibernateSaveDaoTest<Subpr
 
   @Test
   public void testGetByProjectAndAlias() throws Exception {
-    Project project = (Project) currentSession().get(ProjectImpl.class, 2L);
+    Project project = (Project) currentSession().find(ProjectImpl.class, 2L);
     String existingAlias = "Meh";
     Subproject existing = getTestSubject().getByProjectAndAlias(project, existingAlias);
     assertNotNull(existing);

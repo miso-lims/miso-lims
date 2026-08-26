@@ -1,10 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -35,11 +35,11 @@ public class HibernateSequencingOrderDaoIT
   @Override
   public SequencingOrder getCreateItem() {
     SequencingOrder order = new SequencingOrderImpl();
-    order.setPool((Pool) currentSession().get(PoolImpl.class, 1L));
-    order.setSequencingParameters((SequencingParameters) currentSession().get(SequencingParameters.class, 1L));
+    order.setPool((Pool) currentSession().find(PoolImpl.class, 1L));
+    order.setSequencingParameters((SequencingParameters) currentSession().find(SequencingParameters.class, 1L));
     order.setPartitions(2);
-    order.setPurpose((RunPurpose) currentSession().get(RunPurpose.class, 1L));
-    order.setChangeDetails((User) currentSession().get(UserImpl.class, 1L));
+    order.setPurpose((RunPurpose) currentSession().find(RunPurpose.class, 1L));
+    order.setChangeDetails((User) currentSession().find(UserImpl.class, 1L));
     return order;
   }
 
@@ -51,19 +51,19 @@ public class HibernateSequencingOrderDaoIT
 
   @Test
   public void testListByPool() throws Exception {
-    Pool pool1 = (Pool) currentSession().get(PoolImpl.class, 1L);
+    Pool pool1 = (Pool) currentSession().find(PoolImpl.class, 1L);
     assertEquals(2, getTestSubject().listByPool(pool1).size());
-    Pool pool2 = (Pool) currentSession().get(PoolImpl.class, 2L);
+    Pool pool2 = (Pool) currentSession().find(PoolImpl.class, 2L);
     assertEquals(0, getTestSubject().listByPool(pool2).size());
   }
 
   @Test
   public void testListByAttributes() throws Exception {
-    Pool pool = (Pool) currentSession().get(PoolImpl.class, 1L);
-    RunPurpose purpose = (RunPurpose) currentSession().get(RunPurpose.class, 1L);
+    Pool pool = (Pool) currentSession().find(PoolImpl.class, 1L);
+    RunPurpose purpose = (RunPurpose) currentSession().find(RunPurpose.class, 1L);
     SequencingContainerModel containerModel =
-        (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, 1L);
-    SequencingParameters parameters = (SequencingParameters) currentSession().get(SequencingParameters.class, 1L);
+        (SequencingContainerModel) currentSession().find(SequencingContainerModel.class, 1L);
+    SequencingParameters parameters = (SequencingParameters) currentSession().find(SequencingParameters.class, 1L);
     assertEquals(1, getTestSubject().listByAttributes(pool, purpose, null, parameters, 1).size());
     assertEquals(1, getTestSubject().listByAttributes(pool, purpose, containerModel, parameters, 2).size());
     assertEquals(0, getTestSubject().listByAttributes(pool, purpose, null, parameters, 10).size());

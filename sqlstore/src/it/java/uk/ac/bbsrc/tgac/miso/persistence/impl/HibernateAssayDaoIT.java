@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -32,7 +32,7 @@ public class HibernateAssayDaoIT extends AbstractHibernateSaveDaoTest<Assay, Hib
     Assay assay = new Assay();
     assay.setAlias("New Assay");
     assay.setVersion("1.0");
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     Date now = new Date();
     assay.setCreator(user);
     assay.setCreationTime(now);
@@ -59,7 +59,7 @@ public class HibernateAssayDaoIT extends AbstractHibernateSaveDaoTest<Assay, Hib
 
   @Test
   public void testGetUsage() throws Exception {
-    Assay assay = (Assay) currentSession().get(Assay.class, 1L);
+    Assay assay = (Assay) currentSession().find(Assay.class, 1L);
     assertEquals(1L, getTestSubject().getUsage(assay));
   }
 
@@ -73,7 +73,7 @@ public class HibernateAssayDaoIT extends AbstractHibernateSaveDaoTest<Assay, Hib
     final long assayId = 2L;
     final long metricId = 2L;
 
-    Assay before = (Assay) currentSession().get(Assay.class, assayId);
+    Assay before = (Assay) currentSession().find(Assay.class, assayId);
     assertEquals(2, before.getAssayMetrics().size());
     AssayMetric beforeMetric =
         before.getAssayMetrics().stream().filter(x -> x.getMetric().getId() == metricId).findAny().orElse(null);
@@ -83,7 +83,7 @@ public class HibernateAssayDaoIT extends AbstractHibernateSaveDaoTest<Assay, Hib
 
     clearSession();
 
-    Assay after = (Assay) currentSession().get(Assay.class, assayId);
+    Assay after = (Assay) currentSession().find(Assay.class, assayId);
     assertEquals(1, after.getAssayMetrics().size());
     assertTrue(after.getAssayMetrics().stream().noneMatch(x -> x.getMetric().getId() == metricId));
   }

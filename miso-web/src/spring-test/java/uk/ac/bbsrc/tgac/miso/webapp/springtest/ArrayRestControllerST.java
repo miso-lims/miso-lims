@@ -1,49 +1,26 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.web.servlet.*;
 
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
-
 import javax.ws.rs.core.MediaType;
-
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
-import com.jayway.jsonpath.JsonPath;
 
-import static org.hamcrest.Matchers.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.Array;
 import uk.ac.bbsrc.tgac.miso.dto.ArrayDto;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ArrayRestController.BulkUpdateRequestItem;
 
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.View;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.security.test.context.support.WithMockUser;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
 import java.util.Arrays;
-import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
-
+import java.util.List;
 
 public class ArrayRestControllerST extends AbstractST {
 
@@ -71,7 +48,7 @@ public class ArrayRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "hhenderson", roles = {"INTERNAL"})
   public void testUpdate() throws Exception {
-    ArrayDto array = Dtos.asDto(currentSession().get(controllerClass, 2));
+    ArrayDto array = Dtos.asDto(currentSession().find(controllerClass, 2));
     array.setAlias("testing array");
 
     Array updatedArray = baseTestUpdate(CONTROLLER_BASE, array, 2, controllerClass);
@@ -80,7 +57,7 @@ public class ArrayRestControllerST extends AbstractST {
 
   @Test
   public void testRemoveSample() throws Exception {
-    Array updatedArray = currentSession().get(controllerClass, 1);
+    Array updatedArray = currentSession().find(controllerClass, 1);
     assertNotNull(updatedArray.getSample("R01C01"));
 
     getMockMvc()
@@ -91,7 +68,7 @@ public class ArrayRestControllerST extends AbstractST {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
-    updatedArray = currentSession().get(controllerClass, 1);
+    updatedArray = currentSession().find(controllerClass, 1);
     assertNull(updatedArray.getSample("R01C01"));
   }
 
@@ -103,14 +80,14 @@ public class ArrayRestControllerST extends AbstractST {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
 
-    Array updatedArray = currentSession().get(controllerClass, 1);
-    SampleImpl addedSample = currentSession().get(SampleImpl.class, 9);
+    Array updatedArray = currentSession().find(controllerClass, 1);
+    SampleImpl addedSample = currentSession().find(SampleImpl.class, 9);
     assertEquals(updatedArray.getSample("R02C01"), addedSample);
   }
 
   @Test
   public void testBulkAddSamples() throws Exception {
-    Array updatedArray = currentSession().get(controllerClass, 1);
+    Array updatedArray = currentSession().find(controllerClass, 1);
     assertNull(updatedArray.getSample("R02C01"));
     assertNull(updatedArray.getSample("R03C01"));
 
@@ -124,15 +101,15 @@ public class ArrayRestControllerST extends AbstractST {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
-    updatedArray = currentSession().get(controllerClass, 1);
-    assertEquals(currentSession().get(SampleImpl.class, 9), updatedArray.getSample("R02C01"));
-    assertEquals(currentSession().get(SampleImpl.class, 11), updatedArray.getSample("R03C01"));
+    updatedArray = currentSession().find(controllerClass, 1);
+    assertEquals(currentSession().find(SampleImpl.class, 9), updatedArray.getSample("R02C01"));
+    assertEquals(currentSession().find(SampleImpl.class, 11), updatedArray.getSample("R03C01"));
   }
 
   @Test
   public void testBulkUpdateSamples() throws Exception {
-    Array updatedArray = currentSession().get(controllerClass, 1);
-    assertEquals(currentSession().get(SampleImpl.class, 8), updatedArray.getSample("R01C01"));
+    Array updatedArray = currentSession().find(controllerClass, 1);
+    assertEquals(currentSession().find(SampleImpl.class, 8), updatedArray.getSample("R01C01"));
     assertNull(updatedArray.getSample("R02C01"));
 
     getMockMvc()
@@ -145,9 +122,9 @@ public class ArrayRestControllerST extends AbstractST {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
-    updatedArray = currentSession().get(controllerClass, 1);
-    assertEquals(currentSession().get(SampleImpl.class, 9), updatedArray.getSample("R01C01"));
-    assertEquals(currentSession().get(SampleImpl.class, 11), updatedArray.getSample("R02C01"));
+    updatedArray = currentSession().find(controllerClass, 1);
+    assertEquals(currentSession().find(SampleImpl.class, 9), updatedArray.getSample("R01C01"));
+    assertEquals(currentSession().find(SampleImpl.class, 11), updatedArray.getSample("R02C01"));
   }
 
   @Test
@@ -162,7 +139,7 @@ public class ArrayRestControllerST extends AbstractST {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
-    Array updatedArray = currentSession().get(controllerClass, 1);
+    Array updatedArray = currentSession().find(controllerClass, 1);
     assertNotNull(updatedArray.getSample("R01C01"));
     assertNotNull(updatedArray.getSample("R02C01"));
     assertNotNull(updatedArray.getSample("R03C01"));
@@ -178,7 +155,7 @@ public class ArrayRestControllerST extends AbstractST {
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
-    updatedArray = currentSession().get(controllerClass, 1);
+    updatedArray = currentSession().find(controllerClass, 1);
     assertNull(updatedArray.getSample("R01C01"));
     assertNull(updatedArray.getSample("R02C01"));
     assertNull(updatedArray.getSample("R03C01"));
@@ -186,7 +163,7 @@ public class ArrayRestControllerST extends AbstractST {
 
   @Test
   public void testFindSamples() throws Exception {
-    baseSearchByTerm(CONTROLLER_BASE + "/sample-search", "SAM8", Arrays.asList(8));
+    baseSearchByTerm(CONTROLLER_BASE + "/sample-search", "SAM8", List.of(8));
   }
 
   @Test

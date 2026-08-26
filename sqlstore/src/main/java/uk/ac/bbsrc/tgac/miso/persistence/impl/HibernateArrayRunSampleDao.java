@@ -44,7 +44,7 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
       return null;
     }
 
-    ArrayRun persistedRun = currentSession().get(ArrayRun.class, run.getId());
+    ArrayRun persistedRun = currentSession().find(ArrayRun.class, run.getId());
     if (persistedRun == null || persistedRun.getArray() == null) {
       return null;
     }
@@ -69,7 +69,7 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
     id.setPosition(position);
     id.setSample(expectedSample);
 
-    ArrayRunSample result = currentSession().get(ArrayRunSample.class, id);
+    ArrayRunSample result = currentSession().find(ArrayRunSample.class, id);
     if (result == null) {
       result = new ArrayRunSample(persistedRun, persistedArray, position, expectedSample);
     }
@@ -78,7 +78,7 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
 
   @Override
   public List<ArrayRunSample> listByRunId(long arrayRunId) throws IOException {
-    ArrayRun persistedRun = currentSession().get(ArrayRun.class, arrayRunId);
+    ArrayRun persistedRun = currentSession().find(ArrayRun.class, arrayRunId);
     if (persistedRun == null || persistedRun.getArray() == null) {
       return new ArrayList<>();
     }
@@ -113,12 +113,12 @@ public class HibernateArrayRunSampleDao implements ArrayRunSampleDao {
 
   @Override
   public void save(ArrayRunSample arrayRunSample) throws IOException {
-    currentSession().saveOrUpdate(arrayRunSample);
+    currentSession().merge(arrayRunSample);
   }
 
   @Override
   public void delete(ArrayRunSample arrayRunSample) throws IOException {
-    ArrayRunSample managed = currentSession().get(ArrayRunSample.class, new ArrayRunSampleId(
+    ArrayRunSample managed = currentSession().find(ArrayRunSample.class, new ArrayRunSampleId(
         arrayRunSample.getArrayRun(),
         arrayRunSample.getArray(),
         arrayRunSample.getPosition(),

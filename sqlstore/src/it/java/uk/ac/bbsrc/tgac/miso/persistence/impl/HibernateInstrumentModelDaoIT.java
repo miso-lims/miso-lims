@@ -1,15 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
@@ -26,8 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @Autowired
   @Spy
@@ -39,11 +37,16 @@ public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
   @InjectMocks
   private HibernateInstrumentModelDao dao;
 
-  @Before
+  @BeforeEach
   public void setup() throws IOException {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setEntityManager(entityManager);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
@@ -83,7 +86,7 @@ public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
     long id = 16L;
     String alias = "Illumina HiSeq 2500";
     String description = "4-channel flow cell";
-    InstrumentModel old = (InstrumentModel) currentSession().get(InstrumentModel.class, id);
+    InstrumentModel old = (InstrumentModel) currentSession().find(InstrumentModel.class, id);
     assertNotEquals(alias, old.getAlias());
     assertNotEquals(description, old.getDescription());
     old.setAlias(alias);
@@ -92,7 +95,7 @@ public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    InstrumentModel saved = (InstrumentModel) currentSession().get(InstrumentModel.class, id);
+    InstrumentModel saved = (InstrumentModel) currentSession().find(InstrumentModel.class, id);
     assertNotNull(saved);
     assertEquals(old.getAlias(), saved.getAlias());
     assertEquals(old.getDescription(), saved.getDescription());
@@ -100,19 +103,19 @@ public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
 
   @Test
   public void testCreate() throws IOException {
-    InstrumentModel newPlatform = makeInstrumentModel("PacBio", "Mystery container", 1);
+    InstrumentModel newPlatform = makeInstrumentModel("PacBio", "Mystery container");
     newPlatform.setInstrumentType(InstrumentType.SEQUENCER);
     long newId = dao.create(newPlatform);
 
     clearSession();
 
-    InstrumentModel saved = (InstrumentModel) currentSession().get(InstrumentModel.class, newId);
+    InstrumentModel saved = (InstrumentModel) currentSession().find(InstrumentModel.class, newId);
     assertNotNull(saved);
     assertEquals(newPlatform.getAlias(), saved.getAlias());
     assertEquals(newPlatform.getDescription(), saved.getDescription());
   }
 
-  InstrumentModel makeInstrumentModel(String instrumentModel, String description, Integer numContainers) {
+  InstrumentModel makeInstrumentModel(String instrumentModel, String description) {
     InstrumentModel platform = new InstrumentModel();
     platform.setDescription(description);
     platform.setAlias(instrumentModel);
@@ -130,19 +133,19 @@ public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetUsage() throws Exception {
-    InstrumentModel model = (InstrumentModel) currentSession().get(InstrumentModel.class, 16L);
+    InstrumentModel model = (InstrumentModel) currentSession().find(InstrumentModel.class, 16L);
     assertEquals(3L, dao.getUsage(model));
   }
 
   @Test
   public void testGetMaxContainersUsedSequencer() throws Exception {
-    InstrumentModel sequencer = (InstrumentModel) currentSession().get(InstrumentModel.class, 16L);
+    InstrumentModel sequencer = (InstrumentModel) currentSession().find(InstrumentModel.class, 16L);
     assertEquals(1, dao.getMaxContainersUsed(sequencer));
   }
 
   @Test
   public void testGetMaxContainersUsedArrayScanner() throws Exception {
-    InstrumentModel scanner = (InstrumentModel) currentSession().get(InstrumentModel.class, 30L);
+    InstrumentModel scanner = (InstrumentModel) currentSession().find(InstrumentModel.class, 30L);
     assertEquals(0, dao.getMaxContainersUsed(scanner));
   }
 
@@ -156,7 +159,7 @@ public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetPositionUsage() throws Exception {
-    InstrumentPosition position = (InstrumentPosition) currentSession().get(InstrumentPosition.class, 1L);
+    InstrumentPosition position = (InstrumentPosition) currentSession().find(InstrumentPosition.class, 1L);
     assertEquals(2, dao.getPositionUsage(position));
   }
 
@@ -166,13 +169,13 @@ public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
     long modelId = 16L;
     InstrumentPosition position = new InstrumentPosition();
     position.setAlias(alias);
-    InstrumentModel model = (InstrumentModel) currentSession().get(InstrumentModel.class, modelId);
+    InstrumentModel model = (InstrumentModel) currentSession().find(InstrumentModel.class, modelId);
     position.setInstrumentModel(model);
     long savedId = dao.createPosition(position);
 
     clearSession();
 
-    InstrumentPosition saved = (InstrumentPosition) currentSession().get(InstrumentPosition.class, savedId);
+    InstrumentPosition saved = (InstrumentPosition) currentSession().find(InstrumentPosition.class, savedId);
     assertNotNull(saved);
     assertEquals(alias, saved.getAlias());
     assertEquals(modelId, saved.getInstrumentModel().getId());
@@ -181,13 +184,13 @@ public class HibernateInstrumentModelDaoIT extends AbstractDAOTest {
   @Test
   public void testDeletePosition() throws Exception {
     long id = 3L;
-    InstrumentPosition before = (InstrumentPosition) currentSession().get(InstrumentPosition.class, id);
+    InstrumentPosition before = (InstrumentPosition) currentSession().find(InstrumentPosition.class, id);
     assertNotNull(before);
     dao.deletePosition(before);
 
     clearSession();
 
-    InstrumentPosition after = (InstrumentPosition) currentSession().get(InstrumentPosition.class, id);
+    InstrumentPosition after = (InstrumentPosition) currentSession().find(InstrumentPosition.class, id);
     assertNull(after);
   }
 

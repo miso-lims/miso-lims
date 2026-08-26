@@ -2,9 +2,6 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
 import java.math.BigDecimal;
 
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateQcDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
@@ -14,11 +11,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class HibernateContainerQCDaoIT
     extends AbstractHibernateQcDaoTest<ContainerQC, HibernateContainerQcDao, SequencerPartitionContainer, ContainerQcControlRun> {
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   public HibernateContainerQCDaoIT() {
     super(ContainerQC.class, SequencerPartitionContainerImpl.class, ContainerQcControlRun.class, QcTarget.Container, 16L, 1, 1, 7L, 1, 1);
@@ -46,8 +42,8 @@ public class HibernateContainerQCDaoIT
   @Override
   public void testUpdateEntity() throws Exception {
     // No valid correspondingfields for containers
-    exception.expect(UnsupportedOperationException.class);
-    getTestSubject().updateEntity(1L, QcCorrespondingField.CONCENTRATION, new BigDecimal(1), "nM");
+    assertThrows(UnsupportedOperationException.class,
+        () -> getTestSubject().updateEntity(1L, QcCorrespondingField.CONCENTRATION, new BigDecimal(1), "nM"));
   }
 
   @Override

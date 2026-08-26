@@ -1,14 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListContainerView;
@@ -19,12 +17,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateListContainerViewDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
-
   private HibernateListContainerViewDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateListContainerViewDao();
     sut.setEntityManager(getEntityManager());
@@ -74,8 +69,7 @@ public class HibernateListContainerViewDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListOffsetBadLimit() throws IOException {
-    exception.expect(IOException.class);
-    sut.list(5, -3, true, "id");
+    assertThrows(IOException.class, () -> sut.list(5, -3, true, "id"));
   }
 
   @Test

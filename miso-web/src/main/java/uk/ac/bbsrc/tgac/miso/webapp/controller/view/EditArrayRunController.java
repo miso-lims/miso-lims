@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
@@ -42,7 +41,7 @@ public class EditArrayRunController {
   @Autowired
   private InstrumentService instrumentService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @ModelAttribute("healthTypes")
   public Collection<String> populateHealthTypes() {

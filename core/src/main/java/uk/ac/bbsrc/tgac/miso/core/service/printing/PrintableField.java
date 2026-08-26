@@ -1,19 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.BarcodableVisitor;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
@@ -425,9 +422,9 @@ public enum PrintableField implements PrintableText {
   }
 
   @Override
-  public final void asJson(JsonGenerator generator) throws IOException, JsonProcessingException {
+  public final void asJson(JsonGenerator generator) {
     generator.writeStartObject();
-    generator.writeStringField("use", name());
+    generator.writeStringProperty("use", name());
     generator.writeEndObject();
   }
 

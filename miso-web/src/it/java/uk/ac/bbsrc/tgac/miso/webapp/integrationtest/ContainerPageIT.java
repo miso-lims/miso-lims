@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -34,7 +34,7 @@ public class ContainerPageIT extends AbstractIT {
     idForPlatform.put("PacBio RS II", 3L);
   }
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -45,8 +45,8 @@ public class ContainerPageIT extends AbstractIT {
     // correct container model
     ListTabbedPage listContainers = ListTabbedPage.getTabbedListPage(getDriver(), getBaseUrl(), ListTarget.CONTAINERS);
     String containerName = PlatformType.get("Illumina").getContainerName();
-    InstrumentModel miseq = (InstrumentModel) getSession().get(InstrumentModel.class, 2L);
-    SequencingContainerModel model = (SequencingContainerModel) getSession().get(SequencingContainerModel.class, 3L);
+    InstrumentModel miseq = (InstrumentModel) getSession().find(InstrumentModel.class, 2L);
+    SequencingContainerModel model = (SequencingContainerModel) getSession().find(SequencingContainerModel.class, 3L);
     String newUrl = listContainers
         .clickButtonAndGetUrl(ButtonText.ADD + " " + containerName,
             Lists.newArrayList(miseq.getAlias(), model.getAlias()));
@@ -84,7 +84,7 @@ public class ContainerPageIT extends AbstractIT {
     assertFieldValues("post-save", fields, page2);
     long savedId = Long.parseLong(page2.getField(Field.ID));
     SequencerPartitionContainer savedContainer =
-        (SequencerPartitionContainer) getSession().get(SequencerPartitionContainerImpl.class,
+        (SequencerPartitionContainer) getSession().find(SequencerPartitionContainerImpl.class,
             savedId);
     assertContainerAttributes(fields, savedContainer);
   }
@@ -115,7 +115,7 @@ public class ContainerPageIT extends AbstractIT {
     ContainerPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
     SequencerPartitionContainer savedContainer =
-        (SequencerPartitionContainer) getSession().get(SequencerPartitionContainerImpl.class,
+        (SequencerPartitionContainer) getSession().find(SequencerPartitionContainerImpl.class,
             6001L);
     assertContainerAttributes(fields, savedContainer);
   }

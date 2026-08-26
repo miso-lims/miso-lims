@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -8,11 +8,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -23,15 +20,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.BarcodableView;
 
 public class HibernateBarcodableViewDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
-
   private HibernateBarcodableViewDao dao;
 
   @PersistenceContext
   private EntityManager entityManager;
 
-  @Before
+  @BeforeEach
   public void setup() {
     dao = new HibernateBarcodableViewDao();
     dao.setEntityManager(entityManager);
@@ -39,8 +33,7 @@ public class HibernateBarcodableViewDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSearchNull() {
-    exception.expect(IllegalArgumentException.class);
-    dao.search(null);
+    assertThrows(IllegalArgumentException.class,  () -> dao.search(null));
   }
 
   @Test
@@ -86,20 +79,17 @@ public class HibernateBarcodableViewDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSearchByBarcodeNull() {
-    exception.expect(IllegalArgumentException.class);
-    dao.searchByBarcode(null, Arrays.asList(EntityType.SAMPLE));
+    assertThrows(IllegalArgumentException.class,  () -> dao.searchByBarcode(null, List.of(EntityType.SAMPLE)));
   }
 
   @Test
   public void testSearchByBarcodeNullTypes() {
-    exception.expect(IllegalArgumentException.class);
-    dao.searchByBarcode("asdf", null);
+    assertThrows(IllegalArgumentException.class,  () -> dao.searchByBarcode("asdf", null));
   }
 
   @Test
   public void testSearchByBarcodeNoTypes() {
-    exception.expect(IllegalArgumentException.class);
-    dao.searchByBarcode("asdf", Collections.emptyList());
+    assertThrows(IllegalArgumentException.class,  () -> dao.searchByBarcode("asdf", Collections.emptyList()));
   }
 
   @Test
@@ -123,25 +113,22 @@ public class HibernateBarcodableViewDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSearchByAliasNull() {
-    exception.expect(IllegalArgumentException.class);
-    dao.searchByAlias(null, Arrays.asList(EntityType.SAMPLE));
+    assertThrows(IllegalArgumentException.class,  () -> dao.searchByAlias(null, List.of(EntityType.SAMPLE)));
   }
 
   @Test
   public void testSearchByAliasNullTypes() {
-    exception.expect(IllegalArgumentException.class);
-    dao.searchByAlias("asdf", null);
+    assertThrows(IllegalArgumentException.class,  () -> dao.searchByAlias("asdf", null));
   }
 
   @Test
   public void testSearchByAliasNoTypes() {
-    exception.expect(IllegalArgumentException.class);
-    dao.searchByAlias("asdf", Collections.emptyList());
+    assertThrows(IllegalArgumentException.class,  () -> dao.searchByAlias("asdf", Collections.emptyList()));
   }
 
   @Test
   public void testSearchByAliasSingleType() {
-    testSearchByAlias("TEST_0001_TISSUE_2", Arrays.asList(EntityType.SAMPLE), EntityType.SAMPLE, 17);
+    testSearchByAlias("TEST_0001_TISSUE_2", List.of(EntityType.SAMPLE), EntityType.SAMPLE, 17);
   }
 
   @Test
@@ -187,14 +174,12 @@ public class HibernateBarcodableViewDaoIT extends AbstractDAOTest {
 
   @Test
   public void testCheckForExistingNull() throws Exception {
-    exception.expect(IllegalArgumentException.class);
-    assertNull(dao.checkForExisting(null));
+    assertThrows(IllegalArgumentException.class,  () -> assertNull(dao.checkForExisting(null)));
   }
 
   @Test
   public void testCheckForExistingEmpty() throws Exception {
-    exception.expect(IllegalArgumentException.class);
-    assertNull(dao.checkForExisting(""));
+    assertThrows(IllegalArgumentException.class,  () -> assertNull(dao.checkForExisting("")));
   }
 
   @Test
@@ -203,8 +188,7 @@ public class HibernateBarcodableViewDaoIT extends AbstractDAOTest {
   }
 
   private void testSearchByBarcode(String identificationBarcode, Collection<EntityType> typeFilter,
-      EntityType targetType,
-      long targetId) {
+      EntityType targetType, long targetId) {
     List<BarcodableView> results = dao.searchByBarcode(identificationBarcode, typeFilter);
     assertSingleResult(results, targetType, targetId);
   }

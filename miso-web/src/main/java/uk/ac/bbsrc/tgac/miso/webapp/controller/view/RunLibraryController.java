@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.QcNodeType;
@@ -56,7 +56,7 @@ public class RunLibraryController {
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @PostMapping("/metrics")
   public ModelAndView getRunLibraryQcTable(@RequestParam Map<String, String> form, ModelMap model) throws IOException {
@@ -136,12 +136,8 @@ public class RunLibraryController {
       throws IOException {
     RunLibraryQcTableRequestDto data = null;
     if (form.containsKey("data")) {
-      try {
-        String json = form.get("data");
-        data = mapper.readValue(json, RunLibraryQcTableRequestDto.class);
-      } catch (JsonProcessingException e) {
-        throw new ClientErrorException("Invalid request data", e);
-      }
+      String json = form.get("data");
+      data = mapper.readValue(json, RunLibraryQcTableRequestDto.class);
     }
 
     if (data == null) {

@@ -22,9 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
@@ -87,7 +86,7 @@ public class EditLibraryAliquotController {
   @Autowired
   private IndexChecker indexChecker;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @GetMapping("/{aliquotId}")
   public ModelAndView edit(ModelMap model, @PathVariable long aliquotId) throws IOException {
@@ -175,7 +174,7 @@ public class EditLibraryAliquotController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
       config.set("defaultTargetedSequencingByProject", mapper.valueToTree(defaultTargetedSequencingByProject));
     }
@@ -261,7 +260,7 @@ public class EditLibraryAliquotController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
       config.set("defaultTargetedSequencingByProject", mapper.valueToTree(defaultTargetedSequencingByProject));
     }
@@ -304,7 +303,7 @@ public class EditLibraryAliquotController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) {
       // no config required
     }
   };
@@ -363,7 +362,7 @@ public class EditLibraryAliquotController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
     }
   }
@@ -385,7 +384,7 @@ public class EditLibraryAliquotController {
     private final BoxDto newBox;
 
     public BulkCustomPoolTableBackend(int poolQuantity, String idString, LibraryAliquotService libraryAliquotService,
-        BoxDto newBox, ObjectMapper mapper) throws IOException {
+        BoxDto newBox, JsonMapper mapper) throws IOException {
       super("pool", PoolDto.class, mapper);
       this.poolQuantity = poolQuantity;
       List<LibraryAliquot> ldis = libraryAliquotService.listByIdList(parseIds(idString));
@@ -403,7 +402,7 @@ public class EditLibraryAliquotController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       aliquots.forEach(config.putArray("aliquotsToPool")::addPOJO);
       config.putPOJO("box", newBox);
     }
@@ -461,7 +460,7 @@ public class EditLibraryAliquotController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) {
       config.putPOJO("box", newBox);
     }
   }

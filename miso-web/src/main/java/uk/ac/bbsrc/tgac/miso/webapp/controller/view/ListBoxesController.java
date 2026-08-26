@@ -14,9 +14,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxUseService;
 import uk.ac.bbsrc.tgac.miso.webapp.util.TabbedListItemsPage;
@@ -28,7 +27,7 @@ public class ListBoxesController {
   @Autowired
   private BoxUseService boxUseService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @ModelAttribute("title")
   public String title() {
@@ -60,21 +59,21 @@ public class ListBoxesController {
   public class TabbedListBoxPage extends TabbedListItemsPage {
 
     public <T> TabbedListBoxPage(String targetType, String property, Stream<T> tabItems, Function<T, String> getName,
-        Function<T, Object> getValue, ObjectMapper mapper) {
+        Function<T, Object> getValue, JsonMapper mapper) {
       super(targetType, property, tabItems, getName, getValue, mapper);
     }
 
     public <T> TabbedListBoxPage(String targetType, String property, Stream<T> tabItems, Comparator<String> tabSorter,
-        Function<T, String> getName, Function<T, Object> getValue, ObjectMapper mapper) {
+        Function<T, String> getName, Function<T, Object> getValue, JsonMapper mapper) {
       super(targetType, property, tabItems, tabSorter, getName, getValue, mapper);
     }
 
-    public TabbedListBoxPage(String targetType, String property, SortedMap<String, String> tabs, ObjectMapper mapper) {
+    public TabbedListBoxPage(String targetType, String property, SortedMap<String, String> tabs, JsonMapper mapper) {
       super(targetType, property, tabs, mapper);
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       config.put("showFreezerLocation", false);
       config.put("showStorageLocation", true);
     }
