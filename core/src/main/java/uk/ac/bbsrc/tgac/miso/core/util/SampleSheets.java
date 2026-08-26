@@ -23,8 +23,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.LibraryAliquotProperty;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.PoolProperty;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.RequisitionProperty;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheet;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetField;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetFieldCommonSource;
@@ -33,7 +35,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetFieldSource.A
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetParameter;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetSection;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SequencingParametersProperty;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.GrandparentSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 
 public class SampleSheets {
@@ -264,6 +269,13 @@ public class SampleSheets {
             .map(PoolElement::getAliquot)
             .toList();
         return getMultiValue(source, aliquots, SampleSheets::getLibraryAliquotValue);
+      case REQUISITION:
+        List<ListLibraryAliquotView> requisitionAliquots = input.getPoolLayout().values().stream()
+            .flatMap(map -> map.values().stream().filter(Objects::nonNull))
+            .flatMap(pool -> pool.getPoolContents() == null ? Stream.empty() : pool.getPoolContents().stream())
+            .map(PoolElement::getAliquot)
+            .toList();
+        return getMultiValue(source, requisitionAliquots, SampleSheets::getRequisitionValue);
       case CURRENT_TIME:
         return formatCurrentDateTime(source.getDateFormat());
       default:
@@ -303,6 +315,13 @@ public class SampleSheets {
             .map(PoolElement::getAliquot)
             .toList();
         return getMultiValue(source, aliquots, SampleSheets::getLibraryAliquotValue);
+      case REQUISITION:
+        List<ListLibraryAliquotView> requisitionAliquots = poolsByPartition.values().stream()
+            .filter(Objects::nonNull)
+            .flatMap(pool -> pool.getPoolContents() == null ? Stream.empty() : pool.getPoolContents().stream())
+            .map(PoolElement::getAliquot)
+            .toList();
+        return getMultiValue(source, requisitionAliquots, SampleSheets::getRequisitionValue);
       case CURRENT_TIME:
         return formatCurrentDateTime(source.getDateFormat());
       default:
@@ -341,6 +360,8 @@ public class SampleSheets {
         return getPoolValue(source, pool);
       case LIBRARY_ALIQUOT:
         return getLibraryAliquotValue(source, libraryAliquot);
+      case REQUISITION:
+        return getRequisitionValue(source, libraryAliquot);
       case CURRENT_TIME:
         return formatCurrentDateTime(source.getDateFormat());
       default:
@@ -471,6 +492,37 @@ public class SampleSheets {
       default:
         throw new IllegalArgumentException("Unexpected parameter type: %s".formatted(parameter.getType()));
     }
+  }
+
+  protected static Requisition getEffectiveRequisition(ListLibraryAliquotView aliquot) {
+    ParentLibrary library = aliquot.getParentLibrary();
+    if (library.getRequisition() != null) {
+      return library.getRequisition();
+    }
+    ParentSample sample = library.getParentSample();
+    if (sample == null) {
+      return null;
+    }
+    if (sample.getRequisition() != null) {
+      return sample.getRequisition();
+    }
+    GrandparentSample parent = sample.getParentSample();
+    while (parent != null) {
+      if (parent.getRequisition() != null) {
+        return parent.getRequisition();
+      }
+      parent = parent.getParentSample();
+    }
+    return null;
+  }
+
+  protected static String getRequisitionValue(SampleSheetFieldSource source, ListLibraryAliquotView aliquot) {
+    Requisition requisition = getEffectiveRequisition(aliquot);
+    if (requisition == null) {
+      return null;
+    }
+    RequisitionProperty property = RequisitionProperty.valueOf(source.getSourceProperty());
+    return property.extract(requisition);
   }
 
   private static JsonNode findByValue(SampleSheetParameter parameter, String value) {

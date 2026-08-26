@@ -16,6 +16,7 @@ import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 
 @Entity
 @Immutable
@@ -50,6 +51,10 @@ public class ParentSample implements Serializable {
   @ManyToOne
   @JoinColumn(name = "sampleClassId")
   private ParentSampleClass parentSampleClass;
+
+  @ManyToOne
+  @JoinColumn(name = "requisitionId")
+  private Requisition requisition;
 
   @OneToOne
   @PrimaryKeyJoinColumn
@@ -154,6 +159,14 @@ public class ParentSample implements Serializable {
 
   public void setParentSample(GrandparentSample parentSample) {
     this.parentSample = parentSample;
+  }
+
+  public Requisition getRequisition() {
+    return requisition;
+  }
+
+  public void setRequisition(Requisition requisition) {
+    this.requisition = requisition;
   }
 
 }

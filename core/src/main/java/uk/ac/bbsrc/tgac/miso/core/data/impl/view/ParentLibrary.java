@@ -12,9 +12,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -43,6 +46,18 @@ public class ParentLibrary implements IndexedLibrary, Serializable {
   @ManyToOne
   @JoinColumn(name = "index2Id")
   private LibraryIndex index2;
+
+  @ManyToOne
+  @JoinColumn(name = "librarySelectionType")
+  private LibrarySelectionType librarySelectionType;
+
+  @ManyToOne
+  @JoinColumn(name = "libraryStrategyType")
+  private LibraryStrategyType libraryStrategyType;
+
+  @ManyToOne
+  @JoinColumn(name = "requisitionId")
+  private Requisition requisition;
 
   @ManyToOne(targetEntity = DetailedQcStatusImpl.class)
   @JoinColumn(name = "detailedQcStatusId")
@@ -126,6 +141,30 @@ public class ParentLibrary implements IndexedLibrary, Serializable {
 
   public void setUmis(boolean umis) {
     this.umis = umis;
+  }
+
+  public LibrarySelectionType getLibrarySelectionType() {
+    return librarySelectionType;
+  }
+
+  public void setLibrarySelectionType(LibrarySelectionType librarySelectionType) {
+    this.librarySelectionType = librarySelectionType;
+  }
+
+  public LibraryStrategyType getLibraryStrategyType() {
+    return libraryStrategyType;
+  }
+
+  public void setLibraryStrategyType(LibraryStrategyType libraryStrategyType) {
+    this.libraryStrategyType = libraryStrategyType;
+  }
+
+  public Requisition getRequisition() {
+    return requisition;
+  }
+
+  public void setRequisition(Requisition requisition) {
+    this.requisition = requisition;
   }
 
   public DetailedQcStatus getDetailedQcStatus() {

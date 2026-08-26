@@ -138,6 +138,44 @@ public enum LibraryAliquotProperty {
     public String extract(ListLibraryAliquotView aliquot) {
       return aliquot.getCreated() == null ? null : new SimpleDateFormat("yyyy-MM-dd").format(aliquot.getCreated());
     }
+  },
+
+  PLATFORM("Platform") {
+    @Override
+    public String extract(ListLibraryAliquotView aliquot) {
+      return aliquot.getParentLibrary().getPlatformType() == null ? null
+          : aliquot.getParentLibrary().getPlatformType().getKey();
+    }
+  },
+
+  SELECTION("Selection") {
+    @Override
+    public String extract(ListLibraryAliquotView aliquot) {
+      return aliquot.getParentLibrary().getLibrarySelectionType() == null ? null
+          : aliquot.getParentLibrary().getLibrarySelectionType().getName();
+    }
+  },
+
+  STRATEGY("Strategy") {
+    @Override
+    public String extract(ListLibraryAliquotView aliquot) {
+      return aliquot.getParentLibrary().getLibraryStrategyType() == null ? null
+          : aliquot.getParentLibrary().getLibraryStrategyType().getName();
+    }
+  },
+
+  HAS_UMIS("Has UMIs") {
+    @Override
+    public String extract(ListLibraryAliquotView aliquot) {
+      return aliquot.getParentLibrary().getUmis() ? "True" : "False";
+    }
+  },
+
+  TARGETED_SEQUENCING("Targeted Sequencing") {
+    @Override
+    public String extract(ListLibraryAliquotView aliquot) {
+      return aliquot.getTargetedSequencing() == null ? null : aliquot.getTargetedSequencing().getAlias();
+    }
   };
 
   private final String label;

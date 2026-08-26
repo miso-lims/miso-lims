@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 
 @Entity
 @Immutable
@@ -33,6 +34,10 @@ public class GrandparentSample implements Serializable {
   @ManyToOne
   @JoinColumn(name = "parentId")
   private GrandparentSample parentSample;
+
+  @ManyToOne
+  @JoinColumn(name = "requisitionId")
+  private Requisition requisition;
 
   public long getId() {
     return sampleId;
@@ -64,6 +69,14 @@ public class GrandparentSample implements Serializable {
 
   public void setParentSample(GrandparentSample parentSample) {
     this.parentSample = parentSample;
+  }
+
+  public Requisition getRequisition() {
+    return requisition;
+  }
+
+  public void setRequisition(Requisition requisition) {
+    this.requisition = requisition;
   }
 
 }

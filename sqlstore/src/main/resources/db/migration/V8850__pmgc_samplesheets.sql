@@ -1,8 +1,7 @@
 -- GLT-4829: PMGC sample sheet formats
--- Requisition ID/Alias, Assay, Sample Type, Sci. Name, Platform, Type, Selection, Strategy, 
--- Has UMIs, Requisition Description, Requisition Contacts, Targeted Sequencing, FCID,
--- barcode_ids and slide_matrix_id have no data source in MISO yet -- included as blank
--- placeholder columns (sources: []) 
+-- Sample Type, Sci. Name, Type, Requisition Description, FCID, barcode_ids and
+-- slide_matrix_id have no data source in MISO yet -- included as blank placeholder
+-- columns (sources: [])
 
 INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
 ('Visium', 'ILLUMINA', '[]', '[
@@ -61,15 +60,30 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition ID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ID" 
+          }
+        ]
       },
       {
         "name": "Requisition Alias",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ALIAS" 
+          }
+        ]
       },
       {
         "name": "Assay",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ASSAY" 
+          }
+        ]
       },
       {
         "name": "Tissue Origin",
@@ -117,7 +131,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Platform",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "PLATFORM"
+          }
+        ]
       },
       {
         "name": "Type",
@@ -125,11 +144,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Selection",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "SELECTION"
+          }
+        ]
       },
       {
         "name": "Strategy",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "STRATEGY"
+          }
+        ]
       },
       {
         "name": "Index Kit",
@@ -180,7 +209,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Has UMIs",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "HAS_UMIS"
+          }
+        ]
       },
       {
         "name": "Creation Date",
@@ -197,11 +231,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Contacts",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "CONTACTS"
+          }
+        ]
       },
       {
         "name": "Targeted Sequencing",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "TARGETED_SEQUENCING"
+          }
+        ]
       },
       {
         "name": "External Name",
@@ -271,15 +315,30 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition ID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ID" 
+          }
+        ]
       },
       {
         "name": "Requisition Alias",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ALIAS" 
+          }
+        ]
       },
       {
         "name": "Assay",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ASSAY" 
+          }
+        ]
       },
       {
         "name": "Tissue Origin",
@@ -327,7 +386,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Platform",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "PLATFORM"
+          }
+        ]
       },
       {
         "name": "Type",
@@ -335,11 +399,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Selection",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "SELECTION"
+          }
+        ]
       },
       {
         "name": "Strategy",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "STRATEGY"
+          }
+        ]
       },
       {
         "name": "Index Kit",
@@ -390,7 +464,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Has UMIs",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "HAS_UMIS"
+          }
+        ]
       },
       {
         "name": "Creation Date",
@@ -407,11 +486,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Contacts",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "CONTACTS" 
+          }
+        ]
       },
       {
         "name": "Targeted Sequencing",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "TARGETED_SEQUENCING"
+          }
+        ]
       },
       {
         "name": "External Name",
@@ -481,15 +570,30 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition ID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ID" 
+          }
+        ]
       },
       {
         "name": "Requisition Alias",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ALIAS" 
+          }
+        ]
       },
       {
         "name": "Assay",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ASSAY" 
+          }
+        ]
       },
       {
         "name": "Tissue Origin",
@@ -537,7 +641,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Platform",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "PLATFORM"
+          }
+        ]
       },
       {
         "name": "Type",
@@ -545,11 +654,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Selection",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "SELECTION"
+          }
+        ]
       },
       {
         "name": "Strategy",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "STRATEGY"
+          }
+        ]
       },
       {
         "name": "Index Kit",
@@ -600,7 +719,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Has UMIs",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "HAS_UMIS"
+          }
+        ]
       },
       {
         "name": "Creation Date",
@@ -617,11 +741,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Contacts",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "CONTACTS"
+          }
+        ]
       },
       {
         "name": "Targeted Sequencing",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "TARGETED_SEQUENCING"
+          }
+        ]
       },
       {
         "name": "External Name",
@@ -691,15 +825,30 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition ID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ID" 
+          }
+        ]
       },
       {
         "name": "Requisition Alias",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ALIAS" 
+          }
+        ]
       },
       {
         "name": "Assay",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ASSAY" 
+          }
+        ]
       },
       {
         "name": "Tissue Origin",
@@ -747,7 +896,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Platform",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "PLATFORM"
+          }
+        ]
       },
       {
         "name": "Type",
@@ -755,11 +909,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Selection",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "SELECTION"
+          }
+        ]
       },
       {
         "name": "Strategy",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "STRATEGY"
+          }
+        ]
       },
       {
         "name": "Index Kit",
@@ -810,7 +974,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Has UMIs",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "HAS_UMIS"
+          }
+        ]
       },
       {
         "name": "Creation Date",
@@ -827,11 +996,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Contacts",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "CONTACTS"
+          }
+        ]
       },
       {
         "name": "Targeted Sequencing",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "TARGETED_SEQUENCING"
+          }
+        ]
       },
       {
         "name": "External Name",
@@ -901,15 +1080,30 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition ID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ID" 
+          }
+        ]
       },
       {
         "name": "Requisition Alias",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ALIAS" 
+          }
+        ]
       },
       {
         "name": "Assay",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ASSAY" 
+          }
+        ]
       },
       {
         "name": "Tissue Origin",
@@ -957,7 +1151,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Platform",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "PLATFORM"
+          }
+        ]
       },
       {
         "name": "Type",
@@ -965,11 +1164,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Selection",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "SELECTION"
+          }
+        ]
       },
       {
         "name": "Strategy",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "STRATEGY"
+          }
+        ]
       },
       {
         "name": "Index Kit",
@@ -1020,7 +1229,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Has UMIs",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "HAS_UMIS"
+          }
+        ]
       },
       {
         "name": "Creation Date",
@@ -1037,11 +1251,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Contacts",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "CONTACTS"
+          }
+        ]
       },
       {
         "name": "Targeted Sequencing",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "TARGETED_SEQUENCING"
+          }
+        ]
       },
       {
         "name": "External Name",
@@ -1111,15 +1335,30 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition ID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ID" 
+          }
+        ]
       },
       {
         "name": "Requisition Alias",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ALIAS" 
+          }
+        ]
       },
       {
         "name": "Assay",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ASSAY" 
+          }
+        ]
       },
       {
         "name": "Tissue Origin",
@@ -1167,7 +1406,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Platform",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "PLATFORM"
+          }
+        ]
       },
       {
         "name": "Type",
@@ -1175,11 +1419,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Selection",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "SELECTION"
+          }
+        ]
       },
       {
         "name": "Strategy",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "STRATEGY"
+          }
+        ]
       },
       {
         "name": "Index Kit",
@@ -1230,7 +1484,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Has UMIs",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "HAS_UMIS"
+          }
+        ]
       },
       {
         "name": "Creation Date",
@@ -1247,11 +1506,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Contacts",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "CONTACTS"
+          }
+        ]
       },
       {
         "name": "Targeted Sequencing",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "TARGETED_SEQUENCING"
+          }
+        ]
       },
       {
         "name": "External Name",
@@ -1321,15 +1590,30 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition ID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ID" 
+          }
+        ]
       },
       {
         "name": "Requisition Alias",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ALIAS" 
+          }
+        ]
       },
       {
         "name": "Assay",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ASSAY" 
+          }
+        ]
       },
       {
         "name": "Tissue Origin",
@@ -1377,7 +1661,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Platform",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "PLATFORM"
+          }
+        ]
       },
       {
         "name": "Type",
@@ -1385,11 +1674,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Selection",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "SELECTION"
+          }
+        ]
       },
       {
         "name": "Strategy",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "STRATEGY"
+          }
+        ]
       },
       {
         "name": "Index Kit",
@@ -1440,7 +1739,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Has UMIs",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "HAS_UMIS"
+          }
+        ]
       },
       {
         "name": "Creation Date",
@@ -1457,11 +1761,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Contacts",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "CONTACTS" 
+          }
+        ]
       },
       {
         "name": "Targeted Sequencing",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "TARGETED_SEQUENCING"
+          }
+        ]
       },
       {
         "name": "External Name",
@@ -1538,15 +1852,30 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition ID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ID" 
+          }
+        ]
       },
       {
         "name": "Requisition Alias",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ALIAS" 
+          }
+        ]
       },
       {
         "name": "Assay",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "ASSAY" 
+          }
+        ]
       },
       {
         "name": "Tissue Origin",
@@ -1594,7 +1923,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Platform",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "PLATFORM"
+          }
+        ]
       },
       {
         "name": "Type",
@@ -1602,11 +1936,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Selection",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "SELECTION"
+          }
+        ]
       },
       {
         "name": "Strategy",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "STRATEGY"
+          }
+        ]
       },
       {
         "name": "Index Kit",
@@ -1657,7 +2001,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Has UMIs",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "HAS_UMIS"
+          }
+        ]
       },
       {
         "name": "Creation Date",
@@ -1674,11 +2023,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Contacts",
-        "sources": []
+        "sources": [
+          { 
+            "source": "REQUISITION", 
+            "sourceProperty": "CONTACTS" 
+          }
+        ]
       },
       {
         "name": "Targeted Sequencing",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "TARGETED_SEQUENCING"
+          }
+        ]
       },
       {
         "name": "External Name",
@@ -1713,7 +2072,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "requisition_alias",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "ALIAS"
+          }
+        ]
       }
     ]
   }
@@ -1739,7 +2103,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "requisition_alias",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "ALIAS"
+          }
+        ]
       }
     ]
   }
