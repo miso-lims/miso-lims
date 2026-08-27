@@ -1,1 +1,0 @@
-Added the ability to create projects via API
