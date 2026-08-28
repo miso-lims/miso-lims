@@ -1,6 +1,4 @@
 -- GLT-4829: PMGC sample sheet formats
--- Type, Requisition Description, FCID, barcode_ids and slide_matrix_id have no
--- data source in MISO yet -- included as blank placeholder columns (sources: [])
 
 INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
 ('Visium', 'ILLUMINA', '[]', '[
@@ -11,7 +9,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
     "fields": [
       {
         "name": "FCID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "CONTAINER" 
+          }
+        ]
       },
       {
         "name": "Lane",
@@ -149,7 +151,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Type",
-        "sources": []
+        "sources": [
+          { 
+            "source": "SEQUENCING_PARAMETERS", 
+            "sourceProperty": "TYPE" 
+          }
+        ]
       },
       {
         "name": "Selection",
@@ -281,7 +288,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
     "fields": [
       {
         "name": "FCID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "CONTAINER" 
+          }
+        ]
       },
       {
         "name": "Lane",
@@ -419,7 +430,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Type",
-        "sources": []
+        "sources": [
+          { 
+            "source": "SEQUENCING_PARAMETERS", 
+            "sourceProperty": "TYPE" 
+          }
+        ]
       },
       {
         "name": "Selection",
@@ -551,7 +567,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
     "fields": [
       {
         "name": "FCID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "CONTAINER" 
+          }
+        ]
       },
       {
         "name": "Lane",
@@ -689,7 +709,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Type",
-        "sources": []
+        "sources": [
+          { 
+            "source": "SEQUENCING_PARAMETERS", 
+            "sourceProperty": "TYPE" 
+          }
+        ]
       },
       {
         "name": "Selection",
@@ -821,7 +846,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
     "fields": [
       {
         "name": "FCID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "CONTAINER" 
+          }
+        ]
       },
       {
         "name": "Lane",
@@ -959,7 +988,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Type",
-        "sources": []
+        "sources": [
+          { 
+            "source": "SEQUENCING_PARAMETERS", 
+            "sourceProperty": "TYPE" 
+          }
+        ]
       },
       {
         "name": "Selection",
@@ -1091,7 +1125,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
     "fields": [
       {
         "name": "FCID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "CONTAINER" 
+          }
+        ]
       },
       {
         "name": "Lane",
@@ -1229,7 +1267,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Type",
-        "sources": []
+        "sources": [
+          { 
+            "source": "SEQUENCING_PARAMETERS", 
+            "sourceProperty": "TYPE" 
+          }
+        ]
       },
       {
         "name": "Selection",
@@ -1361,7 +1404,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
     "fields": [
       {
         "name": "FCID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "CONTAINER" 
+          }
+        ]
       },
       {
         "name": "Lane",
@@ -1499,7 +1546,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Type",
-        "sources": []
+        "sources": [
+          { 
+            "source": "SEQUENCING_PARAMETERS", 
+            "sourceProperty": "TYPE" 
+          }
+        ]
       },
       {
         "name": "Selection",
@@ -1631,7 +1683,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
     "fields": [
       {
         "name": "FCID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "CONTAINER" 
+          }
+        ]
       },
       {
         "name": "Lane",
@@ -1769,7 +1825,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Type",
-        "sources": []
+        "sources": [
+          { 
+            "source": "SEQUENCING_PARAMETERS", 
+            "sourceProperty": "TYPE" 
+          }
+        ]
       },
       {
         "name": "Selection",
@@ -1901,7 +1962,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
     "fields": [
       {
         "name": "FCID",
-        "sources": []
+        "sources": [
+          { 
+            "source": "CONTAINER" 
+          }
+        ]
       },
       {
         "name": "Lane",
@@ -2046,7 +2111,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Type",
-        "sources": []
+        "sources": [
+          { 
+            "source": "SEQUENCING_PARAMETERS", 
+            "sourceProperty": "TYPE" 
+          }
+        ]
       },
       {
         "name": "Selection",
@@ -2218,7 +2288,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "slide_matrix_id",
-        "sources": []
+        "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SLIDE_IDENTIFICATION_BARCODE" 
+          }
+        ]
       },
       {
         "name": "requisition_alias",

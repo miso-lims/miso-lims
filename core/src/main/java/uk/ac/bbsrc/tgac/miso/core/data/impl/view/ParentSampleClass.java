@@ -22,6 +22,8 @@ public class ParentSampleClass implements Serializable {
 
   private String sampleCategory;
 
+  private String sampleSubCategory;
+
   public long getId() {
     return sampleClassId;
   }
@@ -44,6 +46,14 @@ public class ParentSampleClass implements Serializable {
 
   public void setSampleCategory(String sampleCategory) {
     this.sampleCategory = sampleCategory;
+  }
+
+  public String getSampleSubCategory() {
+    return sampleSubCategory;
+  }
+
+  public void setSampleSubCategory(String sampleSubCategory) {
+    this.sampleSubCategory = sampleSubCategory;
   }
 
 }

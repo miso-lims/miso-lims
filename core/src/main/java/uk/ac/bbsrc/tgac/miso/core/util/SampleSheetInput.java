@@ -16,6 +16,7 @@ public class SampleSheetInput {
   private ObjectNode customParameters;
   private Map<String, Map<Integer, Pool>> poolLayout;
   private Map<String, Boolean> includeSections;
+  private Map<String, String> containerIdentificationBarcode;
 
   public InstrumentModel getInstrumentModel() {
     return instrumentModel;
@@ -64,6 +65,14 @@ public class SampleSheetInput {
 
   public void setIncludeSections(Map<String, Boolean> includeSections) {
     this.includeSections = includeSections;
+  }
+
+  public Map<String, String> getContainerIdentificationBarcode() {
+    return containerIdentificationBarcode;
+  }
+
+  public void setContainerIdentificationBarcode(Map<String, String> containerIdentificationBarcode) {
+    this.containerIdentificationBarcode = containerIdentificationBarcode;
   }
 
 }

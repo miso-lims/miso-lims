@@ -48,6 +48,19 @@ public enum SequencingParametersProperty {
     public String extract(SequencingParameters sequencingParameters) {
       return Objects.toString(sequencingParameters.getFlows(), null);
     }
+  },
+
+  TYPE("Type") {
+    @Override
+    public String extract(SequencingParameters sequencingParameters) {
+      if (sequencingParameters.getReadLength2() > 0) {
+        return "Paired-End Sequencing";
+      } else if (sequencingParameters.getReadLength() > 0) {
+        return "Single-End Sequencing";
+      } else {
+        return null;
+      }
+    }
   };
 
   private final String label;

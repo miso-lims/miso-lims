@@ -139,19 +139,24 @@ public class SampleSheetRestController extends AbstractRestController {
     }
 
     Map<String, Map<Integer, Pool>> poolLayout = new HashMap<>();
+    Map<String, String> containerIdentificationBarcode = new HashMap<>();
     if (model.getNumContainers() == 1 && run.getRunPositions().size() == 1) {
       RunPosition runPos = run.getRunPositions().iterator().next();
       if (runPos.getContainer() != null) {
         poolLayout.put("*", makePoolsByPartition(runPos));
+        containerIdentificationBarcode.put("*", runPos.getContainer().getIdentificationBarcode());
       }
     } else {
       for (RunPosition runPos : run.getRunPositions()) {
         if (runPos.getContainer() != null) {
           poolLayout.put(runPos.getPosition().getAlias(), makePoolsByPartition(runPos));
+          containerIdentificationBarcode.put(runPos.getPosition().getAlias(),
+              runPos.getContainer().getIdentificationBarcode());
         }
       }
     }
     input.setPoolLayout(poolLayout);
+    input.setContainerIdentificationBarcode(containerIdentificationBarcode);
 
     return input;
   }

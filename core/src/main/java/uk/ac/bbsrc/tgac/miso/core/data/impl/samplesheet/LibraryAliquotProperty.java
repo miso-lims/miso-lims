@@ -2,8 +2,10 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet;
 
 import java.text.SimpleDateFormat;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.GrandparentSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSampleClass;
 
 public enum LibraryAliquotProperty {
 
@@ -218,6 +220,13 @@ public enum LibraryAliquotProperty {
       }
       return null;
     }
+  },
+
+  SLIDE_IDENTIFICATION_BARCODE("Slide Matrix ID") {
+    @Override
+    public String extract(ListLibraryAliquotView aliquot) {
+      return findSlideIdentificationBarcode(aliquot);
+    }
   };
 
   private final String label;
@@ -231,4 +240,26 @@ public enum LibraryAliquotProperty {
   }
 
   public abstract String extract(ListLibraryAliquotView aliquot);
+
+  private static String findSlideIdentificationBarcode(ListLibraryAliquotView aliquot) {
+    ParentSample sample = aliquot.getParentLibrary().getParentSample();
+    if (sample == null) {
+      return null;
+    }
+    if (isSlide(sample.getParentSampleClass())) {
+      return sample.getIdentificationBarcode();
+    }
+    GrandparentSample parent = sample.getParentSample();
+    while (parent != null) {
+      if (isSlide(parent.getParentSampleClass())) {
+        return parent.getIdentificationBarcode();
+      }
+      parent = parent.getParentSample();
+    }
+    return null;
+  }
+
+  private static boolean isSlide(ParentSampleClass sampleClass) {
+    return sampleClass != null && "Slide".equals(sampleClass.getSampleSubCategory());
+  }
 }

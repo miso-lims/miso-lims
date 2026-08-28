@@ -32,6 +32,7 @@ public class ParentSample implements Serializable {
   private String alias;
   private String accession;
   private String sampleType;
+  private String identificationBarcode;
 
   @ManyToOne
   @JoinColumn(name = "sequencingControlTypeId")
@@ -176,6 +177,14 @@ public class ParentSample implements Serializable {
 
   public void setRequisition(Requisition requisition) {
     this.requisition = requisition;
+  }
+
+  public String getIdentificationBarcode() {
+    return identificationBarcode;
+  }
+
+  public void setIdentificationBarcode(String identificationBarcode) {
+    this.identificationBarcode = identificationBarcode;
   }
 
 }

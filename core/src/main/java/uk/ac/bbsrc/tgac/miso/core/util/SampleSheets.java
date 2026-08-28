@@ -276,6 +276,12 @@ public class SampleSheets {
             .map(PoolElement::getAliquot)
             .toList();
         return getMultiValue(source, requisitionAliquots, SampleSheets::getRequisitionValue);
+      case CONTAINER:
+        return getMultiValue(source, input.getContainerIdentificationBarcode() == null
+            ? Collections.emptyList()
+            : input.getContainerIdentificationBarcode().values(),
+            SampleSheets::getContainerValue);
+
       case CURRENT_TIME:
         return formatCurrentDateTime(source.getDateFormat());
       default:
@@ -322,6 +328,8 @@ public class SampleSheets {
             .map(PoolElement::getAliquot)
             .toList();
         return getMultiValue(source, requisitionAliquots, SampleSheets::getRequisitionValue);
+      case CONTAINER:
+        return getContainerValue(source, getContainerBarcode(input, instrumentPos));
       case CURRENT_TIME:
         return formatCurrentDateTime(source.getDateFormat());
       default:
@@ -362,6 +370,8 @@ public class SampleSheets {
         return getLibraryAliquotValue(source, libraryAliquot);
       case REQUISITION:
         return getRequisitionValue(source, libraryAliquot);
+      case CONTAINER:
+        return getContainerValue(source, getContainerBarcode(input, instrumentPos));
       case CURRENT_TIME:
         return formatCurrentDateTime(source.getDateFormat());
       default:
@@ -514,6 +524,21 @@ public class SampleSheets {
       parent = parent.getParentSample();
     }
     return null;
+  }
+
+  protected static String getContainerValue(SampleSheetFieldSource source, String identificationBarcode) {
+    if (source.getSourceProperty() != null) {
+      throw new IllegalArgumentException("Unexpected container property: %s".formatted(source.getSourceProperty()));
+    }
+    return identificationBarcode;
+  }
+
+  private static String getContainerBarcode(SampleSheetInput input, String instrumentPos) {
+    if (input.getContainerIdentificationBarcode() == null) {
+      return null;
+    }
+    String key = instrumentPos == null ? DEFAULT_INSTRUMENT_POS : instrumentPos;
+    return input.getContainerIdentificationBarcode().get(key);
   }
 
   protected static String getRequisitionValue(SampleSheetFieldSource source, ListLibraryAliquotView aliquot) {
