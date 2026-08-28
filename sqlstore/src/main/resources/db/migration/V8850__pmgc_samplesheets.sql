@@ -236,7 +236,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Description",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "DESCRIPTION"
+          }
+        ]
       },
       {
         "name": "Requisition Contacts",
@@ -501,7 +506,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Description",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "DESCRIPTION"
+          }
+        ]
       },
       {
         "name": "Requisition Contacts",
@@ -766,7 +776,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Description",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "DESCRIPTION"
+          }
+        ]
       },
       {
         "name": "Requisition Contacts",
@@ -1031,7 +1046,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Description",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "DESCRIPTION"
+          }
+        ]
       },
       {
         "name": "Requisition Contacts",
@@ -1296,7 +1316,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Description",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "DESCRIPTION"
+          }
+        ]
       },
       {
         "name": "Requisition Contacts",
@@ -1561,7 +1586,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Description",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "DESCRIPTION"
+          }
+        ]
       },
       {
         "name": "Requisition Contacts",
@@ -1826,7 +1856,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Description",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "DESCRIPTION"
+          }
+        ]
       },
       {
         "name": "Requisition Contacts",
@@ -2098,7 +2133,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Requisition Description",
-        "sources": []
+        "sources": [
+          {
+            "source": "REQUISITION",
+            "sourceProperty": "DESCRIPTION"
+          }
+        ]
       },
       {
         "name": "Requisition Contacts",

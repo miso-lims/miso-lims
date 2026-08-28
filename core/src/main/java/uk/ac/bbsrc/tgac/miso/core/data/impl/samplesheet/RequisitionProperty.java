@@ -34,6 +34,13 @@ public enum RequisitionProperty {
 
   },
 
+  DESCRIPTION("Description") {
+    @Override
+    public String extract(Requisition requisition) {
+      return requisition.getDescription();
+    }
+  },
+
   CONTACTS("Contacts") {
 
     @Override

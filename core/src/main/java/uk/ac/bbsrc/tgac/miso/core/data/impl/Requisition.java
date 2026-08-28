@@ -50,6 +50,8 @@ public class Requisition implements Attachable, Deletable, QualityControllable<R
 
   private String alias;
 
+  private String description;
+
   @ManyToMany
   @JoinTable(name = "Requisition_Assay", joinColumns = {@JoinColumn(name = "requisitionId")},
       inverseJoinColumns = {@JoinColumn(name = "assayId")})
@@ -256,6 +258,14 @@ public class Requisition implements Attachable, Deletable, QualityControllable<R
 
   public void setPauses(List<RequisitionPause> pauses) {
     this.pauses = pauses;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   @Override

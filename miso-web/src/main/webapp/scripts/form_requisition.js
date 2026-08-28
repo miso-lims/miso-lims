@@ -49,6 +49,13 @@ FormTarget.requisition = (function () {
                 "Should usually match the identifier of a requisition form stored in a separate system",
             },
             {
+              title: "Description",
+              type: "text",
+              data: "description",
+              maxLength: 1024,
+              description: "notes for this requisition",
+            },
+            {
               title: "Stopped",
               type: "checkbox",
               data: "stopped",
