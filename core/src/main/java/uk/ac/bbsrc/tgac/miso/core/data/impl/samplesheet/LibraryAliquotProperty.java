@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet;
 import java.text.SimpleDateFormat;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
 
 public enum LibraryAliquotProperty {
 
@@ -22,7 +23,8 @@ public enum LibraryAliquotProperty {
 
   INDEX_FAMILY("Index Family") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getParentLibrary().getIndex1() == null ? null
           : aliquot.getParentLibrary().getIndex1().getFamily().getName();
     }
@@ -30,14 +32,16 @@ public enum LibraryAliquotProperty {
 
   INDEX_1_NAME("Index 1 Name") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getParentLibrary().getIndex1() == null ? null : aliquot.getParentLibrary().getIndex1().getName();
     }
   },
 
   INDEX_1_SEQUENCE("Index 1 Sequence") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getParentLibrary().getIndex1() == null ? null
           : aliquot.getParentLibrary().getIndex1().getSequence();
     }
@@ -45,14 +49,16 @@ public enum LibraryAliquotProperty {
 
   INDEX_2_NAME("Index 2 Name") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getParentLibrary().getIndex2() == null ? null : aliquot.getParentLibrary().getIndex2().getName();
     }
   },
 
   INDEX_2_SEQUENCE("Index 2 Sequence") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getParentLibrary().getIndex2() == null ? null
           : aliquot.getParentLibrary().getIndex2().getSequence();
     }
@@ -60,7 +66,8 @@ public enum LibraryAliquotProperty {
 
   BOX_ALIAS("Box Alias") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getBox() == null ? null : aliquot.getBox().getAlias();
     }
   },
@@ -102,7 +109,8 @@ public enum LibraryAliquotProperty {
 
   DESIGN_CODE("Design Code") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       if (aliquot.getDesignCode() == null) {
         return null;
       }
@@ -112,7 +120,8 @@ public enum LibraryAliquotProperty {
 
   TISSUE_ORIGIN("Tissue Origin") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getTissueAttributes() == null || aliquot.getTissueAttributes().getTissueOrigin() == null ? null
           : aliquot.getTissueAttributes().getTissueOrigin().getAlias();
     }
@@ -120,7 +129,8 @@ public enum LibraryAliquotProperty {
 
   TISSUE_TYPE("Tissue Type") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getTissueAttributes() == null || aliquot.getTissueAttributes().getTissueType() == null ? null
           : aliquot.getTissueAttributes().getTissueType().getAlias();
     }
@@ -128,21 +138,24 @@ public enum LibraryAliquotProperty {
 
   EXTERNAL_NAME("External Name") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getIdentityAttributes() == null ? null : aliquot.getIdentityAttributes().getExternalName();
     }
   },
 
   CREATED_DATE("Created Date") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getCreated() == null ? null : new SimpleDateFormat("yyyy-MM-dd").format(aliquot.getCreated());
     }
   },
 
   PLATFORM("Platform") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getParentLibrary().getPlatformType() == null ? null
           : aliquot.getParentLibrary().getPlatformType().getKey();
     }
@@ -150,7 +163,8 @@ public enum LibraryAliquotProperty {
 
   SELECTION("Selection") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getParentLibrary().getLibrarySelectionType() == null ? null
           : aliquot.getParentLibrary().getLibrarySelectionType().getName();
     }
@@ -158,7 +172,8 @@ public enum LibraryAliquotProperty {
 
   STRATEGY("Strategy") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getParentLibrary().getLibraryStrategyType() == null ? null
           : aliquot.getParentLibrary().getLibraryStrategyType().getName();
     }
@@ -173,8 +188,35 @@ public enum LibraryAliquotProperty {
 
   TARGETED_SEQUENCING("Targeted Sequencing") {
     @Override
-    public String extract(ListLibraryAliquotView aliquot) {
+    public String extract(
+        ListLibraryAliquotView aliquot) {
       return aliquot.getTargetedSequencing() == null ? null : aliquot.getTargetedSequencing().getAlias();
+    }
+  },
+
+  SAMPLE_TYPE("Sample Type") {
+
+    @Override
+    public String extract(ListLibraryAliquotView aliquot) {
+      return aliquot.getParentLibrary().getParentSample() == null ? null
+          : aliquot.getParentLibrary().getParentSample().getSampleType();
+    }
+  },
+
+  SCI_NAME("Sci. Name") {
+    @Override
+    public String extract(ListLibraryAliquotView aliquot) {
+      ParentSample sample = aliquot.getParentLibrary().getParentSample();
+      if (sample == null) {
+        return null;
+      }
+      if (sample.getParentSubproject() != null && sample.getParentSubproject().getReferenceGenome() != null) {
+        return sample.getParentSubproject().getReferenceGenome().getAlias();
+      }
+      if (sample.getParentProject() != null && sample.getParentProject().getReferenceGenome() != null) {
+        return sample.getParentProject().getReferenceGenome().getAlias();
+      }
+      return null;
     }
   };
 

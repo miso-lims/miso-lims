@@ -1,7 +1,6 @@
 -- GLT-4829: PMGC sample sheet formats
--- Sample Type, Sci. Name, Type, Requisition Description, FCID, barcode_ids and
--- slide_matrix_id have no data source in MISO yet -- included as blank placeholder
--- columns (sources: [])
+-- Type, Requisition Description, FCID, barcode_ids and slide_matrix_id have no
+-- data source in MISO yet -- included as blank placeholder columns (sources: [])
 
 INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
 ('Visium', 'ILLUMINA', '[]', '[
@@ -114,11 +113,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Sample Type",
-        "sources": []
+        "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SAMPLE_TYPE" 
+          }
+        ]
       },
       {
         "name": "Sci. Name",
-        "sources": []
+        "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SCI_NAME" 
+          }
+        ]
       },
       {
         "name": "Code",
@@ -369,11 +378,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Sample Type",
-        "sources": []
+         "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SAMPLE_TYPE" 
+          }
+        ]
       },
       {
         "name": "Sci. Name",
-        "sources": []
+        "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SCI_NAME" 
+          }
+        ]
       },
       {
         "name": "Code",
@@ -624,11 +643,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Sample Type",
-        "sources": []
+         "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SAMPLE_TYPE" 
+          }
+        ]
       },
       {
         "name": "Sci. Name",
-        "sources": []
+        "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SCI_NAME" 
+          }
+        ]
       },
       {
         "name": "Code",
@@ -879,11 +908,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Sample Type",
-        "sources": []
+         "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SAMPLE_TYPE" 
+          }
+        ]
       },
       {
         "name": "Sci. Name",
-        "sources": []
+        "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SCI_NAME" 
+          }
+        ]
       },
       {
         "name": "Code",
@@ -1134,11 +1173,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Sample Type",
-        "sources": []
+         "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SAMPLE_TYPE" 
+          }
+        ]
       },
       {
         "name": "Sci. Name",
-        "sources": []
+        "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SCI_NAME" 
+          }
+        ]
       },
       {
         "name": "Code",
@@ -1389,11 +1438,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Sample Type",
-        "sources": []
+         "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SAMPLE_TYPE" 
+          }
+        ]
       },
       {
         "name": "Sci. Name",
-        "sources": []
+        "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SCI_NAME" 
+          }
+        ]
       },
       {
         "name": "Code",
@@ -1644,11 +1703,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Sample Type",
-        "sources": []
+         "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SAMPLE_TYPE" 
+          }
+        ]
       },
       {
         "name": "Sci. Name",
-        "sources": []
+        "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SCI_NAME" 
+          }
+        ]
       },
       {
         "name": "Code",
@@ -1906,11 +1975,21 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "Sample Type",
-        "sources": []
+         "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SAMPLE_TYPE" 
+          }
+        ]
       },
       {
         "name": "Sci. Name",
-        "sources": []
+        "sources": [
+          { 
+            "source": "LIBRARY_ALIQUOT", 
+            "sourceProperty": "SCI_NAME" 
+          }
+        ]
       },
       {
         "name": "Code",

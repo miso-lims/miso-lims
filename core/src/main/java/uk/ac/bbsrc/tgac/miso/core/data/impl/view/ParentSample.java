@@ -31,6 +31,7 @@ public class ParentSample implements Serializable {
   private String name;
   private String alias;
   private String accession;
+  private String sampleType;
 
   @ManyToOne
   @JoinColumn(name = "sequencingControlTypeId")
@@ -95,6 +96,14 @@ public class ParentSample implements Serializable {
 
   public void setAccession(String accession) {
     this.accession = accession;
+  }
+
+  public String getSampleType() {
+    return sampleType;
+  }
+
+  public void setSampleType(String sampleType) {
+    this.sampleType = sampleType;
   }
 
   public SequencingControlType getSequencingControlType() {
