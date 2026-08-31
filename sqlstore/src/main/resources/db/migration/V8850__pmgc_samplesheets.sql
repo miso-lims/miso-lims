@@ -2257,7 +2257,12 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       },
       {
         "name": "barcode_ids",
-        "sources": []
+        "sources": [
+          {
+            "source": "LIBRARY_ALIQUOT",
+            "sourceProperty": "SAMPLE_INDEX"
+          }
+        ]
       },
       {
         "name": "requisition_alias",

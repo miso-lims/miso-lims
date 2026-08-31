@@ -205,6 +205,27 @@ public enum LibraryAliquotProperty {
     }
   },
 
+  SAMPLE_INDEX("Sample Index") {
+    @Override
+    public String extract(ListLibraryAliquotView aliquot) {
+      ParentSample sample = aliquot.getParentLibrary().getParentSample();
+      if (sample == null) {
+        return null;
+      }
+      if (sample.getIndex() != null) {
+        return sample.getIndex().getName();
+      }
+      GrandparentSample parent = sample.getParentSample();
+      while (parent != null) {
+        if (parent.getIndex() != null) {
+          return parent.getIndex().getName();
+        }
+        parent = parent.getParentSample();
+      }
+      return null;
+    }
+  },
+
   SCI_NAME("Sci. Name") {
     @Override
     public String extract(ListLibraryAliquotView aliquot) {

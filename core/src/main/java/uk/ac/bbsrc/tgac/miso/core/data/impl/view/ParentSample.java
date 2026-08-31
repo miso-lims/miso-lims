@@ -17,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIndex;
 
 @Entity
 @Immutable
@@ -57,6 +58,10 @@ public class ParentSample implements Serializable {
   @ManyToOne
   @JoinColumn(name = "requisitionId")
   private Requisition requisition;
+
+  @ManyToOne
+  @JoinColumn(name = "indexId")
+  private SampleIndex index;
 
   @OneToOne
   @PrimaryKeyJoinColumn
@@ -185,6 +190,14 @@ public class ParentSample implements Serializable {
 
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
+  }
+
+  public SampleIndex getIndex() {
+    return index;
+  }
+
+  public void setIndex(SampleIndex index) {
+    this.index = index;
   }
 
 }

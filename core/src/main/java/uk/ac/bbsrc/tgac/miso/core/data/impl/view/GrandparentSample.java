@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIndex;
 
 @Entity
 @Immutable
@@ -40,6 +41,10 @@ public class GrandparentSample implements Serializable {
   @ManyToOne
   @JoinColumn(name = "requisitionId")
   private Requisition requisition;
+
+  @ManyToOne
+  @JoinColumn(name = "indexId")
+  private SampleIndex index;
 
   public long getId() {
     return sampleId;
@@ -87,6 +92,14 @@ public class GrandparentSample implements Serializable {
 
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
+  }
+
+  public SampleIndex getIndex() {
+    return index;
+  }
+
+  public void setIndex(SampleIndex index) {
+    this.index = index;
   }
 
 }
