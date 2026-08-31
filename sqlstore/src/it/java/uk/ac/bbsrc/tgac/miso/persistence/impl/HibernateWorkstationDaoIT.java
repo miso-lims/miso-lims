@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
@@ -16,7 +16,7 @@ public class HibernateWorkstationDaoIT extends AbstractDAOTest {
 
   private HibernateWorkstationDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateWorkstationDao();
     sut.setEntityManager(getEntityManager());
@@ -46,7 +46,7 @@ public class HibernateWorkstationDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    Workstation saved = (Workstation) currentSession().get(Workstation.class, savedId);
+    Workstation saved = (Workstation) currentSession().find(Workstation.class, savedId);
     assertNotNull(saved);
     assertEquals(alias, saved.getAlias());
   }
@@ -55,20 +55,20 @@ public class HibernateWorkstationDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Alias";
-    Workstation workstation = (Workstation) currentSession().get(Workstation.class, id);
+    Workstation workstation = (Workstation) currentSession().find(Workstation.class, id);
     assertNotEquals(alias, workstation.getAlias());
     workstation.setAlias(alias);
     sut.update(workstation);
 
     clearSession();
 
-    Workstation saved = (Workstation) currentSession().get(Workstation.class, id);
+    Workstation saved = (Workstation) currentSession().find(Workstation.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    Workstation workstation = (Workstation) currentSession().get(Workstation.class, 1L);
+    Workstation workstation = (Workstation) currentSession().find(Workstation.class, 1L);
     assertEquals(4L, sut.getUsage(workstation));
   }
 

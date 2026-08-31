@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -19,7 +19,7 @@ public class HibernateStorageLocationDaoIT extends AbstractDAOTest {
 
   private HibernateStorageLocationDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateStorageLocationDao();
     sut.setEntityManager(getEntityManager());
@@ -51,7 +51,7 @@ public class HibernateStorageLocationDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetbyServiceRecord() throws Exception {
-    ServiceRecord record = (ServiceRecord) currentSession().get(ServiceRecord.class, 4L);
+    ServiceRecord record = (ServiceRecord) currentSession().find(ServiceRecord.class, 4L);
     StorageLocation storageLocation = sut.getByServiceRecord(record);
     assertNotNull(storageLocation);
     assertEquals(1L, storageLocation.getId());
@@ -81,12 +81,12 @@ public class HibernateStorageLocationDaoIT extends AbstractDAOTest {
     StorageLocation room = new StorageLocation();
     room.setAlias(alias);
     room.setLocationUnit(LocationUnit.ROOM);
-    room.setChangeDetails((User) currentSession().get(UserImpl.class, 1L));
+    room.setChangeDetails((User) currentSession().find(UserImpl.class, 1L));
     long savedId = sut.create(room);
 
     clearSession();
 
-    StorageLocation saved = (StorageLocation) currentSession().get(StorageLocation.class, savedId);
+    StorageLocation saved = (StorageLocation) currentSession().find(StorageLocation.class, savedId);
     assertNotNull(saved);
     assertEquals(alias, saved.getAlias());
   }
@@ -95,14 +95,14 @@ public class HibernateStorageLocationDaoIT extends AbstractDAOTest {
   public void testUpdate() throws Exception {
     long locationId = 2L;
     String newAlias = "Changed";
-    StorageLocation original = (StorageLocation) currentSession().get(StorageLocation.class, locationId);
+    StorageLocation original = (StorageLocation) currentSession().find(StorageLocation.class, locationId);
     assertNotEquals(newAlias, original.getAlias());
     original.setAlias(newAlias);
     sut.update(original);
 
     clearSession();
 
-    StorageLocation saved = (StorageLocation) currentSession().get(StorageLocation.class, locationId);
+    StorageLocation saved = (StorageLocation) currentSession().find(StorageLocation.class, locationId);
     assertEquals(newAlias, saved.getAlias());
   }
 

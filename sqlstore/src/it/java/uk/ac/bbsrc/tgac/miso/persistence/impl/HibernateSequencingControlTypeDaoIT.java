@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
@@ -15,7 +15,7 @@ public class HibernateSequencingControlTypeDaoIT extends AbstractDAOTest {
 
   private HibernateSequencingControlTypeDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateSequencingControlTypeDao();
     sut.setEntityManager(getEntityManager());
@@ -45,7 +45,7 @@ public class HibernateSequencingControlTypeDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    SequencingControlType saved = (SequencingControlType) currentSession().get(SequencingControlType.class, savedId);
+    SequencingControlType saved = (SequencingControlType) currentSession().find(SequencingControlType.class, savedId);
     assertNotNull(saved);
     assertEquals(alias, saved.getAlias());
   }
@@ -53,14 +53,14 @@ public class HibernateSequencingControlTypeDaoIT extends AbstractDAOTest {
   @Test
   public void testUpdate() throws Exception {
     String newAlias = "Changed";
-    SequencingControlType type = (SequencingControlType) currentSession().get(SequencingControlType.class, 1L);
+    SequencingControlType type = (SequencingControlType) currentSession().find(SequencingControlType.class, 1L);
     assertNotEquals(newAlias, type.getAlias());
     type.setAlias(newAlias);
     sut.update(type);
 
     clearSession();
 
-    SequencingControlType saved = (SequencingControlType) currentSession().get(SequencingControlType.class, 1L);
+    SequencingControlType saved = (SequencingControlType) currentSession().find(SequencingControlType.class, 1L);
     assertEquals(newAlias, saved.getAlias());
   }
 
@@ -74,7 +74,7 @@ public class HibernateSequencingControlTypeDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetUsage() throws Exception {
-    SequencingControlType type = (SequencingControlType) currentSession().get(SequencingControlType.class, 1L);
+    SequencingControlType type = (SequencingControlType) currentSession().find(SequencingControlType.class, 1L);
     assertEquals(3L, sut.getUsage(type));
   }
 

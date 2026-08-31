@@ -8,9 +8,8 @@ import java.util.stream.Stream;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.QualityControlService;
@@ -27,7 +26,7 @@ public abstract class BulkQcTable extends BulkTableBackend<QcDto> {
   private final String verb;
 
   public BulkQcTable(QcTarget qcTarget, boolean create, QualityControlService qcService,
-      InstrumentService instrumentService, String verb, ObjectMapper mapper) {
+      InstrumentService instrumentService, String verb, JsonMapper mapper) {
     super("qc", QcDto.class, mapper);
     this.qcTarget = qcTarget;
     this.create = create;
@@ -40,15 +39,15 @@ public abstract class BulkQcTable extends BulkTableBackend<QcDto> {
 
     return prepare(model, create ? PageMode.CREATE : PageMode.EDIT, verb + " " + qcTarget + " QCs",
         LimsUtils.parseIds(idString).stream()
-                .flatMap(WhineyFunction.rethrow(this::load))
-                .sorted(Comparator.comparing(QcDto::getEntityAlias))
-                .collect(Collectors.toList()));
+            .flatMap(WhineyFunction.rethrow(this::load))
+            .sorted(Comparator.comparing(QcDto::getEntityAlias))
+            .collect(Collectors.toList()));
   }
 
   protected abstract Stream<QcDto> load(long ownerId) throws IOException;
 
   @Override
-  protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+  protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
     config.putPOJO("instruments", instrumentService.list().stream().map(Dtos::asDto).collect(Collectors.toList()));
     config.put("qcTarget", qcTarget.getLabel());
   }

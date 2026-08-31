@@ -1,28 +1,26 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 
-import static org.junit.Assert.*;
-
 public class DefaultUserServiceTest {
 
-  private static final String ENCODED = "ENCODED";
+  private AutoCloseable mockito;
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  private static final String ENCODED = "ENCODED";
 
   @Mock
   private PasswordEncoder passwordEncoder;
@@ -33,11 +31,16 @@ public class DefaultUserServiceTest {
   @InjectMocks
   private DefaultUserService sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     Mockito.when(passwordEncoder.encode(Mockito.anyString())).thenReturn(ENCODED);
     Mockito.when(securityManager.isPasswordMutable()).thenReturn(true);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test

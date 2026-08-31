@@ -21,12 +21,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import jakarta.servlet.http.HttpServletResponse;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Issue;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.qc.SampleQcNode;
@@ -147,7 +146,7 @@ public class MisoWebUtils {
     return headers;
   }
 
-  public static <U, V> void addJsonArray(ObjectMapper mapper, ObjectNode node, String key, Collection<U> items,
+  public static <U, V> void addJsonArray(JsonMapper mapper, ObjectNode node, String key, Collection<U> items,
       Function<U, V> toDto) {
     ArrayNode array = node.putArray(key);
     for (U item : items) {
@@ -188,7 +187,7 @@ public class MisoWebUtils {
   public static Long getLongInput(String key, Map<String, String> formData, boolean required) {
     String stringValue = getStringInput(key, formData, required);
     try {
-      return stringValue == null ? null : new Long(stringValue);
+      return stringValue == null ? null : Long.valueOf(stringValue);
     } catch (NumberFormatException e) {
       throw new ClientErrorException(String.format("Invalid value for parameter '%s'", key), e);
     }
@@ -215,7 +214,7 @@ public class MisoWebUtils {
 
   public static ModelAndView getQcHierarchy(String entityType, long id,
       ThrowingFunction<Long, SampleQcNode, IOException> getter,
-      ModelMap model, ObjectMapper mapper) throws IOException {
+      ModelMap model, JsonMapper mapper) throws IOException {
     SampleQcNode hierarchy = getter.apply(id);
     if (hierarchy == null) {
       throw new NotFoundException(String.format("No %s found with ID %d", entityType, id));
@@ -245,7 +244,7 @@ public class MisoWebUtils {
     }
   }
 
-  public static ArrayNode getLibraryQualificationMethodDtos(ObjectMapper mapper) {
+  public static ArrayNode getLibraryQualificationMethodDtos(JsonMapper mapper) {
     ArrayNode libraryQualificationMethods = mapper.createArrayNode();
     for (AssayTest.LibraryQualificationMethod method : AssayTest.LibraryQualificationMethod.values()) {
       ObjectNode dto = libraryQualificationMethods.addObject();

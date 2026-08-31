@@ -13,6 +13,10 @@ BulkTarget.sample = (function ($) {
    *   projects: all projects
    *   sortLibraryPropagate: string; column for default sort when propagating libraries
    *   sops: array
+   *   sopId: optional; the SOP chosen in the propagate dialog. When set with pageMode "propagate",
+   *       one column per SOP field is added to the table
+   *   instruments: array; dropdown source for INSTRUMENT-type SOP fields
+   *   workstations: array; dropdown source for WORKSTATION-type SOP fields
    * }
    */
 
@@ -69,6 +73,7 @@ BulkTarget.sample = (function ($) {
   };
 
   var originalProjectIdsBySampleId = {};
+  var originalSopIdsBySampleId = {};
   var originalEffectiveGroupIdsByRow = {};
   var parentLocationsByRow = null;
   var metricCategories = [];
@@ -175,12 +180,13 @@ BulkTarget.sample = (function ($) {
                 : getCommonChildCategories(classes).map(function (category) {
                     return {
                       name: category,
-                      action: function (replicates, newBoxId) {
+                      action: function (replicates, newBoxId, sopId) {
                         Utils.page.post(Urls.ui.samples.bulkPropagate, {
                           boxId: newBoxId,
                           parentIds: idsString,
                           replicates: replicates,
                           targetCategory: category,
+                          sopId: sopId,
                         });
                       },
                     };
@@ -237,13 +243,32 @@ BulkTarget.sample = (function ($) {
                         getLabel: Utils.array.getName,
                       }
                     : null,
+                  config.sops && config.sops.length
+                    ? {
+                        property: "sop",
+                        type: "select",
+                        label: "SOP",
+                        values: config.sops,
+                        getLabel: function (sop) {
+                          return sop.alias + " v." + sop.version;
+                        },
+                        showIf: function (output) {
+                          var target = output.target || (targets.length === 1 ? targets[0] : null);
+                          return !target || target.name !== "Tissue";
+                        },
+                      }
+                    : null,
                   ListUtils.createBoxField,
                 ].filter(function (x) {
                   return !!x;
                 }),
                 function (result) {
                   var loadPage = function (boxId, replicates) {
-                    (result.target || targets[0]).action(replicates, boxId);
+                    (result.target || targets[0]).action(
+                      replicates,
+                      boxId,
+                      result.sop ? result.sop.id : null
+                    );
                   };
                   var createBox = function (sampleCount, replicates) {
                     Utils.createBoxDialog(
@@ -389,6 +414,7 @@ BulkTarget.sample = (function ($) {
         }
         if (config.pageMode === "edit") {
           originalProjectIdsBySampleId[sample.id] = sample.projectId;
+          originalSopIdsBySampleId[sample.id] = sample.sopId;
         } else {
           if (Constants.isDetailedSample) {
             if (sample.relatedSlides && sample.relatedSlides.length === 1) {
@@ -854,11 +880,16 @@ BulkTarget.sample = (function ($) {
                   });
                   setValue = firstReceiptLabel;
                 }
-                api.updateField(rowIndex, "identityId", {
-                  source: potentialIdentities,
-                  value: setValue,
-                  formatter: potentialIdentities.length > 1 ? "multipleOptions" : null,
-                }, true);
+                api.updateField(
+                  rowIndex,
+                  "identityId",
+                  {
+                    source: potentialIdentities,
+                    value: setValue,
+                    formatter: potentialIdentities.length > 1 ? "multipleOptions" : null,
+                  },
+                  true
+                );
               })
               .fail(function (response, textStatus, serverStatus) {
                 var error = JSON.parse(response.responseText);
@@ -953,7 +984,16 @@ BulkTarget.sample = (function ($) {
         !Constants.isDetailedSample ||
         (targetCategory !== "Identity" && targetCategory !== "Tissue")
       ) {
-        columns.push(BulkUtils.columns.sop(config.sops));
+        var sopColumn = BulkUtils.columns.sop(config.sops);
+        if (config.pageMode === "propagate") {
+          sopColumn.disabled = true;
+          columns.push(sopColumn);
+          if (config.sopId) {
+            columns = columns.concat(makeSopFieldColumns(config));
+          }
+        } else {
+          columns.push(sopColumn);
+        }
       }
 
       if (Constants.isDetailedSample && !config.isLibraryReceipt) {
@@ -1520,6 +1560,22 @@ BulkTarget.sample = (function ($) {
           " affected"
         );
       });
+    var sopChanges = data.filter(function (sample) {
+      if (sample.sopId === originalSopIdsBySampleId[sample.id]) {
+        return false;
+      }
+      return (
+        sample.sopFieldValues &&
+        Object.keys(sample.sopFieldValues).some(function (fieldId) {
+          var value = sample.sopFieldValues[fieldId];
+          return value !== null && value !== undefined && value !== "";
+        })
+      );
+    });
+    var sopWarnings = sopChanges.map(function (sample) {
+      return "• " + (sample.alias || sample.parentAlias);
+    });
+
     var messages = [];
     if (consentWarnings.length) {
       messages.push("The following project changes may violate consent:");
@@ -1529,13 +1585,25 @@ BulkTarget.sample = (function ($) {
       messages.push("The following project changes affect existing libraries:");
       messages = messages.concat(libraryWarnings);
     }
+    if (sopWarnings.length) {
+      messages.push(
+        "Changing the SOP for the following samples will clear their existing SOP field" +
+          " values. SOP field values can only be edited on the individual Edit Sample page."
+      );
+      messages = messages.concat(sopWarnings);
+    }
     if (messages.length) {
       messages.push("Are you sure you wish to save?");
       Utils.showConfirmDialog(
-        "Project Changes",
+        "Confirm Changes",
         "Save",
         messages,
-        deferred.resolve,
+        function () {
+          sopChanges.forEach(function (sample) {
+            sample.sopFieldValues = {};
+          });
+          deferred.resolve();
+        },
         deferred.reject
       );
     } else {
@@ -1612,6 +1680,60 @@ BulkTarget.sample = (function ($) {
       col.sampleSubcategory = sampleSubcategory;
     }
     return col;
+  }
+
+  function makeSopFieldColumns(config) {
+    var sop = (config.sops || []).filter(Utils.array.idPredicate(Number(config.sopId)))[0];
+    if (!sop || !sop.fields) {
+      return [];
+    }
+
+    return sop.fields.map(function (field) {
+      if (field.fieldType === "INSTRUMENT") {
+        return {
+          title: field.name + (field.units ? " (" + field.units + ")" : ""),
+          type: "dropdown",
+          data: "sopFieldValues." + field.id,
+          source: (config.instruments || []).filter(function (instrument) {
+            return instrument.instrumentModelId === field.instrumentModelId;
+          }),
+          sortSource: Utils.sorting.standardSort("name"),
+          getItemLabel: Utils.array.getName,
+          getItemValue: Utils.array.getId,
+        };
+      }
+      if (field.fieldType === "WORKSTATION") {
+        return {
+          title: field.name + (field.units ? " (" + field.units + ")" : ""),
+          type: "dropdown",
+          data: "sopFieldValues." + field.id,
+          source: config.workstations || [],
+          sortSource: Utils.sorting.standardSort("alias"),
+          getItemLabel: Utils.array.getAlias,
+          getItemValue: Utils.array.getId,
+        };
+      }
+
+      var type;
+
+      switch (field.fieldType) {
+        case "NUMBER":
+          type = "decimal";
+          break;
+        case "TEXT":
+          type = "text";
+          break;
+        default:
+          throw Error("Unhandled field type: " + field.fieldType);
+      }
+
+      return {
+        title: field.name + (field.units ? " (" + field.units + ")" : ""),
+        type: type,
+        data: "sopFieldValues." + field.id,
+        maxLength: 255,
+      };
+    });
   }
 
   function getSampleClassOptions(targetSampleClass, targetCategory, parentSampleClassId) {

@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
- * MISO project contacts: Robert Davey @ TGAC
- * *********************************************************************
- *
- * This file is part of MISO.
- *
- * MISO is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * MISO is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MISO. If not, see <http://www.gnu.org/licenses/>.
- *
- * *********************************************************************
- */
-
 package uk.ac.bbsrc.tgac.miso.webapp.controller.view;
 
 import java.io.IOException;
@@ -38,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -52,7 +29,8 @@ public class ListUsersController {
   private static String getUsername(Object user) {
     if (user instanceof org.springframework.security.core.userdetails.User)
       return ((org.springframework.security.core.userdetails.User) user).getUsername();
-    if (user instanceof InetOrgPerson) return ((InetOrgPerson) user).getUsername();
+    if (user instanceof InetOrgPerson)
+      return ((InetOrgPerson) user).getUsername();
     throw new IllegalArgumentException("User principal of unsupported type: " + user.getClass().getName());
   }
 
@@ -63,7 +41,7 @@ public class ListUsersController {
   @Autowired
   private UserService userService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @Autowired
   @Qualifier("sessionRegistry")
@@ -78,13 +56,14 @@ public class ListUsersController {
 
     ListItemsPage usersPage = new ListItemsPageWithAuthorization("user", authorizationManager, mapper) {
       @Override
-      protected void writeConfigurationExtra(ObjectMapper mapper, ObjectNode config) throws IOException {
+      protected void writeConfigurationExtra(JsonMapper mapper, ObjectNode config) throws IOException {
         config.put("allowCreateUser", securityManager.canCreateNewUser());
         config.put("listMode", "list");
       }
     };
     return usersPage.list(model,
-        userService.list().stream().map(Dtos::asDto).peek(user -> user.setLoggedIn(loggedIn.contains(user.getLoginName()))));
+        userService.list().stream().map(Dtos::asDto)
+            .peek(user -> user.setLoggedIn(loggedIn.contains(user.getLoginName()))));
   }
 
   public AuthorizationManager getAuthorizationManager() {

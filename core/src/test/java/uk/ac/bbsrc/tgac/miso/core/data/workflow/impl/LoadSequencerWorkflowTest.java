@@ -1,11 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -30,18 +31,25 @@ public class LoadSequencerWorkflowTest {
   private static final String POOL_1 = "Pool 1";
   private static final String POOL_2 = "Pool2";
 
+  private AutoCloseable mockito;
+
   @Mock
   private WorkflowExecutor workflowExecutor;
 
   private Workflow sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
 
     Progress progress = new ProgressImpl();
     progress.setWorkflowName(WorkflowName.LOAD_SEQUENCER);
     sut = WorkflowName.LOAD_SEQUENCER.createWorkflow(progress);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
@@ -88,7 +96,8 @@ public class LoadSequencerWorkflowTest {
     enterNewFlowCell();
     assertState(true, null);
 
-    // changing to an existing container should clear the pool steps and make the model step unneccessary
+    // changing to an existing container should clear the pool steps and make the model step
+    // unneccessary
     sut.processInput(0, makeContainerStep(SERIAL_NUMBER, MODEL_ALIAS, 2, PlatformType.ILLUMINA));
     assertState(false, 1, InputType.POOL, InputType.SKIP);
   }
@@ -133,7 +142,8 @@ public class LoadSequencerWorkflowTest {
   @Test
   public void testThrowUnexpectedInput() {
     try {
-      // for step 1, a container step is not expected and should be rejected with an IllegalArgumentException
+      // for step 1, a container step is not expected and should be rejected with an
+      // IllegalArgumentException
       sut.processInput(1, makeContainerStep(SERIAL_NUMBER, MODEL_ALIAS, 2, PlatformType.ILLUMINA));
       fail("testThrowUnexpectedInput should have thrown IllegalArgumentException");
     } catch (IllegalArgumentException expected) {
@@ -146,8 +156,8 @@ public class LoadSequencerWorkflowTest {
     assertEquals(nextStep, sut.getNextStepNumber());
     if (nextStep != null) {
       for (InputType inputType : inputTypes) {
-        assertTrue(String.format("Step %d should accept input type %s", nextStep, inputType.getName()),
-            sut.getStep(nextStep).getInputTypes().contains(inputType));
+        assertTrue(sut.getStep(nextStep).getInputTypes().contains(inputType),
+            String.format("Step %d should accept input type %s", nextStep, inputType.getName()));
       }
     }
   }
@@ -176,7 +186,8 @@ public class LoadSequencerWorkflowTest {
 
   private SequencerPartitionContainer executeWorkflow() throws IOException {
     sut.execute(workflowExecutor);
-    ArgumentCaptor<SequencerPartitionContainer> containerCaptor = ArgumentCaptor.forClass(SequencerPartitionContainer.class);
+    ArgumentCaptor<SequencerPartitionContainer> containerCaptor =
+        ArgumentCaptor.forClass(SequencerPartitionContainer.class);
     Mockito.verify(workflowExecutor).save(containerCaptor.capture());
     return containerCaptor.getValue();
   }
@@ -187,8 +198,8 @@ public class LoadSequencerWorkflowTest {
     return step;
   }
 
-  private SequencerPartitionContainerProgressStep makeContainerStep(String serialNumber, String modelAlias, int partitionCount,
-      PlatformType platformType) {
+  private SequencerPartitionContainerProgressStep makeContainerStep(String serialNumber, String modelAlias,
+      int partitionCount, PlatformType platformType) {
     SequencerPartitionContainer container = new SequencerPartitionContainerImpl();
     container.setIdentificationBarcode(serialNumber);
     container.setModel(makeModel(modelAlias, partitionCount, platformType));
@@ -209,7 +220,8 @@ public class LoadSequencerWorkflowTest {
     return step;
   }
 
-  private SequencingContainerModelProgressStep makeModelStep(String alias, int partitionCount, PlatformType platformType) {
+  private SequencingContainerModelProgressStep makeModelStep(String alias, int partitionCount,
+      PlatformType platformType) {
     SequencingContainerModelProgressStep step = new SequencingContainerModelProgressStep();
     step.setInput(makeModel(alias, partitionCount, platformType));
     return step;

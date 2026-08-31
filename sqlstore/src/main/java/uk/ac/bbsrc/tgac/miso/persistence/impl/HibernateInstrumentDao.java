@@ -10,6 +10,8 @@ import java.util.function.Consumer;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
@@ -21,8 +23,14 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel_;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Run_;
+import uk.ac.bbsrc.tgac.miso.core.data.RunSopFieldValue;
+import uk.ac.bbsrc.tgac.miso.core.data.RunSopFieldValue_;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSopFieldValue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSopFieldValue_;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord_;
+import uk.ac.bbsrc.tgac.miso.core.data.SopField;
+import uk.ac.bbsrc.tgac.miso.core.data.SopField_;
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
@@ -206,6 +214,32 @@ public class HibernateInstrumentDao extends HibernateSaveDao<Instrument>
       counts.add(builder.getCount());
     }
     return counts.stream().mapToLong(Long::longValue).sum();
+  }
+
+  @Override
+  public long getUsageByRunSopFieldValues(Instrument instrument) throws IOException {
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<Long> query = builder.createQuery(Long.class);
+    Root<RunSopFieldValue> root = query.from(RunSopFieldValue.class);
+    Join<RunSopFieldValue, SopField> sopFieldJoin = root.join(RunSopFieldValue_.sopField);
+    query.select(builder.count(root))
+        .where(
+            builder.equal(sopFieldJoin.get(SopField_.fieldType), SopField.FieldType.INSTRUMENT),
+            builder.equal(root.get(RunSopFieldValue_.value), Long.toString(instrument.getId())));
+    return currentSession().createQuery(query).getSingleResult();
+  }
+
+  @Override
+  public long getUsageBySampleSopFieldValues(Instrument instrument) throws IOException {
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<Long> query = builder.createQuery(Long.class);
+    Root<SampleSopFieldValue> root = query.from(SampleSopFieldValue.class);
+    Join<SampleSopFieldValue, SopField> sopFieldJoin = root.join(SampleSopFieldValue_.sopField);
+    query.select(builder.count(root))
+        .where(
+            builder.equal(sopFieldJoin.get(SopField_.fieldType), SopField.FieldType.INSTRUMENT),
+            builder.equal(root.get(SampleSopFieldValue_.value), Long.toString(instrument.getId())));
+    return currentSession().createQuery(query).getSingleResult();
   }
 
   @Override

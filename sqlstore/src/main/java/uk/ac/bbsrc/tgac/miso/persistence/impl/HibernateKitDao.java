@@ -59,7 +59,7 @@ public class HibernateKitDao implements KitStore, JpaCriteriaPaginatedDataSource
 
   @Override
   public Kit get(long id) throws IOException {
-    return (Kit) currentSession().get(KitImpl.class, id);
+    return (Kit) currentSession().find(KitImpl.class, id);
   }
 
   @Override
@@ -88,7 +88,7 @@ public class HibernateKitDao implements KitStore, JpaCriteriaPaginatedDataSource
 
   @Override
   public KitDescriptor getKitDescriptorById(long id) throws IOException {
-    return (KitDescriptor) currentSession().get(KitDescriptor.class, id);
+    return (KitDescriptor) currentSession().find(KitDescriptor.class, id);
   }
 
   @Override

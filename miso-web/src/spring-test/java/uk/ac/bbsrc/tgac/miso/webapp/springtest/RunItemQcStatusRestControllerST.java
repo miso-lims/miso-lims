@@ -1,10 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import uk.ac.bbsrc.tgac.miso.core.data.RunItemQcStatus;
 import uk.ac.bbsrc.tgac.miso.dto.RunItemQcStatusDto;
 
@@ -55,8 +55,8 @@ public class RunItemQcStatusRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // only admin can update
-    RunItemQcStatusDto statOne = Dtos.asDto(currentSession().get(entityClass, 1));
-    RunItemQcStatusDto statTwo = Dtos.asDto(currentSession().get(entityClass, 2));
+    RunItemQcStatusDto statOne = Dtos.asDto(currentSession().find(entityClass, 1));
+    RunItemQcStatusDto statTwo = Dtos.asDto(currentSession().find(entityClass, 2));
     statOne.setDescription("one");
     statTwo.setDescription("two");
 
@@ -69,8 +69,8 @@ public class RunItemQcStatusRestControllerST extends AbstractST {
 
   @Test
   public void testUpdateFail() throws Exception {
-    RunItemQcStatusDto statOne = Dtos.asDto(currentSession().get(entityClass, 1));
-    RunItemQcStatusDto statTwo = Dtos.asDto(currentSession().get(entityClass, 2));
+    RunItemQcStatusDto statOne = Dtos.asDto(currentSession().find(entityClass, 1));
+    RunItemQcStatusDto statTwo = Dtos.asDto(currentSession().find(entityClass, 2));
     statOne.setDescription("one");
     statTwo.setDescription("two");
     testBulkUpdateAsyncUnauthorized(CONTROLLER_BASE, entityClass, Arrays.asList(statOne, statTwo));

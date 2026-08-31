@@ -6,8 +6,8 @@ import java.util.List;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Create a Handsontable for propagating or editing a particular entity type
@@ -20,9 +20,9 @@ public abstract class BulkTableBackend<Dto> {
 
   private final String targetType;
   private final Class<? extends Dto> dtoClass;
-  private final ObjectMapper mapper;
+  private final JsonMapper mapper;
 
-  public BulkTableBackend(String targetType, Class<? extends Dto> dtoClass, ObjectMapper mapper) {
+  public BulkTableBackend(String targetType, Class<? extends Dto> dtoClass, JsonMapper mapper) {
     super();
     this.targetType = targetType;
     this.dtoClass = dtoClass;
@@ -38,7 +38,8 @@ public abstract class BulkTableBackend<Dto> {
    * @return
    * @throws IOException
    */
-  protected final ModelAndView prepare(ModelMap model, PageMode pageMode, String title, List<Dto> dtos) throws IOException {
+  protected final ModelAndView prepare(ModelMap model, PageMode pageMode, String title, List<Dto> dtos)
+      throws IOException {
     ObjectNode config = mapper.createObjectNode();
     config.put(PageMode.PROPERTY, pageMode.getLabel());
     writeConfiguration(mapper, config);
@@ -46,12 +47,13 @@ public abstract class BulkTableBackend<Dto> {
     model.put("config", mapper.writeValueAsString(config));
     model.put("target", targetType);
     model.put("input",
-        mapper.writerFor(mapper.getTypeFactory().constructCollectionType(List.class, dtoClass)).writeValueAsString(dtos));
+        mapper.writerFor(mapper.getTypeFactory().constructCollectionType(List.class, dtoClass))
+            .writeValueAsString(dtos));
     return new ModelAndView(JSP, model);
   }
 
   /**
    * Pass arbitrary configuration data to the front end so that it can display the correct interface.
    */
-  protected abstract void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException;
+  protected abstract void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException;
 }

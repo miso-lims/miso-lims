@@ -1,14 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
@@ -20,7 +20,7 @@ public class HibernateLibraryIndexDaoIT extends AbstractDAOTest {
 
   private HibernateLibraryIndexDao dao;
 
-  @Before
+  @BeforeEach
   public void setup() {
     dao = new HibernateLibraryIndexDao();
     dao.setEntityManager(getEntityManager());
@@ -70,7 +70,7 @@ public class HibernateLibraryIndexDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetByFamilyPositionAndName() throws Exception {
-    LibraryIndexFamily family = (LibraryIndexFamily) currentSession().get(LibraryIndexFamily.class, 3L);
+    LibraryIndexFamily family = (LibraryIndexFamily) currentSession().find(LibraryIndexFamily.class, 3L);
     int position = 1;
     String name = "N710";
     LibraryIndex index = dao.getByFamilyPositionAndName(family, position, name);
@@ -82,13 +82,13 @@ public class HibernateLibraryIndexDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetUsage() throws Exception {
-    LibraryIndex index = (LibraryIndex) currentSession().get(LibraryIndex.class, 12L);
+    LibraryIndex index = (LibraryIndex) currentSession().find(LibraryIndex.class, 12L);
     assertEquals(1L, dao.getUsage(index));
   }
 
   @Test
   public void testCreate() throws Exception {
-    LibraryIndexFamily family = (LibraryIndexFamily) currentSession().get(LibraryIndexFamily.class, 1L);
+    LibraryIndexFamily family = (LibraryIndexFamily) currentSession().find(LibraryIndexFamily.class, 1L);
     LibraryIndex index = new LibraryIndex();
     index.setFamily(family);
     index.setName("New Index");
@@ -97,7 +97,7 @@ public class HibernateLibraryIndexDaoIT extends AbstractDAOTest {
     long savedId = dao.create(index);
 
     clearSession();
-    LibraryIndex saved = (LibraryIndex) currentSession().get(LibraryIndex.class, savedId);
+    LibraryIndex saved = (LibraryIndex) currentSession().find(LibraryIndex.class, savedId);
     assertNotNull(saved);
     assertEquals(index.getFamily().getId(), saved.getFamily().getId());
     assertEquals(index.getName(), saved.getName());
@@ -109,14 +109,14 @@ public class HibernateLibraryIndexDaoIT extends AbstractDAOTest {
   public void testUpdate() throws Exception {
     long indexId = 15L;
     String newName = "changed";
-    LibraryIndex index = (LibraryIndex) currentSession().get(LibraryIndex.class, indexId);
+    LibraryIndex index = (LibraryIndex) currentSession().find(LibraryIndex.class, indexId);
     assertNotEquals(newName, index.getName());
     index.setName(newName);
     dao.update(index);
 
     clearSession();
 
-    LibraryIndex updated = (LibraryIndex) currentSession().get(LibraryIndex.class, indexId);
+    LibraryIndex updated = (LibraryIndex) currentSession().find(LibraryIndex.class, indexId);
     assertEquals(newName, updated.getName());
   }
 

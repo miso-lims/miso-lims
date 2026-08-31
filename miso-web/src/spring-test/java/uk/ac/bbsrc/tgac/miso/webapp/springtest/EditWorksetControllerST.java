@@ -4,7 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
@@ -22,7 +22,7 @@ public class EditWorksetControllerST extends AbstractST {
     @Test
     @WithMockUser(username = "user", roles = {"INTERNAL"})
     public void testSetupForm() throws Exception {
-        Workset workset = currentSession().get(Workset.class, 1L);
+        Workset workset = currentSession().find(Workset.class, 1L);
 
         getMockMvc().perform(get(CONTROLLER_BASE + "/1"))
                 .andExpect(status().isOk())

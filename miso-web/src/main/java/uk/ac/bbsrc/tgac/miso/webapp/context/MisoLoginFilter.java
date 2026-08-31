@@ -13,7 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import com.eaglegenomics.simlims.core.User;
@@ -29,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.UserService;
 
 public class MisoLoginFilter extends UsernamePasswordAuthenticationFilter {
 
-  private static final RequestMatcher URI_MATCHER = new AntPathRequestMatcher("/api/**");
+  private static final RequestMatcher URI_MATCHER = PathPatternRequestMatcher.withDefaults().matcher("/api/**");
 
   @Autowired
   private UserService userService;

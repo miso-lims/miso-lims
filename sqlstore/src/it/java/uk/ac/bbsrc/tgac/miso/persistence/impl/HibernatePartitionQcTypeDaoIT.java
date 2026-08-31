@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.PartitionQCType;
@@ -16,7 +16,7 @@ public class HibernatePartitionQcTypeDaoIT extends AbstractDAOTest {
 
   private HibernatePartitionQcTypeDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernatePartitionQcTypeDao();
     sut.setEntityManager(getEntityManager());
@@ -65,7 +65,7 @@ public class HibernatePartitionQcTypeDaoIT extends AbstractDAOTest {
     clearSession();
 
     PartitionQCType saved =
-        (PartitionQCType) currentSession().get(PartitionQCType.class, savedId);
+        (PartitionQCType) currentSession().find(PartitionQCType.class, savedId);
     assertEquals(desc, saved.getDescription());
   }
 
@@ -73,7 +73,7 @@ public class HibernatePartitionQcTypeDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long typeId = 1L;
     String newDesc = "New Desc";
-    PartitionQCType st = (PartitionQCType) currentSession().get(PartitionQCType.class, typeId);
+    PartitionQCType st = (PartitionQCType) currentSession().find(PartitionQCType.class, typeId);
     assertNotEquals(newDesc, st.getDescription());
     st.setDescription(newDesc);
     assertEquals(typeId, sut.update(st));
@@ -81,13 +81,13 @@ public class HibernatePartitionQcTypeDaoIT extends AbstractDAOTest {
     clearSession();
 
     PartitionQCType saved =
-        (PartitionQCType) currentSession().get(PartitionQCType.class, typeId);
+        (PartitionQCType) currentSession().find(PartitionQCType.class, typeId);
     assertEquals(newDesc, saved.getDescription());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    PartitionQCType ok = (PartitionQCType) currentSession().get(PartitionQCType.class, 1L);
+    PartitionQCType ok = (PartitionQCType) currentSession().find(PartitionQCType.class, 1L);
     assertEquals("OK", ok.getDescription());
     assertEquals(1L, sut.getUsage(ok));
   }

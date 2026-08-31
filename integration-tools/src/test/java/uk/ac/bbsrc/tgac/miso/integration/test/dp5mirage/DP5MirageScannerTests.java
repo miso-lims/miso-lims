@@ -1,31 +1,31 @@
 package uk.ac.bbsrc.tgac.miso.integration.test.dp5mirage;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+
 import uk.ac.bbsrc.tgac.miso.integration.BoxScan;
 import uk.ac.bbsrc.tgac.miso.integration.dp5mirage.DP5MirageScan;
 import uk.ac.bbsrc.tgac.miso.integration.dp5mirage.DP5MirageScanner;
 import uk.ac.bbsrc.tgac.miso.integration.dp5mirage.DP5MirageScanner.DP5MirageScanPosition;
 import uk.ac.bbsrc.tgac.miso.integration.test.BoxScannerTests;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-
 public class DP5MirageScannerTests extends BoxScannerTests<DP5MirageScanner> {
   private static WireMockServer server;
   private static DP5MirageScanner client;
 
-  @BeforeClass
+  @BeforeAll
   public static void setup() {
     server = new WireMockServer(WireMockConfiguration.wireMockConfig().dynamicPort());
     server.start();
@@ -33,7 +33,7 @@ public class DP5MirageScannerTests extends BoxScannerTests<DP5MirageScanner> {
     client = new DP5MirageScanner("localhost", server.port());
   }
 
-  @AfterClass
+  @AfterAll
   public static void shutdown() {
     server.shutdown();
   }
@@ -77,12 +77,10 @@ public class DP5MirageScannerTests extends BoxScannerTests<DP5MirageScanner> {
         // Get the decode status
         if (scan.getBarcode(row, col).equals("No Tube")) {
           positionObjectNode.put("decodeStatus", "EMPTY");
-        }
-        else if (scan.getBarcode(row, col).equals("No Read")) {
-          positionObjectNode.put("decodeStatus","ERROR");
-        }
-        else {
-          positionObjectNode.put("decodeStatus","SUCCESS");
+        } else if (scan.getBarcode(row, col).equals("No Read")) {
+          positionObjectNode.put("decodeStatus", "ERROR");
+        } else {
+          positionObjectNode.put("decodeStatus", "SUCCESS");
         }
         positionObjectNode.put("column", col);
         positionObjectNode.put("barcode", scan.getBarcode(row, col));
@@ -91,14 +89,14 @@ public class DP5MirageScannerTests extends BoxScannerTests<DP5MirageScanner> {
         tubeBarcodeArrayNode.add(positionObjectNode);
       }
     }
-    scanObjectNode.put("tubeBarcode", tubeBarcodeArrayNode);
+    scanObjectNode.set("tubeBarcode", tubeBarcodeArrayNode);
 
     // Create the stubbed mock response
     stubFor(post(urlEqualTo("/dp5/remote/v1/scan?container_uid=mirage96sbs"))
-    .willReturn(aResponse()
-          .withStatus(200)
-          .withHeader("Content-Type", "application/json")
-          .withBody(scanObjectNode.toString())));
+        .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody(scanObjectNode.toString())));
   }
 
   @Override
@@ -117,9 +115,9 @@ public class DP5MirageScannerTests extends BoxScannerTests<DP5MirageScanner> {
     // Default stub post request that mocks an empty response
     stubFor(post(urlEqualTo("/dp5/remote/v1/scan?container_uid=mirage96sbs"))
         .willReturn(aResponse()
-              .withStatus(200)
-              .withHeader("Content-Type", "application/json")
-              .withBody("")));
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody("")));
   }
 
   @Override

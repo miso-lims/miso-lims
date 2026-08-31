@@ -3,10 +3,9 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import tools.jackson.databind.node.ArrayNode;
 
 public class SampleSheetParameter {
 

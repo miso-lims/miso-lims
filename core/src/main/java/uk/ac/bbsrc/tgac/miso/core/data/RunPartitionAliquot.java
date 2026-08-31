@@ -28,16 +28,10 @@ public class RunPartitionAliquot implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ManyToOne
-    @JoinColumn(name = "runId")
     private Run run;
 
-    @ManyToOne(targetEntity = PartitionImpl.class)
-    @JoinColumn(name = "partitionId")
     private Partition partition;
 
-    @ManyToOne
-    @JoinColumn(name = "aliquotId")
     private ListLibraryAliquotView aliquot;
 
     public RunPartitionAliquotId() {
@@ -92,12 +86,18 @@ public class RunPartitionAliquot implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
+  @ManyToOne
+  @JoinColumn(name = "runId")
   private Run run;
 
   @Id
+  @ManyToOne(targetEntity = PartitionImpl.class)
+  @JoinColumn(name = "partitionId")
   private Partition partition;
 
   @Id
+  @ManyToOne
+  @JoinColumn(name = "aliquotId")
   private ListLibraryAliquotView aliquot;
 
   @ManyToOne

@@ -1,14 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.assertFieldValues;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 
@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.WorksetPage.Field;
 
 public class WorksetPageIT extends AbstractIT {
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -39,10 +39,10 @@ public class WorksetPageIT extends AbstractIT {
     assertEquals("", page.getField(Field.ID));
     assertFieldValues("changes pre-save", fields, page);
     WorksetPage savedPage = page.clickSave();
-    assertNotNull("Workset should save successfully", savedPage);
+    assertNotNull(savedPage, "Workset should save successfully");
     assertFieldValues("changes post-save", fields, savedPage);
 
-    Workset workset = (Workset) getSession().get(Workset.class, Long.valueOf(savedPage.getField(Field.ID)));
+    Workset workset = (Workset) getSession().find(Workset.class, Long.valueOf(savedPage.getField(Field.ID)));
     assertEquals(fields.get(Field.ALIAS), workset.getAlias());
     assertEquals(fields.get(Field.DESCRIPTION), workset.getDescription());
   }
@@ -60,10 +60,10 @@ public class WorksetPageIT extends AbstractIT {
     assertFieldValues("changes pre-save", fields, page);
 
     WorksetPage savedPage = page.clickSave();
-    assertNotNull("Workset should save successfully", savedPage);
+    assertNotNull(savedPage, "Workset should save successfully");
     assertFieldValues("changes post-save", fields, savedPage);
 
-    Workset workset = (Workset) getSession().get(Workset.class, Long.valueOf(savedPage.getField(Field.ID)));
+    Workset workset = (Workset) getSession().find(Workset.class, Long.valueOf(savedPage.getField(Field.ID)));
     assertEquals(fields.get(Field.ALIAS), workset.getAlias());
     assertEquals(fields.get(Field.DESCRIPTION), workset.getDescription());
   }
@@ -79,10 +79,10 @@ public class WorksetPageIT extends AbstractIT {
     assertFieldValues("changes pre-save", fields, page);
 
     WorksetPage savedPage = page.clickSave();
-    assertNotNull("Workset should save successfully", savedPage);
+    assertNotNull(savedPage, "Workset should save successfully");
     assertFieldValues("changes post-save", fields, savedPage);
 
-    Workset workset = (Workset) getSession().get(Workset.class, 1L);
+    Workset workset = (Workset) getSession().find(Workset.class, 1L);
     assertTrue(LimsUtils.isStringEmptyOrNull(workset.getDescription()));
   }
 
@@ -91,7 +91,7 @@ public class WorksetPageIT extends AbstractIT {
     WorksetPage page = getWorksetPage(1L);
     page.setField(Field.ALIAS, "Workset Two");
     WorksetPage savedPage = page.clickSave();
-    assertNull("Workset fail to save", savedPage);
+    assertNull(savedPage, "Workset fail to save");
     List<String> errs = page.getAliasValidationErrors();
     assertEquals(1, errs.size());
     assertEquals("There is already a workset with this alias", errs.get(0));
@@ -103,12 +103,12 @@ public class WorksetPageIT extends AbstractIT {
     List<String> names = Lists.newArrayList("SAM100001", "SAM100002");
     List<String> samples = page.getSampleNames();
     for (String name : names) {
-      assertTrue(String.format("%s should be in workset before delete", name), samples.contains(name));
+      assertTrue(samples.contains(name), String.format("%s should be in workset before delete", name));
     }
     WorksetPage updatedPage = page.removeSamplesByName(names);
     List<String> updated = updatedPage.getSampleNames();
     for (String name : names) {
-      assertFalse(String.format("%s should be removed", name), updated.contains(name));
+      assertFalse(updated.contains(name), String.format("%s should be removed", name));
     }
   }
 
@@ -118,12 +118,12 @@ public class WorksetPageIT extends AbstractIT {
     List<String> names = Lists.newArrayList("LIB100001", "LIB100002");
     List<String> libraries = page.getLibraryNames();
     for (String name : names) {
-      assertTrue(String.format("%s should be in workset before delete", name), libraries.contains(name));
+      assertTrue(libraries.contains(name), String.format("%s should be in workset before delete", name));
     }
     WorksetPage updatedPage = page.removeLibrariesByName(names);
     List<String> updated = updatedPage.getLibraryNames();
     for (String name : names) {
-      assertFalse(String.format("%s should be removed", name), updated.contains(name));
+      assertFalse(updated.contains(name), String.format("%s should be removed", name));
     }
   }
 
@@ -133,12 +133,12 @@ public class WorksetPageIT extends AbstractIT {
     List<String> names = Lists.newArrayList("LDI120001", "LDI120002");
     List<String> aliquotNames = page.getLibraryAliquotNames();
     for (String name : names) {
-      assertTrue(String.format("%s should be in workset before delete", name), aliquotNames.contains(name));
+      assertTrue(aliquotNames.contains(name), String.format("%s should be in workset before delete", name));
     }
     WorksetPage updatedPage = page.removeLibraryAliquotsByName(names);
     List<String> updated = updatedPage.getLibraryAliquotNames();
     for (String name : names) {
-      assertFalse(String.format("%s should be removed", name), updated.contains(name));
+      assertFalse(updated.contains(name), String.format("%s should be removed", name));
     }
   }
 

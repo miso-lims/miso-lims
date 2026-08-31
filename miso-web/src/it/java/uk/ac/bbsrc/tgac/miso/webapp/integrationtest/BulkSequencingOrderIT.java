@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -24,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.element.HandsOnTable;
 
 public class BulkSequencingOrderIT extends AbstractIT {
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -38,7 +38,7 @@ public class BulkSequencingOrderIT extends AbstractIT {
     List<String> expectedColumns = BulkSequencingOrderPage.Columns.all();
     assertEquals(expectedColumns.size(), headings.size());
     for (String col : expectedColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+      assertTrue(headings.contains(col), "Check for column: '" + col + "'");
     }
     assertEquals(3, table.getRowCount());
   }
@@ -73,7 +73,7 @@ public class BulkSequencingOrderIT extends AbstractIT {
     changes.remove(Columns.INSTRUMENT_MODEL); // not shown after save as it's not actually saved
     assertColumnValues(savedTable, 0, changes, "post-save");
 
-    Pool pool = (Pool) getSession().get(PoolImpl.class, 120001L);
+    Pool pool = (Pool) getSession().find(PoolImpl.class, 120001L);
 
     QueryBuilder<SequencingOrder, SequencingOrderImpl> builder =
         new QueryBuilder<>(getSession(), SequencingOrderImpl.class, SequencingOrder.class);

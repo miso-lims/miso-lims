@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.math.BigDecimal;
@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -40,7 +40,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
   private static final Set<String> propagateColumns = Sets.newHashSet(LibraryAliquotColumns.PARENT_NAME,
       LibraryAliquotColumns.PARENT_ALIAS, LibraryAliquotColumns.PARENT_LOCATION);
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -90,7 +90,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     Set<String> targetedSequencings = table.getDropdownOptions(LibraryAliquotColumns.TARGETED_SEQUENCING, 0);
     assertTrue(targetedSequencings.contains("Test TarSeq One"));
     assertTrue(targetedSequencings.contains("Test TarSeq Two"));
-    assertEquals("targeted sequencing size", 2, targetedSequencings.size());
+    assertEquals(2, targetedSequencings.size(), "targeted sequencing size");
   }
 
   @Test
@@ -125,7 +125,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertColumnValues(savedTable, 0, attrs, "post-save");
 
     Long newId = getSavedId(savedTable, 0);
-    LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
+    LibraryAliquot saved = (LibraryAliquot) getSession().find(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
   }
 
@@ -151,7 +151,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertColumnValues(savedTable, 0, attrs, "post-save");
 
     Long newId = getSavedId(savedTable, 0);
-    LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
+    LibraryAliquot saved = (LibraryAliquot) getSession().find(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
   }
 
@@ -180,7 +180,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertColumnValues(savedTable, 0, attrs, "post-save");
 
     Long newId = getSavedId(savedTable, 0);
-    LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
+    LibraryAliquot saved = (LibraryAliquot) getSession().find(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
     // chain edit library aliquots
@@ -196,7 +196,7 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertTrue(page2.save(false));
     HandsOnTable savedTable2 = page2.getTable();
     assertColumnValues(savedTable2, 0, attrs, "edit post-save");
-    LibraryAliquot saved2 = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
+    LibraryAliquot saved2 = (LibraryAliquot) getSession().find(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved2);
 
     // chain pool aliquots separately
@@ -220,11 +220,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertColumnValues(savedTable, 0, attrs, "post-save");
 
     Long newId = getSavedId(savedTable, 0);
-    LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
+    LibraryAliquot saved = (LibraryAliquot) getSession().find(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
-    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue("Expected library volume to be negative, received positive value", savedLib.getVolume().compareTo(BigDecimal.ZERO) < 0);
+    LibraryImpl savedLib = (LibraryImpl) getSession().find(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue(savedLib.getVolume().compareTo(BigDecimal.ZERO) < 0, "Expected library volume to be negative, received positive value");
   }
 
   @Test
@@ -244,11 +244,11 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertColumnValues(savedTable, 0, attrs, "post-save");
 
     Long newId = getSavedId(savedTable, 0);
-    LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
+    LibraryAliquot saved = (LibraryAliquot) getSession().find(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
-    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue("Expected library volume to be positive, received negative value", savedLib.getVolume().compareTo(BigDecimal.ZERO) > 0);
+    LibraryImpl savedLib = (LibraryImpl) getSession().find(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue(savedLib.getVolume().compareTo(BigDecimal.ZERO) > 0, "Expected library volume to be positive, received negative value");
   }
 
   @Test
@@ -268,12 +268,12 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertColumnValues(savedTable, 0, attrs, "post-save");
 
     Long newId = getSavedId(savedTable, 0);
-    LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
+    LibraryAliquot saved = (LibraryAliquot) getSession().find(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
-    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 89.9, savedLib.getVolume()),
-        compareDoubles(savedLib.getVolume(), "89.9"));
+    LibraryImpl savedLib = (LibraryImpl) getSession().find(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue(compareDoubles(savedLib.getVolume(), "89.9"),
+        String.format("Expected library volume to be %f, actual library volume was %f", 89.9, savedLib.getVolume()));
   }
 
   @Test
@@ -300,20 +300,20 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertColumnValues(savedTable, 1, row1, "post-save row 1");
 
     Long newId0 = getSavedId(savedTable, 0);
-    LibraryAliquot saved0 = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId0);
+    LibraryAliquot saved0 = (LibraryAliquot) getSession().find(LibraryAliquot.class, newId0);
     assertLibraryAliquotAttributes(row0, saved0);
 
     Long newId1 = getSavedId(savedTable, 1);
-    LibraryAliquot saved1 = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId1);
+    LibraryAliquot saved1 = (LibraryAliquot) getSession().find(LibraryAliquot.class, newId1);
     assertLibraryAliquotAttributes(row1, saved1);
 
-    LibraryImpl savedLib0 = (LibraryImpl) getSession().get(LibraryImpl.class, saved0.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 87.66, savedLib0.getVolume()),
-        compareDoubles(savedLib0.getVolume(), "87.66"));
+    LibraryImpl savedLib0 = (LibraryImpl) getSession().find(LibraryImpl.class, saved0.getLibrary().getId());
+    assertTrue(compareDoubles(savedLib0.getVolume(), "87.66"),
+        String.format("Expected library volume to be %f, actual library volume was %f", 87.66, savedLib0.getVolume()));
 
-    LibraryImpl savedLib1 = (LibraryImpl) getSession().get(LibraryImpl.class, saved1.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", -10.2, savedLib1.getVolume()),
-        compareDoubles(savedLib1.getVolume(), "-10.2"));
+    LibraryImpl savedLib1 = (LibraryImpl) getSession().find(LibraryImpl.class, saved1.getLibrary().getId());
+    assertTrue(compareDoubles(savedLib1.getVolume(), "-10.2"),
+        String.format("Expected library volume to be %f, actual library volume was %f", -10.2, savedLib1.getVolume()));
   }
 
   @Test
@@ -332,12 +332,12 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertColumnValues(savedTable, 0, attrs, "post-save");
 
     Long newId = getSavedId(savedTable, 0);
-    LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
+    LibraryAliquot saved = (LibraryAliquot) getSession().find(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
-    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 49.8, savedLib.getVolume()),
-        compareDoubles(savedLib.getVolume(), "49.8"));
+    LibraryImpl savedLib = (LibraryImpl) getSession().find(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue(compareDoubles(savedLib.getVolume(), "49.8"),
+        String.format("Expected library volume to be %f, actual library volume was %f", 49.8, savedLib.getVolume()));
   }
 
   @Test
@@ -356,12 +356,12 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertColumnValues(savedTable, 0, attrs, "post-save");
 
     Long newId = getSavedId(savedTable, 0);
-    LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
+    LibraryAliquot saved = (LibraryAliquot) getSession().find(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
-    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 67.6, savedLib.getVolume()),
-        compareDoubles(savedLib.getVolume(), "67.6"));
+    LibraryImpl savedLib = (LibraryImpl) getSession().find(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue(compareDoubles(savedLib.getVolume(), "67.6"),
+        String.format("Expected library volume to be %f, actual library volume was %f", 67.6, savedLib.getVolume()));
   }
 
   @Test
@@ -380,12 +380,12 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertColumnValues(savedTable, 0, attrs, "post-save");
 
     Long newId = getSavedId(savedTable, 0);
-    LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
+    LibraryAliquot saved = (LibraryAliquot) getSession().find(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
-    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 87.8, savedLib.getVolume()),
-        compareDoubles(savedLib.getVolume(), "87.8"));
+    LibraryImpl savedLib = (LibraryImpl) getSession().find(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue(compareDoubles(savedLib.getVolume(), "87.8"),
+        String.format("Expected library volume to be %f, actual library volume was %f", 87.8, savedLib.getVolume()));
   }
 
   @Test
@@ -404,16 +404,16 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     assertColumnValues(savedTable, 0, attrs, "post-save");
 
     Long newId = getSavedId(savedTable, 0);
-    LibraryAliquot saved = (LibraryAliquot) getSession().get(LibraryAliquot.class, newId);
+    LibraryAliquot saved = (LibraryAliquot) getSession().find(LibraryAliquot.class, newId);
     assertLibraryAliquotAttributes(attrs, saved);
 
-    LibraryImpl savedLib = (LibraryImpl) getSession().get(LibraryImpl.class, saved.getLibrary().getId());
-    assertTrue(String.format("Expected library volume to be %f, actual library volume was %f", 100.0, savedLib.getVolume()),
-        compareDoubles(savedLib.getVolume(), "100.0"));
+    LibraryImpl savedLib = (LibraryImpl) getSession().find(LibraryImpl.class, saved.getLibrary().getId());
+    assertTrue(compareDoubles(savedLib.getVolume(), "100.0"),
+        String.format("Expected library volume to be %f, actual library volume was %f", 100.0, savedLib.getVolume()));
   }
 
   private long getSavedId(HandsOnTable table, int rowNum) {
-    return Long.valueOf(table.getText(LibraryAliquotColumns.NAME, rowNum).substring(3, table.getText(LibraryAliquotColumns.NAME, 0).length()));
+    return Long.parseLong(table.getText(LibraryAliquotColumns.NAME, rowNum).substring(3, table.getText(LibraryAliquotColumns.NAME, 0).length()));
   }
 
   private void fillRow(HandsOnTable table, int rowNum, Map<String, String> attributes) {
@@ -424,9 +424,9 @@ public class BulkLibraryAliquotIT extends AbstractIT {
     String formatString = hintMessage + " row %d column '%s' value";
     attributes.forEach((key, val) -> {
       if (isStringEmptyOrNull(val)) {
-        assertTrue(String.format(formatString, rowNum, key) + " expected empty", isStringEmptyOrNull(table.getText(key, rowNum)));
+        assertTrue(isStringEmptyOrNull(table.getText(key, rowNum)), String.format(formatString, rowNum, key) + " expected empty");
       } else {
-        assertEquals(String.format(formatString, rowNum, key), val, table.getText(key, rowNum));
+        assertEquals(val, table.getText(key, rowNum), String.format(formatString, rowNum, key));
       }
     });
   }
@@ -459,9 +459,9 @@ public class BulkLibraryAliquotIT extends AbstractIT {
       String objectAttribute = getter.apply(object);
       String tableAttribute = cleanNullValues(column, attributes.get(column));
       if (tableAttribute == null) {
-        assertTrue(String.format("persisted attribute expected empty '%s'", column), isStringEmptyOrNull(objectAttribute));
+        assertTrue(isStringEmptyOrNull(objectAttribute), String.format("persisted attribute expected empty '%s'", column));
       } else {
-        assertEquals(String.format("persisted attribute '%s'", column), tableAttribute, objectAttribute);
+        assertEquals(tableAttribute, objectAttribute, String.format("persisted attribute '%s'", column));
       }
     }
   }

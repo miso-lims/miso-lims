@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -10,10 +10,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.eaglegenomics.simlims.core.User;
@@ -44,15 +42,12 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateSampleDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
-
   @PersistenceContext
   private EntityManager entityManager;
 
   private HibernateSampleDao dao;
 
-  @Before
+  @BeforeEach
   public void setup() {
     dao = new HibernateSampleDao();
     dao.setEntityManager(entityManager);
@@ -73,7 +68,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     sample.setAlias("alias32LK");
     sample.setProject(dao.get(1L).getProject());
     sample.setSampleType("GENOMIC");
-    ScientificName scientificName = (ScientificName) currentSession().get(ScientificName.class, 1L);
+    ScientificName scientificName = (ScientificName) currentSession().find(ScientificName.class, 1L);
     sample.setScientificName(scientificName);
     User user = new UserImpl();
     user.setId(1L);
@@ -89,8 +84,8 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     clearSession();
 
     Sample retrieved = dao.get(id);
-    assertEquals("did not insert sample", sizeBefore + 1, dao.list().size());
-    assertEquals("sample name does not match", sampleName, retrieved.getName());
+    assertEquals(sizeBefore + 1, dao.list().size(), "did not insert sample");
+    assertEquals(sampleName, retrieved.getName(), "sample name does not match");
   }
 
   @Test
@@ -114,8 +109,8 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     clearSession();
 
     Sample retrieved = dao.get(id);
-    assertEquals("sample name does not match", sampleName, retrieved.getName());
-    assertEquals("did not update sample", sizeBefore, dao.list().size());
+    assertEquals(sampleName, retrieved.getName(), "sample name does not match");
+    assertEquals(sizeBefore, dao.list().size(), "did not update sample");
   }
 
   @Test
@@ -171,17 +166,17 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   @Test
   public void testGetByBarcode() throws Exception {
     Sample sample = dao.getByBarcode("SAM7::TEST_0004_Bn_P_nn_1-1_D_1");
-    assertEquals("Sample id does not match", 7, sample.getId());
+    assertEquals(7, sample.getId(), "Sample id does not match");
   }
 
   @Test
   public void testListByBarcodeList() throws Exception {
     Collection<Sample> samples =
         dao.listByBarcodeList(Arrays.asList("SAM7::TEST_0004_Bn_P_nn_1-1_D_1", "SAM11::TEST_0006_Bn_P_nn_1-1_D_1"));
-    assertEquals("Sample size does not match", 2, samples.size());
+    assertEquals(2, samples.size(), "Sample size does not match");
 
     for (Sample sample : samples) {
-      assertTrue("did not find id " + sample.getId(), Arrays.asList(7L, 11L).contains(sample.getId()));
+      assertTrue(Arrays.asList(7L, 11L).contains(sample.getId()), "did not find id " + sample.getId());
     }
   }
 
@@ -204,7 +199,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     String alias = "TEST_0007_Bn_P_nn_1-1_D_1";
     List<EntityReference> samples = dao.listByAlias(alias);
     assertEquals(1, samples.size());
-    assertEquals("wrong sample found", 13, samples.get(0).getId());
+    assertEquals(13, samples.get(0).getId(), "wrong sample found");
     assertEquals(alias, samples.get(0).getLabel());
   }
 
@@ -363,7 +358,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetChildSampleCount() throws Exception {
-    Sample parent = (Sample) currentSession().get(SampleImpl.class, 15L);
+    Sample parent = (Sample) currentSession().find(SampleImpl.class, 15L);
     assertEquals(3L, dao.getChildSampleCount(parent));
   }
 
@@ -374,7 +369,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
     assertNotNull(results);
     assertEquals(ids.size(), results.size());
     for (Long id : ids) {
-      assertTrue(results.stream().anyMatch(x -> x.getId() == id.longValue()));
+      assertTrue(results.stream().anyMatch(x -> x.getId() == id));
     }
   }
 
@@ -387,7 +382,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetPreviousInProject() throws Exception {
-    Sample sample = (Sample) currentSession().get(SampleImpl.class, 23L);
+    Sample sample = (Sample) currentSession().find(SampleImpl.class, 23L);
     EntityReference reference = dao.getPreviousInProject(sample);
     assertNotNull(reference);
     assertEquals(22L, reference.getId());
@@ -395,13 +390,13 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetPreviousInProjectNone() throws Exception {
-    Sample sample = (Sample) currentSession().get(SampleImpl.class, 22L);
+    Sample sample = (Sample) currentSession().find(SampleImpl.class, 22L);
     assertNull(dao.getPreviousInProject(sample));
   }
 
   @Test
   public void testGetNextInProject() throws Exception {
-    Sample sample = (Sample) currentSession().get(SampleImpl.class, 23L);
+    Sample sample = (Sample) currentSession().find(SampleImpl.class, 23L);
     EntityReference reference = dao.getNextInProject(sample);
     assertNotNull(reference);
     assertEquals(24L, reference.getId());
@@ -409,7 +404,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetNextInProjectNone() throws Exception {
-    Sample sample = (Sample) currentSession().get(SampleImpl.class, 24L);
+    Sample sample = (Sample) currentSession().find(SampleImpl.class, 24L);
     assertNull(dao.getNextInProject(sample));
   }
 
@@ -425,7 +420,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void testGetChildren() throws Exception {
     final long identityId = 15L;
     final long stockId = 18L;
-    List<Sample> children = dao.getChildren(Arrays.asList(identityId), SampleStock.CATEGORY_NAME, 2L);
+    List<Sample> children = dao.getChildren(List.of(identityId), SampleStock.CATEGORY_NAME, 2L);
     assertNotNull(children);
     assertEquals(1, children.size());
     assertEquals(stockId, children.get(0).getId());
@@ -435,7 +430,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
   public void testGetChildIds() throws Exception {
     final long identityId = 15L;
     final long stockId = 18L;
-    Set<Long> ids = dao.getChildIds(Arrays.asList(identityId), SampleStock.CATEGORY_NAME, null);
+    Set<Long> ids = dao.getChildIds(List.of(identityId), SampleStock.CATEGORY_NAME, null);
     assertNotNull(ids);
     assertEquals(1, ids.size());
     assertTrue(ids.contains(stockId));
@@ -443,7 +438,7 @@ public class HibernateSampleDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetUsageAsReferenceSlide() throws Exception {
-    Sample slide = (Sample) currentSession().get(SampleImpl.class, 25L);
+    Sample slide = (Sample) currentSession().find(SampleImpl.class, 25L);
     assertEquals(1L, dao.getUsageAsReferenceSlide(slide));
   }
 

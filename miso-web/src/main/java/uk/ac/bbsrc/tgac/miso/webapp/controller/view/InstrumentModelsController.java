@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -36,7 +35,7 @@ public class InstrumentModelsController {
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @GetMapping("/list")
   public ModelAndView list(ModelMap model) throws IOException {

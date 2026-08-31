@@ -48,7 +48,7 @@ public class HibernateSecurityDao implements SecurityStore {
 
   @Override
   public Group getGroupById(Long groupId) throws IOException {
-    return (Group) currentSession().get(Group.class, groupId);
+    return (Group) currentSession().find(Group.class, groupId);
   }
 
   @Override
@@ -63,7 +63,7 @@ public class HibernateSecurityDao implements SecurityStore {
 
   @Override
   public User getUserById(Long userId) throws IOException {
-    return (User) currentSession().get(UserImpl.class, userId);
+    return (User) currentSession().find(UserImpl.class, userId);
   }
 
   @Override

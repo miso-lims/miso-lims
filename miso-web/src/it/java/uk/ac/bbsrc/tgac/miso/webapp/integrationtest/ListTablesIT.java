@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Sets;
 
@@ -84,7 +84,7 @@ public class ListTablesIT extends AbstractIT {
     sortOnTab = Collections.unmodifiableMap(preferredTab);
   }
 
-  private static final Comparator<String> standardComparator = (s1, s2) -> s1.compareToIgnoreCase(s2);
+  private static final Comparator<String> standardComparator = String::compareToIgnoreCase;
 
   private static Comparator<String> standardComparatorWithNullLabel(String nullLabel) {
     return (s1, s2) -> (nullLabel.equals(s1) ? "" : s1).compareToIgnoreCase(nullLabel.equals(s2) ? "" : s2);
@@ -118,9 +118,8 @@ public class ListTablesIT extends AbstractIT {
    */
   private static final Comparator<String> nameNumericComparator = (name1, name2) -> {
     if (name1.matches(NAME_REGEX) && name2.matches(NAME_REGEX) && name1.substring(0, 3).equals(name2.substring(0, 3))) {
-      int id1 = Integer.parseInt(name1.substring(3, name1.length()));
-      int id2 = Integer.parseInt(name2.substring(3,
-          name2.length()));
+      int id1 = Integer.parseInt(name1.substring(3));
+      int id2 = Integer.parseInt(name2.substring(3));
       return Integer.compare(id1, id2);
     } else {
       return standardComparator.compare(name1, name2);
@@ -129,8 +128,8 @@ public class ListTablesIT extends AbstractIT {
 
   private static final Comparator<String> numericComparator = (num1, num2) -> {
     if (NumberUtils.isCreatable(num1) && NumberUtils.isCreatable(num2)) {
-      double d1 = Double.valueOf(num1);
-      double d2 = Double.valueOf(num2);
+      double d1 = Double.parseDouble(num1);
+      double d2 = Double.parseDouble(num2);
       return Double.compare(d1, d2);
     } else {
       return standardComparator.compare(num1, num2);
@@ -166,17 +165,16 @@ public class ListTablesIT extends AbstractIT {
   public void testIndexDistanceToolSetup() throws Exception {
     // Goal: ensure all expected columns are present and no extra
     login();
-    Set<String> indicesColumns =
+    Set<String> expectedColumns =
         Sets.newHashSet(Columns.FAMILY, Columns.INDEX_NAME, Columns.SEQUENCE, Columns.POSITION);
     ListPage page = ListPage.getListPage(getDriver(), getBaseUrl(), "tools/indexdistance");
     DataTable table = page.getTable();
-    Set<String> expected = indicesColumns;
-    expected.add(Columns.SELECTOR); // Checkbox column
-    expected.add(Columns.PLATFORM); // Platform column
+    expectedColumns.add(Columns.SELECTOR); // Checkbox column
+    expectedColumns.add(Columns.PLATFORM); // Platform column
     List<String> headings = table.getColumnHeadings();
-    assertEquals("number of columns", expected.size(), headings.size());
-    for (String col : indicesColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+    assertEquals(expectedColumns.size(), headings.size(), "number of columns");
+    for (String col : expectedColumns) {
+      assertTrue(headings.contains(col), "Check for column: '" + col + "'");
     }
   }
 
@@ -187,9 +185,9 @@ public class ListTablesIT extends AbstractIT {
     IdentitySearchPage page = IdentitySearchPage.get(getDriver(), getBaseUrl());
     DataTable table = page.getSamplesTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals("number of columns", samplesColumns.size(), headings.size());
+    assertEquals(samplesColumns.size(), headings.size(), "number of columns");
     for (String col : samplesColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+      assertTrue(headings.contains(col), "Check for column: '" + col + "'");
     }
   }
 
@@ -282,7 +280,7 @@ public class ListTablesIT extends AbstractIT {
       // size = order columns + some number of completion state columns
       assertTrue(ordersColumns.size() <= headings.size());
       for (String col : ordersColumns) {
-        assertTrue("Check for column: '" + col + "'", headings.contains(col));
+        assertTrue(headings.contains(col), "Check for column: '" + col + "'");
       }
       headings.removeAll(ordersColumns);
 
@@ -1072,9 +1070,9 @@ public class ListTablesIT extends AbstractIT {
     ListPage page = getList(listTarget);
     DataTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
-    assertEquals("number of columns", targetColumns.size(), headings.size());
+    assertEquals(targetColumns.size(), headings.size(), "number of columns");
     for (String col : targetColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+      assertTrue(headings.contains(col), "Check for column: '" + col + "'");
     }
   }
 
@@ -1087,13 +1085,13 @@ public class ListTablesIT extends AbstractIT {
     Set<String> tabs = tabsForTarget.get(listTarget);
     Set<String> foundTabs = page.getTabHeadings();
     for (String tab : tabs) {
-      assertTrue("Check for tab '" + tab + "': ", foundTabs.contains(tab));
+      assertTrue(foundTabs.contains(tab), "Check for tab '" + tab + "': ");
     }
 
     List<String> headings = table.getColumnHeadings();
-    assertEquals("number of columns", targetColumns.size(), headings.size());
+    assertEquals(targetColumns.size(), headings.size(), "number of columns");
     for (String col : targetColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+      assertTrue(headings.contains(col), "Check for column: '" + col + "'");
     }
   }
 
@@ -1128,7 +1126,7 @@ public class ListTablesIT extends AbstractIT {
     Set<String> tabHeadings = page.getTabHeadings();
     tabHeadings.forEach(tabHeading -> {
       page.clickTab(tabHeading);
-      assertTrue("clicked tab without errors", isStringEmptyOrNull(page.getErrors().getText()));
+      assertTrue(isStringEmptyOrNull(page.getErrors().getText()), "clicked tab without errors");
     });
   }
 
@@ -1137,24 +1135,24 @@ public class ListTablesIT extends AbstractIT {
     for (String heading : headings) {
       // sort one way
       table.sortByColumn(heading);
-      assertTrue("first sort on column '" + heading, isStringEmptyOrNull(page.getErrors().getText()));
+      assertTrue(isStringEmptyOrNull(page.getErrors().getText()), "first sort on column '" + heading);
       // if there are at least two rows, ensure that sort was correct
       if (!table.isTableEmpty() && table.countRows() > 1) {
         int sort1 = compareFirstTwoNonMatchingValues(table, heading);
         List<String> columnSort1 = getColumn(table, heading);
         // sort the other way
         table.sortByColumn(heading);
-        assertTrue("second sort on column '" + heading, isStringEmptyOrNull(page.getErrors().getText()));
+        assertTrue(isStringEmptyOrNull(page.getErrors().getText()), "second sort on column '" + heading);
         int sort2 = compareFirstTwoNonMatchingValues(table, heading);
         List<String> columnSort2 = getColumn(table, heading);
 
         // compare results (if either is 0, value of the other can be anything though)
         if (sort1 != 0) {
           assertTrue(
+              sort2 == 0 || sort1 > 0 != sort2 > 0,
               heading + " column second sort order should differ from first:"
-                  + " First sort order was <" + String.join(", ", columnSort1) + ">, "
-                  + "Second sort order was <" + String.join(", ", columnSort2) + ">",
-              sort2 == 0 || sort1 > 0 != sort2 > 0);
+                            + " First sort order was <" + String.join(", ", columnSort1) + ">, "
+                            + "Second sort order was <" + String.join(", ", columnSort2) + ">");
         }
       }
     }
@@ -1172,16 +1170,16 @@ public class ListTablesIT extends AbstractIT {
     ListPage page = getList(target);
     DataTable table = page.getTable();
     table.searchFor(query);
-    assertTrue(String.format("'%s' column does not contain '%s' warning", column, warning),
-        table.doesColumnContainTooltip(column, warning));
+    assertTrue(table.doesColumnContainTooltip(column, warning),
+        String.format("'%s' column does not contain '%s' warning", column, warning));
   }
 
   private void testWarningTabbed(String target, String query, String warning, String column) {
     ListTabbedPage page = getTabbedList(target);
     DataTable table = page.getTable();
     table.searchFor(query);
-    assertTrue(String.format("'%s' column does not contain '%s' warning", column, warning),
-        table.doesColumnContainTooltip(column, warning));
+    assertTrue(table.doesColumnContainTooltip(column, warning),
+        String.format("'%s' column does not contain '%s' warning", column, warning));
   }
 
   private int compareFirstTwoNonMatchingValues(DataTable table, String heading) {

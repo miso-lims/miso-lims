@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -9,8 +8,9 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -34,6 +34,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public class HibernateKitDaoIT extends AbstractDAOTest {
 
+  private AutoCloseable mockito;
+
   @InjectMocks
   private HibernateKitDao dao;
 
@@ -49,23 +51,28 @@ public class HibernateKitDaoIT extends AbstractDAOTest {
 
   private final User user = new UserImpl();
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
     user.setId(1L);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
   public void testGet() throws IOException {
     Kit kit = dao.get(1L);
-    assertThat(kit.getLocationBarcode(), is("Freezer2"));
+    assertEquals("Freezer2", kit.getLocationBarcode());
   }
 
   @Test
   public void testGetKitByLotNumber() throws IOException {
     Kit kit = dao.getKitByLotNumber("LOT35");
-    assertThat(kit.getIdentificationBarcode(), is("5678"));
+    assertEquals("5678", kit.getIdentificationBarcode());
   }
 
   @Test
@@ -77,7 +84,7 @@ public class HibernateKitDaoIT extends AbstractDAOTest {
   @Test
   public void testListAll() throws IOException {
     Collection<Kit> kits = dao.listAll();
-    assertThat(kits.size(), is(2));
+    assertEquals(2, kits.size());
   }
 
   @Test
@@ -88,19 +95,19 @@ public class HibernateKitDaoIT extends AbstractDAOTest {
     clearSession();
 
     Kit savedKit = dao.get(savedId);
-    assertThat(savedKit.getIdentificationBarcode(), is(newKit.getIdentificationBarcode()));
+    assertEquals(newKit.getIdentificationBarcode(), savedKit.getIdentificationBarcode());
   }
 
   @Test
   public void testSaveUpdate() throws IOException {
     Kit existingKit = dao.get(1L);
     existingKit.setLotNumber("UPDATED");
-    assertThat(dao.save(existingKit), is(1L));
+    assertEquals(1L, dao.save(existingKit));
 
     clearSession();
 
     Kit updatedKit = dao.get(1L);
-    assertThat(updatedKit.getLotNumber(), is("UPDATED"));
+    assertEquals("UPDATED", updatedKit.getLotNumber());
   }
 
   private Kit makeNewKit() throws IOException {
@@ -116,7 +123,7 @@ public class HibernateKitDaoIT extends AbstractDAOTest {
   @Test
   public void testGetKitDescriptorById() throws IOException {
     KitDescriptor kitDescriptor = dao.getKitDescriptorById(1L);
-    assertThat(kitDescriptor.getName(), is("Test Kit 1"));
+    assertEquals("Test Kit 1", kitDescriptor.getName());
   }
 
   @Test
@@ -129,7 +136,7 @@ public class HibernateKitDaoIT extends AbstractDAOTest {
   public void testGetKitDescriptorByPartNumber() throws IOException {
     KitDescriptor kitDescriptor = dao.getKitDescriptorByPartNumber("k002", KitType.LIBRARY,
         PlatformType.ILLUMINA);
-    assertThat(kitDescriptor.getName(), is("Test Kit 2"));
+    assertEquals("Test Kit 2", kitDescriptor.getName());
   }
 
   @Test
@@ -150,18 +157,18 @@ public class HibernateKitDaoIT extends AbstractDAOTest {
     KitDescriptor newKitDescriptor = makeNewKitDescriptor();
     newKitDescriptor.setChangeDetails(user);
     long id = dao.saveKitDescriptor(newKitDescriptor);
-    assertThat(id, not(0L));
+    assertNotEquals(0L, id);
     KitDescriptor savedKitDescriptor = dao.getKitDescriptorById(id);
-    assertThat(newKitDescriptor.getName(), is(savedKitDescriptor.getName()));
+    assertEquals(savedKitDescriptor.getName(), newKitDescriptor.getName());
   }
 
   @Test
   public void testSaveKitDescriptorUpdate() throws IOException {
     KitDescriptor existingKitDescriptor = dao.getKitDescriptorById(1L);
     existingKitDescriptor.setName("UPDATED");
-    assertThat(dao.saveKitDescriptor(existingKitDescriptor), is(1L));
+    assertEquals(1L, dao.saveKitDescriptor(existingKitDescriptor));
     KitDescriptor updatedKitDescriptor = dao.getKitDescriptorById(1L);
-    assertThat(updatedKitDescriptor.getName(), is("UPDATED"));
+    assertEquals("UPDATED", updatedKitDescriptor.getName());
   }
 
   private KitDescriptor makeNewKitDescriptor() {
@@ -185,8 +192,8 @@ public class HibernateKitDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetLibraryAliquotsForKdTsRelationship() throws Exception {
-    KitDescriptor kit = (KitDescriptor) currentSession().get(KitDescriptor.class, 1L);
-    TargetedSequencing target = (TargetedSequencing) currentSession().get(TargetedSequencing.class, 1L);
+    KitDescriptor kit = (KitDescriptor) currentSession().find(KitDescriptor.class, 1L);
+    TargetedSequencing target = (TargetedSequencing) currentSession().find(TargetedSequencing.class, 1L);
     List<LibraryAliquot> aliquots = dao.getLibraryAliquotsForKdTsRelationship(kit, target);
     assertNotNull(aliquots);
     assertEquals(1, aliquots.size());
@@ -196,25 +203,25 @@ public class HibernateKitDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetUsageByLibraries() throws Exception {
-    KitDescriptor kit = (KitDescriptor) currentSession().get(KitDescriptor.class, 2L);
+    KitDescriptor kit = (KitDescriptor) currentSession().find(KitDescriptor.class, 2L);
     assertEquals(3, dao.getUsageByLibraries(kit));
   }
 
   @Test
   public void testGetUsageByContainers() throws Exception {
-    KitDescriptor kit = (KitDescriptor) currentSession().get(KitDescriptor.class, 4L);
+    KitDescriptor kit = (KitDescriptor) currentSession().find(KitDescriptor.class, 4L);
     assertEquals(2, dao.getUsageByContainers(kit));
   }
 
   @Test
   public void testGetUsageByRuns() throws Exception {
-    KitDescriptor kit = (KitDescriptor) currentSession().get(KitDescriptor.class, 5L);
+    KitDescriptor kit = (KitDescriptor) currentSession().find(KitDescriptor.class, 5L);
     assertEquals(2, dao.getUsageByRuns(kit));
   }
 
   @Test
   public void testGetUsageByQcTypes() throws Exception {
-    KitDescriptor kit = (KitDescriptor) currentSession().get(KitDescriptor.class, 3L);
+    KitDescriptor kit = (KitDescriptor) currentSession().find(KitDescriptor.class, 3L);
     assertEquals(1, dao.getUsageByQcTypes(kit));
   }
 

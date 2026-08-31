@@ -24,7 +24,7 @@ public class HibernateLibraryQcDao extends HibernateQcStore<LibraryQC> implement
   @Override
   public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units)
       throws IOException {
-    Library library = (Library) currentSession().get(LibraryImpl.class, id);
+    Library library = (Library) currentSession().find(LibraryImpl.class, id);
     correspondingField.updateField(library, value, units);
     currentSession().merge(library);
   }

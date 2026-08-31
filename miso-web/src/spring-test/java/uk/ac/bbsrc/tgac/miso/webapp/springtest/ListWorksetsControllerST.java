@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.hamcrest.Matchers.hasKey;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.WorksetCategory;
@@ -15,7 +15,7 @@ public class ListWorksetsControllerST extends AbstractST {
 
     @Test
     public void testListWorksets() throws Exception {
-        WorksetCategory cat = currentSession().get(WorksetCategory.class, 1L);
+        WorksetCategory cat = currentSession().find(WorksetCategory.class, 1L);
         getMockMvc().perform(get("/worksets"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/WEB-INF/pages/listTabbed.jsp"))

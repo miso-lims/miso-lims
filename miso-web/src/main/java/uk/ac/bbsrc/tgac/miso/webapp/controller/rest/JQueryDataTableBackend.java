@@ -10,9 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,8 +21,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 
 public abstract class JQueryDataTableBackend<Model, Dto> {
-
-  private static final Logger log = LoggerFactory.getLogger(JQueryDataTableBackend.class);
 
   protected abstract Dto asDto(Model model);
 

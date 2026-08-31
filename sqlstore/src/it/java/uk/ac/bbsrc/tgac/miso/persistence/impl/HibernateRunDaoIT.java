@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -9,10 +9,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -42,8 +41,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SequencerPartitionContainerStore;
 
 public class HibernateRunDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @Autowired
   @Spy
@@ -67,14 +65,19 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
   private final User emptyUser = new UserImpl();
   private final Instrument emptySR = new InstrumentImpl();
 
-  @Before
+  @BeforeEach
   public void setup() throws IOException {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
     emptyUser.setId(1L);
     when(securityDAO.getUserById(ArgumentMatchers.anyLong())).thenReturn(emptyUser);
     emptySR.setId(1L);
     when(instrumentDAO.get(ArgumentMatchers.anyLong())).thenReturn(emptySR);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
@@ -135,14 +138,14 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListByLibraryIdList() throws IOException {
-    List<Run> runs = dao.listByLibraryIdList(Arrays.asList(3L));
+    List<Run> runs = dao.listByLibraryIdList(List.of(3L));
     assertEquals(1, runs.size());
     assertEquals(1L, runs.get(0).getId());
   }
 
   @Test
   public void testListByLibraryIdListNone() throws IOException {
-    List<Run> runs = dao.listByLibraryIdList(Arrays.asList(9999L));
+    List<Run> runs = dao.listByLibraryIdList(List.of(9999L));
     assertEquals(0, runs.size());
   }
 
@@ -157,7 +160,7 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
     List<Run> runs = dao.listByIdList(ids);
     assertEquals(2, runs.size());
     for (Long id : ids) {
-      assertTrue(runs.stream().anyMatch(run -> run.getId() == id.longValue()));
+      assertTrue(runs.stream().anyMatch(run -> run.getId() == id));
     }
   }
 
@@ -227,8 +230,8 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
   public void testSaveEdit() throws IOException, MisoNamingException {
     Run run = dao.get(1L);
 
-    Instrument instrument = (Instrument) currentSession().get(InstrumentImpl.class, 1L);
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    Instrument instrument = (Instrument) currentSession().find(InstrumentImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     run.setSequencer(instrument);
     run.setFilePath("/far/far/away");
     run.setName("AwesomeRun");
@@ -248,7 +251,7 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
   public void testSaveNew() throws IOException, MisoNamingException {
     Run newRun = makeRun("TestRun");
     newRun.setName("RUNX");
-    Long savedId = dao.create(newRun);
+    long savedId = dao.create(newRun);
 
     clearSession();
 
@@ -258,18 +261,15 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
 
   @Test
   public void testCreateNull() throws IOException {
-    exception.expect(IllegalArgumentException.class);
-    dao.create(null);
+    assertThrows(IllegalArgumentException.class,  () -> dao.create(null));
   }
 
   @Test
   public void testUpdateNull() throws IOException {
-    exception.expect(IllegalArgumentException.class);
-    dao.update(null);
+    assertThrows(IllegalArgumentException.class,  () -> dao.update(null));
   }
 
   private Run makeRun(String alias) {
-    Instrument instrument = emptySR;
     Date now = new Date();
     User user = new UserImpl();
     user.setId(1L);
@@ -278,7 +278,7 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
     run.setAlias(alias);
     run.setDescription("description");
     run.setFilePath("/somewhere/someplace/");
-    run.setSequencer(instrument);
+    run.setSequencer(emptySR);
     run.setCreator(user);
     run.setCreationTime(now);
     run.setLastModifier(user);
@@ -329,8 +329,7 @@ public class HibernateRunDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListOffsetBadLimit() throws IOException {
-    exception.expect(IOException.class);
-    dao.list(5, -3, true, "id");
+    assertThrows(IOException.class, () -> dao.list(5, -3, true, "id"));
   }
 
   @Test

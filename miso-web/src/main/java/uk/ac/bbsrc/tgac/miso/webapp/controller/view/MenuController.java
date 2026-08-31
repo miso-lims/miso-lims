@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response.Status;
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.ApiKeyDto;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ApiKeyService;
@@ -51,7 +51,7 @@ public class MenuController {
   private ApiKeyService apiKeyService;
 
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @Resource
   private Boolean boxScannerEnabled;

@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.StudyType;
@@ -45,9 +45,9 @@ public class HibernateStudyTypeDaoIT extends AbstractHibernateSaveDaoTest<StudyT
 
   @Test
   public void testGetUsage() throws Exception {
-    StudyType type1 = (StudyType) currentSession().get(StudyType.class, 1L);
+    StudyType type1 = (StudyType) currentSession().find(StudyType.class, 1L);
     assertEquals(6, getTestSubject().getUsage(type1));
-    StudyType type2 = (StudyType) currentSession().get(StudyType.class, 2L);
+    StudyType type2 = (StudyType) currentSession().find(StudyType.class, 2L);
     assertEquals(0, getTestSubject().getUsage(type2));
   }
 

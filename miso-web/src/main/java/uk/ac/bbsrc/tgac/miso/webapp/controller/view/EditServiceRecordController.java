@@ -10,11 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
@@ -32,7 +30,7 @@ public class EditServiceRecordController {
   @Autowired
   private ServiceRecordService serviceRecordService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @GetMapping(value = "/{recordId}")
   public ModelAndView viewServiceRecord(@PathVariable(value = "recordId") Long recordId,
@@ -59,8 +57,7 @@ public class EditServiceRecordController {
     return showPage(record, instrument, model);
   }
 
-  public ModelAndView showPage(ServiceRecord record, Instrument instrument, ModelMap model)
-      throws JsonProcessingException, IOException {
+  public ModelAndView showPage(ServiceRecord record, Instrument instrument, ModelMap model) throws IOException {
     if (!record.isSaved()) {
       model.put("title", "New Service Record");
     } else {

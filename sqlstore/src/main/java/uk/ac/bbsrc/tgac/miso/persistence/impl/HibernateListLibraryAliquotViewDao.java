@@ -17,10 +17,10 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.metamodel.SingularAttribute;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex_;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode_;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot_;
@@ -76,7 +76,7 @@ public class HibernateListLibraryAliquotViewDao extends HibernateProviderDao<Lis
 
   @Override
   public ListLibraryAliquotView get(Long aliquotId) throws IOException {
-    return (ListLibraryAliquotView) currentSession().get(ListLibraryAliquotView.class, aliquotId);
+    return (ListLibraryAliquotView) currentSession().find(ListLibraryAliquotView.class, aliquotId);
   }
 
   @Override

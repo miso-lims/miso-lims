@@ -1,10 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -27,7 +27,7 @@ public class HibernateApiKeyDaoIT extends AbstractHibernateSaveDaoTest<ApiKey, H
 
   @Override
   public ApiKey getCreateItem() {
-    User admin = currentSession().get(UserImpl.class, 1L);
+    User admin = currentSession().find(UserImpl.class, 1L);
     ApiKey key = new ApiKey();
     key.setKey("asdf");
     key.setSecret("ghjk");
@@ -55,13 +55,13 @@ public class HibernateApiKeyDaoIT extends AbstractHibernateSaveDaoTest<ApiKey, H
 
   @Test
   public void testDelete() throws Exception {
-    ApiKey beforeDelete = currentSession().get(ApiKey.class, 1L);
+    ApiKey beforeDelete = currentSession().find(ApiKey.class, 1L);
     assertNotNull(beforeDelete);
 
     getTestSubject().delete(beforeDelete);
     clearSession();
 
-    ApiKey afterDelete = currentSession().get(ApiKey.class, 1L);
+    ApiKey afterDelete = currentSession().find(ApiKey.class, 1L);
     assertNull(afterDelete);
   }
 

@@ -17,9 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
@@ -41,10 +40,11 @@ public class QcController {
   @Autowired
   private InstrumentService instrumentService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @PostMapping("/bulk/addFrom/{qcTarget}")
-  public ModelAndView addBulk(@PathVariable("qcTarget") String qcTargetLabel, @RequestParam Map<String, String> form, ModelMap model)
+  public ModelAndView addBulk(@PathVariable("qcTarget") String qcTargetLabel, @RequestParam Map<String, String> form,
+      ModelMap model)
       throws IOException {
     QcTarget qcTarget = getQcTarget(qcTargetLabel);
     String entityIds = getStringInput("entityIds", form, true);
@@ -55,7 +55,8 @@ public class QcController {
   }
 
   @PostMapping("/bulk/edit/{qcTarget}")
-  public ModelAndView editBulk(@PathVariable("qcTarget") String qcTargetLabel, @RequestParam Map<String, String> form, ModelMap model)
+  public ModelAndView editBulk(@PathVariable("qcTarget") String qcTargetLabel, @RequestParam Map<String, String> form,
+      ModelMap model)
       throws IOException {
     QcTarget qcTarget = getQcTarget(qcTargetLabel);
     String qcIds = getStringInput("ids", form, true);
@@ -73,7 +74,7 @@ public class QcController {
       }
 
       @Override
-      protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
         config.putPOJO("instruments", instrumentService.list().stream().map(Dtos::asDto).collect(Collectors.toList()));
         config.put("addControls", addControls);
         config.put("qcTarget", qcTarget.getLabel());
@@ -82,7 +83,8 @@ public class QcController {
   }
 
   @PostMapping("/bulk/editFrom/{qcTarget}")
-  public ModelAndView editBulkFrom(@PathVariable("qcTarget") String qcTargetLabel, @RequestParam Map<String, String> form, ModelMap model)
+  public ModelAndView editBulkFrom(@PathVariable("qcTarget") String qcTargetLabel,
+      @RequestParam Map<String, String> form, ModelMap model)
       throws IOException {
     QcTarget qcTarget = getQcTarget(qcTargetLabel);
     String entityIds = getStringInput("entityIds", form, true);

@@ -17,16 +17,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import jakarta.ws.rs.core.Response.Status;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SequencingContainerModelDto;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AsyncOperationManager;
 
@@ -68,6 +67,7 @@ public class SequencingContainerModelRestController extends AbstractRestControll
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody List<Long> ids) throws IOException {
     RestUtils.bulkDelete(TYPE_LABEL, ids, containerModelService);
+    constantsController.refreshConstants();
   }
 
   @GetMapping("/search")

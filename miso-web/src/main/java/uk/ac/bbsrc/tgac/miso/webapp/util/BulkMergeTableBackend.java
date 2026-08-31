@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
@@ -20,7 +20,7 @@ public abstract class BulkMergeTableBackend<Dto> extends BulkTableBackend<Dto> {
   private final String parentName;
 
   public BulkMergeTableBackend(String targetType, Class<? extends Dto> dtoClass, String name, String parentName,
-      ObjectMapper mapper) {
+      JsonMapper mapper) {
     super(targetType, dtoClass, mapper);
     this.name = name;
     this.parentName = parentName;

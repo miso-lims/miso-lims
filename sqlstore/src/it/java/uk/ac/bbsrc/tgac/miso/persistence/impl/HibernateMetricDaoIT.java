@@ -1,10 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Metric;
@@ -42,7 +42,7 @@ public class HibernateMetricDaoIT extends AbstractHibernateSaveDaoTest<Metric, H
 
   @Test
   public void testGetUsage() throws Exception {
-    Metric metric = (Metric) currentSession().get(Metric.class, 1L);
+    Metric metric = (Metric) currentSession().find(Metric.class, 1L);
     assertEquals(2L, getTestSubject().getUsage(metric));
   }
 

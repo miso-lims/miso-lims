@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.ws.rs.core.Response.Status;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
@@ -32,7 +32,7 @@ public abstract class AbstractInstituteDefaultsController<Model extends Aliasabl
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   protected abstract Dto asDto(Model model);
 
@@ -44,7 +44,7 @@ public abstract class AbstractInstituteDefaultsController<Model extends Aliasabl
     return new BulkCreateTableBackend<Dto>(getType(), getDtoClass(), getName(), getBlankModel(), quantity, mapper) {
 
       @Override
-      protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
         AbstractInstituteDefaultsController.this.writeConfiguration(mapper, config);
       }
     }.create(model);
@@ -67,7 +67,7 @@ public abstract class AbstractInstituteDefaultsController<Model extends Aliasabl
       }
 
       @Override
-      protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
         AbstractInstituteDefaultsController.this.writeConfiguration(mapper, config);
       }
     };
@@ -95,14 +95,14 @@ public abstract class AbstractInstituteDefaultsController<Model extends Aliasabl
     model.addAttribute("title", getName());
     ListItemsPage listPage = new ListItemsPageWithAuthorization(getType(), authorizationManager, mapper) {
       @Override
-      protected void writeConfigurationExtra(ObjectMapper mapper, ObjectNode config) throws IOException {
+      protected void writeConfigurationExtra(JsonMapper mapper, ObjectNode config) throws IOException {
         AbstractInstituteDefaultsController.this.writeConfiguration(mapper, config);
       }
     };
     return listPage.list(model, getAll().stream().map(this::asDto));
   }
 
-  protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+  protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
     User user = authorizationManager.getCurrentUser();
     config.put("isAdmin", user.isAdmin());
   }

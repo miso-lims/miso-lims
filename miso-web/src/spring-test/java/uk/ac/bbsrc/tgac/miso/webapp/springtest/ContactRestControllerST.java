@@ -1,46 +1,18 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.web.servlet.*;
 
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
-
-import javax.ws.rs.core.MediaType;
-
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
-import com.jayway.jsonpath.JsonPath;
-
-import static org.hamcrest.Matchers.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
-import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.dto.ContactDto;
 
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.View;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.springframework.security.test.context.support.WithMockUser;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
-import static org.junit.Assert.*;
-import java.util.Collections;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
 
 
 public class ContactRestControllerST extends AbstractST {
@@ -51,7 +23,7 @@ public class ContactRestControllerST extends AbstractST {
 
   @Test
   public void testSearch() throws Exception {
-    baseSearchByTerm(CONTROLLER_BASE, "someone", Arrays.asList(1));
+    baseSearchByTerm(CONTROLLER_BASE, "someone", List.of(1));
   }
 
   private List<ContactDto> makeCreateDtos() {
@@ -82,8 +54,8 @@ public class ContactRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateAsync() throws Exception {
-    ContactDto con1 = Dtos.asDto(currentSession().get(entityClass, 1));
-    ContactDto con2 = Dtos.asDto(currentSession().get(entityClass, 2));
+    ContactDto con1 = Dtos.asDto(currentSession().find(entityClass, 1));
+    ContactDto con2 = Dtos.asDto(currentSession().find(entityClass, 2));
 
     con1.setName("con1");
     con2.setName("con2");

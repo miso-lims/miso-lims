@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -15,7 +15,7 @@ public class HibernateBoxUseDaoIT extends AbstractDAOTest {
 
   private HibernateBoxUseDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateBoxUseDao();
     sut.setEntityManager(getEntityManager());
@@ -53,7 +53,7 @@ public class HibernateBoxUseDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    BoxUse saved = (BoxUse) currentSession().get(BoxUse.class, savedId);
+    BoxUse saved = (BoxUse) currentSession().find(BoxUse.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -61,20 +61,20 @@ public class HibernateBoxUseDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Alias";
-    BoxUse boxUse = (BoxUse) currentSession().get(BoxUse.class, id);
+    BoxUse boxUse = (BoxUse) currentSession().find(BoxUse.class, id);
     assertNotEquals(alias, boxUse.getAlias());
     boxUse.setAlias(alias);
     sut.update(boxUse);
 
     clearSession();
 
-    BoxUse saved = (BoxUse) currentSession().get(BoxUse.class, id);
+    BoxUse saved = (BoxUse) currentSession().find(BoxUse.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    BoxUse boxUse = (BoxUse) currentSession().get(BoxUse.class, 1L);
+    BoxUse boxUse = (BoxUse) currentSession().find(BoxUse.class, 1L);
     assertEquals("boxuse1", boxUse.getAlias());
     assertEquals(2L, sut.getUsage(boxUse));
   }

@@ -1,14 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
 import java.io.IOException;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Maps;
@@ -23,7 +23,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ServiceRecordPage.Field
 
 public class ServiceRecordPageIT extends AbstractIT {
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -31,7 +31,7 @@ public class ServiceRecordPageIT extends AbstractIT {
   @Test
   public void testCreate() throws Exception {
     // goal: add one service record
-    Instrument seq = (Instrument) getSession().get(InstrumentImpl.class, 200L);
+    Instrument seq = (Instrument) getSession().find(InstrumentImpl.class, 200L);
     assertNotNull(seq);
     assertEquals(0, seq.getServiceRecords().size());
 
@@ -58,7 +58,7 @@ public class ServiceRecordPageIT extends AbstractIT {
 
     String newId = page2.getField(Field.ID);
 
-    ServiceRecord sr = (ServiceRecord) getSession().get(ServiceRecord.class, Long.valueOf(newId));
+    ServiceRecord sr = (ServiceRecord) getSession().find(ServiceRecord.class, Long.valueOf(newId));
     assertServiceRecordAttributes(fields, sr);
   }
 
@@ -94,9 +94,9 @@ public class ServiceRecordPageIT extends AbstractIT {
 
     ServiceRecordPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
-    ServiceRecord savedRecord = (ServiceRecord) getSession().get(ServiceRecord.class, 150L);
+    ServiceRecord savedRecord = (ServiceRecord) getSession().find(ServiceRecord.class, 150L);
 
-    Instrument instrument = (Instrument) getSession().get(InstrumentImpl.class, 101L);
+    Instrument instrument = (Instrument) getSession().find(InstrumentImpl.class, 101L);
     assertTrue(instrument.getServiceRecords().stream().anyMatch(x -> x.getId() == savedRecord.getId()));
     assertEquals("NewHiSeq_101", instrument.getName());
     assertEquals("NewHiSeq_101", ServiceRecordPage.getParentName());
@@ -134,9 +134,9 @@ public class ServiceRecordPageIT extends AbstractIT {
 
     ServiceRecordPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
-    ServiceRecord savedRecord = (ServiceRecord) getSession().get(ServiceRecord.class, 151L);
+    ServiceRecord savedRecord = (ServiceRecord) getSession().find(ServiceRecord.class, 151L);
 
-    Instrument instrument = (Instrument) getSession().get(InstrumentImpl.class, 101L);
+    Instrument instrument = (Instrument) getSession().find(InstrumentImpl.class, 101L);
     assertTrue(instrument.getServiceRecords().stream().anyMatch(x -> x.getId() == savedRecord.getId()));
     assertEquals("NewHiSeq_101", instrument.getName());
     assertEquals("NewHiSeq_101", ServiceRecordPage.getParentName());
@@ -174,8 +174,8 @@ public class ServiceRecordPageIT extends AbstractIT {
 
     ServiceRecordPage page2 = page1.save();
     assertFieldValues("post-save", fields, page2);
-    ServiceRecord savedRecord = (ServiceRecord) getSession().get(ServiceRecord.class, 152L);
-    Instrument instrument = (Instrument) getSession().get(InstrumentImpl.class, 101L);
+    ServiceRecord savedRecord = (ServiceRecord) getSession().find(ServiceRecord.class, 152L);
+    Instrument instrument = (Instrument) getSession().find(InstrumentImpl.class, 101L);
     assertTrue(instrument.getServiceRecords().stream().anyMatch(x -> x.getId() == savedRecord.getId()));
     assertEquals("NewHiSeq_101", instrument.getName());
     assertEquals("NewHiSeq_101", ServiceRecordPage.getParentName());

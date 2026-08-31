@@ -18,8 +18,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
+import tools.jackson.databind.JsonNode;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
@@ -466,8 +465,8 @@ public class SampleSheets {
       if (instrumentPosition == null) {
         // combine position-specific values into one value
         List<String> values = new ArrayList<>();
-        inputValue.fields()
-            .forEachRemaining(entry -> values.add(getValueFromInput(entry.getValue(), source, parameter)));
+        inputValue.properties()
+            .forEach(entry -> values.add(getValueFromInput(entry.getValue(), source, parameter)));
         return String.join(source.getSeparator() == null ? "; " : source.getSeparator(), values);
       } else {
         // single position-specific value
@@ -482,22 +481,22 @@ public class SampleSheets {
 
   protected static String getValueFromInput(JsonNode inputValue, SampleSheetFieldSource source,
       SampleSheetParameter parameter) {
-    if (inputValue.isNull() || (inputValue.isTextual() && inputValue.asText().isBlank())) {
+    if (inputValue.isNull() || (inputValue.isString() && inputValue.asString().isBlank())) {
       return null;
     }
     switch (parameter.getType()) {
       case TEXT:
       case INT:
       case DECIMAL:
-        return inputValue.asText();
+        return inputValue.asString();
       case DATE:
-        return formatDate(inputValue.asText(), source.getDateFormat());
+        return formatDate(inputValue.asString(), source.getDateFormat());
       case DROPDOWN:
-        JsonNode valueJson = findByValue(parameter, inputValue.asText());
+        JsonNode valueJson = findByValue(parameter, inputValue.asString());
         if (source.getSourceProperty() == null) {
-          return valueJson.get("value").asText();
+          return valueJson.get("value").asString();
         } else {
-          return valueJson.get(source.getSourceProperty()).asText();
+          return valueJson.get(source.getSourceProperty()).asString();
         }
       default:
         throw new IllegalArgumentException("Unexpected parameter type: %s".formatted(parameter.getType()));
@@ -552,7 +551,7 @@ public class SampleSheets {
 
   private static JsonNode findByValue(SampleSheetParameter parameter, String value) {
     for (JsonNode node : parameter.getSource()) {
-      if (Objects.equals(node.get("value").asText(), value)) {
+      if (Objects.equals(node.get("value").asString(), value)) {
         return node;
       }
     }

@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,10 +10,8 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.Group;
 
@@ -42,12 +40,9 @@ public abstract class PaginationFilterSinkIT extends AbstractDAOTest {
     TISSUE_ORIGIN, TISSUE_TYPE, TRANSFER_TYPE, UPDATED, WORKSET, WORKSTATION;
   }
 
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
-
   private PaginatedDataSource<?> sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = constructTestSubject();
   }
@@ -434,16 +429,20 @@ public abstract class PaginationFilterSinkIT extends AbstractDAOTest {
    * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
    * 
    * @param filter the search filter
-   * @throws IOException
    */
   private void testSearch(PaginationFilter filter, SearchType searchType) throws Exception {
     // verify Hibernate mappings by ensuring that no exception is thrown unless expected
     if (!validSearchTypes.contains(searchType)) {
-      exception.expect(RuntimeException.class);
+      assertThrows(RuntimeException.class, () -> {
+        sut.list(err -> {
+          throw new RuntimeException(err);
+        }, 0, 10, true, defaultSortProperty, filter);
+      });
+    } else {
+      assertNotNull(sut.list(err -> {
+        throw new RuntimeException(err);
+      }, 0, 10, true, defaultSortProperty, filter));
     }
-    assertNotNull(sut.list(err -> {
-      throw new RuntimeException(err);
-    }, 0, 10, true, defaultSortProperty, filter));
   }
 
   @Test

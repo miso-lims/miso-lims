@@ -1,14 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
@@ -29,7 +29,7 @@ public class HibernateArrayDaoIT extends AbstractDAOTest {
 
   private HibernateArrayDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateArrayDao();
     sut.setEntityManager(entityManager);
@@ -38,9 +38,8 @@ public class HibernateArrayDaoIT extends AbstractDAOTest {
 
   @Test
   public void testSaveNew() throws Exception {
-    Session session = entityManager.unwrap(Session.class);
-    ArrayModel model = (ArrayModel) session.get(ArrayModel.class, 1L);
-    User user = (User) session.get(UserImpl.class, 1L);
+    ArrayModel model = (ArrayModel) currentSession().find(ArrayModel.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     Date now = new Date();
 
     Array a = new Array();

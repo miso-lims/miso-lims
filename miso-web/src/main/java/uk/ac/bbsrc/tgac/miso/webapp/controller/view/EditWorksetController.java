@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.workset.Workset;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -31,7 +30,7 @@ public class EditWorksetController {
   @Autowired
   private WorksetService worksetService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @RequestMapping("/new")
   public ModelAndView newArray(ModelMap model) {

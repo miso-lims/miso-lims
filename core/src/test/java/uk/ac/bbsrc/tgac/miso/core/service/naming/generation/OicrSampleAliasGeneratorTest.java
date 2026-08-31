@@ -1,9 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -34,15 +35,22 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleNumberPerProjectService;
 
 public class OicrSampleAliasGeneratorTest {
 
+  private AutoCloseable mockito;
+
   @Mock
   private SampleNumberPerProjectService sampleNumberPerProjectService;
 
   @InjectMocks
   private OicrSampleAliasGenerator sut;
 
-  @Before
+  @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test

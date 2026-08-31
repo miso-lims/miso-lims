@@ -7,6 +7,46 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.27.0] - 2026-08-27
+
+### Added
+
+* Initial support for Element Biosciences sequencing
+* Pinery sample responses now include a `qcs` list with the full QC history (name, date, result,
+  and units) for samples, libraries, and library aliquots.
+* Configuration to hide additional bulk table columns. See the
+  [admin guide](https://miso-lims.readthedocs.io/en/latest/admin/site-configuration/#bulk-table-customization) for more info.
+  * miso.display.bulk.receipt - Date of Receipt, Time of Receipt, Received From, and Received By
+  * miso.display.bulk.boxFields - Box Search, Box Alias, and Position
+  * miso.display.bulk.parentLocation - parent/sample location
+  * miso.display.bulk.workstation - Workstation
+  * miso.display.bulk.thermalCycler - Thermal Cycler
+  * miso.display.bulk.kitLot - Kit Lot
+  * miso.display.bulk.spikeIn - Spike-In, Spike-In Dilution Factor, and Spike-In Volume
+  * miso.display.bulk.targetedSequencing - Targeted Sequencing
+  * miso.display.bulk.parentUsed - Parent ng Used and Parent Vol. Used
+* New bulk table default configuration. See the
+  [admin guide](https://miso-lims.readthedocs.io/en/latest/admin/site-configuration/#bulk-table-customization) for more info.
+  * miso.defaults.bulk.poolQcPassed - default pool QC status
+* Configuration to control whether fields are required. See the
+  [admin guide](https://miso-lims.readthedocs.io/en/latest/admin/site-configuration/#bulk-table-customization) for more info.
+  * miso.required.kitLot - whether Kit Lot is required (bulk and single edit pages)
+* Added the ability to create projects via API
+
+### Changed
+
+* The existing miso.display.bulk.qcStatus flag now also hides the QC Status column on bulk pool
+  pages. See the
+  [admin guide](https://miso-lims.readthedocs.io/en/latest/admin/site-configuration/#bulk-table-customization) for more info.
+* Update pinery to 3.4.1
+* Updated to Run Scanner 2.8.0
+* Sample SOPs now support SOP fields.
+
+### Fixed
+
+* Library aliquot alias validator key "allowAny" not matching due to case-sensitive map key vs. lowercase lookup
+
+
 ## [3.26.0] - 2026-08-13
 
 ### Added

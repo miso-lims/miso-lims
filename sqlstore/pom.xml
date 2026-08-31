@@ -6,7 +6,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>3.26.1-SNAPSHOT</version>
+    <version>3.27.1-SNAPSHOT</version>
   </parent>
   <artifactId>sqlstore</artifactId>
   <packaging>jar</packaging>
@@ -42,7 +42,7 @@
       <artifactId>mysql-connector-j</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
+      <groupId>tools.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
       <type>jar</type>
       <scope>compile</scope>
@@ -104,6 +104,11 @@
       <artifactId>xml-apis</artifactId>
       <type>jar</type>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

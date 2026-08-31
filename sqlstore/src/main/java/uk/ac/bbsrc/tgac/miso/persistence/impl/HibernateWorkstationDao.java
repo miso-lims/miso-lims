@@ -11,9 +11,10 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Root;
-
 import uk.ac.bbsrc.tgac.miso.core.data.RunSopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.RunSopFieldValue_;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSopFieldValue;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSopFieldValue_;
 import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.SopField_;
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
@@ -39,7 +40,7 @@ public class HibernateWorkstationDao extends HibernateSaveDao<Workstation> imple
   }
 
   @Override
-  public long getUsageBySopFieldValues(Workstation workstation) throws IOException {
+  public long getUsageByRunSopFieldValues(Workstation workstation) throws IOException {
     CriteriaBuilder builder = currentSession().getCriteriaBuilder();
     CriteriaQuery<Long> query = builder.createQuery(Long.class);
     Root<RunSopFieldValue> root = query.from(RunSopFieldValue.class);
@@ -48,6 +49,19 @@ public class HibernateWorkstationDao extends HibernateSaveDao<Workstation> imple
         .where(
             builder.equal(sopFieldJoin.get(SopField_.fieldType), SopField.FieldType.WORKSTATION),
             builder.equal(root.get(RunSopFieldValue_.value), Long.toString(workstation.getId())));
+    return currentSession().createQuery(query).getSingleResult();
+  }
+
+  @Override
+  public long getUsageBySampleSopFieldValues(Workstation workstation) throws IOException {
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<Long> query = builder.createQuery(Long.class);
+    Root<SampleSopFieldValue> root = query.from(SampleSopFieldValue.class);
+    Join<SampleSopFieldValue, SopField> sopFieldJoin = root.join(SampleSopFieldValue_.sopField);
+    query.select(builder.count(root))
+        .where(
+            builder.equal(sopFieldJoin.get(SopField_.fieldType), SopField.FieldType.WORKSTATION),
+            builder.equal(root.get(SampleSopFieldValue_.value), Long.toString(workstation.getId())));
     return currentSession().createQuery(query).getSingleResult();
   }
 

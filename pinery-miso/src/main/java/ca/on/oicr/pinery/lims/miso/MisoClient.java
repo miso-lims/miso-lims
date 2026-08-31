@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.text.WordUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -133,6 +133,9 @@ public class MisoClient implements Lims {
 
   private static final String QUERY_ALL_SAMPLE_QCS = getResourceAsString("queryAllSampleQcs.sql");
   private static final String QUERY_SAMPLE_QCS_BY_ID = "SELECT * FROM (" + QUERY_ALL_SAMPLE_QCS + ") combined WHERE sampleId = ?";
+
+  private static final String QUERY_ALL_SAMPLE_QC_HISTORY = getResourceAsString("queryAllSampleQcHistory.sql");
+  private static final String QUERY_SAMPLE_QC_HISTORY_BY_ID = "SELECT * FROM (" + QUERY_ALL_SAMPLE_QC_HISTORY + ") combined WHERE sampleId = ?";
   
   private static final String QUERY_SAMPLE_CHILD_IDS_BY_SAMPLE_ID = getResourceAsString("querySampleChildIdsBySampleId.sql");
 
@@ -220,6 +223,9 @@ public class MisoClient implements Lims {
     template.query(QUERY_SAMPLE_QCS_BY_ID, new Object[] {sample.getId()}, paramTypes, rs -> {
       QcConverter.addToSample(rs, sample);
     });
+    template.query(QUERY_SAMPLE_QC_HISTORY_BY_ID, new Object[] {sample.getId()}, paramTypes, rs -> {
+      QcConverter.addToQcs(rs, sample);
+    });
     return sample;
   }
 
@@ -292,6 +298,12 @@ public class MisoClient implements Lims {
       Sample sample = samplesById.get(rs.getString("sampleId"));
       if (sample != null) {
         QcConverter.addToSample(rs, sample);
+      }
+    });
+    template.query(QUERY_ALL_SAMPLE_QC_HISTORY, rs -> {
+      Sample sample = samplesById.get(rs.getString("sampleId"));
+      if (sample != null) {
+        QcConverter.addToQcs(rs, sample);
       }
     });
   }

@@ -1,14 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
@@ -28,7 +28,7 @@ public class HibernateTransferDaoIT extends AbstractDAOTest {
 
   private HibernateTransferDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateTransferDao();
     sut.setEntityManager(getEntityManager());
@@ -51,9 +51,9 @@ public class HibernateTransferDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListByProperties() throws Exception {
-    Lab sender = (Lab) currentSession().get(LabImpl.class, 1L);
-    Group recipient = (Group) currentSession().get(Group.class, 1L);
-    Project project = (Project) currentSession().get(ProjectImpl.class, 1L);
+    Lab sender = (Lab) currentSession().find(LabImpl.class, 1L);
+    Group recipient = (Group) currentSession().find(Group.class, 1L);
+    Project project = (Project) currentSession().find(ProjectImpl.class, 1L);
     Date transferTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-07-07 12:00:00");
 
     List<Transfer> list = sut.listByProperties(sender, recipient, project, transferTime);
@@ -70,18 +70,18 @@ public class HibernateTransferDaoIT extends AbstractDAOTest {
   @Test
   public void testCreate() throws Exception {
     Transfer transfer = new Transfer();
-    Lab senderLab = (Lab) currentSession().get(LabImpl.class, 1L);
+    Lab senderLab = (Lab) currentSession().find(LabImpl.class, 1L);
     transfer.setSenderLab(senderLab);
-    Group recipientGroup = (Group) currentSession().get(Group.class, 1L);
+    Group recipientGroup = (Group) currentSession().find(Group.class, 1L);
     transfer.setRecipientGroup(recipientGroup);
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     transfer.setChangeDetails(user);
     transfer.setTransferTime(new Date());
     long savedId = sut.create(transfer);
 
     clearSession();
 
-    Transfer saved = (Transfer) currentSession().get(Transfer.class, savedId);
+    Transfer saved = (Transfer) currentSession().find(Transfer.class, savedId);
     assertNotNull(saved);
     assertNotNull(saved.getSenderLab());
     assertEquals(senderLab.getAlias(), saved.getSenderLab().getAlias());
@@ -91,21 +91,21 @@ public class HibernateTransferDaoIT extends AbstractDAOTest {
 
   @Test
   public void testUpdate() throws Exception {
-    Transfer transfer = (Transfer) currentSession().get(Transfer.class, 1L);
-    Lab lab = (Lab) currentSession().get(LabImpl.class, 4L);
+    Transfer transfer = (Transfer) currentSession().find(Transfer.class, 1L);
+    Lab lab = (Lab) currentSession().find(LabImpl.class, 4L);
     assertNotEquals(lab.getId(), transfer.getSenderLab().getId());
     transfer.setSenderLab(lab);
     sut.update(transfer);
 
     clearSession();
 
-    Transfer saved = (Transfer) currentSession().get(Transfer.class, 1L);
+    Transfer saved = (Transfer) currentSession().find(Transfer.class, 1L);
     assertEquals(lab.getId(), saved.getSenderLab().getId());
   }
 
   @Test
   public void testCascadeUpdateItems() throws Exception {
-    Transfer transfer = (Transfer) currentSession().get(Transfer.class, 1L);
+    Transfer transfer = (Transfer) currentSession().find(Transfer.class, 1L);
     String qcNote = "bad stuff";
     for (TransferSample item : transfer.getSampleTransfers()) {
       assertNull(item.isReceived());
@@ -119,7 +119,7 @@ public class HibernateTransferDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    Transfer saved = (Transfer) currentSession().get(Transfer.class, 1L);
+    Transfer saved = (Transfer) currentSession().find(Transfer.class, 1L);
     for (TransferSample item : saved.getSampleTransfers()) {
       assertTrue(item.isReceived());
       assertFalse(item.isQcPassed());
@@ -129,7 +129,7 @@ public class HibernateTransferDaoIT extends AbstractDAOTest {
 
   @Test
   public void testUpdateRemoveItem() throws Exception {
-    Transfer transfer = (Transfer) currentSession().get(Transfer.class, 1L);
+    Transfer transfer = (Transfer) currentSession().find(Transfer.class, 1L);
     Predicate<TransferSample> predicate = item -> item.getItem().getId() == 1L;
     TransferSample item = transfer.getSampleTransfers().stream().filter(predicate).findFirst().orElse(null);
     assertNotNull(item);
@@ -139,18 +139,18 @@ public class HibernateTransferDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    Transfer saved = (Transfer) currentSession().get(Transfer.class, 1L);
+    Transfer saved = (Transfer) currentSession().find(Transfer.class, 1L);
     assertFalse(saved.getSampleTransfers().stream().anyMatch(predicate));
   }
 
   @Test
   public void testUpdateAddItem() throws Exception {
-    Transfer transfer = (Transfer) currentSession().get(Transfer.class, 1L);
+    Transfer transfer = (Transfer) currentSession().find(Transfer.class, 1L);
     Predicate<TransferSample> predicate = item -> item.getItem().getId() == 4L;
     assertFalse(transfer.getSampleTransfers().stream().anyMatch(predicate));
 
     TransferSample newItem = new TransferSample();
-    Sample sample = (Sample) currentSession().get(SampleImpl.class, 4L);
+    Sample sample = (Sample) currentSession().find(SampleImpl.class, 4L);
     newItem.setItem(sample);
     newItem.setTransfer(transfer);
     transfer.getSampleTransfers().add(newItem);
@@ -158,7 +158,7 @@ public class HibernateTransferDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    Transfer saved = (Transfer) currentSession().get(Transfer.class, 1L);
+    Transfer saved = (Transfer) currentSession().find(Transfer.class, 1L);
     assertTrue(saved.getSampleTransfers().stream().anyMatch(predicate));
   }
 

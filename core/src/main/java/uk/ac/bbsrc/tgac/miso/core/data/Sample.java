@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Set;
 
 import com.eaglegenomics.simlims.core.Note;
 
@@ -227,5 +228,9 @@ public interface Sample extends Attachable, Comparable<Sample>, Deletable, Hiera
   public Sop getSop();
 
   public void setSop(Sop sop);
+
+  public Set<SampleSopFieldValue> getSopFieldValues();
+
+  public void setSopFieldValues(Set<SampleSopFieldValue> sopFieldValues);
 
 }

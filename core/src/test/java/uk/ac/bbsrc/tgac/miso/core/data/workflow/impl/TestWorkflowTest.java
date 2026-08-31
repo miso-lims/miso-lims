@@ -1,18 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.data.workflow.Workflow.WorkflowName.LOAD_SEQUENCER;
-import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.assertEquivalent;
-import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.assertThrows;
-import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.makeProgress;
+import static uk.ac.bbsrc.tgac.miso.core.data.workflow.impl.WorkflowTestUtils.*;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Sets;
 
@@ -53,7 +48,7 @@ public class TestWorkflowTest {
     assertThrows(IllegalArgumentException.class, () -> workflow.getStep(1));
     assertFalse(workflow.isComplete());
     assertEquals(Collections.emptyList(), workflow.getLog());
-    assertEquals(new Integer(0), workflow.getNextStepNumber());
+    assertEquals(Integer.valueOf(0), workflow.getNextStepNumber());
   }
 
   @Test
@@ -99,7 +94,7 @@ public class TestWorkflowTest {
     assertThrows(IllegalArgumentException.class, () -> workflow.getStep(2));
     assertFalse(workflow.isComplete());
     assertEquals(Collections.singletonList(String.format("Entered concentration value: %d", input)), workflow.getLog());
-    assertEquals(new Integer(1), workflow.getNextStepNumber());
+    assertEquals(Integer.valueOf(1), workflow.getNextStepNumber());
   }
 
   @Test
@@ -135,16 +130,19 @@ public class TestWorkflowTest {
   private void assertReceivedTwoInputs(Workflow workflow, int intInput, String poolAlias, String poolName) {
     assertThrows(IllegalArgumentException.class, () -> workflow.processInput(2, makePoolStep(POOL_ALIAS, POOL_NAME)));
 
-    assertEquivalent(makeProgress(WORKFLOW_NAME, makeIntegerStep(intInput, 0), makePoolStep(poolAlias, poolName, 1)), workflow.getProgress());
+    assertEquivalent(makeProgress(WORKFLOW_NAME, makeIntegerStep(intInput, 0), makePoolStep(poolAlias, poolName, 1)),
+        workflow.getProgress());
     assertIntegerPrompt(workflow.getStep(0));
     assertPoolPrompt(workflow.getStep(1));
     assertThrows(IllegalArgumentException.class, () -> workflow.getStep(2));
     assertTrue(workflow.isComplete());
     assertEquals(
-        Arrays.asList(String.format("Entered concentration value: %d", intInput), String.format("Selected Pool %s (%s)", poolAlias, poolName)),
+        Arrays.asList(String.format("Entered concentration value: %d", intInput),
+            String.format("Selected Pool %s (%s)", poolAlias, poolName)),
         workflow.getLog());
     assertNull(workflow.getNextStepNumber());
-    assertEquals(String.format("Pool %s (%s) will be modified to have concentration %d.", poolAlias, poolName, intInput),
+    assertEquals(
+        String.format("Pool %s (%s) will be modified to have concentration %d.", poolAlias, poolName, intInput),
         workflow.getConfirmMessage());
   }
 

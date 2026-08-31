@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 
@@ -11,11 +11,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import com.jayway.jsonpath.JsonPath;
 
 import java.util.List;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class AssayControllerST extends AbstractST {
@@ -27,7 +27,7 @@ public class AssayControllerST extends AbstractST {
     assertEquals(Integer.valueOf(ids.size()), JsonPath.read(resultJson, "$.length()"));
 
     for (int i = 0; i < ids.size(); i++) {
-      Assay dbObject = currentSession().get(entityClass, ids.get(i));
+      Assay dbObject = currentSession().find(entityClass, ids.get(i));
       assertEquals(dbObject.getId(), readLong(resultJson, "$[" + i + "].id"));
       assertEquals(dbObject.getAlias(), JsonPath.read(resultJson, "$[" + i + "].alias"));
     }
@@ -49,7 +49,7 @@ public class AssayControllerST extends AbstractST {
   @Test
   public void testCopy() throws Exception {
     int copiedId = 1;
-    Assay base = currentSession().get(Assay.class, copiedId);
+    Assay base = currentSession().find(Assay.class, copiedId);
 
     String response =
         getMockMvc()

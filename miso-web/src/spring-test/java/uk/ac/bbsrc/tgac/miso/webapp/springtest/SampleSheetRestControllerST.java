@@ -1,9 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.SampleSheetRestController.SampleSheetRequest;
 
 import java.util.Arrays;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -39,7 +39,7 @@ public class SampleSheetRestControllerST extends AbstractST {
     long instrumentModelId = 2L;
     long containerModelId = 3L;
     Long sequencingParametersId = 4L;
-    ObjectNode customParameters = new ObjectMapper().createObjectNode();
+    ObjectNode customParameters = JsonMapper.builder().build().createObjectNode();
     customParameters.put("Genome Folder", "/some/path");
     customParameters.put("Custom Read 1 Primer Well", "");
     customParameters.put("Custom Index Primer Well", "");
@@ -48,12 +48,14 @@ public class SampleSheetRestControllerST extends AbstractST {
     Map<String, Map<Integer, Long>> poolIdsByInstrumentPositionAndPartition = new HashMap<>();
     poolIdsByInstrumentPositionAndPartition.put("*", new HashMap<>());
     poolIdsByInstrumentPositionAndPartition.get("*").put(1, 1L);
-    SampleSheetRequest request = new SampleSheetRequest(null, instrumentModelId, containerModelId, sequencingParametersId,
-        null, customParameters, poolIdsByInstrumentPositionAndPartition, null);
+    SampleSheetRequest request =
+        new SampleSheetRequest(null, instrumentModelId, containerModelId, sequencingParametersId,
+            null, customParameters, poolIdsByInstrumentPositionAndPartition, null);
 
     String response = getMockMvc()
         .perform(post(CONTROLLER_BASE + "/3/generate").content(makeJson(request))
-            .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andReturn().getResponse().getContentAsString();
 

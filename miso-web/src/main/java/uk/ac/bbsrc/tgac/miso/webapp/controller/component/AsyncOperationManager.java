@@ -17,10 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import jakarta.ws.rs.core.Response.Status;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
 import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
@@ -47,7 +46,7 @@ public class AsyncOperationManager {
   @Autowired
   private ConstantsController constantsController;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   private final ConcurrentHashMap<String, BulkSaveOperation<?>> asyncOperations = new ConcurrentHashMap<>();
 

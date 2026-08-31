@@ -1,18 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-
-
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 import javax.ws.rs.core.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.beans.factory.annotation.Value;
 
 import com.jayway.jsonpath.JsonPath;
 import static org.hamcrest.Matchers.*;
@@ -22,23 +17,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
 import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-
 
 import uk.ac.bbsrc.tgac.miso.dto.PoolDto;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.PoolRestController.*;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.Comparator;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.Arrays;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 
 
@@ -77,7 +68,7 @@ public class PoolRestControllerST extends AbstractST {
     pool1.setDiscarded(false);
     pool1.setCreationDate("2025-07-29");
     pool1.setLibraryAliquotCount(1);
-    pool1.setPooledElements(Set.of(Dtos.asDto(currentSession().get(LibraryAliquot.class, 1), false)));
+    pool1.setPooledElements(Set.of(Dtos.asDto(currentSession().find(LibraryAliquot.class, 1), false)));
 
 
 
@@ -87,8 +78,8 @@ public class PoolRestControllerST extends AbstractST {
     pool2.setDiscarded(false);
     pool2.setCreationDate("2025-07-30");
     pool2.setLibraryAliquotCount(2);
-    pool2.setPooledElements(Set.of(Dtos.asDto(currentSession().get(LibraryAliquot.class, 304), false),
-        Dtos.asDto(currentSession().get(LibraryAliquot.class, 305), false)));
+    pool2.setPooledElements(Set.of(Dtos.asDto(currentSession().find(LibraryAliquot.class, 304), false),
+        Dtos.asDto(currentSession().find(LibraryAliquot.class, 305), false)));
 
 
     return Arrays.asList(pool1, pool2);
@@ -99,7 +90,7 @@ public class PoolRestControllerST extends AbstractST {
     PoolImpl created = baseTestCreate(CONTROLLER_BASE, makeCreateDtos().get(0), entityClass, 200);
     assertEquals("ILLUMINA", created.getPlatformType().toString());
     assertEquals("pool1_alias", created.getAlias());
-    assertEquals(false, created.isDiscarded());
+    assertFalse(created.isDiscarded());
     assertEquals(LocalDate.of(2025, 7, 29), created.getCreationDate());
     assertEquals(1, created.getPoolContents().size());
     assertEquals(1L, created.getPoolContents().iterator().next().getAliquot().getId());
@@ -107,7 +98,7 @@ public class PoolRestControllerST extends AbstractST {
 
   @Test
   public void testUpdate() throws Exception {
-    PoolDto dto = Dtos.asDto(currentSession().get(entityClass, 1), true, true, null);
+    PoolDto dto = Dtos.asDto(currentSession().find(entityClass, 1), true, true, null);
     dto.setDescription("updated");
 
     PoolImpl updated = baseTestUpdate(CONTROLLER_BASE, dto, 1, entityClass);
@@ -120,19 +111,19 @@ public class PoolRestControllerST extends AbstractST {
     // request to remove or add library aliquots to a pool
     int poolId = 801;
 
-    PoolImpl beforeChange = currentSession().get(entityClass, poolId);
+    PoolImpl beforeChange = currentSession().find(entityClass, poolId);
     assertEquals(2, beforeChange.getPoolContents().size());
     req.setRemove(Arrays.asList(200001L, 200002L)); // removes both of the library aliquots in this pool
     // based on the test data
 
-    req.setAdd(Arrays.asList(1L)); // adds library aliquot 1
+    req.setAdd(List.of(1L)); // adds library aliquot 1
 
     getMockMvc()
         .perform(put(CONTROLLER_BASE + "/" + poolId + "/contents").content(makeJson(req))
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
-    PoolImpl changed = currentSession().get(entityClass, poolId);
+    PoolImpl changed = currentSession().find(entityClass, poolId);
     assertEquals(1, changed.getPoolContents().size());
     assertEquals(1L, changed.getPoolContents().iterator().next().getAliquot().getId());
   }
@@ -149,7 +140,7 @@ public class PoolRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
-    PoolImpl changed = currentSession().get(entityClass, 802);
+    PoolImpl changed = currentSession().find(entityClass, 802);
     List<PoolElement> elements =
         changed.getPoolContents().stream().sorted(Comparator.comparing(PoolElement::getProportion)).toList();
 
@@ -176,12 +167,12 @@ public class PoolRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
 
-    PoolImpl updated = currentSession().get(entityClass, 802);
+    PoolImpl updated = currentSession().find(entityClass, 802);
     // just to make sure it matches the expected
     assertEquals(dto.getUnits(), updated.getConcentrationUnits());
     assertEquals(dto.getConcentration(), updated.getConcentration().toString());
     for (Long id : partitionIds) {
-      PartitionImpl part = currentSession().get(PartitionImpl.class, id);
+      PartitionImpl part = currentSession().find(PartitionImpl.class, id);
       assertEquals(poolId, part.getPool().getId());
       assertEquals(updated.getConcentration(), part.getLoadingConcentration());
       assertEquals(updated.getConcentrationUnits(), part.getLoadingConcentrationUnits());
@@ -190,7 +181,7 @@ public class PoolRestControllerST extends AbstractST {
 
   @Test
   public void testGetPoolsByPlatform() throws Exception {
-    testListPools(CONTROLLER_BASE + "/platform/Illumina", ALL_IDS);
+    testListPools(CONTROLLER_BASE + "/platform/Illumina", ALL_IDS, new LinkedMultiValueMap<>(), false);
   }
 
   @Test
@@ -205,13 +196,13 @@ public class PoolRestControllerST extends AbstractST {
 
   @Test
   public void testGetDatatablePoolsByProject() throws Exception {
-    testDtRequest(CONTROLLER_BASE + "/dt/project/3", Arrays.asList(1));
+    testDtRequest(CONTROLLER_BASE + "/dt/project/3", List.of(1));
 
   }
 
   @Test
   public void testGetPickersBySearch() throws Exception {
-    MultiValueMap<String, String> params = new LinkedMultiValueMap();
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     params.add("platform", "ILLUMINA");
     params.add("query", "IPO51");
     testListPools(CONTROLLER_BASE + "/picker/search", Arrays.asList(5101, 5102, 5103, 5104, 5105), params, true);
@@ -220,7 +211,7 @@ public class PoolRestControllerST extends AbstractST {
 
   @Test
   public void testGetPickersByRecentSearch() throws Exception {
-    MultiValueMap<String, String> params = new LinkedMultiValueMap();
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     params.add("platform", "ILLUMINA");
     testListPools(CONTROLLER_BASE + "/picker/recent",
         Arrays.asList(120001, 801, 120002, 120003, 802, 803, 804, 5004, 5101, 5005, 5102, 5006, 5103,
@@ -279,7 +270,7 @@ public class PoolRestControllerST extends AbstractST {
         "Identity Alias", "External Identifier", "Secondary Identifier", "Group ID", "Location");
 
     List<List<String>> rows =
-        Arrays.asList(Arrays.asList("LDI1", "TEST_0001_Bn_R_PE_300_WG", "Req One", "Main Assay v1.0",
+        List.of(Arrays.asList("LDI1", "TEST_0001_Bn_R_PE_300_WG", "Req One", "Main Assay v1.0",
             "Bn", "R", "12321", "LIB1", "TEST_0001_Bn_R_PE_300_WG", "11211", "Paired End", "WG", "", "", "", "", "SAM8",
             "TEST_0001_Bn_R_nn_1-1_D_1", "88888", "SAM1", "TEST_0001", "TEST_external_1", "tube 1", "7357",
             "First Box - B02"));
@@ -403,7 +394,7 @@ public class PoolRestControllerST extends AbstractST {
     List<PoolImpl> created = baseTestBulkCreateAsync(CONTROLLER_BASE, entityClass, makeCreateDtos());
     assertEquals("ILLUMINA", created.get(0).getPlatformType().toString());
     assertEquals("pool1_alias", created.get(0).getAlias());
-    assertEquals(false, created.get(0).isDiscarded());
+    assertFalse(created.get(0).isDiscarded());
     assertEquals(1, created.get(0).getPoolContents().size());
     assertEquals(1L, created.get(0).getPoolContents().toArray(new PoolElement[0])[0].getAliquot().getId());
     assertEquals(LocalDate.of(2025, 7, 29), created.get(0).getCreationDate());
@@ -411,7 +402,7 @@ public class PoolRestControllerST extends AbstractST {
 
     assertEquals("PACBIO", created.get(1).getPlatformType().toString());
     assertEquals("pool2_alias", created.get(1).getAlias());
-    assertEquals(false, created.get(1).isDiscarded());
+    assertFalse(created.get(1).isDiscarded());
     assertEquals(2, created.get(1).getPoolContents().size());
     List<PoolElement> poolTwoElements =
         created.get(1).getPoolContents().stream().sorted(Comparator.comparing(element -> element.getAliquot().getId()))
@@ -423,8 +414,8 @@ public class PoolRestControllerST extends AbstractST {
 
   @Test
   public void testAsyncUpdate() throws Exception {
-    PoolDto pool1 = Dtos.asDto(currentSession().get(entityClass, 1), true, true, null);
-    PoolDto pool501 = Dtos.asDto(currentSession().get(entityClass, 501), true, true, null);
+    PoolDto pool1 = Dtos.asDto(currentSession().find(entityClass, 1), true, true, null);
+    PoolDto pool501 = Dtos.asDto(currentSession().find(entityClass, 501), true, true, null);
     pool1.setDescription("pool 1");
     pool501.setDescription("pool 501");
 
@@ -461,13 +452,13 @@ public class PoolRestControllerST extends AbstractST {
     List<Integer> resultIds = JsonPath.read(response, "$" + addedPath + "[*]" + addedAfter + ".id");
     assertEquals(expectedIds.size(), resultIds.size());
     for (Integer expectedId : expectedIds) {
-      assertTrue("id " + expectedId + " expected but not found", resultIds.contains(expectedId));
+      assertTrue(resultIds.contains(expectedId), "id " + expectedId + " expected but not found");
     }
 
   }
 
 
-  private ResultActions testListPools(String url, List<Integer> ids, MultiValueMap params, boolean isItems)
+  private ResultActions testListPools(String url, List<Integer> ids, MultiValueMap<String, String> params, boolean isItems)
       throws Exception {
     ResultActions result = getMockMvc().perform(get(url).params(params));
 
@@ -475,10 +466,6 @@ public class PoolRestControllerST extends AbstractST {
     checkPoolIds(ids, response, isItems);
 
     return result; // return the result for more content testing if needed
-  }
-
-  private ResultActions testListPools(String url, List<Integer> ids) throws Exception {
-    return testListPools(url, ids, new LinkedMultiValueMap(), false);
   }
 
 }

@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
@@ -16,7 +16,7 @@ public class HibernateLibraryIndexFamilyDaoIT extends AbstractDAOTest {
 
   private HibernateLibraryIndexFamilyDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateLibraryIndexFamilyDao();
     sut.setEntityManager(getEntityManager());
@@ -56,7 +56,7 @@ public class HibernateLibraryIndexFamilyDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    LibraryIndexFamily saved = (LibraryIndexFamily) currentSession().get(LibraryIndexFamily.class, savedId);
+    LibraryIndexFamily saved = (LibraryIndexFamily) currentSession().find(LibraryIndexFamily.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -64,20 +64,20 @@ public class HibernateLibraryIndexFamilyDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String name = "New Name";
-    LibraryIndexFamily fam = (LibraryIndexFamily) currentSession().get(LibraryIndexFamily.class, id);
+    LibraryIndexFamily fam = (LibraryIndexFamily) currentSession().find(LibraryIndexFamily.class, id);
     assertNotEquals(name, fam.getName());
     fam.setName(name);
     sut.update(fam);
 
     clearSession();
 
-    LibraryIndexFamily saved = (LibraryIndexFamily) currentSession().get(LibraryIndexFamily.class, id);
+    LibraryIndexFamily saved = (LibraryIndexFamily) currentSession().find(LibraryIndexFamily.class, id);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    LibraryIndexFamily fam = (LibraryIndexFamily) currentSession().get(LibraryIndexFamily.class, 1L);
+    LibraryIndexFamily fam = (LibraryIndexFamily) currentSession().find(LibraryIndexFamily.class, 1L);
     assertEquals("TruSeq Single Index", fam.getName());
     assertEquals(14L, sut.getUsage(fam));
   }

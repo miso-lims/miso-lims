@@ -1,17 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
-import java.io.IOException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-
-public final class PrintableTextSerializer extends JsonSerializer<PrintableText> {
+public final class PrintableTextSerializer extends ValueSerializer<PrintableText> {
 
   @Override
-  public void serialize(PrintableText text, JsonGenerator generator, SerializerProvider provider)
-      throws IOException, JsonProcessingException {
+  public void serialize(PrintableText text, JsonGenerator generator, SerializationContext ctxt) {
     text.asJson(generator);
   }
 

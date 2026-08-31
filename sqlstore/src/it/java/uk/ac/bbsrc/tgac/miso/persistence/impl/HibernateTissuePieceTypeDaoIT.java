@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.type.TissuePieceType;
@@ -16,7 +16,7 @@ public class HibernateTissuePieceTypeDaoIT extends AbstractDAOTest {
 
   private HibernateTissuePieceTypeDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateTissuePieceTypeDao();
     sut.setEntityManager(getEntityManager());
@@ -49,7 +49,7 @@ public class HibernateTissuePieceTypeDaoIT extends AbstractDAOTest {
     clearSession();
 
     TissuePieceType saved =
-        (TissuePieceType) currentSession().get(TissuePieceType.class, savedId);
+        (TissuePieceType) currentSession().find(TissuePieceType.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -57,20 +57,20 @@ public class HibernateTissuePieceTypeDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String name = "New Name";
-    TissuePieceType type = (TissuePieceType) currentSession().get(TissuePieceType.class, id);
+    TissuePieceType type = (TissuePieceType) currentSession().find(TissuePieceType.class, id);
     assertNotEquals(name, type.getName());
     type.setName(name);
     sut.update(type);
 
     clearSession();
 
-    TissuePieceType saved = (TissuePieceType) currentSession().get(TissuePieceType.class, id);
+    TissuePieceType saved = (TissuePieceType) currentSession().find(TissuePieceType.class, id);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsageByTissuePieces() throws IOException {
-    TissuePieceType type = (TissuePieceType) currentSession().get(TissuePieceType.class, 1L);
+    TissuePieceType type = (TissuePieceType) currentSession().find(TissuePieceType.class, 1L);
     assertEquals("LCM Tube", type.getName());
     assertEquals(0L, sut.getUsage(type));
   }

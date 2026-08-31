@@ -38,7 +38,7 @@ public class HibernateProgressDao implements ProgressStore {
 
   @Override
   public Progress get(long id) {
-    Progress progress = (Progress) currentSession().get(ProgressImpl.class, id);
+    Progress progress = (Progress) currentSession().find(ProgressImpl.class, id);
     if (progress != null) {
       currentSession().evict(progress);
       for (ProgressStep step : progress.getSteps()) {
@@ -50,7 +50,7 @@ public class HibernateProgressDao implements ProgressStore {
 
   @Override
   public Progress getManaged(long id) {
-    return (Progress) currentSession().get(ProgressImpl.class, id);
+    return (Progress) currentSession().find(ProgressImpl.class, id);
   }
 
   @Override
@@ -72,7 +72,7 @@ public class HibernateProgressDao implements ProgressStore {
 
     if (progress.getSteps() != null) {
       for (ProgressStep step : progress.getSteps()) {
-        if (currentSession().get(AbstractProgressStep.class, step.getId()) == null) {
+        if (currentSession().find(AbstractProgressStep.class, step.getId()) == null) {
           currentSession().persist(step);
         } else {
           currentSession().merge(step);

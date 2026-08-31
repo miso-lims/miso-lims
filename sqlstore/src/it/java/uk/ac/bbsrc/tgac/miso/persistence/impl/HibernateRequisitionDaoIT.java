@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -39,9 +39,9 @@ public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requ
   public Requisition getCreateItem() {
     Requisition req = new Requisition();
     req.setAlias("New Req");
-    Assay assay = (Assay) currentSession().get(Assay.class, 1L);
+    Assay assay = (Assay) currentSession().find(Assay.class, 1L);
     req.getAssays().add(assay);
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     Date date = new Date();
     req.setCreator(user);
     req.setCreationTime(date);
@@ -68,8 +68,8 @@ public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requ
   public void testGetSupplementalSample() throws Exception {
     long reqId = 2L;
     long sampleId = 21L;
-    Requisition req = (Requisition) currentSession().get(Requisition.class, reqId);
-    Sample sample = (Sample) currentSession().get(SampleImpl.class, sampleId);
+    Requisition req = (Requisition) currentSession().find(Requisition.class, reqId);
+    Sample sample = (Sample) currentSession().find(SampleImpl.class, sampleId);
     RequisitionSupplementalSample result = getTestSubject().getSupplementalSample(req, sample);
     assertNotNull(result);
     assertEquals(Long.valueOf(reqId), result.getRequisitionId());
@@ -81,8 +81,8 @@ public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requ
   public void testSaveSupplementalSample() throws Exception {
     long reqId = 1L;
     long sampleId = 5L;
-    Requisition req = (Requisition) currentSession().get(Requisition.class, reqId);
-    Sample sample = (Sample) currentSession().get(SampleImpl.class, sampleId);
+    Requisition req = (Requisition) currentSession().find(Requisition.class, reqId);
+    Sample sample = (Sample) currentSession().find(SampleImpl.class, sampleId);
     assertNull(getTestSubject().getSupplementalSample(req, sample));
 
     getTestSubject().saveSupplementalSample(new RequisitionSupplementalSample(req.getId(), sample));
@@ -94,25 +94,25 @@ public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requ
   public void testRemoveSupplementalSample() throws Exception {
     long reqId = 2L;
     long sampleId = 21L;
-    Sample sample = (Sample) currentSession().get(SampleImpl.class, sampleId);
+    Sample sample = (Sample) currentSession().find(SampleImpl.class, sampleId);
     RequisitionSupplementalSampleId supplementalSampleId = new RequisitionSupplementalSampleId();
     supplementalSampleId.setRequisitionId(reqId);
     supplementalSampleId.setSample(sample);
     RequisitionSupplementalSample supplementalSample =
-        currentSession().get(RequisitionSupplementalSample.class, supplementalSampleId);
+        currentSession().find(RequisitionSupplementalSample.class, supplementalSampleId);
     assertNotNull(supplementalSample);
 
     getTestSubject().removeSupplementalSample(supplementalSample);
 
-    assertNull(currentSession().get(RequisitionSupplementalSample.class, supplementalSampleId));
+    assertNull(currentSession().find(RequisitionSupplementalSample.class, supplementalSampleId));
   }
 
   @Test
   public void testGetSupplementalLibrary() throws Exception {
     long reqId = 2L;
     long libraryId = 15L;
-    Requisition req = (Requisition) currentSession().get(Requisition.class, reqId);
-    Library library = (Library) currentSession().get(LibraryImpl.class, libraryId);
+    Requisition req = (Requisition) currentSession().find(Requisition.class, reqId);
+    Library library = (Library) currentSession().find(LibraryImpl.class, libraryId);
     RequisitionSupplementalLibrary result = getTestSubject().getSupplementalLibrary(req, library);
     assertNotNull(result);
     assertEquals(Long.valueOf(reqId), result.getRequisitionId());
@@ -124,8 +124,8 @@ public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requ
   public void testSaveSupplementalLibrary() throws Exception {
     long reqId = 1L;
     long libraryId = 14L;
-    Requisition req = (Requisition) currentSession().get(Requisition.class, reqId);
-    Library library = (Library) currentSession().get(LibraryImpl.class, libraryId);
+    Requisition req = (Requisition) currentSession().find(Requisition.class, reqId);
+    Library library = (Library) currentSession().find(LibraryImpl.class, libraryId);
     assertNull(getTestSubject().getSupplementalLibrary(req, library));
 
     getTestSubject().saveSupplementalLibrary(new RequisitionSupplementalLibrary(req.getId(), library));
@@ -137,17 +137,17 @@ public class HibernateRequisitionDaoIT extends AbstractHibernateSaveDaoTest<Requ
   public void testRemoveSupplementalLibrary() throws Exception {
     long reqId = 2L;
     long libraryId = 15L;
-    Library library = (Library) currentSession().get(LibraryImpl.class, libraryId);
+    Library library = (Library) currentSession().find(LibraryImpl.class, libraryId);
     RequisitionSupplementalLibraryId supplementalLibraryId = new RequisitionSupplementalLibraryId();
     supplementalLibraryId.setRequisitionId(reqId);
     supplementalLibraryId.setLibrary(library);
     RequisitionSupplementalLibrary supplementalLibrary =
-        currentSession().get(RequisitionSupplementalLibrary.class, supplementalLibraryId);
+        currentSession().find(RequisitionSupplementalLibrary.class, supplementalLibraryId);
     assertNotNull(supplementalLibrary);
 
     getTestSubject().removeSupplementalLibrary(supplementalLibrary);
 
-    assertNull(currentSession().get(RequisitionSupplementalLibrary.class, supplementalLibraryId));
+    assertNull(currentSession().find(RequisitionSupplementalLibrary.class, supplementalLibraryId));
   }
 
   @Test

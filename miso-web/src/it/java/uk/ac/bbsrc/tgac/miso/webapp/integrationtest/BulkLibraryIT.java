@@ -1,19 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -70,7 +67,7 @@ public class BulkLibraryIT extends AbstractIT {
 
   private static final String NO_INDEX_FAMILY = "No indices";
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -89,7 +86,7 @@ public class BulkLibraryIT extends AbstractIT {
   public void testPropagateSetup() throws Exception {
     // Goal: ensure all expected fields are present and no extra
     BulkLibraryPage page =
-        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(4));
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), List.of(100004L), List.of(4));
     Set<String> expectedColumns = Sets.newHashSet();
     expectedColumns.addAll(commonColumns);
     expectedColumns.addAll(propagateColumns);
@@ -127,7 +124,7 @@ public class BulkLibraryIT extends AbstractIT {
   @Test
   public void testPropagateDropdowns() throws Exception {
     BulkLibraryPage page =
-        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), List.of(100004L), List.of(1));
     HandsOnTable table = page.getTable();
 
     Set<String> designs = table.getDropdownOptions(LibColumns.DESIGN, 0);
@@ -164,7 +161,7 @@ public class BulkLibraryIT extends AbstractIT {
   @Test
   public void testPropagateDependencyCells() {
     BulkLibraryPage page =
-        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), List.of(100004L), List.of(1));
     HandsOnTable table = page.getTable();
 
     // verify empty options; library type, index family, and kit depend on platform
@@ -224,7 +221,7 @@ public class BulkLibraryIT extends AbstractIT {
   @Test
   public void testReadOnlyCells() {
     BulkLibraryPage page =
-        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), List.of(100004L), List.of(1));
     HandsOnTable table = page.getTable();
 
     assertFalse(table.isWritable(LibColumns.NAME, 0));
@@ -243,7 +240,7 @@ public class BulkLibraryIT extends AbstractIT {
   @Test
   public void testPropagate() {
     BulkLibraryPage page =
-        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), List.of(100004L), List.of(1));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -277,14 +274,14 @@ public class BulkLibraryIT extends AbstractIT {
     HandsOnTable savedTable = page.getTable();
 
     Long newId = getSavedId(savedTable, 0);
-    DetailedLibrary saved = (DetailedLibrary) getSession().get(LibraryImpl.class, newId);
+    DetailedLibrary saved = (DetailedLibrary) getSession().find(LibraryImpl.class, newId);
     assertDetailedLibraryAttributes(attrs, saved);
   }
 
   @Test
   public void testPropagateTwoMinimal() {
     BulkLibraryPage page =
-        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(2));
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), List.of(100004L), List.of(2));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -315,8 +312,8 @@ public class BulkLibraryIT extends AbstractIT {
 
     Long newId1 = getSavedId(savedTable, 0);
     Long newId2 = getSavedId(savedTable, 1);
-    DetailedLibrary saved1 = (DetailedLibrary) getSession().get(LibraryImpl.class, newId1);
-    DetailedLibrary saved2 = (DetailedLibrary) getSession().get(LibraryImpl.class, newId2);
+    DetailedLibrary saved1 = (DetailedLibrary) getSession().find(LibraryImpl.class, newId1);
+    DetailedLibrary saved2 = (DetailedLibrary) getSession().find(LibraryImpl.class, newId2);
     assertDetailedLibraryAttributes(attrs, saved1);
     attrs.put(LibColumns.SIZE, "205");
     assertDetailedLibraryAttributes(attrs, saved2);
@@ -379,7 +376,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertColumnValues(table, 0, changes, "changes pre-save");
 
     assertTrue(page.save(false));
-    DetailedLibrary lib = (DetailedLibrary) getSession().get(LibraryImpl.class, 100001L);
+    DetailedLibrary lib = (DetailedLibrary) getSession().find(LibraryImpl.class, 100001L);
     assertDetailedLibraryAttributes(changes, lib);
   }
 
@@ -444,7 +441,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertColumnValues(table, 0, changes, "changes pre-save");
 
     assertTrue(page.save(false));
-    DetailedLibrary lib = (DetailedLibrary) getSession().get(LibraryImpl.class, 100002L);
+    DetailedLibrary lib = (DetailedLibrary) getSession().find(LibraryImpl.class, 100002L);
     assertDetailedLibraryAttributes(changes, lib);
   }
 
@@ -504,7 +501,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertColumnValues(table, 0, changes, "changes pre-save");
 
     assertTrue(page.save(false));
-    DetailedLibrary lib = (DetailedLibrary) getSession().get(LibraryImpl.class, 100003L);
+    DetailedLibrary lib = (DetailedLibrary) getSession().find(LibraryImpl.class, 100003L);
     assertDetailedLibraryAttributes(changes, lib);
   }
 
@@ -558,7 +555,7 @@ public class BulkLibraryIT extends AbstractIT {
     HandsOnTable savedTable = page.getTable();
 
     Long newId = getSavedId(savedTable, 0);
-    DetailedLibrary saved = (DetailedLibrary) getSession().get(LibraryImpl.class, newId);
+    DetailedLibrary saved = (DetailedLibrary) getSession().find(LibraryImpl.class, newId);
     assertDetailedLibraryAttributes(attrs, saved);
     assertParentSampleAttributes(attrs, saved);
   }
@@ -567,7 +564,7 @@ public class BulkLibraryIT extends AbstractIT {
   public void testPropagateToEditToPropagate() {
     // propagate sample to library
     BulkLibraryPage page =
-        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), Arrays.asList(100004L), Arrays.asList(1));
+        BulkLibraryPage.getForPropagate(getDriver(), getBaseUrl(), List.of(100004L), List.of(1));
     HandsOnTable table = page.getTable();
 
     Map<String, String> attrs = Maps.newLinkedHashMap();
@@ -590,7 +587,7 @@ public class BulkLibraryIT extends AbstractIT {
     HandsOnTable savedTable = page.getTable();
 
     long newId = getSavedId(savedTable, 0);
-    DetailedLibrary saved = (DetailedLibrary) getSession().get(LibraryImpl.class, newId);
+    DetailedLibrary saved = (DetailedLibrary) getSession().find(LibraryImpl.class, newId);
     assertDetailedLibraryAttributes(attrs, saved);
 
     // chain edit library
@@ -603,7 +600,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertTrue(page2.save(false));
     HandsOnTable savedTable2 = page2.getTable();
     assertColumnValues(savedTable2, 0, attrs, "edit post-save");
-    DetailedLibrary saved2 = (DetailedLibrary) getSession().get(LibraryImpl.class, newId);
+    DetailedLibrary saved2 = (DetailedLibrary) getSession().find(LibraryImpl.class, newId);
     assertDetailedLibraryAttributes(attrs, saved2);
 
     // chain propagate library to library aliquot
@@ -621,7 +618,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertEquals(descEdit1, table.getText(LibColumns.DESCRIPTION, 0));
 
     assertTrue(page.save(false));
-    DetailedLibrary saved = (DetailedLibrary) getSession().get(LibraryImpl.class, 100004L);
+    DetailedLibrary saved = (DetailedLibrary) getSession().find(LibraryImpl.class, 100004L);
     assertEquals(descEdit1, saved.getDescription());
 
     // edit twice
@@ -633,7 +630,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertEquals(descEdit2, table2.getText(LibColumns.DESCRIPTION, 0));
     assertTrue(page2.save(false));
 
-    DetailedLibrary saved2 = (DetailedLibrary) getSession().get(LibraryImpl.class, 100004L);
+    DetailedLibrary saved2 = (DetailedLibrary) getSession().find(LibraryImpl.class, 100004L);
     assertEquals(descEdit2, saved2.getDescription());
   }
 
@@ -657,8 +654,7 @@ public class BulkLibraryIT extends AbstractIT {
 
     initial.forEach((k, v) -> {
       String text = table.getText(LibColumns.SAMPLE_LOCATION, k);
-      assertTrue("initial value expected %s in row %d, but was '%s'".formatted(v, k, text),
-          text.endsWith(v));
+      assertTrue(text.endsWith(v), "initial value expected %s in row %d, but was '%s'".formatted(v, k, text));
     });
 
     Map<Integer, String> sortCols = new HashMap<>();
@@ -670,8 +666,7 @@ public class BulkLibraryIT extends AbstractIT {
     HandsOnTable sort1Table = page.getTable();
     sortCols.forEach((k, v) -> {
       String text = sort1Table.getText(LibColumns.SAMPLE_LOCATION, k);
-      assertTrue("sortCols value expected %s in row %d, but was '%s'".formatted(v, k, text),
-          text.endsWith(v));
+      assertTrue(text.endsWith(v), "sortCols value expected %s in row %d, but was '%s'".formatted(v, k, text));
     });
 
     Map<Integer, String> sortRows = new HashMap<>();
@@ -683,15 +678,14 @@ public class BulkLibraryIT extends AbstractIT {
     HandsOnTable sort2Table = page.getTable();
     sortRows.forEach((k, v) -> {
       String text = sort2Table.getText(LibColumns.SAMPLE_LOCATION, k);
-      assertTrue("sortRows value expected %s in row %d, but was '%s'".formatted(v, k, text),
-          text.endsWith(v));
+      assertTrue(text.endsWith(v), "sortRows value expected %s in row %d, but was '%s'".formatted(v, k, text));
     });
   }
 
   @Test
   public void testAddToBox() {
     Long libId = 100005L;
-    DetailedLibrary before = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    DetailedLibrary before = (DetailedLibrary) getSession().find(LibraryImpl.class, libId);
     assertNull(before.getBox());
     assertNull(before.getBoxPosition());
 
@@ -706,7 +700,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertFalse(table.getInvalidCells(0).contains(LibColumns.BOX_POSITION));
     assertTrue(page.save(false));
 
-    DetailedLibrary after = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    DetailedLibrary after = (DetailedLibrary) getSession().find(LibraryImpl.class, libId);
     assertNotNull(after.getBox());
     assertEquals("BOX100001", after.getBox().getName());
     assertEquals("A01", after.getBoxPosition());
@@ -715,7 +709,7 @@ public class BulkLibraryIT extends AbstractIT {
   @Test
   public void testRemoveFromBox() {
     Long libId = 100006L;
-    DetailedLibrary before = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    DetailedLibrary before = (DetailedLibrary) getSession().find(LibraryImpl.class, libId);
     assertNotNull(before.getBox());
     assertEquals("BOX100001", before.getBox().getName());
     assertEquals("A02", before.getBoxPosition());
@@ -725,7 +719,7 @@ public class BulkLibraryIT extends AbstractIT {
     table.clearField(LibColumns.BOX_ALIAS, 0);
     assertTrue(page.save(false));
 
-    DetailedLibrary after = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    DetailedLibrary after = (DetailedLibrary) getSession().find(LibraryImpl.class, libId);
     assertNull(after.getBox());
     assertNull(after.getBoxPosition());
   }
@@ -733,7 +727,7 @@ public class BulkLibraryIT extends AbstractIT {
   @Test
   public void testDiscardFromBox() {
     Long libId = 100007L;
-    DetailedLibrary before = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    DetailedLibrary before = (DetailedLibrary) getSession().find(LibraryImpl.class, libId);
     assertNotNull(before.getBox());
     assertEquals("BOX100001", before.getBox().getName());
     assertEquals("A03", before.getBoxPosition());
@@ -745,7 +739,7 @@ public class BulkLibraryIT extends AbstractIT {
     table.clearField(LibColumns.BOX_ALIAS, 0);
     assertTrue(page.save(false));
 
-    DetailedLibrary after = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    DetailedLibrary after = (DetailedLibrary) getSession().find(LibraryImpl.class, libId);
     assertNull(after.getBox());
     assertNull(after.getBoxPosition());
     assertTrue(after.isDiscarded());
@@ -754,7 +748,7 @@ public class BulkLibraryIT extends AbstractIT {
   @Test
   public void testUndiscardIntoBox() {
     Long libId = 100008L;
-    DetailedLibrary before = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    DetailedLibrary before = (DetailedLibrary) getSession().find(LibraryImpl.class, libId);
     assertNull(before.getBox());
     assertNull(before.getBoxPosition());
     assertTrue(before.isDiscarded());
@@ -769,7 +763,7 @@ public class BulkLibraryIT extends AbstractIT {
     assertEquals("B01", table.getText(LibColumns.BOX_POSITION, 0));
     assertTrue(page.save(false));
 
-    DetailedLibrary after = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
+    DetailedLibrary after = (DetailedLibrary) getSession().find(LibraryImpl.class, libId);
     assertNotNull(after.getBox());
     assertEquals("BOX100001", after.getBox().getName());
     assertEquals("B01", after.getBoxPosition());
@@ -796,7 +790,7 @@ public class BulkLibraryIT extends AbstractIT {
   }
 
   private long getSavedId(HandsOnTable table, int rowNum) {
-    return Long.valueOf(table.getText(LibColumns.NAME, 0).substring(3, table.getText(LibColumns.NAME, 0).length()));
+    return Long.parseLong(table.getText(LibColumns.NAME, 0).substring(3));
   }
 
   public void assertPlainLibraryAttributes(Map<String, String> attributes, Library library) {
@@ -834,7 +828,7 @@ public class BulkLibraryIT extends AbstractIT {
     builder.addPredicate(builder.getCriteriaBuilder().isNotNull(join.get(Transfer_.senderLab)));
     TransferLibrary receipt = builder.getSingleResultOrNull();
 
-    assertNotNull("A receipt transfer should be created", receipt);
+    assertNotNull(receipt, "A receipt transfer should be created");
 
     assertEntityAttribute(LibColumns.RECEIVE_DATE, attributes, receipt,
         s -> s == null ? "" : LimsUtils.formatDate(s.getTransfer().getTransferTime()));
@@ -921,10 +915,10 @@ public class BulkLibraryIT extends AbstractIT {
       String objectAttribute = getter.apply(object);
       String tableAttribute = cleanNullValues(column, attributes.get(column));
       if (tableAttribute == null) {
-        assertTrue(String.format("persisted attribute expected empty '%s'", column),
-            isStringEmptyOrNull(objectAttribute));
+        assertTrue(isStringEmptyOrNull(objectAttribute),
+            String.format("persisted attribute expected empty '%s'", column));
       } else {
-        assertEquals(String.format("persisted attribute '%s'", column), tableAttribute, objectAttribute);
+        assertEquals(tableAttribute, objectAttribute, String.format("persisted attribute '%s'", column));
       }
     }
   }

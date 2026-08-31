@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.math.BigDecimal;
@@ -24,10 +24,10 @@ public class HandsontableUtils {
     HandsOnTable table = page.getTable();
     List<String> headings = table.getColumnHeadings();
     for (String col : expectedColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+      assertTrue(headings.contains(col), "Check for column: '" + col + "'");
     }
-    assertEquals("Column count", expectedColumns.size(), headings.size());
-    assertEquals("Row count", expectedRows, table.getRowCount());
+    assertEquals(expectedColumns.size(), headings.size(), "Column count");
+    assertEquals(expectedRows, table.getRowCount(), "Row count");
   }
 
   public static void assertColumnValues(HandsOnTable table, int rowNum, Map<String, String> attributes,
@@ -35,10 +35,10 @@ public class HandsontableUtils {
     String formatString = hintMessage + " row %d column '%s' value";
     attributes.forEach((key, val) -> {
       if (isStringEmptyOrNull(val)) {
-        assertTrue(String.format(formatString, rowNum, key) + " expected empty",
-            isStringEmptyOrNull(table.getText(key, rowNum)));
+        assertTrue(isStringEmptyOrNull(table.getText(key, rowNum)),
+            String.format(formatString, rowNum, key) + " expected empty");
       } else {
-        assertEquals(String.format(formatString, rowNum, key), val, table.getText(key, rowNum));
+        assertEquals(val, table.getText(key, rowNum), String.format(formatString, rowNum, key));
       }
     });
   }
@@ -53,10 +53,10 @@ public class HandsontableUtils {
       String objectAttribute = getter.apply(object);
       String tableAttribute = attributes.get(column);
       if (tableAttribute == null) {
-        assertTrue(String.format("persisted attribute expected empty '%s'", column),
-            isStringEmptyOrNull(objectAttribute));
+        assertTrue(isStringEmptyOrNull(objectAttribute),
+            String.format("persisted attribute expected empty '%s'", column));
       } else {
-        assertEquals(String.format("persisted attribute '%s'", column), tableAttribute, objectAttribute);
+        assertEquals(tableAttribute, objectAttribute, String.format("persisted attribute '%s'", column));
       }
     }
   }
@@ -80,7 +80,7 @@ public class HandsontableUtils {
   public static String booleanString(Boolean value, String nullValue) {
     if (value == null) {
       return nullValue;
-    } else if (Boolean.TRUE.equals(value)) {
+    } else if (value) {
       return "True";
     } else {
       return "False";

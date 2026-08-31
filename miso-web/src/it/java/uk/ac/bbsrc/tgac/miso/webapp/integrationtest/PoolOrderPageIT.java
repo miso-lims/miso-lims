@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.assertFieldValues;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 
@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.PoolOrderPage.Field;
 
 public class PoolOrderPageIT extends AbstractIT {
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -37,10 +37,10 @@ public class PoolOrderPageIT extends AbstractIT {
     assertEquals("", page.getField(Field.ID));
     assertFieldValues("changes pre-save", fields, page);
     PoolOrderPage savedPage = page.clickSave();
-    assertNotNull("Pool order should save successfully", savedPage);
+    assertNotNull(savedPage, "Pool order should save successfully");
     assertFieldValues("changes post-save", fields, savedPage);
 
-    PoolOrder order = (PoolOrder) getSession().get(PoolOrder.class, Long.valueOf(savedPage.getField(Field.ID)));
+    PoolOrder order = (PoolOrder) getSession().find(PoolOrder.class, Long.valueOf(savedPage.getField(Field.ID)));
     assertEquals(fields.get(Field.ALIAS), order.getAlias());
     assertEquals(fields.get(Field.PURPOSE), order.getPurpose().getAlias());
     assertEquals(2, order.getOrderLibraryAliquots().size());

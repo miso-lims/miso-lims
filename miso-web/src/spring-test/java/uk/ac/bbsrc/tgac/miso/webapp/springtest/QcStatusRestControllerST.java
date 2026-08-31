@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
@@ -29,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.QcDto;
 import static org.hamcrest.Matchers.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import org.springframework.test.web.servlet.MockMvc;
 
 
@@ -47,8 +47,8 @@ public class QcStatusRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateSampleQc() throws Exception {
-    QcNodeDto dto1 = Dtos.asDto(currentSession().get(sampleQC, 1));
-    QcNodeDto dto2 = Dtos.asDto(currentSession().get(sampleQC, 2));
+    QcNodeDto dto1 = Dtos.asDto(currentSession().find(sampleQC, 1));
+    QcNodeDto dto2 = Dtos.asDto(currentSession().find(sampleQC, 2));
 
     dto1.setQcStatusId(1L);
     dto1.setQcNote("note 1");
@@ -63,7 +63,7 @@ public class QcStatusRestControllerST extends AbstractST {
 
 
     List<SampleQcNode> qcStatuses =
-        Arrays.asList(currentSession().get(sampleQC, 1), currentSession().get(sampleQC, 2));
+        Arrays.asList(currentSession().find(sampleQC, 1), currentSession().find(sampleQC, 2));
 
     assertNotNull(qcStatuses.get(0));
     assertNotNull(qcStatuses.get(1));
@@ -75,22 +75,22 @@ public class QcStatusRestControllerST extends AbstractST {
 
   @Test
   public void testUpdateSampleQc() throws Exception {
-    QcNodeDto dto = Dtos.asDto(currentSession().get(sampleQC, 1));
+    QcNodeDto dto = Dtos.asDto(currentSession().find(sampleQC, 1));
 
     dto.setQcStatusId(1L);
     getMockMvc()
         .perform(put(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
         .andExpect(status().isNoContent());
 
-    SampleQcNode updated = currentSession().get(sampleQC, 1);
+    SampleQcNode updated = currentSession().find(sampleQC, 1);
     assertNotNull(updated);
     assertEquals(dto.getQcStatusId(), updated.getQcStatusId());
   }
 
   @Test
   public void testBulkUpdateLibraryQc() throws Exception {
-    QcNodeDto dto1 = Dtos.asDto(currentSession().get(libraryQC, 1));
-    QcNodeDto dto2 = Dtos.asDto(currentSession().get(libraryQC, 204));
+    QcNodeDto dto1 = Dtos.asDto(currentSession().find(libraryQC, 1));
+    QcNodeDto dto2 = Dtos.asDto(currentSession().find(libraryQC, 204));
 
     dto1.setQcStatusId(1L);
     dto1.setQcNote("note 1");
@@ -105,7 +105,7 @@ public class QcStatusRestControllerST extends AbstractST {
 
 
     List<LibraryQcNode> qcStatuses =
-        Arrays.asList(currentSession().get(libraryQC, 1), currentSession().get(libraryQC, 204));
+        Arrays.asList(currentSession().find(libraryQC, 1), currentSession().find(libraryQC, 204));
 
     assertNotNull(qcStatuses.get(0));
     assertNotNull(qcStatuses.get(1));
@@ -118,22 +118,22 @@ public class QcStatusRestControllerST extends AbstractST {
 
   @Test
   public void testUpdateLibraryQc() throws Exception {
-    QcNodeDto dto = Dtos.asDto(currentSession().get(libraryQC, 1));
+    QcNodeDto dto = Dtos.asDto(currentSession().find(libraryQC, 1));
 
     dto.setQcStatusId(1L);
     getMockMvc()
         .perform(put(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
         .andExpect(status().isNoContent());
 
-    LibraryQcNode updated = currentSession().get(libraryQC, 1);
+    LibraryQcNode updated = currentSession().find(libraryQC, 1);
     assertNotNull(updated);
     assertEquals(dto.getQcStatusId(), updated.getQcStatusId());
   }
 
   @Test
   public void testBulkUpdatePoolQc() throws Exception {
-    QcNodeDto dto1 = Dtos.asDto(currentSession().get(poolQC, 1));
-    QcNodeDto dto2 = Dtos.asDto(currentSession().get(poolQC, 501));
+    QcNodeDto dto1 = Dtos.asDto(currentSession().find(poolQC, 1));
+    QcNodeDto dto2 = Dtos.asDto(currentSession().find(poolQC, 501));
 
 
     dto1.setQcPassed(true);
@@ -145,7 +145,7 @@ public class QcStatusRestControllerST extends AbstractST {
 
 
     List<PoolQcNode> qcStatuses =
-        Arrays.asList(currentSession().get(poolQC, 1), currentSession().get(poolQC, 501));
+        Arrays.asList(currentSession().find(poolQC, 1), currentSession().find(poolQC, 501));
 
     assertNotNull(qcStatuses.get(0));
     assertNotNull(qcStatuses.get(1));
@@ -157,14 +157,14 @@ public class QcStatusRestControllerST extends AbstractST {
 
   @Test
   public void testUpdatePoolQc() throws Exception {
-    QcNodeDto dto = Dtos.asDto(currentSession().get(poolQC, 1));
+    QcNodeDto dto = Dtos.asDto(currentSession().find(poolQC, 1));
 
     dto.setQcPassed(false);
     getMockMvc()
         .perform(put(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
         .andExpect(status().isNoContent());
 
-    PoolQcNode updated = currentSession().get(poolQC, 1);
+    PoolQcNode updated = currentSession().find(poolQC, 1);
     assertNotNull(updated);
     assertEquals(dto.getQcPassed(), updated.getQcPassed());
   }
@@ -172,8 +172,8 @@ public class QcStatusRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateRunQc() throws Exception {
-    QcNodeDto dto1 = Dtos.asDto(currentSession().get(runQC, 1));
-    QcNodeDto dto2 = Dtos.asDto(currentSession().get(runQC, 2));
+    QcNodeDto dto1 = Dtos.asDto(currentSession().find(runQC, 1));
+    QcNodeDto dto2 = Dtos.asDto(currentSession().find(runQC, 2));
 
 
     dto1.setQcPassed(true);
@@ -185,7 +185,7 @@ public class QcStatusRestControllerST extends AbstractST {
 
 
     List<RunQcNode> qcStatuses =
-        Arrays.asList(currentSession().get(runQC, 1), currentSession().get(runQC, 2));
+        Arrays.asList(currentSession().find(runQC, 1), currentSession().find(runQC, 2));
 
     assertNotNull(qcStatuses.get(0));
     assertNotNull(qcStatuses.get(1));
@@ -197,14 +197,14 @@ public class QcStatusRestControllerST extends AbstractST {
 
   @Test
   public void testUpdateRunQc() throws Exception {
-    QcNodeDto dto = Dtos.asDto(currentSession().get(runQC, 1));
+    QcNodeDto dto = Dtos.asDto(currentSession().find(runQC, 1));
 
     dto.setQcPassed(false);
     getMockMvc()
         .perform(put(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
         .andExpect(status().isNoContent());
 
-    RunQcNode updated = currentSession().get(runQC, 1);
+    RunQcNode updated = currentSession().find(runQC, 1);
     assertNotNull(updated);
     assertEquals(dto.getQcPassed(), updated.getQcPassed());
   }
@@ -212,15 +212,15 @@ public class QcStatusRestControllerST extends AbstractST {
   @Test
   public void testBulkUpdateRunPartitionQc() throws Exception {
     RunPartitionQcNodeId idOne = new RunPartitionQcNodeId();
-    idOne.setRun(currentSession().get(runQC, 1));
-    idOne.setPartition(currentSession().get(RunPartitionQcNodePartition.class, 11));
+    idOne.setRun(currentSession().find(runQC, 1));
+    idOne.setPartition(currentSession().find(RunPartitionQcNodePartition.class, 11));
 
     RunPartitionQcNodeId idTwo = new RunPartitionQcNodeId();
-    idTwo.setRun(currentSession().get(runQC, 1));
-    idTwo.setPartition(currentSession().get(RunPartitionQcNodePartition.class, 12));
+    idTwo.setRun(currentSession().find(runQC, 1));
+    idTwo.setPartition(currentSession().find(RunPartitionQcNodePartition.class, 12));
 
-    QcNodeDto dto1 = Dtos.asDto(currentSession().get(runPartQC, idOne));
-    QcNodeDto dto2 = Dtos.asDto(currentSession().get(runPartQC, idTwo));
+    QcNodeDto dto1 = Dtos.asDto(currentSession().find(runPartQC, idOne));
+    QcNodeDto dto2 = Dtos.asDto(currentSession().find(runPartQC, idTwo));
 
     dto1.setQcStatusId(1L);
     dto2.setQcStatusId(2L);
@@ -232,7 +232,7 @@ public class QcStatusRestControllerST extends AbstractST {
 
 
     List<RunPartitionQcNode> qcStatuses =
-        Arrays.asList(currentSession().get(runPartQC, idOne), currentSession().get(runPartQC, idTwo));
+        Arrays.asList(currentSession().find(runPartQC, idOne), currentSession().find(runPartQC, idTwo));
 
     assertNotNull(qcStatuses.get(0));
     assertNotNull(qcStatuses.get(1));
@@ -244,17 +244,17 @@ public class QcStatusRestControllerST extends AbstractST {
   @Test
   public void testUpdateRunPartitionQc() throws Exception {
     RunPartitionQcNodeId id = new RunPartitionQcNodeId();
-    id.setRun(currentSession().get(runQC, 1));
-    id.setPartition(currentSession().get(RunPartitionQcNodePartition.class, 11));
+    id.setRun(currentSession().find(runQC, 1));
+    id.setPartition(currentSession().find(RunPartitionQcNodePartition.class, 11));
 
-    QcNodeDto dto = Dtos.asDto(currentSession().get(runPartQC, id));
+    QcNodeDto dto = Dtos.asDto(currentSession().find(runPartQC, id));
 
     dto.setQcStatusId(2L);
     getMockMvc()
         .perform(put(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
         .andExpect(status().isNoContent());
 
-    RunPartitionQcNode updated = currentSession().get(runPartQC, id);
+    RunPartitionQcNode updated = currentSession().find(runPartQC, id);
     assertNotNull(updated);
     assertEquals(dto.getQcStatusId(), updated.getQcStatusId());
   }
@@ -264,18 +264,18 @@ public class QcStatusRestControllerST extends AbstractST {
   public void testBulkUpdateRunPartitionAliquotQc() throws Exception {
 
     RunPartitionAliquotQcNodeId idOne = new RunPartitionAliquotQcNodeId();
-    idOne.setAliquot(currentSession().get(libraryAliquotQC, 1));
-    idOne.setRun(currentSession().get(runQC, 1));
-    idOne.setPartition(currentSession().get(RunPartitionQcNodePartition.class, 11));
+    idOne.setAliquot(currentSession().find(libraryAliquotQC, 1));
+    idOne.setRun(currentSession().find(runQC, 1));
+    idOne.setPartition(currentSession().find(RunPartitionQcNodePartition.class, 11));
 
 
     RunPartitionAliquotQcNodeId idTwo = new RunPartitionAliquotQcNodeId();
-    idTwo.setRun(currentSession().get(runQC, 1));
-    idTwo.setPartition(currentSession().get(RunPartitionQcNodePartition.class, 12));
-    idTwo.setAliquot(currentSession().get(libraryAliquotQC, 304));
+    idTwo.setRun(currentSession().find(runQC, 1));
+    idTwo.setPartition(currentSession().find(RunPartitionQcNodePartition.class, 12));
+    idTwo.setAliquot(currentSession().find(libraryAliquotQC, 304));
 
-    QcNodeDto dto1 = Dtos.asDto(currentSession().get(runPartAlQC, idOne));
-    QcNodeDto dto2 = Dtos.asDto(currentSession().get(runPartAlQC, idTwo));
+    QcNodeDto dto1 = Dtos.asDto(currentSession().find(runPartAlQC, idOne));
+    QcNodeDto dto2 = Dtos.asDto(currentSession().find(runPartAlQC, idTwo));
 
 
 
@@ -293,7 +293,7 @@ public class QcStatusRestControllerST extends AbstractST {
 
 
     List<RunPartitionAliquotQcNode> qcStatuses =
-        Arrays.asList(currentSession().get(runPartAlQC, idOne), currentSession().get(runPartAlQC, idTwo));
+        Arrays.asList(currentSession().find(runPartAlQC, idOne), currentSession().find(runPartAlQC, idTwo));
 
     assertNotNull(qcStatuses.get(0));
     assertNotNull(qcStatuses.get(1));
@@ -308,11 +308,11 @@ public class QcStatusRestControllerST extends AbstractST {
   @Test
   public void testUpdateRunPartitionAliquotQc() throws Exception {
     RunPartitionAliquotQcNodeId id = new RunPartitionAliquotQcNodeId();
-    id.setRun(currentSession().get(runQC, 1));
-    id.setPartition(currentSession().get(RunPartitionQcNodePartition.class, 11));
-    id.setAliquot(currentSession().get(libraryAliquotQC, 1));
+    id.setRun(currentSession().find(runQC, 1));
+    id.setPartition(currentSession().find(RunPartitionQcNodePartition.class, 11));
+    id.setAliquot(currentSession().find(libraryAliquotQC, 1));
 
-    QcNodeDto dto = Dtos.asDto(currentSession().get(runPartAlQC, id));
+    QcNodeDto dto = Dtos.asDto(currentSession().find(runPartAlQC, id));
 
     dto.setQcPassed(false);
     dto.setQcStatusId(2L); // qc failed: STR
@@ -320,7 +320,7 @@ public class QcStatusRestControllerST extends AbstractST {
         .perform(put(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
         .andExpect(status().isNoContent());
 
-    RunPartitionAliquotQcNode updated = currentSession().get(runPartAlQC, id);
+    RunPartitionAliquotQcNode updated = currentSession().find(runPartAlQC, id);
     assertNotNull(updated);
     assertEquals(dto.getQcStatusId(), updated.getQcStatusId());
     assertEquals(dto.getQcPassed(), updated.getQcPassed());
@@ -329,8 +329,8 @@ public class QcStatusRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateLibraryAliquotQc() throws Exception {
-    QcNodeDto dto1 = Dtos.asDto(currentSession().get(libraryAliquotQC, 1));
-    QcNodeDto dto2 = Dtos.asDto(currentSession().get(libraryAliquotQC, 304));
+    QcNodeDto dto1 = Dtos.asDto(currentSession().find(libraryAliquotQC, 1));
+    QcNodeDto dto2 = Dtos.asDto(currentSession().find(libraryAliquotQC, 304));
 
     dto1.setQcStatusId(1L);
     dto1.setQcNote("note 1");
@@ -345,7 +345,7 @@ public class QcStatusRestControllerST extends AbstractST {
 
 
     List<LibraryAliquotQcNode> qcStatuses =
-        Arrays.asList(currentSession().get(libraryAliquotQC, 1), currentSession().get(libraryAliquotQC, 304));
+        Arrays.asList(currentSession().find(libraryAliquotQC, 1), currentSession().find(libraryAliquotQC, 304));
 
     assertNotNull(qcStatuses.get(0));
     assertNotNull(qcStatuses.get(1));
@@ -358,14 +358,14 @@ public class QcStatusRestControllerST extends AbstractST {
 
   @Test
   public void testUpdateLibraryAliquotQc() throws Exception {
-    QcNodeDto dto = Dtos.asDto(currentSession().get(libraryAliquotQC, 1));
+    QcNodeDto dto = Dtos.asDto(currentSession().find(libraryAliquotQC, 1));
 
     dto.setQcNote("updated");
     getMockMvc()
         .perform(put(CONTROLLER_BASE).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)))
         .andExpect(status().isNoContent());
 
-    LibraryAliquotQcNode updated = currentSession().get(libraryAliquotQC, 1);
+    LibraryAliquotQcNode updated = currentSession().find(libraryAliquotQC, 1);
     assertNotNull(updated);
     assertEquals(dto.getQcPassed(), updated.getQcPassed());
   }

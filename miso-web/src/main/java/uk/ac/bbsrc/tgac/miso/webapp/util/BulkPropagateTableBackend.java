@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -24,7 +24,7 @@ public abstract class BulkPropagateTableBackend<ParentModel extends Identifiable
   private final String parentName;
 
   public BulkPropagateTableBackend(String targetType, Class<? extends Dto> dtoClass, String name, String parentName,
-      ObjectMapper mapper) {
+      JsonMapper mapper) {
     super(targetType, dtoClass, mapper);
     this.name = name;
     this.parentName = parentName;
@@ -56,10 +56,12 @@ public abstract class BulkPropagateTableBackend<ParentModel extends Identifiable
    * @param replicates the number of copies of each target that should be provided for parent
    */
   public final ModelAndView propagate(String idString, int replicates, ModelMap model) throws IOException {
-      if (replicates < 1) throw new IllegalArgumentException("Invalid number of replicates.");
+    if (replicates < 1)
+      throw new IllegalArgumentException("Invalid number of replicates.");
     List<Long> ids = LimsUtils.parseIds(idString);
-    List<Dto> dtos = loadParents(ids).map(this::createDtoFromParent).flatMap(dto -> Stream.generate(() -> dto).limit(replicates))
-        .collect(Collectors.toList());
+    List<Dto> dtos =
+        loadParents(ids).map(this::createDtoFromParent).flatMap(dto -> Stream.generate(() -> dto).limit(replicates))
+            .collect(Collectors.toList());
     return prepare(model, PageMode.PROPAGATE, "Create " + name + " from " + parentName, dtos);
   }
 
@@ -79,7 +81,8 @@ public abstract class BulkPropagateTableBackend<ParentModel extends Identifiable
       throw new IllegalArgumentException("Invalid number of replicates.");
     }
     List<Dto> dtos = loadParents(ids)
-        .flatMap(parent -> Stream.generate(() -> parent).limit(replicates.get(ids.indexOf(parent.getId())))).map(this::createDtoFromParent)
+        .flatMap(parent -> Stream.generate(() -> parent).limit(replicates.get(ids.indexOf(parent.getId()))))
+        .map(this::createDtoFromParent)
         .collect(Collectors.toList());
     return prepare(model, PageMode.PROPAGATE, "Create " + name + " from " + parentName, dtos);
   }

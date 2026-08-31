@@ -1,19 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -24,8 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public class HibernateSequencingContainerModelDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -33,15 +29,20 @@ public class HibernateSequencingContainerModelDaoIT extends AbstractDAOTest {
   @InjectMocks
   private HibernateSequencingContainerModelDao dao;
 
-  @Before
+  @BeforeEach
   public void setup() throws IOException {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
   public void testFindModelByAlias() throws Exception {
-    InstrumentModel platform = (InstrumentModel) entityManager.unwrap(Session.class).get(InstrumentModel.class, 16L);
+    InstrumentModel platform = (InstrumentModel) currentSession().find(InstrumentModel.class, 16L);
     String search = "HiSeq PE Flow Cell v4";
     int lanes = 8;
     SequencingContainerModel model = dao.find(platform, search, lanes);
@@ -52,7 +53,7 @@ public class HibernateSequencingContainerModelDaoIT extends AbstractDAOTest {
 
   @Test
   public void testFindModelByBarcode() throws Exception {
-    InstrumentModel platform = (InstrumentModel) entityManager.unwrap(Session.class).get(InstrumentModel.class, 16L);
+    InstrumentModel platform = (InstrumentModel) currentSession().find(InstrumentModel.class, 16L);
     String search = "12345678";
     int lanes = 8;
     SequencingContainerModel model = dao.find(platform, search, lanes);
@@ -63,7 +64,7 @@ public class HibernateSequencingContainerModelDaoIT extends AbstractDAOTest {
 
   @Test
   public void testFindFallbackModel() throws Exception {
-    InstrumentModel platform = (InstrumentModel) entityManager.unwrap(Session.class).get(InstrumentModel.class, 16L);
+    InstrumentModel platform = (InstrumentModel) currentSession().find(InstrumentModel.class, 16L);
     String search = null;
     int lanes = 8;
     SequencingContainerModel model = dao.find(platform, search, lanes);
@@ -98,7 +99,7 @@ public class HibernateSequencingContainerModelDaoIT extends AbstractDAOTest {
     clearSession();
 
     SequencingContainerModel saved =
-        (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, savedId);
+        (SequencingContainerModel) currentSession().find(SequencingContainerModel.class, savedId);
     assertNotNull(saved);
     assertEquals(model.getAlias(), saved.getAlias());
     assertEquals(model.getIdentificationBarcode(), saved.getIdentificationBarcode());
@@ -111,7 +112,7 @@ public class HibernateSequencingContainerModelDaoIT extends AbstractDAOTest {
     long id = 1L;
     String alias = "Changed Alias";
     SequencingContainerModel model =
-        (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, id);
+        (SequencingContainerModel) currentSession().find(SequencingContainerModel.class, id);
     assertNotEquals(alias, model.getAlias());
     model.setAlias(alias);
     dao.update(model);
@@ -119,7 +120,7 @@ public class HibernateSequencingContainerModelDaoIT extends AbstractDAOTest {
     clearSession();
 
     SequencingContainerModel saved =
-        (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, id);
+        (SequencingContainerModel) currentSession().find(SequencingContainerModel.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -146,7 +147,7 @@ public class HibernateSequencingContainerModelDaoIT extends AbstractDAOTest {
   @Test
   public void testGetUsage() throws Exception {
     SequencingContainerModel model =
-        (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, 1L);
+        (SequencingContainerModel) currentSession().find(SequencingContainerModel.class, 1L);
     assertNotNull(model);
     assertEquals(4, dao.getUsage(model));
   }
@@ -154,9 +155,9 @@ public class HibernateSequencingContainerModelDaoIT extends AbstractDAOTest {
   @Test
   public void testGetUsagePlatform() throws Exception {
     SequencingContainerModel containerModel =
-        (SequencingContainerModel) currentSession().get(SequencingContainerModel.class, 1L);
+        (SequencingContainerModel) currentSession().find(SequencingContainerModel.class, 1L);
     assertNotNull(containerModel);
-    InstrumentModel instrumentModel = (InstrumentModel) currentSession().get(InstrumentModel.class, 16L);
+    InstrumentModel instrumentModel = (InstrumentModel) currentSession().find(InstrumentModel.class, 16L);
     assertNotNull(instrumentModel);
     assertEquals(4, dao.getUsage(containerModel, instrumentModel));
   }

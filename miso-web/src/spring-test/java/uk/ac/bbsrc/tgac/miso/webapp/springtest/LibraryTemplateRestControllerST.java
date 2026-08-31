@@ -1,7 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 import javax.ws.rs.core.MediaType;
 
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
@@ -89,8 +89,8 @@ public class LibraryTemplateRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateAsync() throws Exception {
-      LibraryTemplateDto one = Dtos.asDto(currentSession().get(LibraryTemplate.class, 1));
-      LibraryTemplateDto three = Dtos.asDto(currentSession().get(LibraryTemplate.class, 3));
+      LibraryTemplateDto one = Dtos.asDto(currentSession().find(LibraryTemplate.class, 1));
+      LibraryTemplateDto three = Dtos.asDto(currentSession().find(LibraryTemplate.class, 3));
       one.setAlias("one");
       three.setAlias("three");
 
@@ -120,7 +120,7 @@ public class LibraryTemplateRestControllerST extends AbstractST {
 
   @Test
   public void testUpdate() throws Exception {
-      LibraryTemplateDto testlibtemp = Dtos.asDto(currentSession().get(LibraryTemplate.class, 1));
+      LibraryTemplateDto testlibtemp = Dtos.asDto(currentSession().find(LibraryTemplate.class, 1));
       testlibtemp.setAlias("tester");
 
       LibraryTemplate updated = baseTestUpdate(CONTROLLER_BASE, testlibtemp, 1, entityClass);
@@ -135,10 +135,10 @@ public class LibraryTemplateRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNoContent());
 
-    Project proj = currentSession().get(ProjectImpl.class, 1);
+    Project proj = currentSession().find(ProjectImpl.class, 1);
 
-    LibraryTemplate temp1 = currentSession().get(entityClass, 1);
-    LibraryTemplate temp2 = currentSession().get(entityClass, 2);
+    LibraryTemplate temp1 = currentSession().find(entityClass, 1);
+    LibraryTemplate temp2 = currentSession().find(entityClass, 2);
     assertTrue(temp1.getProjects().contains(proj));
     assertTrue(temp2.getProjects().contains(proj));
   }
@@ -150,8 +150,8 @@ public class LibraryTemplateRestControllerST extends AbstractST {
                       .contentType(MediaType.APPLICATION_JSON))
               .andExpect(status().isNoContent());
 
-      Project proj = currentSession().get(ProjectImpl.class, 1);
-      LibraryTemplate temp = currentSession().get(entityClass, 1);
+      Project proj = currentSession().find(ProjectImpl.class, 1);
+      LibraryTemplate temp = currentSession().find(entityClass, 1);
 
       assertTrue(temp.getProjects().stream().noneMatch(p -> p.getId() == 1));
   }
@@ -167,7 +167,7 @@ public class LibraryTemplateRestControllerST extends AbstractST {
 
     pollingResponserHelper("post", Arrays.asList(indexDto), CONTROLLER_BASE + "/" + templateId + "/indices", CONTROLLER_BASE + "/bulk/", 202);
 
-    LibraryTemplate template = currentSession().get(entityClass, templateId);
+    LibraryTemplate template = currentSession().find(entityClass, templateId);
     assertNotNull(template.getIndexOnes().get("A03"));
     assertEquals(3L, template.getIndexOnes().get("A03").getId());
   }
@@ -182,7 +182,7 @@ public class LibraryTemplateRestControllerST extends AbstractST {
 
       pollingResponserHelper("put", Arrays.asList(indexDto), CONTROLLER_BASE + "/" + templateId + "/indices", CONTROLLER_BASE + "/bulk/", 202);
 
-      LibraryTemplate template = currentSession().get(entityClass, templateId);
+      LibraryTemplate template = currentSession().find(entityClass, templateId);
       assertNotNull(template.getIndexOnes().get("A01"));
       assertEquals(4L, template.getIndexOnes().get("A01").getId());
   }

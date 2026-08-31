@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 
 import javax.ws.rs.core.MediaType;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -65,7 +65,7 @@ public class UserRestControllerST extends AbstractST {
   public void testUpdate() throws Exception {
     // must be admin or matching owner to update user
 
-    UserDto user = Dtos.asDto(currentSession().get(entityClass, 1));
+    UserDto user = Dtos.asDto(currentSession().find(entityClass, 1));
     user.setEmail("newemail@gmail.com");
     UserImpl updated = baseTestUpdate(CONTROLLER_BASE, user, 1, entityClass);
     assertEquals(user.getEmail(), updated.getEmail());
@@ -75,7 +75,7 @@ public class UserRestControllerST extends AbstractST {
   public void testUpdateFail() throws Exception {
     // must be admin or matching owner to update user
 
-    UserDto user = Dtos.asDto(currentSession().get(entityClass, 1));
+    UserDto user = Dtos.asDto(currentSession().find(entityClass, 1));
     user.setEmail("newemail@gmail.com");
     testUpdateUnauthorized(CONTROLLER_BASE, user, 1, entityClass);
   }
@@ -110,7 +110,7 @@ public class UserRestControllerST extends AbstractST {
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/3/password").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
-    UserImpl changedPass = currentSession().get(entityClass, 3);
+    UserImpl changedPass = currentSession().find(entityClass, 3);
 
     assertTrue(passwordEncoder.matches(dto.getNewPassword(), changedPass.getPassword()));
   }
@@ -126,7 +126,7 @@ public class UserRestControllerST extends AbstractST {
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/3/password").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
-    UserImpl changedPass = currentSession().get(entityClass, 3);
+    UserImpl changedPass = currentSession().find(entityClass, 3);
     assertTrue(passwordEncoder.matches(dto.getNewPassword(), changedPass.getPassword()));
   }
 
@@ -142,7 +142,7 @@ public class UserRestControllerST extends AbstractST {
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/3/password").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isUnauthorized());
-    UserImpl unchangedPass = currentSession().get(entityClass, 3);
+    UserImpl unchangedPass = currentSession().find(entityClass, 3);
     assertTrue(passwordEncoder.matches(dto.getOldPassword(), unchangedPass.getPassword()));
   }
 }

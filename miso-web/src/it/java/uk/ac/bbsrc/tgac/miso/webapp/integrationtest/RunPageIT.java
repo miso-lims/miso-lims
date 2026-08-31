@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.*;
 
@@ -8,11 +8,10 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Maps;
 
@@ -34,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.RunPage.RunTableWrapper
 
 public class RunPageIT extends AbstractIT {
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -74,7 +73,7 @@ public class RunPageIT extends AbstractIT {
     fields.remove(Field.NAME);
     assertFieldValues("post-save", fields, page2);
     long savedId = Long.parseLong(page2.getField(Field.ID));
-    Run savedRun = (Run) getSession().get(PacBioRun.class, savedId);
+    Run savedRun = (Run) getSession().find(PacBioRun.class, savedId);
     fields.put(Field.ID, Long.toString(savedId));
     fields.put(Field.NAME, "RUN" + savedId);
     assertRunAttributes(fields, savedRun);
@@ -117,7 +116,7 @@ public class RunPageIT extends AbstractIT {
     fields.remove(Field.NAME);
     assertFieldValues("post-save", fields, page2);
     long savedId = Long.parseLong(page2.getField(Field.ID));
-    Run savedRun = (Run) getSession().get(IlluminaRun.class, savedId);
+    Run savedRun = (Run) getSession().find(IlluminaRun.class, savedId);
     fields.put(Field.ID, Long.toString(savedId));
     fields.put(Field.NAME, "RUN" + savedId);
     assertRunAttributes(fields, savedRun);
@@ -175,21 +174,21 @@ public class RunPageIT extends AbstractIT {
     assertNotNull(page2);
     assertFieldValues("changes post-save", changes, page2);
 
-    Run run = (Run) getSession().get(Run.class, 5001L);
+    Run run = (Run) getSession().find(Run.class, 5001L);
     assertRunAttributes(changes, run);
   }
 
   @Test
   public void testAddExistingContainer() throws Exception {
     // goal: add an existing container to a run with no containers
-    Run run = (Run) getSession().get(Run.class, 5002L);
+    Run run = (Run) getSession().find(Run.class, 5002L);
     assertTrue(run.getSequencerPartitionContainers().isEmpty());
 
     RunPage page = RunPage.getForEdit(getDriver(), getBaseUrl(), 5002L);
     RunPage page2 = page.addContainer("EXISTING", "Illumina", false);
     assertTrue(page2.getTable(RunTableWrapperId.CONTAINER).doesColumnContain(Columns.SERIAL_NUMBER, "EXISTING"));
 
-    Run addedRun = (Run) getSession().get(Run.class, 5002L);
+    Run addedRun = (Run) getSession().find(Run.class, 5002L);
     assertEquals(1, addedRun.getSequencerPartitionContainers().size());
     assertEquals("EXISTING", addedRun.getSequencerPartitionContainers().get(0).getIdentificationBarcode());
   }
@@ -197,7 +196,7 @@ public class RunPageIT extends AbstractIT {
   @Test
   public void testRemoveContainer() throws Exception {
     // goal: remove a container from a run with one container
-    Run run = (Run) getSession().get(Run.class, 5003L);
+    Run run = (Run) getSession().find(Run.class, 5003L);
     assertEquals(1, run.getSequencerPartitionContainers().size());
     assertEquals("REMOVABLE", run.getSequencerPartitionContainers().get(0).getIdentificationBarcode());
 
@@ -205,7 +204,7 @@ public class RunPageIT extends AbstractIT {
     RunPage page2 = page1.removeContainer(0);
     assertFalse(page2.getTable(RunTableWrapperId.CONTAINER).doesColumnContain(Columns.SERIAL_NUMBER, "REMOVABLE"));
 
-    Run strippedRun = (Run) getSession().get(Run.class, 5003L);
+    Run strippedRun = (Run) getSession().find(Run.class, 5003L);
     assertTrue(strippedRun.getSequencerPartitionContainers().isEmpty());
   }
 
@@ -213,22 +212,22 @@ public class RunPageIT extends AbstractIT {
   public void testAssignPoolToTwoLanes() throws Exception {
     // goal: assign a pool to two empty lanes of a run
     final String poolAlias = "RUN_POOL_ADD";
-    Run initial = (Run) getSession().get(Run.class, 5004L);
+    Run initial = (Run) getSession().find(Run.class, 5004L);
     assertEquals(1, initial.getSequencerPartitionContainers().size());
     initial.getSequencerPartitionContainers().get(0).getPartitions()
         .forEach(partition -> assertNull(partition.getPool()));
 
     RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5004L);
     List<String> page1Pools = page1.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
-    assertEquals(0, page1Pools.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
+    assertEquals(0, page1Pools.stream().filter(val -> val.contains(poolAlias)).toList().size());
 
     BigDecimal concentration = new BigDecimal("12.34");
     RunPage page2 = page1.assignPools(Arrays.asList(0, 1), PoolSearch.SEARCH, poolAlias, concentration,
         ConcentrationUnit.NANOMOLAR);
     List<String> columnValues = page2.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
-    assertEquals(2, columnValues.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
+    assertEquals(2, columnValues.stream().filter(val -> val.contains(poolAlias)).toList().size());
 
-    Run run = (Run) getSession().get(Run.class, 5004L);
+    Run run = (Run) getSession().find(Run.class, 5004L);
     assertEquals(1, run.getSequencerPartitionContainers().size());
     int partitionsSet = 0;
     for (Partition partition : run.getSequencerPartitionContainers().get(0).getPartitions()) {
@@ -249,7 +248,7 @@ public class RunPageIT extends AbstractIT {
   public void testRemovePoolsFromLanes() throws Exception {
     // goal: remove pools from two lane of a run
     final String poolAlias = "RUN_POOL_REMOVE";
-    Run initial = (Run) getSession().get(Run.class, 5005L);
+    Run initial = (Run) getSession().find(Run.class, 5005L);
     assertEquals(1, initial.getSequencerPartitionContainers().size());
     for (Partition partition : initial.getSequencerPartitionContainers().get(0).getPartitions()) {
       if (partition.getPartitionNumber() > 2) {
@@ -261,12 +260,12 @@ public class RunPageIT extends AbstractIT {
 
     RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5005L);
     List<String> page1Pools = page1.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
-    assertEquals(2, page1Pools.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
+    assertEquals(2, page1Pools.stream().filter(val -> val.contains(poolAlias)).toList().size());
     RunPage page2 = page1.assignPools(Arrays.asList(0, 1), PoolSearch.NO_POOL, null);
     List<String> page2Pools = page2.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
-    assertEquals(0, page2Pools.stream().filter(val -> val.contains(poolAlias)).collect(Collectors.toList()).size());
+    assertEquals(0, page2Pools.stream().filter(val -> val.contains(poolAlias)).toList().size());
 
-    Run run = (Run) getSession().get(Run.class, 5005L);
+    Run run = (Run) getSession().find(Run.class, 5005L);
     assertEquals(1, run.getSequencerPartitionContainers().size());
     run.getSequencerPartitionContainers().get(0).getPartitions()
         .forEach(partition -> assertNull(partition.getPool()));
@@ -277,7 +276,7 @@ public class RunPageIT extends AbstractIT {
     // goal: assign a pool to one full lane of a run
     final String firstPool = "IPO5006";
     final String secondPool = "IPO5007";
-    Run initial = (Run) getSession().get(Run.class, 5006L);
+    Run initial = (Run) getSession().find(Run.class, 5006L);
     assertEquals(1, initial.getSequencerPartitionContainers().size());
     Partition initialPartition = initial.getSequencerPartitionContainers().get(0).getPartitionAt(1);
     assertNotNull(initialPartition.getPool());
@@ -285,15 +284,15 @@ public class RunPageIT extends AbstractIT {
 
     RunPage page1 = RunPage.getForEdit(getDriver(), getBaseUrl(), 5006L);
     List<String> page1Pools = page1.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
-    assertEquals(1, page1Pools.stream().filter(val -> val.contains(firstPool)).collect(Collectors.toList()).size());
+    assertEquals(1, page1Pools.stream().filter(val -> val.contains(firstPool)).toList().size());
 
     BigDecimal concentration = new BigDecimal("11.22");
-    RunPage page2 = page1.assignPools(Arrays.asList(0), PoolSearch.SEARCH, secondPool, concentration,
+    RunPage page2 = page1.assignPools(List.of(0), PoolSearch.SEARCH, secondPool, concentration,
         ConcentrationUnit.NANOGRAMS_PER_MICROLITRE);
     List<String> page2Pools = page2.getTable(RunTableWrapperId.PARTITION).getColumnValues(Columns.POOL);
-    assertEquals(1, page2Pools.stream().filter(val -> val.contains(secondPool)).collect(Collectors.toList()).size());
+    assertEquals(1, page2Pools.stream().filter(val -> val.contains(secondPool)).toList().size());
 
-    Run run = (Run) getSession().get(Run.class, 5006L);
+    Run run = (Run) getSession().find(Run.class, 5006L);
     assertEquals(1, run.getSequencerPartitionContainers().size());
     Partition partition = run.getSequencerPartitionContainers().get(0).getPartitionAt(1);
     assertNotNull(partition.getPool());
@@ -309,7 +308,7 @@ public class RunPageIT extends AbstractIT {
     assertEquals("(Unset)", page.getLaneInfo(Columns.QC_STATUS, 0));
     assertTrue(isStringEmptyOrNull(page.getLaneInfo(Columns.QC_NOTE, 0)));
 
-    RunPage page2 = page.setPartitionQC(Arrays.asList(0), LaneQC.FAIL_INSTRUMENT, null);
+    RunPage page2 = page.setPartitionQC(List.of(0), LaneQC.FAIL_INSTRUMENT, null);
     assertEquals(LaneQC.FAIL_INSTRUMENT, page2.getLaneInfo(Columns.QC_STATUS, 0));
     assertTrue(isStringEmptyOrNull(page.getLaneInfo(Columns.QC_NOTE, 0)));
   }
@@ -321,7 +320,7 @@ public class RunPageIT extends AbstractIT {
     assertEquals("(Unset)", page.getLaneInfo(Columns.QC_STATUS, 0));
     assertTrue(isStringEmptyOrNull(page.getLaneInfo(Columns.QC_NOTE, 0)));
 
-    RunPage page2 = page.setPartitionQC(Arrays.asList(0), LaneQC.FAIL_OTHER, "Sequencer ran out of Cs");
+    RunPage page2 = page.setPartitionQC(List.of(0), LaneQC.FAIL_OTHER, "Sequencer ran out of Cs");
     assertEquals(LaneQC.FAIL_OTHER, page2.getLaneInfo(Columns.QC_STATUS, 0));
     assertEquals("Sequencer ran out of Cs", page.getLaneInfo(Columns.QC_NOTE, 0));
   }
@@ -333,11 +332,11 @@ public class RunPageIT extends AbstractIT {
     assertEquals("(Unset)", page.getLaneInfo(Columns.QC_STATUS, 0));
     assertTrue(isStringEmptyOrNull(page.getLaneInfo(Columns.QC_NOTE, 0)));
 
-    RunPage page2 = page.setPartitionQC(Arrays.asList(0), LaneQC.FAIL_INSTRUMENT, null);
+    RunPage page2 = page.setPartitionQC(List.of(0), LaneQC.FAIL_INSTRUMENT, null);
     assertEquals(LaneQC.FAIL_INSTRUMENT, page2.getLaneInfo(Columns.QC_STATUS, 0));
     assertTrue(isStringEmptyOrNull(page2.getLaneInfo(Columns.QC_NOTE, 0)));
 
-    RunPage page3 = page2.setPartitionQC(Arrays.asList(0), LaneQC.OK_COLLAB, null);
+    RunPage page3 = page2.setPartitionQC(List.of(0), LaneQC.OK_COLLAB, null);
     assertEquals(LaneQC.OK_COLLAB, page3.getLaneInfo(Columns.QC_STATUS, 0));
     assertTrue(isStringEmptyOrNull(page3.getLaneInfo(Columns.QC_NOTE, 0)));
   }
@@ -350,11 +349,11 @@ public class RunPageIT extends AbstractIT {
     String nameSearch = "IPO510";
 
     // search by partial name
-    page.searchForPools(false, Arrays.asList(0), PoolSearch.SEARCH, nameSearch + "*");
+    page.searchForPools(false, List.of(0), PoolSearch.SEARCH, nameSearch + "*");
     List<Long> poolIds = page.getPoolIdsFromTiles();
     assertFalse(poolIds.isEmpty());
     poolIds.forEach(poolId -> {
-      Pool pool = (Pool) getSession().get(PoolImpl.class, poolId);
+      Pool pool = (Pool) getSession().find(PoolImpl.class, poolId);
       assertTrue(pool.getName().startsWith(nameSearch));
     });
     // assert that pool with name "IPO200002" is not returned
@@ -369,12 +368,12 @@ public class RunPageIT extends AbstractIT {
     String aliasSearch = "POOL_SEARCH_1";
 
     // search by exact alias
-    page.searchForPools(false, Arrays.asList(0), PoolSearch.SEARCH, aliasSearch);
+    page.searchForPools(false, List.of(0), PoolSearch.SEARCH, aliasSearch);
     List<Long> poolIds = page.getPoolIdsFromTiles();
     assertEquals(1, poolIds.size());
     poolIds.forEach(poolId -> {
-      Pool pool = (Pool) getSession().get(PoolImpl.class, poolId);
-      assertTrue(aliasSearch.equals(pool.getAlias()));
+      Pool pool = (Pool) getSession().find(PoolImpl.class, poolId);
+      assertEquals(aliasSearch, pool.getAlias());
     });
     // assert that pool with alias "POOL_SEARCH_2" is not returned
     assertFalse(poolIds.contains(5102L));
@@ -388,11 +387,11 @@ public class RunPageIT extends AbstractIT {
     String barcodeSearch = "ipobar";
 
     // search by partial identificationBarcode
-    page.searchForPools(false, Arrays.asList(0), PoolSearch.SEARCH, barcodeSearch + "*");
+    page.searchForPools(false, List.of(0), PoolSearch.SEARCH, barcodeSearch + "*");
     List<Long> poolIds = page.getPoolIdsFromTiles();
     assertTrue(poolIds.size() > 1);
     poolIds.forEach(poolId -> {
-      Pool pool = (Pool) getSession().get(PoolImpl.class, poolId);
+      Pool pool = (Pool) getSession().find(PoolImpl.class, poolId);
       assertTrue(pool.getIdentificationBarcode().startsWith(barcodeSearch));
     });
     // assert that pool with barcode "TIB_POOL" is not returned
@@ -407,12 +406,12 @@ public class RunPageIT extends AbstractIT {
     String descSearch = "swimming";
 
     // search by exact description
-    page.searchForPools(false, Arrays.asList(0), PoolSearch.SEARCH, descSearch);
+    page.searchForPools(false, List.of(0), PoolSearch.SEARCH, descSearch);
     List<Long> poolIds = page.getPoolIdsFromTiles();
     assertEquals(1, poolIds.size());
     poolIds.forEach(poolId -> {
-      Pool pool = (Pool) getSession().get(PoolImpl.class, poolId);
-      assertTrue(descSearch.equals(pool.getDescription()));
+      Pool pool = (Pool) getSession().find(PoolImpl.class, poolId);
+      assertEquals(descSearch, pool.getDescription());
     });
     // assert that pool with description "cats" is not returned
     assertFalse(poolIds.contains(5102L));
@@ -424,7 +423,7 @@ public class RunPageIT extends AbstractIT {
     RunPage page = RunPage.getForEdit(getDriver(), getBaseUrl(), 5100L);
 
     // search by exact description
-    page.searchForPools(false, Arrays.asList(0), PoolSearch.OUTSTANDING_MATCH, null);
+    page.searchForPools(false, List.of(0), PoolSearch.OUTSTANDING_MATCH, null);
     List<Long> poolIds = page.getPoolIdsFromTiles();
     assertEquals(1, poolIds.size());
     assertTrue(poolIds.contains(5103L));
@@ -438,14 +437,14 @@ public class RunPageIT extends AbstractIT {
     RunPage page = RunPage.getForEdit(getDriver(), getBaseUrl(), 5100L);
 
     // search by exact description
-    page.searchForPools(false, Arrays.asList(0), PoolSearch.OUTSTANDING_ALL, null);
+    page.searchForPools(false, List.of(0), PoolSearch.OUTSTANDING_ALL, null);
     List<Long> poolIds = page.getPoolIdsFromTiles();
     assertTrue(poolIds.size() > 1);
     // assert that pool with fulfilled orders is not returned
     assertFalse(poolIds.contains(5104L));
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void testPoolSearchRecentlyModified() throws Exception {
     // goal: pool search should return pools in order of last modified descending
@@ -453,16 +452,15 @@ public class RunPageIT extends AbstractIT {
     // not necessarily preserved.
     RunPage page = RunPage.getForEdit(getDriver(), getBaseUrl(), 5100L);
 
-    page.searchForPools(false, Arrays.asList(0), PoolSearch.RECENT, null);
+    page.searchForPools(false, List.of(0), PoolSearch.RECENT, null);
     List<Long> poolIds = page.getPoolIdsFromTiles();
     assertTrue(poolIds.size() > 1);
     for (int i = 0; i < poolIds.size(); i++) {
       if (i + 1 < poolIds.size()) {
-        Pool recent = (Pool) getSession().get(PoolImpl.class, poolIds.get(i));
-        Pool older = (Pool) getSession().get(PoolImpl.class, poolIds.get(i + 1));
+        Pool recent = (Pool) getSession().find(PoolImpl.class, poolIds.get(i));
+        Pool older = (Pool) getSession().find(PoolImpl.class, poolIds.get(i + 1));
         // doing the assertion this way because copy-pasting means we have some equivalent dates
-        assertFalse("recent: " + recent.getLastModified() + "; older: " + older.getLastModified(),
-            recent.getLastModified().before(older.getLastModified()));
+        assertFalse(recent.getLastModified().before(older.getLastModified()), "recent: " + recent.getLastModified() + "; older: " + older.getLastModified());
       }
     }
   }
@@ -478,9 +476,9 @@ public class RunPageIT extends AbstractIT {
   private void testPoolTileWarning(String search, String warning) throws Exception {
     RunPage page = RunPage.getForEdit(getDriver(), getBaseUrl(), 5100L);
 
-    page.searchForPools(false, Arrays.asList(0), PoolSearch.SEARCH, search);
+    page.searchForPools(false, List.of(0), PoolSearch.SEARCH, search);
     List<String> poolWarnings = page.getPoolWarningsFromTiles();
-    assertTrue(poolWarnings.size() >= 1);
+    assertFalse(poolWarnings.isEmpty());
 
     boolean containsWarning = false;
     for (String poolWarning : poolWarnings) {

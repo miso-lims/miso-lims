@@ -23,7 +23,7 @@ public class HibernateRequisitionQcDao extends HibernateQcStore<RequisitionQC> i
   @Override
   public void updateEntity(long id, QcCorrespondingField correspondingField, BigDecimal value, String units)
       throws IOException {
-    Requisition requisition = (Requisition) currentSession().get(Requisition.class, id);
+    Requisition requisition = (Requisition) currentSession().find(Requisition.class, id);
     requisition.updateFromQc(correspondingField, value, units);
     currentSession().merge(requisition);
   }

@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocation;
@@ -50,10 +48,10 @@ public class EditFreezerController {
   @Autowired
   private ServiceRecordService serviceRecordService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @ModelAttribute("rooms")
-  public String getRoomDtos() throws JsonProcessingException {
+  public String getRoomDtos() {
     List<StorageLocation> rooms = storageLocationService.listRooms();
     return mapper.writeValueAsString(
         rooms.stream().map(r -> StorageLocationDto.from(r, false, false)).collect(Collectors.toList()));
@@ -144,8 +142,7 @@ public class EditFreezerController {
         storage.getChildLocations().stream().flatMap(EditFreezerController::boxesInStorage));
   }
 
-  public ModelAndView showServiceRecordPage(ServiceRecord record, ModelMap model)
-      throws JsonProcessingException, IOException {
+  public ModelAndView showServiceRecordPage(ServiceRecord record, ModelMap model) throws IOException {
     if (!record.isSaved()) {
       model.put("title", "New Service Record");
     } else {

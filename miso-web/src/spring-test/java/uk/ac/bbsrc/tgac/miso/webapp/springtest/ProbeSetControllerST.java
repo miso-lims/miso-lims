@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProbeSet;
 
 import javax.ws.rs.core.MediaType;
@@ -20,7 +20,7 @@ public class ProbeSetControllerST extends AbstractST {
     assertEquals(Integer.valueOf(ids.size()), JsonPath.read(resultJson, "$.length()"));
 
     for (int i = 0; i < ids.size(); i++) {
-      ProbeSet dbObject = currentSession().get(ProbeSet.class, ids.get(i));
+      ProbeSet dbObject = currentSession().find(ProbeSet.class, ids.get(i));
       assertEquals(dbObject.getId(), readLong(resultJson, "$[" + i + "].id"));
       assertEquals(dbObject.getName(), JsonPath.read(resultJson, "$[" + i + "].name"));
     }

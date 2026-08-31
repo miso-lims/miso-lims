@@ -1,14 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -26,8 +25,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.StudyTypeDao;
 
 public class DefaultStudyServiceTest {
 
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @Mock
   private AuthorizationManager authorizationManager;
@@ -45,10 +43,15 @@ public class DefaultStudyServiceTest {
   @InjectMocks
   private DefaultStudyService sut;
 
-  @Before
+  @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     Mockito.when(namingSchemeHolder.getPrimary()).thenReturn(namingScheme);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test

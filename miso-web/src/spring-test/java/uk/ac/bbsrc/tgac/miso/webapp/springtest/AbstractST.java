@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import java.io.File;
@@ -8,9 +8,9 @@ import java.io.IOException;
 
 import javax.sql.DataSource;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +19,14 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.util.LinkedMultiValueMap;
-import java.util.Map;
+
+import java.util.*;
 
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -35,22 +36,18 @@ import org.hibernate.Session;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.Identifiable;
 import uk.ac.bbsrc.tgac.miso.core.data.spreadsheet.SpreadSheetFormat;
 import uk.ac.bbsrc.tgac.miso.dto.SpreadsheetRequest;
 
-import static org.junit.Assert.*;
-import java.util.List;
-import java.util.Arrays;
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import java.util.ArrayList;
-
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -62,7 +59,7 @@ import com.jayway.jsonpath.JsonPath;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration("/st-context.xml")
 @WebAppConfiguration
 @PropertySource("/tomcat-config/miso.it.properties")
@@ -84,8 +81,6 @@ public abstract class AbstractST {
     // this allows debug mode to be turned on via command line args, i.e. -Dst.debug=true
   }
 
-  private static Boolean constantsComplete = false;
-
   @Autowired
   protected WebApplicationContext wac;
 
@@ -98,10 +93,10 @@ public abstract class AbstractST {
   private DataSource dataSource;
 
 
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
   private ObjectWriter ow;
 
-  @Before
+  @BeforeEach
   public final void setupAbstractTest() throws IOException {
 
     // reset test data for each test
@@ -113,8 +108,7 @@ public abstract class AbstractST {
 
     this.mockMvc = webAppContextSetup(this.wac).build();
 
-    mapper = new ObjectMapper();
-    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+    mapper = JsonMapper.builder().configure(SerializationFeature.WRAP_ROOT_VALUE, false).build();
     ow = mapper.writer().withDefaultPrettyPrinter();
   }
 
@@ -135,8 +129,7 @@ public abstract class AbstractST {
   }
 
   public String makeJson(Object obj) throws Exception {
-    String requestJson = ow.writeValueAsString(obj);
-    return requestJson;
+    return ow.writeValueAsString(obj);
   }
 
   /**
@@ -190,7 +183,7 @@ public abstract class AbstractST {
     List<T> objects = new ArrayList<T>();
     for (int i = 0; i < dtos.size(); i++) {
       Integer id = JsonPath.read(response, "$.data[" + i + "].id");
-      T obj = currentSession().get(createType, id);
+      T obj = currentSession().find(createType, id);
       assertNotNull(obj);
       objects.add(obj);
     }
@@ -247,7 +240,7 @@ public abstract class AbstractST {
 
     List<T> objects = new ArrayList<T>();
     for (Long id : ids) {
-      T obj = currentSession().get(updateType, id);
+      T obj = currentSession().find(updateType, id);
       assertNotNull(obj);
       assertEquals(id.longValue(), obj.getId());
       objects.add(obj);
@@ -261,7 +254,6 @@ public abstract class AbstractST {
    * 
    * @param <T> Target entity type
    * @param controllerBase Controller URL prefix
-   * @param updateType Type of target entity to be updated
    * @param dtos DTOs for the target entities to be updated
    */
   protected <T> void testBulkUpdateAsyncUnauthorized(String controllerBase, Class<T> createType, List<?> dtos)
@@ -345,9 +337,9 @@ public abstract class AbstractST {
    * @param controllerBase Controller URL prefix
    */
   protected <T> void testBulkDelete(Class<T> deleteType, int id, String controllerBase) throws Exception {
-    List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
+    List<Long> ids = new ArrayList<Long>(Collections.singletonList((long) id));
 
-    assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
+    assertNotNull(currentSession().find(deleteType, id)); // first check that it exists
 
     ResultActions ac = getMockMvc()
         .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)));
@@ -358,7 +350,7 @@ public abstract class AbstractST {
     ac.andExpect(status().isNoContent());
 
     // now check that the lab was actually deleted
-    assertNull(currentSession().get(deleteType, id));
+    assertNull(currentSession().find(deleteType, id));
   }
 
 
@@ -371,9 +363,9 @@ public abstract class AbstractST {
    * @param controllerBase Controller URL prefix
    */
   protected <T> void testDeleteUnauthorized(Class<T> deleteType, int id, String controllerBase) throws Exception {
-    List<Long> ids = new ArrayList<Long>(Arrays.asList(Long.valueOf(id)));
+    List<Long> ids = new ArrayList<Long>(Collections.singletonList((long) id));
 
-    assertNotNull(currentSession().get(deleteType, id)); // first check that it exists
+    assertNotNull(currentSession().find(deleteType, id)); // first check that it exists
 
     ResultActions ac = getMockMvc()
         .perform(post(controllerBase + "/bulk-delete").contentType(MediaType.APPLICATION_JSON).content(makeJson(ids)));
@@ -409,7 +401,7 @@ public abstract class AbstractST {
         .andReturn();
     Integer id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
 
-    T obj = currentSession().get(entityClass, id);
+    T obj = currentSession().find(entityClass, id);
     assertNotNull(obj);
     return obj;
   }
@@ -453,7 +445,7 @@ public abstract class AbstractST {
 
     ac.andExpect(status().isOk());
 
-    T obj = currentSession().get(entityClass, id);
+    T obj = currentSession().find(entityClass, id);
 
     assertNotNull(obj);
     assertEquals(id, (int) ((Identifiable) obj).getId());
@@ -472,7 +464,7 @@ public abstract class AbstractST {
    * @param id Target entity ID
    * @param entityClass Target entity type
    */
-  protected <T, D> void testUpdateUnauthorized(String controllerBase, D dto, int id, Class<T> updateType)
+  protected <T, D> void testUpdateUnauthorized(String controllerBase, D dto, int id, Class<T> entityClass)
       throws Exception {
     ResultActions ac = getMockMvc()
         .perform(put(controllerBase + "/" + id).contentType(MediaType.APPLICATION_JSON).content(makeJson(dto)));
@@ -481,8 +473,8 @@ public abstract class AbstractST {
     ac.andExpect(status().isUnauthorized());
   }
 
-  private static MultiValueMap searchTerm(String term) {
-    MultiValueMap<String, String> map = new LinkedMultiValueMap();
+  private static MultiValueMap<String, String> searchTerm(String term) {
+    MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
     map.add("q", term);
     return map;
   }
@@ -493,9 +485,9 @@ public abstract class AbstractST {
    * 
    * @param url URL to query for search
    * @param params Parameters for the search
-   * @param ids Expected IDs from search
+   * @param expectedIds Expected IDs from search
    */
-  protected void baseSearchByTerm(String url, MultiValueMap params, List<Integer> expectedIds)
+  protected void baseSearchByTerm(String url, MultiValueMap<String, String> params, List<Integer> expectedIds)
       throws Exception {
     ResultActions ac = getMockMvc().perform(get(url).params(params).accept(MediaType.APPLICATION_JSON));
     if (DEBUG_MODE)
@@ -515,7 +507,7 @@ public abstract class AbstractST {
    * 
    * @param url URL to query for search
    * @param searchTerm Term to search for
-   * @param ids Expected IDs from search
+   * @param expectedIds Expected IDs from search
    */
   protected void baseSearchByTerm(String url, String searchTerm, List<Integer> expectedIds) throws Exception {
     baseSearchByTerm(url, searchTerm(searchTerm), expectedIds);
@@ -525,10 +517,7 @@ public abstract class AbstractST {
    * Template datatable endpoint test. Useful for any "/dt" or "/dt/..." endpoints.
    * 
    * @param url URL to query for datatable
-   * @param displayLength Max number of entries displayed
-   * @param dataProp Property to sort on
    * @param ids Expected IDs
-   * @return ResultActions response for further testing if needed
    */
 
   protected void testListAll(String url, List<Integer> ids) throws Exception {
@@ -571,7 +560,7 @@ public abstract class AbstractST {
     List<Integer> resultIds = JsonPath.read(response, "$" + addedPath + "[*].id");
     assertEquals(expectedIds.size(), resultIds.size());
     for (Integer expectedId : expectedIds) {
-      assertTrue("id " + expectedId + " expected but not found", resultIds.contains(expectedId));
+      assertTrue(resultIds.contains(expectedId), "id " + expectedId + " expected but not found");
     }
 
   }
@@ -611,7 +600,7 @@ public abstract class AbstractST {
     return result;
   }
 
-  protected ResultActions testList(String url, List<Integer> ids, MultiValueMap params)
+  protected ResultActions testList(String url, List<Integer> ids, MultiValueMap<String, String> params)
       throws Exception {
     ResultActions result = getMockMvc().perform(get(url).params(params));
     if (DEBUG_MODE)
@@ -624,7 +613,7 @@ public abstract class AbstractST {
   }
 
   protected ResultActions testList(String url, List<Integer> ids) throws Exception {
-    return testList(url, ids, new LinkedMultiValueMap());
+    return testList(url, ids, new LinkedMultiValueMap<>());
   }
 
   protected void testSpreadsheetContents(String url, SpreadsheetRequest sheet, List<String> headers,
@@ -646,7 +635,7 @@ public abstract class AbstractST {
     for (int i = 0; i < rawRows.length; i++) {
       String s = rawRows[i].replaceAll("\\r", "");
       s = s.replaceAll("\\n", "");
-      s = s.replaceAll("\"", "");
+      s = s.replace("\"", "");
       records[i] = s.split(",", -1);
     }
     checkArray(records[0], headers);
@@ -676,10 +665,8 @@ public abstract class AbstractST {
     if (DEBUG_MODE)
       ac = ac.andDo(print());
 
-    ModelAndView response = ac.andExpect(status().isOk())
+    return ac.andExpect(status().isOk())
         .andReturn().getModelAndView();
-
-    return response;
   }
 
   /**
@@ -710,9 +697,8 @@ public abstract class AbstractST {
     if (DEBUG_MODE)
       ac = ac.andDo(print());
 
-    ModelAndView response = ac.andExpect(status().isOk())
+    return ac.andExpect(status().isOk())
         .andReturn().getModelAndView();
-    return response;
   }
 
   /**

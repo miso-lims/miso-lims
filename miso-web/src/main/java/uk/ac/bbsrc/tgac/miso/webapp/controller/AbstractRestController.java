@@ -4,11 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Abstract class meant to be extended by all REST controllers. Adds exception handling for all
@@ -17,7 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public abstract class AbstractRestController {
 
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   /**
    * converts an Exception into a RestError model to be returned in response to a REST request.
@@ -31,10 +30,10 @@ public abstract class AbstractRestController {
   @ExceptionHandler
   private @ResponseBody ObjectNode handleError(HttpServletRequest request, HttpServletResponse response,
       Exception exception) {
-    return RestExceptionHandler.handleException(request, response, exception, getObjectMapper());
+    return RestExceptionHandler.handleException(request, response, exception, getJsonMapper());
   }
 
-  protected ObjectMapper getObjectMapper() {
+  protected JsonMapper getJsonMapper() {
     return mapper;
   }
 

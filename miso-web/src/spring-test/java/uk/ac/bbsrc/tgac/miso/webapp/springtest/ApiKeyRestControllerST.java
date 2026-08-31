@@ -1,21 +1,21 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.*;
 import org.springframework.test.context.web.WebAppConfiguration;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import javax.ws.rs.core.MediaType;
 
 import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -34,7 +34,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import com.jayway.jsonpath.JsonPath;
 import jakarta.transaction.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ApiKey;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Arrays;
@@ -79,7 +79,7 @@ public class ApiKeyRestControllerST extends AbstractST {
 
 
     // check that the api key we want to delete exists
-    assertNotNull(currentSession().get(ApiKey.class, 2));
+    assertNotNull(currentSession().find(ApiKey.class, 2));
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)
@@ -87,7 +87,7 @@ public class ApiKeyRestControllerST extends AbstractST {
         .andExpect(status().isNoContent());
 
     // now check that the api key was actually deleted
-    assertNull(currentSession().get(ApiKey.class, 2));
+    assertNull(currentSession().find(ApiKey.class, 2));
   }
 
   @Test
@@ -96,7 +96,7 @@ public class ApiKeyRestControllerST extends AbstractST {
 
 
     // check that the api key we want to delete exists
-    assertNotNull(currentSession().get(ApiKey.class, 2));
+    assertNotNull(currentSession().find(ApiKey.class, 2));
 
     getMockMvc()
         .perform(post(CONTROLLER_BASE + "/bulk-delete").contentType(MediaType.APPLICATION_JSON)

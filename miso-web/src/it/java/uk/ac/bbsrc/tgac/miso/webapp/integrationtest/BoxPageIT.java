@@ -1,14 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.FormPageTestUtils.assertFieldValues;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxPosition;
@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.BoxVisualization;
 
 public class BoxPageIT extends AbstractIT {
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -51,19 +51,19 @@ public class BoxPageIT extends AbstractIT {
     unsaved.put(Field.LOCATION, "Here");
     page.setFields(unsaved);
 
-    assertEquals("Box ID is unsaved", "", page.getField(Field.ID));
+    assertEquals("", page.getField(Field.ID), "Box ID is unsaved");
     assertFieldValues("changes pre-save", unsaved, page);
     BoxPage savedPage = page.clickSave();
     assertFieldValues("changes post-save", unsaved, savedPage);
 
-    Box box = (Box) getSession().get(BoxImpl.class, Long.valueOf(savedPage.getField(Field.ID)));
-    assertNotEquals("Box ID is now a number", "Unsaved", box.getId());
-    assertEquals("confirm box alias", unsaved.get(Field.ALIAS), box.getAlias());
-    assertEquals("confirm box barcode", unsaved.get(Field.BARCODE), box.getIdentificationBarcode());
-    assertEquals("confirm box description", unsaved.get(Field.DESCRIPTION), box.getDescription());
-    assertEquals("confirm box use", unsaved.get(Field.USE), box.getUse().getAlias());
-    assertEquals("confirm box size", unsaved.get(Field.SIZE), box.getSize().getLabel());
-    assertEquals("confirm box location", unsaved.get(Field.LOCATION), box.getLocationBarcode());
+    Box box = (Box) getSession().find(BoxImpl.class, Long.valueOf(savedPage.getField(Field.ID)));
+    assertNotEquals(0L, box.getId(), "Box ID is now a number");
+    assertEquals(unsaved.get(Field.ALIAS), box.getAlias(), "confirm box alias");
+    assertEquals(unsaved.get(Field.BARCODE), box.getIdentificationBarcode(), "confirm box barcode");
+    assertEquals(unsaved.get(Field.DESCRIPTION), box.getDescription(), "confirm box description");
+    assertEquals(unsaved.get(Field.USE), box.getUse().getAlias(), "confirm box use");
+    assertEquals(unsaved.get(Field.SIZE), box.getSize().getLabel(), "confirm box size");
+    assertEquals(unsaved.get(Field.LOCATION), box.getLocationBarcode(), "confirm box location");
   }
 
   @Test
@@ -72,7 +72,6 @@ public class BoxPageIT extends AbstractIT {
     assertNotNull(page);
 
     Map<Field, String> changed = new HashMap<>();
-    changed.put(Field.ALIAS, "Changed alias");
     changed.put(Field.ALIAS, "Changed Box");
     changed.put(Field.BARCODE, "Changed Barcode");
     changed.put(Field.DESCRIPTION, "Changed Description");
@@ -84,7 +83,7 @@ public class BoxPageIT extends AbstractIT {
     BoxPage savedPage = page.clickSave();
     assertFieldValues("post-save changes", changed, savedPage);
 
-    Box box = (Box) getSession().get(BoxImpl.class, 502L);
+    Box box = (Box) getSession().find(BoxImpl.class, 502L);
     assertEquals(changed.get(Field.ALIAS), box.getAlias());
     assertEquals(changed.get(Field.BARCODE), box.getIdentificationBarcode());
     assertEquals(changed.get(Field.DESCRIPTION), box.getDescription());
@@ -99,9 +98,9 @@ public class BoxPageIT extends AbstractIT {
     // confirm values pre-add
     BoxPage page = getBoxPage(500L);
     BoxVisualization visualization = page.getVisualization();
-    assertTrue("empty position is empty", visualization.isEmptyPosition(position));
+    assertTrue(visualization.isEmptyPosition(position), "empty position is empty");
 
-    Box initial = (Box) getSession().get(BoxImpl.class, 500L);
+    Box initial = (Box) getSession().find(BoxImpl.class, 500L);
     assertNull(initial.getBoxPositions().get(position));
 
     // add the item
@@ -111,9 +110,9 @@ public class BoxPageIT extends AbstractIT {
     
     // confirm values post-add
     BoxPage again = getBoxPage(500L);
-    assertFalse("checking that position is no longer empty", again.getVisualization().isEmptyPosition(position));
+    assertFalse(again.getVisualization().isEmptyPosition(position), "checking that position is no longer empty");
 
-    Box box = (Box) getSession().get(BoxImpl.class, 500L);
+    Box box = (Box) getSession().find(BoxImpl.class, 500L);
     assertNotNull(box.getBoxPositions().get(position));
   }
 
@@ -122,12 +121,12 @@ public class BoxPageIT extends AbstractIT {
     final String position = "H12";
 
     // confirm values pre-lookup
-    Box initial = (Box) getSession().get(BoxImpl.class, 500L);
+    Box initial = (Box) getSession().find(BoxImpl.class, 500L);
     assertNull(initial.getBoxPositions().get(position));
 
     BoxPage page = getBoxPage(500L);
     BoxVisualization visualization = page.getVisualization();
-    assertTrue("empty position is empty", visualization.isEmptyPosition(position));
+    assertTrue(visualization.isEmptyPosition(position), "empty position is empty");
 
     // do the lookup
     visualization.selectPosition(position);
@@ -135,23 +134,23 @@ public class BoxPageIT extends AbstractIT {
     assertFalse(visualization.isUpdatePositionButtonClickable());
 
     // confirm nothing has changed
-    Box box = (Box) getSession().get(BoxImpl.class, 500L);
+    Box box = (Box) getSession().find(BoxImpl.class, 500L);
     assertNull(box.getBoxPositions().get(position));
     
     BoxPage again = getBoxPage(500L);
-    assertTrue("empty position is still empty", again.getVisualization().isEmptyPosition(position));
+    assertTrue(again.getVisualization().isEmptyPosition(position), "empty position is still empty");
   }
 
   @Test
   public void testMoveItemWithinBox() {
     final String initialPosition = "F10";
     final String finalPosition = "F12";
-    Library lib = (Library) getSession().get(LibraryImpl.class, 505L);
+    Library lib = (Library) getSession().find(LibraryImpl.class, 505L);
     assertNotNull(lib);
     BoxableId libBoxableId = new BoxableId(lib.getEntityType(), lib.getId());
 
     // confirm positions pre-move
-    Box initial = (Box) getSession().get(BoxImpl.class, 500L);
+    Box initial = (Box) getSession().find(BoxImpl.class, 500L);
     BoxPosition itemAtInitialPosition = initial.getBoxPositions().get(initialPosition);
     assertNotNull(itemAtInitialPosition);
     assertNull(initial.getBoxPositions().get(finalPosition));
@@ -160,17 +159,17 @@ public class BoxPageIT extends AbstractIT {
     BoxPage page = getBoxPage(500L);
     BoxVisualization visualization = page.getVisualization();
 
-    assertFalse("checking that library is in position F10", visualization.isEmptyPosition(initialPosition));
-    assertTrue("checking which library is in position F10",
-        visualization.getPositionTitle(initialPosition).contains(lib.getAlias()));
-    assertTrue("checking that no tube is in position F12", visualization.isEmptyPosition(finalPosition));
+    assertFalse(visualization.isEmptyPosition(initialPosition), "checking that library is in position F10");
+    assertTrue(visualization.getPositionTitle(initialPosition).contains(lib.getAlias()),
+        "checking which library is in position F10");
+    assertTrue(visualization.isEmptyPosition(finalPosition), "checking that no tube is in position F12");
 
     visualization.selectPosition(finalPosition);
     visualization.searchBoxables(lib.getIdentificationBarcode());
     visualization.updatePosition(false);
 
     // confirm positions post-move
-    Box updated = (Box) getSession().get(BoxImpl.class, 500L);
+    Box updated = (Box) getSession().find(BoxImpl.class, 500L);
     assertNull(updated.getBoxPositions().get(initialPosition));
     BoxPosition updatedAtFinalPosition = updated.getBoxPositions().get(finalPosition);
     assertNotNull(updatedAtFinalPosition);
@@ -179,10 +178,10 @@ public class BoxPageIT extends AbstractIT {
     BoxPage afterSave = getBoxPage(500L);
     BoxVisualization afterVisualization = afterSave.getVisualization();
 
-    assertTrue("checking that no tube is in position F10", afterVisualization.isEmptyPosition(initialPosition));
-    assertFalse("checking that library is in position F12", afterVisualization.isEmptyPosition(finalPosition));
-    assertTrue("checking which library is in position F12",
-        afterVisualization.getPositionTitle(finalPosition).contains(lib.getAlias()));
+    assertTrue(afterVisualization.isEmptyPosition(initialPosition), "checking that no tube is in position F10");
+    assertFalse(afterVisualization.isEmptyPosition(finalPosition), "checking that library is in position F12");
+    assertTrue(afterVisualization.getPositionTitle(finalPosition).contains(lib.getAlias()),
+        "checking which library is in position F12");
   }
 
   @Test
@@ -191,18 +190,18 @@ public class BoxPageIT extends AbstractIT {
     final String barcode = "TIB_SamTissue";
 
     // confirm values pre-save
-    Box firstBox = (Box) getSession().get(BoxImpl.class, 500L);
+    Box firstBox = (Box) getSession().find(BoxImpl.class, 500L);
     assertNotNull(firstBox.getBoxPositions().get(position));
-    Box secondBox = (Box) getSession().get(BoxImpl.class, 501L);
+    Box secondBox = (Box) getSession().find(BoxImpl.class, 501L);
     assertNull(secondBox.getBoxPositions().get(position));
 
     BoxPage firstPage = getBoxPage(500L);
     BoxVisualization firstVis = firstPage.getVisualization();
-    assertFalse("tissue is in position 500-A01", firstVis.isEmptyPosition(position));
+    assertFalse(firstVis.isEmptyPosition(position), "tissue is in position 500-A01");
 
     BoxPage secondPage = getBoxPage(501L);
     BoxVisualization secondVisualization = secondPage.getVisualization();
-    assertTrue("position 501-A01 is empty", secondVisualization.isEmptyPosition(position));
+    assertTrue(secondVisualization.isEmptyPosition(position), "position 501-A01 is empty");
 
     // move the item from one box to the next
     secondVisualization.selectPosition(position);
@@ -210,16 +209,16 @@ public class BoxPageIT extends AbstractIT {
     secondVisualization.updatePosition(false);
 
     // confirm values post-move
-    Box first = (Box) getSession().get(BoxImpl.class, 500L);
-    Box second = (Box) getSession().get(BoxImpl.class, 501L);
+    Box first = (Box) getSession().find(BoxImpl.class, 500L);
+    Box second = (Box) getSession().find(BoxImpl.class, 501L);
     assertNotNull(second.getBoxPositions().get(position));
     assertNull(first.getBoxPositions().get(position));
 
     BoxPage firstAgain = getBoxPage(500L);
-    assertTrue("check that position 500-A01 is empty", firstAgain.getVisualization().isEmptyPosition(position));
+    assertTrue(firstAgain.getVisualization().isEmptyPosition(position), "check that position 500-A01 is empty");
 
     BoxPage secondAgain = getBoxPage(501L);
-    assertFalse("check that tissue is in position 501-A01", secondAgain.getVisualization().isEmptyPosition(position));
+    assertFalse(secondAgain.getVisualization().isEmptyPosition(position), "check that tissue is in position 501-A01");
   }
 
   @Test
@@ -229,9 +228,9 @@ public class BoxPageIT extends AbstractIT {
     // confirm values pre-save
     BoxPage page = getBoxPage(500L);
     BoxVisualization visualization = page.getVisualization();
-    assertFalse("check that position B01 is full", visualization.isEmptyPosition(position));
+    assertFalse(visualization.isEmptyPosition(position), "check that position B01 is full");
 
-    Box initial = (Box) getSession().get(BoxImpl.class, 500L);
+    Box initial = (Box) getSession().find(BoxImpl.class, 500L);
     assertNotNull(initial.getBoxPositions().get(position));
 
     // remove the tube
@@ -241,9 +240,9 @@ public class BoxPageIT extends AbstractIT {
     // confirm values post-removal
     BoxPage newPage = getBoxPage(500L);
     BoxVisualization newVisualization = newPage.getVisualization();
-    assertTrue(" check that position B01 is now empty", newVisualization.isEmptyPosition(position));
+    assertTrue(newVisualization.isEmptyPosition(position), " check that position B01 is now empty");
 
-    Box box = (Box) getSession().get(BoxImpl.class, 500L);
+    Box box = (Box) getSession().find(BoxImpl.class, 500L);
     assertNull(box.getBoxPositions().get(position));
   }
 
@@ -254,15 +253,15 @@ public class BoxPageIT extends AbstractIT {
     // confirm values pre-save
     BoxPage page = getBoxPage(500L);
     BoxVisualization visualization = page.getVisualization();
-    assertFalse("check that position C01 is full", visualization.isEmptyPosition(position));
-    assertTrue("check that title matches LDI name", visualization.getPositionTitle(position).contains("TIB_0001_nn_n_PE_404_WG"));
+    assertFalse(visualization.isEmptyPosition(position), "check that position C01 is full");
+    assertTrue(visualization.getPositionTitle(position).contains("TIB_0001_nn_n_PE_404_WG"), "check that title matches LDI name");
 
-    Box initial = (Box) getSession().get(BoxImpl.class, 500L);
+    Box initial = (Box) getSession().find(BoxImpl.class, 500L);
     assertNotNull(initial.getBoxPositions().get(position));
 
-    LibraryAliquot initialLD = (LibraryAliquot) getSession().get(LibraryAliquot.class, 504L);
-    assertFalse("check that boxable is not discarded", initialLD.isDiscarded());
-    assertFalse("check that boxable location is not EMPTY", "EMPTY".equals(BoxUtils.makeLocationLabel(initialLD)));
+    LibraryAliquot initialLD = (LibraryAliquot) getSession().find(LibraryAliquot.class, 504L);
+    assertFalse(initialLD.isDiscarded(), "check that boxable is not discarded");
+    assertNotEquals("EMPTY", BoxUtils.makeLocationLabel(initialLD), "check that boxable location is not EMPTY");
 
     // discard the tube
     visualization.selectPosition(position);
@@ -271,15 +270,15 @@ public class BoxPageIT extends AbstractIT {
     // confirm values post-discard
     BoxPage newPage = getBoxPage(500L);
     BoxVisualization newVisualization = newPage.getVisualization();
-    assertTrue("check that position C01 is now empty", newVisualization.isEmptyPosition(position));
+    assertTrue(newVisualization.isEmptyPosition(position), "check that position C01 is now empty");
 
-    Box box = (Box) getSession().get(BoxImpl.class, 500L);
+    Box box = (Box) getSession().find(BoxImpl.class, 500L);
     assertNull(box.getBoxPositions().get(position));
 
-    LibraryAliquot boxable = (LibraryAliquot) getSession().get(LibraryAliquot.class, 504L);
-    assertTrue("check that boxable is discarded", boxable.isDiscarded());
-    assertEquals("check that boxable volume is null", 0, boxable.getVolume().compareTo(BigDecimal.ZERO));
-    assertEquals("check that boxable location is empty", "EMPTY", BoxUtils.makeLocationLabel(boxable));
+    LibraryAliquot boxable = (LibraryAliquot) getSession().find(LibraryAliquot.class, 504L);
+    assertTrue(boxable.isDiscarded(), "check that boxable is discarded");
+    assertEquals(0, boxable.getVolume().compareTo(BigDecimal.ZERO), "check that boxable volume is null");
+    assertEquals("EMPTY", BoxUtils.makeLocationLabel(boxable), "check that boxable location is empty");
   }
 
   @Test
@@ -289,11 +288,12 @@ public class BoxPageIT extends AbstractIT {
     // assert values pre-replace
     BoxPage page = getBoxPage(500L);
     BoxVisualization visualization = page.getVisualization();
-    assertFalse("check that position D01 is full", visualization.isEmptyPosition(position));
-    assertTrue("check that D01 contains pool", visualization.getPositionTitle(position).contains("Pool"));
+    assertFalse(visualization.isEmptyPosition(position), "check that position D01 is full");
+    assertTrue(visualization.getPositionTitle(position).contains("Pool"), "check that D01 contains pool");
 
-    Box initial = (Box) getSession().get(BoxImpl.class, 500L);
-    assertEquals("check that D01 is a pool", EntityType.POOL, initial.getBoxPositions().get(position).getBoxableId().getTargetType());
+    Box initial = (Box) getSession().find(BoxImpl.class, 500L);
+    assertEquals(EntityType.POOL, initial.getBoxPositions().get(position).getBoxableId().getTargetType(),
+        "check that D01 is a pool");
 
     // replace the tube
     visualization.selectPosition(position);
@@ -303,19 +303,19 @@ public class BoxPageIT extends AbstractIT {
     // assert values post-replace
     BoxPage post = getBoxPage(500L);
     BoxVisualization postVis = post.getVisualization();
-    assertFalse("check that position D01 is still full", postVis.isEmptyPosition(position));
-    assertTrue("check that D01 is now a library aliquot", postVis.getPositionTitle(position).contains("TIB_"));
+    assertFalse(postVis.isEmptyPosition(position), "check that position D01 is still full");
+    assertTrue(postVis.getPositionTitle(position).contains("TIB_"), "check that D01 is now a library aliquot");
 
-    Box box = (Box) getSession().get(BoxImpl.class, 500L);
-    assertEquals("check that D01 now contains library aliquot", EntityType.LIBRARY_ALIQUOT,
-        box.getBoxPositions().get(position).getBoxableId().getTargetType());
+    Box box = (Box) getSession().find(BoxImpl.class, 500L);
+    assertEquals(EntityType.LIBRARY_ALIQUOT, box.getBoxPositions().get(position).getBoxableId().getTargetType(),
+        "check that D01 now contains library aliquot");
   }
 
   @Test
   public void testAddMultipleTubes() {
-    Library lib1 = (Library) getSession().get(LibraryImpl.class, 100001L);
-    Library lib2 = (Library) getSession().get(LibraryImpl.class, 100002L);
-    Library lib3 = (Library) getSession().get(LibraryImpl.class, 100003L);
+    Library lib1 = (Library) getSession().find(LibraryImpl.class, 100001L);
+    Library lib2 = (Library) getSession().find(LibraryImpl.class, 100002L);
+    Library lib3 = (Library) getSession().find(LibraryImpl.class, 100003L);
 
     BoxPage page = getBoxPage(1L);
     BoxVisualization visualization = page.getVisualization();
@@ -334,7 +334,7 @@ public class BoxPageIT extends AbstractIT {
     updates.put("H12", lib3.getName());
     visualization.updatePositions(updates, false);
 
-    Box box = (Box) getSession().get(BoxImpl.class, 1L);
+    Box box = (Box) getSession().find(BoxImpl.class, 1L);
     assertTrue(visualization.getPositionTitle("H10").contains(lib1.getAlias()));
     assertEquals(new BoxableId(EntityType.LIBRARY, lib1.getId()), box.getBoxPositions().get("H10").getBoxableId());
     assertTrue(visualization.getPositionTitle("H11").contains(lib2.getAlias()));
@@ -345,9 +345,9 @@ public class BoxPageIT extends AbstractIT {
 
   @Test
   public void testMoveMultipleTubes() {
-    Sample sam1 = (Sample) getSession().get(SampleImpl.class, 4L);
-    Sample sam2 = (Sample) getSession().get(SampleImpl.class, 7L);
-    Sample sam3 = (Sample) getSession().get(SampleImpl.class, 8L);
+    Sample sam1 = (Sample) getSession().find(SampleImpl.class, 4L);
+    Sample sam2 = (Sample) getSession().find(SampleImpl.class, 7L);
+    Sample sam3 = (Sample) getSession().find(SampleImpl.class, 8L);
 
     BoxPage page = getBoxPage(1L);
     BoxVisualization visualization = page.getVisualization();
@@ -366,7 +366,7 @@ public class BoxPageIT extends AbstractIT {
     updates.put("H12", sam3.getIdentificationBarcode());
     visualization.updatePositions(updates, false);
 
-    Box box = (Box) getSession().get(BoxImpl.class, 1L);
+    Box box = (Box) getSession().find(BoxImpl.class, 1L);
     assertTrue(visualization.isEmptyPosition("F06"));
     assertNull(box.getBoxPositions().get("F06"));
     assertTrue(visualization.isEmptyPosition("G07"));
@@ -384,9 +384,9 @@ public class BoxPageIT extends AbstractIT {
 
   @Test
   public void replaceMultipleTubes() {
-    Library lib1 = (Library) getSession().get(LibraryImpl.class, 100001L);
-    Library lib2 = (Library) getSession().get(LibraryImpl.class, 100002L);
-    Library lib3 = (Library) getSession().get(LibraryImpl.class, 100003L);
+    Library lib1 = (Library) getSession().find(LibraryImpl.class, 100001L);
+    Library lib2 = (Library) getSession().find(LibraryImpl.class, 100002L);
+    Library lib3 = (Library) getSession().find(LibraryImpl.class, 100003L);
 
     BoxPage page = getBoxPage(1L);
     BoxVisualization visualization = page.getVisualization();
@@ -405,7 +405,7 @@ public class BoxPageIT extends AbstractIT {
     updates.put("H08", lib3.getName());
     visualization.updatePositions(updates, true);
 
-    Box box = (Box) getSession().get(BoxImpl.class, 1L);
+    Box box = (Box) getSession().find(BoxImpl.class, 1L);
     assertTrue(visualization.getPositionTitle("F06").contains(lib1.getAlias()));
     assertEquals(new BoxableId(EntityType.LIBRARY, lib1.getId()), box.getBoxPositions().get("F06").getBoxableId());
     assertTrue(visualization.getPositionTitle("G07").contains(lib2.getAlias()));
@@ -416,9 +416,9 @@ public class BoxPageIT extends AbstractIT {
 
   @Test
   public void rearrangeMultipleTubes() {
-    Sample sam1 = (Sample) getSession().get(SampleImpl.class, 4L);
-    Sample sam2 = (Sample) getSession().get(SampleImpl.class, 7L);
-    Sample sam3 = (Sample) getSession().get(SampleImpl.class, 8L);
+    Sample sam1 = (Sample) getSession().find(SampleImpl.class, 4L);
+    Sample sam2 = (Sample) getSession().find(SampleImpl.class, 7L);
+    Sample sam3 = (Sample) getSession().find(SampleImpl.class, 8L);
 
     BoxPage page = getBoxPage(1L);
     BoxVisualization visualization = page.getVisualization();
@@ -433,7 +433,7 @@ public class BoxPageIT extends AbstractIT {
     updates.put("F06", sam3.getIdentificationBarcode());
     visualization.updatePositions(updates, true);
 
-    Box box = (Box) getSession().get(BoxImpl.class, 1L);
+    Box box = (Box) getSession().find(BoxImpl.class, 1L);
     assertTrue(visualization.getPositionTitle("G07").contains(sam1.getAlias()));
     assertEquals(new BoxableId(EntityType.SAMPLE, sam1.getId()), box.getBoxPositions().get("G07").getBoxableId());
     assertTrue(visualization.getPositionTitle("H08").contains(sam2.getAlias()));

@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.web.servlet.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
@@ -8,7 +8,7 @@ import javax.ws.rs.core.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.jayway.jsonpath.JsonPath;
 import static org.hamcrest.Matchers.*;
@@ -84,7 +84,7 @@ public class InstrumentRestControllerST extends AbstractST {
             post(CONTROLLER_BASE + "/1/servicerecords").content(makeJson(dto)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
-    Set<ServiceRecord> records = currentSession().get(entityClass, 1).getServiceRecords();    
+    Set<ServiceRecord> records = currentSession().find(entityClass, 1).getServiceRecords();    
     assertTrue(records.size() == 1);
     ServiceRecord rec = records.iterator().next();
     assertEquals(dto.getTitle(), rec.getTitle());
@@ -122,7 +122,7 @@ public class InstrumentRestControllerST extends AbstractST {
   public void testUpdate() throws Exception {
     // must be admin to update instrument
 
-    InstrumentDto dto = Dtos.asDto(currentSession().get(entityClass, 1));
+    InstrumentDto dto = Dtos.asDto(currentSession().find(entityClass, 1));
     dto.setName("updated");
     InstrumentImpl updated = baseTestUpdate(CONTROLLER_BASE, dto, 1, entityClass);
     assertEquals("updated", updated.getName());
@@ -132,7 +132,7 @@ public class InstrumentRestControllerST extends AbstractST {
   public void testUpdateFail() throws Exception {
     // must be admin to update instrument model
 
-    InstrumentDto dto = Dtos.asDto(currentSession().get(entityClass, 1));
+    InstrumentDto dto = Dtos.asDto(currentSession().find(entityClass, 1));
     dto.setName("updated");
     testUpdateUnauthorized(CONTROLLER_BASE, dto, 1, entityClass);
   }

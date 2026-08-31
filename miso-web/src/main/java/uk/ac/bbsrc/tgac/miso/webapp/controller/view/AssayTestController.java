@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.AssayTest;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayTestService;
@@ -56,7 +55,7 @@ public class AssayTestController extends AbstractTypeDataController<AssayTest, A
   }
 
   @Override
-  protected void addBaseConfig(ObjectNode config, ObjectMapper mapper) throws IOException {
+  protected void addBaseConfig(ObjectNode config, JsonMapper mapper) throws IOException {
     config.set("libraryQualificationMethods", MisoWebUtils.getLibraryQualificationMethodDtos(mapper));
   }
 

@@ -1,7 +1,7 @@
 
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -11,10 +11,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -45,8 +44,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SampleStore;
 
 public class HibernateLibraryDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -60,16 +58,20 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   @InjectMocks
   private HibernateLibraryDao dao;
 
-  @Before
+  @BeforeEach
   public void setup() throws IOException {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
     dao.setDetailedSample(true);
   }
 
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
+  }
+
   @Test
   public void testCreate() throws Exception {
-
     Library library = new LibraryImpl();
     String libraryName = "newLibrary";
     library.setName(libraryName);
@@ -111,14 +113,14 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   public void testUpdate() throws Exception {
     long id = 5L;
     String newDescription = "New Description";
-    Library before = (Library) currentSession().get(LibraryImpl.class, id);
+    Library before = (Library) currentSession().find(LibraryImpl.class, id);
     assertNotEquals(newDescription, before.getDescription());
     before.setDescription(newDescription);
     dao.update(before);
 
     clearSession();
 
-    Library after = (Library) currentSession().get(LibraryImpl.class, id);
+    Library after = (Library) currentSession().find(LibraryImpl.class, id);
     assertEquals(newDescription, after.getDescription());
   }
 
@@ -126,8 +128,8 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   public void testGet() throws Exception {
     Library library = dao.get(3);
     assertNotNull(library);
-    assertEquals("library name is incorrect", "LIB3", library.getName());
-    assertEquals("library description is incorrect", "Inherited from TEST_0002", library.getDescription());
+    assertEquals("LIB3", library.getName(), "library name is incorrect");
+    assertEquals("Inherited from TEST_0002", library.getDescription(), "library description is incorrect");
   }
 
   @Test
@@ -151,10 +153,10 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   @Test
   public void testListByProjectId() throws Exception {
     List<Library> libraries = dao.listByProjectId(1);
-    List<Long> libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l, 15l);
+    List<Long> libraryIds = Arrays.asList(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 13L, 14L, 15L);
     assertEquals(15, libraries.size());
     for (Library library : libraries) {
-      assertTrue("bad library found", libraryIds.contains(library.getId()));
+      assertTrue(libraryIds.contains(library.getId()), "bad library found");
     }
   }
 
@@ -164,7 +166,7 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
     List<Library> libraries = dao.listByIdList(ids);
     assertNotNull(libraries);
     for (Long id : ids) {
-      assertTrue(libraries.stream().anyMatch(x -> x.getId() == id.longValue()));
+      assertTrue(libraries.stream().anyMatch(x -> x.getId() == id));
     }
   }
 
@@ -184,57 +186,58 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetNextSibling() throws Exception {
-    Library library = (Library) currentSession().get(LibraryImpl.class, 1L);
+    Library library = (Library) currentSession().find(LibraryImpl.class, 1L);
     long nextId = 2L;
     EntityReference next = dao.getAdjacentLibrary(library, false);
     assertNotNull(next);
     assertEquals(nextId, next.getId());
-    Library nextLibrary = (Library) currentSession().get(LibraryImpl.class, nextId);
+    Library nextLibrary = (Library) currentSession().find(LibraryImpl.class, nextId);
     assertEquals(library.getSample().getId(), nextLibrary.getSample().getId());
   }
 
   @Test
   public void testGetNextCousin() throws Exception {
-    Library library = (Library) currentSession().get(LibraryImpl.class, 2L);
+    Library library = (Library) currentSession().find(LibraryImpl.class, 2L);
     long nextId = 3L;
     EntityReference next = dao.getAdjacentLibrary(library, false);
     assertNotNull(next);
     assertEquals(nextId, next.getId());
-    Library nextLibrary = (Library) currentSession().get(LibraryImpl.class, nextId);
+    Library nextLibrary = (Library) currentSession().find(LibraryImpl.class, nextId);
     assertNotEquals(library.getSample().getId(), nextLibrary.getSample().getId());
   }
 
   @Test
   public void testGetNextNull() throws Exception {
-    Library library = (Library) currentSession().get(LibraryImpl.class, 15L);
+    Library library = (Library) currentSession().find(LibraryImpl.class, 15L);
     EntityReference next = dao.getAdjacentLibrary(library, false);
     assertNull(next);
   }
 
   @Test
   public void testGetPreviousSibling() throws Exception {
-    Library library = (Library) currentSession().get(LibraryImpl.class, 2L);
+    Library library = (Library) currentSession().find(LibraryImpl.class, 2L);
     long previousId = 1L;
     EntityReference previous = dao.getAdjacentLibrary(library, true);
     assertNotNull(previous);
     assertEquals(previousId, previous.getId());
-    Library previousLibrary = (Library) currentSession().get(LibraryImpl.class, previousId);
+    Library previousLibrary = (Library) currentSession().find(LibraryImpl.class, previousId);
     assertEquals(library.getSample().getId(), previousLibrary.getSample().getId());
   }
 
   @Test
   public void testGetPreviousCousin() throws Exception {
-    Library library = (Library) currentSession().get(LibraryImpl.class, 3L);
+    Library library = (Library) currentSession().find(LibraryImpl.class, 3L);
     long previousId = 2L;
     EntityReference previous = dao.getAdjacentLibrary(library, true);
     assertNotNull(previous);
     assertEquals(previousId, previous.getId());
-    Library previousLibrary = (Library) currentSession().get(LibraryImpl.class, previousId);
+    Library previousLibrary = (Library) currentSession().find(LibraryImpl.class, previousId);
     assertNotEquals(library.getSample().getId(), previousLibrary.getSample().getId());
   }
 
+  @Test
   public void testGetPreviousNull() throws Exception {
-    Library library = (Library) currentSession().get(LibraryImpl.class, 1L);
+    Library library = (Library) currentSession().find(LibraryImpl.class, 1L);
     EntityReference previous = dao.getAdjacentLibrary(library, true);
     assertNull(previous);
   }
@@ -242,10 +245,10 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
   @Test
   public void testList() throws Exception {
     List<Library> libraries = dao.list();
-    List<Long> libraryIds = Arrays.asList(1l, 2l, 3l, 4l, 5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l, 13l, 14l, 15l);
+    List<Long> libraryIds = Arrays.asList(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 13L, 14L, 15L);
     assertEquals(15, libraries.size());
     for (Library library : libraries) {
-      assertTrue("bad library found", libraryIds.contains(library.getId()));
+      assertTrue(libraryIds.contains(library.getId()), "bad library found");
     }
 
   }
@@ -268,9 +271,9 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
     assertEquals(0L, libraries.size());
   }
 
-  @Test(expected = IOException.class)
+  @Test
   public void testListIlluminaOffsetBadLimit() throws IOException {
-    dao.list(5, -3, true, "id");
+    assertThrows(IOException.class, () -> dao.list(5, -3, true, "id"));
   }
 
   @Test
@@ -313,7 +316,7 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListIdsByAncestorSampleIdListDirect() throws Exception {
-    List<Long> sampleIds = Arrays.asList(19L);
+    List<Long> sampleIds = List.of(19L);
     Mockito.when(sampleStore.getChildIds(sampleIds, SampleAliquot.CATEGORY_NAME, null))
         .thenReturn(Collections.emptySet());
 
@@ -324,7 +327,7 @@ public class HibernateLibraryDaoIT extends AbstractDAOTest {
 
   @Test
   public void testListIdsByAncestorSampleIdListIndirect() throws Exception {
-    List<Long> sampleIds = Arrays.asList(17L);
+    List<Long> sampleIds = List.of(17L);
     Set<Long> aliquotSampleIds = Collections.singleton(19L);
     Mockito.when(sampleStore.getChildIds(sampleIds, SampleAliquot.CATEGORY_NAME, null))
         .thenReturn(aliquotSampleIds);

@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ConcentrationUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
@@ -170,6 +171,9 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @ManyToOne
   @JoinColumn(name = "sopId")
   private Sop sop;
+
+  @OneToMany(mappedBy = "sample", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<SampleSopFieldValue> sopFieldValues = new HashSet<>();
 
   @Transient
   private TransferSample creationReceiptInfo;
@@ -621,6 +625,14 @@ public class SampleImpl extends AbstractBoxable implements Sample {
   @Override
   public void setQcUser(User qcUser) {
     this.qcUser = qcUser;
+  }
+
+  public Set<SampleSopFieldValue> getSopFieldValues() {
+    return sopFieldValues;
+  }
+
+  public void setSopFieldValues(Set<SampleSopFieldValue> sopFieldValues) {
+    this.sopFieldValues = sopFieldValues;
   }
 
   @Override

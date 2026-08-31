@@ -2,7 +2,6 @@ package uk.ac.bbsrc.tgac.miso.dto;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -34,14 +33,13 @@ import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import ca.on.oicr.gsi.runscanner.dto.IlluminaNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.NotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.OxfordNanoporeNotificationDto;
 import ca.on.oicr.gsi.runscanner.dto.type.IndexSequencing;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBoxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Aliasable;
@@ -106,6 +104,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockRna;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
@@ -122,6 +121,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.SopField;
+import uk.ac.bbsrc.tgac.miso.core.data.SopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
 import uk.ac.bbsrc.tgac.miso.core.data.StainCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -553,6 +553,7 @@ public class Dtos {
     dto.setLibraryCount(libraryCount);
     setId(dto::setSequencingControlTypeId, from.getSequencingControlType());
     setId(dto::setSopId, from.getSop());
+    dto.setSopFieldValues(asSopFieldValueMap(from.getSopFieldValues()));
 
     return dto;
 
@@ -980,8 +981,32 @@ public class Dtos {
     }
     setObject(to::setSequencingControlType, SequencingControlType::new, from.getSequencingControlTypeId());
     setObject(to::setSop, Sop::new, from.getSopId());
+    Sample sample = to;
+    setSopFieldValues(to.getSopFieldValues(), SampleSopFieldValue::new, fieldValue -> fieldValue.setSample(sample),
+        from.getSopFieldValues());
     to.setCreationReceiptInfo(toReceiptTransfer(from, to));
     return to;
+  }
+
+  private static <T extends SopFieldValue> void setSopFieldValues(Collection<T> to, Supplier<T> constructor,
+      Consumer<T> setOwner, Map<Long, String> sopFieldValues) {
+    if (sopFieldValues == null) {
+      return;
+    }
+
+    sopFieldValues.forEach((fieldId, value) -> {
+      T fieldValue = constructor.get();
+      setOwner.accept(fieldValue);
+      setObject(fieldValue::setSopField, SopField::new, fieldId);
+      fieldValue.setValue(value);
+      to.add(fieldValue);
+    });
+  }
+
+  private static Map<Long, String> asSopFieldValueMap(Collection<? extends SopFieldValue> sopFieldValues) {
+    Map<Long, String> map = new HashMap<>();
+    sopFieldValues.forEach(value -> map.put(value.getSopField().getId(), value.getValue()));
+    return map;
   }
 
   private static <T extends AbstractBoxableDto, U extends AbstractBoxable> AbstractBoxPosition makeBoxablePosition(
@@ -2143,9 +2168,7 @@ public class Dtos {
     setString(dto::setDataReviewer, maybeGetProperty(from.getDataReviewer(), User::getFullName));
     setDateString(dto::setDataReviewDate, from.getDataReviewDate());
     setId(dto::setSopId, from.getSop());
-    Map<Long, String> sopFieldValues = new HashMap<>();
-    from.getSopFieldValues().forEach(value -> sopFieldValues.put(value.getSopField().getId(), value.getValue()));
-    dto.setSopFieldValues(sopFieldValues);
+    dto.setSopFieldValues(asSopFieldValueMap(from.getSopFieldValues()));
     setString(dto::setDataManglingPolicy,
         maybeGetProperty(from.getDataManglingPolicy(), InstrumentDataManglingPolicy::name));
 
@@ -2224,23 +2247,10 @@ public class Dtos {
     setBoolean(to::setQcPassed, dto.getQcPassed(), true);
     setBoolean(to::setDataReview, dto.getDataReview(), true);
     setObject(to::setSop, Sop::new, dto.getSopId());
-    setRunSopFieldValues(to, dto.getSopFieldValues());
+    setSopFieldValues(to.getSopFieldValues(), RunSopFieldValue::new, fieldValue -> fieldValue.setRun(to),
+        dto.getSopFieldValues());
     setObject(to::setDataManglingPolicy, dto.getDataManglingPolicy(), InstrumentDataManglingPolicy::valueOf);
     return to;
-  }
-
-  private static void setRunSopFieldValues(Run run, Map<Long, String> sopFieldValues) {
-    if (sopFieldValues == null) {
-      return;
-    }
-
-    sopFieldValues.forEach((fieldId, value) -> {
-      RunSopFieldValue fieldValue = new RunSopFieldValue();
-      fieldValue.setRun(run);
-      setObject(fieldValue::setSopField, SopField::new, fieldId);
-      fieldValue.setValue(value);
-      run.getSopFieldValues().add(fieldValue);
-    });
   }
 
   private static Run getPlatformRun(RunDto from) {
@@ -2725,6 +2735,7 @@ public class Dtos {
   public static ProjectDto asDto(@Nonnull Project from) {
     ProjectDto dto = new ProjectDto();
     dto.setId(from.getId());
+    setLong(dto::setId, from.getId(), true);
     dto.setName(from.getName());
     setDateString(dto::setCreationDate, from.getCreationTime());
     dto.setTitle(from.getTitle());
@@ -3117,7 +3128,7 @@ public class Dtos {
     return dto;
   }
 
-  public static PrinterDto asDto(@Nonnull Printer from, @Nonnull ObjectMapper mapper) {
+  public static PrinterDto asDto(@Nonnull Printer from, @Nonnull JsonMapper mapper) {
     PrinterDto dto = new PrinterDto();
     dto.setId(from.getId());
     dto.setAvailable(from.isEnabled());
@@ -3126,16 +3137,12 @@ public class Dtos {
     dto.setDriver(from.getDriver().name());
     dto.setHeight(from.getHeight());
     dto.setWidth(from.getWidth());
-    try {
-      dto.setLayout(mapper.readValue(from.getLayout(), ArrayNode.class));
-    } catch (IOException e) {
-      log.error("Corrupt printer contents", e);
-    }
+    dto.setLayout(mapper.readValue(from.getLayout(), ArrayNode.class));
     dto.setName(from.getName());
     return dto;
   }
 
-  public static Printer to(@Nonnull PrinterDto dto, @Nonnull ObjectMapper mapper) throws JsonProcessingException {
+  public static Printer to(@Nonnull PrinterDto dto, @Nonnull JsonMapper mapper) {
     Printer to = new Printer();
     to.setId(dto.getId());
     to.setBackend(Backend.valueOf(dto.getBackend()));

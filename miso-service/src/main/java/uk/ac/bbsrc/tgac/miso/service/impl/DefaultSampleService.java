@@ -46,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStock;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleStockSingleCell;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
@@ -57,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Probe;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityImpl.IdentityBuilder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleProbe;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.Transfer;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.transfer.TransferSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.EntityReference;
@@ -71,6 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
 import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
+import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
 import uk.ac.bbsrc.tgac.miso.core.service.LabService;
 import uk.ac.bbsrc.tgac.miso.core.service.LibraryService;
 import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
@@ -85,6 +88,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.StainService;
 import uk.ac.bbsrc.tgac.miso.core.service.SubprojectService;
 import uk.ac.bbsrc.tgac.miso.core.service.TransferService;
 import uk.ac.bbsrc.tgac.miso.core.service.WorksetService;
+import uk.ac.bbsrc.tgac.miso.core.service.WorkstationService;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationResult;
@@ -172,6 +176,10 @@ public class DefaultSampleService implements SampleService {
   private BarcodableReferenceService barcodableReferenceService;
   @Autowired
   private ChangeLogService changeLogService;
+  @Autowired
+  private WorkstationService workstationService;
+  @Autowired
+  private InstrumentService instrumentService;
   @Autowired
   private TransactionTemplate transactionTemplate;
   @Autowired
@@ -730,6 +738,7 @@ public class DefaultSampleService implements SampleService {
     loadChildEntity(sample::setSequencingControlType, sample.getSequencingControlType(), sequencingControlTypeService,
         "sequencingControlTypeId");
     loadChildEntity(sample::setSop, sample.getSop(), sopService, "sopId");
+    loadSopFieldValues(sample);
     loadChildEntity(sample::setDetailedQcStatus, sample.getDetailedQcStatus(), detailedQcStatusService,
         "detailedQcStatusId");
     loadChildEntity(sample::setRequisition, sample.getRequisition(), requisitionService, "requisitionId");
@@ -784,6 +793,14 @@ public class DefaultSampleService implements SampleService {
         }
       }
     }
+  }
+
+  private void loadSopFieldValues(Sample sample) {
+    if (sample.getSopFieldValues() == null) {
+      return;
+    }
+    sample.getSopFieldValues().forEach(value -> value.setSample(sample));
+    ValidationUtils.loadSopFieldValues(sample.getSop(), sample.getSopFieldValues());
   }
 
   private void validateHierarchy(DetailedSample sample) throws IOException {
@@ -886,6 +903,12 @@ public class DefaultSampleService implements SampleService {
       validateReceiptTransfer(receiptSample, errors);
     }
 
+    if (sample.getSop() != null && sample.getSop().getCategory() != SopCategory.SAMPLE) {
+      errors.add(new ValidationError("sopId", "Only sample SOPs may be assigned to a sample"));
+    }
+    ValidationUtils.validateSopFieldValues(sample.getSop(), sample.getSopFieldValues(), workstationService,
+        instrumentService, errors);
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
@@ -968,7 +991,12 @@ public class DefaultSampleService implements SampleService {
     target.setLocationBarcode(source.getLocationBarcode());
     target.setRequisition(source.getRequisition());
     target.setSequencingControlType(source.getSequencingControlType());
+    ValidationUtils.makeSopChangesChangeLog(target, target.getSopFieldValues(), source.getSopFieldValues(),
+        changeLogService, authorizationManager.getCurrentUser());
     target.setSop(source.getSop());
+    Sample sopFieldValueOwner = target;
+    ValidationUtils.applySopFieldValueChanges(target.getSopFieldValues(), source.getSopFieldValues(),
+        SampleSopFieldValue::new, fieldValue -> fieldValue.setSample(sopFieldValueOwner));
     target.setDetailedQcStatus(source.getDetailedQcStatus());
     target.setDetailedQcStatusNote(nullifyStringIfBlank(source.getDetailedQcStatusNote()));
     target.setQcUser(source.getQcUser());

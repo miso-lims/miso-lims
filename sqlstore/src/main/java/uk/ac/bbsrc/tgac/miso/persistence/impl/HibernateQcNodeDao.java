@@ -66,7 +66,7 @@ public class HibernateQcNodeDao implements QcNodeDao {
 
   @Override
   public SampleQcNode getForSample(long id) throws IOException {
-    SampleQcNode item = (SampleQcNode) currentSession().get(SampleQcNode.class, id);
+    SampleQcNode item = (SampleQcNode) currentSession().find(SampleQcNode.class, id);
     if (item == null) {
       return null;
     }
@@ -77,7 +77,7 @@ public class HibernateQcNodeDao implements QcNodeDao {
 
   @Override
   public SampleQcNode getForLibrary(long id) throws IOException {
-    LibraryQcNode item = (LibraryQcNode) currentSession().get(LibraryQcNode.class, id);
+    LibraryQcNode item = (LibraryQcNode) currentSession().find(LibraryQcNode.class, id);
     if (item == null) {
       return null;
     }
@@ -88,7 +88,7 @@ public class HibernateQcNodeDao implements QcNodeDao {
 
   @Override
   public SampleQcNode getForLibraryAliquot(long id) throws IOException {
-    LibraryAliquotQcNode item = (LibraryAliquotQcNode) currentSession().get(LibraryAliquotQcNode.class, id);
+    LibraryAliquotQcNode item = (LibraryAliquotQcNode) currentSession().find(LibraryAliquotQcNode.class, id);
     if (item == null) {
       return null;
     }
@@ -99,7 +99,7 @@ public class HibernateQcNodeDao implements QcNodeDao {
 
   @Override
   public SampleQcNode getForRunLibrary(long runId, long partitionId, long aliquotId) throws IOException {
-    RunQcNode run = (RunQcNode) currentSession().get(RunQcNode.class, runId);
+    RunQcNode run = (RunQcNode) currentSession().find(RunQcNode.class, runId);
 
     QueryBuilder<Long, Run> idBuilder = new QueryBuilder<>(currentSession(), Run.class, Long.class);
     Join<Run, RunPosition> runPositionJoin = idBuilder.getJoin(idBuilder.getRoot(), Run_.runPositions);
@@ -120,7 +120,7 @@ public class HibernateQcNodeDao implements QcNodeDao {
 
     pool.setRuns(Lists.newArrayList(run));
 
-    LibraryAliquotQcNode aliquot = (LibraryAliquotQcNode) currentSession().get(LibraryAliquotQcNode.class, aliquotId);
+    LibraryAliquotQcNode aliquot = (LibraryAliquotQcNode) currentSession().find(LibraryAliquotQcNode.class, aliquotId);
     aliquot.setPools(Lists.newArrayList(pool));
 
     SampleQcNode top = populateParents(aliquot);
@@ -148,14 +148,14 @@ public class HibernateQcNodeDao implements QcNodeDao {
     if (item.getParentId() == null) {
       return item;
     } else {
-      SampleQcNode parent = (SampleQcNode) currentSession().get(SampleQcNode.class, item.getParentId());
+      SampleQcNode parent = (SampleQcNode) currentSession().find(SampleQcNode.class, item.getParentId());
       parent.setChildSamples(Lists.newArrayList(item));
       return populateParents(parent);
     }
   }
 
   private SampleQcNode populateParents(LibraryQcNode item) {
-    SampleQcNode parent = (SampleQcNode) currentSession().get(SampleQcNode.class, item.getSampleId());
+    SampleQcNode parent = (SampleQcNode) currentSession().find(SampleQcNode.class, item.getSampleId());
     parent.setLibraries(Lists.newArrayList(item));
     return populateParents(parent);
   }
@@ -163,11 +163,11 @@ public class HibernateQcNodeDao implements QcNodeDao {
   private SampleQcNode populateParents(LibraryAliquotQcNode item) {
     if (item.getParentAliquotId() != null) {
       LibraryAliquotQcNode parent =
-          (LibraryAliquotQcNode) currentSession().get(LibraryAliquotQcNode.class, item.getParentAliquotId());
+          (LibraryAliquotQcNode) currentSession().find(LibraryAliquotQcNode.class, item.getParentAliquotId());
       parent.setChildAliquots(Lists.newArrayList(item));
       return populateParents(parent);
     } else {
-      LibraryQcNode parent = (LibraryQcNode) currentSession().get(LibraryQcNode.class, item.getLibraryId());
+      LibraryQcNode parent = (LibraryQcNode) currentSession().find(LibraryQcNode.class, item.getLibraryId());
       parent.setAliquots(Lists.newArrayList(item));
       return populateParents(parent);
     }

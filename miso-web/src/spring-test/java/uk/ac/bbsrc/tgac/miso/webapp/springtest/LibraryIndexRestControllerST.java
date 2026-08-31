@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.web.servlet.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
@@ -20,7 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.LibraryIndexRestController.IndexSearchRequest;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.LibraryIndexRestController.IndexSearchResult;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -35,13 +35,13 @@ public class LibraryIndexRestControllerST extends AbstractST {
 
     List<LibraryIndexDto> dtos = new ArrayList<LibraryIndexDto>();
     LibraryIndexDto one = new LibraryIndexDto();
-    one.setFamily(Dtos.asDto(currentSession().get(LibraryIndexFamily.class, 1)));
+    one.setFamily(Dtos.asDto(currentSession().find(LibraryIndexFamily.class, 1)));
     one.setName("one");
     one.setPosition(1);
     one.setSequence("TTTTTT");
 
     LibraryIndexDto two = new LibraryIndexDto();
-    two.setFamily(Dtos.asDto(currentSession().get(LibraryIndexFamily.class, 2)));
+    two.setFamily(Dtos.asDto(currentSession().find(LibraryIndexFamily.class, 2)));
     two.setName("two");
     two.setPosition(2);
     two.setSequence("GGGGGG");
@@ -80,8 +80,8 @@ public class LibraryIndexRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // only admin can update these
-    LibraryIndexDto one = Dtos.asDto(currentSession().get(LibraryIndex.class, 1));
-    LibraryIndexDto three = Dtos.asDto(currentSession().get(LibraryIndex.class, 3));
+    LibraryIndexDto one = Dtos.asDto(currentSession().find(LibraryIndex.class, 1));
+    LibraryIndexDto three = Dtos.asDto(currentSession().find(LibraryIndex.class, 3));
     one.setName("one");
     three.setName("three");
 
@@ -99,8 +99,8 @@ public class LibraryIndexRestControllerST extends AbstractST {
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
     // only admin can update these
-    LibraryIndexDto one = Dtos.asDto(currentSession().get(LibraryIndex.class, 1));
-    LibraryIndexDto three = Dtos.asDto(currentSession().get(LibraryIndex.class, 3));
+    LibraryIndexDto one = Dtos.asDto(currentSession().find(LibraryIndex.class, 1));
+    LibraryIndexDto three = Dtos.asDto(currentSession().find(LibraryIndex.class, 3));
     one.setName("one");
     three.setName("three");
 

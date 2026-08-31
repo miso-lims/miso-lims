@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
@@ -8,12 +8,12 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Date;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -36,6 +36,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class HibernateChangeLogDaoIT extends AbstractDAOTest {
 
+  private AutoCloseable mockito;
+
   @Mock
   private HibernateSecurityDao securityDAO;
   @PersistenceContext
@@ -49,13 +51,18 @@ public class HibernateChangeLogDaoIT extends AbstractDAOTest {
 
   User user = new UserImpl();
 
-  @Before
+  @BeforeEach
   public void setup() throws Exception {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     user.setId(1L);
     when(securityDAO.getUserById(anyLong())).thenReturn(user);
     sut.setEntityManager(entityManager);
     libraryDao.setEntityManager(entityManager);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   private Collection<ChangeLog> listSampleChangelogs(long libraryId) {

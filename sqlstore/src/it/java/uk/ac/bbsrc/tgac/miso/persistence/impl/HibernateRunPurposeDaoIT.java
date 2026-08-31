@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractHibernateSaveDaoTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPurpose;
@@ -45,17 +45,17 @@ public class HibernateRunPurposeDaoIT extends AbstractHibernateSaveDaoTest<RunPu
 
   @Test
   public void testGetUsageByPoolOrders() throws Exception {
-    RunPurpose purpose1 = (RunPurpose) currentSession().get(RunPurpose.class, 1L);
+    RunPurpose purpose1 = (RunPurpose) currentSession().find(RunPurpose.class, 1L);
     assertEquals(2, getTestSubject().getUsageByPoolOrders(purpose1));
-    RunPurpose purpose2 = (RunPurpose) currentSession().get(RunPurpose.class, 2L);
+    RunPurpose purpose2 = (RunPurpose) currentSession().find(RunPurpose.class, 2L);
     assertEquals(0, getTestSubject().getUsageByPoolOrders(purpose2));
   }
 
   @Test
   public void testGetUsageBySequencingOrders() throws Exception {
-    RunPurpose purpose1 = (RunPurpose) currentSession().get(RunPurpose.class, 1L);
+    RunPurpose purpose1 = (RunPurpose) currentSession().find(RunPurpose.class, 1L);
     assertEquals(2, getTestSubject().getUsageBySequencingOrders(purpose1));
-    RunPurpose purpose2 = (RunPurpose) currentSession().get(RunPurpose.class, 2L);
+    RunPurpose purpose2 = (RunPurpose) currentSession().find(RunPurpose.class, 2L);
     assertEquals(0, getTestSubject().getUsageBySequencingOrders(purpose2));
   }
 

@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -16,7 +16,7 @@ public class HibernateBoxSizeDaoIT extends AbstractDAOTest {
 
   private HibernateBoxSizeDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateBoxSizeDao();
     sut.setEntityManager(getEntityManager());
@@ -49,7 +49,7 @@ public class HibernateBoxSizeDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    BoxSize saved = (BoxSize) currentSession().get(BoxSize.class, savedId);
+    BoxSize saved = (BoxSize) currentSession().find(BoxSize.class, savedId);
     assertEquals(rows, saved.getRows().intValue());
     assertEquals(cols, saved.getColumns().intValue());
   }
@@ -59,7 +59,7 @@ public class HibernateBoxSizeDaoIT extends AbstractDAOTest {
     long id = 1L;
     int rows = 7;
     int cols = 5;
-    BoxSize boxSize = (BoxSize) currentSession().get(BoxSize.class, id);
+    BoxSize boxSize = (BoxSize) currentSession().find(BoxSize.class, id);
     assertNotEquals(rows, boxSize.getRows().intValue());
     assertNotEquals(cols, boxSize.getColumns().intValue());
     boxSize.setRows(rows);
@@ -68,14 +68,14 @@ public class HibernateBoxSizeDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    BoxSize saved = (BoxSize) currentSession().get(BoxSize.class, id);
+    BoxSize saved = (BoxSize) currentSession().find(BoxSize.class, id);
     assertEquals(rows, saved.getRows().intValue());
     assertEquals(cols, saved.getColumns().intValue());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    BoxSize boxSize = (BoxSize) currentSession().get(BoxSize.class, 1L);
+    BoxSize boxSize = (BoxSize) currentSession().find(BoxSize.class, 1L);
     assertNotNull(boxSize);
     assertEquals(2L, sut.getUsage(boxSize));
   }

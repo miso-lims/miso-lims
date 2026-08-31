@@ -1,14 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Collection;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -25,8 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
 public class HibernateInstrumentDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @Mock
   private HibernateInstrumentModelDao platformDAO;
@@ -37,10 +35,15 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
   @InjectMocks
   private HibernateInstrumentDao dao;
 
-  @Before
+  @BeforeEach
   public void setup() {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
@@ -63,17 +66,17 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
     int sizeBefore = dao.list().size();
     long id = dao.update(instrument);
     Instrument retrieved = dao.get(id);
-    assertEquals("instrument name does not match", "blargh", retrieved.getName());
-    assertEquals("did not update sample", sizeBefore, dao.list().size());
+    assertEquals("blargh", retrieved.getName(), "instrument name does not match");
+    assertEquals(sizeBefore, dao.list().size(), "did not update sample");
   }
 
   @Test
   public void testGet() throws Exception {
     Instrument instrument = dao.get(1);
     assertNotNull(instrument);
-    assertEquals("instrument name does not match", "SN7001179", instrument.getName());
-    assertNull("instrument date commissioned is not null", instrument.getDateCommissioned());
-    assertNull("instrument date decommissioned is not null", instrument.getDateDecommissioned());
+    assertEquals("SN7001179", instrument.getName(), "instrument name does not match");
+    assertNull(instrument.getDateCommissioned(), "instrument date commissioned is not null");
+    assertNull(instrument.getDateDecommissioned(), "instrument date decommissioned is not null");
   }
 
   @Test
@@ -85,7 +88,6 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
    * Verifies Hibernate mappings by ensuring that no exception is thrown by a search
    * 
    * @param filter the search filter
-   * @throws IOException
    */
   private void testSearch(PaginationFilter filter) throws IOException {
     // verify Hibernate mappings by ensuring that no exception is thrown
@@ -94,25 +96,25 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetUsageByRuns() throws Exception {
-    Instrument instrument = (Instrument) currentSession().get(InstrumentImpl.class, 1L);
+    Instrument instrument = (Instrument) currentSession().find(InstrumentImpl.class, 1L);
     assertEquals(3L, dao.getUsageByRuns(instrument));
   }
 
   @Test
   public void testGetUsageByArrayRuns() throws Exception {
-    Instrument instrument = (Instrument) currentSession().get(InstrumentImpl.class, 3L);
+    Instrument instrument = (Instrument) currentSession().find(InstrumentImpl.class, 3L);
     assertEquals(2L, dao.getUsageByArrayRuns(instrument));
   }
 
   @Test
   public void testGetUsageByQcs() throws Exception {
-    Instrument instrument = (Instrument) currentSession().get(InstrumentImpl.class, 5L);
+    Instrument instrument = (Instrument) currentSession().find(InstrumentImpl.class, 5L);
     assertEquals(1L, dao.getUsageByQcs(instrument));
   }
 
   @Test
   public void testGetUsageByQcsNone() throws Exception {
-    Instrument instrument = (Instrument) currentSession().get(InstrumentImpl.class, 1L);
+    Instrument instrument = (Instrument) currentSession().find(InstrumentImpl.class, 1L);
     assertEquals(0L, dao.getUsageByQcs(instrument));
   }
 
@@ -142,7 +144,7 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
 
   @Test
   public void testGetbyServiceRecord() throws Exception {
-    ServiceRecord record = (ServiceRecord) currentSession().get(ServiceRecord.class, 3L);
+    ServiceRecord record = (ServiceRecord) currentSession().find(ServiceRecord.class, 3L);
     Instrument instrument = dao.getByServiceRecord(record);
     assertNotNull(instrument);
     assertEquals(2L, instrument.getId());
@@ -152,13 +154,13 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
   public void testCreate() throws Exception {
     Instrument instrument = new InstrumentImpl();
     instrument.setName("Test Instrument");
-    InstrumentModel model = (InstrumentModel) currentSession().get(InstrumentModel.class, 2L);
+    InstrumentModel model = (InstrumentModel) currentSession().find(InstrumentModel.class, 2L);
     instrument.setInstrumentModel(model);
     long savedId = dao.create(instrument);
 
     clearSession();
 
-    Instrument saved = (Instrument) currentSession().get(InstrumentImpl.class, savedId);
+    Instrument saved = (Instrument) currentSession().find(InstrumentImpl.class, savedId);
     assertNotNull(saved);
   }
 

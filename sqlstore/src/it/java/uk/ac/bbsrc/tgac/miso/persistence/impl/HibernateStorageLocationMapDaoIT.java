@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StorageLocationMap;
@@ -15,7 +15,7 @@ public class HibernateStorageLocationMapDaoIT extends AbstractDAOTest {
 
   private HibernateStorageLocationMapDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateStorageLocationMapDao();
     sut.setEntityManager(getEntityManager());
@@ -54,7 +54,7 @@ public class HibernateStorageLocationMapDaoIT extends AbstractDAOTest {
     clearSession();
 
     StorageLocationMap saved =
-        (StorageLocationMap) currentSession().get(StorageLocationMap.class, savedId);
+        (StorageLocationMap) currentSession().find(StorageLocationMap.class, savedId);
     assertEquals(filename, saved.getFilename());
   }
 
@@ -63,7 +63,7 @@ public class HibernateStorageLocationMapDaoIT extends AbstractDAOTest {
     long id = 1L;
     String filename = "renamed.html";
     StorageLocationMap map =
-        (StorageLocationMap) currentSession().get(StorageLocationMap.class, id);
+        (StorageLocationMap) currentSession().find(StorageLocationMap.class, id);
     assertNotEquals(filename, map.getFilename());
     map.setFilename(filename);
     sut.update(map);
@@ -71,14 +71,14 @@ public class HibernateStorageLocationMapDaoIT extends AbstractDAOTest {
     clearSession();
 
     StorageLocationMap saved =
-        (StorageLocationMap) currentSession().get(StorageLocationMap.class, id);
+        (StorageLocationMap) currentSession().find(StorageLocationMap.class, id);
     assertEquals(filename, saved.getFilename());
   }
 
   @Test
   public void testGetUsage() throws IOException {
     StorageLocationMap map =
-        (StorageLocationMap) currentSession().get(StorageLocationMap.class, 1L);
+        (StorageLocationMap) currentSession().find(StorageLocationMap.class, 1L);
     assertEquals("floor_one.html", map.getFilename());
     assertEquals(2L, sut.getUsage(map));
   }

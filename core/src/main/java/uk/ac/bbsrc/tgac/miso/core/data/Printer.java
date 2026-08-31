@@ -8,11 +8,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionLikeType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Charsets;
 
 import jakarta.persistence.Column;
@@ -24,6 +19,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.type.CollectionLikeType;
+import tools.jackson.databind.type.TypeFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Backend;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.Driver;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelCanvas;
@@ -34,9 +32,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.LabelElement;
 public class Printer implements Deletable, Serializable {
 
   private static final CollectionLikeType LAYOUT_TYPE =
-      TypeFactory.defaultInstance().constructCollectionLikeType(List.class,
+      TypeFactory.createDefaultInstance().constructCollectionLikeType(List.class,
           LabelElement.class);
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final JsonMapper MAPPER = JsonMapper.builder().build();
   private static final long serialVersionUID = 1L;
 
   private static final long UNSAVED_ID = 0;
@@ -69,7 +67,7 @@ public class Printer implements Deletable, Serializable {
 
   private double width;
 
-  public void changeLayout(List<LabelElement> elements) throws IOException, JsonParseException, JsonMappingException {
+  public void changeLayout(List<LabelElement> elements) throws IOException {
     layout = MAPPER.writerFor(LAYOUT_TYPE).writeValueAsString(elements);
   }
 
@@ -125,13 +123,13 @@ public class Printer implements Deletable, Serializable {
     return getId() != UNSAVED_ID;
   }
 
-  public List<LabelElement> parseLayout() throws IOException, JsonParseException, JsonMappingException {
+  public List<LabelElement> parseLayout() throws IOException {
     return MAPPER.readValue(layout,
         LAYOUT_TYPE);
   }
 
   public long printBarcode(User user, int copies, Stream<Barcodable> barcodables)
-      throws JsonParseException, JsonMappingException, IOException {
+      throws IOException {
     AtomicLong counter = new AtomicLong();
     if (layoutCache == null) {
       layoutCache = parseLayout();

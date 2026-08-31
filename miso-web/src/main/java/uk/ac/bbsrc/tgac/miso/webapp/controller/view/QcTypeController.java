@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import tools.jackson.databind.json.JsonMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.service.QcTypeService;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
@@ -28,7 +26,7 @@ public class QcTypeController extends AbstractInstituteDefaultsController<QcType
   @Autowired
   private QcTypeService qcTypeService;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   @Override
   protected QcTypeDto asDto(QcType model) {
@@ -83,7 +81,7 @@ public class QcTypeController extends AbstractInstituteDefaultsController<QcType
     return setupForm(qcType, model);
   }
 
-  private ModelAndView setupForm(QcType qcType, ModelMap model) throws JsonProcessingException {
+  private ModelAndView setupForm(QcType qcType, ModelMap model) {
     QcTypeDto dto = Dtos.asDto(qcType);
     model.put("qcTypeDto", mapper.writeValueAsString(dto));
     return new ModelAndView("/WEB-INF/pages/editQcType.jsp", model);

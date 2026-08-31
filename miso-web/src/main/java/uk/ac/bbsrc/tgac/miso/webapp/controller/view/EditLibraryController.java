@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +30,13 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.GroupIdentifiable;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -170,7 +170,7 @@ public class EditLibraryController {
   @Autowired
   private NamingSchemeHolder namingSchemeHolder;
   @Autowired
-  private ObjectMapper mapper;
+  private JsonMapper mapper;
 
   public void setLibraryService(LibraryService libraryService) {
     this.libraryService = libraryService;
@@ -275,7 +275,7 @@ public class EditLibraryController {
     private final BoxDto newBox;
     private final String sort;
 
-    public LibraryBulkPropagateBackend(BoxDto newBox, String sort, ObjectMapper mapper) {
+    public LibraryBulkPropagateBackend(BoxDto newBox, String sort, JsonMapper mapper) {
       super("library", LibraryDto.class, "Libraries", "Samples", mapper);
       this.newBox = newBox;
       this.sort = sort;
@@ -364,7 +364,7 @@ public class EditLibraryController {
     }
 
     @Override
-    protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+    protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
       if (templatesByProjectId != null && !templatesByProjectId.isEmpty()) {
         config.putPOJO(Config.TEMPLATES, templatesByProjectId);
       }
@@ -414,7 +414,7 @@ public class EditLibraryController {
       }
 
       @Override
-      protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
         config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
         config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
         addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
@@ -445,7 +445,7 @@ public class EditLibraryController {
     BulkCreateTableBackend<LibraryDto> backend = new BulkCreateTableBackend<>("library", LibraryDto.class,
         "Libraries", libDto, quantity, mapper) {
       @Override
-      protected void writeConfiguration(ObjectMapper mapper, ObjectNode config) throws IOException {
+      protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
         if (aliquotClass != null) {
           config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(aliquotClass));
         }

@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -12,15 +11,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.qc.*;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.ContainerQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryAliquotQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryAliquotQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.LibraryQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.PoolQcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcControlRun;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcCorrespondingField;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QcTarget;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.QualityControlEntity;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.qc.SampleQcControlRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BulkQcSaveOperation;
@@ -35,7 +46,15 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationException;
 import uk.ac.bbsrc.tgac.miso.core.store.DeletionStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PrometheusAsyncMonitor;
 import uk.ac.bbsrc.tgac.miso.core.util.ThrowingFunction;
-import uk.ac.bbsrc.tgac.miso.persistence.*;
+import uk.ac.bbsrc.tgac.miso.persistence.ChangeLoggableStore;
+import uk.ac.bbsrc.tgac.miso.persistence.ContainerQcStore;
+import uk.ac.bbsrc.tgac.miso.persistence.LibraryAliquotQcStore;
+import uk.ac.bbsrc.tgac.miso.persistence.LibraryQcStore;
+import uk.ac.bbsrc.tgac.miso.persistence.PoolQcStore;
+import uk.ac.bbsrc.tgac.miso.persistence.QcTargetStore;
+import uk.ac.bbsrc.tgac.miso.persistence.QualityControlTypeStore;
+import uk.ac.bbsrc.tgac.miso.persistence.RequisitionQcStore;
+import uk.ac.bbsrc.tgac.miso.persistence.SampleQcStore;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -159,8 +178,8 @@ public class DefaultQualityControlService implements QualityControlService {
             ((LibraryQcControlRun) fromControl).setQc((LibraryQC) to);
             break;
           case LibraryAliquot:
-              ((LibraryAliquotQcControlRun) fromControl).setQc((LibraryAliquotQC) to);
-              break;
+            ((LibraryAliquotQcControlRun) fromControl).setQc((LibraryAliquotQC) to);
+            break;
           case Pool:
             ((PoolQcControlRun) fromControl).setQc((PoolQC) to);
             break;
@@ -242,7 +261,7 @@ public class DefaultQualityControlService implements QualityControlService {
     switch (target) {
       case Library:
         return libraryQcStore;
-     case LibraryAliquot:
+      case LibraryAliquot:
         return libraryAliquotQcStore;
       case Pool:
         return poolQcStore;
@@ -276,7 +295,9 @@ public class DefaultQualityControlService implements QualityControlService {
     this.libraryQcStore = libraryQcStore;
   }
 
-  public void setLibraryAliquotQcStore(LibraryAliquotQcStore libraryAliquotQcStore) { this.libraryAliquotQcStore = libraryAliquotQcStore; }
+  public void setLibraryAliquotQcStore(LibraryAliquotQcStore libraryAliquotQcStore) {
+    this.libraryAliquotQcStore = libraryAliquotQcStore;
+  }
 
   public void setPoolQcStore(PoolQcStore poolQcStore) {
     this.poolQcStore = poolQcStore;
@@ -325,22 +346,18 @@ public class DefaultQualityControlService implements QualityControlService {
     Thread thread = new Thread(() -> {
       SecurityContextHolder.getContextHolderStrategy().getContext().setAuthentication(auth);
       try {
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-
-          @Override
-          protected void doInTransactionWithoutResult(TransactionStatus status) {
-            while (operation.hasMore()) {
-              try {
-                QC item = operation.getNextItem();
-                QC saved = action.apply(item);
-                operation.addSuccess(saved.getId());
-              } catch (ValidationException e) {
-                operation.addFailure(e);
-                status.setRollbackOnly();
-              } catch (Exception e) {
-                operation.setFailed(e);
-                status.setRollbackOnly();
-              }
+        transactionTemplate.executeWithoutResult(status -> {
+          while (operation.hasMore()) {
+            try {
+              QC item = operation.getNextItem();
+              QC saved = action.apply(item);
+              operation.addSuccess(saved.getId());
+            } catch (ValidationException e) {
+              operation.addFailure(e);
+              status.setRollbackOnly();
+            } catch (Exception e) {
+              operation.setFailed(e);
+              status.setRollbackOnly();
             }
           }
         });

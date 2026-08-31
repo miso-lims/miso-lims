@@ -1,23 +1,20 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -33,8 +30,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.SecurityStore;
 
 public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
+  private AutoCloseable mockito;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -47,13 +43,18 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
 
   private final User emptyUser = new UserImpl();
 
-  @Before
+  @BeforeEach
   public void setup() throws IOException {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     dao.setEntityManager(entityManager);
 
     emptyUser.setId(1L);
     when(securityDao.getUserById(ArgumentMatchers.anyLong())).thenReturn(emptyUser);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
@@ -97,7 +98,7 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
     SequencerPartitionContainer spc = dao.get(4L);
 
     SequencingContainerModel model =
-        (SequencingContainerModel) entityManager.unwrap(Session.class).get(SequencingContainerModel.class, 1L);
+        (SequencingContainerModel) currentSession().find(SequencingContainerModel.class, 1L);
     spc.setModel(model);
     spc.setLastModifier(emptyUser);
     Run run = Mockito.mock(Run.class);
@@ -113,14 +114,12 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
 
   @Test
   public void testCreateNull() throws IOException {
-    exception.expect(IllegalArgumentException.class);
-    dao.create(null);
+    assertThrows(IllegalArgumentException.class, () -> dao.create(null));
   }
 
   @Test
   public void testUpdateNull() throws IOException {
-    exception.expect(IllegalArgumentException.class);
-    dao.update(null);
+    assertThrows(IllegalArgumentException.class, () -> dao.update(null));
   }
 
   @Test
@@ -140,7 +139,7 @@ public class HibernateSequencerPartitionContainerDaoIT extends AbstractDAOTest {
     Date now = new Date();
     pc.setIdentificationBarcode(identificationBarcode);
     SequencingContainerModel model =
-        (SequencingContainerModel) entityManager.unwrap(Session.class).get(SequencingContainerModel.class, 1L);
+        (SequencingContainerModel) currentSession().find(SequencingContainerModel.class, 1L);
     pc.setModel(model);
     pc.setCreationTime(now);
     pc.setCreator(emptyUser);

@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
@@ -8,7 +8,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.dto.DetailedQcStatusDto;
 
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -61,8 +61,8 @@ public class DetailedQcStatusRestControllerST extends AbstractST {
   @WithMockUser(username = "admin", password = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkUpdateAsync() throws Exception {
     // must be admin to update
-    DetailedQcStatusImpl str = currentSession().get(entityClass, 5);
-    DetailedQcStatusImpl diagnosis = currentSession().get(entityClass, 6);
+    DetailedQcStatusImpl str = currentSession().find(entityClass, 5);
+    DetailedQcStatusImpl diagnosis = currentSession().find(entityClass, 6);
     str.setDescription("STR");
     diagnosis.setDescription("diagnosis");
 
@@ -84,8 +84,8 @@ public class DetailedQcStatusRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateAsyncFail() throws Exception {
-    DetailedQcStatusImpl str = currentSession().get(entityClass, 5);
-    DetailedQcStatusImpl diagnosis = currentSession().get(entityClass, 6);
+    DetailedQcStatusImpl str = currentSession().find(entityClass, 5);
+    DetailedQcStatusImpl diagnosis = currentSession().find(entityClass, 6);
     str.setDescription("STR");
     diagnosis.setDescription("diagnosis");
 

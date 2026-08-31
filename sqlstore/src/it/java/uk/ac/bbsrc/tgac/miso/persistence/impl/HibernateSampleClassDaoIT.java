@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -21,7 +21,7 @@ public class HibernateSampleClassDaoIT extends AbstractDAOTest {
 
   private HibernateSampleClassDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateSampleClassDao();
     sut.setEntityManager(getEntityManager());
@@ -56,7 +56,7 @@ public class HibernateSampleClassDaoIT extends AbstractDAOTest {
     SampleClass sampleClass = new SampleClassImpl();
     sampleClass.setAlias(alias);
     sampleClass.setSampleCategory(SampleTissue.CATEGORY_NAME);
-    User user = (User) currentSession().get(UserImpl.class, 1L);
+    User user = (User) currentSession().find(UserImpl.class, 1L);
     Date now = new Date();
     sampleClass.setCreator(user);
     sampleClass.setCreationTime(now);
@@ -66,7 +66,7 @@ public class HibernateSampleClassDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    SampleClass saved = (SampleClass) currentSession().get(SampleClassImpl.class, savedId);
+    SampleClass saved = (SampleClass) currentSession().find(SampleClassImpl.class, savedId);
     assertEquals(alias, saved.getAlias());
   }
 
@@ -74,20 +74,20 @@ public class HibernateSampleClassDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String alias = "New Alias";
-    SampleClass sampleClass = (SampleClass) currentSession().get(SampleClassImpl.class, id);
+    SampleClass sampleClass = (SampleClass) currentSession().find(SampleClassImpl.class, id);
     assertNotEquals(alias, sampleClass.getAlias());
     sampleClass.setAlias(alias);
     sut.update(sampleClass);
 
     clearSession();
 
-    SampleClass saved = (SampleClass) currentSession().get(SampleClassImpl.class, id);
+    SampleClass saved = (SampleClass) currentSession().find(SampleClassImpl.class, id);
     assertEquals(alias, saved.getAlias());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    SampleClass sampleClass = (SampleClass) currentSession().get(SampleClassImpl.class, 2L);
+    SampleClass sampleClass = (SampleClass) currentSession().find(SampleClassImpl.class, 2L);
     assertEquals("Primary Tumor Tissue", sampleClass.getAlias());
     assertEquals(5L, sut.getUsage(sampleClass));
   }

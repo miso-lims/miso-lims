@@ -1,10 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.eaglegenomics.simlims.core.Group;
 
@@ -488,7 +488,7 @@ public class DeleteIT extends AbstractIT {
   private void doTestDelete(String listTarget, String tab, String search, String selectByColumn, String columnValue,
       Class<?> clazz,
       Long id) {
-    assertNotNull("Couldn't find item in the database", getSession().get(clazz, id));
+    assertNotNull(getSession().find(clazz, id), "Couldn't find item in the database");
     AbstractListPage page = null;
     if (tab == null) {
       page = ListPage.getListPage(getDriver(), getBaseUrl(), listTarget);
@@ -506,7 +506,7 @@ public class DeleteIT extends AbstractIT {
       }
     }
     List<String> values = table.getColumnValues(selectByColumn);
-    assertFalse("No values found in column", values.isEmpty());
+    assertFalse(values.isEmpty(), "No values found in column");
     boolean found = false;
     for (int i = 0; i < values.size(); i++) {
       if (values.get(i).equals(columnValue)) {
@@ -515,17 +515,17 @@ public class DeleteIT extends AbstractIT {
         break;
       }
     }
-    assertTrue("Couldn't find item in the list table", found);
+    assertTrue(found, "Couldn't find item in the list table");
 
     AbstractListPage page2 = page.deleteSelected();
-    assertNotNull("Error deleting item", page2);
+    assertNotNull(page2, "Error deleting item");
     DataTable table2 = page2.getTable();
     if (search != null) {
       table2.searchFor(search);
     }
-    assertFalse("Found item in list table after delete attempt",
-        table2.getColumnValues(selectByColumn).contains(search));
-    assertNull("Found item in database after delete attempt", getSession().get(clazz, id));
+    assertFalse(table2.getColumnValues(selectByColumn).contains(search),
+        "Found item in list table after delete attempt");
+    assertNull(getSession().find(clazz, id), "Found item in database after delete attempt");
   }
 
 }

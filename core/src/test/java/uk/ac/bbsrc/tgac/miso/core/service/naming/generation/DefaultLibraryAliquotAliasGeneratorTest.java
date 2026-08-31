@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming.generation;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
@@ -16,7 +16,7 @@ public class DefaultLibraryAliquotAliasGeneratorTest {
 
   private DefaultLibraryAliquotAliasGenerator sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new DefaultLibraryAliquotAliasGenerator();
   }

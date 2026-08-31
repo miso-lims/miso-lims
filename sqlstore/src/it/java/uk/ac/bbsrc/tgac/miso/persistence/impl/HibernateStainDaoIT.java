@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Stain;
@@ -16,7 +16,7 @@ public class HibernateStainDaoIT extends AbstractDAOTest {
 
   private HibernateStainDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateStainDao();
     sut.setEntityManager(getEntityManager());
@@ -54,7 +54,7 @@ public class HibernateStainDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    Stain saved = (Stain) currentSession().get(Stain.class, savedId);
+    Stain saved = (Stain) currentSession().find(Stain.class, savedId);
     assertEquals(name, saved.getName());
   }
 
@@ -62,20 +62,20 @@ public class HibernateStainDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String name = "New Name";
-    Stain stain = (Stain) currentSession().get(Stain.class, id);
+    Stain stain = (Stain) currentSession().find(Stain.class, id);
     assertNotEquals(name, stain.getName());
     stain.setName(name);
     sut.update(stain);
 
     clearSession();
 
-    Stain saved = (Stain) currentSession().get(Stain.class, id);
+    Stain saved = (Stain) currentSession().find(Stain.class, id);
     assertEquals(name, saved.getName());
   }
 
   @Test
   public void testGetUsage() throws IOException {
-    Stain stain = (Stain) currentSession().get(Stain.class, 1L);
+    Stain stain = (Stain) currentSession().find(Stain.class, 1L);
     assertEquals("Stain One", stain.getName());
     assertEquals(0L, sut.getUsage(stain));
   }

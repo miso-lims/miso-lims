@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun;
 import java.util.List;
 import java.util.Map;
 import com.jayway.jsonpath.JsonPath;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EditArrayRunControllerST extends AbstractST {
 
@@ -27,7 +27,7 @@ public class EditArrayRunControllerST extends AbstractST {
   }
 
   private void assertDbVsModelObjects(String resultJson, int id) {
-    ArrayRun dbObject = currentSession().get(entityClass, id);
+    ArrayRun dbObject = currentSession().find(entityClass, id);
     assertEquals(dbObject.getId(), readLong(resultJson, "$.id"));
     assertEquals(dbObject.getAlias(), JsonPath.read(resultJson, "$.alias"));
   }

@@ -1,11 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.HomePage;
 import uk.ac.bbsrc.tgac.miso.webapp.integrationtest.page.ProjectPage;
@@ -14,7 +14,7 @@ public class HomePageIT extends AbstractIT {
 
   private HomePage page;
 
-  @Before
+  @BeforeEach
   public void setup() {
     page = login();
     assertNotNull(page);
@@ -24,7 +24,7 @@ public class HomePageIT extends AbstractIT {
   public void testVersion() {
     String text = page.getFooterText();
     assertNotNull(text);
-    assertTrue("Version number in footer", text.matches(".*Version: .*\\d+\\.\\d+\\.\\d+.*"));
+    assertTrue(text.matches(".*Version: .*\\d+\\.\\d+\\.\\d+.*"), "Version number in footer");
   }
 
   @Test

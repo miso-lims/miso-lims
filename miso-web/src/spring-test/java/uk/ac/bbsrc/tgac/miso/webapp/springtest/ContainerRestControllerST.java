@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
@@ -52,7 +52,7 @@ public class ContainerRestControllerST extends AbstractST {
     @Test
     public void testCreate() throws Exception {
         ContainerDto dto = new ContainerDto();
-        dto.setModel(Dtos.asDto(currentSession().get(SequencingContainerModel.class, 1)));
+        dto.setModel(Dtos.asDto(currentSession().find(SequencingContainerModel.class, 1)));
         dto.setIdentificationBarcode("NEW");
 
         SequencerPartitionContainerImpl container = baseTestCreate(CONTROLLER_BASE, dto, entityClass, 200);
@@ -63,7 +63,7 @@ public class ContainerRestControllerST extends AbstractST {
 
     @Test
     public void testUpdate() throws Exception {
-        ContainerDto dto = Dtos.asDto(currentSession().get(entityClass, 1), null);
+        ContainerDto dto = Dtos.asDto(currentSession().find(entityClass, 1), null);
         dto.setIdentificationBarcode("UPDATED");
 
         SequencerPartitionContainerImpl updated = baseTestUpdate(CONTROLLER_BASE, dto, 1, entityClass);

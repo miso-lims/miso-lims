@@ -1,14 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -27,6 +28,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.BoxRestController.ScanReques
 
 public class BoxRestControllerTest {
 
+  private AutoCloseable mockito;
+
   @InjectMocks
   private BoxRestController sut;
 
@@ -40,12 +43,17 @@ public class BoxRestControllerTest {
   @Mock
   private VisionMateScan scan;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     Map<String, BoxScanner> scanners = new HashMap<>();
     scanners.put(scannerName, boxScanner);
     sut.setBoxScanners(scanners);
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   @Test
@@ -57,7 +65,7 @@ public class BoxRestControllerTest {
     when(scan.getColumnCount()).thenReturn(box.getSize().getColumns());
     when(boxScanner.getScan()).thenReturn(scan);
     when(scan.getReadErrorPositions()).thenReturn(Arrays.asList("A01"));
-    when(boxService.get(1L)).thenReturn(box);
+    when(boxService.get(id)).thenReturn(box);
 
     ScanRequest request = new ScanRequest();
     request.setScannerName(scannerName);

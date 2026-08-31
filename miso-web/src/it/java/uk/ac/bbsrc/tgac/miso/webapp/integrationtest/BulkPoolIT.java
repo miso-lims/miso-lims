@@ -1,17 +1,16 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.webapp.integrationtest.util.HandsontableUtils.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -40,7 +39,7 @@ public class BulkPoolIT extends AbstractIT {
   private static final Set<String> libraryAliquotsToPoolColumns = Sets.newHashSet(Columns.LIBRARY_ALIQUOT_NAME, Columns.ALIAS,
       Columns.BOX_ALIAS, Columns.BOX_POSITION, Columns.LIBRARY_SIZE, Columns.POOL);
 
-  @Before
+  @BeforeEach
   public void setup() {
     login();
   }
@@ -52,7 +51,7 @@ public class BulkPoolIT extends AbstractIT {
     List<String> headings = table.getColumnHeadings();
     assertEquals(commonColumns.size(), headings.size());
     for (String col : commonColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+      assertTrue(headings.contains(col), "Check for column: '" + col + "'");
     }
     assertEquals(1, table.getRowCount());
   }
@@ -64,7 +63,7 @@ public class BulkPoolIT extends AbstractIT {
     List<String> headings = table.getColumnHeadings();
     assertEquals(commonColumns.size(), headings.size());
     for (String col : commonColumns) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+      assertTrue(headings.contains(col), "Check for column: '" + col + "'");
     }
     assertEquals(1, table.getRowCount());
   }
@@ -124,7 +123,7 @@ public class BulkPoolIT extends AbstractIT {
     List<String> headings = table.getColumnHeadings();
     assertEquals(expectedHeadings.size(), headings.size());
     for (String col : expectedHeadings) {
-      assertTrue("Check for column: '" + col + "'", headings.contains(col));
+      assertTrue(headings.contains(col), "Check for column: '" + col + "'");
     }
     assertEquals(expectedRowCount, table.getRowCount());
   }
@@ -175,7 +174,7 @@ public class BulkPoolIT extends AbstractIT {
     HandsOnTable savedTable = page.getTable();
     assertColumnValues(savedTable, 0, changes, "post-save");
 
-    Pool saved = (Pool) getSession().get(PoolImpl.class, 200001L);
+    Pool saved = (Pool) getSession().find(PoolImpl.class, 200001L);
     assertPoolAttributes(changes, saved);
   }
 
@@ -213,7 +212,7 @@ public class BulkPoolIT extends AbstractIT {
     HandsOnTable savedTable = page.getTable();
     assertColumnValues(savedTable, 0, changes, "post-save");
 
-    Pool saved = (Pool) getSession().get(PoolImpl.class, 200002L);
+    Pool saved = (Pool) getSession().find(PoolImpl.class, 200002L);
     assertPoolAttributes(changes, saved);
   }
 
@@ -251,7 +250,7 @@ public class BulkPoolIT extends AbstractIT {
     HandsOnTable savedTable = page.getTable();
     assertColumnValues(savedTable, 0, changes, "post-save");
 
-    Pool saved = (Pool) getSession().get(PoolImpl.class, 200003L);
+    Pool saved = (Pool) getSession().find(PoolImpl.class, 200003L);
     assertPoolAttributes(changes, saved);
   }
 
@@ -287,9 +286,9 @@ public class BulkPoolIT extends AbstractIT {
 
     String savedName = assertAndGetSavedName(savedTable, 0);
     attrs.put(Columns.NAME, savedName);
-    Long savedId = Long.valueOf(savedName.substring(3, savedName.length()));
+    Long savedId = Long.valueOf(savedName.substring(3));
 
-    Pool saved = (Pool) getSession().get(PoolImpl.class, savedId);
+    Pool saved = (Pool) getSession().find(PoolImpl.class, savedId);
     assertPoolAttributes(attrs, saved);
   }
 
@@ -303,7 +302,6 @@ public class BulkPoolIT extends AbstractIT {
     row0.put(Columns.NAME, null);
     row0.put(Columns.ALIAS, "IPOT_0001_Pa_P_PE_251_WG_POOL");
     row0.put(Columns.BARCODE, null);
-    row0.put(Columns.CONCENTRATION, null);
     row0.put(Columns.VOLUME, null);
     row0.put(Columns.QC_STATUS, "Not Ready");
     row0.put(Columns.CONCENTRATION, "4.0");
@@ -349,17 +347,17 @@ public class BulkPoolIT extends AbstractIT {
     String savedName1 = assertAndGetSavedName(savedTable, 1);
     row0.put(Columns.NAME, savedName0);
     row1.put(Columns.NAME, savedName1);
-    Long savedId0 = Long.valueOf(savedName0.substring(3, savedName0.length()));
-    Long savedId1 = Long.valueOf(savedName1.substring(3, savedName1.length()));
+    Long savedId0 = Long.valueOf(savedName0.substring(3));
+    Long savedId1 = Long.valueOf(savedName1.substring(3));
 
-    Pool saved0 = (Pool) getSession().get(PoolImpl.class, savedId0);
+    Pool saved0 = (Pool) getSession().find(PoolImpl.class, savedId0);
     assertPoolAttributes(row0, saved0);
-    Pool saved1 = (Pool) getSession().get(PoolImpl.class, savedId1);
+    Pool saved1 = (Pool) getSession().find(PoolImpl.class, savedId1);
     assertPoolAttributes(row1, saved1);
   }
 
   @Test
-  @Ignore // TODO: fails on Travis only for reasons unknown (Save count expected:<2> but was:<0>)
+  @Disabled // TODO: fails on Travis only for reasons unknown (Save count expected:<2> but was:<0>)
   public void testPoolCustom() throws Exception {
     BulkPoolCustomPage page = BulkPoolCustomPage.get(getDriver(), getBaseUrl(), Sets.newHashSet(504L, 505L, 701L, 702L), 2);
     HandsOnTable table = page.getTable();
@@ -403,26 +401,26 @@ public class BulkPoolIT extends AbstractIT {
     String savedName1 = assertAndGetSavedName(savedTable, 1);
     row0.put(Columns.NAME, savedName0);
     row1.put(Columns.NAME, savedName1);
-    Long savedId0 = Long.valueOf(savedName0.substring(3, savedName0.length()));
-    Long savedId1 = Long.valueOf(savedName1.substring(3, savedName1.length()));
+    Long savedId0 = Long.valueOf(savedName0.substring(3));
+    Long savedId1 = Long.valueOf(savedName1.substring(3));
 
-    Pool saved0 = (Pool) getSession().get(PoolImpl.class, savedId0);
+    Pool saved0 = (Pool) getSession().find(PoolImpl.class, savedId0);
     assertPoolAttributes(row0, saved0);
     assertEquals(2, saved0.getPoolContents().size());
     List<Long> pool0AliquotIds = saved0.getPoolContents().stream()
         .map(pd -> pd.getAliquot().getId())
-        .collect(Collectors.toList());
-    assertTrue(pool0AliquotIds.contains(Long.valueOf(504L)));
-    assertTrue(pool0AliquotIds.contains(Long.valueOf(505L)));
+        .toList();
+    assertTrue(pool0AliquotIds.contains(504L));
+    assertTrue(pool0AliquotIds.contains(505L));
 
-    Pool saved1 = (Pool) getSession().get(PoolImpl.class, savedId1);
+    Pool saved1 = (Pool) getSession().find(PoolImpl.class, savedId1);
     assertPoolAttributes(row1, saved1);
     assertEquals(2, saved1.getPoolContents().size());
     List<Long> pool1AliquotIds = saved1.getPoolContents().stream()
         .map(pd -> pd.getAliquot().getId())
-        .collect(Collectors.toList());
-    assertTrue(pool1AliquotIds.contains(Long.valueOf(701L)));
-    assertTrue(pool1AliquotIds.contains(Long.valueOf(702L)));
+        .toList();
+    assertTrue(pool1AliquotIds.contains(701L));
+    assertTrue(pool1AliquotIds.contains(702L));
   }
 
   @Test
@@ -447,9 +445,9 @@ public class BulkPoolIT extends AbstractIT {
 
     String savedName = assertAndGetSavedName(savedTable, 0);
     attrs.put(Columns.NAME, savedName);
-    Long savedId = Long.valueOf(savedName.substring(3, savedName.length()));
+    Long savedId = Long.valueOf(savedName.substring(3));
 
-    Pool saved = (Pool) getSession().get(PoolImpl.class, savedId);
+    Pool saved = (Pool) getSession().find(PoolImpl.class, savedId);
     attrs.put(Columns.VOLUME, "36.0");
     assertPoolAttributes(attrs, saved);
   }
@@ -470,9 +468,9 @@ public class BulkPoolIT extends AbstractIT {
     HandsOnTable savedTable = page.getTable();
     String savedName = assertAndGetSavedName(savedTable, 0);
     attrs.put(Columns.NAME, savedName);
-    Long savedId = Long.valueOf(savedName.substring(3, savedName.length()));
+    Long savedId = Long.valueOf(savedName.substring(3));
 
-    Pool saved = (Pool) getSession().get(PoolImpl.class, savedId);
+    Pool saved = (Pool) getSession().find(PoolImpl.class, savedId);
     assertPoolAttributes(attrs, saved);
   }
 
@@ -511,15 +509,15 @@ public class BulkPoolIT extends AbstractIT {
     row0.put(Columns.NAME, savedName0);
     row1.put(Columns.NAME, savedName1);
 
-    Long savedId0 = Long.valueOf(savedName0.substring(3, savedName0.length()));
-    Long savedId1 = Long.valueOf(savedName1.substring(3, savedName1.length()));
+    Long savedId0 = Long.valueOf(savedName0.substring(3));
+    Long savedId1 = Long.valueOf(savedName1.substring(3));
 
     row0.put(Columns.VOLUME, "14.7");
     row1.put(Columns.VOLUME, "21.3");
 
-    Pool saved0 = (Pool) getSession().get(PoolImpl.class, savedId0);
+    Pool saved0 = (Pool) getSession().find(PoolImpl.class, savedId0);
     assertPoolAttributes(row0, saved0);
-    Pool saved1 = (Pool) getSession().get(PoolImpl.class, savedId1);
+    Pool saved1 = (Pool) getSession().find(PoolImpl.class, savedId1);
     assertPoolAttributes(row1, saved1);
   }
 
@@ -550,12 +548,12 @@ public class BulkPoolIT extends AbstractIT {
     row0.put(Columns.NAME, savedName0);
     row1.put(Columns.NAME, savedName1);
 
-    Long savedId0 = Long.valueOf(savedName0.substring(3, savedName0.length()));
-    Long savedId1 = Long.valueOf(savedName1.substring(3, savedName1.length()));
+    Long savedId0 = Long.valueOf(savedName0.substring(3));
+    Long savedId1 = Long.valueOf(savedName1.substring(3));
 
-    Pool saved0 = (Pool) getSession().get(PoolImpl.class, savedId0);
+    Pool saved0 = (Pool) getSession().find(PoolImpl.class, savedId0);
     assertPoolAttributes(row0, saved0);
-    Pool saved1 = (Pool) getSession().get(PoolImpl.class, savedId1);
+    Pool saved1 = (Pool) getSession().find(PoolImpl.class, savedId1);
     assertPoolAttributes(row1, saved1);
   }
 
@@ -585,7 +583,7 @@ public class BulkPoolIT extends AbstractIT {
     HandsOnTable savedTable = page.getTable();
     assertColumnValues(savedTable, 0, attrs, "first edit post-save");
 
-    Pool saved = (Pool) getSession().get(PoolImpl.class, 200004L);
+    Pool saved = (Pool) getSession().find(PoolImpl.class, 200004L);
     assertPoolAttributes(attrs, saved);
 
     BulkPoolPage page2 = page.chainEdit();
@@ -602,7 +600,7 @@ public class BulkPoolIT extends AbstractIT {
     HandsOnTable savedTable2 = page2.getTable();
     assertColumnValues(savedTable2, 0, attrs, "second edit post-save");
 
-    Pool saved2 = (Pool) getSession().get(PoolImpl.class, 200004L);
+    Pool saved2 = (Pool) getSession().find(PoolImpl.class, 200004L);
     assertPoolAttributes(attrs, saved2);
   }
 
@@ -638,9 +636,9 @@ public class BulkPoolIT extends AbstractIT {
 
     String savedName = assertAndGetSavedName(savedTable, 0);
     attrs.put(Columns.NAME, savedName);
-    Long savedId = Long.valueOf(savedName.substring(3, savedName.length()));
+    Long savedId = Long.valueOf(savedName.substring(3));
 
-    Pool saved = (Pool) getSession().get(PoolImpl.class, savedId);
+    Pool saved = (Pool) getSession().find(PoolImpl.class, savedId);
     assertPoolAttributes(attrs, saved);
 
     BulkPoolPage page2 = page.chainEdit();
@@ -657,7 +655,7 @@ public class BulkPoolIT extends AbstractIT {
     HandsOnTable savedTable2 = page2.getTable();
     assertColumnValues(savedTable2, 0, attrs, "edits post-save");
 
-    Pool saved2 = (Pool) getSession().get(PoolImpl.class, savedId);
+    Pool saved2 = (Pool) getSession().find(PoolImpl.class, savedId);
     assertPoolAttributes(attrs, saved2);
   }
 
@@ -697,9 +695,9 @@ public class BulkPoolIT extends AbstractIT {
 
     String savedName = assertAndGetSavedName(savedTable, 0);
     changes.put(Columns.NAME, savedName);
-    Long savedId = Long.valueOf(savedName.substring(3, savedName.length()));
+    Long savedId = Long.valueOf(savedName.substring(3));
 
-    Pool saved = (Pool) getSession().get(PoolImpl.class, savedId);
+    Pool saved = (Pool) getSession().find(PoolImpl.class, savedId);
     assertPoolAttributes(changes, saved);
 
     assertLibraryAliquotViews(saved, Lists.newArrayList(120001L, 200001L, 200002L), Lists.newArrayList(3, 2, 1));
@@ -715,14 +713,14 @@ public class BulkPoolIT extends AbstractIT {
   }
 
   private static void assertLibraryAliquotViews(Pool pool, List<Long> ids, List<Integer> proportions) {
-    assertTrue("Incorrect number of pooled elements in pool", pool.getPoolContents().size() == ids.size());
+    assertEquals(ids.size(), pool.getPoolContents().size(), "Incorrect number of pooled elements in pool");
     for (int i = 0; i < ids.size(); i++) {
       final Long id = ids.get(i);
       PoolElement poolElement = pool.getPoolContents().stream()
           .filter(pd -> Long.valueOf(pd.getAliquot().getId()).equals(id))
           .findFirst().orElse(null);
-      assertNotNull("Pool does not contain element with id " + id, poolElement);
-      assertEquals("Saved PoolElement has incorrect proportion", proportions.get(i), Integer.valueOf(poolElement.getProportion()));
+      assertNotNull(poolElement, "Pool does not contain element with id " + id);
+      assertEquals(proportions.get(i), Integer.valueOf(poolElement.getProportion()), "Saved PoolElement has incorrect proportion");
     }
   }
 

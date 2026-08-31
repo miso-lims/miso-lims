@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 import com.eaglegenomics.simlims.core.User;
 
@@ -16,6 +17,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -24,6 +26,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment.RunPartition.RunPartitionId;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
@@ -31,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.ExperimentChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * An Experiment contains design information about a sequencing experiment, as part of a parent
@@ -41,8 +45,55 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 public class Experiment implements Comparable<Experiment>, Nameable, ChangeLoggable, Deletable, Serializable {
   @Entity
   @Table(name = "Experiment_Run_Partition")
+  @IdClass(RunPartitionId.class)
   public static class RunPartition implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    public static class RunPartitionId implements Serializable {
+
+      private static final long serialVersionUID = 1L;
+
+      private Experiment experiment;
+      private Partition partition;
+      private Run run;
+
+      public Experiment getExperiment() {
+        return experiment;
+      }
+
+      public void setExperiment(Experiment experiment) {
+        this.experiment = experiment;
+      }
+
+      public Partition getPartition() {
+        return partition;
+      }
+
+      public void setPartition(Partition partition) {
+        this.partition = partition;
+      }
+
+      public Run getRun() {
+        return run;
+      }
+
+      public void setRun(Run run) {
+        this.run = run;
+      }
+
+      @Override
+      public int hashCode() {
+        return Objects.hash(experiment, partition, run);
+      }
+
+      @Override
+      public boolean equals(Object obj) {
+        return LimsUtils.equals(this, obj, RunPartitionId::getExperiment, RunPartitionId::getPartition,
+            RunPartitionId::getRun);
+      }
+
+    }
+
     @Id
     @ManyToOne
     @JoinColumn(name = "experiment_experimentId")
@@ -51,6 +102,7 @@ public class Experiment implements Comparable<Experiment>, Nameable, ChangeLogga
     @ManyToOne(targetEntity = PartitionImpl.class)
     @JoinColumn(name = "partition_partitionId")
     private Partition partition;
+    @Id
     @ManyToOne
     @JoinColumn(name = "run_runId")
     private Run run;

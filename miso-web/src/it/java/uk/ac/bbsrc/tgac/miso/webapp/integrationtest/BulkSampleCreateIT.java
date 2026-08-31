@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.integrationtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.util.Collections;
@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Sets;
 
@@ -131,7 +131,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     assertEquals("GENOMIC", table.getText(SamColumns.SAMPLE_TYPE, 0));
 
     Set<String> projects = table.getDropdownOptions(SamColumns.PROJECT, 0);
-    assertTrue(projects.size() > 0);
+    assertFalse(projects.isEmpty());
     assertTrue(projects.contains("PONE"));
 
     table.enterText(SamColumns.PROJECT, 0, "PONE");
@@ -184,10 +184,10 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     BulkSamplePage page = getCreatePage(1, null, SampleTissue.CATEGORY_NAME);
     HandsOnTable table = page.getTable();
 
-    assertTrue("identity alias is empty", isStringEmptyOrNull(table.getText(SamColumns.IDENTITY_ALIAS, 0)));
+    assertTrue(isStringEmptyOrNull(table.getText(SamColumns.IDENTITY_ALIAS, 0)), "identity alias is empty");
     table.enterText(SamColumns.IDENTITY_ALIAS, 0, "Identity 1");
     table.waitForSearch(SamColumns.IDENTITY_ALIAS, 0);
-    assertTrue("identity alias no longer empty", !isStringEmptyOrNull(table.getText(SamColumns.IDENTITY_ALIAS, 0)));
+    assertFalse(isStringEmptyOrNull(table.getText(SamColumns.IDENTITY_ALIAS, 0)), "identity alias no longer empty");
   }
 
   @Test
@@ -278,13 +278,13 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     assertTrue(page.save(false));
     HandsOnTable savedTable = page.getTable();
 
-    String newId = savedTable.getText(SamColumns.NAME, 0).substring(3, savedTable.getText(SamColumns.NAME, 0).length());
+    String newId = savedTable.getText(SamColumns.NAME, 0).substring(3);
 
     // verify attributes against what got saved to the database
-    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleTissue created = (SampleTissue) getSession().get(SampleTissueImpl.class, Long.valueOf(newId));
+    Project predefined = (Project) getSession().find(ProjectImpl.class, projectId);
+    SampleTissue created = (SampleTissue) getSession().find(SampleTissueImpl.class, Long.valueOf(newId));
 
-    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
+    assertEquals(predefined.getCode(), created.getProject().getCode(), "confirm project");
     // everything else should be the same as in testCreateOneTissueNoProject() since the `pack` methods
     // do not differ
   }
@@ -337,14 +337,14 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Long newId = getIdForRow(savedTable, 0);
 
     // verify attributes against what got saved to the database
-    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleTissue created = (SampleTissue) getSession().get(SampleTissueImpl.class, newId);
+    Project predefined = (Project) getSession().find(ProjectImpl.class, projectId);
+    SampleTissue created = (SampleTissue) getSession().find(SampleTissueImpl.class, newId);
 
-    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
+    assertEquals(predefined.getCode(), created.getProject().getCode(), "confirm project");
     String row0Alias = savedTable.getText(SamColumns.ALIAS, 0);
     String row1Alias = savedTable.getText(SamColumns.ALIAS, 1);
-    assertFalse("confirm alias generated", isStringEmptyOrNull(row0Alias));
-    assertEquals("confirm same identity alias", row0Alias.substring(0, 9), row1Alias.substring(0, 9));
+    assertFalse(isStringEmptyOrNull(row0Alias), "confirm alias generated");
+    assertEquals(row0Alias.substring(0, 9), row1Alias.substring(0, 9), "confirm same identity alias");
     // everything else should be the same as in testCreateOneTissueNoProject() since the `pack` methods
     // do not differ
   }
@@ -484,10 +484,10 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Long newId = getIdForRow(savedTable, 0);
 
     // verify attributes against what got saved to the database
-    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleSlide created = (SampleSlide) getSession().get(SampleSlideImpl.class, newId);
+    Project predefined = (Project) getSession().find(ProjectImpl.class, projectId);
+    SampleSlide created = (SampleSlide) getSession().find(SampleSlideImpl.class, newId);
 
-    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
+    assertEquals(predefined.getCode(), created.getProject().getCode(), "confirm project");
     // everything else should be the same as in testCreateOneSlideNoProject()
   }
 
@@ -584,10 +584,10 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Long newId = getIdForRow(savedTable, 0);
 
     // verify attributes against what got saved to the database
-    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleTissueProcessing created = (SampleTissueProcessing) getSession().get(SampleTissueProcessingImpl.class, newId);
+    Project predefined = (Project) getSession().find(ProjectImpl.class, projectId);
+    SampleTissueProcessing created = (SampleTissueProcessing) getSession().find(SampleTissueProcessingImpl.class, newId);
 
-    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
+    assertEquals(predefined.getCode(), created.getProject().getCode(), "confirm project");
     // everything else should be the same as in testCreateOneCurlsNoProject
   }
 
@@ -767,11 +767,11 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     HandsOnTable savedTable = page.getTable();
 
     // verify attributes against what got saved to the database
-    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
+    Project predefined = (Project) getSession().find(ProjectImpl.class, projectId);
     SampleStock created =
-        (SampleStock) getSession().get(SampleStockImpl.class, Long.valueOf(getIdForRow(savedTable, 0)));
+        (SampleStock) getSession().find(SampleStockImpl.class, getIdForRow(savedTable, 0));
 
-    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
+    assertEquals(predefined.getCode(), created.getProject().getCode(), "confirm project");
     // everything else should be the same as in testCreateOneGdnaStockNoProject
   }
 
@@ -923,10 +923,10 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Long newId = getIdForRow(savedTable, 0);
 
     // verify attributes against what got saved to the database
-    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleStock created = (SampleStock) getSession().get(SampleStockImpl.class, newId);
+    Project predefined = (Project) getSession().find(ProjectImpl.class, projectId);
+    SampleStock created = (SampleStock) getSession().find(SampleStockImpl.class, newId);
 
-    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
+    assertEquals(predefined.getCode(), created.getProject().getCode(), "confirm project");
     // everything else should be the same as in testCreateOneRnaStockNoProject
   }
 
@@ -1057,10 +1057,10 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Long newId = getIdForRow(savedTable, 0);
 
     // verify attributes against what got saved to the database
-    Project predefined = (Project) getSession().get(ProjectImpl.class, projectId);
-    SampleAliquot created = (SampleAliquot) getSession().get(SampleAliquotImpl.class, newId);
+    Project predefined = (Project) getSession().find(ProjectImpl.class, projectId);
+    SampleAliquot created = (SampleAliquot) getSession().find(SampleAliquotImpl.class, newId);
 
-    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
+    assertEquals(predefined.getCode(), created.getProject().getCode(), "confirm project");
     // everything else should be the same as in testCreateOneGdnaAliquotNoProject
   }
 
@@ -1239,7 +1239,7 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     assertEquals("GENOMIC", table.getText(SamColumns.SAMPLE_TYPE, 0));
 
     Set<String> projects = table.getDropdownOptions(SamColumns.PROJECT, 0);
-    assertTrue(projects.size() > 0);
+    assertFalse(projects.isEmpty());
     assertTrue(projects.contains("PONE"));
 
     table.enterText(SamColumns.PROJECT, 0, "PONE");
@@ -1317,16 +1317,16 @@ public class BulkSampleCreateIT extends AbstractBulkSampleIT {
     Long newId = getIdForRow(savedTable, 0);
 
     // verify attributes on the Edit single Sample page
-    Project predefined = (Project) getSession().get(ProjectImpl.class, 2L);
-    SampleIdentity created = (SampleIdentity) getSession().get(SampleIdentityImpl.class, newId);
+    Project predefined = (Project) getSession().find(ProjectImpl.class, 2L);
+    SampleIdentity created = (SampleIdentity) getSession().find(SampleIdentityImpl.class, newId);
 
-    assertEquals("confirm project", predefined.getCode(), created.getProject().getCode());
+    assertEquals(predefined.getCode(), created.getProject().getCode(), "confirm project");
     // rest should be same as testCreateOneIdentityNoProject
   }
 
   private void assertIdentityLookupWasSuccessful(HandsOnTable table, int rowNum) {
     table.waitForSearch(SamColumns.IDENTITY_ALIAS, rowNum);
-    assertEquals("identity lookup was successful", "First Receipt (PONE)", table.getText(SamColumns.IDENTITY_ALIAS, 0));
+    assertEquals("First Receipt (PONE)", table.getText(SamColumns.IDENTITY_ALIAS, 0), "identity lookup was successful");
   }
 
   @Test

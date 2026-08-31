@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -12,7 +12,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.view.ListPoolsController;
 import uk.ac.bbsrc.tgac.miso.core.service.PoolService;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,7 +27,7 @@ public class ListPoolsControllerST extends AbstractST {
 
     @Test
     public void testGetPoolsPage() throws Exception {
-        PoolImpl pool = currentSession().get(PoolImpl.class, 1L);
+        PoolImpl pool = currentSession().find(PoolImpl.class, 1L);
         assertNotNull(pool);
         assertNotNull(pool.getPlatformType());
 

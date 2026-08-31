@@ -39,6 +39,10 @@ public interface InstrumentStore extends SaveDao<Instrument>, PaginatedDataSourc
 
   long getUsageByQcs(Instrument instrument) throws IOException;
 
+  long getUsageByRunSopFieldValues(Instrument instrument) throws IOException;
+
+  long getUsageBySampleSopFieldValues(Instrument instrument) throws IOException;
+
   Instrument getByServiceRecord(ServiceRecord record) throws IOException;
 
 }

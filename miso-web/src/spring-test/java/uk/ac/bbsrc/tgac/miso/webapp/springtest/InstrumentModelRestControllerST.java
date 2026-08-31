@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentDataManglingPolicy;
@@ -10,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.dto.InstrumentModelDto;
 
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.Arrays;
 
 import org.springframework.web.servlet.*;
@@ -24,7 +24,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.jayway.jsonpath.JsonPath;
 import static org.hamcrest.Matchers.*;
 import org.springframework.security.test.context.support.WithMockUser;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 
@@ -78,7 +78,7 @@ public class InstrumentModelRestControllerST extends AbstractST {
   public void testUpdate() throws Exception {
     // must be admin to update instrument model
 
-    InstrumentModelDto model = Dtos.asDto(currentSession().get(entityClass, 1));
+    InstrumentModelDto model = Dtos.asDto(currentSession().find(entityClass, 1));
     model.setAlias("updated");
     InstrumentModel updated = baseTestUpdate(CONTROLLER_BASE, model, 1, entityClass);
     assertEquals("updated", updated.getAlias());
@@ -88,7 +88,7 @@ public class InstrumentModelRestControllerST extends AbstractST {
   public void testUpdateFail() throws Exception {
     // must be admin to update instrument model
 
-    InstrumentModelDto model = Dtos.asDto(currentSession().get(entityClass, 1));
+    InstrumentModelDto model = Dtos.asDto(currentSession().find(entityClass, 1));
     model.setAlias("updated");
     testUpdateUnauthorized(CONTROLLER_BASE, model, 1, entityClass);
   }

@@ -1,14 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 public class ExperimentTest {
   private Experiment ae;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     ae = new Experiment();
   }

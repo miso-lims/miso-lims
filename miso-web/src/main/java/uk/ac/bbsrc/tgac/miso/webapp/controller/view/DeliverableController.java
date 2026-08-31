@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DeliverableCategory;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
@@ -78,7 +77,7 @@ public class DeliverableController extends AbstractTypeDataController<Deliverabl
   }
 
   @Override
-  protected void addHotConfig(ObjectNode config, ObjectMapper mapper) throws IOException {
+  protected void addHotConfig(ObjectNode config, JsonMapper mapper) throws IOException {
     List<DeliverableCategory> categories = deliverableCategoryService.list();
     MisoWebUtils.addJsonArray(mapper, config, "categories", categories, DeliverableCategoryDto::from);
   }

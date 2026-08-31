@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
@@ -58,7 +58,7 @@ public class IndexCheckerTest {
 
   private IndexChecker sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new IndexChecker();
     sut.setErrorMismatches(1);

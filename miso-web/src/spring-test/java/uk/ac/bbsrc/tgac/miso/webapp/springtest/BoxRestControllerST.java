@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.*;
@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.BoxRestController.ScanReques
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Arrays;
@@ -45,7 +45,7 @@ public class BoxRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
-    BoxImpl updatedBox = currentSession().get(entityClass, 1L);
+    BoxImpl updatedBox = currentSession().find(entityClass, 1L);
     assertNotNull(updatedBox);
     assertFalse(updatedBox.isFreePosition("C04"));
     assertNotNull(updatedBox.getBoxPositions().get("C04"));
@@ -55,7 +55,7 @@ public class BoxRestControllerST extends AbstractST {
 
   @Test
   public void testSearch() throws Exception {
-    baseSearchByTerm(CONTROLLER_BASE + "/search", "BOX501", Arrays.asList(501));
+    baseSearchByTerm(CONTROLLER_BASE + "/search", "BOX501", List.of(501));
   }
 
   @Test
@@ -83,20 +83,20 @@ public class BoxRestControllerST extends AbstractST {
         .getResponse()
         .getContentAsString();
 
-    BoxImpl box1 = currentSession().get(entityClass, 1L);
-    BoxImpl box2 = currentSession().get(entityClass, 2L);
+    BoxImpl box1 = currentSession().find(entityClass, 1L);
+    BoxImpl box2 = currentSession().find(entityClass, 2L);
 
     assertNotNull(box1);
     assertNotNull(box2);
     assertNotNull(csvContent);
     assertFalse(csvContent.isEmpty());
-    assertTrue("CSV should contain box 1 alias", csvContent.contains(box1.getAlias()));
-    assertTrue("CSV should contain box 2 alias", csvContent.contains(box2.getAlias()));
+    assertTrue(csvContent.contains(box1.getAlias()), "CSV should contain box 1 alias");
+    assertTrue(csvContent.contains(box2.getAlias()), "CSV should contain box 2 alias");
   }
 
   @Test
   public void testRemoveSingleItem() throws Exception {
-    BoxImpl boxBefore = currentSession().get(entityClass, 1L);
+    BoxImpl boxBefore = currentSession().find(entityClass, 1L);
     assertNotNull(boxBefore);
     assertFalse(boxBefore.isFreePosition("A07"));
 
@@ -104,14 +104,14 @@ public class BoxRestControllerST extends AbstractST {
         .perform(delete(CONTROLLER_BASE + "/1/positions/A07"))
         .andExpect(status().isOk());
 
-    BoxImpl box = currentSession().get(entityClass, 1L);
+    BoxImpl box = currentSession().find(entityClass, 1L);
     assertNotNull(box);
     assertTrue(box.isFreePosition("A07"));
   }
 
   @Test
   public void testRemoveMultipleItems() throws Exception {
-    BoxImpl boxBefore = currentSession().get(entityClass, 1L);
+    BoxImpl boxBefore = currentSession().find(entityClass, 1L);
     assertNotNull(boxBefore);
     assertFalse(boxBefore.isFreePosition("A07"));
     assertFalse(boxBefore.isFreePosition("B05"));
@@ -123,7 +123,7 @@ public class BoxRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
-    BoxImpl box = currentSession().get(entityClass, 1L);
+    BoxImpl box = currentSession().find(entityClass, 1L);
     assertNotNull(box);
     assertTrue(box.isFreePosition("A07"));
     assertTrue(box.isFreePosition("B05"));
@@ -131,11 +131,11 @@ public class BoxRestControllerST extends AbstractST {
 
   @Test
   public void testDiscardSingleItem() throws Exception {
-    BoxImpl boxBefore = currentSession().get(entityClass, 1L);
+    BoxImpl boxBefore = currentSession().find(entityClass, 1L);
     assertNotNull(boxBefore);
     assertFalse(boxBefore.isFreePosition("A07"));
 
-    SampleImpl sampleBefore = currentSession().get(SampleImpl.class, 205L);
+    SampleImpl sampleBefore = currentSession().find(SampleImpl.class, 205L);
     assertNotNull(sampleBefore);
     assertFalse(sampleBefore.isDiscarded());
 
@@ -143,24 +143,24 @@ public class BoxRestControllerST extends AbstractST {
         .perform(post(CONTROLLER_BASE + "/1/positions/A07/discard"))
         .andExpect(status().isOk());
 
-    BoxImpl box = currentSession().get(entityClass, 1L);
+    BoxImpl box = currentSession().find(entityClass, 1L);
     assertNotNull(box);
     assertTrue(box.isFreePosition("A07"));
 
-    SampleImpl sample = currentSession().get(SampleImpl.class, 205L);
+    SampleImpl sample = currentSession().find(SampleImpl.class, 205L);
     assertNotNull(sample);
     assertTrue(sample.isDiscarded());
   }
 
   @Test
   public void testDiscardMultipleItems() throws Exception {
-    BoxImpl boxBefore = currentSession().get(entityClass, 1L);
+    BoxImpl boxBefore = currentSession().find(entityClass, 1L);
     assertNotNull(boxBefore);
     assertFalse(boxBefore.isFreePosition("A07"));
     assertFalse(boxBefore.isFreePosition("B05"));
 
-    SampleImpl sample205Before = currentSession().get(SampleImpl.class, 205L);
-    SampleImpl sample206Before = currentSession().get(SampleImpl.class, 206L);
+    SampleImpl sample205Before = currentSession().find(SampleImpl.class, 205L);
+    SampleImpl sample206Before = currentSession().find(SampleImpl.class, 206L);
     assertNotNull(sample205Before);
     assertNotNull(sample206Before);
     assertFalse(sample205Before.isDiscarded());
@@ -173,23 +173,23 @@ public class BoxRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
-    BoxImpl box = currentSession().get(entityClass, 1L);
+    BoxImpl box = currentSession().find(entityClass, 1L);
     assertNotNull(box);
     assertTrue(box.isFreePosition("A07"));
     assertTrue(box.isFreePosition("B05"));
 
-    SampleImpl sample205 = currentSession().get(SampleImpl.class, 205L);
+    SampleImpl sample205 = currentSession().find(SampleImpl.class, 205L);
     assertNotNull(sample205);
     assertTrue(sample205.isDiscarded());
 
-    SampleImpl sample206 = currentSession().get(SampleImpl.class, 206L);
+    SampleImpl sample206 = currentSession().find(SampleImpl.class, 206L);
     assertNotNull(sample206);
     assertTrue(sample206.isDiscarded());
   }
 
   @Test
   public void testDiscardEntireBox() throws Exception {
-    BoxImpl boxBefore = currentSession().get(entityClass, 1L);
+    BoxImpl boxBefore = currentSession().find(entityClass, 1L);
     assertNotNull(boxBefore);
     int initialFreeCount = boxBefore.getFreeCount();
     assertTrue(initialFreeCount < 96);
@@ -198,7 +198,7 @@ public class BoxRestControllerST extends AbstractST {
         .perform(post(CONTROLLER_BASE + "/1/discard-all"))
         .andExpect(status().isNoContent());
 
-    BoxImpl box = currentSession().get(entityClass, 1L);
+    BoxImpl box = currentSession().find(entityClass, 1L);
     assertNotNull(box);
     assertEquals(96, box.getFreeCount());
   }
@@ -221,7 +221,7 @@ public class BoxRestControllerST extends AbstractST {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
 
-    BoxImpl updatedBox = currentSession().get(entityClass, 1L);
+    BoxImpl updatedBox = currentSession().find(entityClass, 1L);
     assertNotNull(updatedBox);
     assertFalse(updatedBox.isFreePosition("A07"));
     assertFalse(updatedBox.isFreePosition("C06"));
@@ -240,7 +240,7 @@ public class BoxRestControllerST extends AbstractST {
             .param("storageId", "7"))
         .andExpect(status().isAccepted());
 
-    BoxImpl box = currentSession().get(entityClass, 1L);
+    BoxImpl box = currentSession().find(entityClass, 1L);
     assertNotNull(box);
     assertNotNull(box.getStorageLocation());
     assertEquals(7L, box.getStorageLocation().getId());
@@ -264,13 +264,13 @@ public class BoxRestControllerST extends AbstractST {
 
   @Test
   public void testUpdateBox() throws Exception {
-    BoxImpl box = currentSession().get(entityClass, 1L);
+    BoxImpl box = currentSession().find(entityClass, 1L);
     assertNotNull(box);
     String originalAlias = box.getAlias();
     assertNotNull(originalAlias);
     box.setAlias("changed");
 
-    List<BoxDto> dtos = Dtos.asBoxDtosWithPositions(Arrays.asList(box));
+    List<BoxDto> dtos = Dtos.asBoxDtosWithPositions(List.of(box));
     BoxImpl updatedBox = baseTestUpdate(CONTROLLER_BASE, dtos.get(0), 1, entityClass);
     assertNotNull(updatedBox);
     assertEquals("changed", updatedBox.getAlias());
@@ -290,7 +290,7 @@ public class BoxRestControllerST extends AbstractST {
 
     BoxImpl box1 = createdBoxes.get(0);
     assertNotNull(box1);
-    assertNotNull(box1.getId());
+    assertNotEquals(0L, box1.getId());
     assertEquals("the first", box1.getAlias());
     assertNotNull(box1.getName());
     assertNotNull(box1.getSize());
@@ -300,7 +300,7 @@ public class BoxRestControllerST extends AbstractST {
 
     BoxImpl box2 = createdBoxes.get(1);
     assertNotNull(box2);
-    assertNotNull(box2.getId());
+    assertNotEquals(0L, box2.getId());
     assertEquals("the second", box2.getAlias());
     assertNotNull(box2.getName());
     assertNotNull(box2.getSize());
@@ -313,8 +313,8 @@ public class BoxRestControllerST extends AbstractST {
 
   @Test
   public void testBulkUpdateAsync() throws Exception {
-    BoxImpl box1 = currentSession().get(entityClass, 1L);
-    BoxImpl box2 = currentSession().get(entityClass, 2L);
+    BoxImpl box1 = currentSession().find(entityClass, 1L);
+    BoxImpl box2 = currentSession().find(entityClass, 2L);
     assertNotNull(box1);
     assertNotNull(box2);
 
@@ -342,12 +342,12 @@ public class BoxRestControllerST extends AbstractST {
   @Test
   @WithMockUser(username = "admin", roles = {"INTERNAL", "ADMIN"})
   public void testBulkDelete() throws Exception {
-    BoxImpl boxBefore = currentSession().get(entityClass, 100001L);
+    BoxImpl boxBefore = currentSession().find(entityClass, 100001L);
     assertNotNull(boxBefore);
 
     testBulkDelete(entityClass, 100001, CONTROLLER_BASE);
 
-    BoxImpl boxAfter = currentSession().get(entityClass, 100001L);
+    BoxImpl boxAfter = currentSession().find(entityClass, 100001L);
     assertNull(boxAfter);
   }
 
@@ -359,7 +359,7 @@ public class BoxRestControllerST extends AbstractST {
 
   @Test
   public void testFillByPattern() throws Exception {
-    BoxImpl boxBefore = currentSession().get(entityClass, 1L);
+    BoxImpl boxBefore = currentSession().find(entityClass, 1L);
     assertNotNull(boxBefore);
     int initialCount = boxBefore.getBoxPositions().size();
 
@@ -369,12 +369,11 @@ public class BoxRestControllerST extends AbstractST {
             .param("suffix", "standard"))
         .andExpect(status().isNoContent());
 
-    BoxImpl boxAfter = currentSession().get(entityClass, 1L);
+    BoxImpl boxAfter = currentSession().find(entityClass, 1L);
     assertNotNull(boxAfter);
     int finalCount = boxAfter.getBoxPositions().size();
 
-    assertTrue("Fill-by-pattern should result in valid box state", finalCount >= 0);
-    assertTrue("Final count should not exceed capacity", finalCount <= 96);
+    assertTrue(finalCount <= 96, "Final count should not exceed capacity");
   }
 
   @Test
@@ -389,9 +388,9 @@ public class BoxRestControllerST extends AbstractST {
 
     assertNotNull(sheetContent);
     assertFalse(sheetContent.isEmpty());
-    assertTrue("Sheet should contain position A01", sheetContent.contains("A01"));
-    assertTrue("Sheet should contain position H12", sheetContent.contains("H12"));
-    assertTrue("Sheet should contain Ladder", sheetContent.contains("Ladder"));
+    assertTrue(sheetContent.contains("A01"), "Sheet should contain position A01");
+    assertTrue(sheetContent.contains("H12"), "Sheet should contain position H12");
+    assertTrue(sheetContent.contains("Ladder"), "Sheet should contain Ladder");
   }
 
   private List<BoxDto> makeCreateDtos() {

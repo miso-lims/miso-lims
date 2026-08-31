@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
@@ -17,7 +17,7 @@ public class HibernateLibraryTypeDaoIT extends AbstractDAOTest {
 
   private HibernateLibraryTypeDao sut;
 
-  @Before
+  @BeforeEach
   public void setup() {
     sut = new HibernateLibraryTypeDao();
     sut.setEntityManager(getEntityManager());
@@ -75,7 +75,7 @@ public class HibernateLibraryTypeDaoIT extends AbstractDAOTest {
 
     clearSession();
 
-    LibraryType saved = (LibraryType) currentSession().get(LibraryType.class, savedId);
+    LibraryType saved = (LibraryType) currentSession().find(LibraryType.class, savedId);
     assertEquals(desc, saved.getDescription());
   }
 
@@ -83,27 +83,27 @@ public class HibernateLibraryTypeDaoIT extends AbstractDAOTest {
   public void testUpdate() throws IOException {
     long id = 1L;
     String desc = "New Desc";
-    LibraryType type = (LibraryType) currentSession().get(LibraryType.class, id);
+    LibraryType type = (LibraryType) currentSession().find(LibraryType.class, id);
     assertNotEquals(desc, type.getDescription());
     type.setDescription(desc);
     sut.update(type);
 
     clearSession();
 
-    LibraryType saved = (LibraryType) currentSession().get(LibraryType.class, id);
+    LibraryType saved = (LibraryType) currentSession().find(LibraryType.class, id);
     assertEquals(desc, saved.getDescription());
   }
 
   @Test
   public void testGetUsageByLibraries() throws IOException {
-    LibraryType type = (LibraryType) currentSession().get(LibraryType.class, 3L);
+    LibraryType type = (LibraryType) currentSession().find(LibraryType.class, 3L);
     assertEquals("mRNA Seq", type.getDescription());
     assertEquals(15L, sut.getUsageByLibraries(type));
   }
 
   @Test
   public void testGetUsageByLibraryTemplates() throws IOException {
-    LibraryType type = (LibraryType) currentSession().get(LibraryType.class, 1L);
+    LibraryType type = (LibraryType) currentSession().find(LibraryType.class, 1L);
     assertEquals("Paired End", type.getDescription());
     assertEquals(0L, sut.getUsageByLibraryTemplates(type));
   }

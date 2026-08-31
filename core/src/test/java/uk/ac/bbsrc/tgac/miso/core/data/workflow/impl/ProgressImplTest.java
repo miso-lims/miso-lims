@@ -1,14 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.core.data.workflow.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.Progress;
 import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
@@ -16,7 +16,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.workflow.ProgressStep;
 public class ProgressImplTest {
   private Progress progress;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     progress = new ProgressImpl();
     progress.setSteps(Collections.emptyList());

@@ -1,14 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.service.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -30,17 +31,23 @@ import uk.ac.bbsrc.tgac.miso.core.service.exception.ValidationError;
 
 public class DefaultTransferServiceTest {
 
+  private AutoCloseable mockito;
+
   @Mock
   private AuthorizationManager authorizationManager;
 
   @InjectMocks
   private DefaultTransferService sut;
 
-  @Before
+  @BeforeEach
   public void setup() throws IOException {
-    MockitoAnnotations.initMocks(this);
+    mockito = MockitoAnnotations.openMocks(this);
     setUser(true);
+  }
 
+  @AfterEach
+  public void cleanUp() throws Exception {
+    mockito.close();
   }
 
   private void setUser(boolean isAdmin, Group... groups) throws IOException {
