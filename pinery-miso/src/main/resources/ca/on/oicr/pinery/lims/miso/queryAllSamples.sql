@@ -28,7 +28,7 @@ SELECT s.alias NAME
         ,s.donorSex sex
         ,tor.alias tissue_origin
         ,tm.alias tissue_preparation
-        ,s.region tissue_region
+        ,COALESCE(s.region, tissueRow.region) tissue_region
         ,s.timepoint timepoint
         ,s.secondaryIdentifier tube_id
         ,s.strStatus str_result
@@ -91,6 +91,8 @@ LEFT JOIN SamplePurpose sp ON sp.samplePurposeId = s.samplePurposeId
 LEFT JOIN TissueType tt ON tt.tissueTypeId = s.tissueTypeId
 LEFT JOIN TissueOrigin tor ON tor.tissueOriginId = s.tissueOriginId 
 LEFT JOIN TissueMaterial tm ON tm.tissueMaterialId = s.tissueMaterialId
+LEFT JOIN SampleHierarchy sh ON sh.sampleId = s.sampleId
+LEFT JOIN Sample tissueRow ON tissueRow.sampleId = sh.tissueId
 LEFT JOIN Lab la ON s.labId = la.labId
 LEFT JOIN Sample refSlide ON refSlide.sampleId = s.referenceSlideId
 LEFT JOIN Stain stain ON stain.stainId = s.stain
