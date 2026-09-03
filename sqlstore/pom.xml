@@ -154,16 +154,20 @@
           <password>tgaclims</password>
           <url>jdbc:mysql://localhost:3306/lims?characterEncoding=UTF-8</url>
           <outOfOrder>true</outOfOrder>
-          <ignoreMissingMigrations>true</ignoreMissingMigrations>
+          <ignoreMigrationPatterns>
+            <ignoreMigrationPattern>*:missing</ignoreMigrationPattern>
+          </ignoreMigrationPatterns>
           <locations>
-            <location>classpath:db.migration</location>
+            <location>filesystem:src/main/resources/db/migration</location>
             <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
           </locations>
           <placeholderReplacement>true</placeholderReplacement>
           <placeholders>
             <filesDir>/storage/miso/files/</filesDir>
           </placeholders>
-          <configFile>flyway.properties</configFile>
+          <configFiles>
+            <configFile>flyway.properties</configFile>
+          </configFiles>
         </configuration>
       </plugin>
     </plugins>
@@ -207,7 +211,7 @@
             <removeVolumes>true</removeVolumes>
             <images>
               <image>
-                <name>mysql:8.0</name>
+                <name>mysql:9.7</name>
                 <alias>mysql</alias>
                 <run>
                   <env>
@@ -312,6 +316,7 @@
               </execution>
             </executions>
             <configuration>
+              <cleanDisabled>false</cleanDisabled>
               <url>jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${mysql.params}</url>
               <user>root</user>
               <password>${mysql.rootpw}</password>
@@ -325,7 +330,9 @@
                 <filesDir>/storage/miso/files/</filesDir>
               </placeholders>
               <!-- this is to prevent flyway.properties from overriding the settings here -->
-              <configFile>empty.properties</configFile>
+              <configFiles>
+                <configFile>empty.properties</configFile>
+              </configFiles>
             </configuration>
           </plugin>
           <plugin>
@@ -370,7 +377,7 @@
             <configuration>
               <images>
                 <image>
-                  <name>mysql:8.0</name>
+                  <name>mysql:9.7</name>
                   <alias>mysql</alias>
                   <run>
                     <wait>
