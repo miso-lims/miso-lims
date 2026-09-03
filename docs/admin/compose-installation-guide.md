@@ -80,23 +80,22 @@ networks and release their resources to the host operating system.
 
 The MISO Docker containers consist of four parts:
 
-**MySQL database**. The database. We use the
-[MySQL official Docker container](https://hub.docker.com/_/mysql).
+**MySQL database**. The database. We use the official
+[MySQL image](https://hub.docker.com/_/mysql).
 
 **Apache Tomcat server**. The actual server for the MISO webapp. The image is
-[miso-lims-webapp](https://github.com/miso-lims/miso-lims/pkgs/container/miso-lims-webapp)
-container, based on the
-[official Tomcat alpine container](https://hub.docker.com/_/tomcat).
+[miso-lims-webapp](https://github.com/miso-lims/miso-lims/pkgs/container/miso-lims-webapp), based
+on the [official Tomcat Alpine image](https://hub.docker.com/_/tomcat).
 
-**Flyway DB migration**. Initializes or updates the database.
-This is miso-lims's
+**Flyway DB migration**. Initializes or updates the database. This is miso-lims's
 [miso-lims-migration](https://github.com/miso-lims/miso-lims/pkgs/container/miso-lims-migration)
-container (_[Dockerfile](https://github.com/miso-lims/miso-lims/blob/master/Dockerfile),
-target `flyway-migration`_), based on [boxfuse/flyway](https://hub.docker.com/r/boxfuse/flyway). It will initialize or update the MySQL database for a particular MISO
-version.
+image (_[Dockerfile](https://github.com/miso-lims/miso-lims/blob/master/Dockerfile),
+target `flyway-migration`_), based on the
+[official Flyway Alpine image](https://hub.docker.com/r/flyway/flyway). It will initialize or update
+the MySQL database for a particular MISO version.
 
-**Nginx reverse proxy**. Redirects traffic from port 80 to MISO's 8080 address,
-and is also required for HTTPS. We use the official [nginx](https://hub.docker.com/_/nginx) container.
+**NGINX reverse proxy**. Configures SSL and redirects traffic from standard HTTP/S ports to
+Tomcat/MISO. We use the official [NGINX image](https://hub.docker.com/_/nginx).
 
 ## Installing MISO for production use
 
@@ -453,8 +452,8 @@ in the `miso` user's home directory.
 
 This environment:
 
-* mounts the database, MISO logs, and MISO files from the local filesystem. We
-  made the directories `db`, `logs` and `files` to bind to.
+* mounts the database and MISO files from the local filesystem. We made the directories `db` and
+  `files` to bind to.
 * has site-specific migrations in `V9000__institution-custom.sql`
 * overrides `miso.properties`.
 * has SSL encryption for HTTPS (`ssl.conf` and `.ssl_password`) and
@@ -507,7 +506,7 @@ secrets:
 
 services:
   db:
-    image: mysql:8.0
+    image: mysql:9.7
     restart: always
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
@@ -525,6 +524,9 @@ services:
   flyway:
     image: ghcr.io/miso-lims/miso-lims-migration:${MISO_TAG}
     command: migrate
+    environment:
+      FLYWAY_USER: root
+      FLYWAY_PASSWORD_FILE: /run/secrets/root_password
     secrets:
       - root_password
     links:
@@ -538,7 +540,6 @@ services:
       - type: bind
         source: "./V9000__institution-custom.sql"
         target: "/flyway/sql/V9000__institution-custom.sql"
-
 
   webapp:
     image: ghcr.io/miso-lims/miso-lims-webapp:${MISO_TAG}
@@ -556,9 +557,6 @@ services:
       - type: bind
         source: "./files"
         target: "/storage/miso/files"
-      - type: bind
-        source: "./logs"
-        target: "/storage/miso/log"
 
   nginx:
     image: nginx:1.15.12-alpine
@@ -618,7 +616,7 @@ starting.
     password on the existing database, you'll have to log in to the MySQL container
     (with `docker exec -it <container-name> mysql`) with the old password and
     change the database user's password. See the
-    [MySQL documentation](https://dev.mysql.com/doc/refman/8.0/en/set-password.html)
+    [MySQL documentation](https://dev.mysql.com/doc/refman/9.7/en/set-password.html)
     for more information.
 
     The more straightforward option is to destroy the database and rebuild it.

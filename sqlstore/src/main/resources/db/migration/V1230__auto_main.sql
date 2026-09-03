@@ -6,7 +6,7 @@ DROP TRIGGER IF EXISTS LibraryAliquotChange;
 DROP TRIGGER IF EXISTS RunPartitionLibraryAliquotUpdate;
 
 ALTER TABLE Sample ADD COLUMN qcDate DATE;
-ALTER TABLE Library ADD COLUMN qcDate DATE;
+ALTER TABLE `Library` ADD COLUMN qcDate DATE;
 ALTER TABLE LibraryAliquot ADD COLUMN qcDate DATE;
 ALTER TABLE Run ADD COLUMN qcDate DATE;
 ALTER TABLE Run ADD COLUMN dataReviewDate DATE;
@@ -19,7 +19,7 @@ UPDATE Sample SET qcDate = COALESCE((
 ), created)
 WHERE detailedQcStatusId IS NOT NULL;
 
-UPDATE Library SET qcDate = COALESCE((
+UPDATE `Library` SET qcDate = COALESCE((
   SELECT MAX(changeTime) FROM LibraryChangeLog
   WHERE LibraryChangeLog.libraryId = Library.libraryId
   AND columnsChanged LIKE '%detailedQcStatusId%'
@@ -64,9 +64,9 @@ ALTER TABLE Sample MODIFY COLUMN initialVolume DECIMAL(16,10);
 ALTER TABLE Sample MODIFY COLUMN volume DECIMAL(16,10);
 ALTER TABLE Sample MODIFY COLUMN volumeUsed DECIMAL(16,10);
 
-ALTER TABLE Library MODIFY COLUMN initialVolume DECIMAL(16,10);
-ALTER TABLE Library MODIFY COLUMN volume DECIMAL(16,10);
-ALTER TABLE Library MODIFY COLUMN volumeUsed DECIMAL(16,10);
+ALTER TABLE `Library` MODIFY COLUMN initialVolume DECIMAL(16,10);
+ALTER TABLE `Library` MODIFY COLUMN volume DECIMAL(16,10);
+ALTER TABLE `Library` MODIFY COLUMN volumeUsed DECIMAL(16,10);
 
 ALTER TABLE LibraryAliquot MODIFY COLUMN volume DECIMAL(16,10);
 ALTER TABLE LibraryAliquot MODIFY COLUMN volumeUsed DECIMAL(16,10);

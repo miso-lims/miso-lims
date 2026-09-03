@@ -183,7 +183,7 @@
               <removeVolumes>true</removeVolumes>
               <images>
                 <image>
-                  <name>mysql:8.0</name>
+                  <name>mysql:9.7</name>
                   <alias>mysql</alias>
                   <run>
                     <env>
@@ -234,6 +234,7 @@
               </execution>
             </executions>
             <configuration>
+              <cleanDisabled>false</cleanDisabled>
               <url>
                 jdbc:mysql://localhost:${mysql.port}/${mysql.db}?${db.params}</url>
               <user>root</user>
@@ -289,7 +290,7 @@
             <configuration>
               <images>
                 <image>
-                  <name>mysql:8.0</name>
+                  <name>mysql:9.7</name>
                   <alias>mysql</alias>
                   <run>
                     <wait>

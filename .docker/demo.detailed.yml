@@ -13,6 +13,7 @@ version: '3.7'
 # * MISO_DB_USER : name of the MySQL user who accesses MISO_DB
 # * MISO_DB : name of the LIMS Db in MySql
 # * MISO_DB_PASSWORD_FILE : path to the file with the password to the MySQL DB for user MISO_DB_USER
+# * MISO_DB_ROOT_PASSWORD_FILE : path to the file with the password to the MySQL root user
 # * MISO_TAG : tag of the MISO Docker containers (migration and webapp)
 #
 ################################################################################
@@ -36,7 +37,7 @@ secrets:
 
 services:
   db:
-    image: mysql:8.0
+    image: mysql:9.7
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/root_password
@@ -49,6 +50,9 @@ services:
 
   flyway:
     image: ghcr.io/miso-lims/miso-lims-migration:${MISO_TAG}
+    environment:
+      FLYWAY_USER: root
+      FLYWAY_PASSWORD_FILE: /run/secrets/root_password
     command: migrate
     secrets:
       - root_password

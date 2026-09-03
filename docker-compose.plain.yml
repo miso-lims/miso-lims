@@ -1,5 +1,3 @@
-version: '3.7'
-
 ################################################################################
 # Builds and brings up a MISO LIMS environment in plain sample mode.
 # 
@@ -13,11 +11,14 @@ version: '3.7'
 # * MISO_DB_USER : name of the MySQL user who accesses MISO_DB [tgaclims]
 # * MISO_DB : name of the LIMS Db in MySql [lims]
 # * MISO_DB_PASSWORD_FILE : path to the file with the password to the MySQL DB for user MISO_DB_USER
+# * MISO_DB_ROOT_PASSWORD_FILE : path to the file with the password to the MySQL root user
 #
 ################################################################################
 # USAGE : run in cloned miso-lims repository 
 #
-# echo "changeme" > ./.miso_db_password && docker-compose build && docker-compose up
+# echo "changeme" > ./.miso_db_password
+# docker-compose -f docker-compose.plain.yml build
+# docker-compose -f docker-compose.plain.yml up
 ################################################################################
 # Code available at https://github.com/miso-lims/miso-lims under GPL-3.0
 ################################################################################
@@ -31,7 +32,7 @@ secrets:
 
 services:
   db:
-    image: mysql:8.0
+    image: mysql:9.7
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/root_password
@@ -46,6 +47,9 @@ services:
     build:
       context: .
       target: flyway-migration
+    environment:
+      FLYWAY_USER: root
+      FLYWAY_PASSWORD_FILE: /run/secrets/root_password
     command: migrate
     secrets:
       - root_password

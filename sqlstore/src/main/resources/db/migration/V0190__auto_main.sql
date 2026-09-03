@@ -71,7 +71,7 @@ UPDATE QCType SET precisionAfterDecimal = 0 WHERE name = 'Tape Station';
 UPDATE QCType SET precisionAfterDecimal = -1 WHERE name = 'DNAse Treated';
 UPDATE QCType SET name = 'Qubit' WHERE name = 'QuBit';
 
-ALTER TABLE LibraryQC ADD CONSTRAINT fk_libraryQc_library FOREIGN KEY (library_libraryId) REFERENCES Library (libraryId);
+ALTER TABLE LibraryQC ADD CONSTRAINT fk_libraryQc_library FOREIGN KEY (library_libraryId) REFERENCES `Library` (libraryId);
 ALTER TABLE LibraryQC ADD CONSTRAINT fk_libraryQc_qcType FOREIGN KEY (qcMethod) REFERENCES QCType (qcTypeId);
 
 INSERT INTO QCType (name, description, qcTarget, units) 
@@ -89,8 +89,8 @@ ALTER TABLE RunQC CHANGE COLUMN qcUserName qcCreator varchar(255) NOT NULL;
 
 -- library_size
 
-ALTER TABLE Library ADD COLUMN dnaSize bigint;
+ALTER TABLE `Library` ADD COLUMN dnaSize bigint;
 
-UPDATE Library SET dnaSize = (SELECT insertSize FROM LibraryQC WHERE LibraryQC.library_libraryId = Library.libraryId AND insertSize IS NOT NULL AND insertSize != 0 ORDER BY qcDate LIMIT 1);
+UPDATE `Library` SET dnaSize = (SELECT insertSize FROM LibraryQC WHERE LibraryQC.library_libraryId = Library.libraryId AND insertSize IS NOT NULL AND insertSize != 0 ORDER BY qcDate LIMIT 1);
 
 

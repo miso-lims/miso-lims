@@ -1,5 +1,5 @@
 -- kitlot_expand
-ALTER TABLE Library MODIFY COLUMN kitLot varchar(255);
+ALTER TABLE `Library` MODIFY COLUMN kitLot varchar(255);
 
 -- transfer_volume
 ALTER TABLE Transfer_Sample

@@ -227,7 +227,7 @@ ALTER TABLE TissuePieceType MODIFY COLUMN archived BOOLEAN NOT NULL DEFAULT FALS
 
 DROP TRIGGER IF EXISTS DetailedLibraryChange;
 
-ALTER TABLE Library
+ALTER TABLE `Library`
   ADD COLUMN discriminator varchar(50) NOT NULL DEFAULT 'Library',
   ADD COLUMN `archived` bit,
   ADD COLUMN `libraryDesign` bigint,
@@ -240,7 +240,7 @@ ALTER TABLE Library
   ADD CONSTRAINT `fk_library_libraryDesignCode` FOREIGN KEY (`libraryDesignCodeId`) REFERENCES `LibraryDesignCode` (`libraryDesignCodeId`),
   ADD CONSTRAINT `fk_library_libraryDesign` FOREIGN KEY (`libraryDesign`) REFERENCES `LibraryDesign` (`libraryDesignId`);
 
-UPDATE Library l
+UPDATE `Library` l
 JOIN DetailedLibrary dl ON dl.libraryId = l.libraryId
 SET
   l.discriminator = 'DetailedLibrary',
@@ -279,12 +279,12 @@ CREATE PROCEDURE verifyDiscriminators()
 BEGIN
   IF (
     EXISTS (SELECT 1 FROM Sample WHERE discriminator = 'Sample')
-    OR EXISTS (SELECT 1 FROM Library WHERE discriminator = 'Library')
+    OR EXISTS (SELECT 1 FROM `Library` WHERE discriminator = 'Library')
     OR EXISTS (SELECT 1 FROM LibraryAliquot WHERE discriminator = 'LibraryAliquot')
   )
   AND (
     EXISTS (SELECT 1 FROM Sample WHERE discriminator <> 'Sample')
-    OR (SELECT 1 FROM Library WHERE discriminator <> 'Library')
+    OR (SELECT 1 FROM `Library` WHERE discriminator <> 'Library')
     OR (SELECT 1 FROM LibraryAliquot WHERE discriminator <> 'LibraryAliquot')
   ) THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Failed to determine all discriminators';

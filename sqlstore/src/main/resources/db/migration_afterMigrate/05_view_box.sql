@@ -28,7 +28,7 @@ CREATE OR REPLACE VIEW SampleDistributionView AS
 
 CREATE OR REPLACE VIEW LibraryDistributionView AS
   SELECT l.libraryId, IF(SUM(IF(t.recipient IS NOT NULL, 1, 0)) > 0, TRUE, FALSE) as distributed
-  FROM Library l
+  FROM `Library` l
   LEFT JOIN Transfer_Library tl ON tl.libraryId = l.libraryId
   LEFT JOIN Transfer t ON t.transferId = tl.transferId
   GROUP BY l.libraryId;
