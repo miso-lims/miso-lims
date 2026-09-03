@@ -7,4 +7,4 @@ CREATE OR REPLACE VIEW ActivePlatformTypes AS
 
   UNION SELECT DISTINCT platformType FROM Pool
 
-  UNION SELECT DISTINCT platformType FROM Library;
+  UNION SELECT DISTINCT platformType FROM `Library`;

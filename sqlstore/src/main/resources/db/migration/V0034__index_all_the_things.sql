@@ -4,8 +4,8 @@ CREATE INDEX ExperimentChangeLog_experimentId_changeTime ON ExperimentChangeLog(
 CREATE INDEX KitDescriptorChangeLog_kitDescriptorId_changeTime ON KitDescriptorChangeLog(kitDescriptorId, changeTime);
 CREATE INDEX LibraryChangeLog_libraryId_changeTime ON LibraryChangeLog(libraryId, changeTime);
 CREATE INDEX LibraryDilution_libraryId_dilutionId ON LibraryDilution(library_libraryId, dilutionId);
-CREATE INDEX Library_boxPositionId ON Library(boxPositionId);
-CREATE INDEX Library_sampleId_libraryId ON Library(sample_sampleId,libraryId);
+CREATE INDEX Library_boxPositionId ON `Library`(boxPositionId);
+CREATE INDEX Library_sampleId_libraryId ON `Library`(sample_sampleId,libraryId);
 CREATE INDEX PlateChangeLog_plateId_changeTime ON PlateChangeLog(plateId, changeTime);
 CREATE INDEX PoolChangeLog_poolId_changeTime ON PoolChangeLog(poolId, changeTime);
 CREATE INDEX PoolElements_pool_poolId_elementId ON Pool_Elements(pool_poolId, elementId);

@@ -2,7 +2,7 @@
 ALTER TABLE SequencerPartitionContainer ADD CONSTRAINT uk_container_identificationBarcode UNIQUE (identificationBarcode);
 
 -- plate_change_log
-DROP TABLE PlateChangeLog;
+DROP TABLE IF EXISTS PlateChangeLog;
 
 -- fix_login
 DROP TABLE IF EXISTS `persistent_logins`;

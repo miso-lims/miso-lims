@@ -28,7 +28,7 @@ CREATE TABLE LibraryAliquot (
   CONSTRAINT fk_libraryAliquot_targetedSequencing FOREIGN KEY (targetedSequencingId) REFERENCES TargetedSequencing (targetedSequencingId),
   CONSTRAINT fk_libraryAliquot_creator FOREIGN KEY (creator) REFERENCES User (userId),
   CONSTRAINT fk_libraryAliquot_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId),
-  CONSTRAINT fk_libraryAliquot_library FOREIGN KEY (libraryId) REFERENCES Library (libraryId)
+  CONSTRAINT fk_libraryAliquot_library FOREIGN KEY (libraryId) REFERENCES `Library` (libraryId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO LibraryAliquot(aliquotId, name, libraryId, preMigrationId, identificationBarcode, volumeUsed, volume, volumeUnits, discarded,

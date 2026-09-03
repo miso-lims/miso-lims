@@ -29,7 +29,7 @@ ALTER TABLE LibraryAliquotChangeLog ADD CONSTRAINT fk_libraryAliquotChangeLog_li
 
 ALTER TABLE LibraryChangeLog DROP FOREIGN KEY fk_libraryChangeLog_library;
 ALTER TABLE LibraryChangeLog ADD CONSTRAINT fk_libraryChangeLog_library
-  FOREIGN KEY (libraryId) REFERENCES Library (libraryId) ON DELETE CASCADE;
+  FOREIGN KEY (libraryId) REFERENCES `Library` (libraryId) ON DELETE CASCADE;
 
 ALTER TABLE PoolChangeLog DROP FOREIGN KEY fk_poolChangeLog_pool;
 ALTER TABLE PoolChangeLog ADD CONSTRAINT fk_poolChangeLog_pool

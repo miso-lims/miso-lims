@@ -31,7 +31,7 @@ CREATE TABLE Library_Attachment (
   libraryId bigint NOT NULL,
   attachmentId bigint NOT NULL,
   PRIMARY KEY (libraryId, attachmentId),
-  CONSTRAINT fk_attachment_library FOREIGN KEY (libraryId) REFERENCES Library (libraryId),
+  CONSTRAINT fk_attachment_library FOREIGN KEY (libraryId) REFERENCES `Library` (libraryId),
   CONSTRAINT fk_library_attachment FOREIGN KEY (attachmentId) REFERENCES Attachment (attachmentId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

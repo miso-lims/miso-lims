@@ -17,10 +17,10 @@ CREATE TABLE Workstation (
   UNIQUE KEY uk_workstation_alias (alias)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-ALTER TABLE Library ADD COLUMN thermalCyclerId bigint;
-ALTER TABLE Library ADD CONSTRAINT fk_library_thermalCycler FOREIGN KEY (thermalCyclerId) REFERENCES Instrument (instrumentId);
-ALTER TABLE Library ADD COLUMN workstationId bigint;
-ALTER TABLE Library ADD CONSTRAINT fk_library_workstation FOREIGN KEY (workstationId) REFERENCES Workstation (workstationId);
+ALTER TABLE `Library` ADD COLUMN thermalCyclerId bigint;
+ALTER TABLE `Library` ADD CONSTRAINT fk_library_thermalCycler FOREIGN KEY (thermalCyclerId) REFERENCES Instrument (instrumentId);
+ALTER TABLE `Library` ADD COLUMN workstationId bigint;
+ALTER TABLE `Library` ADD CONSTRAINT fk_library_workstation FOREIGN KEY (workstationId) REFERENCES Workstation (workstationId);
 
 -- qc_type_kits
 ALTER TABLE QCType DROP FOREIGN KEY fk_qcType_kitDescriptor;

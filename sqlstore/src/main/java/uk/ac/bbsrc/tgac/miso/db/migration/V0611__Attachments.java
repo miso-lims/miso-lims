@@ -11,21 +11,22 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
 
-public class V0611__Attachments implements JdbcMigration {
+public class V0611__Attachments extends BaseJavaMigration {
 
   private static final Logger logger = Logger.getLogger(V0611__Attachments.class.getName());
 
   private enum EntityType {
-    PROJECT("project", "Project", "projectId", "Project_Attachment"),
-    SERVICE_RECORD("servicerecord", "ServiceRecord", "recordId", "ServiceRecord_Attachment");
-    
+    PROJECT("project", "Project", "projectId", "Project_Attachment"), SERVICE_RECORD("servicerecord", "ServiceRecord",
+        "recordId", "ServiceRecord_Attachment");
+
     private final String dirName;
     private final String table;
     private final String primaryKey;
     private final String joinTable;
-    
+
     private EntityType(String dirName, String table, String primaryKey, String joinTable) {
       this.dirName = dirName;
       this.table = table;
@@ -55,10 +56,10 @@ public class V0611__Attachments implements JdbcMigration {
   private Path basePath;
 
   @Override
-  public void migrate(Connection connection) throws Exception {
+  public void migrate(Context context) throws Exception {
     logger.log(Level.INFO, "Scanning existing attachments to save in database...");
 
-    this.connection = connection;
+    this.connection = context.getConnection();
     filesDir = getFilesDir();
     if (filesDir == null || filesDir.isEmpty()) {
       throw new IllegalStateException("MISO_FILES_DIR not set");
@@ -88,7 +89,8 @@ public class V0611__Attachments implements JdbcMigration {
       try (PreparedStatement getStatement = connection
           .prepareStatement(String.format("SELECT * FROM %s WHERE %s = ?", type.getTable(), type.getPrimaryKey()));
           PreparedStatement joinStatement = connection.prepareStatement(
-              String.format("INSERT INTO %s(%s, attachmentId) VALUES (?, ?);", type.getJoinTable(), type.getPrimaryKey()))) {
+              String.format("INSERT INTO %s(%s, attachmentId) VALUES (?, ?);", type.getJoinTable(),
+                  type.getPrimaryKey()))) {
         for (File typeFile : dir.listFiles()) {
           processObjectDir(type, typeFile, getStatement, insertStatement, joinStatement);
         }
@@ -96,7 +98,8 @@ public class V0611__Attachments implements JdbcMigration {
     }
   }
 
-  private void processObjectDir(EntityType type, File dir, PreparedStatement getStatement, PreparedStatement insertStatement,
+  private void processObjectDir(EntityType type, File dir, PreparedStatement getStatement,
+      PreparedStatement insertStatement,
       PreparedStatement joinStatement) throws SQLException {
     logger.log(Level.INFO, "scanning directory {0}", dir.getAbsolutePath());
     if (!dir.isDirectory()) {
@@ -114,7 +117,7 @@ public class V0611__Attachments implements JdbcMigration {
         getStatement.setLong(1, entityId);
         try (ResultSet results = getStatement.executeQuery()) {
           if (!results.next()) {
-            logger.log(Level.WARNING, "Found files for non-existant {0} {1}", new Object[] { type.getTable(), entityId });
+            logger.log(Level.WARNING, "Found files for non-existant {0} {1}", new Object[] {type.getTable(), entityId});
           } else {
             joinStatement.setLong(1, entityId);
             for (File objectFile : dir.listFiles()) {
@@ -126,7 +129,8 @@ public class V0611__Attachments implements JdbcMigration {
     }
   }
 
-  private void processFile(File objectFile, PreparedStatement insertStatement, PreparedStatement joinStatement) throws SQLException {
+  private void processFile(File objectFile, PreparedStatement insertStatement, PreparedStatement joinStatement)
+      throws SQLException {
     if (!objectFile.isFile()) {
       logger.log(Level.WARNING, "Unexpected non-file found: {0}", objectFile.getAbsolutePath());
     } else {

@@ -2,7 +2,7 @@
 
 -- add indexes on all default sort columns for faster querying
 CREATE INDEX lastModified_Sample ON Sample (lastModified);
-CREATE INDEX lastModified_Library ON Library (lastModified);
+CREATE INDEX lastModified_Library ON `Library` (lastModified);
 CREATE INDEX name_LibraryDilution ON LibraryDilution (name);
 CREATE INDEX lastModified_Pool ON Pool (lastModified);
 CREATE INDEX lastUpdated_PoolOrder ON PoolOrder (lastUpdated);

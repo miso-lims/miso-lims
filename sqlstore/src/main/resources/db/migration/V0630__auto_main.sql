@@ -32,7 +32,7 @@ CREATE TABLE Workset_Library (
   libraryId bigint NOT NULL,
   PRIMARY KEY (worksetId, libraryId),
   CONSTRAINT fk_library_workset FOREIGN KEY (worksetId) REFERENCES Workset (worksetId),
-  CONSTRAINT fk_workset_library FOREIGN KEY (libraryId) REFERENCES Library (libraryId)
+  CONSTRAINT fk_workset_library FOREIGN KEY (libraryId) REFERENCES `Library` (libraryId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Workset_Dilution (
