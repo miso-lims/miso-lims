@@ -759,7 +759,7 @@ FormUtils = (function ($) {
     var control = $("#" + makeInputId(containerId, field.data));
     switch (field.type) {
       case "read-only":
-        return field.getDisplayValue ? control.val() : control.text();
+        return field.getDisplayValue ? getHiddenInputValue(control) : control.text();
       case "text":
       case "textarea":
       case "password":
@@ -802,7 +802,7 @@ FormUtils = (function ($) {
       case "read-only":
         // Note: only the value is updated; display value and/or link url must be updated separately if applicable
         if (field.getDisplayValue) {
-          $(inputSelector).val(value);
+          setHiddenInputValue($(inputSelector), value);
         } else {
           $(inputSelector).text(value);
         }
@@ -1077,7 +1077,10 @@ FormUtils = (function ($) {
       var changeSop = function () {
         object.sopId = newSopId;
         object.sopFieldValues = {};
-        form.rewriteSection(title, makeSopSectionFields(object, sops, workstations, instruments, title));
+        form.rewriteSection(
+          title,
+          makeSopSectionFields(object, sops, workstations, instruments, title)
+        );
         form.markOtherChanges();
       };
 
@@ -1173,6 +1176,35 @@ FormUtils = (function ($) {
     }
   }
 
+  function setHiddenInputValue(input, value) {
+    input.data("type", typeof value);
+    input.val(value);
+  }
+
+  function getHiddenInputValue(input) {
+    var stringValue = input.val();
+    switch (input.data("type")) {
+      case "boolean":
+        switch (stringValue) {
+          case "true":
+            return true;
+          case "false":
+            return false;
+          default:
+            return null;
+        }
+        break;
+      case "number":
+        return Number(stringValue);
+      default:
+        if (stringValue === "") {
+          return null;
+        } else {
+          return stringValue;
+        }
+    }
+  }
+
   function makeFieldInput(containerId, field, object, form) {
     var td = $("<td>");
     var value = getDisplayValue(field, object);
@@ -1183,9 +1215,7 @@ FormUtils = (function ($) {
         .attr("id", makeInputId(containerId, field.data))
         .attr("type", "hidden");
       var dataValue = Utils.getObjectField(object, field.data);
-      if (dataValue) {
-        hidden.val(dataValue);
-      }
+      setHiddenInputValue(hidden, dataValue);
       td.append(hidden);
     }
 
