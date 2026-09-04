@@ -34,7 +34,7 @@ public class PoolOrderPageIT extends AbstractIT {
     String aliquotName2 = "LDI1001";
     page.addAliquots(Lists.newArrayList(aliquotName1, aliquotName2));
 
-    assertEquals("", page.getField(Field.ID));
+    assertEquals("0", page.getField(Field.ID));
     assertFieldValues("changes pre-save", fields, page);
     PoolOrderPage savedPage = page.clickSave();
     assertNotNull(savedPage, "Pool order should save successfully");
@@ -44,7 +44,8 @@ public class PoolOrderPageIT extends AbstractIT {
     assertEquals(fields.get(Field.ALIAS), order.getAlias());
     assertEquals(fields.get(Field.PURPOSE), order.getPurpose().getAlias());
     assertEquals(2, order.getOrderLibraryAliquots().size());
-    assertEquals(1, order.getOrderLibraryAliquots().stream().filter(a -> a.getAliquot().getName().equals(aliquotName1)).count());
+    assertEquals(1,
+        order.getOrderLibraryAliquots().stream().filter(a -> a.getAliquot().getName().equals(aliquotName1)).count());
   }
 
   @Test
