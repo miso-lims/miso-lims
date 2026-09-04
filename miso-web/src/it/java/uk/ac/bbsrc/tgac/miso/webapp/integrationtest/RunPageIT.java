@@ -44,7 +44,7 @@ public class RunPageIT extends AbstractIT {
 
     // default values
     Map<RunPage.Field, String> fields = Maps.newLinkedHashMap();
-    fields.put(Field.ID, null);
+    fields.put(Field.ID, "0");
     fields.put(Field.NAME, null);
     fields.put(Field.ALIAS, null);
     fields.put(Field.PLATFORM, "PacBio");
@@ -85,7 +85,7 @@ public class RunPageIT extends AbstractIT {
 
     // default values
     Map<RunPage.Field, String> fields = Maps.newLinkedHashMap();
-    fields.put(Field.ID, null);
+    fields.put(Field.ID, "0");
     fields.put(Field.NAME, null);
     fields.put(Field.ALIAS, null);
     fields.put(Field.PLATFORM, "Illumina");
@@ -460,7 +460,8 @@ public class RunPageIT extends AbstractIT {
         Pool recent = (Pool) getSession().find(PoolImpl.class, poolIds.get(i));
         Pool older = (Pool) getSession().find(PoolImpl.class, poolIds.get(i + 1));
         // doing the assertion this way because copy-pasting means we have some equivalent dates
-        assertFalse(recent.getLastModified().before(older.getLastModified()), "recent: " + recent.getLastModified() + "; older: " + older.getLastModified());
+        assertFalse(recent.getLastModified().before(older.getLastModified()),
+            "recent: " + recent.getLastModified() + "; older: " + older.getLastModified());
       }
     }
   }

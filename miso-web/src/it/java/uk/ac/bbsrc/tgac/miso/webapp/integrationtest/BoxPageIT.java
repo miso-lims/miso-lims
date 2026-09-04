@@ -51,7 +51,7 @@ public class BoxPageIT extends AbstractIT {
     unsaved.put(Field.LOCATION, "Here");
     page.setFields(unsaved);
 
-    assertEquals("", page.getField(Field.ID), "Box ID is unsaved");
+    assertEquals("0", page.getField(Field.ID), "Box ID is unsaved");
     assertFieldValues("changes pre-save", unsaved, page);
     BoxPage savedPage = page.clickSave();
     assertFieldValues("changes post-save", unsaved, savedPage);
@@ -107,7 +107,7 @@ public class BoxPageIT extends AbstractIT {
     visualization.selectPosition(position);
     visualization.searchBoxables("TIB_SamStock");
     visualization.updatePosition(false);
-    
+
     // confirm values post-add
     BoxPage again = getBoxPage(500L);
     assertFalse(again.getVisualization().isEmptyPosition(position), "checking that position is no longer empty");
@@ -136,7 +136,7 @@ public class BoxPageIT extends AbstractIT {
     // confirm nothing has changed
     Box box = (Box) getSession().find(BoxImpl.class, 500L);
     assertNull(box.getBoxPositions().get(position));
-    
+
     BoxPage again = getBoxPage(500L);
     assertTrue(again.getVisualization().isEmptyPosition(position), "empty position is still empty");
   }
@@ -249,12 +249,13 @@ public class BoxPageIT extends AbstractIT {
   @Test
   public void testDiscardTube() {
     final String position = "C01";
-    
+
     // confirm values pre-save
     BoxPage page = getBoxPage(500L);
     BoxVisualization visualization = page.getVisualization();
     assertFalse(visualization.isEmptyPosition(position), "check that position C01 is full");
-    assertTrue(visualization.getPositionTitle(position).contains("TIB_0001_nn_n_PE_404_WG"), "check that title matches LDI name");
+    assertTrue(visualization.getPositionTitle(position).contains("TIB_0001_nn_n_PE_404_WG"),
+        "check that title matches LDI name");
 
     Box initial = (Box) getSession().find(BoxImpl.class, 500L);
     assertNotNull(initial.getBoxPositions().get(position));
