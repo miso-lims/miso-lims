@@ -7,6 +7,13 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [3.27.1] - 2026-09-08
+
+### Fixed
+
+* Unexpected error when trying to save some projects
+
+
 ## [3.27.0] - 2026-08-27
 
 ### Added
