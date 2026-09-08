@@ -14,6 +14,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
@@ -62,6 +63,10 @@ public class ParentSample implements Serializable {
   @ManyToOne
   @JoinColumn(name = "indexId")
   private SampleIndex index;
+
+  @ManyToOne
+  @JoinColumn(name = "scientificNameId")
+  private ScientificName scientificName;
 
   @OneToOne
   @PrimaryKeyJoinColumn
@@ -198,6 +203,14 @@ public class ParentSample implements Serializable {
 
   public void setIndex(SampleIndex index) {
     this.index = index;
+  }
+
+  public ScientificName getScientificName() {
+    return scientificName;
+  }
+
+  public void setScientificName(ScientificName scientificName) {
+    this.scientificName = scientificName;
   }
 
 }

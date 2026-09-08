@@ -1,1 +1,1 @@
-ALTER TABLE Requisition ADD COLUMN description VARCHAR(1024);
+ALTER TABLE Requisition ADD COLUMN description VARCHAR(255);

@@ -6,11 +6,7 @@ import org.hibernate.annotations.Immutable;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import uk.ac.bbsrc.tgac.miso.core.data.ReferenceGenome;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 
 @Entity
 @Immutable
@@ -25,10 +21,6 @@ public class ParentProject implements Serializable {
   private String name;
   private String code;
   private String title;
-
-  @ManyToOne(targetEntity = ReferenceGenomeImpl.class)
-  @JoinColumn(name = "referenceGenomeId")
-  private ReferenceGenome referenceGenome;
 
   public long getId() {
     return projectId;
@@ -60,14 +52,6 @@ public class ParentProject implements Serializable {
 
   public void setTitle(String title) {
     this.title = title;
-  }
-
-  public ReferenceGenome getReferenceGenome() {
-    return referenceGenome;
-  }
-
-  public void setReferenceGenome(ReferenceGenome referenceGenome) {
-    this.referenceGenome = referenceGenome;
   }
 
 }

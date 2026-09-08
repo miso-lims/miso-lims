@@ -58,6 +58,7 @@ public class ListLibraryAliquotView
 
   private String name;
   private String alias;
+  private String description;
   private Integer dnaSize;
   private BigDecimal concentration;
 
@@ -145,6 +146,14 @@ public class ListLibraryAliquotView
 
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public Integer getDnaSize() {
@@ -309,10 +318,6 @@ public class ListLibraryAliquotView
 
   public String getLibraryAlias() {
     return getLibraryAttribute(ParentLibrary::getAlias);
-  }
-
-  public String getLibraryDescription() {
-    return getLibraryAttribute(ParentLibrary::getDescription);
   }
 
   public Boolean isLibraryLowQuality() {

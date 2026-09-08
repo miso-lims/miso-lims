@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet;
 
 import java.text.SimpleDateFormat;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleSlide;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.GrandparentSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
@@ -98,25 +99,28 @@ public enum LibraryAliquotProperty {
   PROJECT_NAME("Project Name") {
     @Override
     public String extract(ListLibraryAliquotView aliquot) {
-      return aliquot.getProjectName();
+      return aliquot.getProjectTitle();
     }
   },
 
   LIBRARY_DESCRIPTION("Library Description") {
     @Override
     public String extract(ListLibraryAliquotView aliquot) {
-      return aliquot.getLibraryDescription();
+      return aliquot.getDescription();
     }
   },
 
   DESIGN_CODE("Design Code") {
     @Override
-    public String extract(
-        ListLibraryAliquotView aliquot) {
-      if (aliquot.getDesignCode() == null) {
-        return null;
-      }
-      return "%s (%s)".formatted(aliquot.getDesignCode().getCode(), aliquot.getDesignCode().getDescription());
+    public String extract(ListLibraryAliquotView aliquot) {
+      return aliquot.getDesignCode() == null ? null : aliquot.getDesignCode().getCode();
+    }
+  },
+
+  DESIGN_CODE_DESCRIPTION("Design Code Description") {
+    @Override
+    public String extract(ListLibraryAliquotView aliquot) {
+      return aliquot.getDesignCode() == null ? null : aliquot.getDesignCode().getDescription();
     }
   },
 
@@ -129,12 +133,28 @@ public enum LibraryAliquotProperty {
     }
   },
 
+  TISSUE_ORIGIN_DESCRIPTION("Tissue Origin Description") {
+    @Override
+    public String extract(ListLibraryAliquotView aliquot) {
+      return aliquot.getTissueAttributes() == null || aliquot.getTissueAttributes().getTissueOrigin() == null ? null
+          : aliquot.getTissueAttributes().getTissueOrigin().getDescription();
+    }
+  },
+
   TISSUE_TYPE("Tissue Type") {
     @Override
     public String extract(
         ListLibraryAliquotView aliquot) {
       return aliquot.getTissueAttributes() == null || aliquot.getTissueAttributes().getTissueType() == null ? null
           : aliquot.getTissueAttributes().getTissueType().getAlias();
+    }
+  },
+
+  TISSUE_TYPE_DESCRIPTION("Tissue Type Description") {
+    @Override
+    public String extract(ListLibraryAliquotView aliquot) {
+      return aliquot.getTissueAttributes() == null || aliquot.getTissueAttributes().getTissueType() == null ? null
+          : aliquot.getTissueAttributes().getTissueType().getDescription();
     }
   },
 
@@ -226,18 +246,22 @@ public enum LibraryAliquotProperty {
     }
   },
 
-  SCI_NAME("Sci. Name") {
+  SCIENTIFIC_NAME("Scientific Name") {
     @Override
     public String extract(ListLibraryAliquotView aliquot) {
       ParentSample sample = aliquot.getParentLibrary().getParentSample();
       if (sample == null) {
         return null;
       }
-      if (sample.getParentSubproject() != null && sample.getParentSubproject().getReferenceGenome() != null) {
-        return sample.getParentSubproject().getReferenceGenome().getAlias();
+      if (sample.getScientificName() != null) {
+        return sample.getScientificName().getAlias();
       }
-      if (sample.getParentProject() != null && sample.getParentProject().getReferenceGenome() != null) {
-        return sample.getParentProject().getReferenceGenome().getAlias();
+      GrandparentSample parent = sample.getParentSample();
+      while (parent != null) {
+        if (parent.getScientificName() != null) {
+          return parent.getScientificName().getAlias();
+        }
+        parent = parent.getParentSample();
       }
       return null;
     }
@@ -281,6 +305,6 @@ public enum LibraryAliquotProperty {
   }
 
   private static boolean isSlide(ParentSampleClass sampleClass) {
-    return sampleClass != null && "Slide".equals(sampleClass.getSampleSubCategory());
+    return sampleClass != null && SampleSlide.SUBCATEGORY_NAME.equals(sampleClass.getSampleSubCategory());
   }
 }

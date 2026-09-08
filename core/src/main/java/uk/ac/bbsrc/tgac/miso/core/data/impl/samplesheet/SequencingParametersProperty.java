@@ -50,13 +50,13 @@ public enum SequencingParametersProperty {
     }
   },
 
-  TYPE("Type") {
+  PAIRED("Paired") {
     @Override
     public String extract(SequencingParameters sequencingParameters) {
       if (sequencingParameters.getReadLength2() > 0) {
-        return "Paired-End Sequencing";
+        return "True";
       } else if (sequencingParameters.getReadLength() > 0) {
-        return "Single-End Sequencing";
+        return "False";
       } else {
         return null;
       }

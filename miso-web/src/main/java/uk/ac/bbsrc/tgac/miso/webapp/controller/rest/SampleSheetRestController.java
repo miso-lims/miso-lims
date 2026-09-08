@@ -30,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
@@ -138,24 +139,23 @@ public class SampleSheetRestController extends AbstractRestController {
     }
 
     Map<String, Map<Integer, Pool>> poolLayout = new HashMap<>();
-    Map<String, String> containerIdentificationBarcode = new HashMap<>();
+    Map<String, SequencerPartitionContainer> containersByInstrumentPosition = new HashMap<>();
     if (model.getNumContainers() == 1 && run.getRunPositions().size() == 1) {
       RunPosition runPos = run.getRunPositions().iterator().next();
       if (runPos.getContainer() != null) {
         poolLayout.put("*", makePoolsByPartition(runPos));
-        containerIdentificationBarcode.put("*", runPos.getContainer().getIdentificationBarcode());
+        containersByInstrumentPosition.put("*", runPos.getContainer());
       }
     } else {
       for (RunPosition runPos : run.getRunPositions()) {
         if (runPos.getContainer() != null) {
           poolLayout.put(runPos.getPosition().getAlias(), makePoolsByPartition(runPos));
-          containerIdentificationBarcode.put(runPos.getPosition().getAlias(),
-              runPos.getContainer().getIdentificationBarcode());
+          containersByInstrumentPosition.put(runPos.getPosition().getAlias(), runPos.getContainer());
         }
       }
     }
     input.setPoolLayout(poolLayout);
-    input.setContainerIdentificationBarcode(containerIdentificationBarcode);
+    input.setContainersByInstrumentPosition(containersByInstrumentPosition);
 
     return input;
   }

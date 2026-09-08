@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
+import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIndex;
@@ -45,6 +46,10 @@ public class GrandparentSample implements Serializable {
   @ManyToOne
   @JoinColumn(name = "indexId")
   private SampleIndex index;
+
+  @ManyToOne
+  @JoinColumn(name = "scientificNameId")
+  private ScientificName scientificName;
 
   public long getId() {
     return sampleId;
@@ -100,6 +105,14 @@ public class GrandparentSample implements Serializable {
 
   public void setIndex(SampleIndex index) {
     this.index = index;
+  }
+
+  public ScientificName getScientificName() {
+    return scientificName;
+  }
+
+  public void setScientificName(ScientificName scientificName) {
+    this.scientificName = scientificName;
   }
 
 }

@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 import tools.jackson.databind.JsonNode;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.LibraryAliquotProperty;
@@ -250,7 +251,8 @@ public class SampleSheets {
           return getSequencingParametersValue(source, input.getSequencingParameters());
         }
       case INSTRUMENT_POSITION:
-        return getMultiValue(source, input.getPoolLayout().keySet(), SampleSheets::getInstrumentPositionValue);
+        return getMultiValue(source, input.getPoolLayout().keySet(),
+            (src, pos) -> getInstrumentPositionValue(src, input, pos));
       case PARTITION:
         List<Integer> partitionNumbers =
             input.getPoolLayout().values().stream().flatMap(map -> map.keySet().stream()).toList();
@@ -275,12 +277,6 @@ public class SampleSheets {
             .map(PoolElement::getAliquot)
             .toList();
         return getMultiValue(source, requisitionAliquots, SampleSheets::getRequisitionValue);
-      case CONTAINER:
-        return getMultiValue(source, input.getContainerIdentificationBarcode() == null
-            ? Collections.emptyList()
-            : input.getContainerIdentificationBarcode().values(),
-            SampleSheets::getContainerValue);
-
       case CURRENT_TIME:
         return formatCurrentDateTime(source.getDateFormat());
       default:
@@ -307,7 +303,7 @@ public class SampleSheets {
           return getSequencingParametersValue(source, input.getSequencingParameters());
         }
       case INSTRUMENT_POSITION:
-        return getInstrumentPositionValue(source, instrumentPos);
+        return getInstrumentPositionValue(source, input, instrumentPos);
       case PARTITION:
         return getMultiValue(source, poolsByPartition.keySet(), SampleSheets::getPartitionValue);
       case POOL:
@@ -327,8 +323,6 @@ public class SampleSheets {
             .map(PoolElement::getAliquot)
             .toList();
         return getMultiValue(source, requisitionAliquots, SampleSheets::getRequisitionValue);
-      case CONTAINER:
-        return getContainerValue(source, getContainerBarcode(input, instrumentPos));
       case CURRENT_TIME:
         return formatCurrentDateTime(source.getDateFormat());
       default:
@@ -356,7 +350,7 @@ public class SampleSheets {
           return getSequencingParametersValue(source, input.getSequencingParameters());
         }
       case INSTRUMENT_POSITION:
-        return getInstrumentPositionValue(source, instrumentPos);
+        return getInstrumentPositionValue(source, input, instrumentPos);
       case PARTITION:
         if (partitionNumber == null) {
           throw new IllegalArgumentException(
@@ -369,8 +363,6 @@ public class SampleSheets {
         return getLibraryAliquotValue(source, libraryAliquot);
       case REQUISITION:
         return getRequisitionValue(source, libraryAliquot);
-      case CONTAINER:
-        return getContainerValue(source, getContainerBarcode(input, instrumentPos));
       case CURRENT_TIME:
         return formatCurrentDateTime(source.getDateFormat());
       default:
@@ -426,9 +418,14 @@ public class SampleSheets {
     return property.extract(sequencingParameters);
   }
 
-  protected static String getInstrumentPositionValue(SampleSheetFieldSource source, String position) {
+  protected static String getInstrumentPositionValue(SampleSheetFieldSource source, SampleSheetInput input,
+      String position) {
     if (source.getSourceProperty() == null) {
       return position;
+    }
+    if ("IDENTIFICATION_BARCODE".equals(source.getSourceProperty())) {
+      SequencerPartitionContainer container = getContainer(input, position);
+      return container == null ? null : container.getIdentificationBarcode();
     }
     throw new IllegalArgumentException(
         "Unexpected instrument position property: %s".formatted(source.getSourceProperty()));
@@ -525,19 +522,12 @@ public class SampleSheets {
     return null;
   }
 
-  protected static String getContainerValue(SampleSheetFieldSource source, String identificationBarcode) {
-    if (source.getSourceProperty() != null) {
-      throw new IllegalArgumentException("Unexpected container property: %s".formatted(source.getSourceProperty()));
-    }
-    return identificationBarcode;
-  }
-
-  private static String getContainerBarcode(SampleSheetInput input, String instrumentPos) {
-    if (input.getContainerIdentificationBarcode() == null) {
+  private static SequencerPartitionContainer getContainer(SampleSheetInput input, String instrumentPos) {
+    if (input.getContainersByInstrumentPosition() == null) {
       return null;
     }
     String key = instrumentPos == null ? DEFAULT_INSTRUMENT_POS : instrumentPos;
-    return input.getContainerIdentificationBarcode().get(key);
+    return input.getContainersByInstrumentPosition().get(key);
   }
 
   protected static String getRequisitionValue(SampleSheetFieldSource source, ListLibraryAliquotView aliquot) {

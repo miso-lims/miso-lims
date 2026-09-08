@@ -222,7 +222,7 @@ public class SampleSheetsTest {
     InstrumentPosition position = mock(InstrumentPosition.class);
     when(position.getAlias()).thenReturn(alias);
 
-    assertEquals(alias, SampleSheets.getInstrumentPositionValue(source, alias));
+    assertEquals(alias, SampleSheets.getInstrumentPositionValue(source, null, alias));
   }
 
   @Test

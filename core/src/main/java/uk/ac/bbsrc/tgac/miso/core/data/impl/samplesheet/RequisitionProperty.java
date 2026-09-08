@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet;
 
 import java.util.stream.Collectors;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 
 public enum RequisitionProperty {
@@ -20,7 +21,7 @@ public enum RequisitionProperty {
     }
   },
 
-  ASSAY("Assay") {
+  ASSAY_ALIAS("Assay Alias") {
 
     @Override
     public String extract(Requisition requisition) {
@@ -28,7 +29,21 @@ public enum RequisitionProperty {
         return null;
       }
       return requisition.getAssays().stream()
-          .map(assay -> assay.getAlias() + " v" + assay.getVersion())
+          .map(Assay::getAlias)
+          .collect(Collectors.joining(";"));
+    }
+
+  },
+
+  ASSAY_VERSION("Assay Version") {
+
+    @Override
+    public String extract(Requisition requisition) {
+      if (requisition.getAssays() == null || requisition.getAssays().isEmpty()) {
+        return null;
+      }
+      return requisition.getAssays().stream()
+          .map(Assay::getVersion)
           .collect(Collectors.joining(";"));
     }
 

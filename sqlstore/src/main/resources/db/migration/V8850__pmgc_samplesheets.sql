@@ -10,8 +10,9 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "FCID",
         "sources": [
-          { 
-            "source": "CONTAINER" 
+          {
+            "source": "INSTRUMENT_POSITION",
+            "sourceProperty": "IDENTIFICATION_BARCODE"
           }
         ]
       },
@@ -80,28 +81,27 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "Assay",
         "sources": [
-          { 
-            "source": "REQUISITION", 
-            "sourceProperty": "ASSAY" 
-          }
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_ALIAS" },
+          { "value": " v" },
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_VERSION" }
         ]
       },
       {
         "name": "Tissue Origin",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_ORIGIN"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
         "name": "Tissue Type",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_TYPE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -127,17 +127,17 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           { 
             "source": "LIBRARY_ALIQUOT", 
-            "sourceProperty": "SCI_NAME" 
+            "sourceProperty": "SCIENTIFIC_NAME" 
           }
         ]
       },
       {
         "name": "Code",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "DESIGN_CODE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -150,11 +150,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         ]
       },
       {
-        "name": "Type",
+        "name": "Paired",
         "sources": [
-          { 
-            "source": "SEQUENCING_PARAMETERS", 
-            "sourceProperty": "TYPE" 
+          {
+            "source": "SEQUENCING_PARAMETERS",
+            "sourceProperty": "PAIRED"
           }
         ]
       },
@@ -289,8 +289,9 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "FCID",
         "sources": [
-          { 
-            "source": "CONTAINER" 
+          {
+            "source": "INSTRUMENT_POSITION",
+            "sourceProperty": "IDENTIFICATION_BARCODE"
           }
         ]
       },
@@ -359,28 +360,27 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "Assay",
         "sources": [
-          { 
-            "source": "REQUISITION", 
-            "sourceProperty": "ASSAY" 
-          }
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_ALIAS" },
+          { "value": " v" },
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_VERSION" }
         ]
       },
       {
         "name": "Tissue Origin",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_ORIGIN"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
         "name": "Tissue Type",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_TYPE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -406,17 +406,17 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           { 
             "source": "LIBRARY_ALIQUOT", 
-            "sourceProperty": "SCI_NAME" 
+            "sourceProperty": "SCIENTIFIC_NAME" 
           }
         ]
       },
       {
         "name": "Code",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "DESIGN_CODE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -429,11 +429,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         ]
       },
       {
-        "name": "Type",
+        "name": "Paired",
         "sources": [
-          { 
-            "source": "SEQUENCING_PARAMETERS", 
-            "sourceProperty": "TYPE" 
+          {
+            "source": "SEQUENCING_PARAMETERS",
+            "sourceProperty": "PAIRED"
           }
         ]
       },
@@ -568,8 +568,9 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "FCID",
         "sources": [
-          { 
-            "source": "CONTAINER" 
+          {
+            "source": "INSTRUMENT_POSITION",
+            "sourceProperty": "IDENTIFICATION_BARCODE"
           }
         ]
       },
@@ -638,28 +639,27 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "Assay",
         "sources": [
-          { 
-            "source": "REQUISITION", 
-            "sourceProperty": "ASSAY" 
-          }
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_ALIAS" },
+          { "value": " v" },
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_VERSION" }
         ]
       },
       {
         "name": "Tissue Origin",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_ORIGIN"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
         "name": "Tissue Type",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_TYPE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -685,17 +685,17 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           { 
             "source": "LIBRARY_ALIQUOT", 
-            "sourceProperty": "SCI_NAME" 
+            "sourceProperty": "SCIENTIFIC_NAME" 
           }
         ]
       },
       {
         "name": "Code",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "DESIGN_CODE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -708,11 +708,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         ]
       },
       {
-        "name": "Type",
+        "name": "Paired",
         "sources": [
-          { 
-            "source": "SEQUENCING_PARAMETERS", 
-            "sourceProperty": "TYPE" 
+          {
+            "source": "SEQUENCING_PARAMETERS",
+            "sourceProperty": "PAIRED"
           }
         ]
       },
@@ -847,8 +847,9 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "FCID",
         "sources": [
-          { 
-            "source": "CONTAINER" 
+          {
+            "source": "INSTRUMENT_POSITION",
+            "sourceProperty": "IDENTIFICATION_BARCODE"
           }
         ]
       },
@@ -917,28 +918,27 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "Assay",
         "sources": [
-          { 
-            "source": "REQUISITION", 
-            "sourceProperty": "ASSAY" 
-          }
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_ALIAS" },
+          { "value": " v" },
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_VERSION" }
         ]
       },
       {
         "name": "Tissue Origin",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_ORIGIN"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
         "name": "Tissue Type",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_TYPE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -964,17 +964,17 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           { 
             "source": "LIBRARY_ALIQUOT", 
-            "sourceProperty": "SCI_NAME" 
+            "sourceProperty": "SCIENTIFIC_NAME" 
           }
         ]
       },
       {
         "name": "Code",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "DESIGN_CODE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -987,11 +987,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         ]
       },
       {
-        "name": "Type",
+        "name": "Paired",
         "sources": [
-          { 
-            "source": "SEQUENCING_PARAMETERS", 
-            "sourceProperty": "TYPE" 
+          {
+            "source": "SEQUENCING_PARAMETERS",
+            "sourceProperty": "PAIRED"
           }
         ]
       },
@@ -1126,8 +1126,9 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "FCID",
         "sources": [
-          { 
-            "source": "CONTAINER" 
+          {
+            "source": "INSTRUMENT_POSITION",
+            "sourceProperty": "IDENTIFICATION_BARCODE"
           }
         ]
       },
@@ -1196,28 +1197,27 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "Assay",
         "sources": [
-          { 
-            "source": "REQUISITION", 
-            "sourceProperty": "ASSAY" 
-          }
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_ALIAS" },
+          { "value": " v" },
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_VERSION" }
         ]
       },
       {
         "name": "Tissue Origin",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_ORIGIN"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
         "name": "Tissue Type",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_TYPE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -1243,17 +1243,17 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           { 
             "source": "LIBRARY_ALIQUOT", 
-            "sourceProperty": "SCI_NAME" 
+            "sourceProperty": "SCIENTIFIC_NAME" 
           }
         ]
       },
       {
         "name": "Code",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "DESIGN_CODE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -1266,11 +1266,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         ]
       },
       {
-        "name": "Type",
+        "name": "Paired",
         "sources": [
-          { 
-            "source": "SEQUENCING_PARAMETERS", 
-            "sourceProperty": "TYPE" 
+          {
+            "source": "SEQUENCING_PARAMETERS",
+            "sourceProperty": "PAIRED"
           }
         ]
       },
@@ -1405,8 +1405,9 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "FCID",
         "sources": [
-          { 
-            "source": "CONTAINER" 
+          {
+            "source": "INSTRUMENT_POSITION",
+            "sourceProperty": "IDENTIFICATION_BARCODE"
           }
         ]
       },
@@ -1475,28 +1476,27 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "Assay",
         "sources": [
-          { 
-            "source": "REQUISITION", 
-            "sourceProperty": "ASSAY" 
-          }
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_ALIAS" },
+          { "value": " v" },
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_VERSION" }
         ]
       },
       {
         "name": "Tissue Origin",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_ORIGIN"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
         "name": "Tissue Type",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_TYPE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -1522,17 +1522,17 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           { 
             "source": "LIBRARY_ALIQUOT", 
-            "sourceProperty": "SCI_NAME" 
+            "sourceProperty": "SCIENTIFIC_NAME" 
           }
         ]
       },
       {
         "name": "Code",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "DESIGN_CODE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -1545,11 +1545,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         ]
       },
       {
-        "name": "Type",
+        "name": "Paired",
         "sources": [
-          { 
-            "source": "SEQUENCING_PARAMETERS", 
-            "sourceProperty": "TYPE" 
+          {
+            "source": "SEQUENCING_PARAMETERS",
+            "sourceProperty": "PAIRED"
           }
         ]
       },
@@ -1684,8 +1684,9 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "FCID",
         "sources": [
-          { 
-            "source": "CONTAINER" 
+          {
+            "source": "INSTRUMENT_POSITION",
+            "sourceProperty": "IDENTIFICATION_BARCODE"
           }
         ]
       },
@@ -1754,28 +1755,27 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "Assay",
         "sources": [
-          { 
-            "source": "REQUISITION", 
-            "sourceProperty": "ASSAY" 
-          }
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_ALIAS" },
+          { "value": " v" },
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_VERSION" }
         ]
       },
       {
         "name": "Tissue Origin",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_ORIGIN"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
         "name": "Tissue Type",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_TYPE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -1801,17 +1801,17 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           { 
             "source": "LIBRARY_ALIQUOT", 
-            "sourceProperty": "SCI_NAME" 
+            "sourceProperty": "SCIENTIFIC_NAME" 
           }
         ]
       },
       {
         "name": "Code",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "DESIGN_CODE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -1824,11 +1824,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         ]
       },
       {
-        "name": "Type",
+        "name": "Paired",
         "sources": [
-          { 
-            "source": "SEQUENCING_PARAMETERS", 
-            "sourceProperty": "TYPE" 
+          {
+            "source": "SEQUENCING_PARAMETERS",
+            "sourceProperty": "PAIRED"
           }
         ]
       },
@@ -1963,8 +1963,9 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "FCID",
         "sources": [
-          { 
-            "source": "CONTAINER" 
+          {
+            "source": "INSTRUMENT_POSITION",
+            "sourceProperty": "IDENTIFICATION_BARCODE"
           }
         ]
       },
@@ -2040,28 +2041,27 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
       {
         "name": "Assay",
         "sources": [
-          { 
-            "source": "REQUISITION", 
-            "sourceProperty": "ASSAY" 
-          }
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_ALIAS" },
+          { "value": " v" },
+          { "source": "REQUISITION", "sourceProperty": "ASSAY_VERSION" }
         ]
       },
       {
         "name": "Tissue Origin",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_ORIGIN"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_ORIGIN_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
         "name": "Tissue Type",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "TISSUE_TYPE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "TISSUE_TYPE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -2087,17 +2087,17 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           { 
             "source": "LIBRARY_ALIQUOT", 
-            "sourceProperty": "SCI_NAME" 
+            "sourceProperty": "SCIENTIFIC_NAME" 
           }
         ]
       },
       {
         "name": "Code",
         "sources": [
-          {
-            "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "DESIGN_CODE"
-          }
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE" },
+          { "value": " (" },
+          { "source": "LIBRARY_ALIQUOT", "sourceProperty": "DESIGN_CODE_DESCRIPTION" },
+          { "value": ")" }
         ]
       },
       {
@@ -2110,11 +2110,11 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         ]
       },
       {
-        "name": "Type",
+        "name": "Paired",
         "sources": [
-          { 
-            "source": "SEQUENCING_PARAMETERS", 
-            "sourceProperty": "TYPE" 
+          {
+            "source": "SEQUENCING_PARAMETERS",
+            "sourceProperty": "PAIRED"
           }
         ]
       },
