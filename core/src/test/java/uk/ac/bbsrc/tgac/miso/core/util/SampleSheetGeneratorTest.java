@@ -16,7 +16,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.LibraryAliquotProperty;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.PoolProperty;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheet;
@@ -26,30 +30,34 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetParameter;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetParameter.MultivalueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetParameter.ParameterType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SequencingParametersProperty;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 
-public class SampleSheetsTest {
+public class SampleSheetGeneratorTest {
 
   private final JsonMapper mapper = JsonMapper.builder().build();
+
+  private final SampleSheetGenerator sut = new SampleSheetGenerator(mock(LibraryAliquotService.class));
 
   @Test
   public void testGetMultiValueNone() {
     SampleSheetFieldSource source = mock(SampleSheetFieldSource.class);
-    String value = SampleSheets.getMultiValue(source, Collections.<String>emptySet(), (fieldSource, object) -> object);
+    String value =
+        sut.getMultiValue(source, Collections.<String>emptySet(), (fieldSource, object) -> object);
     assertNull(value);
   }
 
   @Test
   public void testGetMultiValueSingle() {
     SampleSheetFieldSource source = mock(SampleSheetFieldSource.class);
-    String value = SampleSheets.getMultiValue(source, Arrays.asList("a"), (fieldSource, object) -> object);
+    String value = sut.getMultiValue(source, Arrays.asList("a"), (fieldSource, object) -> object);
     assertEquals("a", value);
   }
 
   @Test
   public void testGetMultiValueMulti() {
     SampleSheetFieldSource source = mock(SampleSheetFieldSource.class);
-    String value = SampleSheets.getMultiValue(source, Arrays.asList("a", "b", "c"), (fieldSource, object) -> object);
+    String value =
+        sut.getMultiValue(source, Arrays.asList("a", "b", "c"), (fieldSource, object) -> object);
     assertEquals("a; b; c", value);
   }
 
@@ -73,7 +81,7 @@ public class SampleSheetsTest {
     customParameters.put(parameterName, value);
     when(input.getCustomParameters()).thenReturn(customParameters);
 
-    assertEquals(value, SampleSheets.getParameterValue(sampleSheet, source, input, null));
+    assertEquals(value, sut.getParameterValue(sampleSheet, source, input, null));
   }
 
   @Test
@@ -100,7 +108,7 @@ public class SampleSheetsTest {
 
     when(input.getCustomParameters()).thenReturn(customParameters);
 
-    assertEquals(value, SampleSheets.getParameterValue(sampleSheet, source, input, instrumentPosition));
+    assertEquals(value, sut.getParameterValue(sampleSheet, source, input, instrumentPosition));
   }
 
   @Test
@@ -127,7 +135,7 @@ public class SampleSheetsTest {
 
     when(input.getCustomParameters()).thenReturn(customParameters);
 
-    assertEquals("Value A/Value B", SampleSheets.getParameterValue(sampleSheet, source, input, null));
+    assertEquals("Value A/Value B", sut.getParameterValue(sampleSheet, source, input, null));
   }
 
   @Test
@@ -145,7 +153,7 @@ public class SampleSheetsTest {
 
     SampleSheetFieldSource source = mock(SampleSheetFieldSource.class);
 
-    assertEquals(value, SampleSheets.getValueFromInput(inputValue, source, parameter));
+    assertEquals(value, sut.getValueFromInput(inputValue, source, parameter));
   }
 
   @Test
@@ -168,7 +176,7 @@ public class SampleSheetsTest {
 
     SampleSheetFieldSource source = mock(SampleSheetFieldSource.class);
 
-    assertEquals(selectedValue, SampleSheets.getValueFromInput(inputValue, source, parameter));
+    assertEquals(selectedValue, sut.getValueFromInput(inputValue, source, parameter));
   }
 
   @Test
@@ -196,7 +204,7 @@ public class SampleSheetsTest {
     SampleSheetFieldSource source = mock(SampleSheetFieldSource.class);
     when(source.getSourceProperty()).thenReturn(customField);
 
-    assertEquals(selectedCustomValue, SampleSheets.getValueFromInput(inputValue, source, parameter));
+    assertEquals(selectedCustomValue, sut.getValueFromInput(inputValue, source, parameter));
   }
 
   @Test
@@ -209,7 +217,7 @@ public class SampleSheetsTest {
     InstrumentModel model = mock(InstrumentModel.class);
     when(model.getAlias()).thenReturn(alias);
 
-    assertEquals(alias, SampleSheets.getInstrumentModelValue(source, model));
+    assertEquals(alias, sut.getInstrumentModelValue(source, model));
   }
 
   @Test
@@ -222,7 +230,9 @@ public class SampleSheetsTest {
     InstrumentPosition position = mock(InstrumentPosition.class);
     when(position.getAlias()).thenReturn(alias);
 
-    assertEquals(alias, SampleSheets.getInstrumentPositionValue(source, null, alias));
+    SampleSheetInput input = mock(SampleSheetInput.class);
+
+    assertEquals(alias, sut.getInstrumentPositionValue(source, input, alias));
   }
 
   @Test
@@ -233,10 +243,19 @@ public class SampleSheetsTest {
     when(source.getSource()).thenReturn(SampleSheetFieldCommonSource.LIBRARY_ALIQUOT.name());
     when(source.getSourceProperty()).thenReturn(LibraryAliquotProperty.PROJECT_CODE.name());
 
-    ListLibraryAliquotView aliquot = mock(ListLibraryAliquotView.class);
-    when(aliquot.getProjectCode()).thenReturn(projectCode);
+    Project project = mock(Project.class);
+    when(project.getCode()).thenReturn(projectCode);
 
-    assertEquals(projectCode, SampleSheets.getLibraryAliquotValue(source, aliquot));
+    Sample sample = mock(Sample.class);
+    when(sample.getProject()).thenReturn(project);
+
+    Library library = mock(Library.class);
+    when(library.getSample()).thenReturn(sample);
+
+    LibraryAliquot aliquot = mock(LibraryAliquot.class);
+    when(aliquot.getLibrary()).thenReturn(library);
+
+    assertEquals(projectCode, sut.getLibraryAliquotValue(source, aliquot));
   }
 
   @Test
@@ -249,7 +268,7 @@ public class SampleSheetsTest {
     Partition partition = mock(Partition.class);
     when(partition.getPartitionNumber()).thenReturn(partitionNumber);
 
-    assertEquals(partitionNumber.toString(), SampleSheets.getPartitionValue(source, partitionNumber));
+    assertEquals(partitionNumber.toString(), sut.getPartitionValue(source, partitionNumber));
   }
 
   @Test
@@ -263,7 +282,7 @@ public class SampleSheetsTest {
     Pool pool = mock(Pool.class);
     when(pool.getAlias()).thenReturn(alias);
 
-    assertEquals(alias, SampleSheets.getPoolValue(source, pool));
+    assertEquals(alias, sut.getPoolValue(source, pool));
   }
 
   @Test
@@ -277,7 +296,7 @@ public class SampleSheetsTest {
     SequencingParameters params = mock(SequencingParameters.class);
     when(params.getReadLength()).thenReturn(readLength);
 
-    assertEquals(Integer.toString(readLength), SampleSheets.getSequencingParametersValue(source, params));
+    assertEquals(Integer.toString(readLength), sut.getSequencingParametersValue(source, params));
   }
 
   @Test
@@ -297,6 +316,6 @@ public class SampleSheetsTest {
     input.getSequencingParametersByInstrumentPosition().put(instrumentPosition, params);
 
     assertEquals(Integer.toString(readLength),
-        SampleSheets.getSequencingParametersValue(source, input, instrumentPosition));
+        sut.getSequencingParametersValue(source, input, instrumentPosition));
   }
 }

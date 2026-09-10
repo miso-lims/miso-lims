@@ -15,9 +15,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
@@ -34,7 +31,6 @@ public class ParentLibrary implements IndexedLibrary, Serializable {
   private String alias;
   private String description;
   private boolean lowQuality;
-  private boolean umis;
 
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
@@ -46,18 +42,6 @@ public class ParentLibrary implements IndexedLibrary, Serializable {
   @ManyToOne
   @JoinColumn(name = "index2Id")
   private LibraryIndex index2;
-
-  @ManyToOne
-  @JoinColumn(name = "librarySelectionType")
-  private LibrarySelectionType librarySelectionType;
-
-  @ManyToOne
-  @JoinColumn(name = "libraryStrategyType")
-  private LibraryStrategyType libraryStrategyType;
-
-  @ManyToOne
-  @JoinColumn(name = "requisitionId")
-  private Requisition requisition;
 
   @ManyToOne(targetEntity = DetailedQcStatusImpl.class)
   @JoinColumn(name = "detailedQcStatusId")
@@ -133,38 +117,6 @@ public class ParentLibrary implements IndexedLibrary, Serializable {
   @Override
   public void setIndex2(LibraryIndex index2) {
     this.index2 = index2;
-  }
-
-  public boolean getUmis() {
-    return umis;
-  }
-
-  public void setUmis(boolean umis) {
-    this.umis = umis;
-  }
-
-  public LibrarySelectionType getLibrarySelectionType() {
-    return librarySelectionType;
-  }
-
-  public void setLibrarySelectionType(LibrarySelectionType librarySelectionType) {
-    this.librarySelectionType = librarySelectionType;
-  }
-
-  public LibraryStrategyType getLibraryStrategyType() {
-    return libraryStrategyType;
-  }
-
-  public void setLibraryStrategyType(LibraryStrategyType libraryStrategyType) {
-    this.libraryStrategyType = libraryStrategyType;
-  }
-
-  public Requisition getRequisition() {
-    return requisition;
-  }
-
-  public void setRequisition(Requisition requisition) {
-    this.requisition = requisition;
   }
 
   public DetailedQcStatus getDetailedQcStatus() {

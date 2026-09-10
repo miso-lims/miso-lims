@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.util;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -18,11 +19,15 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import tools.jackson.databind.JsonNode;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.LibraryAliquotProperty;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.PoolProperty;
@@ -35,13 +40,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetFieldSource.A
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetParameter;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetSection;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SequencingParametersProperty;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.GrandparentSample;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
+import uk.ac.bbsrc.tgac.miso.core.service.LibraryAliquotService;
 
-public class SampleSheets {
+@Component
+public class SampleSheetGenerator {
 
   private static final String DEFAULT_INSTRUMENT_POS = "*";
 
@@ -49,25 +52,47 @@ public class SampleSheets {
   private static final Set<String> validDateTimeFormats =
       Collections.unmodifiableSet(Set.of("yyyy-MM-dd", "M/d/yyyy", "yyyyMMddHHmmss"));
 
-  private SampleSheets() {
-    // static util class not intended for instantiation
+  private final LibraryAliquotService libraryAliquotService;
+
+  @Autowired
+  public SampleSheetGenerator(LibraryAliquotService libraryAliquotService) {
+    this.libraryAliquotService = libraryAliquotService;
   }
 
   /**
    * Generate a sample sheet based on a sample sheet definition combined with user input. A valid
    * definition and matching valid input are assumed, and any invalid data will result in a runtime
    * exception.
-   * 
+   *
    * @param sampleSheet the sample sheet format definition
    * @param input user input
    * @return the bytes of a String intended for writing as a CSV file
    */
-  public static byte[] generate(SampleSheet sampleSheet, SampleSheetInput input) {
-    List<List<String>> sampleSheetRows = generateData(sampleSheet, input);
+  public byte[] generate(SampleSheet sampleSheet, SampleSheetInput input) throws IOException {
+    Map<Long, LibraryAliquot> aliquotsById = loadAliquots(input);
+    List<List<String>> sampleSheetRows = generateData(sampleSheet, input, aliquotsById);
     return writeCsv(sampleSheetRows);
   }
 
-  private static List<List<String>> generateData(SampleSheet sampleSheet, SampleSheetInput input) {
+  private Map<Long, LibraryAliquot> loadAliquots(SampleSheetInput input) throws IOException {
+    Set<Long> poolIds = input.getPoolLayout().values().stream()
+        .flatMap(map -> map.values().stream())
+        .filter(Objects::nonNull)
+        .map(Pool::getId)
+        .collect(Collectors.toSet());
+    if (poolIds.isEmpty()) {
+      return Map.of();
+    }
+    return libraryAliquotService.listByPoolIds(poolIds).stream()
+        .collect(Collectors.toMap(LibraryAliquot::getId, aliquot -> aliquot));
+  }
+
+  private static LibraryAliquot resolveAliquot(Map<Long, LibraryAliquot> aliquotsById, PoolElement poolElement) {
+    return aliquotsById.get(poolElement.getAliquot().getId());
+  }
+
+  private List<List<String>> generateData(SampleSheet sampleSheet, SampleSheetInput input,
+      Map<Long, LibraryAliquot> aliquotsById) {
     List<List<String>> sampleSheetRows = new ArrayList<>();
     boolean firstSection = true;
     for (SampleSheetSection section : sampleSheet.getSections()) {
@@ -75,7 +100,7 @@ public class SampleSheets {
           && Objects.equals(input.getIncludeSections().get(section.getName()), Boolean.FALSE)) {
         continue;
       }
-      List<List<String>> unformattedRows = generateUnformattedSectionData(sampleSheet, section, input);
+      List<List<String>> unformattedRows = generateUnformattedSectionData(sampleSheet, section, input, aliquotsById);
 
       if (firstSection) {
         firstSection = false;
@@ -87,8 +112,8 @@ public class SampleSheets {
     return sampleSheetRows;
   }
 
-  private static List<List<String>> generateUnformattedSectionData(SampleSheet sampleSheet, SampleSheetSection section,
-      SampleSheetInput input) {
+  private List<List<String>> generateUnformattedSectionData(SampleSheet sampleSheet, SampleSheetSection section,
+      SampleSheetInput input, Map<Long, LibraryAliquot> aliquotsById) {
     List<List<String>> rows = new ArrayList<>();
     for (SampleSheetField field : section.getFields()) {
       List<String> values = new ArrayList<>();
@@ -96,7 +121,7 @@ public class SampleSheets {
       if (section.getMultivalue() == null) {
         StringBuilder sb = new StringBuilder();
         for (SampleSheetFieldSource source : field.getSources()) {
-          String value = generateSingleValue(sampleSheet, source, input);
+          String value = generateSingleValue(sampleSheet, source, input, aliquotsById);
           if (value != null) {
             sb.append(value);
           }
@@ -109,7 +134,8 @@ public class SampleSheets {
               String realPos = Objects.equals(instrumentPos, DEFAULT_INSTRUMENT_POS) ? null : instrumentPos;
               StringBuilder sb = new StringBuilder();
               for (SampleSheetFieldSource source : field.getSources()) {
-                String value = generateValueForInstrumentPos(sampleSheet, source, input, realPos, poolsByPartition);
+                String value = generateValueForInstrumentPos(sampleSheet, source, input, realPos, poolsByPartition,
+                    aliquotsById);
                 if (value != null) {
                   sb.append(value);
                 }
@@ -128,7 +154,7 @@ public class SampleSheets {
                   StringBuilder sb = new StringBuilder();
                   for (SampleSheetFieldSource source : field.getSources()) {
                     String value = generateValueForLibraryAliquot(sampleSheet, source, input, realPos,
-                        partitionNumber, pool, poolElement.getAliquot());
+                        partitionNumber, pool, resolveAliquot(aliquotsById, poolElement));
                     if (value != null) {
                       sb.append(value);
                     }
@@ -153,7 +179,7 @@ public class SampleSheets {
                   StringBuilder sb = new StringBuilder();
                   for (SampleSheetFieldSource source : field.getSources()) {
                     String value = generateValueForLibraryAliquot(sampleSheet, source, input, realPos,
-                        null, pool, poolElement.getAliquot());
+                        null, pool, resolveAliquot(aliquotsById, poolElement));
                     if (value != null) {
                       sb.append(value);
                     }
@@ -172,7 +198,7 @@ public class SampleSheets {
     return rows;
   }
 
-  private static void addFormatedSectionData(SampleSheetSection section, List<List<String>> unformattedRows,
+  private void addFormatedSectionData(SampleSheetSection section, List<List<String>> unformattedRows,
       List<List<String>> sampleSheetRows) {
     List<String> headerRow = new ArrayList<>();
     headerRow.add("[" + section.getName() + "]");
@@ -227,12 +253,12 @@ public class SampleSheets {
     }
   }
 
-  private static boolean omitRow(List<String> row, SampleSheetField field) {
+  private boolean omitRow(List<String> row, SampleSheetField field) {
     return Objects.equals(field.getOmitIfEmpty(), Boolean.TRUE) && row.stream().noneMatch(Objects::nonNull);
   }
 
-  private static String generateSingleValue(SampleSheet sampleSheet, SampleSheetFieldSource source,
-      SampleSheetInput input) {
+  private String generateSingleValue(SampleSheet sampleSheet, SampleSheetFieldSource source,
+      SampleSheetInput input, Map<Long, LibraryAliquot> aliquotsById) {
     if (source.getValue() != null) {
       return source.getValue();
     }
@@ -246,7 +272,7 @@ public class SampleSheets {
       case SEQUENCING_PARAMETERS:
         if (input.getInstrumentModel().getPlatformType().hasContainerLevelParameters()) {
           Collection<SequencingParameters> params = input.getSequencingParametersByInstrumentPosition().values();
-          return getMultiValue(source, params, SampleSheets::getSequencingParametersValue);
+          return getMultiValue(source, params, this::getSequencingParametersValue);
         } else {
           return getSequencingParametersValue(source, input.getSequencingParameters());
         }
@@ -256,27 +282,27 @@ public class SampleSheets {
       case PARTITION:
         List<Integer> partitionNumbers =
             input.getPoolLayout().values().stream().flatMap(map -> map.keySet().stream()).toList();
-        return getMultiValue(source, partitionNumbers, SampleSheets::getPartitionValue);
+        return getMultiValue(source, partitionNumbers, this::getPartitionValue);
       case POOL:
         List<Pool> pools = input.getPoolLayout().values().stream()
             .flatMap(map -> map.values().stream())
             .filter(Objects::nonNull)
             .toList();
-        return getMultiValue(source, pools, SampleSheets::getPoolValue);
+        return getMultiValue(source, pools, this::getPoolValue);
       case LIBRARY_ALIQUOT:
-        List<ListLibraryAliquotView> aliquots = input.getPoolLayout().values().stream()
+        List<LibraryAliquot> aliquots = input.getPoolLayout().values().stream()
             .flatMap(map -> map.values().stream().filter(Objects::nonNull))
             .flatMap(pool -> pool.getPoolContents() == null ? Stream.empty() : pool.getPoolContents().stream())
-            .map(PoolElement::getAliquot)
+            .map(poolElement -> resolveAliquot(aliquotsById, poolElement))
             .toList();
-        return getMultiValue(source, aliquots, SampleSheets::getLibraryAliquotValue);
+        return getMultiValue(source, aliquots, this::getLibraryAliquotValue);
       case REQUISITION:
-        List<ListLibraryAliquotView> requisitionAliquots = input.getPoolLayout().values().stream()
+        List<LibraryAliquot> requisitionAliquots = input.getPoolLayout().values().stream()
             .flatMap(map -> map.values().stream().filter(Objects::nonNull))
             .flatMap(pool -> pool.getPoolContents() == null ? Stream.empty() : pool.getPoolContents().stream())
-            .map(PoolElement::getAliquot)
+            .map(poolElement -> resolveAliquot(aliquotsById, poolElement))
             .toList();
-        return getMultiValue(source, requisitionAliquots, SampleSheets::getRequisitionValue);
+        return getMultiValue(source, requisitionAliquots, this::getRequisitionValue);
       case CURRENT_TIME:
         return formatCurrentDateTime(source.getDateFormat());
       default:
@@ -284,8 +310,9 @@ public class SampleSheets {
     }
   }
 
-  private static String generateValueForInstrumentPos(SampleSheet sampleSheet, SampleSheetFieldSource source,
-      SampleSheetInput input, String instrumentPos, Map<Integer, Pool> poolsByPartition) {
+  private String generateValueForInstrumentPos(SampleSheet sampleSheet, SampleSheetFieldSource source,
+      SampleSheetInput input, String instrumentPos, Map<Integer, Pool> poolsByPartition,
+      Map<Long, LibraryAliquot> aliquotsById) {
     if (source.getValue() != null) {
       return source.getValue();
     }
@@ -305,24 +332,24 @@ public class SampleSheets {
       case INSTRUMENT_POSITION:
         return getInstrumentPositionValue(source, input, instrumentPos);
       case PARTITION:
-        return getMultiValue(source, poolsByPartition.keySet(), SampleSheets::getPartitionValue);
+        return getMultiValue(source, poolsByPartition.keySet(), this::getPartitionValue);
       case POOL:
         return getMultiValue(source, poolsByPartition.values().stream().filter(Objects::nonNull).toList(),
-            SampleSheets::getPoolValue);
+            this::getPoolValue);
       case LIBRARY_ALIQUOT:
-        List<ListLibraryAliquotView> aliquots = poolsByPartition.values().stream()
+        List<LibraryAliquot> aliquots = poolsByPartition.values().stream()
             .filter(Objects::nonNull)
             .flatMap(pool -> pool.getPoolContents() == null ? Stream.empty() : pool.getPoolContents().stream())
-            .map(PoolElement::getAliquot)
+            .map(poolElement -> resolveAliquot(aliquotsById, poolElement))
             .toList();
-        return getMultiValue(source, aliquots, SampleSheets::getLibraryAliquotValue);
+        return getMultiValue(source, aliquots, this::getLibraryAliquotValue);
       case REQUISITION:
-        List<ListLibraryAliquotView> requisitionAliquots = poolsByPartition.values().stream()
+        List<LibraryAliquot> requisitionAliquots = poolsByPartition.values().stream()
             .filter(Objects::nonNull)
             .flatMap(pool -> pool.getPoolContents() == null ? Stream.empty() : pool.getPoolContents().stream())
-            .map(PoolElement::getAliquot)
+            .map(poolElement -> resolveAliquot(aliquotsById, poolElement))
             .toList();
-        return getMultiValue(source, requisitionAliquots, SampleSheets::getRequisitionValue);
+        return getMultiValue(source, requisitionAliquots, this::getRequisitionValue);
       case CURRENT_TIME:
         return formatCurrentDateTime(source.getDateFormat());
       default:
@@ -330,9 +357,9 @@ public class SampleSheets {
     }
   }
 
-  private static String generateValueForLibraryAliquot(SampleSheet sampleSheet, SampleSheetFieldSource source,
+  private String generateValueForLibraryAliquot(SampleSheet sampleSheet, SampleSheetFieldSource source,
       SampleSheetInput input, String instrumentPos, Integer partitionNumber, Pool pool,
-      ListLibraryAliquotView libraryAliquot) {
+      LibraryAliquot libraryAliquot) {
     if (source.getValue() != null) {
       return source.getValue();
     }
@@ -370,7 +397,7 @@ public class SampleSheets {
     }
   }
 
-  protected static <T> String getMultiValue(SampleSheetFieldSource source, Collection<T> objects,
+  protected <T> String getMultiValue(SampleSheetFieldSource source, Collection<T> objects,
       BiFunction<SampleSheetFieldSource, T, String> getValue) {
     if (objects == null || objects.isEmpty()) {
       return null;
@@ -397,7 +424,7 @@ public class SampleSheets {
 
   }
 
-  protected static String getInstrumentModelValue(SampleSheetFieldSource source,
+  protected String getInstrumentModelValue(SampleSheetFieldSource source,
       InstrumentModel model) {
     if (source.getSourceProperty() == null) {
       return model.getAlias();
@@ -406,19 +433,19 @@ public class SampleSheets {
         "Unexpected instrument model property: %s".formatted(source.getSourceProperty()));
   }
 
-  protected static String getSequencingParametersValue(SampleSheetFieldSource source,
+  protected String getSequencingParametersValue(SampleSheetFieldSource source,
       SampleSheetInput input, String instrumentPosition) {
     SequencingParameters params = input.getSequencingParametersByInstrumentPosition().get(instrumentPosition);
     return getSequencingParametersValue(source, params);
   }
 
-  protected static String getSequencingParametersValue(SampleSheetFieldSource source,
+  protected String getSequencingParametersValue(SampleSheetFieldSource source,
       SequencingParameters sequencingParameters) {
     SequencingParametersProperty property = SequencingParametersProperty.valueOf(source.getSourceProperty());
     return property.extract(sequencingParameters);
   }
 
-  protected static String getInstrumentPositionValue(SampleSheetFieldSource source, SampleSheetInput input,
+  protected String getInstrumentPositionValue(SampleSheetFieldSource source, SampleSheetInput input,
       String position) {
     if (source.getSourceProperty() == null) {
       return position;
@@ -431,24 +458,24 @@ public class SampleSheets {
         "Unexpected instrument position property: %s".formatted(source.getSourceProperty()));
   }
 
-  protected static String getPartitionValue(SampleSheetFieldSource source, Integer partitionNumber) {
+  protected String getPartitionValue(SampleSheetFieldSource source, Integer partitionNumber) {
     if (source.getSourceProperty() == null) {
       return partitionNumber.toString();
     }
     throw new IllegalArgumentException("Unexpected partition property: %s".formatted(source.getSourceProperty()));
   }
 
-  protected static String getPoolValue(SampleSheetFieldSource source, Pool pool) {
+  protected String getPoolValue(SampleSheetFieldSource source, Pool pool) {
     PoolProperty property = PoolProperty.valueOf(source.getSourceProperty());
     return property.extract(pool);
   }
 
-  protected static String getLibraryAliquotValue(SampleSheetFieldSource source, ListLibraryAliquotView aliquot) {
+  protected String getLibraryAliquotValue(SampleSheetFieldSource source, LibraryAliquot aliquot) {
     LibraryAliquotProperty property = LibraryAliquotProperty.valueOf(source.getSourceProperty());
     return property.extract(aliquot);
   }
 
-  protected static String getParameterValue(SampleSheet sampleSheet, SampleSheetFieldSource source,
+  protected String getParameterValue(SampleSheet sampleSheet, SampleSheetFieldSource source,
       SampleSheetInput input, String instrumentPosition) {
     SampleSheetParameter parameter = sampleSheet.getParameters().stream()
         .filter(param -> Objects.equals(param.getName(), source.getSource()))
@@ -476,7 +503,7 @@ public class SampleSheets {
     }
   }
 
-  protected static String getValueFromInput(JsonNode inputValue, SampleSheetFieldSource source,
+  protected String getValueFromInput(JsonNode inputValue, SampleSheetFieldSource source,
       SampleSheetParameter parameter) {
     if (inputValue.isNull() || (inputValue.isString() && inputValue.asString().isBlank())) {
       return null;
@@ -500,29 +527,7 @@ public class SampleSheets {
     }
   }
 
-  protected static Requisition getEffectiveRequisition(ListLibraryAliquotView aliquot) {
-    ParentLibrary library = aliquot.getParentLibrary();
-    if (library.getRequisition() != null) {
-      return library.getRequisition();
-    }
-    ParentSample sample = library.getParentSample();
-    if (sample == null) {
-      return null;
-    }
-    if (sample.getRequisition() != null) {
-      return sample.getRequisition();
-    }
-    GrandparentSample parent = sample.getParentSample();
-    while (parent != null) {
-      if (parent.getRequisition() != null) {
-        return parent.getRequisition();
-      }
-      parent = parent.getParentSample();
-    }
-    return null;
-  }
-
-  private static SequencerPartitionContainer getContainer(SampleSheetInput input, String instrumentPos) {
+  private SequencerPartitionContainer getContainer(SampleSheetInput input, String instrumentPos) {
     if (input.getContainersByInstrumentPosition() == null) {
       return null;
     }
@@ -530,8 +535,8 @@ public class SampleSheets {
     return input.getContainersByInstrumentPosition().get(key);
   }
 
-  protected static String getRequisitionValue(SampleSheetFieldSource source, ListLibraryAliquotView aliquot) {
-    Requisition requisition = getEffectiveRequisition(aliquot);
+  protected String getRequisitionValue(SampleSheetFieldSource source, LibraryAliquot aliquot) {
+    Requisition requisition = LimsUtils.getEffectiveRequisition(aliquot.getLibrary());
     if (requisition == null) {
       return null;
     }
@@ -539,7 +544,7 @@ public class SampleSheets {
     return property.extract(requisition);
   }
 
-  private static JsonNode findByValue(SampleSheetParameter parameter, String value) {
+  private JsonNode findByValue(SampleSheetParameter parameter, String value) {
     for (JsonNode node : parameter.getSource()) {
       if (Objects.equals(node.get("value").asString(), value)) {
         return node;
@@ -548,7 +553,7 @@ public class SampleSheets {
     throw new IllegalArgumentException("Invalid value for '%s' parameter: %s".formatted(parameter.getName(), value));
   }
 
-  private static String formatDate(String inputDate, String format) {
+  private String formatDate(String inputDate, String format) {
     LocalDate date = LimsUtils.parseLocalDate(inputDate);
     if (format == null) {
       return date.format(DateTimeFormatter.ISO_LOCAL_DATE);
@@ -559,7 +564,7 @@ public class SampleSheets {
     throw new IllegalArgumentException("Unexpected date format: %s".formatted(format));
   }
 
-  private static String formatCurrentDateTime(String format) {
+  private String formatCurrentDateTime(String format) {
     if (format == null) {
       return formatCurrentDateTime("yyyy-mm-dd");
     }
@@ -569,7 +574,7 @@ public class SampleSheets {
     throw new IllegalArgumentException("Unexpected date format: %s".formatted(format));
   }
 
-  private static byte[] writeCsv(List<List<String>> rows) {
+  private byte[] writeCsv(List<List<String>> rows) {
     StringBuilder sb = new StringBuilder();
     int columnCount = rows.stream().mapToInt(List::size).max().orElseThrow();
     for (List<String> row : rows) {

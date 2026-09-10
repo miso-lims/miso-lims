@@ -43,8 +43,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleSheetService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.SampleSheetGenerator;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheetInput;
-import uk.ac.bbsrc.tgac.miso.core.util.SampleSheets;
 import uk.ac.bbsrc.tgac.miso.dto.SampleSheetDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
@@ -66,6 +66,8 @@ public class SampleSheetRestController extends AbstractRestController {
   private PoolService poolService;
   @Autowired
   private RunService runService;
+  @Autowired
+  private SampleSheetGenerator sampleSheetGenerator;
 
   @GetMapping
   @ResponseBody
@@ -93,7 +95,7 @@ public class SampleSheetRestController extends AbstractRestController {
       HttpServletResponse response) throws IOException {
     SampleSheet sampleSheet = RestUtils.retrieve("sample sheet", sampleSheetId, sampleSheetService, Status.NOT_FOUND);
     SampleSheetInput input = validateSampleSheetInput(sampleSheet, request);
-    byte[] outputBytes = SampleSheets.generate(sampleSheet, input);
+    byte[] outputBytes = sampleSheetGenerator.generate(sampleSheet, input);
 
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(new MediaType("text", "csv"));

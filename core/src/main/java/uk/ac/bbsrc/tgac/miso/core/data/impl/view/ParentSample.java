@@ -14,11 +14,8 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
-import uk.ac.bbsrc.tgac.miso.core.data.ScientificName;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIndex;
 
 @Entity
 @Immutable
@@ -33,8 +30,6 @@ public class ParentSample implements Serializable {
   private String name;
   private String alias;
   private String accession;
-  private String sampleType;
-  private String identificationBarcode;
 
   @ManyToOne
   @JoinColumn(name = "sequencingControlTypeId")
@@ -55,18 +50,6 @@ public class ParentSample implements Serializable {
   @ManyToOne
   @JoinColumn(name = "sampleClassId")
   private ParentSampleClass parentSampleClass;
-
-  @ManyToOne
-  @JoinColumn(name = "requisitionId")
-  private Requisition requisition;
-
-  @ManyToOne
-  @JoinColumn(name = "indexId")
-  private SampleIndex index;
-
-  @ManyToOne
-  @JoinColumn(name = "scientificNameId")
-  private ScientificName scientificName;
 
   @OneToOne
   @PrimaryKeyJoinColumn
@@ -107,14 +90,6 @@ public class ParentSample implements Serializable {
 
   public void setAccession(String accession) {
     this.accession = accession;
-  }
-
-  public String getSampleType() {
-    return sampleType;
-  }
-
-  public void setSampleType(String sampleType) {
-    this.sampleType = sampleType;
   }
 
   public SequencingControlType getSequencingControlType() {
@@ -179,38 +154,6 @@ public class ParentSample implements Serializable {
 
   public void setParentSample(GrandparentSample parentSample) {
     this.parentSample = parentSample;
-  }
-
-  public Requisition getRequisition() {
-    return requisition;
-  }
-
-  public void setRequisition(Requisition requisition) {
-    this.requisition = requisition;
-  }
-
-  public String getIdentificationBarcode() {
-    return identificationBarcode;
-  }
-
-  public void setIdentificationBarcode(String identificationBarcode) {
-    this.identificationBarcode = identificationBarcode;
-  }
-
-  public SampleIndex getIndex() {
-    return index;
-  }
-
-  public void setIndex(SampleIndex index) {
-    this.index = index;
-  }
-
-  public ScientificName getScientificName() {
-    return scientificName;
-  }
-
-  public void setScientificName(ScientificName scientificName) {
-    this.scientificName = scientificName;
   }
 
 }
