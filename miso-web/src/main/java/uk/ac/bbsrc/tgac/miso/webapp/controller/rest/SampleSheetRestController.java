@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -31,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.InstrumentPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingContainerModel;
@@ -43,8 +43,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.SampleSheetService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingContainerModelService;
 import uk.ac.bbsrc.tgac.miso.core.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.SampleSheetGenerator;
 import uk.ac.bbsrc.tgac.miso.core.util.SampleSheetInput;
-import uk.ac.bbsrc.tgac.miso.core.util.SampleSheets;
 import uk.ac.bbsrc.tgac.miso.dto.SampleSheetDto;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.AbstractRestController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
@@ -66,6 +66,8 @@ public class SampleSheetRestController extends AbstractRestController {
   private PoolService poolService;
   @Autowired
   private RunService runService;
+  @Autowired
+  private SampleSheetGenerator sampleSheetGenerator;
 
   @GetMapping
   @ResponseBody
@@ -93,7 +95,7 @@ public class SampleSheetRestController extends AbstractRestController {
       HttpServletResponse response) throws IOException {
     SampleSheet sampleSheet = RestUtils.retrieve("sample sheet", sampleSheetId, sampleSheetService, Status.NOT_FOUND);
     SampleSheetInput input = validateSampleSheetInput(sampleSheet, request);
-    byte[] outputBytes = SampleSheets.generate(sampleSheet, input);
+    byte[] outputBytes = sampleSheetGenerator.generate(sampleSheet, input);
 
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(new MediaType("text", "csv"));
@@ -139,23 +141,33 @@ public class SampleSheetRestController extends AbstractRestController {
     }
 
     Map<String, Map<Integer, Pool>> poolLayout = new HashMap<>();
+    Map<String, SequencerPartitionContainer> containersByInstrumentPosition = new HashMap<>();
     if (model.getNumContainers() == 1 && run.getRunPositions().size() == 1) {
       RunPosition runPos = run.getRunPositions().iterator().next();
       if (runPos.getContainer() != null) {
-        poolLayout.put("*", runPos.getContainer().getPartitions().stream()
-            .collect(Collectors.toMap(Partition::getPartitionNumber, Partition::getPool)));
+        poolLayout.put("*", makePoolsByPartition(runPos));
+        containersByInstrumentPosition.put("*", runPos.getContainer());
       }
     } else {
       for (RunPosition runPos : run.getRunPositions()) {
         if (runPos.getContainer() != null) {
-          poolLayout.put(runPos.getPosition().getAlias(), runPos.getContainer().getPartitions().stream()
-              .collect(Collectors.toMap(Partition::getPartitionNumber, Partition::getPool)));
+          poolLayout.put(runPos.getPosition().getAlias(), makePoolsByPartition(runPos));
+          containersByInstrumentPosition.put(runPos.getPosition().getAlias(), runPos.getContainer());
         }
       }
     }
     input.setPoolLayout(poolLayout);
+    input.setContainersByInstrumentPosition(containersByInstrumentPosition);
 
     return input;
+  }
+
+  private static Map<Integer, Pool> makePoolsByPartition(RunPosition runPos) {
+    Map<Integer, Pool> poolsByPartition = new HashMap<>();
+    for (Partition partition : runPos.getContainer().getPartitions()) {
+      poolsByPartition.put(partition.getPartitionNumber(), partition.getPool());
+    }
+    return poolsByPartition;
   }
 
   private SampleSheetInput makeInputFromPools(SampleSheetRequest request) throws IOException {
