@@ -940,9 +940,6 @@ BulkUtils = (function ($) {
         };
       },
 
-      // One column per field of config.sops entry matching config.sopId. Used when a single SOP
-      // has been locked in for a whole propagate/create batch, to let each row's field values be
-      // entered directly in the table.
       sopFieldValues: function (config) {
         var sop = (config.sops || []).filter(Utils.array.idPredicate(Number(config.sopId)))[0];
         if (!sop || !sop.fields) {
