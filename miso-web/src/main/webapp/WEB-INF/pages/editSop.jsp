@@ -18,7 +18,7 @@
 
     <div id="sopFieldsUnsupported" style="display:none;">
       <div class="messagebox">
-        SOP Fields are only supported for Run and Sample category SOPs.
+        SOP Fields are only supported for Run, Sample and Library category SOPs.
       </div>
     </div>
 
@@ -39,7 +39,7 @@
         Sop.setFields((sop && sop.fields) ? sop.fields : []);
 
         var category = form.get("category");
-        var fieldsSupported = category === "RUN" || category === "SAMPLE";
+        var fieldsSupported = category === "RUN" || category === "SAMPLE" || category === "LIBRARY";
         jQuery("#listSopFields").toggle(fieldsSupported);
         jQuery("#sopFieldsUnsupported").toggle(!fieldsSupported);
 

@@ -45,4 +45,5 @@ public interface InstrumentStore extends SaveDao<Instrument>, PaginatedDataSourc
 
   Instrument getByServiceRecord(ServiceRecord record) throws IOException;
 
+  long getUsageByLibrarySopFieldValues(Instrument instrument) throws IOException;
 }

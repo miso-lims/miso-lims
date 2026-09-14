@@ -226,6 +226,11 @@ public class DefaultInstrumentService implements InstrumentService {
       result.addError(
           ValidationError.forDeletionUsage(object, sampleSopFieldUsage, Pluralizer.samples(sampleSopFieldUsage)));
     }
+    long librarySopFieldUsage = instrumentDao.getUsageByLibrarySopFieldValues(object);
+    if (librarySopFieldUsage > 0L) {
+      result.addError(
+          ValidationError.forDeletionUsage(object, librarySopFieldUsage, Pluralizer.libraries(librarySopFieldUsage)));
+    }
     return result;
   }
 

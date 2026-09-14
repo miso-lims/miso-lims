@@ -99,6 +99,11 @@ public class DefaultWorkstationService extends AbstractSaveService<Workstation> 
       result.addError(
           ValidationError.forDeletionUsage(object, sampleSopFieldUsage, Pluralizer.samples(sampleSopFieldUsage)));
     }
+    long librarySopFieldUsage = workstationDao.getUsageByLibrarySopFieldValues(object);
+    if (librarySopFieldUsage > 0L) {
+      result.addError(
+          ValidationError.forDeletionUsage(object, librarySopFieldUsage, Pluralizer.libraries(librarySopFieldUsage)));
+    }
     return result;
   }
 }

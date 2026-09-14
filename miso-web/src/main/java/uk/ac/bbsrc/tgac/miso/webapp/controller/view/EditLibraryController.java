@@ -131,6 +131,9 @@ public class EditLibraryController {
     private static final String BOX = "box";
     private static final String SAMPLE_ALIAS_MAYBE_REQUIRED = "sampleAliasMaybeRequired";
     private static final String LIBRARY_ALIAS_MAYBE_REQUIRED = "libraryAliasMaybeRequired";
+    private static final String SOP_ID = "sopId";
+    private static final String INSTRUMENTS = "instruments";
+    private static final String WORKSTATIONS = "workstations";
   }
 
   @Autowired
@@ -242,6 +245,7 @@ public class EditLibraryController {
     ObjectNode formConfig = mapper.createObjectNode();
     formConfig.put("detailedSample", isDetailedSampleEnabled());
     addJsonArray(mapper, formConfig, "workstations", workstationService.list(), Dtos::asDto);
+    addJsonArray(mapper, formConfig, "instruments", instrumentService.list(), Dtos::asDto);
     addJsonArray(mapper, formConfig, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
         Dtos::asDto);
     addJsonArray(mapper, formConfig, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
@@ -274,11 +278,13 @@ public class EditLibraryController {
 
     private final BoxDto newBox;
     private final String sort;
+    private final Long sopId;
 
-    public LibraryBulkPropagateBackend(BoxDto newBox, String sort, JsonMapper mapper) {
+    public LibraryBulkPropagateBackend(BoxDto newBox, String sort, Long sopId, JsonMapper mapper) {
       super("library", LibraryDto.class, "Libraries", "Samples", mapper);
       this.newBox = newBox;
       this.sort = sort;
+      this.sopId = sopId;
     }
 
     private Map<Long, List<LibraryTemplateDto>> templatesByProjectId;
@@ -318,6 +324,8 @@ public class EditLibraryController {
       dto.setProjectCode(item.getProject().getCode());
       dto.setBox(newBox);
       dto.setUmis(null);
+      dto.setSopId(sopId);
+      dto.setSopFieldValues(new HashMap<>());
 
       Requisition requisition = getEffectiveRequisition(item);
       if (requisition != null) {
@@ -372,12 +380,14 @@ public class EditLibraryController {
         config.put(Config.SORT, sort);
       }
       config.putPOJO(Config.BOX, newBox);
+      config.putPOJO(Config.SOP_ID, sopId);
       config.put(Config.SAMPLE_ALIAS_MAYBE_REQUIRED, !alwaysGenerateSampleAliases());
       config.put(Config.LIBRARY_ALIAS_MAYBE_REQUIRED, !alwaysGenerateLibraryAliases());
       config.put(Config.SHOW_DESCRIPTION, showDescription);
       config.put(Config.SHOW_VOLUME, showVolume);
       config.put(Config.SHOW_LIBRARY_ALIAS, showLibraryAlias);
       addJsonArray(mapper, config, "workstations", workstationService.list(), Dtos::asDto);
+      addJsonArray(mapper, config, "instruments", instrumentService.list(), Dtos::asDto);
       addJsonArray(mapper, config, "thermalCyclers", instrumentService.listByType(InstrumentType.THERMAL_CYCLER),
           Dtos::asDto);
       addJsonArray(mapper, config, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
@@ -391,9 +401,10 @@ public class EditLibraryController {
     String replicates = getStringInput("replicates", form, true);
     String sort = getStringInput("sort", form, false);
     Long boxId = getLongInput("boxId", form, false);
+    Long sopId = getLongInput("sopId", form, false);
 
     BoxDto newBox = boxId != null ? Dtos.asDto(boxService.get(boxId), true) : null;
-    return new LibraryBulkPropagateBackend(newBox, sort, mapper)
+    return new LibraryBulkPropagateBackend(newBox, sort, sopId, mapper)
         .propagate(sampleIds, replicates, model);
   }
 

@@ -52,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedQcStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
@@ -223,6 +224,9 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   @ManyToOne
   @JoinColumn(name = "sopId")
   private Sop sop;
+
+  @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<LibrarySopFieldValue> sopFieldValues = new HashSet<>();
 
   @Immutable
   @ManyToMany
@@ -913,6 +917,14 @@ public class LibraryImpl extends AbstractBoxable implements Library {
   @Override
   public void setSop(Sop sop) {
     this.sop = sop;
+  }
+
+  public Set<LibrarySopFieldValue> getSopFieldValues() {
+    return sopFieldValues;
+  }
+
+  public void setSopFieldValues(Set<LibrarySopFieldValue> sopFieldValues) {
+    this.sopFieldValues = sopFieldValues;
   }
 
   @Override

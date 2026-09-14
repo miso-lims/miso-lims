@@ -81,6 +81,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.LibrarySpikeIn;
 import uk.ac.bbsrc.tgac.miso.core.data.ElementRun;
 import uk.ac.bbsrc.tgac.miso.core.data.OxfordNanoporeRun;
@@ -1553,6 +1554,7 @@ public class Dtos {
     setId(dto::setWorkstationId, from.getWorkstation());
     setId(dto::setThermalCyclerId, from.getThermalCycler());
     setId(dto::setSopId, from.getSop());
+    dto.setSopFieldValues(asSopFieldValueMap(from.getSopFieldValues()));
     setString(dto::setBatchId, from.getBatchId());
     setEffectiveQcFailure(from, dto);
 
@@ -1648,6 +1650,9 @@ public class Dtos {
     setObject(to::setWorkstation, Workstation::new, from.getWorkstationId());
     setObject(to::setThermalCycler, InstrumentImpl::new, from.getThermalCyclerId());
     setObject(to::setSop, Sop::new, from.getSopId());
+    Library library = to;
+    setSopFieldValues(to.getSopFieldValues(), LibrarySopFieldValue::new, fieldValue -> fieldValue.setLibrary(library),
+        from.getSopFieldValues());
     to.setCreationReceiptInfo(toReceiptTransfer(from, to));
 
     setObject(to::setRequisition, Requisition::new, from.getRequisitionId());

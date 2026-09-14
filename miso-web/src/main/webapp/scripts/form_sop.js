@@ -56,7 +56,7 @@ FormTarget.sop = (function ($) {
               getItemLabel: Utils.array.getName,
               getItemValue: Utils.array.get("value"),
               onChange: function (value, formObject) {
-                var fieldsSupported = value === "RUN" || value === "SAMPLE";
+                var fieldsSupported = value === "RUN" || value === "SAMPLE" || value === "LIBRARY";
                 $("#listSopFields").toggle(fieldsSupported);
                 $("#sopFieldsUnsupported").toggle(!fieldsSupported);
                 $("#sopForm_fieldsError").empty();
@@ -89,7 +89,7 @@ FormTarget.sop = (function ($) {
     },
 
     confirmSave: function (sop, isDialog) {
-      if (sop.category === "RUN" || sop.category === "SAMPLE") {
+      if (sop.category === "RUN" || sop.category === "SAMPLE" || sop.category === "LIBRARY") {
         sop.fields = Sop.getFields();
       }
     },

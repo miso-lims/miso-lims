@@ -7,6 +7,7 @@ FormTarget.library = (function ($) {
    *   detailedSample: boolean,
    *   workstations: array,
    *   thermalCyclers: array,
+   *   instruments: array,
    *   sops: array
    * }
    */
@@ -108,7 +109,6 @@ FormTarget.library = (function ($) {
               type: "date",
             },
           ]
-            .concat(FormUtils.makeSopFields(object, config.sops))
             .concat(
               [
                 {
@@ -550,6 +550,7 @@ FormTarget.library = (function ($) {
             },
           ],
         },
+        FormUtils.makeSopSection(object, config.sops, config.workstations, config.instruments),
       ];
     },
   };
