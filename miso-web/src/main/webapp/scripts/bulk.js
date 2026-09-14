@@ -940,6 +940,63 @@ BulkUtils = (function ($) {
         };
       },
 
+      // One column per field of config.sops entry matching config.sopId. Used when a single SOP
+      // has been locked in for a whole propagate/create batch, to let each row's field values be
+      // entered directly in the table.
+      sopFieldValues: function (config) {
+        var sop = (config.sops || []).filter(Utils.array.idPredicate(Number(config.sopId)))[0];
+        if (!sop || !sop.fields) {
+          return [];
+        }
+
+        return sop.fields.map(function (field) {
+          if (field.fieldType === "INSTRUMENT") {
+            return {
+              title: field.name + (field.units ? " (" + field.units + ")" : ""),
+              type: "dropdown",
+              data: "sopFieldValues." + field.id,
+              source: (config.instruments || []).filter(function (instrument) {
+                return instrument.instrumentModelId === field.instrumentModelId;
+              }),
+              sortSource: Utils.sorting.standardSort("name"),
+              getItemLabel: Utils.array.getName,
+              getItemValue: Utils.array.getId,
+            };
+          }
+          if (field.fieldType === "WORKSTATION") {
+            return {
+              title: field.name + (field.units ? " (" + field.units + ")" : ""),
+              type: "dropdown",
+              data: "sopFieldValues." + field.id,
+              source: config.workstations || [],
+              sortSource: Utils.sorting.standardSort("alias"),
+              getItemLabel: Utils.array.getAlias,
+              getItemValue: Utils.array.getId,
+            };
+          }
+
+          var type;
+
+          switch (field.fieldType) {
+            case "NUMBER":
+              type = "decimal";
+              break;
+            case "TEXT":
+              type = "text";
+              break;
+            default:
+              throw Error("Unhandled field type: " + field.fieldType);
+          }
+
+          return {
+            title: field.name + (field.units ? " (" + field.units + ")" : ""),
+            type: type,
+            data: "sopFieldValues." + field.id,
+            maxLength: 255,
+          };
+        });
+      },
+
       requisition: function (dataProject) {
         return [
           {
