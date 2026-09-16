@@ -67,7 +67,7 @@ DELETE FROM LibraryAliquot;
 DELETE FROM LibraryAliquotQc;
 DELETE FROM Library_Note;
 DELETE FROM LibraryChangeLog;
-DELETE FROM Library;
+DELETE FROM `Library`;
 DELETE FROM LibraryDesign;
 DELETE FROM LibraryDesignCode;
 DELETE FROM LibrarySpikeIn;
