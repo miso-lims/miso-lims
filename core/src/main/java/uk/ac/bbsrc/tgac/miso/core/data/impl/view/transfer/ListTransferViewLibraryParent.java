@@ -12,7 +12,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "Library")
+@Table(name = "`Library`")
 @Immutable
 public class ListTransferViewLibraryParent implements Serializable {
 

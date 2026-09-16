@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 @Entity
-@Table(name = "Library")
+@Table(name = "`Library`")
 @Immutable
 public class LibraryQcNode extends DetailedQcNode {
 
