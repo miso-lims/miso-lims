@@ -30,14 +30,14 @@ LEFT JOIN (
     UNION ALL
     
     SELECT project_projectId, l.archived, l.created, l.lastModified
-    FROM Library l
+    FROM `Library` l
     JOIN Sample s ON s.sampleId = l.sample_sampleId
     
     UNION ALL
     
     SELECT project_projectId, FALSE, la.created, la.lastUpdated
     FROM LibraryAliquot la
-    JOIN Library l ON l.libraryId = la.libraryId
+    JOIN `Library` l ON l.libraryId = la.libraryId
     JOIN Sample s ON s.sampleId = l.sample_sampleId
   ) items
   GROUP BY project_projectId
