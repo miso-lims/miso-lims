@@ -33,7 +33,7 @@ INSERT INTO SampleChangeLog(sampleId, columnsChanged, message, userId, changeTim
 (2,'one','change twoone',1,'2016-07-20 09:00:00'),
 (2,'two','change twotwo',1,'2016-07-20 09:00:01');
 
-INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType,
+INSERT INTO `Library`(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, detailedQcStatusId, qcDate, dnaSize,
   volume, concentration, locationBarcode, kitDescriptorId, index1Id, discriminator) VALUES
   (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 8, 'ILLUMINA',

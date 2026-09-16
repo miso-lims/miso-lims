@@ -777,7 +777,7 @@ INSERT INTO Transfer_Sample(transferId, sampleId, received, qcPassed, qcNote) VA
 (1, 2, TRUE, TRUE, NULL),
 (2, 100002, TRUE, TRUE, NULL);
 
-INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType, libraryType, librarySelectionType, libraryStrategyType, creationDate,
+INSERT INTO `Library`(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType, libraryType, librarySelectionType, libraryStrategyType, creationDate,
   creator, created, lastModifier, lastModified, detailedQcStatusId, qcUser, qcDate, dnaSize, volume, concentration, locationBarcode, kitDescriptorId, discarded, volumeUnits, concentrationUnits, spikeInId, spikeInDilutionFactor, spikeInVolume, lowQuality,
   discriminator, archived, libraryDesign, libraryDesignCodeId, nonStandardAlias, sopId, kitLot, index1Id, index2Id, requisitionId, workstationId) VALUES
   (1, 'LIB1', 'TEST_0001_Bn_R_PE_300_WG', '11211', 'description lib 1', 8, 'ILLUMINA', 1, 3, 1,  '2016-11-07', 

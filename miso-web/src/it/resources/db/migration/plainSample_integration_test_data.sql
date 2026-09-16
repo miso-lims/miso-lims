@@ -181,7 +181,7 @@ INSERT INTO Transfer(transferId, transferTime, senderLabId, recipientGroupId, cr
 INSERT INTO Transfer_Sample(transferId, sampleId, received, qcPassed, qcNote) VALUES
 (1, 1, TRUE, TRUE, NULL);
 
-INSERT INTO Library(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType, index1Id,
+INSERT INTO `Library`(libraryId, name, alias, identificationBarcode, description, sample_sampleId, platformType, index1Id,
   libraryType, librarySelectionType, libraryStrategyType, creationDate, creator, created, lastModifier, lastModified, detailedQcStatusId, qcUser, qcDate, dnaSize,
   volume, volumeUnits, concentration, concentrationUnits, locationBarcode, kitDescriptorId, discriminator) VALUES
   (1, 'LIB1', 'PLAIN_L0001-1_1', 'LIB1::PLAIN_L0001-1_1', 'plain lib', 1, 'ILLUMINA', 5,
