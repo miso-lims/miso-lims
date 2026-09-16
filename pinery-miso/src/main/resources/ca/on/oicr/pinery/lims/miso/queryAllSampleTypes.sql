@@ -24,7 +24,7 @@ SELECT NULL NAME
         ,COUNT(CASE WHEN l.archived = true THEN l.archived END) archivedCount 
         ,MIN(l.creationDate) earliest 
         ,MAX(lcl.lastUpdated) latest 
-FROM Library l
+FROM `Library` l
 INNER JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType
 LEFT JOIN ( 
         SELECT libraryId, MAX(changeTime) lastUpdated 
@@ -43,6 +43,6 @@ SELECT NULL NAME
         ,MIN(d.creationDate) earliest 
         ,MAX(d.lastUpdated) latest 
 FROM LibraryAliquot d 
-INNER JOIN Library l ON l.libraryId = d.libraryId 
+INNER JOIN `Library` l ON l.libraryId = d.libraryId 
 INNER JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType 
 GROUP BY l.libraryType

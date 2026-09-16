@@ -5,5 +5,5 @@ WHERE requisitionId IS NOT NULL
 UNION ALL
 
 SELECT name AS sampleId, requisitionId
-FROM Library
+FROM `Library`
 WHERE requisitionId IS NOT NULL
