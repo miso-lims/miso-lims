@@ -321,7 +321,7 @@
               <user>root</user>
               <password>${mysql.rootpw}</password>
               <locations>
-                <location>classpath:uk.ac.bbsrc.tgac.miso.db.migration</location>
+                <location>classpath:/uk/ac/bbsrc/tgac/miso/db/migration</location>
                 <location>filesystem:target/classes/db/migration</location>
                 <location>filesystem:target/test-classes/db/migration</location>
               </locations>
