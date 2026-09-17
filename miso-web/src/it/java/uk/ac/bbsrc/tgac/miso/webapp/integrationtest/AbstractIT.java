@@ -46,7 +46,7 @@ public abstract class AbstractIT {
 
   public static final TimeZone EASTERN_TIME_ZONE = TimeZone.getTimeZone("Canada/Eastern");
 
-  private static final String SCRIPT_DIR = System.getProperty("basedir") + "/src/it/resources/db/migration/";
+  private static final String SCRIPT_DIR = System.getProperty("basedir") + "/src/it/resources/db/scripts/";
   private static final String CLEAR_DATA_SCRIPT = "clear_test_data.sql";
   private static final String PLAIN_SCRIPT = "plainSample_integration_test_data.sql";
   private static final String DETAILED_SCRIPT = "integration_test_data.sql";
