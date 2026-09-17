@@ -243,7 +243,7 @@
                 <location>classpath:/uk/ac/bbsrc/tgac/miso/db/migration</location>
                 <location>filesystem:target/test-classes/db/migration</location>
               </locations>
-              <sqlMigrationSuffix>.test.sql</sqlMigrationSuffix>
+              <sqlMigrationSuffixes>.test.sql</sqlMigrationSuffixes>
               <placeholders>
                 <filesDir>/storage/miso/files/</filesDir>
               </placeholders>
