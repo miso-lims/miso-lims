@@ -19,8 +19,8 @@ Application Server:
 
 Database Server:
 
-* MySQL 8.0
-* [Flyway 5.2.4](https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/5.2.4/) (newer versions may cause issues)
+* MySQL 9.7
+* Docker
 
 *Important Note*: MISO requires SSL (HTTPS) to function correctly over a
 network. It is usually ideal to configure SSL using a proxy server. This guide
@@ -40,15 +40,9 @@ Use the GitHub interface to download the following files for the
 
 ## Setting Up the Database Server
 
-The database server needs to have [MySQL 8.0](https://www.mysql.com/). The tool
-[Flyway](https://flywaydb.org/) must also be present to migrate the database as
-the application is developed, but it can be installed on a different server so
-long as it can access the database server.
-
-**Important**: The Flyway install will likely include a `jre` directory containing the Java 8 JRE.
-If it does, Flyway will use this instead of the system Java. MISO requires JDK 17, so this will
-cause an error when you try to run the migration. To fix this, simply delete Flyway's `jre`
-directory.
+The database server needs to have [MySQL 9.7](https://www.mysql.com/). Docker must also be present
+to migrate the database as the application is developed, but it can be installed on a different
+server so long as it can access the database server.
 
 It is best to set a default timezone for MySQL. You can configure this in
 `my.cnf`. The simplest and recommended option is to set it to UTC by adding the
@@ -60,7 +54,7 @@ default-time-zone='+00:00'
 ```
 
 You could use a named timezone instead if you've populated the timezone tables.
-See the [MySQL docs](https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html)
+See the [MySQL docs](https://dev.mysql.com/doc/refman/9.7/en/time-zone-support.html)
 for more information.
 
 The default password in the following `IDENTIFIED BY` clauses should be
@@ -86,9 +80,6 @@ Refer to [Development Alternatives](#development-alternatives) for a different w
 
 
 ## Setting Up the Application Server
-
-Download the [Flyway command line tool](https://flywaydb.org/download/community) version 5.2.4 and install it.
-Newer versions of Flyway may cause issues, and are not recommended.
 
 The application server needs [Tomcat 10](https://tomcat.apache.org/download-10.cgi).
 
@@ -232,13 +223,15 @@ previously-established MISO environment, restart MISO.
 
 ## Installing and Upgrading
 
-Prior to the installation, ensure that you have followed the instructions in the above and have WAR files for both MISO
-(`ROOT.war`) and, if desired, [Run Scanner](https://github.com/miso-lims/runscanner)(`runscanner-*.war`).
+Prior to the installation, ensure that you have followed the instructions in the above and have WAR
+files for both MISO (`ROOT.war`) and, if desired, [Run Scanner](https://github.com/miso-lims/runscanner)(`runscanner-*.war`).
+Docker must also be available on either the database server, or another machine that can access the
+database.
 
 To install or upgrade, perform the following steps:
 
-1. If performing an upgrade, make sure to read all release notes since the previous version you were running. Some
-   releases indicate additional upgrade instructions, which may include
+1. If performing an upgrade, make sure to read all release notes since the previous version you were
+   running. Some releases indicate additional upgrade instructions, which may include
     * Configuration changes (in `miso.properties` or elsewhere)
     * Database preparation or cleanup steps
     * Other necessary steps or warnings
@@ -255,10 +248,8 @@ To install or upgrade, perform the following steps:
 
 ## Migrating the database
 
-Flyway is used to apply patches to your database to make it compatible with the new MISO version.
-The same path should be used for `MISO_FILES_DIR` as is set for `miso.fileStorageDirectory` in
-`miso.properties` (`/storage/miso/files/` by default). `SQLSTORE.JAR` should be the `sqlstore.jar`
-file you downloaded.
+Flyway is used to apply patches to your database to make it compatible with the new MISO version. A
+Docker image is provided to simplify setup and running the migrations.
 
 The MySQL root user, or another user with similar privileges, must be used to run Flyway and create
 and restore backups. `GRANT ALL PRIVILEGES ON *.* TO 'username'@'host';` will grant all the
@@ -266,27 +257,35 @@ necessary privileges. Only a subset of these is required, but we have not invest
 The user specified in `ROOT.xml`, which the web server will use to communicate with the database,
 should **NOT** be granted global (`*.*`) privileges, so this should be a different user.
 
-    cd ${FLYWAY}
-    rm -f jars/sqlstore-*.jar
-    cp ${SQLSTORE.JAR} jars
-    ./flyway -user=root -password=$MYSQL_ROOT_PASSWORD -url=$MISO_DB_URL -outOfOrder=true -locations=classpath:db/migration,classpath:uk.ac.bbsrc.tgac.miso.db.migration migrate -placeholders.filesDir=${MISO_FILES_DIR}
+1. If you have not already done so, create an environment file defining the parameters required for
+Flyway to connect to your database:
+    ```
+    # Database server hostname and port separated by a colon
+    # use "host.docker.internal" to refer to the host if you're running this on the database server
+    # 3306 is the default port for MySQL
+    MISO_DB_HOST_PORT=host.docker.internal:3306
 
-`$MISO_DB_URL` should be in the same format as in the `ROOT.xml`, except replacing `&amp;` with just
-`&`, and adding `&useSSL=false` (redundant, but prevents some warning messages):
+    # Database name
+    MISO_DB=lims
 
-```
-jdbc:mysql://localhost:3306/lims?autoReconnect=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&sslMode=DISABLED&connectionTimeZone=SERVER&cacheDefaultTimeZone=false&useSSL=false
-```
+    # Same path set for `miso.fileStorageDirectory` in `miso.properties`
+    MISO_FILES_DIR=/storage/miso/files
+
+    # MySQL user that Flyway will use
+    FLYWAY_USER=root
+    ```
+2. Create a file containing just the password for the MySQL user that Flyway will use.
+3. Run Flyway via the Docker container.
+   * use your environment file created above for `${ENV_FILE}`
+   * mount the password file to `/run/secrets/flyway_password`. `${PASSWORD_FILE}` is the absolute
+     path to the file on the host machine
+   * `${MISO_VERSION}` must match the version of MISO that you are deploying
+   ```
+   docker run --rm --env-file "${ENV_FILE}" -v "${PASSWORD_FILE}:/run/secrets/flyway_password:ro" miso-lims-flyway:${MISO_VERSION} migrate
+   ```
 
 If you run into an issue with migration `V0611`, ensure that the user running Flyway has read and
 write permissions on `MISO_FILES_DIR`.
-
-If you encounter an error regarding class file versions, Flyway is using an incompatible JRE. If
-the Flyway install contains a `jre` directory, delete it so that Flyway uses the system JRE instead.
-Ensure that a Java 17 JDK is installed and is the system default.
-
-If you encounter other errors migrating the database, make sure that you are using the recommended
-version of Flyway (see [Prerequisites](#prerequisites)).
 
 # Server Deployment Troubleshooting
 

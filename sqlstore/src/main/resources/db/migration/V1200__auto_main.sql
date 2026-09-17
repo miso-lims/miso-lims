@@ -18,9 +18,9 @@ UPDATE Sample SET qcUser = COALESCE((
 ), creator)
 WHERE detailedQcStatusId IS NOT NULL;
 
-ALTER TABLE Library ADD COLUMN qcUser bigint;
-ALTER TABLE Library ADD CONSTRAINT fk_library_qcUser FOREIGN KEY (qcUser) REFERENCES User (userId);
-UPDATE Library SET qcUser = COALESCE((
+ALTER TABLE `Library` ADD COLUMN qcUser bigint;
+ALTER TABLE `Library` ADD CONSTRAINT fk_library_qcUser FOREIGN KEY (qcUser) REFERENCES User (userId);
+UPDATE `Library` SET qcUser = COALESCE((
   SELECT userId FROM LibraryChangeLog
   WHERE LibraryChangeLog.libraryId = Library.libraryId
   AND columnsChanged LIKE '%detailedQcStatusId%'

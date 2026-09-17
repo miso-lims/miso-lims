@@ -36,7 +36,7 @@ CREATE TABLE Transfer_Library (
   qcNote varchar(255),
   PRIMARY KEY (transferId, libraryId),
   CONSTRAINT fk_library_transfer FOREIGN KEY (transferId) REFERENCES Transfer (transferId),
-  CONSTRAINT fk_transfer_library FOREIGN KEY (libraryId) REFERENCES Library (libraryId)
+  CONSTRAINT fk_transfer_library FOREIGN KEY (libraryId) REFERENCES `Library` (libraryId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Transfer_LibraryAliquot (
@@ -158,7 +158,7 @@ DELETE FROM TemporaryTransfer;
 -- Construct inbound library transfers
 INSERT INTO TemporaryTransfer(projectId, receivedDate, creator, labId)
 SELECT DISTINCT s.project_projectId, l.receivedDate, l.creator, COALESCE(st.labId, @unknownLab)
-FROM Library l
+FROM `Library` l
 JOIN Sample s ON s.sampleId = l.sample_sampleId
 JOIN TissueParentView v ON v.sampleId = s.sampleId
 LEFT JOIN SampleTissue st ON st.sampleId = v.tissueId
@@ -181,7 +181,7 @@ SELECT (
   AND creator = l.creator
   AND labId = COALESCE(st.labId, @unknownLab)
 ), l.libraryId, TRUE, COALESCE(l.qcPassed, TRUE), IF(l.qcPassed = FALSE, 'Unspecified failure', NULL)
-FROM Library l
+FROM `Library` l
 JOIN Sample s ON s.sampleId = l.sample_sampleId
 JOIN TissueParentView v ON v.sampleId = s.sampleId
 LEFT JOIN SampleTissue st ON st.sampleId = v.tissueId
@@ -227,7 +227,7 @@ DELETE FROM TemporaryTransfer;
 -- Construct outbound library transfers
 INSERT INTO TemporaryTransfer (projectId, distributionDate, distributionRecipient)
 SELECT DISTINCT s.project_projectId, l.distributionDate, l.distributionRecipient
-FROM Library l
+FROM `Library` l
 JOIN Sample s ON s.sampleId = l.sample_sampleId
 WHERE l.distributed = TRUE;
 
@@ -243,7 +243,7 @@ SELECT (
   AND distributionDate = l.distributionDate
   AND distributionRecipient = l.distributionRecipient
 ), l.libraryId, TRUE, NULL
-FROM Library l
+FROM `Library` l
 JOIN Sample s ON s.sampleId = l.sample_sampleId
 WHERE l.distributed = TRUE;
 
@@ -253,7 +253,7 @@ DELETE FROM TemporaryTransfer;
 INSERT INTO TemporaryTransfer (projectId, distributionDate, distributionRecipient)
 SELECT DISTINCT s.project_projectId, la.distributionDate, la.distributionRecipient
 FROM LibraryAliquot la
-JOIN Library l ON l.libraryId = la.libraryId
+JOIN `Library` l ON l.libraryId = la.libraryId
 JOIN Sample s ON s.sampleId = l.sample_sampleId
 WHERE la.distributed = TRUE;
 
@@ -270,7 +270,7 @@ SELECT (
   AND distributionRecipient = la.distributionRecipient
 ), la.aliquotId, TRUE, NULL
 FROM LibraryAliquot la
-JOIN Library l ON l.libraryId = la.libraryId
+JOIN `Library` l ON l.libraryId = la.libraryId
 JOIN Sample s ON s.sampleId = l.sample_sampleId
 WHERE la.distributed = TRUE;
 
@@ -310,10 +310,10 @@ ALTER TABLE Sample DROP COLUMN distributed;
 ALTER TABLE Sample DROP COLUMN distributionDate;
 ALTER TABLE Sample DROP COLUMN distributionRecipient;
 
-ALTER TABLE Library DROP COLUMN receivedDate;
-ALTER TABLE Library DROP COLUMN distributed;
-ALTER TABLE Library DROP COLUMN distributionDate;
-ALTER TABLE Library DROP COLUMN distributionRecipient;
+ALTER TABLE `Library` DROP COLUMN receivedDate;
+ALTER TABLE `Library` DROP COLUMN distributed;
+ALTER TABLE `Library` DROP COLUMN distributionDate;
+ALTER TABLE `Library` DROP COLUMN distributionRecipient;
 
 ALTER TABLE LibraryAliquot DROP COLUMN distributed;
 ALTER TABLE LibraryAliquot DROP COLUMN distributionDate;

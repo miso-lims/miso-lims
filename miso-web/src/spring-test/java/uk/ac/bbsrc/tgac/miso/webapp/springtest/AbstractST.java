@@ -69,7 +69,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 public abstract class AbstractST {
   private static final Logger log = LoggerFactory.getLogger(AbstractST.class);
 
-  private static final String SCRIPT_DIR = System.getProperty("basedir") + "/src/it/resources/db/migration/";
+  private static final String SCRIPT_DIR = System.getProperty("basedir") + "/src/it/resources/db/scripts/";
 
   private static final String CLEAR_DATA_SCRIPT = "clear_test_data.sql";
   private static final String DETAILED_SCRIPT = "integration_test_data.sql";
@@ -224,7 +224,8 @@ public abstract class AbstractST {
    * @param getId The getId method for the target entity
    * @return List of updated entities
    */
-  protected <T extends Identifiable, D> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType, List<D> dtos,
+  protected <T extends Identifiable, D> List<T> baseTestBulkUpdateAsync(String controllerBase, Class<T> updateType,
+      List<D> dtos,
       Function<D, Long> getId)
       throws Exception {
     String response = pollingResponserHelper("put", dtos, controllerBase);

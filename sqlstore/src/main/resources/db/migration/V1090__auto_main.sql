@@ -36,8 +36,8 @@ CREATE TABLE Sop (
 
 ALTER TABLE Sample ADD COLUMN sopId bigint;
 ALTER TABLE Sample ADD CONSTRAINT fk_sample_sop FOREIGN KEY (sopId) REFERENCES Sop (sopId);
-ALTER TABLE Library ADD COLUMN sopId bigint;
-ALTER TABLE Library ADD CONSTRAINT fk_library_sop FOREIGN KEY (sopId) REFERENCES Sop (sopId);
+ALTER TABLE `Library` ADD COLUMN sopId bigint;
+ALTER TABLE `Library` ADD CONSTRAINT fk_library_sop FOREIGN KEY (sopId) REFERENCES Sop (sopId);
 ALTER TABLE Run ADD COLUMN sopId bigint;
 ALTER TABLE Run ADD CONSTRAINT fk_run_sop FOREIGN KEY (sopId) REFERENCES Sop (sopId);
 

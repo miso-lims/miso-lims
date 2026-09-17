@@ -37,7 +37,7 @@ DELETE FROM KitDescriptor;
 DELETE FROM KitDescriptorChangeLog;
 DELETE FROM Kit_Note;
 DELETE FROM Lab;
-DELETE FROM Library;
+DELETE FROM `Library`;
 DELETE FROM LibraryAliquot;
 DELETE FROM LibraryAliquotQc;
 DELETE FROM LibraryAliquotQcControl;

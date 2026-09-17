@@ -14,14 +14,14 @@ CREATE TABLE DilutionChangeLog (
 INSERT INTO DilutionChangeLog (dilutionId, columnsChanged, userId, message, changeTime)
 SELECT dilutionId, columnsChanged, userId, REPLACE(message, CONCAT(d.name, ' '), ''), changeTime
 FROM LibraryDilution d
-JOIN Library l ON l.libraryId = d.library_libraryId
+JOIN `Library` l ON l.libraryId = d.library_libraryId
 JOIN LibraryChangeLog c ON c.libraryId = l.libraryId
   AND c.message = CONCAT('Library Dilution ', d.name, ' created.');
 
 INSERT INTO DilutionChangeLog (dilutionId, columnsChanged, userId, message, changeTime)
 SELECT dilutionId, REPLACE(columnsChanged, CONCAT(d.name, ' '), ''), userId, REPLACE(message, CONCAT(d.name, ' '), ''), changeTime
 FROM LibraryDilution d
-JOIN Library l ON l.libraryId = d.library_libraryId
+JOIN `Library` l ON l.libraryId = d.library_libraryId
 JOIN LibraryChangeLog c ON c.libraryId = l.libraryId
   AND c.message LIKE CONCAT(d.name, ' %');
 

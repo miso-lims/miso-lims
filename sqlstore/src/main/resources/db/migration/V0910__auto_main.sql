@@ -33,7 +33,7 @@ ALTER TABLE LibraryAliquot ADD COLUMN alias varchar(100);
 ALTER TABLE LibraryAliquot ADD COLUMN dnaSize bigint;
 
 UPDATE LibraryAliquot ali
-JOIN Library lib ON lib.libraryId = ali.libraryId
+JOIN `Library` lib ON lib.libraryId = ali.libraryId
 SET ali.alias = lib.alias, ali.dnaSize = lib.dnaSize;
 
 ALTER TABLE LibraryAliquot MODIFY COLUMN alias varchar(100) NOT NULL;
@@ -52,7 +52,7 @@ CREATE TABLE DetailedLibraryAliquot (
 INSERT INTO DetailedLibraryAliquot (aliquotId, nonStandardAlias, libraryDesignCodeId)
 SELECT ali.aliquotId, dl.nonStandardAlias, dl.libraryDesignCodeId
 FROM LibraryAliquot ali
-JOIN Library lib ON lib.libraryId = ali.libraryId
+JOIN `Library` lib ON lib.libraryId = ali.libraryId
 JOIN DetailedLibrary dl ON dl.libraryId = lib.libraryId;
 
 -- propagate_ali_to_ali
@@ -60,7 +60,7 @@ ALTER TABLE LibraryAliquot ADD COLUMN parentAliquotId bigint;
 ALTER TABLE LibraryAliquot ADD CONSTRAINT fk_libraryAliquot_parentAliquot FOREIGN KEY (parentAliquotId) REFERENCES LibraryAliquot (aliquotId);
 
 -- rm_external_role
-ALTER TABLE User DROP COLUMN external;
+ALTER TABLE User DROP COLUMN `external`;
 
 -- drop_poolableelementview_index
 DROP VIEW IF EXISTS `DuplicateBarcodes`;

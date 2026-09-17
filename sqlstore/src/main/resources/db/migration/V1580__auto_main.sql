@@ -16,11 +16,11 @@ ALTER TABLE Requisition
   DROP COLUMN assayId;
 
 -- Fix missing constraints
-UPDATE Library SET requisitionId = NULL
+UPDATE `Library` SET requisitionId = NULL
   WHERE requisitionId IS NOT NULL
-  AND NOT EXISTS (SELECT 1 FROM Requisition WHERE requisitionId = Library.requisitionId);
+  AND NOT EXISTS (SELECT 1 FROM Requisition WHERE requisitionId = `Library`.requisitionId);
 
-ALTER TABLE Library
+ALTER TABLE `Library`
   ADD CONSTRAINT fk_library_requisition FOREIGN KEY (requisitionId) REFERENCES Requisition (requisitionId);
 
 ALTER TABLE RequisitionChangeLog

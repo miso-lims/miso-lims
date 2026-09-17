@@ -10,7 +10,7 @@ FOR EACH ROW
       lastModifier,
       CONCAT('QC added: ', (SELECT name FROM QCType WHERE qcTypeId = NEW.type)),
       lastModified
-    FROM Library WHERE libraryId = NEW.library_libraryId;
+    FROM `Library` WHERE libraryId = NEW.library_libraryId;
 //
 
 DROP TRIGGER IF EXISTS LibraryQcUpdate//
@@ -29,7 +29,7 @@ FOR EACH ROW
         lastModifier,
         log_message,
         lastModified
-      FROM Library WHERE libraryId = NEW.library_libraryId;
+      FROM `Library` WHERE libraryId = NEW.library_libraryId;
     END IF;
   END//
 

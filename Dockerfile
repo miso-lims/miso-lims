@@ -2,7 +2,7 @@
 ## Build miso-lims from current directory
 #######################################################
 
-FROM maven:3.8-eclipse-temurin-17 as builder
+FROM maven:3.8-eclipse-temurin-17 AS builder
 # only re-initialize Maven when there's a POM change
 COPY pom.xml /miso-lims/
 COPY ./integration-tools/pom.xml /miso-lims/integration-tools/pom.xml
@@ -33,33 +33,17 @@ RUN mvn clean && mvn package -DskipTests
 
 #######################################################
 ## Flyway database migration
-## Adapted from https://github.com/flyway/flyway-docker/blob/v7.7.1/Dockerfile
 #######################################################
-FROM eclipse-temurin:17-jdk-jammy as flyway-migration
-
-# Add the flyway user and step in the directory
-RUN adduser --system --home /flyway --disabled-password --group flyway
-WORKDIR /flyway
-
-# Change to the flyway user
-USER flyway
-
-ENV FLYWAY_VERSION 5.2.4
-
-RUN curl -L https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${FLYWAY_VERSION}/flyway-commandline-${FLYWAY_VERSION}.tar.gz -o flyway-commandline-${FLYWAY_VERSION}.tar.gz \
-  && tar -xzf flyway-commandline-${FLYWAY_VERSION}.tar.gz --strip-components=1 \
-  && rm flyway-commandline-${FLYWAY_VERSION}.tar.gz
-
-ENV PATH="/flyway:${PATH}"
-
+FROM flyway/flyway:13.7.0-alpine AS flyway-migration
 COPY --from=builder /miso-lims/sqlstore/target/classes/db/migration/*.sql /flyway/sql/
 COPY --from=builder /miso-lims/sqlstore/target/sqlstore*.jar /flyway/jars/
+COPY --from=builder /miso-lims/miso-web/target/ROOT/WEB-INF/lib/mysql-connector-j-*.jar /flyway/drivers/
 COPY ./.docker/run-flyway /
 
-ENV MISO_DB lims
-ENV MISO_DB_HOST_PORT db:3306
-ENV MISO_DB_ROOT_PASS_FILE /run/secrets/root_password
-ENV MISO_FILES_DIR /storage/miso/files/
+ENV MISO_DB=lims
+ENV MISO_DB_HOST_PORT=db:3306
+ENV MISO_FILES_DIR=/storage/miso/files/
+ENV FLYWAY_PASSWORD_FILE=/run/secrets/flyway_password
 
 ENTRYPOINT ["/run-flyway"]
 
@@ -67,7 +51,7 @@ ENTRYPOINT ["/run-flyway"]
 ## Tomcat webapp
 #######################################################
 
-FROM tomcat:10.1-jdk17-temurin as webapp
+FROM tomcat:10.1-jdk17-temurin AS webapp
 
 COPY ./.docker/tomcat/setenv.sh /usr/local/tomcat/bin/
 COPY ./.docker/tomcat/logging.properties ${CATALINA_HOME}/conf/
@@ -80,10 +64,10 @@ COPY --from=builder /miso-lims/miso-web/src/main/resources/submission.properties
 
 COPY --from=builder /miso-lims/miso-web/target/ROOT.war ${CATALINA_HOME}/webapps/
 
-ENV MISO_DB_USER tgaclims
-ENV MISO_DB lims
-ENV MISO_DB_HOST_PORT db:3306
-ENV MISO_DB_PASS_FILE /run/secrets/lims_password
-ENV MISO_FILES_DIR /storage/miso/files/
+ENV MISO_DB_USER=tgaclims
+ENV MISO_DB=lims
+ENV MISO_DB_HOST_PORT=db:3306
+ENV MISO_DB_PASS_FILE=/run/secrets/lims_password
+ENV MISO_FILES_DIR=/storage/miso/files/
 
 CMD ["catalina.sh", "run"]

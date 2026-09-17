@@ -70,21 +70,21 @@ JOIN (
 SET s.boxPositionId = seq.value + @sequence;
 SELECT MAX(boxPositionId) FROM Sample INTO @sequence;
 
-ALTER TABLE Library ADD COLUMN (
+ALTER TABLE `Library` ADD COLUMN (
 	boxPositionId bigint,
 	emptied boolean NOT NULL DEFAULT 0,
 	volume double DEFAULT NULL);
 
-ALTER TABLE Library
+ALTER TABLE `Library`
   MODIFY identificationBarcode VARCHAR(255) UNIQUE;
 
-UPDATE Library l
+UPDATE `Library` l
 JOIN (
   SELECT libraryId, ROW_NUMBER() OVER() AS value
-  FROM Library
+  FROM `Library`
 ) seq ON seq.libraryId = l.libraryId
 SET l.boxPositionId = seq.value + @sequence;
-SELECT MAX(boxPositionId) FROM Library INTO @sequence;
+SELECT MAX(boxPositionId) FROM `Library` INTO @sequence;
 
 ALTER TABLE Pool ADD COLUMN (
   boxPositionId bigint,

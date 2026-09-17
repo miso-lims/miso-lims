@@ -13,7 +13,7 @@ DELETE FROM ExperimentChangeLog WHERE experimentId IN (SELECT experimentId  FROM
 DELETE FROM Experiment WHERE alias LIKE 'EXP_AUTOGEN%' AND NOT EXISTS(SELECT * FROM Experiment_Kit WHERE Experiment_Kit.experiments_experimentId = Experiment.experimentId) AND NOT EXISTS(SELECT * FROM Submission_Experiment WHERE Submission_Experiment.experiments_experimentId = Experiment.experimentId);
 
 ALTER TABLE Experiment ADD COLUMN library_libraryId bigint;
-ALTER TABLE Experiment ADD CONSTRAINT experiment_library_libraryId_fkey FOREIGN KEY(library_libraryId) REFERENCES Library(libraryId);
+ALTER TABLE Experiment ADD CONSTRAINT experiment_library_libraryId_fkey FOREIGN KEY(library_libraryId) REFERENCES `Library`(libraryId);
 
 UPDATE Experiment SET library_libraryId = (SELECT DISTINCT library_libraryId FROM LibraryDilution JOIN Pool_Dilution ON LibraryDilution.dilutionId = Pool_Dilution.dilution_dilutionId WHERE Pool_Dilution.pool_poolId = Experiment.pool_poolId);
 

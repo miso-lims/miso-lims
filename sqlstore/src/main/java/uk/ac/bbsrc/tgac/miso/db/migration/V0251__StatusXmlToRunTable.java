@@ -17,7 +17,8 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
 import org.xml.sax.InputSource;
 
 /**
@@ -29,12 +30,13 @@ import org.xml.sax.InputSource;
  * copied to the four new columns. The xml filed in the Status table is then deleted.
  *
  */
-public class V0251__StatusXmlToRunTable implements JdbcMigration {
+public class V0251__StatusXmlToRunTable extends BaseJavaMigration {
 
   private static final Logger logger = Logger.getLogger(V0251__StatusXmlToRunTable.class.getName());
 
   @Override
-  public void migrate(Connection connection) throws Exception {
+  public void migrate(Context context) throws Exception {
+    Connection connection = context.getConnection();
     addStatusColumnsToRun(connection);
     Map<String, String> statusXml = getStatusXml(connection);
     Map<String, StatusValues> statusValues = statusXml.entrySet().stream()

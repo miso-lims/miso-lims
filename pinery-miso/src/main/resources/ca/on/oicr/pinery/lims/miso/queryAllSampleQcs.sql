@@ -16,7 +16,7 @@ UNION ALL
 SELECT qc.qcId, qc.date, l.name sampleId, qt.name, qc.results
 FROM LibraryQC qc
 JOIN QCType qt ON qt.qcTypeId = qc.type
-JOIN Library l ON l.libraryId = qc.library_libraryId
+JOIN `Library` l ON l.libraryId = qc.library_libraryId
 WHERE qc.qcId IN (
   SELECT MAX(qc.qcId) qcId FROM LibraryQC qc
   JOIN (
