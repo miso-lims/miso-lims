@@ -5,6 +5,7 @@ import java.util.Map;
 import tools.jackson.databind.node.ObjectNode;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 
 public class SampleSheetInput {
@@ -15,6 +16,7 @@ public class SampleSheetInput {
   private ObjectNode customParameters;
   private Map<String, Map<Integer, Pool>> poolLayout;
   private Map<String, Boolean> includeSections;
+  private Map<String, SequencerPartitionContainer> containersByInstrumentPosition;
 
   public InstrumentModel getInstrumentModel() {
     return instrumentModel;
@@ -63,6 +65,15 @@ public class SampleSheetInput {
 
   public void setIncludeSections(Map<String, Boolean> includeSections) {
     this.includeSections = includeSections;
+  }
+
+  public Map<String, SequencerPartitionContainer> getContainersByInstrumentPosition() {
+    return containersByInstrumentPosition;
+  }
+
+  public void setContainersByInstrumentPosition(
+      Map<String, SequencerPartitionContainer> containersByInstrumentPosition) {
+    this.containersByInstrumentPosition = containersByInstrumentPosition;
   }
 
 }

@@ -4,6 +4,7 @@ public enum SampleSheetFieldCommonSource {
 
   LIBRARY_ALIQUOT("Library Aliquot"), //
   POOL("Pool"), //
+  REQUISITION("Requisition"), //
   INSTRUMENT_MODEL("Instrument Model"), //
   INSTRUMENT_POSITION("Instrument Position"), //
   PARTITION("Partition"), //

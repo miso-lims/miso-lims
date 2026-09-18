@@ -17,6 +17,7 @@ public class RequisitionDto {
   private String stopReason;
   private String creationTime;
   private String lastModified;
+  private String description;
   private List<RequisitionPauseDto> pauses;
   private List<RequisitionContactDto> contacts;
 
@@ -29,6 +30,7 @@ public class RequisitionDto {
     setString(to::setStopReason, from.getStopReason());
     setDateTimeString(to::setCreationTime, from.getCreationTime());
     setDateTimeString(to::setLastModified, from.getLastModified());
+    setString(to::setDescription, from.getDescription());
     to.setPauses(from.getPauses().stream().map(RequisitionPauseDto::from).toList());
     to.setContacts(from.getContacts().stream().map(Dtos::asDto).toList());
     return to;
@@ -106,6 +108,14 @@ public class RequisitionDto {
     this.contacts = contacts;
   }
 
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
   public Requisition to() {
     Requisition to = new Requisition();
     setLong(to::setId, getId(), false);
@@ -121,6 +131,7 @@ public class RequisitionDto {
     }
     setBoolean(to::setStopped, isStopped(), false);
     setString(to::setStopReason, getStopReason());
+    setString(to::setDescription, getDescription());
     if (getPauses() != null) {
       to.setPauses(getPauses().stream().map(RequisitionPauseDto::to).toList());
     }

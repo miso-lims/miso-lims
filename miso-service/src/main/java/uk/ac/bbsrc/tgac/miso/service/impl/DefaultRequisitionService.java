@@ -239,6 +239,7 @@ public class DefaultRequisitionService extends AbstractSaveService<Requisition> 
   @Override
   protected void applyChanges(Requisition to, Requisition from) throws IOException {
     to.setAlias(from.getAlias());
+    to.setDescription(from.getDescription());
     ValidationUtils.applySetChanges(to.getAssays(), from.getAssays());
     to.setStopped(from.isStopped());
     to.setStopReason(from.getStopReason());
