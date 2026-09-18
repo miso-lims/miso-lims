@@ -109,7 +109,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "LIBRARY_ALIQUOT_DESCRIPTION"
+            "sourceProperty": "DESCRIPTION"
           }
         ]
       },
@@ -388,7 +388,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "LIBRARY_ALIQUOT_DESCRIPTION"
+            "sourceProperty": "DESCRIPTION"
           }
         ]
       },
@@ -667,7 +667,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "LIBRARY_ALIQUOT_DESCRIPTION"
+            "sourceProperty": "DESCRIPTION"
           }
         ]
       },
@@ -946,7 +946,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "LIBRARY_ALIQUOT_DESCRIPTION"
+            "sourceProperty": "DESCRIPTION"
           }
         ]
       },
@@ -1225,7 +1225,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "LIBRARY_ALIQUOT_DESCRIPTION"
+            "sourceProperty": "DESCRIPTION"
           }
         ]
       },
@@ -1504,7 +1504,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "LIBRARY_ALIQUOT_DESCRIPTION"
+            "sourceProperty": "DESCRIPTION"
           }
         ]
       },
@@ -1783,7 +1783,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "LIBRARY_ALIQUOT_DESCRIPTION"
+            "sourceProperty": "DESCRIPTION"
           }
         ]
       },
@@ -2069,7 +2069,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "LIBRARY_ALIQUOT",
-            "sourceProperty": "LIBRARY_ALIQUOT_DESCRIPTION"
+            "sourceProperty": "DESCRIPTION"
           }
         ]
       },

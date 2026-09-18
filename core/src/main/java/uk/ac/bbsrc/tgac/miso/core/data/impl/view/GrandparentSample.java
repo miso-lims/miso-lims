@@ -22,8 +22,6 @@ public class GrandparentSample implements Serializable {
   @Id
   private long sampleId;
 
-  private String identificationBarcode;
-
   @ManyToOne(targetEntity = DetailedQcStatusImpl.class)
   @JoinColumn(name = "detailedQcStatusId")
   private DetailedQcStatus detailedQcStatus;
@@ -66,14 +64,6 @@ public class GrandparentSample implements Serializable {
 
   public void setParentSample(GrandparentSample parentSample) {
     this.parentSample = parentSample;
-  }
-
-  public String getIdentificationBarcode() {
-    return identificationBarcode;
-  }
-
-  public void setIdentificationBarcode(String identificationBarcode) {
-    this.identificationBarcode = identificationBarcode;
   }
 
 }

@@ -84,7 +84,7 @@ public class SampleSheetGenerator {
       return Map.of();
     }
     return libraryAliquotService.listByPoolIds(poolIds).stream()
-        .collect(Collectors.toMap(LibraryAliquot::getId, aliquot -> aliquot));
+        .collect(Collectors.toMap(LibraryAliquot::getId, aliquot -> aliquot, (a, b) -> a));
   }
 
   private static LibraryAliquot resolveAliquot(Map<Long, LibraryAliquot> aliquotsById, PoolElement poolElement) {

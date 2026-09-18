@@ -34,7 +34,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencingControlType;
 import uk.ac.bbsrc.tgac.miso.core.data.VolumeUnit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedQcStatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.TargetedSequencing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.boxposition.LibraryAliquotBoxPosition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.transfer.ListTransferView;
@@ -58,7 +57,6 @@ public class ListLibraryAliquotView
 
   private String name;
   private String alias;
-  private String description;
   private Integer dnaSize;
   private BigDecimal concentration;
 
@@ -92,11 +90,6 @@ public class ListLibraryAliquotView
 
   private Long preMigrationId;
   private Long targetedSequencingId;
-
-  @ManyToOne
-  @JoinColumn(name = "targetedSequencingId", insertable = false, updatable = false)
-  private TargetedSequencing targetedSequencing;
-
   private Date created;
 
   @ManyToOne(targetEntity = UserImpl.class)
@@ -146,14 +139,6 @@ public class ListLibraryAliquotView
 
   public void setAlias(String alias) {
     this.alias = alias;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
   }
 
   public Integer getDnaSize() {
@@ -320,6 +305,10 @@ public class ListLibraryAliquotView
     return getLibraryAttribute(ParentLibrary::getAlias);
   }
 
+  public String getLibraryDescription() {
+    return getLibraryAttribute(ParentLibrary::getDescription);
+  }
+
   public Boolean isLibraryLowQuality() {
     return getLibraryAttribute(ParentLibrary::isLowQuality);
   }
@@ -396,14 +385,6 @@ public class ListLibraryAliquotView
 
   public void setTargetedSequencingId(Long targetedSequencingId) {
     this.targetedSequencingId = targetedSequencingId;
-  }
-
-  public TargetedSequencing getTargetedSequencing() {
-    return targetedSequencing;
-  }
-
-  public void setTargetedSequencing(TargetedSequencing targetedSequencing) {
-    this.targetedSequencing = targetedSequencing;
   }
 
   public BigDecimal getAliquotVolume() {

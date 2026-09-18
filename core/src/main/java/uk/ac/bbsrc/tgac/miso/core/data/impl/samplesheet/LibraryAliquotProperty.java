@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet;
 
-import java.text.SimpleDateFormat;
+import java.util.TreeSet;
 
 import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -51,6 +51,18 @@ public enum LibraryAliquotProperty {
     }
   },
 
+  INDEX_1_REAL_SEQUENCES("Index 1 Real Sequences") {
+    @Override
+    public String extract(LibraryAliquot aliquot) {
+      if (aliquot.getLibrary().getIndex1() == null) {
+        return null;
+      }
+      return aliquot.getLibrary().getIndex1().getRealSequences().isEmpty()
+          ? aliquot.getLibrary().getIndex1().getSequence()
+          : String.join(",", new TreeSet<>(aliquot.getLibrary().getIndex1().getRealSequences()));
+    }
+  },
+
   INDEX_2_NAME("Index 2 Name") {
     @Override
     public String extract(LibraryAliquot aliquot) {
@@ -62,6 +74,18 @@ public enum LibraryAliquotProperty {
     @Override
     public String extract(LibraryAliquot aliquot) {
       return aliquot.getLibrary().getIndex2() == null ? null : aliquot.getLibrary().getIndex2().getSequence();
+    }
+  },
+
+  INDEX_2_REAL_SEQUENCES("Index 2 Real Sequences") {
+    @Override
+    public String extract(LibraryAliquot aliquot) {
+      if (aliquot.getLibrary().getIndex2() == null) {
+        return null;
+      }
+      return aliquot.getLibrary().getIndex2().getRealSequences().isEmpty()
+          ? aliquot.getLibrary().getIndex2().getSequence()
+          : String.join(",", new TreeSet<>(aliquot.getLibrary().getIndex2().getRealSequences()));
     }
   },
 
@@ -93,14 +117,14 @@ public enum LibraryAliquotProperty {
     }
   },
 
-  PROJECT_TITLE("Project Name") {
+  PROJECT_TITLE("Project Title") {
     @Override
     public String extract(LibraryAliquot aliquot) {
       return aliquot.getLibrary().getSample().getProject().getTitle();
     }
   },
 
-  LIBRARY_ALIQUOT_DESCRIPTION("Library Aliquot Description") {
+  DESCRIPTION("Description") {
     @Override
     public String extract(LibraryAliquot aliquot) {
       return aliquot.getDescription();
@@ -110,22 +134,22 @@ public enum LibraryAliquotProperty {
   DESIGN_CODE("Design Code") {
     @Override
     public String extract(LibraryAliquot aliquot) {
-      if (!(aliquot instanceof DetailedLibraryAliquot detailedAliquot)
-          || detailedAliquot.getLibraryDesignCode() == null) {
+      if (!LimsUtils.isDetailedLibraryAliquot(aliquot)
+          || ((DetailedLibraryAliquot) aliquot).getLibraryDesignCode() == null) {
         return null;
       }
-      return detailedAliquot.getLibraryDesignCode().getCode();
+      return ((DetailedLibraryAliquot) aliquot).getLibraryDesignCode().getCode();
     }
   },
 
   DESIGN_CODE_DESCRIPTION("Design Code Description") {
     @Override
     public String extract(LibraryAliquot aliquot) {
-      if (!(aliquot instanceof DetailedLibraryAliquot detailedAliquot)
-          || detailedAliquot.getLibraryDesignCode() == null) {
+      if (!LimsUtils.isDetailedLibraryAliquot(aliquot)
+          || ((DetailedLibraryAliquot) aliquot).getLibraryDesignCode() == null) {
         return null;
       }
-      return detailedAliquot.getLibraryDesignCode().getDescription();
+      return ((DetailedLibraryAliquot) aliquot).getLibraryDesignCode().getDescription();
     }
   },
 
@@ -165,12 +189,10 @@ public enum LibraryAliquotProperty {
     @Override
     public String extract(LibraryAliquot aliquot) {
       Sample sample = aliquot.getLibrary().getSample();
-      SampleIdentity identity = null;
-      if (sample instanceof SampleIdentity si) {
-        identity = si;
-      } else if (LimsUtils.isDetailedSample(sample)) {
-        identity = LimsUtils.getParent(SampleIdentity.class, (DetailedSample) sample);
+      if (!LimsUtils.isDetailedSample(sample)) {
+        return null;
       }
+      SampleIdentity identity = LimsUtils.getParent(SampleIdentity.class, (DetailedSample) sample);
       return identity == null ? null : identity.getExternalName();
     }
   },
@@ -178,8 +200,7 @@ public enum LibraryAliquotProperty {
   CREATED_DATE("Created Date") {
     @Override
     public String extract(LibraryAliquot aliquot) {
-      return aliquot.getCreationTime() == null ? null
-          : new SimpleDateFormat("yyyy-MM-dd").format(aliquot.getCreationTime());
+      return LimsUtils.formatDate(aliquot.getCreationDate());
     }
   },
 
@@ -250,7 +271,7 @@ public enum LibraryAliquotProperty {
     }
   },
 
-  SLIDE_IDENTIFICATION_BARCODE("Slide Matrix ID") {
+  SLIDE_IDENTIFICATION_BARCODE("Slide Matrix Barcode") {
     @Override
     public String extract(LibraryAliquot aliquot) {
       Sample sample = aliquot.getLibrary().getSample();
