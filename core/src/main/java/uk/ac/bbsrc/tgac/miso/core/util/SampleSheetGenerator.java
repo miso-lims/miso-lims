@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -84,7 +85,7 @@ public class SampleSheetGenerator {
       return Map.of();
     }
     return libraryAliquotService.listByPoolIds(poolIds).stream()
-        .collect(Collectors.toMap(LibraryAliquot::getId, aliquot -> aliquot, (a, b) -> a));
+        .collect(Collectors.toMap(LibraryAliquot::getId, Function.identity(), (a, b) -> a));
   }
 
   private static LibraryAliquot resolveAliquot(Map<Long, LibraryAliquot> aliquotsById, PoolElement poolElement) {
@@ -450,7 +451,7 @@ public class SampleSheetGenerator {
     if (source.getSourceProperty() == null) {
       return position;
     }
-    if ("IDENTIFICATION_BARCODE".equals(source.getSourceProperty())) {
+    if ("CONTAINER_BARCODE".equals(source.getSourceProperty())) {
       SequencerPartitionContainer container = getContainer(input, position);
       return container == null ? null : container.getIdentificationBarcode();
     }

@@ -12,7 +12,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "INSTRUMENT_POSITION",
-            "sourceProperty": "IDENTIFICATION_BARCODE"
+            "sourceProperty": "CONTAINER_BARCODE"
           }
         ]
       },
@@ -210,8 +210,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
             "source": "LIBRARY_ALIQUOT",
             "sourceProperty": "INDEX_2_NAME"
           }
-        ],
-        "omitIfEmpty": true
+        ]
       },
       {
         "name": "index2",
@@ -291,7 +290,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "INSTRUMENT_POSITION",
-            "sourceProperty": "IDENTIFICATION_BARCODE"
+            "sourceProperty": "CONTAINER_BARCODE"
           }
         ]
       },
@@ -489,8 +488,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
             "source": "LIBRARY_ALIQUOT",
             "sourceProperty": "INDEX_2_NAME"
           }
-        ],
-        "omitIfEmpty": true
+        ]
       },
       {
         "name": "index2",
@@ -570,7 +568,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "INSTRUMENT_POSITION",
-            "sourceProperty": "IDENTIFICATION_BARCODE"
+            "sourceProperty": "CONTAINER_BARCODE"
           }
         ]
       },
@@ -768,8 +766,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
             "source": "LIBRARY_ALIQUOT",
             "sourceProperty": "INDEX_2_NAME"
           }
-        ],
-        "omitIfEmpty": true
+        ]
       },
       {
         "name": "index2",
@@ -849,7 +846,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "INSTRUMENT_POSITION",
-            "sourceProperty": "IDENTIFICATION_BARCODE"
+            "sourceProperty": "CONTAINER_BARCODE"
           }
         ]
       },
@@ -1047,8 +1044,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
             "source": "LIBRARY_ALIQUOT",
             "sourceProperty": "INDEX_2_NAME"
           }
-        ],
-        "omitIfEmpty": true
+        ]
       },
       {
         "name": "index2",
@@ -1128,7 +1124,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "INSTRUMENT_POSITION",
-            "sourceProperty": "IDENTIFICATION_BARCODE"
+            "sourceProperty": "CONTAINER_BARCODE"
           }
         ]
       },
@@ -1326,8 +1322,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
             "source": "LIBRARY_ALIQUOT",
             "sourceProperty": "INDEX_2_NAME"
           }
-        ],
-        "omitIfEmpty": true
+        ]
       },
       {
         "name": "index2",
@@ -1407,7 +1402,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "INSTRUMENT_POSITION",
-            "sourceProperty": "IDENTIFICATION_BARCODE"
+            "sourceProperty": "CONTAINER_BARCODE"
           }
         ]
       },
@@ -1605,8 +1600,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
             "source": "LIBRARY_ALIQUOT",
             "sourceProperty": "INDEX_2_NAME"
           }
-        ],
-        "omitIfEmpty": true
+        ]
       },
       {
         "name": "index2",
@@ -1686,7 +1680,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "INSTRUMENT_POSITION",
-            "sourceProperty": "IDENTIFICATION_BARCODE"
+            "sourceProperty": "CONTAINER_BARCODE"
           }
         ]
       },
@@ -1884,8 +1878,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
             "source": "LIBRARY_ALIQUOT",
             "sourceProperty": "INDEX_2_NAME"
           }
-        ],
-        "omitIfEmpty": true
+        ]
       },
       {
         "name": "index2",
@@ -1965,7 +1958,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
         "sources": [
           {
             "source": "INSTRUMENT_POSITION",
-            "sourceProperty": "IDENTIFICATION_BARCODE"
+            "sourceProperty": "CONTAINER_BARCODE"
           }
         ]
       },
@@ -2170,8 +2163,7 @@ INSERT INTO SampleSheet(name, platformType, parameters, sections) VALUES
             "source": "LIBRARY_ALIQUOT",
             "sourceProperty": "INDEX_2_NAME"
           }
-        ],
-        "omitIfEmpty": true
+        ]
       },
       {
         "name": "index2",
