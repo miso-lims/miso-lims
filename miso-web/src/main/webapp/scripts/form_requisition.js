@@ -48,6 +48,7 @@ FormTarget.requisition = (function () {
               description:
                 "Should usually match the identifier of a requisition form stored in a separate system",
             },
+            BulkUtils.columns.description,
             {
               title: "Stopped",
               type: "checkbox",
