@@ -32,6 +32,7 @@ public class MetricDto {
   private Integer readLength;
   private Integer readLength2;
   private String label;
+  private boolean optional;
 
   public static MetricDto from(Metric from) {
     MetricDto to = new MetricDto();
@@ -50,6 +51,7 @@ public class MetricDto {
     Dtos.setId(to::setContainerModelId, from.getContainerModel());
     setInteger(to::setReadLength, from.getReadLength(), true);
     setInteger(to::setReadLength2, from.getReadLength2(), true);
+    setBoolean(to::setOptional, from.isOptional(), false);
     to.setLabel(makeLabel(from));
     return to;
   }
@@ -80,7 +82,8 @@ public class MetricDto {
         if (from.getReadLength2().equals(from.getReadLength())) {
           sb.append("2×").append(from.getReadLength());
         } else {
-          sb.append("Read lengths (").append(from.getReadLength()).append(", ").append(from.getReadLength2()).append(")");
+          sb.append("Read lengths (").append(from.getReadLength()).append(", ").append(from.getReadLength2())
+              .append(")");
         }
       } else {
         sb.append("1×").append(from.getReadLength());
@@ -215,6 +218,14 @@ public class MetricDto {
     this.readLength2 = readLength2;
   }
 
+  public boolean isOptional() {
+    return optional;
+  }
+
+  public void setOptional(boolean optional) {
+    this.optional = optional;
+  }
+
   public String getLabel() {
     return label;
   }
@@ -240,6 +251,7 @@ public class MetricDto {
     setObject(to::setContainerModel, SequencingContainerModel::new, getContainerModelId());
     setInteger(to::setReadLength, getReadLength(), true);
     setInteger(to::setReadLength2, getReadLength2(), true);
+    setBoolean(to::setOptional, isOptional(), false);
     return to;
   }
 
