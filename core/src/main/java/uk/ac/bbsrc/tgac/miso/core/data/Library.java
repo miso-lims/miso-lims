@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Set;
 
 import com.eaglegenomics.simlims.core.Note;
 
@@ -312,4 +313,7 @@ public interface Library extends Attachable, Comparable<Library>, Deletable, Hie
 
   String getBatchId();
 
+  public Set<LibrarySopFieldValue> getSopFieldValues();
+
+  public void setSopFieldValues(Set<LibrarySopFieldValue> sopFieldValues);
 }
