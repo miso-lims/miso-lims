@@ -17,8 +17,14 @@ import jakarta.persistence.PersistenceContext;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.ServiceRecord;
+import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.InstrumentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 
@@ -117,6 +123,13 @@ public class HibernateInstrumentDaoIT extends AbstractDAOTest {
     Instrument instrument = (Instrument) currentSession().find(InstrumentImpl.class, 1L);
     assertEquals(0L, dao.getUsageByQcs(instrument));
   }
+
+  @Test
+  public void testGetUsageByLibrarySopFieldValues() throws Exception {
+    Instrument instrument = (Instrument) currentSession().find(InstrumentImpl.class, 1L);
+    assertEquals(0L, dao.getUsageByLibrarySopFieldValues(instrument));
+  }
+
 
   @Test
   public void testGetByUpgradedInstrument() throws Exception {

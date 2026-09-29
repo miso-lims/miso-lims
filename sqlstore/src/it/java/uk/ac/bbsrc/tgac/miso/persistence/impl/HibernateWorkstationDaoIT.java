@@ -10,7 +10,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySopFieldValue;
+import uk.ac.bbsrc.tgac.miso.core.data.SopField;
 import uk.ac.bbsrc.tgac.miso.core.data.Workstation;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 
 public class HibernateWorkstationDaoIT extends AbstractDAOTest {
 
@@ -70,6 +76,12 @@ public class HibernateWorkstationDaoIT extends AbstractDAOTest {
   public void testGetUsage() throws IOException {
     Workstation workstation = (Workstation) currentSession().find(Workstation.class, 1L);
     assertEquals(4L, sut.getUsage(workstation));
+  }
+
+  @Test
+  public void testGetUsageByLibrarySopFieldValues() throws Exception {
+    Workstation workstation = (Workstation) currentSession().find(Workstation.class, 1L);
+    assertEquals(0L, sut.getUsageByLibrarySopFieldValues(workstation));
   }
 
   @Test

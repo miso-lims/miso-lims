@@ -11,4 +11,6 @@ public interface SopService extends DeleterService<Sop>, ListService<Sop>, BulkS
 
   public List<Sop> listByCategory(SopCategory category) throws IOException;
 
+  public List<Sop> listActiveByCategory(SopCategory category) throws IOException;
+
 }

@@ -42,7 +42,8 @@ public class ListLibrariesController {
     return new ListItemsPage("library", mapper) {
       @Override
       protected void writeConfiguration(JsonMapper mapper, ObjectNode config) throws IOException {
-        MisoWebUtils.addJsonArray(mapper, config, "sops", sopService.listByCategory(SopCategory.LIBRARY), Dtos::asDto);
+        MisoWebUtils.addJsonArray(mapper, config, "sops", sopService.listActiveByCategory(SopCategory.LIBRARY),
+            Dtos::asDto);
       }
     }.list(model);
   }

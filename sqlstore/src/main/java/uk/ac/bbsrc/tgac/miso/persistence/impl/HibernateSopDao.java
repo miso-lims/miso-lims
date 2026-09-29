@@ -51,6 +51,14 @@ public class HibernateSopDao extends HibernateSaveDao<Sop>
   }
 
   @Override
+  public List<Sop> listActiveByCategory(SopCategory category) throws IOException {
+    QueryBuilder<Sop, Sop> builder = getQueryBuilder();
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(Sop_.category), category));
+    builder.addPredicate(builder.getCriteriaBuilder().isFalse(builder.getRoot().get(Sop_.archived)));
+    return builder.getResultList();
+  }
+
+  @Override
   public List<Sop> listByIdList(Collection<Long> ids) throws IOException {
     return listByIdList(Sop_.sopId, ids);
   }

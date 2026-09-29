@@ -13,6 +13,8 @@ public interface SopDao extends PaginatedDataSource<Sop>, BulkSaveDao<Sop> {
 
   public List<Sop> listByCategory(SopCategory category) throws IOException;
 
+  public List<Sop> listActiveByCategory(SopCategory category) throws IOException;
+
   public long getUsageBySamples(Sop sop) throws IOException;
 
   public long getUsageByLibraries(Sop sop) throws IOException;
