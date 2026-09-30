@@ -17,6 +17,7 @@ SElECT am.assayId
   ,cm.alias AS containerModel
   ,m.readLength
   ,m.readLength2
+  ,m.optional
 FROM Metric m
 JOIN Assay_Metric am ON am.metricId = m.metricId
 LEFT JOIN MetricSubcategory sub ON sub.subcategoryId = m.subcategoryId

@@ -72,6 +72,8 @@ public class Metric implements Aliasable, Deletable, Serializable {
 
   private Integer readLength2;
 
+  private boolean optional;
+
   @Override
   public long getId() {
     return metricId;
@@ -210,11 +212,18 @@ public class Metric implements Aliasable, Deletable, Serializable {
     this.readLength2 = readLength2;
   }
 
+  public boolean isOptional() {
+    return optional;
+  }
+
+  public void setOptional(boolean optional) {
+    this.optional = optional;
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(metricId, alias, category, thresholdType, units, sortPriority, nucleicAcidType, tissueMaterial,
-        tissueType,
-        negateTissueType, tissueOrigin, containerModel, readLength, readLength2);
+        tissueType, negateTissueType, tissueOrigin, containerModel, readLength, readLength2, optional);
   }
 
   @Override
@@ -233,7 +242,8 @@ public class Metric implements Aliasable, Deletable, Serializable {
         Metric::getTissueOrigin,
         Metric::getContainerModel,
         Metric::getReadLength,
-        Metric::getReadLength2);
+        Metric::getReadLength2,
+        Metric::isOptional);
   }
 
 }

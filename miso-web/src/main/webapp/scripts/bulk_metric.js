@@ -124,26 +124,16 @@ BulkTarget.metric = (function () {
             "Metric only applies to samples of this tissue type if selected. If negate tissue type is" +
             " selected, applies instead to all EXCEPT the selected tissue type",
         },
-        {
-          title: "Negate Tissue Type",
-          type: "dropdown",
-          data: "negateTissueType",
-          source: [
-            {
-              label: "No",
-              value: false,
-            },
-            {
-              label: "Yes",
-              value: true,
-            },
-          ],
-          required: true,
-          getItemLabel: Utils.array.get("label"),
-          getItemValue: Utils.array.get("value"),
-          include: Constants.isDetailedSample,
-          description: "If yes, the metric applies to all EXCEPT the selected tissue type",
-        },
+        (function () {
+          var column = BulkUtils.columns.makeBoolean(
+            "Negate Tissue Type",
+            "negateTissueType",
+            true,
+            Constants.isDetailedSample
+          );
+          column.description = "If true, the metric applies to all EXCEPT the selected tissue type";
+          return column;
+        })(),
         {
           title: "Tissue Origin",
           type: "dropdown",
@@ -181,6 +171,14 @@ BulkTarget.metric = (function () {
             "Metric only applies to runs with this read 2 length if specified. Use zero (0) to indicate" +
             " single end",
         },
+        (function () {
+          var column = BulkUtils.columns.makeBoolean("Optional", "optional", true, true);
+          column.description =
+            "Metrics normally apply to all items in the category/subcategory, but may have different thresholds " +
+            "depending on some criteria. If the metric is optional, then it does not apply to items that do not " +
+            "match any of the defined criteria.";
+          return column;
+        })(),
       ];
     },
   };

@@ -92,7 +92,8 @@ public class DefaultMetricService extends AbstractSaveService<Metric> implements
   }
 
   @Override
-  protected void collectValidationErrors(Metric object, Metric beforeChange, List<ValidationError> errors) throws IOException {
+  protected void collectValidationErrors(Metric object, Metric beforeChange, List<ValidationError> errors)
+      throws IOException {
     // no checks
   }
 
@@ -111,6 +112,7 @@ public class DefaultMetricService extends AbstractSaveService<Metric> implements
     to.setContainerModel(from.getContainerModel());
     to.setReadLength(from.getReadLength());
     to.setReadLength2(from.getReadLength2());
+    to.setOptional(from.isOptional());
   }
 
   @Override

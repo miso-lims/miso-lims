@@ -1653,6 +1653,10 @@ public class MisoClient implements Lims {
     if (!rs.wasNull()) {
       metric.setReadLength2(readLength2);
     }
+    boolean optional = rs.getBoolean("optional");
+    if (!rs.wasNull()) {
+      metric.setOptional(optional);
+    }
     return metric;
   };
 
