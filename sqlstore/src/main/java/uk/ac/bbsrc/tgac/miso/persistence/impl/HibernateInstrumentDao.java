@@ -21,6 +21,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.ArrayRun_;
 import uk.ac.bbsrc.tgac.miso.core.data.Instrument;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel;
 import uk.ac.bbsrc.tgac.miso.core.data.InstrumentModel_;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySopFieldValue;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySopFieldValue_;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Run_;
 import uk.ac.bbsrc.tgac.miso.core.data.RunSopFieldValue;
@@ -239,6 +241,19 @@ public class HibernateInstrumentDao extends HibernateSaveDao<Instrument>
         .where(
             builder.equal(sopFieldJoin.get(SopField_.fieldType), SopField.FieldType.INSTRUMENT),
             builder.equal(root.get(SampleSopFieldValue_.value), Long.toString(instrument.getId())));
+    return currentSession().createQuery(query).getSingleResult();
+  }
+
+  @Override
+  public long getUsageByLibrarySopFieldValues(Instrument instrument) throws IOException {
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<Long> query = builder.createQuery(Long.class);
+    Root<LibrarySopFieldValue> root = query.from(LibrarySopFieldValue.class);
+    Join<LibrarySopFieldValue, SopField> sopFieldJoin = root.join(LibrarySopFieldValue_.sopField);
+    query.select(builder.count(root))
+        .where(
+            builder.equal(sopFieldJoin.get(SopField_.fieldType), SopField.FieldType.INSTRUMENT),
+            builder.equal(root.get(LibrarySopFieldValue_.value), Long.toString(instrument.getId())));
     return currentSession().createQuery(query).getSingleResult();
   }
 

@@ -73,6 +73,11 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
   }
 
   @Override
+  public List<Sop> listActiveByCategory(SopCategory category) throws IOException {
+    return sopDao.listActiveByCategory(category);
+  }
+
+  @Override
   public List<Sop> list() throws IOException {
     return sopDao.list();
   }
@@ -147,10 +152,6 @@ public class DefaultSopService extends AbstractSaveService<Sop> implements SopSe
     Set<SopField> fields = sop.getFields();
 
     if (fields == null || fields.isEmpty()) {
-      return;
-    }
-    if (sop.getCategory() != SopCategory.RUN && sop.getCategory() != SopCategory.SAMPLE) {
-      errors.add(new ValidationError(FIELDS_PROPERTY, "Only Run and Sample SOPs may have fields"));
       return;
     }
 

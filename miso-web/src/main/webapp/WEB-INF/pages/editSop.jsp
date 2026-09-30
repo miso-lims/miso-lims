@@ -16,12 +16,6 @@
     <h1>SOP Fields</h1>
     <div id="sopForm_fieldsError" class="errorContainer"></div>
 
-    <div id="sopFieldsUnsupported" style="display:none;">
-      <div class="messagebox">
-        SOP Fields are only supported for Run and Sample category SOPs.
-      </div>
-    </div>
-
     <div id="listSopFields"></div>
 
     <script type="text/javascript">
@@ -37,11 +31,6 @@
         var form = FormUtils.createForm("sopForm", config.isAdmin ? "save" : null, sop, "sop", config);
         Sop.setForm(form);
         Sop.setFields((sop && sop.fields) ? sop.fields : []);
-
-        var category = form.get("category");
-        var fieldsSupported = category === "RUN" || category === "SAMPLE";
-        jQuery("#listSopFields").toggle(fieldsSupported);
-        jQuery("#sopFieldsUnsupported").toggle(!fieldsSupported);
 
         Utils.ui.updateHelpLink(FormTarget.sop.getUserManualUrl());
       });

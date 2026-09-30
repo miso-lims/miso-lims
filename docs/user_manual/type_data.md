@@ -293,9 +293,6 @@ workstation field is entered by selecting one of the workstations defined in MIS
 typing a value. An instrument field also specifies an instrument model when it is created; the
 field is entered by selecting one of the instruments of that model defined in MISO.
 
-SOP fields can only be added to run and sample SOPs. Library SOPs do not support SOP fields at this
-time.
-
 If Run Scanner is being used, run SOP field values may be automatically populated based on the
 consumables reported by Run Scanner. For this to work, the SOP field name in MISO must match the
 consumable type reported by Run Scanner. A suffix of "lot number", "lot no", "lot num", or "lot" may

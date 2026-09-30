@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.dto;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -89,6 +90,7 @@ public class LibraryDto extends AbstractBoxableDto
   private Long workstationId;
   private Long thermalCyclerId;
   private Long sopId;
+  private Map<Long, String> sopFieldValues;
   private String batchId;
   private String worksetAddedTime;
   private Long effectiveQcFailureId;
@@ -556,6 +558,14 @@ public class LibraryDto extends AbstractBoxableDto
 
   public void setSopId(Long sopId) {
     this.sopId = sopId;
+  }
+
+  public Map<Long, String> getSopFieldValues() {
+    return sopFieldValues;
+  }
+
+  public void setSopFieldValues(Map<Long, String> sopFieldValues) {
+    this.sopFieldValues = sopFieldValues;
   }
 
   public String getBatchId() {

@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
@@ -46,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
+import uk.ac.bbsrc.tgac.miso.core.service.ChangeLogService;
 import uk.ac.bbsrc.tgac.miso.core.service.DetailedQcStatusService;
 import uk.ac.bbsrc.tgac.miso.core.service.FileAttachmentService;
 import uk.ac.bbsrc.tgac.miso.core.service.InstrumentService;
@@ -131,6 +133,8 @@ public class DefaultLibraryService implements LibraryService {
   private BarcodableReferenceService barcodableReferenceService;
   @Autowired
   private RequisitionService requisitionService;
+  @Autowired
+  private ChangeLogService changeLogService;
   @Autowired
   private TransactionTemplate transactionTemplate;
   @Value("${miso.autoGenerateIdentificationBarcodes}")
@@ -370,6 +374,7 @@ public class DefaultLibraryService implements LibraryService {
       library.setThermalCycler(instrumentService.get(library.getThermalCycler().getId()));
     }
     loadChildEntity(library::setSop, library.getSop(), sopService, "sopId");
+    loadSopFieldValues(library);
     loadChildEntity(library::setDetailedQcStatus, library.getDetailedQcStatus(), detailedQcStatusService,
         "detailedQcStatusId");
     loadChildEntity(library::setRequisition, library.getRequisition(), requisitionService, "requisitionId");
@@ -442,7 +447,12 @@ public class DefaultLibraryService implements LibraryService {
     target.setUmis(source.getUmis());
     target.setWorkstation(source.getWorkstation());
     target.setThermalCycler(source.getThermalCycler());
+    ValidationUtils.makeSopChangesChangeLog(target, target.getSopFieldValues(), source.getSopFieldValues(),
+        changeLogService, authorizationManager.getCurrentUser());
     target.setSop(source.getSop());
+    Library sopFieldValueOwner = target;
+    ValidationUtils.applySopFieldValueChanges(target.getSopFieldValues(), source.getSopFieldValues(),
+        LibrarySopFieldValue::new, fieldValue -> fieldValue.setLibrary(sopFieldValueOwner));
     target.setRequisition(source.getRequisition());
 
     if (isDetailedLibrary(target)) {
@@ -459,6 +469,15 @@ public class DefaultLibraryService implements LibraryService {
       dTarget.setGroupId(dSource.getGroupId());
       dTarget.setGroupDescription(dSource.getGroupDescription());
     }
+  }
+
+  private void loadSopFieldValues(Library library) {
+    if (library.getSopFieldValues() == null) {
+      return;
+    }
+
+    library.getSopFieldValues().forEach(value -> value.setLibrary(library));
+    ValidationUtils.loadSopFieldValues(library.getSop(), library.getSopFieldValues());
   }
 
   private boolean isInvalidDuplicate(Library library, NamingScheme namingScheme) throws IOException {
@@ -563,6 +582,12 @@ public class DefaultLibraryService implements LibraryService {
       }
     }
     validateIndices(library, errors);
+
+    if (library.getSop() != null && library.getSop().getCategory() != SopCategory.LIBRARY) {
+      errors.add(new ValidationError("sopId", "Only library SOPs may be assigned to a library"));
+    }
+    ValidationUtils.validateSopFieldValues(library.getSop(), library.getSopFieldValues(), workstationService,
+        instrumentService, errors);
 
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);

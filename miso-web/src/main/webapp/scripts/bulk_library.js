@@ -14,6 +14,9 @@ BulkTarget.library = (function ($) {
    *   workstations: array
    *   templatesByProjectId: map
    *   sops: array
+   *   sopId: optional; the SOP chosen in the propagate dialog. When set with pageMode "propagate",
+   *       one column per SOP field is added to the table
+   *   instruments: array; dropdown source for INSTRUMENT-type SOP fields
    */
 
   var originalDataByRow = {};
@@ -208,6 +211,7 @@ BulkTarget.library = (function ($) {
           libraryTypeId: library.libraryTypeId,
           indexFamilyId: library.indexFamilyId,
           kitDescriptorId: library.kitDescriptorId,
+          sopId: library.sopId,
         };
         if (library.sampleBoxPosition) {
           parentLocationsByRow[index] = library.sampleBoxPosition;
@@ -476,7 +480,14 @@ BulkTarget.library = (function ($) {
         )
       );
       if (!config.isLibraryReceipt) {
-        columns.push(BulkUtils.columns.sop(config.sops, config.pageMode === "propagate"));
+        var sopColumn = BulkUtils.columns.sop(config.sops, config.pageMode === "propagate");
+        if (config.pageMode === "propagate" && config.sopId) {
+          sopColumn.disabled = true;
+          columns.push(sopColumn);
+          columns = columns.concat(BulkUtils.columns.sopFieldValues(config));
+        } else {
+          columns.push(sopColumn);
+        }
       }
       columns.push(
         {
@@ -990,12 +1001,59 @@ BulkTarget.library = (function ($) {
       }
       if (config.isLibraryReceipt) {
         BulkUtils.checkPausedRequisitions(data, deferred);
+      } else if (config.pageMode === "edit") {
+        showSopChangeWarnings(data, deferred);
       } else {
         deferred.resolve();
       }
       return deferred.promise();
     },
   };
+
+  function showSopChangeWarnings(data, deferred) {
+    var sopChanges = data.filter(function (library, index) {
+      var original = originalDataByRow[index];
+      if (!original || library.sopId === original.sopId) {
+        return false;
+      }
+      return (
+        library.sopFieldValues &&
+        Object.keys(library.sopFieldValues).some(function (fieldId) {
+          var value = library.sopFieldValues[fieldId];
+          return value !== null && value !== undefined && value !== "";
+        })
+      );
+    });
+
+    if (!sopChanges.length) {
+      deferred.resolve();
+      return;
+    }
+
+    var messages = [
+      "Changing the SOP for the following libraries will clear their existing SOP field" +
+        " values. SOP field values can only be edited on the individual Edit Library page.",
+    ];
+    messages = messages.concat(
+      sopChanges.map(function (library) {
+        return "• " + (library.alias || library.name);
+      })
+    );
+    messages.push("Are you sure you wish to save?");
+
+    Utils.showConfirmDialog(
+      "Confirm Changes",
+      "Save",
+      messages,
+      function () {
+        sopChanges.forEach(function (library) {
+          library.sopFieldValues = {};
+        });
+        deferred.resolve();
+      },
+      deferred.reject
+    );
+  }
 
   function makeIndexColumn(position) {
     var column = {

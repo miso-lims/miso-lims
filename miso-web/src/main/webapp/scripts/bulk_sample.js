@@ -13,6 +13,8 @@ BulkTarget.sample = (function ($) {
    *   projects: all projects
    *   sortLibraryPropagate: string; column for default sort when propagating libraries
    *   sops: array
+   *   librarySops: array; LIBRARY-category SOPs, offered when propagating to Library in the
+   *       "Propagate" dialog
    *   sopId: optional; the SOP chosen in the propagate dialog. When set with pageMode "propagate",
    *       one column per SOP field is added to the table
    *   instruments: array; dropdown source for INSTRUMENT-type SOP fields
@@ -194,11 +196,12 @@ BulkTarget.sample = (function ($) {
               if (!Constants.isDetailedSample || sourceCategories[0] === "Aliquot") {
                 targets.push({
                   name: "Library",
-                  action: function (replicates, newBoxId) {
+                  action: function (replicates, newBoxId, sopId) {
                     var params = {
                       boxId: newBoxId,
                       ids: idsString,
                       replicates: replicates,
+                      sopId: sopId,
                     };
                     if (config.sortLibraryPropagate) {
                       params.sort = config.sortLibraryPropagate;
@@ -254,7 +257,22 @@ BulkTarget.sample = (function ($) {
                         },
                         showIf: function (output) {
                           var target = output.target || (targets.length === 1 ? targets[0] : null);
-                          return !target || target.name !== "Tissue";
+                          return !target || (target.name !== "Tissue" && target.name !== "Library");
+                        },
+                      }
+                    : null,
+                  config.librarySops && config.librarySops.length
+                    ? {
+                        property: "librarySop",
+                        type: "select",
+                        label: "SOP",
+                        values: config.librarySops,
+                        getLabel: function (sop) {
+                          return sop.alias + " v." + sop.version;
+                        },
+                        showIf: function (output) {
+                          var target = output.target || (targets.length === 1 ? targets[0] : null);
+                          return !!target && target.name === "Library";
                         },
                       }
                     : null,
@@ -264,11 +282,9 @@ BulkTarget.sample = (function ($) {
                 }),
                 function (result) {
                   var loadPage = function (boxId, replicates) {
-                    (result.target || targets[0]).action(
-                      replicates,
-                      boxId,
-                      result.sop ? result.sop.id : null
-                    );
+                    var target = result.target || targets[0];
+                    var sop = target.name === "Library" ? result.librarySop : result.sop;
+                    target.action(replicates, boxId, sop ? sop.id : null);
                   };
                   var createBox = function (sampleCount, replicates) {
                     Utils.createBoxDialog(

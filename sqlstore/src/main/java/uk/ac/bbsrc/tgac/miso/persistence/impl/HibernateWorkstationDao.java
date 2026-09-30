@@ -11,6 +11,8 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Root;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySopFieldValue;
+import uk.ac.bbsrc.tgac.miso.core.data.LibrarySopFieldValue_;
 import uk.ac.bbsrc.tgac.miso.core.data.RunSopFieldValue;
 import uk.ac.bbsrc.tgac.miso.core.data.RunSopFieldValue_;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleSopFieldValue;
@@ -62,6 +64,19 @@ public class HibernateWorkstationDao extends HibernateSaveDao<Workstation> imple
         .where(
             builder.equal(sopFieldJoin.get(SopField_.fieldType), SopField.FieldType.WORKSTATION),
             builder.equal(root.get(SampleSopFieldValue_.value), Long.toString(workstation.getId())));
+    return currentSession().createQuery(query).getSingleResult();
+  }
+
+  @Override
+  public long getUsageByLibrarySopFieldValues(Workstation workstation) throws IOException {
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<Long> query = builder.createQuery(Long.class);
+    Root<LibrarySopFieldValue> root = query.from(LibrarySopFieldValue.class);
+    Join<LibrarySopFieldValue, SopField> sopFieldJoin = root.join(LibrarySopFieldValue_.sopField);
+    query.select(builder.count(root))
+        .where(
+            builder.equal(sopFieldJoin.get(SopField_.fieldType), SopField.FieldType.WORKSTATION),
+            builder.equal(root.get(LibrarySopFieldValue_.value), Long.toString(workstation.getId())));
     return currentSession().createQuery(query).getSingleResult();
   }
 
