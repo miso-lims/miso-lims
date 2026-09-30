@@ -76,8 +76,6 @@ need to add a grant privilege to the MISO database from your remote machine:
     GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server';
     GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server' IDENTIFIED BY 'tgaclims';
 
-Refer to [Development Alternatives](#development-alternatives) for a different way to do this step.
-
 
 ## Setting Up the Application Server
 
@@ -251,11 +249,12 @@ To install or upgrade, perform the following steps:
 Flyway is used to apply patches to your database to make it compatible with the new MISO version. A
 Docker image is provided to simplify setup and running the migrations.
 
-The MySQL root user, or another user with similar privileges, must be used to run Flyway and create
-and restore backups. `GRANT ALL PRIVILEGES ON *.* TO 'username'@'host';` will grant all the
-necessary privileges. Only a subset of these is required, but we have not investigated specifics.
-The user specified in `ROOT.xml`, which the web server will use to communicate with the database,
-should **NOT** be granted global (`*.*`) privileges, so this should be a different user.
+A MySQL user with several privileges must be used to run Flyway and create and restore backups.
+`GRANT ALL PRIVILEGES ON *.* TO 'username'@'host';` will grant all the necessary privileges. Only a
+subset of these is required, but we have not investigated specifics. Using a host of `'%'` for this
+user is simplest since a different Docker container will be used each time. The user specified in
+`ROOT.xml`, which the web server will use to communicate with the database, should **NOT** be
+granted global (`*.*`) privileges, so this should be a different user.
 
 1. If you have not already done so, create an environment file defining the parameters required for
 Flyway to connect to your database:
@@ -272,7 +271,7 @@ Flyway to connect to your database:
     MISO_FILES_DIR=/storage/miso/files
 
     # MySQL user that Flyway will use
-    FLYWAY_USER=root
+    FLYWAY_USER=admin
     ```
 2. Create a file containing just the password for the MySQL user that Flyway will use.
 3. Run Flyway via the Docker container.
@@ -281,7 +280,7 @@ Flyway to connect to your database:
      path to the file on the host machine
    * `${MISO_VERSION}` must match the version of MISO that you are deploying
    ```
-   docker run --rm --env-file "${ENV_FILE}" -v "${PASSWORD_FILE}:/run/secrets/flyway_password:ro" miso-lims-flyway:${MISO_VERSION} migrate
+   docker run --rm --env-file "${ENV_FILE}" -v "${PASSWORD_FILE}:/run/secrets/flyway_password:ro" --add-host=host.docker.internal:host-gateway ghcr.io/miso-lims/miso-lims-migration:${MISO_VERSION} migrate
    ```
 
 If you run into an issue with migration `V0611`, ensure that the user running Flyway has read and
@@ -292,23 +291,3 @@ write permissions on `MISO_FILES_DIR`.
 * Whenever unexpected behaviour arises, be sure to check the build logs, located at `${CATALINA_BASE}/logs`. Read through the output of `catalina.out`, `catalina.<date>.log`, and `localhost.<date>.log`.
 * Ensure you are using the correct version of Java with Tomcat. This can be checked in `catalina.out`. In case you are not, append/modify the value of `$JAVA_HOME` in `setenv.sh` or `/etc/default/tomcat10`. 
 * If file access for `/storage/miso` is causing an error, [this](https://stackoverflow.com/questions/56827735/how-to-allow-tomcat-war-app-to-write-in-folder) may help.
-
-
-# Development Alternatives
-
- If you can't or don't want to install the correct version of MySQL, this alternative allows the same result without you downloading it. To do this, download [Docker](https://docs.docker.com/get-docker/) to use a Docker container. Creating the container:
-
-    docker run --name $CONTAINER_NAME -e MYSQL_ROOT_PASSWORD=$ROOT_PASSWORD -e MYSQL_DATABASE=$DB_NAME -e MYSQL_USER=$DB_USERNAME -e MYSQL_PASSWORD=$DB_PASSWORD -p 3306:3306 -d mysql:8.0
-
-
-Where:
-
-* `$CONTAINER_NAME` is your desired Docker container name.
-* `$ROOT_PASSWORD` is the root password to your MySQL.
-* `$DB_NAME` is the name of the database (e.g. "lims").
-* `$DB_USERNAME` is the username to access the database (e.g. "tgaclims").
-* `$DB_PASSWORD` is the password to access the database (e.g. "tgaclims").
-
-To map to a different port, change `-p 3306:3306` to `-p $PORT:3306`, where `$PORT` is your desired port.
-
-If you use this container method, you can skip the [database configuration](#setting-up-the-database-server) step entirely.

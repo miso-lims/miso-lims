@@ -10,9 +10,10 @@ move to a later 4.x version if available.
 
 ## Bare Metal
 
-**Note**: The steps that use the MySQL root user may alternately be done using a different user with
-similar privileges (`GRANT ALL PRIVILEGES ON *.* TO 'username'@'host';` works. Only a subset of
-these is required, but we have not investigated specifics)
+A MySQL user with several privileges must be used to run Flyway and create and restore backups.
+`GRANT ALL PRIVILEGES ON *.* TO 'username'@'host';` will grant all the necessary privileges. Only a
+subset of these is required, but we have not investigated specifics. Using a host of `'%'` for this
+user is simplest since a different Docker container will be used each time.
 
 1. Stop Tomcat to prevent MISO access during maintenance
 1. Make a backup in your usual way, to use for roll-back if necessary
@@ -21,9 +22,9 @@ these is required, but we have not investigated specifics)
 
         DATABASE=lims
 
-        mysql -u root -p --skip-column-names -b -e \
+        mysql -u ${DB_USER} -p --skip-column-names -b -e \
           "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${DATABASE}' AND TABLE_TYPE = 'BASE TABLE';" \
-          | xargs mysqldump -u root -p --single-transaction --skip-triggers "${DATABASE}" > misodb_8_0.sql
+          | xargs mysqldump -u ${DB_USER} -p --single-transaction --skip-triggers "${DATABASE}" > misodb_8_0.sql
 
 1. remove MySQL 8.0 and install MySQL 9.7.
     * set the MySQL root password.
@@ -33,8 +34,10 @@ these is required, but we have not investigated specifics)
     * `CREATE DATABASE lims;`
     * Create any necessary users. e.g.
 
-            CREATE USER 'tgaclims'@'localhost' IDENTIFIED BY 'tgaclims';
+            CREATE USER 'tgaclims'@'%' IDENTIFIED BY 'tgaclims';
             GRANT ALL ON `lims`.* TO 'tgaclims'@'localhost';
+            CREATE USER 'dbadmin'@'%' IDENTIFIED BY 'dbadmin';
+            GRANT ALL PRIVILEGES ON *.* TO 'dbadmin'@'%';
 
 1. restore tables-only backup to mysql 9.7 using MySQL root user.
 
@@ -45,7 +48,7 @@ until you get to migrating the database. Note that the steps here have been upda
 recommend running Flyway via our Docker image. Follow these instructions, but before running Flyway
 migrate, run a Flyway repair:
 
-        docker run --rm --env-file "${ENV_FILE}" -v "${PASSWORD_FILE}:/run/secrets/flyway_password:ro" miso-lims-flyway:${MISO_VERSION} repair
+        docker run --rm --env-file "${ENV_FILE}" -v "${PASSWORD_FILE}:/run/secrets/flyway_password:ro" --add-host=host.docker.internal:host-gateway ghcr.io/miso-lims/miso-lims-migration:${MISO_VERSION} repair
 
     If you receive an error regarding the time zone, ensure that you have configured the MySQL time
     zone as instructed above.
