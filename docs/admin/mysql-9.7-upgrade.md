@@ -59,10 +59,10 @@ migrate, run a Flyway repair:
 
 ### Notes for all below instructions:
 
-* You should add your usual parameters to all `docker-compose` commands (--env-file, -f, etc.)
+* You should add your usual parameters to all `docker compose` commands (--env-file, -f, etc.)
 * Docker services named `db`, `flyway`, and `webapp` are assumed. Substitute your own names if
   different
-* You can use `-d` on `docker-compose up` commands to run in the background and use a single
+* You can use `-d` on `docker compose up` commands to run in the background and use a single
   terminal for all of this, but it's often useful to keep an eye on the containers' output, so using
   a second terminal is ideal
 * You will need to know your MySQL root password. See below for instructions to reset it if
@@ -85,11 +85,11 @@ migrate, run a Flyway repair:
           \"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '${DATABASE}' AND TABLE_TYPE = 'BASE TABLE';\" 2> /dev/null \
           | xargs mysqldump -u root -p${ROOT_PASSWORD} --single-transaction --skip-triggers ${DATABASE} 2> /dev/null" > misodb_8_0.sql
 
-1. Shut down the docker-compose environment
+1. Shut down the Docker Compose environment
 
-        docker-compose down
+        docker compose down
 
-1. Update your docker-compose file to use the new MISO version and MySQL 9.7
+1. Update your Compose file to use the new MISO version and MySQL 9.7
     * **db** service:
         * change image to `mysql:9.7`
         * change the volume targeting `/var/lib/mysql` to a new source
@@ -104,7 +104,7 @@ migrate, run a Flyway repair:
 
 1. Spin up the MySQL container only, with new mounted volume
 
-        docker-compose up db
+        docker compose up db
 
 1. Restore tables-only backup to the new container using root user. Replace `miso-lims_db_1` with
   the correct container ID or name if different
@@ -112,16 +112,16 @@ migrate, run a Flyway repair:
         docker exec -i miso-lims_db_1 sh -c "exec mysql -u root -p${ROOT_PASSWORD} ${DATABASE}" < misodb_8_0.sql
 
 1. Use Flyway container to run `repair` command
-    * edit docker-compose file - change flyway service `command` to `repair`
-    * Run `docker-compose up flyway` and wait for it to complete
-    * edit docker-compose file - change flyway service `command` back to `migrate`
-1. Shut down MySQL container
+    * edit the Compose file - change flyway service `command` to `repair`
+    * Run `docker compose up flyway` and wait for it to complete
+    * edit the Compose file - change flyway service `command` back to `migrate`
+1. Shut down the MySQL container
 
-        docker-compose down
+        docker compose down
 
-1. Bring up full docker-compose
+1. Bring up the full Docker Compose environment
 
-        docker-compose up
+        docker compose up
 
 1. Watch the logs to ensure the Flyway migration completes successfully. It will likely take a few minutes, and you should see a message like "miso-lims_flyway_1 exited with code 0" when it's done
 
@@ -131,9 +131,9 @@ Only do this if you don't know your root password.
 
 ```
 # stop all docker containers
-docker-compose down
+docker compose down
 # run bash on db container (doesn't start mysqld):
-docker-compose run db bash
+docker compose run db bash
 
 # create password reset script. Replace CHANGE_ME with your desired password
 echo "USE mysql;
@@ -146,5 +146,5 @@ mysql -u root -p
 # enter password you entered in place of CHANGE_ME above
 exit
 exit
-docker-compose down
+docker compose down
 ```

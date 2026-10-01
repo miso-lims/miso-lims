@@ -23,7 +23,7 @@ version: '3.7'
 # cd miso-lims-compose
 # export MISO_DB_USER=tgaclims && export MISO_DB=lims && export MISO_DB_PASSWORD_FILE=./.miso_db_password && MISO_TAG=latest
 # echo "changeme" > ./.miso_db_password
-# docker-compose -f demo.plain.yml up
+# docker compose -f demo.plain.yml up
 #
 ################################################################################
 # Code available at https://github.com/miso-lims/miso-lims under GPL-3.0
