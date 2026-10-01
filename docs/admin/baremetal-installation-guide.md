@@ -274,7 +274,7 @@ Flyway to connect to your database:
     FLYWAY_USER=admin
     ```
 2. Create a file containing just the password for the MySQL user that Flyway will use.
-3. Run Flyway via the Docker container.
+3. Run Flyway migrate via the Docker container.
    * use your environment file created above for `${ENV_FILE}`
    * mount the password file to `/run/secrets/flyway_password`. `${PASSWORD_FILE}` is the absolute
      path to the file on the host machine
