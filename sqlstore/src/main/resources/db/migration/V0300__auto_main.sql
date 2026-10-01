@@ -15,17 +15,17 @@ ALTER TABLE Sample ADD CONSTRAINT fk_sample_creator FOREIGN KEY (creator) REFERE
 DROP VIEW IF EXISTS SampleDerivedInfo;
 
 
-ALTER TABLE Library ADD COLUMN creator bigint;
-ALTER TABLE Library ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
-ALTER TABLE Library ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
+ALTER TABLE `Library` ADD COLUMN creator bigint;
+ALTER TABLE `Library` ADD COLUMN created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
+ALTER TABLE `Library` ADD COLUMN lastModified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP();
 
-UPDATE Library SET
-  created = (SELECT MIN(changeTime) FROM LibraryChangeLog WHERE libraryId = Library.libraryId),
-  lastModified = (SELECT MAX(changeTime) FROM LibraryChangeLog WHERE libraryId = Library.libraryId),
-  creator = (SELECT userId FROM LibraryChangeLog WHERE libraryId = Library.libraryId ORDER BY changeTime ASC LIMIT 1);
+UPDATE `Library` SET
+  created = (SELECT MIN(changeTime) FROM LibraryChangeLog WHERE libraryId = `Library`.libraryId),
+  lastModified = (SELECT MAX(changeTime) FROM LibraryChangeLog WHERE libraryId = `Library`.libraryId),
+  creator = (SELECT userId FROM LibraryChangeLog WHERE libraryId = `Library`.libraryId ORDER BY changeTime ASC LIMIT 1);
 
-ALTER TABLE Library CHANGE COLUMN creator creator bigint NOT NULL;
-ALTER TABLE Library ADD CONSTRAINT fk_library_creator FOREIGN KEY (creator) REFERENCES User (userId);
+ALTER TABLE `Library` CHANGE COLUMN creator creator bigint NOT NULL;
+ALTER TABLE `Library` ADD CONSTRAINT fk_library_creator FOREIGN KEY (creator) REFERENCES User (userId);
 
 DROP VIEW IF EXISTS LibraryDerivedInfo;
 

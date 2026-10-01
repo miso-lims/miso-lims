@@ -1,7 +1,7 @@
 DELIMITER //
 
 DROP TRIGGER IF EXISTS LibraryChange//
-CREATE TRIGGER LibraryChange BEFORE UPDATE ON Library
+CREATE TRIGGER LibraryChange BEFORE UPDATE ON `Library`
 FOR EACH ROW
   BEGIN
   DECLARE log_message longtext;
@@ -112,7 +112,7 @@ FOR EACH ROW
   END//
 
 DROP TRIGGER IF EXISTS LibraryInsert//
-CREATE TRIGGER LibraryInsert AFTER INSERT ON Library
+CREATE TRIGGER LibraryInsert AFTER INSERT ON `Library`
 FOR EACH ROW
   INSERT INTO LibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime) VALUES (
     NEW.libraryId,

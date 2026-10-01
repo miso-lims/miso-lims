@@ -63,10 +63,10 @@ CREATE TABLE LibrarySpikeIn (
   PRIMARY KEY (spikeInId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-ALTER TABLE Library ADD COLUMN spikeInId bigint;
-ALTER TABLE Library ADD CONSTRAINT fk_library_spikeIn FOREIGN KEY (spikeInId) REFERENCES LibrarySpikeIn(spikeInId);
-ALTER TABLE Library ADD COLUMN spikeInDilutionFactor varchar(50);
-ALTER TABLE Library ADD COLUMN spikeInVolume DECIMAL(14,10);
+ALTER TABLE `Library` ADD COLUMN spikeInId bigint;
+ALTER TABLE `Library` ADD CONSTRAINT fk_library_spikeIn FOREIGN KEY (spikeInId) REFERENCES LibrarySpikeIn(spikeInId);
+ALTER TABLE `Library` ADD COLUMN spikeInDilutionFactor varchar(50);
+ALTER TABLE `Library` ADD COLUMN spikeInVolume DECIMAL(14,10);
 
 
 -- ont_container_models

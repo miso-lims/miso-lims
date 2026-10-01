@@ -41,7 +41,7 @@ SELECT
   sp.priority AS subprojectPriority,
   ident.consentLevel
 FROM LibraryAliquot la
-JOIN Library lib ON lib.libraryId = la.libraryId
+JOIN `Library` lib ON lib.libraryId = la.libraryId
 JOIN Sample sam ON sam.sampleId = lib.sample_sampleId
 LEFT JOIN Subproject sp ON sp.subprojectId = sam.subprojectId
 LEFT JOIN SampleHierarchy sh ON sh.sampleId = sam.sampleId

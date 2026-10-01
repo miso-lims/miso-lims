@@ -10,7 +10,7 @@
 
 # MISO: An open source LIMS for small-to-large scale sequencing centres
 
-&copy; 2019. [Ontario Institute for Cancer Research](http://oicr.on.ca), Toronto, Canada, [Earlham Institute](http://earlham.ac.uk/), Norwich, UK.
+&copy; 2026. [Ontario Institute for Cancer Research](http://oicr.on.ca), Toronto, Canada, [Earlham Institute](http://earlham.ac.uk/), Norwich, UK.
 
 > MISO project contacts: [Morgan Taschuk](morgan.taschuk@oicr.on.ca), [Robert Davey](robert.davey@earlham.ac.uk)
 >
@@ -32,10 +32,9 @@
 
 ### Docker
 
-The simplest way to get MISO up and running quickly is to use
-[Docker](https://www.docker.com/) compose. Images of the most recent MISO releases are
-available on Docker Hub in
-the [misolims](https://hub.docker.com/r/misolims/) organisation.
+The simplest way to get MISO up and running quickly is to use [Docker](https://www.docker.com/)
+Compose. Images of the most recent MISO releases are available on Docker Hub in the
+[misolims](https://hub.docker.com/r/misolims/) organisation.
 
 #### Prerequisites
 
@@ -64,41 +63,42 @@ following commands.
 **Plain sample mode** has a straightforward Sample -> Library -> Library Aliquot ->
 Pool workflow and is sufficient for basic laboratory tracking for sequencing.
 
-Launch the plain sample demo with docker-compose:
+Launch the plain sample demo with Docker Compose:
 ``` bash
 cd miso-lims-compose
 export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_password MISO_DB_ROOT_PASSWORD_FILE=./.miso_root_password MISO_TAG=latest
 echo "changeme" > ./.miso_db_password
 echo "changeme" > ./.miso_root_password
-docker-compose -f demo.plain.yml up
+docker compose -f demo.plain.yml up
 ```
 
 **Detailed sample mode** has all of the features of plain sample mode, plus it
 allows users to build a hierarchy of Samples (e.g. Identity -> Tissue -> Slide
 -> gDNA (stock) -> gDNA (aliquot) and also includes alias autogeneration.
 
-Launch the detailed sample demo with docker-compose:
+Launch the detailed sample demo with Docker Compose:
 
 ```bash
 cd miso-lims-compose
 export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_password MISO_DB_ROOT_PASSWORD_FILE=./.miso_root_password MISO_TAG=latest
 echo "changeme" > ./.miso_db_password
 echo "changeme" > ./.miso_root_password
-docker-compose -f demo.detailed.yml up
+docker compose -f demo.detailed.yml up
 ```
 
 For both environments, navigate to [http://localhost](http://localhost)
 and use the credentials **admin**/**admin**.
 
 Once you are finished with the container, make sure to run
-`docker-compose -f <compose.yml> down`, where `<compose.yml>` is either
+`docker compose -f <compose.yml> down`, where `<compose.yml>` is either
 `demo.plain.yml` or `demo.detailed.yml`. This will clean up the instances and
 networks and release their resources to the host operating system.
 
 
-These compose files are intended as a demonstration and __not a permanent installation__.
+These Compose files are intended as a demonstration and __not a permanent installation__.
 
-Please see the [Docker Compose Guide](https://miso-lims.readthedocs.io/en/latest/admin/compose-installation-guide/) for more information on configuring the containers and the compose files.
+Please see the [Docker Compose Guide](https://miso-lims.readthedocs.io/en/latest/admin/compose-installation-guide/)
+for more information on configuring the containers and the Compose files.
 
 
 ## User Tutorial

@@ -6,4 +6,4 @@ UNION ALL
 
 SELECT l.name AS sampleId, link.requisitionId
 FROM Requisition_SupplementalLibrary link
-JOIN Library l ON l.libraryId = link.libraryId
+JOIN `Library` l ON l.libraryId = link.libraryId

@@ -8,7 +8,7 @@ FOR EACH ROW
     SET log_message = CONCAT_WS(', ',
       CASE WHEN OLD.alias NOT LIKE 'TEMPORARY%' THEN makeChangeMessage('alias', OLD.alias, NEW.alias) END,
       makeChangeMessage('barcode', OLD.identificationBarcode, NEW.identificationBarcode),
-      makeChangeMessage('parent', (SELECT name FROM Library WHERE libraryId = OLD.libraryId), (SELECT name FROM Library WHERE libraryId = NEW.libraryId)),
+      makeChangeMessage('parent', (SELECT name FROM `Library` WHERE libraryId = OLD.libraryId), (SELECT name FROM `Library` WHERE libraryId = NEW.libraryId)),
       makeChangeMessage('kit', (SELECT name FROM KitDescriptor WHERE kitDescriptorId = OLD.kitDescriptorId), (SELECT name FROM KitDescriptor WHERE kitDescriptorId = NEW.kitDescriptorId)),
       makeChangeMessage('kit lot', OLD.kitLot, NEW.kitLot),
       makeChangeMessage('targeted sequencing', (SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = OLD.targetedSequencingId), (SELECT alias FROM TargetedSequencing WHERE targetedSequencingId = NEW.targetedSequencingId)),

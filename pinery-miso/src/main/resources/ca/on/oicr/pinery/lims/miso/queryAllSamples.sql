@@ -224,7 +224,7 @@ SELECT l.alias NAME
         ) batch_id
         ,l.requisitionId
         ,NULL consentLevel
-FROM Library l 
+FROM `Library` l 
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = l.detailedQcStatusId 
@@ -361,7 +361,7 @@ SELECT d.alias name
         ,NULL consentLevel
 FROM LibraryAliquot d 
 LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
-JOIN Library lib ON lib.libraryId = d.libraryId 
+JOIN `Library` lib ON lib.libraryId = d.libraryId 
 JOIN Sample s ON s.sampleId = lib.sample_sampleId
 JOIN Project sp ON sp.projectId = s.project_projectId
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = d.detailedQcStatusId 

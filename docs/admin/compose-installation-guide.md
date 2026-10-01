@@ -1,13 +1,13 @@
-# Installing MISO with docker-compose
+# Installing MISO with Docker Compose
 
 This getting started guide should be all you need to do to get a demonstration
 version of MISO running on your operating system, provided you can install and
 use Docker. If you want to install MISO without using Docker, please see the
 [baremetal installation guide](../baremetal-installation-guide).
 
-These compose files included in the MISO distribution are intended as a
+These Compose files included in the MISO distribution are intended as a
 demonstration and __not a permanent installation__. To customize the behaviour
-of these compose files to be suitable for production systems, look at the
+of these Compose files to be suitable for production systems, look at the
 [Overview](#overview) and [Recipes](#recipes) sections below.
 
 
@@ -39,7 +39,7 @@ following commands.
 **Plain sample mode** has a straightforward Sample -> Library -> Library Aliquot ->
 Pool workflow and is sufficient for basic laboratory tracking for sequencing.
 
-Launch the plain sample demo with docker-compose:
+Launch the plain sample demo with Docker Compose:
 ```bash
 cd miso-lims-compose
 # configuration
@@ -48,14 +48,14 @@ export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_passw
 echo "changeme" > ./.miso_db_password
 echo "changeme" > ./.miso_root_password
 # run
-docker-compose -f demo.plain.yml up
+docker compose -f demo.plain.yml up
 ```
 
 **Detailed sample mode** has all of the features of plain sample mode, plus it
 allows users to build a hierarchy of Samples (e.g. Identity -> Tissue -> Slide
 -> gDNA (stock) -> gDNA (aliquot) and also includes alias autogeneration.
 
-Launch the detailed sample demo with docker-compose:
+Launch the detailed sample demo with Docker Compose:
 ```bash
 cd miso-lims-compose
 # configuration
@@ -64,14 +64,14 @@ export MISO_DB_USER=tgaclims MISO_DB=lims MISO_DB_PASSWORD_FILE=./.miso_db_passw
 echo "changeme" > ./.miso_db_password
 echo "changeme" > ./.miso_root_password
 # run
-docker-compose -f demo.detailed.yml up
+docker compose -f demo.detailed.yml up
 ```
 
 For both environments, navigate to [http://localhost](http://localhost)
 and use the credentials **admin**/**admin**.
 
 Once you are finished with the container, make sure to run
-`docker-compose -f <compose.yml> down`, where `<compose.yml>` is either
+`docker compose -f <compose.yml> down`, where `<compose.yml>` is either
 `demo.plain.yml` or `demo.detailed.yml`. This will clean up the instances and
 networks and release their resources to the host operating system.
 
@@ -80,28 +80,27 @@ networks and release their resources to the host operating system.
 
 The MISO Docker containers consist of four parts:
 
-**MySQL database**. The database. We use the
-[MySQL official Docker container](https://hub.docker.com/_/mysql).
+**MySQL database**. The database. We use the official
+[MySQL image](https://hub.docker.com/_/mysql).
 
 **Apache Tomcat server**. The actual server for the MISO webapp. The image is
-[miso-lims-webapp](https://github.com/miso-lims/miso-lims/pkgs/container/miso-lims-webapp)
-container, based on the
-[official Tomcat alpine container](https://hub.docker.com/_/tomcat).
+[miso-lims-webapp](https://github.com/miso-lims/miso-lims/pkgs/container/miso-lims-webapp), based
+on the [official Tomcat Alpine image](https://hub.docker.com/_/tomcat).
 
-**Flyway DB migration**. Initializes or updates the database.
-This is miso-lims's
+**Flyway DB migration**. Initializes or updates the database. This is miso-lims's
 [miso-lims-migration](https://github.com/miso-lims/miso-lims/pkgs/container/miso-lims-migration)
-container (_[Dockerfile](https://github.com/miso-lims/miso-lims/blob/master/Dockerfile),
-target `flyway-migration`_), based on [boxfuse/flyway](https://hub.docker.com/r/boxfuse/flyway). It will initialize or update the MySQL database for a particular MISO
-version.
+image (_[Dockerfile](https://github.com/miso-lims/miso-lims/blob/master/Dockerfile),
+target `flyway-migration`_), based on the
+[official Flyway Alpine image](https://hub.docker.com/r/flyway/flyway). It will initialize or update
+the MySQL database for a particular MISO version.
 
-**Nginx reverse proxy**. Redirects traffic from port 80 to MISO's 8080 address,
-and is also required for HTTPS. We use the official [nginx](https://hub.docker.com/_/nginx) container.
+**NGINX reverse proxy**. Configures SSL and redirects traffic from standard HTTP/S ports to
+Tomcat/MISO. We use the official [NGINX image](https://hub.docker.com/_/nginx).
 
 ## Installing MISO for production use
 
-The current docker-compose files emphasize that they are not for production use.
-So, how do you configure MISO for production?
+The current Compose files emphasize that they are not for production use. So, how do you configure
+MISO for production?
 
 We suggest the following:
 
@@ -118,8 +117,7 @@ You can upgrade to a newer version of MISO simply by switching to a newer versio
 
 ## Recipes
 
-We provide a number of solutions to common issues so you can construct your
-own docker-compose files.
+We provide a number of solutions to common issues so you can construct your own Compose files.
 
 ### Adding persistent storage
 
@@ -130,14 +128,13 @@ inside the webapp container.
 
 #### Docker volumes
 
-Docker volumes can be used for testing and semi-permanent demonstrations, when
-you don't want to lose all of your data between restarts.
+Docker volumes can be used for testing and semi-permanent demonstrations, when you don't want to
+lose all of your data between restarts.
 
-First ensure that the docker-compose file is working
-correctly before adding persistent storage. Otherwise you risk corrupting your
-database.
+First ensure that the Compose file is working correctly before adding persistent storage. Otherwise
+you risk corrupting your database.
 
-Then modify the docker-compose.yml file with the following:
+Then modify the Compose file with the following:
 
 ``` yaml
 ...
@@ -156,14 +153,14 @@ volumes:
 
 #### Filesystem mount
 
-For permanent, production use, we recommend binding a location on the host
-filesystem for the database and file storage.
+For permanent, production use, we recommend binding a location on the host filesystem for the
+database and file storage.
 
-First ensure that the docker-compose file is working correctly before adding
-persistent storage. Otherwise you risk corrupting your database.
+First ensure that the Compose file is working correctly before adding persistent storage. Otherwise
+you risk corrupting your database.
 
-Then modify the docker-compose file with the following, where `/path/to` and
-subdirs are locations on the host filesystem:
+Then modify the Compose file with the following, where `/path/to` and subdirs are locations on the
+host filesystem:
 
 ``` yaml
 ...
@@ -240,7 +237,7 @@ The first file necessary is the nginx configuration file, which can be found at
 The configuration below redirects requests from port 80 (http://...) to port 443
 (https://...) and then defines the locations of the ssl password file, ssl
 certificate, and certificate key. These locations are important since we will
-have to bind the appropriate files into them through the compose file.
+have to bind the appropriate files into them through the Compose file.
 
 ```
 server {
@@ -394,10 +391,10 @@ certificates.
 ### Building and running from source
 
 If you are developing MISO or want to use the MISO code from a particular
-commit, modify the compose file to build the MISO-specific containers from
+commit, modify the Compose file to build the MISO-specific containers from
 source.
 
-There are two compose files in the main miso-lims source intended for
+There are two Compose files in the main miso-lims source intended for
 developers:
 
 * docker-compose.detailed.yml : builds and starts detailed sample demo mode
@@ -418,9 +415,9 @@ file, and run the version as usual.
 git clone https://github.com/miso-lims/miso-lims.git
 git checkout tags/v0.2.177 -b v0.2.177
 
-# compose.yml is one of the two compose files above
-docker-compose -f compose.yml build
-docker-compose -f compose.yml up
+# compose.yml is one of the two Compose files above
+docker compose -f compose.yml build
+docker compose -f compose.yml up
 ```
 
 The URL [http://localhost](http://localhost) is still where to go and
@@ -433,28 +430,27 @@ For faster startup, you may interested in
 doesn't re-populate on every startup. This drops the startup time
 from ~1 minute to about 20 seconds.
 
-**Be cautious** because while developing MISO or messing with the docker-compose
-file because you may inadvertently cause a database corruption. If your database
-connections are misbehaving, try pruning your Docker volumes to destroy the
-database and re-building from scratch.
+**Be cautious** because while developing MISO or messing with the Compose file because you may
+inadvertently cause a database corruption. If your database connections are misbehaving, try
+pruning your Docker volumes to destroy the database and re-building from scratch.
 
 ```
-# compose.yml is the location of your development compose file
-docker-compose -f compose.yml down
+# compose.yml is the location of your development Compose file
+docker compose -f compose.yml down
 docker volume prune
 ```
 
-## Example docker-compose files
+## Example Compose files
 
 ### Production-like dockerfile
 
-This docker-compose file is installed on a production machine called `miso-lims`
-in the `miso` user's home directory.
+This Compose file is installed on a production machine called `miso-lims` in the `miso` user's home
+directory.
 
 This environment:
 
-* mounts the database, MISO logs, and MISO files from the local filesystem. We
-  made the directories `db`, `logs` and `files` to bind to.
+* mounts the database and MISO files from the local filesystem. We made the directories `db` and
+  `files` to bind to.
 * has site-specific migrations in `V9000__institution-custom.sql`
 * overrides `miso.properties`.
 * has SSL encryption for HTTPS (`ssl.conf` and `.ssl_password`) and
@@ -468,15 +464,14 @@ This environment:
   * `SSL_PASSWORD_FILE` pointing to `.ssl_password`.
 
 
-Create the following home directory before launching the docker-compose
-file for the first time, including the empty `db`, `files` and `logs`
-directories.
+Create the following home directory before launching the Compose file for the first time, including
+the empty `db`, `files` and `logs` directories.
 
 ```
 miso-lims:/home/miso$ tree -a
 .
 ├── db
-├── docker-compose.yml
+├── compose.yml
 ├── .env
 ├── files
 ├── logs
@@ -492,7 +487,7 @@ miso-lims:/home/miso$ tree -a
 └── .ssl_password
 ```
 
-Here is the complete compose file:
+Here is the complete Compose file:
 
 ``` yaml
 version: '3.7'
@@ -507,7 +502,7 @@ secrets:
 
 services:
   db:
-    image: mysql:8.0
+    image: mysql:9.7
     restart: always
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
@@ -525,6 +520,9 @@ services:
   flyway:
     image: ghcr.io/miso-lims/miso-lims-migration:${MISO_TAG}
     command: migrate
+    environment:
+      FLYWAY_USER: root
+      FLYWAY_PASSWORD_FILE: /run/secrets/root_password
     secrets:
       - root_password
     links:
@@ -538,7 +536,6 @@ services:
       - type: bind
         source: "./V9000__institution-custom.sql"
         target: "/flyway/sql/V9000__institution-custom.sql"
-
 
   webapp:
     image: ghcr.io/miso-lims/miso-lims-webapp:${MISO_TAG}
@@ -556,9 +553,6 @@ services:
       - type: bind
         source: "./files"
         target: "/storage/miso/files"
-      - type: bind
-        source: "./logs"
-        target: "/storage/miso/log"
 
   nginx:
     image: nginx:1.15.12-alpine
@@ -582,14 +576,14 @@ services:
     command: ["sh", "-c", "./self-sign-cert.sh; nginx -g 'daemon off;'"]
 ```
 
-Launch the process with `docker-compose up --detach` to start the containers in
+Launch the process with `docker compose up --detach` to start the containers in
 the background.
 
 
 
-## Troubleshooting docker-compose files
+## Troubleshooting Compose files
 
-With docker-compose builds, the error that caused the problem is often not the
+With Docker Compose builds, the error that caused the problem is often not the
 last thing you see, but early on in the logs while one or more containers were
 starting.
 
@@ -598,16 +592,16 @@ starting.
 
     You may have a volume mounted with a MySQL database from a failed
     migration. You have two options: remove the volume entirely or rename the
-    volume in the docker-compose file. Note that this will remove _all_  
+    volume in the Compose file. Note that this will remove _all_  
     detached volumes, not just the MISO ones, and this data will be permanently
     lost.
 
-        # compose.yml is the location of your compose file
-        docker-compose -f compose.yml down
+        # compose.yml is the location of your Compose file
+        docker compose -f compose.yml down
         docker volume prune
 
 
-1. **Problem on docker-compose up:
+1. **Problem on docker compose up:
   "ERROR: Unable to obtain Jdbc connection from DataSource ... for user
   'tgaclims': Could not connect: Access denied for user 'tgaclims'@'172.21.0.3'
   (using password: YES)"**
@@ -618,7 +612,7 @@ starting.
     password on the existing database, you'll have to log in to the MySQL container
     (with `docker exec -it <container-name> mysql`) with the old password and
     change the database user's password. See the
-    [MySQL documentation](https://dev.mysql.com/doc/refman/8.0/en/set-password.html)
+    [MySQL documentation](https://dev.mysql.com/doc/refman/9.7/en/set-password.html)
     for more information.
 
     The more straightforward option is to destroy the database and rebuild it.
@@ -636,13 +630,13 @@ starting.
 
     Sometimes when the database initialization process takes a considerable
     time, the webapp doesn't connect properly. To solve this, restart the
-    `webapp` container. While docker-compose is still up, run the following in
+    `webapp` container. While Docker Compose is still up, run the following in
     another terminal:
 
-        # compose.yml is the location of your compose file
-        docker-compose -f compose.yml restart webapp
+        # compose.yml is the location of your Compose file
+        docker compose -f compose.yml restart webapp
 
-    The `webapp` container will restart in the original docker-compose window.
+    The `webapp` container will restart in the original Docker Compose window.
 
 1. **You see both "/run/secrets/lims_password: Permission denied" and
   "[Note] Access denied for user 'tgaclims'@'192.168.144.3' (using password:
@@ -657,7 +651,7 @@ starting.
         $ ls -la .miso_db_password
           -r--r----- 1 miso-user docker 12 May  3 10:37 .miso_db_password
 
-1. **Problem on docker-compose up:
+1. **Problem on docker compose up:
   "ERROR: for miso-lims_webapp_1  Cannot start service webapp: OCI runtime
   create failed: container_linux.go:344: starting container process caused
   "process_linux.go:424: container init caused ... "not a directory\\\"\"":
@@ -666,10 +660,10 @@ starting.
 
     For some reason, when it can't find a file, Docker will create a directory
     and attempt to link that in its place. Ensure that you have all of the
-    necessary files indicated in the compose file, and that they are at the
-    correct relative locations to the compose file.
+    necessary files indicated in the Compose file, and that they are at the
+    correct relative locations to the Compose file.
 
-1. **Problem on docker-compose up:
+1. **Problem on docker compose up:
   "ERROR: for docker_db.... Cannot create container for service
   db: invalid mount config for type "bind": bind source path does not exist:
   ..../.miso_db_password"**
@@ -677,7 +671,7 @@ starting.
     Make sure that you have password file `.miso_db_password` exists in the
     current working directory with the DB password.
 
-1.  **Problem on docker-compose up:
+1.  **Problem on docker compose up:
   "ERROR: for docker_nginx_1_15442e33d660  Cannot start service nginx: driver
   failed programming external connectivity on endpoint... Error starting
   userland proxy: listen tcp 0.0.0.0:80: bind: address already in use"**
@@ -687,7 +681,7 @@ starting.
     to turn off the other service or to choose an alternative port.
 
     To use another port, 3000 for example, two files need to be changed: the
-    docker compose file and the nginx configuration. First, the compose file:
+    docker Compose file and the nginx configuration. First, the Compose file:
 
 
         services:
@@ -710,14 +704,14 @@ starting.
 1. **Flyway prints "Usage ===== flyway [options] command ..."**
 
     You are likely using an older version of the miso-lims-migrate container.
-    Add `command: migrate` to the docker-compose command.
+    Add `command: migrate` to the docker compose command.
 
 1. **The webapp eventually starts up but first it prints a stack trace about
   "java.sql.SQLException: Cannot create PoolableConnectionFactory (Could not
   create connection to database server. Attempted reconnect 3 times. Giving
   up.)"**
 
-    All docker containers start at the same time in docker-compose, and this
+    All docker containers start at the same time in Docker Compose, and this
     means that the webapp and flyway start before the database is fully
     initialized. Both services continue to re-try until the database is
     available. This is normal startup behaviour.
@@ -755,5 +749,5 @@ starting.
                 - "8080:8080"
 
     Navigate to http://localhost:8080 to check if MISO is running. If it is,
-    the problem is with nginx. Ensure that all three ports in the compose file
-      and `http.conf` file match each other.
+    the problem is with nginx. Ensure that all three ports in the Compose file
+    and `http.conf` file match each other.

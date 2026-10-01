@@ -19,7 +19,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.LibraryChangeLog;
 
 @Entity
 @Immutable
-@Table(name = "Library")
+@Table(name = "`Library`")
 public class LibraryBoxableView extends BoxableView {
 
   private static final long serialVersionUID = 1L;

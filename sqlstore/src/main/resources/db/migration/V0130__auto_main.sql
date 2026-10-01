@@ -41,7 +41,7 @@ BEGIN
   	    SELECT code INTO @code FROM LibraryDesignCode WHERE libraryDesignCodeId = v_ldcId;
 	    UPDATE LibraryDesign SET libraryDesignCodeId = v_ldcId WHERE SUBSTRING(name, 1, 2) = @code;
   	    -- infer libraryDesignCodeId from alias
-	    UPDATE LibraryAdditionalInfo SET libraryDesignCodeId = v_ldcId WHERE libraryId IN (SELECT libraryId FROM Library WHERE RIGHT(alias, 2) = @code);
+	    UPDATE LibraryAdditionalInfo SET libraryDesignCodeId = v_ldcId WHERE libraryId IN (SELECT libraryId FROM `Library` WHERE RIGHT(alias, 2) = @code);
 	    -- overwrite this value when libraryDesign is actually set. Note: There may be more than one library design with the same code.
 	    UPDATE LibraryAdditionalInfo SET libraryDesignCodeId = v_ldcId WHERE libraryDesign IN (SELECT libraryDesignId FROM LibraryDesign WHERE SUBSTRING(name, 1, 2) = @code);
     END LOOP update_LDC;

@@ -16,7 +16,7 @@ final String basedir = "${project.basedir}"
 final File productionSchemaDir = new File(basedir + '/target/test-classes/sqlstore/db/migration/')
 println('Translating schema files from ' + productionSchemaDir.getAbsolutePath() + '...')
 
-final String productionScriptPattern = '^(V\\d{4}_.*|afterMigrate|beforeMigrate)\\.sql$'
+final String productionScriptPattern = '^(V\\d{4}_.*|afterMigrate|beforeMigrate|beforeEachMigrate)\\.sql$'
 final String testSchemaDir = basedir + '/target/test-classes/db/migration/'
 
 Files.createDirectories(Paths.get(testSchemaDir))

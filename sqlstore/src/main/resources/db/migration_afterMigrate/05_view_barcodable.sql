@@ -26,7 +26,7 @@ CREATE OR REPLACE VIEW BarcodableView AS
               name,
               alias,
               'LIBRARY' AS targetType
-            FROM Library
+            FROM `Library`
   UNION ALL SELECT
               boxId,
               identificationBarcode,

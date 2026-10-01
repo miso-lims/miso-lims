@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS `State_Key`;
 DROP TABLE IF EXISTS `State_Value`;
 
 -- Kill orphaned objects
-DELETE FROM LibraryDilution WHERE library_libraryId NOT IN (SELECT libraryId FROM Library);
+DELETE FROM LibraryDilution WHERE library_libraryId NOT IN (SELECT libraryId FROM `Library`);
 
 -- Remove dead foreign keys
 UPDATE Run SET status_statusId = NULL WHERE status_statusId NOT IN (SELECT statusId FROM Status);
@@ -131,7 +131,7 @@ ALTER TABLE Pool_Note ADD CONSTRAINT PoolNote_Note_FK FOREIGN KEY (notes_noteId)
 ALTER TABLE Sample_Note ADD CONSTRAINT SampleNote_Sample_FK FOREIGN KEY (sample_sampleId) REFERENCES Sample (sampleId);
 ALTER TABLE Sample_Note ADD CONSTRAINT SampleNote_Note_FK FOREIGN KEY (notes_noteId) REFERENCES Note (noteId);
 
-ALTER TABLE Library_Note ADD CONSTRAINT LibraryNote_Library_FK FOREIGN KEY (library_libraryId) REFERENCES Library (libraryId);
+ALTER TABLE Library_Note ADD CONSTRAINT LibraryNote_Library_FK FOREIGN KEY (library_libraryId) REFERENCES `Library` (libraryId);
 ALTER TABLE Library_Note ADD CONSTRAINT LibraryNote_Note_FK FOREIGN KEY (notes_noteId) REFERENCES Note (noteId);
 
 ALTER TABLE Kit_Note ADD CONSTRAINT KitNote_Kit_FK FOREIGN KEY (kit_kitId) REFERENCES Kit (kitId);
@@ -329,14 +329,14 @@ CREATE TABLE NewLibraryChangeLog (
   userId bigint NOT NULL,
   message longtext NOT NULL,
   changeTime timestamp DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_libraryChangeLog_library FOREIGN KEY (libraryId) REFERENCES Library(libraryId),
+  CONSTRAINT fk_libraryChangeLog_library FOREIGN KEY (libraryId) REFERENCES `Library` (libraryId),
   CONSTRAINT fk_libraryChangeLog_user FOREIGN KEY (userId) REFERENCES User(userId)
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO NewLibraryChangeLog(libraryId, columnsChanged, userId, message, changeTime)
 SELECT libraryId, columnsChanged, userId, message, changeTime FROM LibraryChangeLog
 WHERE EXISTS (
-    SELECT * FROM Library WHERE Library.libraryId = LibraryChangeLog.libraryId
+    SELECT * FROM `Library` WHERE `Library`.libraryId = LibraryChangeLog.libraryId
 );
 
 DROP TABLE LibraryChangeLog;
@@ -474,18 +474,18 @@ INSERT INTO BoxContents(boxId, position, targetType, targetId) SELECT
         WHEN EXISTS(SELECT * FROM SampleTissueProcessing WHERE SampleTissueProcessing.sampleId = Sample.sampleId) THEN 'Processing'
         ELSE ''
       END) FROM Sample WHERE Sample.boxPositionId = BoxPosition.boxPositionId UNION
-    SELECT CONCAT('Library', CASE WHEN EXISTS(SELECT * FROM LibraryAdditionalInfo WHERE LibraryAdditionalInfo.libraryId = Library.libraryId) THEN 'Detailed' ELSE '' END) FROM Library WHERE Library.boxPositionId = BoxPosition.boxPositionId UNION
+    SELECT CONCAT('Library', CASE WHEN EXISTS(SELECT * FROM LibraryAdditionalInfo WHERE LibraryAdditionalInfo.libraryId = `Library`.libraryId) THEN 'Detailed' ELSE '' END) FROM `Library` WHERE `Library`.boxPositionId = BoxPosition.boxPositionId UNION
     SELECT 'Pool' FROM Pool WHERE Pool.boxPositionId = BoxPosition.boxPositionId),
   (
     SELECT sampleId FROM Sample WHERE Sample.boxPositionId = BoxPosition.boxPositionId UNION
-    SELECT libraryId FROM Library WHERE Library.boxPositionId = BoxPosition.boxPositionId UNION
+    SELECT libraryId FROM `Library` WHERE `Library`.boxPositionId = BoxPosition.boxPositionId UNION
     SELECT poolId FROM Pool WHERE Pool.boxPositionId = BoxPosition.boxPositionId)
 FROM BoxPosition;
 
 DROP TABLE BoxPosition;
 ALTER TABLE BoxContents RENAME TO BoxPosition;
 ALTER TABLE Sample DROP COLUMN `boxPositionId`;
-ALTER TABLE Library DROP COLUMN `boxPositionId`;
+ALTER TABLE `Library` DROP COLUMN `boxPositionId`;
 ALTER TABLE Pool DROP COLUMN `boxPositionId`;
 DROP TABLE sequence_data;
 
@@ -500,20 +500,20 @@ DROP TABLE Flowcell;
 
 UPDATE LibraryType SET platformType = UPPER(platformType);
 
-UPDATE Library SET platformName = UPPER(platformName);
-ALTER TABLE Library CHANGE COLUMN platformName platformType varchar(255) DEFAULT NULL;
-ALTER TABLE Library ADD CONSTRAINT fk_library_libraryType FOREIGN KEY (libraryType) REFERENCES LibraryType (libraryTypeId);
-ALTER TABLE Library ADD CONSTRAINT fk_library_librarySelectionType FOREIGN KEY (librarySelectionType) REFERENCES LibrarySelectionType (librarySelectionTypeId);
-ALTER TABLE Library ADD CONSTRAINT fk_library_libraryStrategyType FOREIGN KEY (libraryStrategyType) REFERENCES LibraryStrategyType (libraryStrategyTypeId);
-ALTER TABLE Library ADD CONSTRAINT fk_library_sample FOREIGN KEY (sample_sampleId) REFERENCES Sample (sampleId);
-ALTER TABLE Library ADD CONSTRAINT fk_library_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
-ALTER TABLE Library ADD CONSTRAINT fk_library_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
+UPDATE `Library` SET platformName = UPPER(platformName);
+ALTER TABLE `Library` CHANGE COLUMN platformName platformType varchar(255) DEFAULT NULL;
+ALTER TABLE `Library` ADD CONSTRAINT fk_library_libraryType FOREIGN KEY (libraryType) REFERENCES LibraryType (libraryTypeId);
+ALTER TABLE `Library` ADD CONSTRAINT fk_library_librarySelectionType FOREIGN KEY (librarySelectionType) REFERENCES LibrarySelectionType (librarySelectionTypeId);
+ALTER TABLE `Library` ADD CONSTRAINT fk_library_libraryStrategyType FOREIGN KEY (libraryStrategyType) REFERENCES LibraryStrategyType (libraryStrategyTypeId);
+ALTER TABLE `Library` ADD CONSTRAINT fk_library_sample FOREIGN KEY (sample_sampleId) REFERENCES Sample (sampleId);
+ALTER TABLE `Library` ADD CONSTRAINT fk_library_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
+ALTER TABLE `Library` ADD CONSTRAINT fk_library_securityProfile FOREIGN KEY (securityProfile_profileId) REFERENCES SecurityProfile (profileId);
 
 ALTER TABLE LibraryDilution ADD COLUMN lastModifier bigint;
-UPDATE LibraryDilution SET lastModifier = (SELECT lastModifier FROM Library l WHERE l.libraryId = library_libraryId);
+UPDATE LibraryDilution SET lastModifier = (SELECT lastModifier FROM `Library` l WHERE l.libraryId = library_libraryId);
 ALTER TABLE LibraryDilution CHANGE COLUMN lastModifier lastModifier bigint NOT NULL;
 ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_lastModifier_user FOREIGN KEY (lastModifier) REFERENCES User (userId);
-ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_library FOREIGN KEY (library_libraryId) REFERENCES Library (libraryId);
+ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_library FOREIGN KEY (library_libraryId) REFERENCES `Library` (libraryId);
 ALTER TABLE LibraryDilution ADD CONSTRAINT fk_libraryDilution_targetedSequencing FOREIGN KEY (targetedSequencingId) REFERENCES TargetedSequencing (targetedSequencingId);
 
 DROP TRIGGER IF EXISTS LibraryAdditionalInfoChange;
