@@ -53,7 +53,7 @@ migrate, run a Flyway repair:
     If you receive an error regarding the time zone, ensure that you have configured the MySQL time
     zone as instructed above.
 
-1. Run Flyway migrate and continue with the usual update procedure.
+1. Resume the usual update procedure beginning with running Flyway migrate.
 
 ## Docker Compose
 
