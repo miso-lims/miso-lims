@@ -1,1 +1,0 @@
-ALTER TABLE Requisition ADD COLUMN description VARCHAR(255);

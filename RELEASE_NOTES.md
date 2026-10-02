@@ -7,6 +7,30 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [4.0.0] - 2026-10-02
+
+### Added
+
+* metric field 'optional' to indicate that a metric does not necessarily apply to all items in the matching metric category/subcategory
+* New `description` field on Requisition.
+
+### Changed
+
+* Database has been moved to MySQL 9.7
+* Library SOPs now support SOP fields.
+
+### Fixed
+
+* Fixed "Download Fail" error when generating a sample sheet from the Edit Run page for a run with an empty lane/partition.
+
+### Upgrade Notes
+
+* This version requires an upgrade to MySQL 9.7. See the
+  [Migrating to MySQL 9.7 guide](https://github.com/miso-lims/miso-lims/blob/develop/docs/admin/mysql-9.7-upgrade.md)
+  and follow the instructions there instead of the regular upgrade procedure
+* Updated Run Scanner to 2.9.0
+
+
 ## [3.27.1] - 2026-09-08
 
 ### Fixed

@@ -1,1 +1,0 @@
-Library SOPs now support SOP fields.
