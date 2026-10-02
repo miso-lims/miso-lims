@@ -39,9 +39,9 @@ user is simplest since a different Docker container will be used each time.
             CREATE USER 'dbadmin'@'%' IDENTIFIED BY 'dbadmin';
             GRANT ALL PRIVILEGES ON *.* TO 'dbadmin'@'%';
 
-1. restore tables-only backup to mysql 9.7 using MySQL root user.
+1. restore tables-only backup to MySQL 9.7.
 
-        mysql -D ${DATABASE} -uroot -p < misodb_8_0.sql
+        mysql -D ${DATABASE} -u ${DB_USER} -p < misodb_8_0.sql
 
 1. Follow the usual [update procedure](https://miso-lims.readthedocs.io/en/latest/admin/baremetal-installation-guide/#installing-and-upgrading)
 until you get to migrating the database. Note that the steps here have been updated and we now
