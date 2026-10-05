@@ -9,37 +9,24 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListPoolViewElement;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
-@Component
 public class IndexChecker {
 
-  @Value("${miso.pools.error.index.mismatches:1}")
-  private int errorMismatches;
-  @Value("${miso.pools.error.index.mismatches.message:DUPLICATE INDICES}")
   private String errorMismatchesMessage;
-  @Value("${miso.pools.warning.index.mismatches:2}")
-  private int warningMismatches;
-  @Value("${miso.pools.warning.index.mismatches.message:Near-Duplicate Indices}")
   private String warningMismatchesMessage;
-
-  public int getErrorMismatches() {
-    return errorMismatches;
-  }
-
-  public void setErrorMismatches(int errorMismatches) {
-    this.errorMismatches = errorMismatches;
-  }
+  private int defaultErrorMismatches;
+  private int defaultWarningMismatches;
+  private Map<PlatformType, Integer> errorMismatchesByPlatform;
+  private Map<PlatformType, Integer> warningMismatchesByPlatform;
 
   public String getErrorMismatchesMessage() {
     return errorMismatchesMessage;
@@ -47,14 +34,6 @@ public class IndexChecker {
 
   public void setErrorMismatchesMessage(String errorMismatchesMessage) {
     this.errorMismatchesMessage = errorMismatchesMessage;
-  }
-
-  public int getWarningMismatches() {
-    return warningMismatches;
-  }
-
-  public void setWarningMismatches(int warningMismatches) {
-    this.warningMismatches = warningMismatches;
   }
 
   public String getWarningMismatchesMessage() {
@@ -65,62 +44,126 @@ public class IndexChecker {
     this.warningMismatchesMessage = warningMismatchesMessage;
   }
 
+  public int getDefaultErrorMismatches() {
+    return defaultErrorMismatches;
+  }
+
+  public void setDefaultErrorMismatches(int errorMismatches) {
+    this.defaultErrorMismatches = errorMismatches;
+  }
+
+  public int getErrorMismatches(PlatformType platform) {
+    if (errorMismatchesByPlatform != null && errorMismatchesByPlatform.containsKey(platform)) {
+      return errorMismatchesByPlatform.get(platform);
+    }
+    return defaultErrorMismatches;
+  }
+
+  public void setErrorMismatches(PlatformType platform, int errorMismatches) {
+    if (errorMismatchesByPlatform == null) {
+      errorMismatchesByPlatform = new HashMap<>();
+    }
+    errorMismatchesByPlatform.put(platform, errorMismatches);
+  }
+
+  public int getDefaultWarningMismatches() {
+    return defaultWarningMismatches;
+  }
+
+  public void setDefaultWarningMismatches(int warningMismatches) {
+    this.defaultWarningMismatches = warningMismatches;
+  }
+
+  public int getWarningMismatches(PlatformType platform) {
+    if (warningMismatchesByPlatform != null && warningMismatchesByPlatform.containsKey(platform)) {
+      return warningMismatchesByPlatform.get(platform);
+    }
+    return defaultWarningMismatches;
+  }
+
+  public void setWarningMismatches(PlatformType platform, int warningMismatches) {
+    if (warningMismatchesByPlatform == null) {
+      warningMismatchesByPlatform = new HashMap<>();
+    }
+    warningMismatchesByPlatform.put(platform, warningMismatches);
+  }
+
   public Set<String> getDuplicateIndicesSequences(Pool pool) {
-    if (pool == null)
+    if (pool == null) {
       return Collections.emptySet();
+    }
     Stream<ParentLibrary> libraries = pool.getPoolContents().stream()
         .map(element -> element.getAliquot().getParentLibrary());
-    return getIndexSequencesWithTooFewMismatches(libraries, errorMismatches);
+    int mismatches = getErrorMismatches(pool.getPlatformType());
+    return getIndexSequencesWithTooFewMismatches(libraries, mismatches);
   }
 
   public Set<String> getNearDuplicateIndicesSequences(Pool pool) {
-    if (pool == null)
+    if (pool == null) {
       return Collections.emptySet();
+    }
     Stream<ParentLibrary> libraries = pool.getPoolContents().stream()
         .map(element -> element.getAliquot().getParentLibrary());
-    return getIndexSequencesWithTooFewMismatches(libraries, warningMismatches);
+    int mismatches = getWarningMismatches(pool.getPlatformType());
+    return getIndexSequencesWithTooFewMismatches(libraries, mismatches);
   }
 
   public Set<String> getDuplicateIndicesSequences(ListPoolView pool) {
-    if (pool == null)
+    if (pool == null) {
       return Collections.emptySet();
+    }
     Stream<ListPoolViewElement> libraries = pool.getElements().stream();
-    return getIndexSequencesWithTooFewMismatches(libraries, errorMismatches);
+    int mismatches = getErrorMismatches(pool.getPlatformType());
+    return getIndexSequencesWithTooFewMismatches(libraries, mismatches);
   }
 
   public Set<String> getNearDuplicateIndicesSequences(ListPoolView pool) {
-    if (pool == null)
+    if (pool == null) {
       return Collections.emptySet();
+    }
     Stream<ListPoolViewElement> libraries = pool.getElements().stream();
-    return getIndexSequencesWithTooFewMismatches(libraries, warningMismatches);
+    int mismatches = getWarningMismatches(pool.getPlatformType());
+    return getIndexSequencesWithTooFewMismatches(libraries, mismatches);
   }
 
   public Set<String> getDuplicateIndicesSequences(PoolOrder order) {
-    if (order == null)
+    if (order == null) {
       return Collections.emptySet();
+    }
     Stream<Library> libraries = order.getOrderLibraryAliquots().stream()
         .map(orderAliquot -> orderAliquot.getAliquot().getLibrary());
-    return getIndexSequencesWithTooFewMismatches(libraries, errorMismatches);
+    int mismatches = getErrorMismatches(getPlatformType(order));
+    return getIndexSequencesWithTooFewMismatches(libraries, mismatches);
+  }
+
+  private static PlatformType getPlatformType(PoolOrder order) {
+    return order.getOrderLibraryAliquots().iterator().next().getAliquot().getLibrary().getPlatformType();
   }
 
   public Set<String> getNearDuplicateIndicesSequences(PoolOrder order) {
-    if (order == null)
+    if (order == null) {
       return Collections.emptySet();
+    }
     Stream<Library> libraries = order.getOrderLibraryAliquots().stream()
         .map(orderAliquot -> orderAliquot.getAliquot().getLibrary());
-    return getIndexSequencesWithTooFewMismatches(libraries, warningMismatches);
+    int mismatches = getWarningMismatches(getPlatformType(order));
+    return getIndexSequencesWithTooFewMismatches(libraries, mismatches);
   }
 
   public Set<String> getDuplicateIndicesSequences(Collection<? extends IndexedLibrary> libraries) {
-    if (libraries == null)
+    if (libraries == null || libraries.isEmpty()) {
       return Collections.emptySet();
-    return getIndexSequencesWithTooFewMismatches(libraries.stream(), errorMismatches);
+    }
+    int mismatches = getErrorMismatches(libraries.iterator().next().getPlatformType());
+    return getIndexSequencesWithTooFewMismatches(libraries.stream(), mismatches);
   }
 
   public Set<String> getNearDuplicateIndicesSequences(Collection<? extends IndexedLibrary> libraries) {
-    if (libraries == null)
+    if (libraries == null) {
       return Collections.emptySet();
-    return getIndexSequencesWithTooFewMismatches(libraries.stream(), warningMismatches);
+    }
+    int mismatches = getWarningMismatches(libraries.iterator().next().getPlatformType());
+    return getIndexSequencesWithTooFewMismatches(libraries.stream(), mismatches);
   }
 
   private static Set<String> getIndexSequencesWithTooFewMismatches(Stream<? extends IndexedLibrary> libraries,
@@ -131,15 +174,10 @@ public class IndexChecker {
     libraries.forEach(library -> {
       String name = getIndicesString(library);
       for (String sequence : getCombinedIndexSequences(library.getIndex1(), library.getIndex2())) {
-        if (knownSequences.containsKey(sequence)) {
-          nearMatchSequences.add(name);
-          nearMatchSequences.add(knownSequences.get(sequence));
-        } else {
-          for (Map.Entry<String, String> otherSequence : knownSequences.entrySet()) {
-            if (LibraryIndex.checkMismatches(sequence, otherSequence.getKey()) <= mismatchesThreshold) {
-              nearMatchSequences.add(name);
-              nearMatchSequences.add(otherSequence.getValue());
-            }
+        for (Map.Entry<String, String> otherSequence : knownSequences.entrySet()) {
+          if (LibraryIndex.checkMismatches(sequence, otherSequence.getKey()) <= mismatchesThreshold) {
+            nearMatchSequences.add(name);
+            nearMatchSequences.add(otherSequence.getValue());
           }
         }
         knownSequences.put(sequence, name);

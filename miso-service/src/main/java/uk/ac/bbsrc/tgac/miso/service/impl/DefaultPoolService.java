@@ -29,7 +29,6 @@ import com.eaglegenomics.simlims.core.Note;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.type.RequiredPoolField;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingOrder;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.OrderLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrder;
@@ -37,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.changelog.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ListLibraryAliquotView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
+import uk.ac.bbsrc.tgac.miso.core.data.type.RequiredPoolField;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.BarcodableReferenceService;
@@ -283,9 +283,9 @@ public class DefaultPoolService implements PoolService {
     Set<String> bcIndices = getAllBadIndices(beforeChange);
 
     if (indices.size() > bcIndices.size()) { // If this change introduces new conflicts
-      String errorMessage = String.format("Pools may not contain Library Aliquots with indices with %d or " +
+      String errorMessage = String.format("%s pools may not contain library aliquots with indices with %d or " +
           "fewer positions of difference, please address the following conflicts: ",
-          indexChecker.getWarningMismatches());
+          pool.getPlatformType().getKey(), indexChecker.getWarningMismatches(pool.getPlatformType()));
       indices.removeAll(bcIndices);
       errorMessage +=
           indices.stream().map(index -> index.length() == 0 ? "(no indices)" : index).collect(Collectors.joining(", "));
