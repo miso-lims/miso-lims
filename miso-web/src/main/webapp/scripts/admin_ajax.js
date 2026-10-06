@@ -67,4 +67,22 @@ var Admin = Admin || {
       );
     });
   },
+  resetRunScanner: function () {
+    Utils.showConfirmDialog(
+      "Run Scanner",
+      "Reset",
+      ["Reset tracking? All runs will be reprocessed."],
+      function () {
+        Utils.ajaxWithDialog(
+          "Resetting Run Scanner tracking",
+          "POST",
+          Urls.rest.admin.resetRunScanner,
+          null,
+          function (success) {
+            Utils.showOkDialog("Run Scanner", ["Tracking reset."]);
+          }
+        );
+      }
+    );
+  },
 };

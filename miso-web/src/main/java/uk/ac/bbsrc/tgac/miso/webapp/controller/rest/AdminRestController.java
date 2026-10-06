@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.WhineyConsumer;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.ConstantsController;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.RestException;
+import uk.ac.bbsrc.tgac.miso.webapp.service.RunScannerClient;
 
 @Controller
 @RequestMapping("/rest/admin")
@@ -114,6 +115,8 @@ public class AdminRestController extends DefaultRestController {
 
   @Autowired
   private ConstantsController constantsController;
+  @Autowired
+  private RunScannerClient runScannerClient;
 
   @PostMapping(value = "/cache/clear")
   @ResponseBody
@@ -165,6 +168,13 @@ public class AdminRestController extends DefaultRestController {
   public int refreshConstants() throws IOException {
     constantsController.refreshConstants(true);
     return 0;
+  }
+
+  @PostMapping(value = "/runscanner/reset")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void resetRunScanner() {
+    runScannerClient.resetTracking();
   }
 
 }

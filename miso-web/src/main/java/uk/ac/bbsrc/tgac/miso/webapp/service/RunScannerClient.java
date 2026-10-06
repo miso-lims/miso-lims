@@ -137,6 +137,18 @@ public class RunScannerClient {
   @Autowired
   private PoolService poolService;
 
+  @Value("${miso.runscanner.httpBasicAuthUsername:}")
+  private String runscannerAuthUsername;
+
+  @Value("${miso.runscanner.httpBasicAuthPassword:}")
+  private String runscannerAuthPassword;
+
+  @Value("${miso.runscanner.urls:}")
+  public void setUrls(String urls) {
+    WHITESPACE.splitAsStream(urls).filter(url -> !url.isEmpty() && !servers.containsKey(url))
+        .forEach(url -> servers.put(url, new ProgressiveRequestDto()));
+  }
+
   private final ConcurrentMap<String, ProgressiveRequestDto> servers = new ConcurrentHashMap<>();
 
   private void processResults(List<NotificationDto> results) {
@@ -426,15 +438,9 @@ public class RunScannerClient {
     }
   }
 
-  @Value("${miso.runscanner.httpBasicAuthUsername:}")
-  private String runscannerAuthUsername;
-
-  @Value("${miso.runscanner.httpBasicAuthPassword:}")
-  private String runscannerAuthPassword;
-
-  @Value("${miso.runscanner.urls:}")
-  public void setUrls(String urls) {
-    WHITESPACE.splitAsStream(urls).filter(url -> !url.isEmpty() && !servers.containsKey(url))
-        .forEach(url -> servers.put(url, new ProgressiveRequestDto()));
+  public void resetTracking() {
+    for (String key : servers.keySet()) {
+      servers.put(key, new ProgressiveRequestDto());
+    }
   }
 }
