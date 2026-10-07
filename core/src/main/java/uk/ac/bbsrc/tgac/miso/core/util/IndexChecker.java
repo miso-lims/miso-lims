@@ -89,7 +89,7 @@ public class IndexChecker {
   }
 
   public Set<String> getDuplicateIndicesSequences(Pool pool) {
-    if (pool == null) {
+    if (pool == null || pool.getPoolContents() == null || pool.getPoolContents().isEmpty()) {
       return Collections.emptySet();
     }
     Stream<ParentLibrary> libraries = pool.getPoolContents().stream()
@@ -99,7 +99,7 @@ public class IndexChecker {
   }
 
   public Set<String> getNearDuplicateIndicesSequences(Pool pool) {
-    if (pool == null) {
+    if (pool == null || pool.getPoolContents() == null || pool.getPoolContents().isEmpty()) {
       return Collections.emptySet();
     }
     Stream<ParentLibrary> libraries = pool.getPoolContents().stream()
@@ -109,7 +109,7 @@ public class IndexChecker {
   }
 
   public Set<String> getDuplicateIndicesSequences(ListPoolView pool) {
-    if (pool == null) {
+    if (pool == null || pool.getElements() == null || pool.getElements().isEmpty()) {
       return Collections.emptySet();
     }
     Stream<ListPoolViewElement> libraries = pool.getElements().stream();
@@ -118,7 +118,7 @@ public class IndexChecker {
   }
 
   public Set<String> getNearDuplicateIndicesSequences(ListPoolView pool) {
-    if (pool == null) {
+    if (pool == null || pool.getElements() == null | pool.getElements().isEmpty()) {
       return Collections.emptySet();
     }
     Stream<ListPoolViewElement> libraries = pool.getElements().stream();
@@ -127,7 +127,7 @@ public class IndexChecker {
   }
 
   public Set<String> getDuplicateIndicesSequences(PoolOrder order) {
-    if (order == null) {
+    if (order == null || order.getOrderLibraryAliquots() == null || order.getOrderLibraryAliquots().isEmpty()) {
       return Collections.emptySet();
     }
     Stream<Library> libraries = order.getOrderLibraryAliquots().stream()
@@ -141,7 +141,7 @@ public class IndexChecker {
   }
 
   public Set<String> getNearDuplicateIndicesSequences(PoolOrder order) {
-    if (order == null) {
+    if (order == null || order.getOrderLibraryAliquots() == null || order.getOrderLibraryAliquots().isEmpty()) {
       return Collections.emptySet();
     }
     Stream<Library> libraries = order.getOrderLibraryAliquots().stream()
@@ -159,7 +159,7 @@ public class IndexChecker {
   }
 
   public Set<String> getNearDuplicateIndicesSequences(Collection<? extends IndexedLibrary> libraries) {
-    if (libraries == null) {
+    if (libraries == null || libraries.isEmpty()) {
       return Collections.emptySet();
     }
     int mismatches = getWarningMismatches(libraries.iterator().next().getPlatformType());
