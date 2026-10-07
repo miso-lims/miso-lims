@@ -58,6 +58,19 @@ public class AssayController {
       assay.setAlias(base.getAlias());
       assay.setVersion(base.getVersion() + " COPY");
       assay.setDescription(base.getDescription());
+      assay.setDraft(base.isDraft());
+      assay.setArchived(base.isArchived());
+
+      assay.setCaseTargetDays(base.getCaseTargetDays());
+      assay.setReceiptTargetDays(base.getReceiptTargetDays());
+      assay.setExtractionTargetDays(base.getExtractionTargetDays());
+      assay.setLibraryPreparationTargetDays(base.getLibraryPreparationTargetDays());
+      assay.setLibraryQualificationTargetDays(base.getLibraryQualificationTargetDays());
+      assay.setFullDepthSequencingTargetDays(base.getFullDepthSequencingTargetDays());
+      assay.setAnalysisReviewTargetDays(base.getAnalysisReviewTargetDays());
+      assay.setReleaseApprovalTargetDays(base.getReleaseApprovalTargetDays());
+      assay.setReleaseTargetDays(base.getReleaseTargetDays());
+
       for (AssayTest test : base.getAssayTests()) {
         assay.getAssayTests().add(test);
       }
