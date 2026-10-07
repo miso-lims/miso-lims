@@ -25,6 +25,7 @@ Urls = (function () {
     clearHibernateCache: adminRestBase + "/cache/clear",
     refreshConstants: adminRestBase + "/constants/refresh",
     regenerateBarcodes: adminRestBase + "/barcode/regen",
+    resetRunScanner: adminRestBase + "/runscanner/reset",
   };
 
   // API Keys
