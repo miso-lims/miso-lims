@@ -8,22 +8,36 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
+@Component
 public class ExternalUriBuilder {
   private final Map<String, String> projectUris = new TreeMap<>();
   private final Map<PlatformType, Map<String, String>> runUris = new TreeMap<>();
+  private final Map<String, String> requisitionUris = new TreeMap<>();
 
   private static final String ID_PLACEHOLDER = "\\{id\\}";
   private static final String NAME_PLACEHOLDER = "\\{name\\}";
   private static final String ALIAS_PLACEHOLDER = "\\{alias\\}";
   private static final String CODE_PLACEHOLDER = "\\{code\\}";
   private static final String REPLACEHOLDER = "REPLACE";
+
+  public ExternalUriBuilder(@Value("${miso.project.report.links:}") String projectConfigLine,
+      @Value("${miso.run.report.links:}") String runConfigLine,
+      @Value("${miso.requisition.report.links:}") String requisitionConfigLine) {
+    setProjectReportLinksConfig(projectConfigLine);
+    setRunReportLinksConfig(runConfigLine);
+    setRequisitionReportLinksConfig(requisitionConfigLine);
+  }
 
   public Map<String, String> getUris(Project project) {
     if (!project.isSaved() || projectUris.isEmpty())
@@ -41,6 +55,13 @@ public class ExternalUriBuilder {
         .collect(Collectors.toMap(Map.Entry::getKey, m -> expandRunUrl(m.getValue(), run)));
   }
 
+  public Map<String, String> getUris(Requisition requisition) {
+    if (!requisition.isSaved() || projectUris.isEmpty())
+      return Collections.emptyMap();
+    return requisitionUris.entrySet().stream()
+        .collect(Collectors.toMap(Map.Entry::getKey, m -> expandRequisitionUrl(m.getValue(), requisition)));
+  }
+
   private String expandProjectUrl(String uriWithPlaceholders, Project project) {
     return uriWithPlaceholders.replaceAll(ID_PLACEHOLDER, String.valueOf(project.getId()))
         .replaceAll(NAME_PLACEHOLDER, project.getName())
@@ -53,17 +74,15 @@ public class ExternalUriBuilder {
         .replaceAll(ALIAS_PLACEHOLDER, run.getAlias());
   }
 
-  public void setProjectReportLinksConfig(String projectReportLinksConfigLine) {
-    processProjectLinksConfig(projectReportLinksConfigLine, projectUris);
+  private String expandRequisitionUrl(String uriWithPlaceholders, Requisition requisition) {
+    return uriWithPlaceholders.replaceAll(ID_PLACEHOLDER, String.valueOf(requisition.getId()))
+        .replaceAll(ALIAS_PLACEHOLDER, requisition.getAlias());
   }
 
-  public void setRunReportLinksConfig(String runReportLinksConfigLine) {
-    processRunLinksConfig(runReportLinksConfigLine, runUris);
-  }
-
-  public void processProjectLinksConfig(String linksConfigLine, Map<String, String> uriMap) {
-    if (LimsUtils.isStringBlankOrNull(linksConfigLine))
+  private void setProjectReportLinksConfig(String linksConfigLine) {
+    if (LimsUtils.isStringBlankOrNull(linksConfigLine)) {
       return;
+    }
 
     String[] configStrings = linksConfigLine.split("\\\\"); // multiple project report links can be
                                                             // double-backslash-separated (\\)
@@ -76,13 +95,14 @@ public class ExternalUriBuilder {
       String uriWithPlaceholders = configParts[1].trim();
       validateUri(uriWithPlaceholders, Sets.newHashSet(ID_PLACEHOLDER, NAME_PLACEHOLDER, CODE_PLACEHOLDER));
 
-      uriMap.put(linkText, uriWithPlaceholders);
+      projectUris.put(linkText, uriWithPlaceholders);
     }
   }
 
-  public void processRunLinksConfig(String linksConfigLine, Map<PlatformType, Map<String, String>> uriMap) {
-    if (LimsUtils.isStringBlankOrNull(linksConfigLine))
+  private void setRunReportLinksConfig(String linksConfigLine) {
+    if (LimsUtils.isStringBlankOrNull(linksConfigLine)) {
       return;
+    }
 
     String[] configStrings = linksConfigLine.split("\\\\"); // multiple run report links can be
                                                             // double-backslash-separated (\\)
@@ -105,12 +125,32 @@ public class ExternalUriBuilder {
       validateUri(uriWithPlaceholders, Sets.newHashSet(ID_PLACEHOLDER, NAME_PLACEHOLDER, ALIAS_PLACEHOLDER));
 
       platformTypes.forEach(pt -> {
-        if (uriMap.get(pt) == null) {
+        if (runUris.get(pt) == null) {
           Map<String, String> linkAndUri = new TreeMap<>();
-          uriMap.put(pt, linkAndUri);
+          runUris.put(pt, linkAndUri);
         }
-        uriMap.get(pt).put(linkText, uriWithPlaceholders);
+        runUris.get(pt).put(linkText, uriWithPlaceholders);
       });
+    }
+  }
+
+  private void setRequisitionReportLinksConfig(String linksConfigLine) {
+    if (LimsUtils.isStringBlankOrNull(linksConfigLine)) {
+      return;
+    }
+
+    String[] configStrings = linksConfigLine.split("\\\\"); // multiple requisition report links can be
+                                                            // double-backslash-separated (\\)
+    for (int i = 0; i < configStrings.length; i++) {
+      String[] configParts = configStrings[i].split("\\|"); // linksConfigLine format: <link text>|<URI with
+                                                            // placeholders>
+      validateConfigLength(configParts, 2);
+
+      String linkText = configParts[0].trim();
+      String uriWithPlaceholders = configParts[1].trim();
+      validateUri(uriWithPlaceholders, Sets.newHashSet(ID_PLACEHOLDER, ALIAS_PLACEHOLDER));
+
+      requisitionUris.put(linkText, uriWithPlaceholders);
     }
   }
 

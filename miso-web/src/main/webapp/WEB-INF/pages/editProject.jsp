@@ -42,7 +42,7 @@
       	<td class="h">External Links:</td>
       	<td>
       	<c:forEach items="${projectReportLinks}" var="projectReportLink">
-      	  <span><a href="<c:out value="${projectReportLink.value}"/>">${projectReportLink.key}</a></span><br/>
+      	  <span><a href="<c:out value="${projectReportLink.value}"/>" target="_blank" rel="noopener noreferrer">${projectReportLink.key}</a></span><br/>
       	</c:forEach>
       	</td>
       </tr>
