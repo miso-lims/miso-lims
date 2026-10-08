@@ -358,6 +358,18 @@ to `http://example.com/456` and an "Illumina Run Report" link to
 
 A PacBio run will only have the "Generic Run Report" link.
 
+### `miso.requisition.report.links`
+
+Config for links to external requisition report services to display on Edit Requisition page. Enter
+in format `<link text>|<URI with placeholders>`. Placeholders can be `{id}` or `{alias}`. Multiple
+reports can be specified by using a double backslash to separate.
+
+Example: `miso.requisition.report.links: External Requisition Link|http://example.com/{id}\\Another Requisition Link|http://example.com/req/{alias}`
+
+For a requisition with ID 234 and alias "MyReq", this will create an "External Requisition Link"
+link to `http://example.com/234` and an "Another Requisition Link" link to
+`http://example.com/req/MyReq`.
+
 ## Bulk Table Customization
 
 ### `miso.defaults.sample.bulk.scientificname`

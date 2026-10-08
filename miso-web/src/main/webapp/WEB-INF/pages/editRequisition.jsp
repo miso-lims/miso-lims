@@ -15,6 +15,19 @@
 
       <form:form id="requisitionForm" data-parsley-validate="" autocomplete="off" acceptCharset="utf-8"></form:form>
 
+      <c:if test="${requisition.id != 0 && !requisitionReportLinks.isEmpty()}">
+        <table class="in">
+          <tr>
+            <td class="h">External Links:</td>
+            <td>
+            <c:forEach items="${requisitionReportLinks}" var="reportLink">
+              <span><a href="<c:out value="${reportLink.value}"/>" target="_blank" rel="noopener noreferrer">${reportLink.key}</a></span><br/>
+            </c:forEach>
+            </td>
+          </tr>
+        </table>
+      </c:if>
+
       <br />
       <h1>Assays</h1>
       <div id="requisitionForm_assaysError"></div>

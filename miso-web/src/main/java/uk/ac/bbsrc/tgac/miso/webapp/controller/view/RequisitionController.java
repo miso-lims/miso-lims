@@ -29,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.RequisitionService;
 import uk.ac.bbsrc.tgac.miso.core.service.SampleService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
 import uk.ac.bbsrc.tgac.miso.dto.RequisitionDto;
+import uk.ac.bbsrc.tgac.miso.webapp.context.ExternalUriBuilder;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.component.NotFoundException;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ListItemsPage;
 import uk.ac.bbsrc.tgac.miso.webapp.util.PageMode;
@@ -43,6 +44,8 @@ public class RequisitionController {
   private SampleService sampleService;
   @Autowired
   private LibraryService libraryService;
+  @Autowired
+  private ExternalUriBuilder externalUriBuilder;
   @Autowired
   private AuthorizationManager authorizationManager;
   @Autowired
@@ -119,6 +122,7 @@ public class RequisitionController {
     model.put(PageMode.PROPERTY, pageMode.getLabel());
     model.put("requisition", requisition);
     model.put("requisitionDto", mapper.writeValueAsString(RequisitionDto.from(requisition)));
+    model.put("requisitionReportLinks", externalUriBuilder.getUris(requisition));
     return new ModelAndView("/WEB-INF/pages/editRequisition.jsp", model);
   }
 
