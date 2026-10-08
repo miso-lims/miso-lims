@@ -11,9 +11,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ConsentLevel;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 @Entity
 @Immutable
@@ -39,6 +40,9 @@ public class ListPoolViewElement implements IndexedLibrary, Serializable {
   @ManyToOne
   @JoinColumn(name = "index2Id")
   private LibraryIndex index2;
+
+  @Enumerated(EnumType.STRING)
+  private PlatformType platformType;
 
   private String subprojectAlias;
   private Boolean subprojectPriority = false;
@@ -120,6 +124,16 @@ public class ListPoolViewElement implements IndexedLibrary, Serializable {
   @Override
   public void setIndex2(LibraryIndex index2) {
     this.index2 = index2;
+  }
+
+  @Override
+  public PlatformType getPlatformType() {
+    return platformType;
+  }
+
+  @Override
+  public void setPlatformType(PlatformType platformType) {
+    this.platformType = platformType;
   }
 
   public String getSubprojectAlias() {

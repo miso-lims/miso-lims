@@ -514,3 +514,15 @@ Maximum number of mismatches to consider a near-duplicate index warning. Default
 ### `miso.pools.warning.index.mismatches.message`
 
 Warning label to display for near-duplicate indices. Defaults to "Near-Duplicate Indices" if unspecified.
+
+### `miso.pools.error.index.mismatches.<platform>`
+
+Allows overriding the default value above for a specific platform. Replace `<platform>` with the
+platform you want to configure
+(`illumina`/`ls454`/`solid`/`iontorrent`/`pacbio`/`oxfordnanopore`/`ultima`/`element`).
+
+### `miso.pools.warning.index.mismatches.<platform>`
+
+Allows overriding the default value above for a specific platform. Replace `<platform>` with the
+platform you want to configure
+(`illumina`/`ls454`/`solid`/`iontorrent`/`pacbio`/`oxfordnanopore`/`ultima`/`element`).

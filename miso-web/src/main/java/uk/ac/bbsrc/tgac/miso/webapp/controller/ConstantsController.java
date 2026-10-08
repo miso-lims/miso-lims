@@ -468,8 +468,8 @@ public class ConstantsController {
       warningsNode.put("missingIndex", "MISSING INDEX");
       warningsNode.put("negativeVolume", "Negative Volume");
       node.set("warningMessages", warningsNode);
-      node.put("errorEditDistance", indexChecker.getErrorMismatches());
-      node.put("warningEditDistance", indexChecker.getWarningMismatches());
+      node.put("errorEditDistance", indexChecker.getDefaultErrorMismatches());
+      node.put("warningEditDistance", indexChecker.getDefaultWarningMismatches());
 
       // Save the regenerated file in cache.
       constantsJs = "Constants = " + mapper.writeValueAsString(node) + ";";

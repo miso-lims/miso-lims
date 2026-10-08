@@ -9,9 +9,10 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.IndexedLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryIndexFamily;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 public class IndexCheckerTest {
 
@@ -45,6 +46,16 @@ public class IndexCheckerTest {
       throw new UnsupportedOperationException();
     }
 
+    @Override
+    public PlatformType getPlatformType() {
+      return PlatformType.ILLUMINA;
+    }
+
+    @Override
+    public void setPlatformType(PlatformType platformType) {
+      throw new UnsupportedOperationException();
+    }
+
   }
 
   private static final String UNIQUE_1 = "AAAAAA";
@@ -61,8 +72,8 @@ public class IndexCheckerTest {
   @BeforeEach
   public void setup() {
     sut = new IndexChecker();
-    sut.setErrorMismatches(1);
-    sut.setWarningMismatches(2);
+    sut.setDefaultErrorMismatches(1);
+    sut.setDefaultWarningMismatches(2);
   }
 
   @Test

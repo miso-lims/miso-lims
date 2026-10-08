@@ -36,6 +36,7 @@ SELECT
   lib.lowQuality,
   lib.index1Id,
   lib.index2Id,
+  lib.platformType,
   sam.project_projectId AS projectId,
   sp.alias AS subprojectAlias,
   sp.priority AS subprojectPriority,

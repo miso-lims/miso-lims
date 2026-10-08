@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.persistence.PoolOrderDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SaveDao;
 import uk.ac.bbsrc.tgac.miso.service.AbstractSaveService;
 import uk.ac.bbsrc.tgac.miso.service.PoolOrderService;
+
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> implements PoolOrderService {
@@ -102,7 +103,8 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
   }
 
   @Override
-  protected void collectValidationErrors(PoolOrder object, PoolOrder beforeChange, List<ValidationError> errors) throws IOException {
+  protected void collectValidationErrors(PoolOrder object, PoolOrder beforeChange, List<ValidationError> errors)
+      throws IOException {
     if (object.getPool() != null || object.getSequencingOrder() != null) {
       // order should be fulfilled
       if (object.isDraft()) {
@@ -116,7 +118,8 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
             if (poolElement.getId() == orderAli.getAliquot().getId()) {
               return true;
             }
-            for (ParentAliquot parent = poolElement.getParentAliquot(); parent != null; parent = parent.getParentAliquot()) {
+            for (ParentAliquot parent = poolElement.getParentAliquot(); parent != null; parent =
+                parent.getParentAliquot()) {
               if (parent.getId() == orderAli.getAliquot().getId()) {
                 return true;
               }
@@ -153,7 +156,8 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
 
     // if any sequencing requirements are specified, all are required
     if (object.getContainerModel() != null || object.getParameters() != null || object.getPartitions() != null) {
-      // exception: container model not required for legacy orders (from before container model was added to orders)
+      // exception: container model not required for legacy orders (from before container model was added
+      // to orders)
       if ((beforeChange == null || beforeChange.getContainerModel() != null) && object.getContainerModel() == null) {
         errors.add(ValidationUtils.makeNoNullError("containerModelId"));
       }
@@ -172,13 +176,15 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
       errors.add(new ValidationError("containerModelId", "Not compatible with the selected sequencing parameters"));
     }
 
-    PlatformType orderPlatform = object.getParameters() == null ? null : object.getParameters().getInstrumentModel().getPlatformType();
+    PlatformType orderPlatform =
+        object.getParameters() == null ? null : object.getParameters().getInstrumentModel().getPlatformType();
     for (OrderLibraryAliquot orderAli : object.getOrderLibraryAliquots()) {
       PlatformType libPlatform = orderAli.getAliquot().getLibrary().getPlatformType();
       if (orderPlatform == null) {
         orderPlatform = libPlatform;
       } else if (!libPlatform.equals(orderPlatform)) {
-        errors.add(new ValidationError("Platform for all aliquots and sequencing parameters (if specified) must match"));
+        errors
+            .add(new ValidationError("Platform for all aliquots and sequencing parameters (if specified) must match"));
         break;
       }
     }
@@ -192,19 +198,22 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
     }
   }
 
-  private void validateNoNewDuplicateIndices(PoolOrder object, PoolOrder beforeChange, List<ValidationError> errors){
-    // Work based on whether bad index count increases, rather than >0, in case Pool Orders already exist w >1
-    if(indexChecker.getDuplicateIndicesSequences(beforeChange).size()
-            < indexChecker.getDuplicateIndicesSequences(object).size()
-            || indexChecker.getNearDuplicateIndicesSequences(beforeChange).size()
-            < indexChecker.getNearDuplicateIndicesSequences(object).size()) {
+  private void validateNoNewDuplicateIndices(PoolOrder object, PoolOrder beforeChange, List<ValidationError> errors) {
+    // Work based on whether bad index count increases, rather than >0, in case Pool Orders already
+    // exist w >1
+    if (indexChecker.getDuplicateIndicesSequences(beforeChange).size() < indexChecker
+        .getDuplicateIndicesSequences(object).size()
+        || indexChecker.getNearDuplicateIndicesSequences(beforeChange).size() < indexChecker
+            .getNearDuplicateIndicesSequences(object).size()) {
       Set<String> indices = indexChecker.getDuplicateIndicesSequences(object);
       indices.addAll(indexChecker.getNearDuplicateIndicesSequences(object));
       Set<String> bcIndices = indexChecker.getDuplicateIndicesSequences(beforeChange);
       bcIndices.addAll(indexChecker.getNearDuplicateIndicesSequences(beforeChange));
-      String errorMessage = String.format("Pools may not contain Library Aliquots with indices with %d or " +
-                      "fewer positions of difference, please address the following conflicts: ",
-              indexChecker.getWarningMismatches());
+      PlatformType platform =
+          object.getOrderLibraryAliquots().iterator().next().getAliquot().getLibrary().getPlatformType();
+      String errorMessage = String.format("%s pools may not contain library aliquots with indices with %d or " +
+          "fewer positions of difference, please address the following conflicts: ",
+          platform.getKey(), indexChecker.getWarningMismatches(platform));
       indices.removeAll(bcIndices);
 
       for (String index : indices) {
@@ -215,7 +224,8 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
     }
   }
 
-  private static <R> void preventFulfilledChange(String property, Function<PoolOrder, R> getter, PoolOrder newItem, PoolOrder beforeChange,
+  private static <R> void preventFulfilledChange(String property, Function<PoolOrder, R> getter, PoolOrder newItem,
+      PoolOrder beforeChange,
       List<ValidationError> errors) {
     if (newItem.getSequencingOrder() != null && ValidationUtils.isSetAndChanged(getter, newItem, beforeChange)) {
       errors.add(new ValidationError(property, "Cannot be changed after order is fulfilled"));
@@ -282,7 +292,8 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
     }
     if (!aliquotChangeMessages.isEmpty()) {
       changeLogService
-          .create(to.createChangeLog(String.join("\n", aliquotChangeMessages), "library aliquots", authorizationManager.getCurrentUser()));
+          .create(to.createChangeLog(String.join("\n", aliquotChangeMessages), "library aliquots",
+              authorizationManager.getCurrentUser()));
     }
 
     to.setPool(from.getPool());
@@ -320,7 +331,7 @@ public class DefaultPoolOrderService extends AbstractSaveService<PoolOrder> impl
   }
 
   @Override
-  public List<PoolOrder> getAllByPoolId(long poolId){
+  public List<PoolOrder> getAllByPoolId(long poolId) {
     return poolOrderDao.getAllByPoolId(poolId);
   }
 

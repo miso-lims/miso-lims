@@ -153,11 +153,13 @@ easier to find that they are related because they are connected to the same ghos
 
 ## Strict Index Checking
 
-By default, any library aliquot can be added to a pool. When strict index checking is enabled, library aliquots
-cannot be added to a pool when their addition would cause duplicate or near-duplicate indices to exist within the
-pool.
+By default, any library aliquot can be added to a pool. When strict index checking is enabled,
+library aliquots cannot be added to a pool when their addition would cause duplicate or
+near-duplicate indices to exist within the pool.
 
-The advantage of enabling this setting is the prevention of sequencing library aliquots which cannot be de-multiplexed.
+The advantage of enabling this setting is the prevention of sequencing library aliquots which
+cannot be de-multiplexed. It is possible to configure this differently for different sequencing
+platforms.
 
 # Email Notifications
 
