@@ -49,7 +49,7 @@ public class SampleIndexController extends AbstractTypeDataController<SampleInde
       throw new ClientErrorException(String.format("Index family %d not found", indexFamilyId));
     }
     return bulkCreate(quantity, model, (config, mapper) -> {
-      config.set("indexFamily", mapper.valueToTree(SampleIndexFamilyDto.from(family)));
+      config.set("indexFamily", mapper.valueToTree(SampleIndexFamilyDto.from(family, true)));
     });
   }
 
@@ -69,7 +69,7 @@ public class SampleIndexController extends AbstractTypeDataController<SampleInde
     }
     final SampleIndexFamily singleFamily = family;
     return bulkEdit(idString, model, (config, mapper) -> {
-      config.set("indexFamily", mapper.valueToTree(SampleIndexFamilyDto.from(singleFamily)));
+      config.set("indexFamily", mapper.valueToTree(SampleIndexFamilyDto.from(singleFamily, true)));
     });
   }
 

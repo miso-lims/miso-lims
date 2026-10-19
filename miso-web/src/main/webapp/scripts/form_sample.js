@@ -746,6 +746,13 @@ FormTarget.sample = (function ($) {
   }
 
   function makeIndexFields(sample) {
+    var family = sample.indexFamilyId
+      ? Utils.array.findUniqueOrThrow(
+        Utils.array.idPredicate(sample.indexFamilyId),
+        Constants.sampleIndexFamilies
+      )
+      : null;
+
     return [
       {
         title: "Index Family",
@@ -758,19 +765,42 @@ FormTarget.sample = (function ($) {
         getItemLabel: Utils.array.getName,
         getItemValue: Utils.array.getId,
         onChange: function (newValue, form) {
+          var family = Utils.array.findFirstOrNull(
+            Utils.array.idPredicate(newValue),
+            Constants.sampleIndexFamilies
+          );
           var changes = {
-            disabled: !newValue,
-            required: !!newValue,
+            source: [],
+            disabled: !family,
+            required: !!family,
           };
-          if (newValue) {
-            var family = Utils.array.findUniqueOrThrow(
-              Utils.array.idPredicate(newValue),
-              Constants.sampleIndexFamilies
-            );
-            changes.source = family.indices;
-          } else {
-            changes.source = [];
+          var changes2 = {
+            source: [],
+            disabled: !family,
+            required: false,
+          };
+          if (family) {
+            changes.source = family.indices.filter(function (index) {
+              return index.position === 1;
+            });
+            changes2.source = family.indices.filter(function (index) {
+              return index.position === 2;
+            });
+            if (family.uniqueDualIndex) {
+              changes2.disabled = true;
+              var index1 = Utils.array.findFirstOrNull(
+                Utils.array.idPredicate(form.get("indexId")),
+                changes.source
+              );
+              var index2 = index1
+                ? changes2.source.find(function (index) {
+                  return index.name === index1.name;
+                })
+                : null;
+              changes2.value = index2 ? index2.id : "";
+            }
           }
+          form.updateField("index2Id", changes2);
           form.updateField("indexId", changes);
         },
       },
@@ -779,11 +809,46 @@ FormTarget.sample = (function ($) {
         data: "indexId",
         type: "dropdown",
         include: Constants.sampleIndexFamilies && Constants.sampleIndexFamilies.length,
-        source: sample.indexFamilyId
-          ? Utils.array.findUniqueOrThrow(
-              Utils.array.idPredicate(sample.indexFamilyId),
-              Constants.sampleIndexFamilies
-            ).indices
+        source: family
+          ? family.indices.filter(function (index) {
+            return index.position === 1;
+          })
+          : [],
+        sortSource: Utils.sorting.standardSort("name"),
+        getItemLabel: Utils.array.getName,
+        getItemValue: Utils.array.getId,
+        nullLabel: "(Choose)",
+        onChange: function (newValue, form) {
+          var family = Utils.array.findFirstOrNull(
+            Utils.array.idPredicate(form.get("indexFamilyId")),
+            Constants.sampleIndexFamilies
+          );
+          if (family && family.uniqueDualIndex) {
+            var index1 = Utils.array.findFirstOrNull(
+              Utils.array.idPredicate(newValue),
+              family.indices
+            );
+            var index2 = index1
+              ? family.indices.find(function (index) {
+                return index.position === 2 && index.name === index1.name;
+              })
+              : null;
+            form.updateField("index2Id", {
+              value: index2 ? index2.id : "",
+            });
+          }
+        },
+      },
+      {
+        title: "Index2",
+        data: "index2Id",
+        type: "dropdown",
+        include: Constants.sampleIndexFamilies && Constants.sampleIndexFamilies.length,
+        disabled: !!(family && family.uniqueDualIndex),
+        source: family
+          ? family.indices.filter(function (index) {
+            return index.position === 2;
+          })
           : [],
         sortSource: Utils.sorting.standardSort("name"),
         getItemLabel: Utils.array.getName,

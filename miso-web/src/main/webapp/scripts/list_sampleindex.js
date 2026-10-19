@@ -54,11 +54,33 @@ ListTarget.sampleindex = {
   createColumns: function (config, projectId) {
     return [
       {
+        sTitle: "Family",
+        include: !config.indexFamilyId,
+        iSortPriority: 2,
+        mData: "family.name",
+      },
+      {
         sTitle: "Index Name",
         include: true,
         iSortPriority: 1,
         bSortDirection: false,
         mData: "name",
+      },
+      {
+        sTitle: "Sequence",
+        include: true,
+        iSortPriority: 0,
+        bSortable: false,
+        mData: "sequence",
+        mRender: function (data) {
+            return data;
+          }
+      },
+      {
+        sTitle: "Position",
+        include: true,
+        iSortPriority: 1,
+        mData: "position",
       },
     ];
   },

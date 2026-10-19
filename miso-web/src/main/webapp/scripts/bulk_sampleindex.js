@@ -35,11 +35,28 @@ BulkTarget.sampleindex = (function ($) {
           disabled: true,
         },
         {
+          title: "Position",
+          data: "position",
+          type: "dropdown",
+          source: [1, 2],
+          required: true,
+        },
+        {
           title: "Name",
           data: "name",
           type: "text",
           maxLength: 24,
           required: true,
+        },
+        {
+          title: "Sequence",
+          data: "sequence",
+          type: "text",
+          maxLength: 120,
+          required: false,
+          regex: "^[ACGT]+$",
+          description: "Can only include the characters [A, C, G, T]",
+          include: !config.indexFamily.fakeSequence,
         },
       ];
     },

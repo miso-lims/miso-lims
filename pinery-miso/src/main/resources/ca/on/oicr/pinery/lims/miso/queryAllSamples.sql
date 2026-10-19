@@ -35,11 +35,11 @@ SELECT s.alias NAME
         ,s.groupId group_id
         ,s.groupDescription group_id_description
         ,sp.alias purpose
-        ,NULL barcode
-        ,NULL barcode_name
-        ,NULL barcode_two
-        ,NULL barcode_two_name
-        ,NULL barcode_kit
+        ,sbc1.sequence barcode
+        ,sbc1.name barcode_name
+        ,sbc2.sequence barcode_two
+        ,sbc2.name barcode_two_name
+        ,sbcfam.name barcode_kit
         ,NULL umis
         ,qpd.status qcPassed
         ,qpd.description detailedQcStatus
@@ -95,7 +95,11 @@ LEFT JOIN Lab la ON s.labId = la.labId
 LEFT JOIN Sample refSlide ON refSlide.sampleId = s.referenceSlideId
 LEFT JOIN Stain stain ON stain.stainId = s.stain
 LEFT JOIN ScientificName sn ON sn.scientificNameId = s.scientificNameId
-LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId 
+LEFT JOIN Sop sop ON sop.sopId = s.sopId
+LEFT JOIN SampleIndex sbc1 ON sbc1.indexId = s.indexId
+LEFT JOIN SampleIndexFamily sbcfam ON sbcfam.indexFamilyId = sbc1.indexFamilyId
+LEFT JOIN SampleIndex sbc2 ON sbc2.indexId = s.index2Id
+LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId
         AND pos.targetType = 'SAMPLE' 
 LEFT JOIN Box box ON box.boxId = pos.boxId 
 LEFT JOIN (
@@ -224,7 +228,7 @@ SELECT l.alias NAME
         ) batch_id
         ,l.requisitionId
         ,NULL consentLevel
-FROM `Library` l 
+FROM `Library` l
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = l.detailedQcStatusId 
@@ -235,8 +239,8 @@ LEFT JOIN LibraryType lt ON lt.libraryTypeId = l.libraryType
 LEFT JOIN LibraryIndex bc1 ON bc1.indexId = l.index1Id
 LEFT JOIN LibraryIndexFamily fam ON fam.indexFamilyId = bc1.indexFamilyId
 LEFT JOIN LibraryIndex bc2 ON bc2.indexId = l.index2Id
-LEFT JOIN BoxPosition pos ON pos.targetId = l.libraryId 
-        AND pos.targetType = 'LIBRARY' 
+LEFT JOIN BoxPosition pos ON pos.targetId = l.libraryId
+        AND pos.targetType = 'LIBRARY'
 LEFT JOIN Box box ON box.boxId = pos.boxId
 LEFT JOIN (
   SELECT xferl.libraryId, xferlab.alias institute, xfer.transferTime, xferlab.excludeFromPinery
@@ -361,7 +365,7 @@ SELECT d.alias name
         ,NULL consentLevel
 FROM LibraryAliquot d 
 LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
-JOIN `Library` lib ON lib.libraryId = d.libraryId 
+JOIN `Library` lib ON lib.libraryId = d.libraryId
 JOIN Sample s ON s.sampleId = lib.sample_sampleId
 JOIN Project sp ON sp.projectId = s.project_projectId
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = d.detailedQcStatusId 

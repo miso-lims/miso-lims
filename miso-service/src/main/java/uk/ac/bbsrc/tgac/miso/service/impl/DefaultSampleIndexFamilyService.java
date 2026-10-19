@@ -67,6 +67,8 @@ public class DefaultSampleIndexFamilyService extends AbstractSaveService<SampleI
   @Override
   protected void applyChanges(SampleIndexFamily to, SampleIndexFamily from) throws IOException {
     to.setName(from.getName());
+    to.setUniqueDualIndex(from.isUniqueDualIndex());
+    to.setArchived(from.getArchived());
   }
 
   @Override
