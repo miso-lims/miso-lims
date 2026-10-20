@@ -4,7 +4,7 @@ ALTER TABLE SampleIndexFamily
 
 ALTER TABLE SampleIndex
     ADD COLUMN sequence varchar(120) NULL,
-    ADD COLUMN position int NULL DEFAULT 1,
+    ADD COLUMN position int NOT NULL DEFAULT 1,
     MODIFY COLUMN name varchar(50) NOT NULL,
 DROP INDEX uk_sampleIndex_family_name,
     ADD CONSTRAINT uk_sampleIndex_family_name_position UNIQUE (indexFamilyId, name, position);
