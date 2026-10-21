@@ -12,15 +12,18 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response.Status;
@@ -53,6 +56,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 @Controller
 @RequestMapping("/rest/samplesheets")
 public class SampleSheetRestController extends AbstractRestController {
+
+  private static final String TYPE_LABEL = "Sample Sheet";
 
   @Autowired
   private SampleSheetService sampleSheetService;
@@ -246,6 +251,25 @@ public class SampleSheetRestController extends AbstractRestController {
     return "%s_%s_samplesheet.csv".formatted(
         LimsUtils.formatDate(LocalDate.now(ZoneId.systemDefault())),
         firstPoolAlias != null ? firstPoolAlias : sampleSheet.getName());
+  }
+
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public @ResponseBody SampleSheetDto create(@RequestBody SampleSheetDto dto) throws IOException {
+    return RestUtils.createObject(TYPE_LABEL, dto, SampleSheetDto::to, sampleSheetService, SampleSheetDto::from);
+  }
+
+  @PutMapping("/{id}")
+  public @ResponseBody SampleSheetDto update(@RequestBody SampleSheetDto dto, @PathVariable long id)
+      throws IOException {
+    return RestUtils.updateObject(TYPE_LABEL, id, dto, SampleSheetDto::to, sampleSheetService, SampleSheetDto::from);
+  }
+
+  @PostMapping(value = "/bulk-delete")
+  @ResponseBody
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
+    RestUtils.bulkDelete(TYPE_LABEL, ids, sampleSheetService);
   }
 
 }

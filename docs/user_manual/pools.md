@@ -169,6 +169,18 @@ different types to see which ones will be useful to you. MISO supports exporting
 
 
 
+## Downloading a Sample Sheet
+
+Sample sheets are required for some sequencing instruments and analysis software for purposes such
+as providing configuration and identifying libraries so they can be demultiplexed. MISO is able to
+automatically generate these sample sheets. The sheets can be downloaded using the "Create Sample
+Sheet" button on the Pools list or the Edit Run page.
+
+Sample sheet formats are can be customized within MISO. See
+[Type Data - Sample Sheets](../type_data#sample-sheets) for more information.
+
+
+
 ## Selecting Pools by Search
 
 If you have a list of pool names, aliases, or barcodes, you can use this list to select and act upon the pools instead

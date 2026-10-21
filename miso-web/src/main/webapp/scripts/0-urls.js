@@ -1028,8 +1028,16 @@ Urls = (function () {
   };
 
   // Sample Sheets
+  var sampleSheetUiBase = "/samplesheet";
+  ui.sampleSheets = {
+    create: sampleSheetUiBase + "/new",
+    edit: idUrlFunction(sampleSheetUiBase),
+  };
+
   var sampleSheetRestBase = restBase + "/samplesheets";
   rest.sampleSheets = {
+    create: sampleSheetRestBase,
+    update: idUrlFunction(sampleSheetRestBase),
     list: sampleSheetRestBase,
     generate: middleIdUrlFunction(sampleSheetRestBase, "/generate"),
   };

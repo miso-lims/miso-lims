@@ -1109,6 +1109,7 @@ ul.unformatted-list {
   height: 12px;
   position: relative;
   top: 2px;
+  margin-right: 4px;
 }
 
 #metricsTable {
@@ -1139,6 +1140,10 @@ ul.unformatted-list {
 
 #dialog {
   max-height: 75vh;
+}
+
+.dialogHelp {
+  margin-top: 0;
 }
 
 .ui-dialog {
