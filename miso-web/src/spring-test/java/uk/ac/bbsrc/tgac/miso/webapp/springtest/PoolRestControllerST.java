@@ -73,7 +73,7 @@ public class PoolRestControllerST extends AbstractST {
 
 
     PoolDto pool2 = new PoolDto();
-    pool2.setPlatformType("PACBIO");
+    pool2.setPlatformType("ILLUMINA");
     pool2.setAlias("pool2_alias");
     pool2.setDiscarded(false);
     pool2.setCreationDate("2025-07-30");
@@ -458,7 +458,8 @@ public class PoolRestControllerST extends AbstractST {
   }
 
 
-  private ResultActions testListPools(String url, List<Integer> ids, MultiValueMap<String, String> params, boolean isItems)
+  private ResultActions testListPools(String url, List<Integer> ids, MultiValueMap<String, String> params,
+      boolean isItems)
       throws Exception {
     ResultActions result = getMockMvc().perform(get(url).params(params));
 
