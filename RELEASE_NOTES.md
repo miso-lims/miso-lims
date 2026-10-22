@@ -7,6 +7,25 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [4.1.0] - 2026-10-22
+
+### Added
+
+* Configurable external links on the Edit Requisition page
+* Link on the My Account page to reset Run Scanner tracking (admin only)
+* Configuration options to set strict index checking per platform. See [Index Checking](https://miso-lims.readthedocs.io/en/latest/admin/site-configuration/#index-checking) in the admin guide
+
+### Changed
+
+* External project, run, and requisition links will now open in a new browser tab
+
+### Fixed
+
+* Error when attempting to delete a metric subcategory
+* Error deleting a project with subprojects
+* When copying an assay, some fields were not copied
+
+
 ## [4.0.0] - 2026-10-02
 
 ### Added
