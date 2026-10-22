@@ -586,6 +586,15 @@ BulkTarget.sample = (function ($) {
               },
               omit: true,
             },
+            {
+              title: "External Name",
+              type: "text",
+              data: "effectiveExternalNames",
+              disabled: true,
+              preventImport: true,
+              omit: true,
+              include: Constants.isDetailedSample && !show["Identity"] && !config.isLibraryReceipt && Constants.showExternalName,
+            },
           ];
           if (config.pageMode === "propagate") {
             columns = parentColumns.concat(columns);

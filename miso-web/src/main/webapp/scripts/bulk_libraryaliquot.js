@@ -273,6 +273,15 @@ BulkTarget.libraryaliquot = (function ($) {
         },
         BulkUtils.columns.assay(),
         {
+          title: "External Name",
+          type: "text",
+          data: "effectiveExternalNames",
+          disabled: true,
+          preventImport: true,
+          omit: true,
+          include: Constants.isDetailedSample && Constants.showExternalName,
+        },
+        {
           title: "Tissue Origin",
           type: "text",
           disabled: true,
