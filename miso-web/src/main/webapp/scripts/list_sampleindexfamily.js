@@ -41,6 +41,20 @@ ListTarget.sampleindexfamily = {
         1,
         true
       ),
+      {
+        sTitle: "Unique Dual Indices",
+        mData: "uniqueDualIndex",
+        include: true,
+        iSortPriority: 0,
+        mRender: ListUtils.render.booleanChecks,
+      },
+      {
+        sTitle: "Archived",
+        mData: "archived",
+        include: true,
+        iSortPriority: 0,
+        mRender: ListUtils.render.archived,
+      },
     ];
   },
 };

@@ -1148,15 +1148,32 @@ BulkTarget.sample = (function ($) {
               Constants.sampleIndexFamilies
             );
             var changes = {
-              required: !!family,
+                source: [],
               disabled: !family,
+              required: !!family,
+            };
+            var changes2 = {
+              source: [],
+              disabled: !family,
+              required: false,
             };
             if (family) {
-              changes.source = family.indices;
-            } else {
-              changes.source = [];
-              changes.value = null;
+              changes.source = family.indices.filter(function (index) {
+                return index.position === 1;
+              });
+              changes2.source = family.indices.filter(function (index) {
+                return index.position === 2;
+              });
+              if (family.uniqueDualIndex) {
+                changes2.disabled = true;
+                var index1Name = api.getValue(rowIndex, "indexId");
+                var index2 = changes2.source.find(function (index) {
+                  return index.name === index1Name;
+                });
+                changes2.value = index2 ? index2.name : null;
+              }
             }
+            api.updateField(rowIndex, "index2Id", changes2);
             api.updateField(rowIndex, "indexId", changes);
           },
         },
@@ -1176,7 +1193,47 @@ BulkTarget.sample = (function ($) {
               Utils.array.idPredicate(sample.indexFamilyId),
               Constants.sampleIndexFamilies
             );
-            return indexFamily.indices;
+            return indexFamily.indices.filter(function (index) {
+              return index.position === 1;
+            });
+          },
+          sortSource: Utils.sorting.standardSort("name"),
+          getItemLabel: Utils.array.getName,
+          getItemValue: Utils.array.getId,
+          onChange: function (rowIndex, newValue, api) {
+            var family = Utils.array.findFirstOrNull(
+              Utils.array.namePredicate(api.getValue(rowIndex, "indexFamilyId")),
+              Constants.sampleIndexFamilies
+            );
+            if (family && family.uniqueDualIndex) {
+              var index2 = family.indices.find(function (index) {
+                return index.position === 2 && index.name === newValue;
+              });
+              api.updateField(rowIndex, "index2Id", {
+                value: index2 ? index2.name : null,
+              });
+            }
+          },
+        },
+        {
+          title: "Index 2",
+          type: "dropdown",
+          data: "index2Id",
+          include:
+            ["Tissue Processing", "Stock"].includes(targetCategory) &&
+            Constants.sampleIndexFamilies &&
+            Constants.sampleIndexFamilies.length,
+          source: function (sample, api) {
+            if (!sample.indexFamilyId) {
+              return [];
+            }
+            var indexFamily = Utils.array.findUniqueOrThrow(
+              Utils.array.idPredicate(sample.indexFamilyId),
+              Constants.sampleIndexFamilies
+            );
+            return indexFamily.indices.filter(function (index) {
+              return index.position === 2;
+            });
           },
           sortSource: Utils.sorting.standardSort("name"),
           getItemLabel: Utils.array.getName,

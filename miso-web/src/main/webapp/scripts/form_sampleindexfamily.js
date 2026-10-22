@@ -51,6 +51,23 @@ FormTarget.sampleindexfamily = (function ($) {
         required: true,
         maxLength: 255,
       },
+      {
+        title: "Unique Dual Indices",
+        data: "uniqueDualIndex",
+        type: "checkbox",
+        description:
+          "For dual-index families, indicates that indices are usually added to libraries" +
+          " in the same pairs, as opposed to mixing any index 1 with any index 2. When selecting" +
+          " the first index for a library, the second will be selected automatically. For this to" +
+          " work, both indices in a pair must have the same name.",
+      },
+      {
+        title: "Archived",
+        data: "archived",
+        type: "checkbox",
+        description:
+          "Archived index families will not show up in the options list when creating new libraries",
+      },
     ];
   }
 
@@ -69,6 +86,12 @@ FormTarget.sampleindexfamily = (function ($) {
         title: "Name",
         data: "name",
         type: "read-only",
+      },
+      {
+        title: "Archived",
+        data: "archived",
+        type: "checkbox",
+        disabled: true,
       },
     ];
   }

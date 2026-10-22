@@ -307,9 +307,10 @@ Note: This item only applies if your site uses [detailed sample mode](../site_co
 
 Indices are mainly applied to libraries, but in some cases, there are multiple levels of indexing,
 one of which happens before library preparation. For this, we have sample indices. Sample indices in
-MISO were mainly designed with Cell Ranger in mind. To keep it simple, there are no associated
-sequences - only the index/barcode name that Cell Ranger requires in order to demultiplex the sample
-data. Sample indices can be added to any tissue processing or stock sample classes.
+MISO were mainly designed with Cell Ranger in mind. To keep it simple, no associated sequences
+are required - only the index/barcode name that Cell Ranger requires in order to demultiplex the sample
+data must be filled out. Sample indices can be added to any tissue processing or stock sample classes.
+Like library indices, sample index families can be dual-indexed, including unique dual index families.
 
 MISO administrators can create, edit, and delete sample index families using the standard interface.
 An index family can only be deleted if it has not been used by any existing samples. MISO

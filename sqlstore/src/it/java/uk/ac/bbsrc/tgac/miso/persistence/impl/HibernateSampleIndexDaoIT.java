@@ -27,6 +27,7 @@ public class HibernateSampleIndexDaoIT extends AbstractHibernateSaveDaoTest<Samp
   public SampleIndex getCreateItem() {
     SampleIndex index = new SampleIndex();
     index.setName("Test Index");
+    index.setPosition(1);
     SampleIndexFamily family = (SampleIndexFamily) currentSession().find(SampleIndexFamily.class, 1L);
     index.setFamily(family);
     return index;
@@ -44,13 +45,15 @@ public class HibernateSampleIndexDaoIT extends AbstractHibernateSaveDaoTest<Samp
   }
 
   @Test
-  public void testGetByFamilyAndName() throws Exception {
+  public void testGetByFamilyPositionAndName() throws Exception {
     long familyId = 2L;
+    int position = 1;
     String name = "Index 2-002";
     SampleIndexFamily family = (SampleIndexFamily) currentSession().find(SampleIndexFamily.class, familyId);
-    SampleIndex index = getTestSubject().getByFamilyAndName(family, name);
+    SampleIndex index = getTestSubject().getByFamilyPositionAndName(family, position, name);
     assertNotNull(index);
     assertEquals(name, index.getName());
+    assertEquals(position, index.getPosition());
     assertEquals(familyId, index.getFamily().getId());
   }
 
