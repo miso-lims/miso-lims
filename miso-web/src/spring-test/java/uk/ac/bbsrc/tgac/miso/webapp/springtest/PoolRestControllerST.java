@@ -400,7 +400,7 @@ public class PoolRestControllerST extends AbstractST {
     assertEquals(LocalDate.of(2025, 7, 29), created.get(0).getCreationDate());
 
 
-    assertEquals("PACBIO", created.get(1).getPlatformType().toString());
+    assertEquals("ILLUMINA", created.get(1).getPlatformType().toString());
     assertEquals("pool2_alias", created.get(1).getAlias());
     assertFalse(created.get(1).isDiscarded());
     assertEquals(2, created.get(1).getPoolContents().size());
