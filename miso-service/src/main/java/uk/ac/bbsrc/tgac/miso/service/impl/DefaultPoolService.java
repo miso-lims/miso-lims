@@ -330,6 +330,15 @@ public class DefaultPoolService implements PoolService {
     validateBarcodeUniqueness(pool, beforeChange, barcodableReferenceService, errors);
     validateUnboxableFields(pool, errors);
 
+    if (pool.getPoolContents() != null) {
+      for (PoolElement element : pool.getPoolContents()) {
+        if (element.getAliquot().getPlatformType() != pool.getPlatformType()) {
+          errors.add(new ValidationError("All library aliquots must match the pool's platform"));
+          break;
+        }
+      }
+    }
+
     for (RequiredPoolField field : requiredPoolFields) {
       field.collectValidationErrors(pool, errors);
     }
