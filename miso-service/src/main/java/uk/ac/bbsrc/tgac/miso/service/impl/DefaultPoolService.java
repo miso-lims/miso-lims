@@ -185,9 +185,9 @@ public class DefaultPoolService implements PoolService {
     }
 
     pool.setName(generateTemporaryName());
-    loadPoolElements(pool.getPoolContents(), pool);
     pool.setChangeDetails(authorizationManager.getCurrentUser());
     boxService.prepareBoxableLocation(pool, false);
+    loadChildEntities(pool);
     validateChange(pool, null);
     poolStore.create(pool);
 
@@ -219,6 +219,7 @@ public class DefaultPoolService implements PoolService {
     if (pool.getVolume() == null) {
       pool.setVolumeUnits(null);
     }
+    loadChildEntities(pool);
     validateChange(pool, managed);
     managed.setAlias(pool.getAlias());
     managed.setConcentration(pool.getConcentration());
@@ -234,7 +235,7 @@ public class DefaultPoolService implements PoolService {
     managed.setDnaSize(pool.getDnaSize());
 
     Set<String> originalItems = extractAliquotNames(managed.getPoolContents());
-    loadPoolElements(pool, managed);
+    applyContentChanges(pool, managed);
     Set<String> updatedItems = extractAliquotNames(managed.getPoolContents());
 
     Set<String> added = new TreeSet<>(updatedItems);
@@ -262,13 +263,6 @@ public class DefaultPoolService implements PoolService {
     return savedId;
   }
 
-  private void refreshPoolElements(Pool pool) throws IOException {
-    for (PoolElement element : pool.getPoolContents()) {
-      element.setPool(pool);
-      element.setAliquot(listLibraryAliquotViewService.get(element.getAliquot().getId()));
-    }
-  }
-
   private Set<String> getAllBadIndices(Pool pool) {
     if (pool == null)
       return new HashSet<>();
@@ -278,7 +272,6 @@ public class DefaultPoolService implements PoolService {
   }
 
   public void validateIndices(Pool pool, Pool beforeChange, Collection<ValidationError> errors) throws IOException {
-    refreshPoolElements(pool);
     Set<String> indices = getAllBadIndices(pool);
     Set<String> bcIndices = getAllBadIndices(beforeChange);
 
@@ -317,6 +310,13 @@ public class DefaultPoolService implements PoolService {
     return errors;
   }
 
+  private void loadChildEntities(Pool pool) throws IOException {
+    for (PoolElement element : pool.getPoolContents()) {
+      loadChildEntity(element::setAliquot, element.getAliquot(), listLibraryAliquotViewService, "poolElements");
+      element.setPool(pool);
+    }
+  }
+
   private void validateChange(Pool pool, Pool beforeChange) throws IOException {
     List<ValidationError> errors = new ArrayList<>();
 
@@ -329,6 +329,18 @@ public class DefaultPoolService implements PoolService {
     validateVolumeUnits(pool.getVolume(), pool.getVolumeUnits(), errors);
     validateBarcodeUniqueness(pool, beforeChange, barcodableReferenceService, errors);
     validateUnboxableFields(pool, errors);
+
+    if (pool.getPoolContents() != null) {
+      List<String> mismatchAliases = pool.getPoolContents().stream()
+          .map(PoolElement::getAliquot)
+          .filter(x -> x.getPlatformType() != pool.getPlatformType())
+          .map(ListLibraryAliquotView::getAlias)
+          .toList();
+      if (!mismatchAliases.isEmpty()) {
+        errors.add(new ValidationError("The following library aliquots don't match the pool's platform: %s"
+            .formatted(String.join(", ", mismatchAliases))));
+      }
+    }
 
     for (RequiredPoolField field : requiredPoolFields) {
       field.collectValidationErrors(pool, errors);
@@ -350,7 +362,7 @@ public class DefaultPoolService implements PoolService {
     }
   }
 
-  private void loadPoolElements(Collection<PoolElement> source, Pool target) throws IOException {
+  private void applyContentChanges(Collection<PoolElement> source, Pool target) throws IOException {
     Set<PoolElement> targetAliquots = target.getPoolContents();
     targetAliquots.removeIf(notInOther(source));
     Set<PoolElement> additions = source.stream()
@@ -361,11 +373,7 @@ public class DefaultPoolService implements PoolService {
           "pooledElements");
     }
     for (PoolElement sourcePd : additions) {
-      ListLibraryAliquotView v = listLibraryAliquotViewService.get(sourcePd.getAliquot().getId());
-      if (v == null) {
-        throw new IllegalStateException("Pool contains an unsaved library aliquot");
-      }
-      targetAliquots.add(new PoolElement(target, v, sourcePd.getProportion()));
+      targetAliquots.add(new PoolElement(target, sourcePd.getAliquot(), sourcePd.getProportion()));
     }
     for (PoolElement targetPd : targetAliquots) {
       PoolElement sourcePd = source.stream()
@@ -382,7 +390,7 @@ public class DefaultPoolService implements PoolService {
         .noneMatch(other -> other.getAliquot().getId() == t.getAliquot().getId());
   }
 
-  private void loadPoolElements(Pool source, Pool target) throws IOException {
+  private void applyContentChanges(Pool source, Pool target) throws IOException {
     Set<ListLibraryAliquotView> removals = target.getPoolContents().stream()
         .filter(notInOther(source.getPoolContents()))
         .map(PoolElement::getAliquot)
@@ -390,7 +398,7 @@ public class DefaultPoolService implements PoolService {
     for (ListLibraryAliquotView aliquot : removals) {
       runPartitionAliquotService.deleteForPoolAliquot(target, aliquot.getId());
     }
-    loadPoolElements(source.getPoolContents(), target);
+    applyContentChanges(source.getPoolContents(), target);
   }
 
   private Set<String> extractAliquotNames(Set<PoolElement> elements) {
