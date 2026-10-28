@@ -44,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleTissueProcessing;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayRunService;
 import uk.ac.bbsrc.tgac.miso.core.service.ArrayService;
@@ -475,6 +476,13 @@ public class EditSampleController {
         dto.setProjectId(sample.getProject().getId());
         if (sample.getIdentityAttributes() != null && sample.getIdentityAttributes().getConsentLevel() != null) {
           dto.setIdentityConsentLevel(sample.getIdentityAttributes().getConsentLevel().getLabel());
+        }
+        ParentIdentityAttributes identity = sample.getIdentityAttributes();
+        if (identity != null) {
+          if (identity.getConsentLevel() != null) {
+            dto.setIdentityConsentLevel(identity.getConsentLevel().getLabel());
+          }
+          dto.setEffectiveExternalNames(identity.getExternalName());
         }
         if (sample.getSubproject() != null) {
           dto.setSubprojectId(sample.getSubproject().getId());

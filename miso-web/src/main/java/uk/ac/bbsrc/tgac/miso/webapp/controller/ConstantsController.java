@@ -248,6 +248,8 @@ public class ConstantsController {
   private boolean showMatrixBarcode;
   @Value("${miso.display.bulk.discarded:true}")
   private boolean showDiscarded;
+  @Value("${miso.display.bulk.externalName:false}")
+  private boolean showExternalName;
   @Value("${miso.defaults.bulk.detailedQcStatus:#{null}}")
   private String defaultDetailedQcStatus;
   @Value("${miso.display.bulk.boxFields:true}")
@@ -319,6 +321,7 @@ public class ConstantsController {
       node.put("showQcStatus", showQcStatus);
       node.put("showMatrixBarcode", showMatrixBarcode);
       node.put("showDiscarded", showDiscarded);
+      node.put("showExternalName", showExternalName);
       node.put("defaultDetailedQcStatus", defaultDetailedQcStatus);
       node.put("showBoxFields", showBoxFields);
       node.put("showParentLocation", showParentLocation);
