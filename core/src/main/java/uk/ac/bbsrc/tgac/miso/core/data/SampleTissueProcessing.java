@@ -15,6 +15,10 @@ public interface SampleTissueProcessing extends DetailedSample {
 
   SampleIndex getIndex();
 
+  SampleIndex getIndex2();
+
   void setIndex(SampleIndex index);
+
+  void setIndex2(SampleIndex index);
 
 }

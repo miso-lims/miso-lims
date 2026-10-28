@@ -1065,6 +1065,7 @@ public class DefaultSampleService implements SampleService {
     target.setSlidesConsumed(source.getSlidesConsumed());
     target.setReferenceSlideId(source.getReferenceSlideId());
     target.setIndex(source.getIndex());
+    target.setIndex2(source.getIndex2());
   }
 
   private void applyTissueChanges(SampleTissue target, SampleTissue source) {
@@ -1083,6 +1084,7 @@ public class DefaultSampleService implements SampleService {
   private void applyTissueProcessingChanges(SampleTissueProcessing target, SampleTissueProcessing source)
       throws IOException {
     target.setIndex(source.getIndex());
+    target.setIndex2(source.getIndex2());
     if (source instanceof SampleSlide) {
       ((SampleSlide) target).setInitialSlides(((SampleSlide) source).getInitialSlides());
       ((SampleSlide) target).setSlides(((SampleSlide) source).getSlides());

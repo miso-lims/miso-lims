@@ -20,6 +20,10 @@ public class SampleTissueProcessingImpl extends DetailedSampleImpl implements Sa
   @JoinColumn(name = "indexId")
   private SampleIndex index;
 
+  @ManyToOne
+  @JoinColumn(name = "index2Id")
+  private SampleIndex index2;
+
   @Override
   public <T> T visit(BarcodableVisitor<T> visitor) {
     return visitor.visitSampleTissueProcessing(this);
@@ -31,8 +35,18 @@ public class SampleTissueProcessingImpl extends DetailedSampleImpl implements Sa
   }
 
   @Override
+  public SampleIndex getIndex2() {
+    return index2;
+  }
+
+  @Override
   public void setIndex(SampleIndex index) {
     this.index = index;
+  }
+
+  @Override
+  public void setIndex2(SampleIndex index) {
+    this.index2 = index;
   }
 
 }
