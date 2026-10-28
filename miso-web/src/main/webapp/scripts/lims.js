@@ -259,8 +259,25 @@ var Utils = Utils || {
     var output = {};
     var conditionalFields = [];
     var updateVisibility = function () {
+      var newlyShown = [];
       conditionalFields.forEach(function (item) {
-        item.p.style.display = item.showIf(output) ? "" : "none";
+        var shownBefore = !item.p.classList.contains("hidden");
+        var showNow = item.showIf(output);
+        if (shownBefore && !showNow) {
+          output[item.property] = null;
+        }
+        if (showNow !== shownBefore) {
+          item.p.classList.toggle("hidden");
+          if (item.help) {
+            item.help.classList.add("hidden");
+          }
+        }
+        if (!shownBefore && showNow) {
+          newlyShown.push(item);
+        }
+      });
+      newlyShown.forEach(function (item) {
+        item.input.dispatchEvent(new Event("change"));
       });
     };
     fields.forEach(function (field) {
@@ -294,11 +311,12 @@ var Utils = Utils || {
             if (selectedIndex === -1) {
               output[field.property] = null;
             } else {
-              output[field.property] = field.values[selectedIndex];
+              var fullValue = field.values[selectedIndex];
+              output[field.property] = field.getValue ? field.getValue(fullValue) : fullValue;
             }
           };
           if (!field.value) {
-            output[field.property] = field.nullLabel || field.values[0];
+            output[field.property] = field.nullLabel ? null : field.values[0];
           }
           break;
         case "text":
@@ -431,9 +449,6 @@ var Utils = Utils || {
         default:
           throw new Error("Unknown field type: " + field.type);
       }
-      if (field.showIf) {
-        conditionalFields.push({ p: p, showIf: field.showIf });
-      }
       if (input.onchange) {
         var originalOnchange = input.onchange;
         input.onchange = function () {
@@ -465,8 +480,39 @@ var Utils = Utils || {
           }
         });
       }
+
+      var helpText = null;
+      if (field.description) {
+        helpText = document.createElement("P");
+        helpText.classList.add("dialogHelp", "hidden");
+        helpText.innerText = field.description;
+
+        var helpBubble = document.createElement("IMG");
+        helpBubble.src = "/styles/images/question_mark.png";
+        helpBubble.alt = "Help";
+        helpBubble.title = field.description;
+        helpBubble.classList.add("field-help-icon");
+        helpBubble.addEventListener("click", function () {
+          helpText.classList.toggle("hidden");
+        });
+        p.appendChild(helpBubble);
+      }
       p.appendChild(input);
       dialogArea.appendChild(p);
+      if (helpText) {
+        dialogArea.appendChild(helpText);
+      }
+
+      if (field.showIf) {
+        p.classList.add("hidden");
+        conditionalFields.push({
+          p: p,
+          input: input,
+          help: helpText,
+          showIf: field.showIf,
+          property: field.property,
+        });
+      }
     });
     updateVisibility();
 

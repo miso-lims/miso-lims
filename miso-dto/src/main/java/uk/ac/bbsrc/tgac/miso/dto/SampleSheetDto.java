@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.dto;
 import static uk.ac.bbsrc.tgac.miso.dto.Dtos.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheet;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -67,6 +68,20 @@ public class SampleSheetDto {
 
   public void setSections(List<SampleSheetSectionDto> sections) {
     this.sections = sections;
+  }
+
+  public SampleSheet to() {
+    SampleSheet to = new SampleSheet();
+    setLong(to::setId, getId(), false);
+    setString(to::setName, getName());
+    setObject(to::setPlatformType, getPlatformType(), str -> PlatformType.valueOf(str));
+    if (getParameters() != null) {
+      to.setParameters(getParameters().stream().map(SampleSheetParameterDto::to).collect(Collectors.toList()));
+    }
+    if (getSections() != null) {
+      to.setSections(getSections().stream().map(SampleSheetSectionDto::to).collect(Collectors.toList()));
+    }
+    return to;
   }
 
 }

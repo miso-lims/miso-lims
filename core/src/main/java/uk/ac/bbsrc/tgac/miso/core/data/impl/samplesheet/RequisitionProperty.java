@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 
-public enum RequisitionProperty {
+public enum RequisitionProperty implements LabelledEnum {
 
   ID("ID") {
     @Override
@@ -78,6 +78,7 @@ public enum RequisitionProperty {
     this.label = label;
   }
 
+  @Override
   public String getLabel() {
     return label;
   }

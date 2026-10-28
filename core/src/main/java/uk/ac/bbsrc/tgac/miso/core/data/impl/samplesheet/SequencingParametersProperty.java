@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencingParameters;
 
-public enum SequencingParametersProperty {
+public enum SequencingParametersProperty implements LabelledEnum {
 
   READ_1_LENGTH("Read 1 Length") {
     @Override

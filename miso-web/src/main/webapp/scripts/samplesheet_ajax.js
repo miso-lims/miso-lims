@@ -1,5 +1,189 @@
-var SampleSheet = (function () {
+var SampleSheet = (function ($) {
+  var parameterListId = "listParameters";
+  var form = null;
+  var admin = false;
+  var parameterListConfig = {};
+  var sectionListId = "listSections";
+  var sectionListConfig = {};
+  var fieldListsContainerId = "sectionFieldLists";
+  var sampleSheetFieldCommonSources = null;
+
   return {
+    setup: function (formApi, isAdmin, commonSources) {
+      form = formApi;
+      admin = isAdmin;
+      sampleSheetFieldCommonSources = commonSources;
+      parameterListConfig = {
+        isAdmin: isAdmin,
+      };
+      sectionListConfig = {
+        isAdmin: isAdmin,
+      };
+    },
+
+    setParameters: function (parameters) {
+      FormUtils.setTableData(
+        ListTarget.samplesheetparameter,
+        parameterListConfig,
+        parameterListId,
+        parameters || [],
+        form
+      );
+    },
+
+    getParameters: function () {
+      return FormUtils.getTableData(parameterListId);
+    },
+
+    refreshParameters: function () {
+      SampleSheet.setParameters(SampleSheet.getParameters());
+    },
+
+    addParameter: function (parameter) {
+      var parameters = SampleSheet.getParameters();
+      if (parameters.some(Utils.array.namePredicate(parameter.name))) {
+        Utils.showOkDialog("Error", [
+          "There is already a parameter named '" + parameter.name + "'",
+        ]);
+        return;
+      }
+      if (
+        parameter.name === "None" ||
+        sampleSheetFieldCommonSources.some(function (source) {
+          return source.value === parameter.name;
+        })
+      ) {
+        Utils.showOkDialog("Error", [
+          "Invalid parameter name: '" + parameter.name + "' (reserved word)",
+        ]);
+        return;
+      }
+      parameters.push(parameter);
+      SampleSheet.setParameters(parameters);
+    },
+
+    removeParameters: function (removeParameters) {
+      var parameters = SampleSheet.getParameters().filter(function (parameter) {
+        return !removeParameters.some(Utils.array.namePredicate(parameter.name));
+      });
+      SampleSheet.setParameters(parameters);
+    },
+
+    setSections: function (sections) {
+      var previousSectionCount = SampleSheet.getSections().length;
+      for (var i = 0; i < previousSectionCount; i++) {
+        FormUtils.removeTable("listSection" + i);
+      }
+
+      sections = sections || [];
+      FormUtils.setTableData(
+        ListTarget.samplesheetsection,
+        sectionListConfig,
+        sectionListId,
+        sections,
+        form
+      );
+
+      var container = $("#" + fieldListsContainerId);
+      container.empty();
+      sections.forEach(function (section, index) {
+        var listId = "listSection" + index;
+        container.append("<h1>" + section.name + "</h1>");
+        container.append('<div id="' + listId + '"></div>');
+        container.append("<br />");
+        SampleSheet.setSectionFields(section.fields, index);
+      });
+    },
+
+    getSections: function () {
+      var sections = FormUtils.getTableData(sectionListId) || [];
+      sections.forEach(function (section, index) {
+        section.fields = SampleSheet.getSectionFields(index);
+      });
+      return sections;
+    },
+
+    addSection: function (section) {
+      var sections = SampleSheet.getSections();
+      if (sections.some(Utils.array.namePredicate(section.name))) {
+        Utils.showOkDialog("Error", ["There is already a section named '" + section.name + "'"]);
+        return;
+      }
+      sections.push(section);
+      SampleSheet.setSections(sections);
+    },
+
+    removeSections: function (removeSections) {
+      var sections = SampleSheet.getSections().filter(function (section) {
+        return !removeSections.some(Utils.array.namePredicate(section.name));
+      });
+      SampleSheet.setSections(sections);
+    },
+
+    repositionSections: function (repositionSections, afterSection) {
+      var sections = SampleSheet.getSections().filter(function (section) {
+        return !repositionSections.some(Utils.array.namePredicate(section.name));
+      });
+      var index = 0;
+      if (afterSection) {
+        index = sections.findIndex(Utils.array.namePredicate(afterSection.name)) + 1;
+      }
+      for (var i = 0; i < repositionSections.length; i++) {
+        sections.splice(index + i, 0, repositionSections[i]);
+      }
+      SampleSheet.setSections(sections);
+    },
+
+    getSectionFields: function (sectionIndex) {
+      return FormUtils.getTableData("listSection" + sectionIndex);
+    },
+
+    setSectionFields: function (fields, sectionIndex) {
+      var listConfig = {
+        sectionIndex: sectionIndex,
+        isAdmin: admin,
+        commonSources: sampleSheetFieldCommonSources,
+      };
+      FormUtils.setTableData(
+        ListTarget.samplesheetfield,
+        listConfig,
+        "listSection" + sectionIndex,
+        fields || [],
+        form
+      );
+    },
+
+    addSectionField: function (field, sectionIndex) {
+      var fields = SampleSheet.getSectionFields(sectionIndex);
+      if (fields.some(Utils.array.namePredicate(field.name))) {
+        Utils.showOkDialog("Error", ["There is already a field named '" + field.name + "'"]);
+        return;
+      }
+      fields.push(field);
+      SampleSheet.setSectionFields(fields, sectionIndex);
+    },
+
+    removeSectionFields: function (removeFields, sectionIndex) {
+      var fields = SampleSheet.getSectionFields(sectionIndex).filter(function (field) {
+        return !removeFields.some(Utils.array.namePredicate(field.name));
+      });
+      SampleSheet.setSectionFields(fields, sectionIndex);
+    },
+
+    repositionSectionFields: function (repositionFields, afterField, sectionIndex) {
+      var fields = SampleSheet.getSectionFields(sectionIndex).filter(function (field) {
+        return !repositionFields.some(Utils.array.namePredicate(field.name));
+      });
+      var index = 0;
+      if (afterField) {
+        index = fields.findIndex(Utils.array.namePredicate(afterField.name)) + 1;
+      }
+      for (var i = 0; i < repositionFields.length; i++) {
+        fields.splice(index + i, 0, repositionFields[i]);
+      }
+      SampleSheet.setSectionFields(fields, sectionIndex);
+    },
+
     fetchSampleSheets: function (platformType, callback) {
       Utils.ajaxWithDialog(
         "Fetching sample sheets",
@@ -108,4 +292,4 @@ var SampleSheet = (function () {
       return data;
     },
   };
-})();
+})(jQuery);

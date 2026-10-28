@@ -4,6 +4,7 @@ import static uk.ac.bbsrc.tgac.miso.dto.Dtos.*;
 
 import tools.jackson.databind.node.ArrayNode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetParameter;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet.SampleSheetParameter.ParameterType;
 
 public class SampleSheetParameterDto {
 
@@ -61,6 +62,16 @@ public class SampleSheetParameterDto {
 
   public void setDefaultValue(String defaultValue) {
     this.defaultValue = defaultValue;
+  }
+
+  public SampleSheetParameter to() {
+    SampleSheetParameter to = new SampleSheetParameter();
+    setString(to::setName, getName());
+    setObject(to::setType, getType(), ParameterType::valueOf);
+    to.setSource(getSource());
+    setObject(to::setMultivalue, getMultivalue(), SampleSheetParameter.MultivalueType::valueOf);
+    setString(to::setDefaultValue, getDefaultValue());
+    return to;
   }
 
 }
