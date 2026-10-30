@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,11 +16,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel_;
 import uk.ac.bbsrc.tgac.miso.core.data.Array_;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl_;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -35,13 +29,6 @@ public class HibernateArrayDao extends HibernateSaveDao<Array>
 
   public HibernateArrayDao() {
     super(Array.class);
-  }
-
-  @Value("${miso.detailed.sample.enabled}")
-  private Boolean detailedSample;
-
-  public void setDetailedSample(boolean isDetailed) {
-    this.detailedSample = isDetailed;
   }
 
   @Override
@@ -78,14 +65,6 @@ public class HibernateArrayDao extends HibernateSaveDao<Array>
         builder.getCriteriaBuilder().equal(root.get(SampleImpl_.identificationBarcode), search),
         builder.getCriteriaBuilder().equal(root.get(SampleImpl_.name), search),
         builder.getCriteriaBuilder().equal(root.get(SampleImpl_.alias), search)));
-
-    if (detailedSample) {
-      Root<DetailedSampleImpl> detailedSampleRoot = builder.getRoot(DetailedSampleImpl.class);
-      Join<DetailedSampleImpl, SampleClassImpl> sampleJoin =
-          builder.getJoin(detailedSampleRoot, DetailedSampleImpl_.sampleClass);
-      builder.addPredicate(builder.getCriteriaBuilder().equal(sampleJoin.get(SampleClassImpl_.sampleCategory),
-          SampleAliquot.CATEGORY_NAME));
-    }
 
     builder.addPredicate(builder.getCriteriaBuilder().equal(root.get(SampleImpl_.discarded), false));
     return builder.getResultList();

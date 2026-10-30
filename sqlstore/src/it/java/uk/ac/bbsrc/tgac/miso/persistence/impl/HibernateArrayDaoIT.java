@@ -33,7 +33,6 @@ public class HibernateArrayDaoIT extends AbstractDAOTest {
   public void setup() {
     sut = new HibernateArrayDao();
     sut.setEntityManager(entityManager);
-    sut.setDetailedSample(true);
   }
 
   @Test
@@ -117,16 +116,7 @@ public class HibernateArrayDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testSampleSearchByNamePlainSample() throws Exception {
-    sut.setDetailedSample(false);
-    List<Sample> results = sut.getArrayableSamplesBySearch("SAM15");
-    assertNotNull(results);
-    assertEquals(1, results.size());
-    assertEquals("SAM15", results.get(0).getName());
-  }
-
-  @Test
-  public void testSampleSearchByNameDetailedSample() throws Exception {
+  public void testSampleSearchByNameAliquot() throws Exception {
     List<Sample> results = sut.getArrayableSamplesBySearch("SAM19");
     assertNotNull(results);
     assertEquals(1, results.size());
@@ -134,10 +124,19 @@ public class HibernateArrayDaoIT extends AbstractDAOTest {
   }
 
   @Test
-  public void testSampleSearchByNameDetailedSampleNotAliquot() throws Exception {
+  public void testSampleSearchByNameTissueProcessing() throws Exception {
+    List<Sample> results = sut.getArrayableSamplesBySearch("SAM25");
+    assertNotNull(results);
+    assertEquals(1, results.size());
+    assertEquals("SAM25", results.get(0).getName());
+  }
+
+  @Test
+  public void testSampleSearchByNameIdentity() throws Exception {
     List<Sample> results = sut.getArrayableSamplesBySearch("SAM15");
     assertNotNull(results);
-    assertEquals(0, results.size());
+    assertEquals(1, results.size());
+    assertEquals("SAM15", results.get(0).getName());
   }
 
   @Test
