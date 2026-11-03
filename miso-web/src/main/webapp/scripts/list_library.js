@@ -226,13 +226,10 @@ ListTarget.library = (function () {
         ),
         ListUtils.columns.project(projectId),
         {
-          title: "External Name",
-          type: "text",
-          data: "effectiveExternalNames",
-          disabled: true,
-          preventImport: true,
-          omit: true,
-          include: Constants.isDetailedSample && Constants.showExternalName,
+          sTitle: "External Name",
+          mData: "effectiveExternalNames",
+          include: Constants.isDetailedSample && Constants.showListLibraryExternalNames,
+          bSortable: false,
         },
         {
           sTitle: "Tissue Origin",

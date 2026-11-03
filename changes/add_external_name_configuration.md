@@ -1,1 +1,1 @@
-Configuration option to show external names on sample, library, and library aliquot bulk/list pages.
+Configuration options to show external names on sample, library, and library aliquot bulk/list pages.

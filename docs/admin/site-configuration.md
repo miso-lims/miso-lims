@@ -450,7 +450,13 @@ library aliquots.
 ### `miso.display.bulk.externalName`
 
 Defaults to `false` if unspecified. Set to `true` in detailed sample mode to show External Names
-on sample, library, and library aliquot bulk and list pages.
+on sample, library, and library aliquot bulk create/edit pages.
+
+### `miso.display.list.libraryExternalNames`
+
+Defaults to `false` if unspecified. Set to `true` in detailed sample mode to show External Names
+on library and library aliquot list pages, including the library aliquots list on the Edit Pool
+page.
 
 ### `miso.display.bulk.workstation`
 
