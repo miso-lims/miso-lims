@@ -1,3 +1,4 @@
+-- fixDeleteProjet
 DELIMITER //
 
 CREATE PROCEDURE FixSubprojectProjectKey()
@@ -25,3 +26,4 @@ DROP PROCEDURE FixSubprojectProjectKey;
 ALTER TABLE Subproject
   ADD CONSTRAINT fk_subproject_project FOREIGN KEY (projectId)
   REFERENCES Project (projectId) ON DELETE CASCADE;
+

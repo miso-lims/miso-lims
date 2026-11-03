@@ -63,10 +63,9 @@ ListTarget.metricsubcategory = (function () {
   };
 
   function makeLabel(subcategory) {
-    var category = Utils.array.findUniqueOrThrow(
-      Utils.array.get("value"),
-      Constants.metricCategories
-    );
+    var category = Utils.array.findUniqueOrThrow(function (x) {
+      return x.value === subcategory.category;
+    }, Constants.metricCategories);
     return subcategory.alias + " (" + category.label + ")";
   }
 })();
