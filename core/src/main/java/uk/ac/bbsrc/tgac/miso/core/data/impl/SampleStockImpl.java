@@ -27,7 +27,7 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   private Long referenceSlideId;
 
   @ManyToOne
-  @JoinColumn(name = "indexId")
+  @JoinColumn(name = "index1Id")
   private SampleIndex index;
 
   @ManyToOne
@@ -70,7 +70,7 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   }
 
   @Override
-  public SampleIndex getIndex() {
+  public SampleIndex getIndex1() {
     return index;
   }
 
@@ -78,7 +78,7 @@ public class SampleStockImpl extends DetailedSampleImpl implements SampleStock {
   public SampleIndex getIndex2() {return index2;}
 
   @Override
-  public void setIndex(SampleIndex index) {
+  public void setIndex1(SampleIndex index) {
     this.index = index;
   }
 

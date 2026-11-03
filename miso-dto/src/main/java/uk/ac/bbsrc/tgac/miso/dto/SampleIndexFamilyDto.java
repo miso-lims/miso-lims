@@ -76,7 +76,7 @@ public class SampleIndexFamilyDto {
     setLong(to::setId, getId(), false);
     setString(to::setName, getName());
     setBoolean(to::setUniqueDualIndex, isUniqueDualIndex(), false);
-    setBoolean(to::setArchived, isArchived(), true);
+    setBoolean(to::setArchived, isArchived(), false);
     to.setIndices(getIndices().stream().map(SampleIndexDto::to).toList());
     return to;
   }

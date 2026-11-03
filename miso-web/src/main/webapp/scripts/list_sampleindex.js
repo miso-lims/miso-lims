@@ -72,9 +72,6 @@ ListTarget.sampleindex = {
         iSortPriority: 0,
         bSortable: false,
         mData: "sequence",
-        mRender: function (data) {
-            return data;
-          }
       },
       {
         sTitle: "Position",

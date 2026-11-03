@@ -752,7 +752,8 @@ public class DefaultSampleService implements SampleService {
       }
       if (isTissueProcessingSample(detailed)) {
         SampleTissueProcessing stp = (SampleTissueProcessing) detailed;
-        loadChildEntity(stp::setIndex, stp.getIndex(), sampleIndexService, "indexId");
+        loadChildEntity(stp::setIndex1, stp.getIndex1(), sampleIndexService, "index1Id");
+        loadChildEntity(stp::setIndex2, stp.getIndex2(), sampleIndexService, "index2Id");
         if (detailed instanceof SampleSlide) {
           Stain originalStain = ((SampleSlide) detailed).getStain();
           Stain stain;
@@ -769,7 +770,8 @@ public class DefaultSampleService implements SampleService {
       }
       if (isStockSample(detailed)) {
         SampleStock ss = (SampleStock) detailed;
-        loadChildEntity(ss::setIndex, ss.getIndex(), sampleIndexService, "indexId");
+        loadChildEntity(ss::setIndex1, ss.getIndex1(), sampleIndexService, "index1Id");
+        loadChildEntity(ss::setIndex2, ss.getIndex2(), sampleIndexService, "index2Id");
       }
       if (isAliquotSample(detailed)) {
         SampleAliquot sa = (SampleAliquot) detailed;
@@ -1064,7 +1066,7 @@ public class DefaultSampleService implements SampleService {
     target.setStrStatus(source.getStrStatus());
     target.setSlidesConsumed(source.getSlidesConsumed());
     target.setReferenceSlideId(source.getReferenceSlideId());
-    target.setIndex(source.getIndex());
+    target.setIndex1(source.getIndex1());
     target.setIndex2(source.getIndex2());
   }
 
@@ -1083,7 +1085,7 @@ public class DefaultSampleService implements SampleService {
 
   private void applyTissueProcessingChanges(SampleTissueProcessing target, SampleTissueProcessing source)
       throws IOException {
-    target.setIndex(source.getIndex());
+    target.setIndex1(source.getIndex1());
     target.setIndex2(source.getIndex2());
     if (source instanceof SampleSlide) {
       ((SampleSlide) target).setInitialSlides(((SampleSlide) source).getInitialSlides());

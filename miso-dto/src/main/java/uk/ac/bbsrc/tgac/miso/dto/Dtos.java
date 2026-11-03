@@ -884,8 +884,8 @@ public class Dtos {
     dto.setStrStatus(from.getStrStatus().getLabel());
     setInteger(dto::setSlidesConsumed, from.getSlidesConsumed(), true);
     setLong(dto::setReferenceSlideId, from.getReferenceSlideId(), true);
-    setId(dto::setIndexFamilyId, maybeGetProperty(from.getIndex(), SampleIndex::getFamily));
-    setId(dto::setIndexId, from.getIndex());
+    setId(dto::setIndexFamilyId, maybeGetProperty(from.getIndex1(), SampleIndex::getFamily));
+    setId(dto::setIndex1Id, from.getIndex1());
     setId(dto::setIndex2Id, from.getIndex2());
     return dto;
   }
@@ -912,7 +912,7 @@ public class Dtos {
     }
     setInteger(to::setSlidesConsumed, from.getSlidesConsumed(), true);
     setLong(to::setReferenceSlideId, from.getReferenceSlideId(), true);
-    setObject(to::setIndex, SampleIndex::new, from.getIndexId());
+    setObject(to::setIndex1, SampleIndex::new, from.getIndex1Id());
     setObject(to::setIndex2, SampleIndex::new, from.getIndex2Id());
     return to;
   }
@@ -1189,8 +1189,8 @@ public class Dtos {
     } else {
       to = new SampleTissueProcessingDto();
     }
-    setId(to::setIndexFamilyId, maybeGetProperty(from.getIndex(), SampleIndex::getFamily));
-    setId(to::setIndexId, from.getIndex());
+    setId(to::setIndexFamilyId, maybeGetProperty(from.getIndex1(), SampleIndex::getFamily));
+    setId(to::setIndex1Id, from.getIndex1());
     setId(to::setIndex2Id, from.getIndex2());
     return to;
   }
@@ -1206,7 +1206,7 @@ public class Dtos {
     } else {
       to = new SampleTissueProcessingImpl();
     }
-    setObject(to::setIndex, SampleIndex::new, from.getIndexId());
+    setObject(to::setIndex1, SampleIndex::new, from.getIndex1Id());
     setObject(to::setIndex2, SampleIndex::new, from.getIndex2Id());
     return to;
   }

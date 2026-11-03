@@ -1267,7 +1267,7 @@ public class MisoClient implements Lims {
       TIMEPOINT("timepoint", "Timepoint"), //
       REQUISITION_ID("requisitionId", "Requisition ID"), //
       CONSENT("consentLevel", "Consent"),
-      SOP_ID("sopId", "SOP ID"), //
+      SOP_VERSION("sopVersion", "SOP Version"), //
       SOP_ALIAS("sopAlias", "SOP Alias");
 
       private final String sqlKey;

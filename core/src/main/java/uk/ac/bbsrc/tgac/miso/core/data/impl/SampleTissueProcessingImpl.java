@@ -17,7 +17,7 @@ public class SampleTissueProcessingImpl extends DetailedSampleImpl implements Sa
   private static final long serialVersionUID = 1L;
 
   @ManyToOne
-  @JoinColumn(name = "indexId")
+  @JoinColumn(name = "index1Id")
   private SampleIndex index;
 
   @ManyToOne
@@ -30,7 +30,7 @@ public class SampleTissueProcessingImpl extends DetailedSampleImpl implements Sa
   }
 
   @Override
-  public SampleIndex getIndex() {
+  public SampleIndex getIndex1() {
     return index;
   }
 
@@ -40,7 +40,7 @@ public class SampleTissueProcessingImpl extends DetailedSampleImpl implements Sa
   }
 
   @Override
-  public void setIndex(SampleIndex index) {
+  public void setIndex1(SampleIndex index) {
     this.index = index;
   }
 

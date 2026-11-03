@@ -78,6 +78,7 @@ BulkTarget.sample = (function ($) {
   var originalSopIdsBySampleId = {};
   var originalEffectiveGroupIdsByRow = {};
   var parentLocationsByRow = null;
+  var previousIndex1NamesByRow = {};
   var metricCategories = [];
 
   var showLabColumn = false;
@@ -423,6 +424,7 @@ BulkTarget.sample = (function ($) {
     },
     prepareData: function (data, config) {
       parentLocationsByRow = {};
+      previousIndex1NamesByRow = {};
       data.forEach(function (sample, index) {
         originalEffectiveGroupIdsByRow[index] = sample.effectiveGroupId;
         if (Constants.isDetailedSample && sample.parentBoxPosition) {
@@ -1147,40 +1149,33 @@ BulkTarget.sample = (function ($) {
               Utils.array.namePredicate(newValue),
               Constants.sampleIndexFamilies
             );
-            var changes = {
-                source: [],
+            var index1Changes = {
+              source: [],
               disabled: !family,
               required: !!family,
             };
-            var changes2 = {
+            var index2Changes = {
               source: [],
               disabled: !family,
               required: false,
             };
             if (family) {
-              changes.source = family.indices.filter(function (index) {
+              index1Changes.source = family.indices.filter(function (index) {
                 return index.position === 1;
               });
-              changes2.source = family.indices.filter(function (index) {
+              index2Changes.source = family.indices.filter(function (index) {
                 return index.position === 2;
               });
-              if (family.uniqueDualIndex) {
-                changes2.disabled = true;
-                var index1Name = api.getValue(rowIndex, "indexId");
-                var index2 = changes2.source.find(function (index) {
-                  return index.name === index1Name;
-                });
-                changes2.value = index2 ? index2.name : null;
-              }
+              index2Changes.disabled = !index2Changes.source.length;
             }
-            api.updateField(rowIndex, "index2Id", changes2);
-            api.updateField(rowIndex, "indexId", changes);
+            api.updateField(rowIndex, "index2Id", index2Changes);
+            api.updateField(rowIndex, "index1Id", index1Changes);
           },
         },
         {
-          title: "Index",
+          title: "Index 1",
           type: "dropdown",
-          data: "indexId",
+          data: "index1Id",
           include:
             ["Tissue Processing", "Stock"].includes(targetCategory) &&
             Constants.sampleIndexFamilies &&
@@ -1201,17 +1196,28 @@ BulkTarget.sample = (function ($) {
           getItemLabel: Utils.array.getName,
           getItemValue: Utils.array.getId,
           onChange: function (rowIndex, newValue, api) {
+            var previousIndex1Name = previousIndex1NamesByRow[rowIndex];
+            previousIndex1NamesByRow[rowIndex] = newValue || null;
+            if (previousIndex1Name === undefined || !newValue || newValue === previousIndex1Name) {
+              return;
+            }
             var family = Utils.array.findFirstOrNull(
               Utils.array.namePredicate(api.getValue(rowIndex, "indexFamilyId")),
               Constants.sampleIndexFamilies
             );
             if (family && family.uniqueDualIndex) {
+              var index2Name = api.getValue(rowIndex, "index2Id");
+              if (index2Name && index2Name !== previousIndex1Name) {
+                return;
+              }
               var index2 = family.indices.find(function (index) {
                 return index.position === 2 && index.name === newValue;
               });
-              api.updateField(rowIndex, "index2Id", {
-                value: index2 ? index2.name : null,
-              });
+              if (index2) {
+                api.updateField(rowIndex, "index2Id", {
+                  value: index2.name,
+                });
+              }
             }
           },
         },

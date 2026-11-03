@@ -6,20 +6,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIndex;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIndexFamily;
 
 public class SampleIndexDto {
-  private SampleIndexFamilyDto family;
   private Long id;
   private Long indexFamilyId;
   private int position = 1;
   private String sequence;
   private String name;
-
-  public SampleIndexFamilyDto getFamily() {
-    return family;
-  }
-
-  public void setFamily(SampleIndexFamilyDto family) {
-    this.family = family;
-  }
 
   public static SampleIndexDto from(SampleIndex from) {
     SampleIndexDto dto = new SampleIndexDto();
@@ -28,7 +19,6 @@ public class SampleIndexDto {
     dto.setSequence(from.getSequence());
     Dtos.setId(dto::setIndexFamilyId, from.getFamily());
     setString(dto::setName, from.getName());
-    dto.setFamily(SampleIndexFamilyDto.from(from.getFamily(), false));
     return dto;
   }
 

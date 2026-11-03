@@ -81,8 +81,8 @@ SELECT s.alias NAME
         ,NULL batch_id
         ,s.requisitionId
         ,s.consentLevel
-        ,s.sopId sopId
         ,sop.alias sopAlias
+        ,sop.version sopVersion
 FROM Sample s
 LEFT JOIN DetailedQcStatus qpd ON qpd.detailedQcStatusId = s.detailedQcStatusId 
 LEFT JOIN Sample parent ON parent.sampleId = s.parentId 
@@ -98,7 +98,7 @@ LEFT JOIN Sample refSlide ON refSlide.sampleId = s.referenceSlideId
 LEFT JOIN Stain stain ON stain.stainId = s.stain
 LEFT JOIN ScientificName sn ON sn.scientificNameId = s.scientificNameId
 LEFT JOIN Sop sop ON sop.sopId = s.sopId
-LEFT JOIN SampleIndex sbc1 ON sbc1.indexId = s.indexId
+LEFT JOIN SampleIndex sbc1 ON sbc1.indexId = s.index1Id
 LEFT JOIN SampleIndexFamily sbcfam ON sbcfam.indexFamilyId = sbc1.indexFamilyId
 LEFT JOIN SampleIndex sbc2 ON sbc2.indexId = s.index2Id
 LEFT JOIN BoxPosition pos ON pos.targetId = s.sampleId
@@ -230,8 +230,8 @@ SELECT l.alias NAME
         ) batch_id
         ,l.requisitionId
         ,NULL consentLevel
-        ,l.sopId sopId
         ,sop.alias sopAlias
+        ,sop.version sopVersion
 FROM `Library` l
 LEFT JOIN Sample parent ON parent.sampleId = l.sample_sampleId
 LEFT JOIN Project sp ON sp.projectId = parent.project_projectId
@@ -368,8 +368,8 @@ SELECT d.alias name
         ,NULL batch_id
         ,NULL requisitionId
         ,NULL consentLevel
-        ,NULL sopId
         ,NULL sopAlias
+        ,NULL sopVersion
 FROM LibraryAliquot d 
 LEFT JOIN LibraryAliquot laParent ON laParent.aliquotId = d.parentAliquotId
 JOIN `Library` lib ON lib.libraryId = d.libraryId

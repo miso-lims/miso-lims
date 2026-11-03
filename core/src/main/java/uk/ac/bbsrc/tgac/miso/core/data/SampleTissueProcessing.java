@@ -13,11 +13,11 @@ public interface SampleTissueProcessing extends DetailedSample {
   public static final List<String> SUBCATEGORIES = Collections.unmodifiableList(Arrays
       .asList(SampleSlide.SUBCATEGORY_NAME, SampleTissuePiece.SUBCATEGORY_NAME, SampleSingleCell.SUBCATEGORY_NAME));
 
-  SampleIndex getIndex();
+  SampleIndex getIndex1();
 
   SampleIndex getIndex2();
 
-  void setIndex(SampleIndex index);
+  void setIndex1(SampleIndex index);
 
   void setIndex2(SampleIndex index);
 

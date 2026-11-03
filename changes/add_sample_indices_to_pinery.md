@@ -1,0 +1,1 @@
+Pinery samples now include attributes for barcode names and sequences for all applicable types 

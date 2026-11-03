@@ -45,7 +45,7 @@ BulkTarget.sampleindex = (function ($) {
           title: "Name",
           data: "name",
           type: "text",
-          maxLength: 24,
+          maxLength: 50,
           required: true,
         },
         {
@@ -56,7 +56,6 @@ BulkTarget.sampleindex = (function ($) {
           required: false,
           regex: "^[ACGT]+$",
           description: "Can only include the characters [A, C, G, T]",
-          include: !config.indexFamily.fakeSequence,
         },
       ];
     },
