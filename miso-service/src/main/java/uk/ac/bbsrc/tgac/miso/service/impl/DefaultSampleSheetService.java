@@ -105,7 +105,8 @@ public class DefaultSampleSheetService extends AbstractSaveService<SampleSheet> 
         errors.add(new ValidationError(FIELD_PARAMETERS, "Invalid parameter name: " + parameter.getName()));
       }
       if (parameter.getType() == null) {
-        errors.add(new ValidationError(FIELD_PARAMETERS, "Parameter '%s' requires a type"));
+        errors.add(
+            new ValidationError(FIELD_PARAMETERS, "Parameter '%s' requires a type".formatted(parameter.getName())));
         continue;
       }
       if (parameter.getType() == ParameterType.DROPDOWN) {
@@ -160,8 +161,9 @@ public class DefaultSampleSheetService extends AbstractSaveService<SampleSheet> 
             }
             break;
           case DROPDOWN:
-            if (parameter.getSource().valueStream()
-                .noneMatch(x -> Objects.equals(x.get("value").asString(), parameter.getDefaultValue()))) {
+            // if source is null, or a value is missing, there are already errors above
+            if (parameter.getSource() != null && parameter.getSource().valueStream().noneMatch(
+                x -> x.has("value") && Objects.equals(x.get("value").asString(), parameter.getDefaultValue()))) {
               errors.add(new ValidationError(FIELD_PARAMETERS,
                   "Dropdown parameter '%s' default value must match one of its option values"
                       .formatted(parameter.getName())));
@@ -244,13 +246,17 @@ public class DefaultSampleSheetService extends AbstractSaveService<SampleSheet> 
                 }
               } else {
                 // Source should be a parameter
-                SampleSheetParameter parameter = object.getParameters().stream()
-                    .filter(x -> x.getName().equals(source.getSource())).findFirst().orElse(null);
+                SampleSheetParameter parameter = object.getParameters() == null ? null
+                    : object.getParameters().stream()
+                        .filter(x -> Objects.equals(x.getName(), source.getSource()))
+                        .findFirst()
+                        .orElse(null);
                 if (parameter == null) {
                   errors.add(new ValidationError(FIELD_SECTIONS, "Section '%s' field '%s' includes invalid source: '%s'"
                       .formatted(section.getName(), field.getName(), source.getSource())));
                 } else {
                   if (source.getSourceProperty() != null && (parameter.getSource() == null
+                      || parameter.getSource().isEmpty()
                       || parameter.getSource().get(0).get(source.getSourceProperty()) == null)) {
                     errors.add(new ValidationError(FIELD_SECTIONS,
                         "Section '%s' field '%s' source '%s' specifies invalid property: %s".formatted(
@@ -272,10 +278,9 @@ public class DefaultSampleSheetService extends AbstractSaveService<SampleSheet> 
               "Each field in section '%s' requires a name".formatted(section.getName())));
         }
       }
-
-      if (anyUnnamedSection) {
-        errors.add(new ValidationError(FIELD_SECTIONS, "Each section requires a name"));
-      }
+    }
+    if (anyUnnamedSection) {
+      errors.add(new ValidationError(FIELD_SECTIONS, "Each section requires a name"));
     }
   }
 

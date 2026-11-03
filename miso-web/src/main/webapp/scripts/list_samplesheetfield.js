@@ -252,17 +252,23 @@ ListTarget.samplesheetfield = (function () {
         label: "Date format",
         property: "dateFormat",
         type: "select",
-        values: ["yyyy-MM-dd", "d/M/yyyy", "yyyyMMddHHmmss"],
+        values: ["yyyy-MM-dd", "M/d/yyyy", "yyyyMMddHHmmss"],
+        showIf: function (output) {
+          return output.source === "CURRENT_TIME";
+        },
+      },
+      {
+        label: "Date format",
+        property: "dateFormat",
+        type: "select",
+        values: ["yyyy-MM-dd", "M/d/yyyy"],
         showIf: function (output) {
           if (output.source === "Static Value") {
             return false;
           }
-          return (
-            output.source === "CURRENT_TIME" ||
-            !!parameters.find(function (parameter) {
-              return parameter.name === output.source && parameter.type === "DATE";
-            })
-          );
+          return !!parameters.find(function (parameter) {
+            return parameter.name === output.source && parameter.type === "DATE";
+          });
         },
       },
       {

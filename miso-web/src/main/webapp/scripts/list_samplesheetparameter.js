@@ -181,7 +181,7 @@ ListTarget.samplesheetparameter = (function () {
         if (results.additionalProperties) {
           showParameterValueSchemaDropdown(results);
         } else {
-          showParameterValueDropdown(results);
+          showParameterValueDropdown(results, addParameter);
         }
       } else {
         addParameter(results);
@@ -230,7 +230,7 @@ ListTarget.samplesheetparameter = (function () {
         previousResults.source = [];
       }
       if (results.setDefault) {
-        previousResults.defaultValue = results.label || results.value;
+        previousResults.defaultValue = results.value;
       }
 
       delete results.setDefault;
@@ -328,18 +328,20 @@ ListTarget.samplesheetparameter = (function () {
         label: "Set as default",
         property: "setDefault",
         type: "checkbox",
-        value: parameter.defaultValue === (option.label || option.value),
+        value: parameter.defaultValue === option.value,
       });
       Utils.showDialog("Edit Option", "Save", fields, function (results) {
         option.value = results.value;
         if (setup.includeLabels) {
           option.label = results.label;
         }
-        setup.additionalProperties.forEach(function (property) {
-          option[property] = results[property];
-        });
+        if (setup.additionalProperties) {
+          setup.additionalProperties.forEach(function (property) {
+            option[property] = results[property];
+          });
+        }
         if (results.setDefault) {
-          parameter.defaultValue = results.label || results.value;
+          parameter.defaultValue = results.value;
         }
         SampleSheet.refreshParameters();
       });
@@ -360,7 +362,7 @@ ListTarget.samplesheetparameter = (function () {
         }
         return x.value !== option.value;
       });
-      if (parameter.defaultValue === (option.label || option.value)) {
+      if (parameter.defaultValue === option.value) {
         parameter.defaultValue = null;
       }
       SampleSheet.refreshParameters();
@@ -370,7 +372,7 @@ ListTarget.samplesheetparameter = (function () {
   function showWizardForParameterOptions(parameter, title, action) {
     var actions = parameter.source.map(function (option) {
       return {
-        name: option.label || option.value,
+        name: option.value,
         handler: function () {
           action(option);
         },
