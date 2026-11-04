@@ -49,8 +49,8 @@ public class SampleSheetGenerator {
 
   private static final String DEFAULT_INSTRUMENT_POS = "*";
 
-  private static final Set<String> validDateFormats = Collections.unmodifiableSet(Set.of("yyyy-MM-dd", "M/d/yyyy"));
-  private static final Set<String> validDateTimeFormats =
+  private static final Set<String> VALID_DATE_FORMATS = Collections.unmodifiableSet(Set.of("yyyy-MM-dd", "M/d/yyyy"));
+  public static final Set<String> VALID_DATE_TIME_FORMATS =
       Collections.unmodifiableSet(Set.of("yyyy-MM-dd", "M/d/yyyy", "yyyyMMddHHmmss"));
 
   private final LibraryAliquotService libraryAliquotService;
@@ -559,17 +559,17 @@ public class SampleSheetGenerator {
     if (format == null) {
       return date.format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
-    if (validDateFormats.contains(format)) {
-      return date.format(DateTimeFormatter.ofPattern("M/d/yyyy"));
+    if (VALID_DATE_FORMATS.contains(format)) {
+      return date.format(DateTimeFormatter.ofPattern(format));
     }
     throw new IllegalArgumentException("Unexpected date format: %s".formatted(format));
   }
 
   private String formatCurrentDateTime(String format) {
     if (format == null) {
-      return formatCurrentDateTime("yyyy-mm-dd");
+      return formatCurrentDateTime("yyyy-MM-dd");
     }
-    if (validDateTimeFormats.contains(format)) {
+    if (VALID_DATE_TIME_FORMATS.contains(format)) {
       return new SimpleDateFormat(format).format(new Date());
     }
     throw new IllegalArgumentException("Unexpected date format: %s".formatted(format));

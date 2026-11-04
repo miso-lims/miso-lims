@@ -13,7 +13,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-public enum LibraryAliquotProperty {
+public enum LibraryAliquotProperty implements LabelledEnum {
 
   ALIAS("Alias") {
     @Override
@@ -289,6 +289,7 @@ public enum LibraryAliquotProperty {
     this.label = label;
   }
 
+  @Override
   public String getLabel() {
     return label;
   }

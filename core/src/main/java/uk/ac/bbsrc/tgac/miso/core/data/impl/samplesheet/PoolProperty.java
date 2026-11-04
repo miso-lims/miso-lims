@@ -2,7 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.samplesheet;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 
-public enum PoolProperty {
+public enum PoolProperty implements LabelledEnum {
 
   ALIAS("Alias") {
     @Override
@@ -17,6 +17,7 @@ public enum PoolProperty {
     this.label = label;
   }
 
+  @Override
   public String getLabel() {
     return label;
   }

@@ -702,6 +702,20 @@ Note that a sequencing parameters option is linked to a single sequencer model. 
 sequencer models, you must create a sequencing parameters option for each sequencer model.
 
 
+
+## Sample Sheets
+
+Sample sheets are files that provide configuration and data for sequencing instruments or analysis
+software. Sample sheet formats in MISO define parameters for user input to request when generating
+the sheet, and sections containing fields which detail the output.
+
+MISO administrators can add, edit, and delete sample sheet formats from the Sample Sheets list. On
+the Create/Edit Sample Sheet page, use the controls in the Parameters and Sections tables to edit
+the sample sheet parameters and sections, respectively. For each section in the Sections table, an
+additional table will be added to the page for defining the fields within that section.
+
+
+
 ## Oxford Nanopore Flow Cell Pore Versions
 
 Oxford Nanopore flow cells (sequencing containers) specify a pore version. This can be recorded in MISO for any Oxford
