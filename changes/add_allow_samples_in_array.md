@@ -1,0 +1,1 @@
+Samples of any category except identity can now be added to arrays (detailed sample)

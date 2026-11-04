@@ -33,6 +33,7 @@ public class HibernateArrayDaoIT extends AbstractDAOTest {
   public void setup() {
     sut = new HibernateArrayDao();
     sut.setEntityManager(entityManager);
+    sut.setDetailedSample(true);
   }
 
   @Test
@@ -116,6 +117,15 @@ public class HibernateArrayDaoIT extends AbstractDAOTest {
   }
 
   @Test
+  public void testSampleSearchByNamePlainSample() throws Exception {
+    sut.setDetailedSample(false);
+    List<Sample> results = sut.getArrayableSamplesBySearch("SAM15");
+    assertNotNull(results);
+    assertEquals(1, results.size());
+    assertEquals("SAM15", results.get(0).getName());
+  }
+
+  @Test
   public void testSampleSearchByNameAliquot() throws Exception {
     List<Sample> results = sut.getArrayableSamplesBySearch("SAM19");
     assertNotNull(results);
@@ -135,8 +145,7 @@ public class HibernateArrayDaoIT extends AbstractDAOTest {
   public void testSampleSearchByNameIdentity() throws Exception {
     List<Sample> results = sut.getArrayableSamplesBySearch("SAM15");
     assertNotNull(results);
-    assertEquals(1, results.size());
-    assertEquals("SAM15", results.get(0).getName());
+    assertEquals(0, results.size());
   }
 
   @Test
