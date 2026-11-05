@@ -73,7 +73,7 @@ public class PoolRestControllerST extends AbstractST {
 
 
     PoolDto pool2 = new PoolDto();
-    pool2.setPlatformType("PACBIO");
+    pool2.setPlatformType("ILLUMINA");
     pool2.setAlias("pool2_alias");
     pool2.setDiscarded(false);
     pool2.setCreationDate("2025-07-30");
@@ -400,7 +400,7 @@ public class PoolRestControllerST extends AbstractST {
     assertEquals(LocalDate.of(2025, 7, 29), created.get(0).getCreationDate());
 
 
-    assertEquals("PACBIO", created.get(1).getPlatformType().toString());
+    assertEquals("ILLUMINA", created.get(1).getPlatformType().toString());
     assertEquals("pool2_alias", created.get(1).getAlias());
     assertFalse(created.get(1).isDiscarded());
     assertEquals(2, created.get(1).getPoolContents().size());
@@ -458,7 +458,8 @@ public class PoolRestControllerST extends AbstractST {
   }
 
 
-  private ResultActions testListPools(String url, List<Integer> ids, MultiValueMap<String, String> params, boolean isItems)
+  private ResultActions testListPools(String url, List<Integer> ids, MultiValueMap<String, String> params,
+      boolean isItems)
       throws Exception {
     ResultActions result = getMockMvc().perform(get(url).params(params));
 
