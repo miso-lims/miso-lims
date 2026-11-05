@@ -17,7 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel;
 import uk.ac.bbsrc.tgac.miso.core.data.ArrayModel_;
 import uk.ac.bbsrc.tgac.miso.core.data.Array_;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAliquot;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleIdentity;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedSampleImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
@@ -83,8 +83,8 @@ public class HibernateArrayDao extends HibernateSaveDao<Array>
       Root<DetailedSampleImpl> detailedSampleRoot = builder.getRoot(DetailedSampleImpl.class);
       Join<DetailedSampleImpl, SampleClassImpl> sampleJoin =
           builder.getJoin(detailedSampleRoot, DetailedSampleImpl_.sampleClass);
-      builder.addPredicate(builder.getCriteriaBuilder().equal(sampleJoin.get(SampleClassImpl_.sampleCategory),
-          SampleAliquot.CATEGORY_NAME));
+      builder.addPredicate(builder.getCriteriaBuilder().notEqual(sampleJoin.get(SampleClassImpl_.sampleCategory),
+          SampleIdentity.CATEGORY_NAME));
     }
 
     builder.addPredicate(builder.getCriteriaBuilder().equal(root.get(SampleImpl_.discarded), false));

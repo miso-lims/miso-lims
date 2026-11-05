@@ -195,8 +195,8 @@ public class DefaultArrayService implements ArrayService {
       if (sam == null) {
         // wasn't found during #loadChildEntities
         errors.add(new ValidationError("Invalid Sample in position " + pos));
-      } else if (isDetailedSample(sam) && !isAliquotSample(sam)) {
-        errors.add(new ValidationError("Sample in position " + pos + " must be an aliquot"));
+      } else if (isIdentitySample(sam)) {
+        errors.add(new ValidationError("Sample in position " + pos + " cannot be an identity"));
       }
     });
   }
