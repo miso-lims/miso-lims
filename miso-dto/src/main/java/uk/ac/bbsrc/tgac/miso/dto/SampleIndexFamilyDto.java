@@ -6,7 +6,7 @@ import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIndexFamily;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 public class SampleIndexFamilyDto {
   private boolean archived;
