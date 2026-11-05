@@ -1,1 +1,1 @@
-    Pinery samples now include sop alias and version
+Pinery samples now include sop alias and version

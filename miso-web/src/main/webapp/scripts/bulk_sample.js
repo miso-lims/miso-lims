@@ -1168,6 +1168,12 @@ BulkTarget.sample = (function ($) {
               });
               index2Changes.disabled = !index2Changes.source.length;
             }
+            if (index1Changes.disabled) {
+              index1Changes.value = null;
+            }
+            if (index2Changes.disabled) {
+              index2Changes.value = null;
+            }
             api.updateField(rowIndex, "index2Id", index2Changes);
             api.updateField(rowIndex, "index1Id", index1Changes);
           },
