@@ -106,6 +106,7 @@
         <a href="<c:url value="/sampleindexfamily/list"/>">Sample Index Families</a>
         <a href="<c:url value="/samplepurpose/list"/>">Sample Purposes</a>
       </c:if>
+      <a href="<c:url value="/samplesheet/list"/>">Sample Sheets</a>
       <a href="<c:url value="/sampletype/list"/>">Sample Types</a>
       <a href="<c:url value="/scientificname/list"/>">Scientific Names</a>
       <a href="<c:url value="/containermodel/list"/>">Sequencing Container Models</a>

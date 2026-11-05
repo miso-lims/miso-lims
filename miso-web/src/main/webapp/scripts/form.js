@@ -542,6 +542,18 @@ FormUtils = (function ($) {
         });
     },
 
+    removeTable: function (containerId) {
+      var listId = containerId + "Table";
+      $("#" + listId)
+        .dataTable()
+        .fnDestroy();
+      $("#" + containerId).empty();
+      ListState[listId] = null;
+      initializedTables = initializedTables.filter(function (id) {
+        return id !== containerId;
+      });
+    },
+
     getSelectedTableData: function (containerId) {
       if (initializedTables.indexOf(containerId) === -1) {
         return null;
@@ -1167,6 +1179,7 @@ FormUtils = (function ($) {
       td.append(
         $("<img>")
           .attr("src", "/styles/images/question_mark.png")
+          .attr("alt", "Help")
           .attr("title", field.description)
           .addClass("field-help-icon")
           .click(function () {

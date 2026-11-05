@@ -128,10 +128,13 @@ issue is considered to be related to the run if the run alias appears in the tit
 
 ## Downloading a Sample Sheet
 
-Sample sheets are required for some sequencing analysis software in order to identify and demultiplex the libraries.
-MISO is able to automatically generate these sample sheets for several versions of BCL2FASTQ/CASAVA and Cell Ranger. To
-download these sheets, go to the Edit Run page. Near the top of the screen, there are buttons for downloading the
-sample sheets.
+Sample sheets are required for some sequencing instruments and analysis software for purposes such
+as providing configuration and identifying libraries so they can be demultiplexed. MISO is able to
+automatically generate these sample sheets. The sheets can be downloaded using the "Create Sample
+Sheet" button on the Pools list or the Edit Run page.
+
+Sample sheet formats are can be customized within MISO. See
+[Type Data - Sample Sheets](../type_data#sample-sheets) for more information.
 
 
 

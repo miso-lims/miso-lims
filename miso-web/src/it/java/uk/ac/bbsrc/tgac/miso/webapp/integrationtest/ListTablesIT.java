@@ -1058,6 +1058,16 @@ public class ListTablesIT extends AbstractIT {
     testColumnsSort(ListTarget.CONTACT_ROLES);
   }
 
+  @Test
+  public void testListSampleSheetsSetup() throws Exception {
+    testPageSetup(ListTarget.SAMPLE_SHEETS, Sets.newHashSet(Columns.NAME, Columns.PLATFORM));
+  }
+
+  @Test
+  public void testListSampleSheetsColumnSort() throws Exception {
+    testColumnsSort(ListTarget.SAMPLE_SHEETS);
+  }
+
   private void testPageSetup(String listTarget, Set<String> targetColumns) {
     testPageSetup(listTarget, targetColumns, false);
   }
@@ -1151,8 +1161,8 @@ public class ListTablesIT extends AbstractIT {
           assertTrue(
               sort2 == 0 || sort1 > 0 != sort2 > 0,
               heading + " column second sort order should differ from first:"
-                            + " First sort order was <" + String.join(", ", columnSort1) + ">, "
-                            + "Second sort order was <" + String.join(", ", columnSort2) + ">");
+                  + " First sort order was <" + String.join(", ", columnSort1) + ">, "
+                  + "Second sort order was <" + String.join(", ", columnSort2) + ">");
         }
       }
     }

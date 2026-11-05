@@ -6,8 +6,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.RegEx;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -24,7 +22,7 @@ public abstract class OicrBaseLibraryAliasGenerator<T, R> implements NameGenerat
   private static final String SEPARATOR = "_";
   private static final DateTimeFormatter NAME_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuuMMdd");
 
-  private static final @RegEx String sampleRegex = "^"
+  private static final String sampleRegex = "^"
       + OicrSampleAliasValidator.IDENTITY_REGEX_PART
       + "(_(?:"
       + OicrSampleAliasValidator.TISSUE_NAME_REGEX
