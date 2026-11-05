@@ -15,7 +15,8 @@ public class SampleStockDto extends SampleTissueDto {
   private Long referenceSlideId;
   private List<SampleDto> relatedSlides;
   private Long indexFamilyId;
-  private Long indexId;
+  private Long index1Id;
+  private Long index2Id;
 
   public Long getTissueProcessingClassId() {
     return tissueProcessingClassId;
@@ -65,12 +66,20 @@ public class SampleStockDto extends SampleTissueDto {
     this.indexFamilyId = indexFamilyId;
   }
 
-  public Long getIndexId() {
-    return indexId;
+  public Long getIndex1Id() {
+    return index1Id;
   }
 
-  public void setIndexId(Long indexId) {
-    this.indexId = indexId;
+  public void setIndex1Id(Long indexId) {
+    this.index1Id = indexId;
+  }
+
+  public Long getIndex2Id() {
+    return index2Id;
+  }
+
+  public void setIndex2Id(Long indexId) {
+    this.index2Id = indexId;
   }
 
 }

@@ -22,6 +22,10 @@ public class SampleIndex implements Deletable, Serializable {
 
   private String name;
 
+  private int position;
+
+  private String sequence;
+
   @ManyToOne
   @JoinColumn(name = "indexFamilyId")
   private SampleIndexFamily family;
@@ -49,12 +53,28 @@ public class SampleIndex implements Deletable, Serializable {
     this.name = name;
   }
 
+  public void setPosition(int position) {
+    this.position = position;
+  }
+
+  public void setSequence(String sequence) {
+    this.sequence = sequence;
+  }
+
   public SampleIndexFamily getFamily() {
     return family;
   }
 
   public void setFamily(SampleIndexFamily family) {
     this.family = family;
+  }
+
+  public int getPosition() {
+    return position;
+  }
+
+  public String getSequence() {
+    return sequence;
   }
 
   @Override

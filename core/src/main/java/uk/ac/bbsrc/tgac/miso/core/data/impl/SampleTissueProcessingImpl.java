@@ -17,8 +17,12 @@ public class SampleTissueProcessingImpl extends DetailedSampleImpl implements Sa
   private static final long serialVersionUID = 1L;
 
   @ManyToOne
-  @JoinColumn(name = "indexId")
+  @JoinColumn(name = "index1Id")
   private SampleIndex index;
+
+  @ManyToOne
+  @JoinColumn(name = "index2Id")
+  private SampleIndex index2;
 
   @Override
   public <T> T visit(BarcodableVisitor<T> visitor) {
@@ -26,13 +30,23 @@ public class SampleTissueProcessingImpl extends DetailedSampleImpl implements Sa
   }
 
   @Override
-  public SampleIndex getIndex() {
+  public SampleIndex getIndex1() {
     return index;
   }
 
   @Override
-  public void setIndex(SampleIndex index) {
+  public SampleIndex getIndex2() {
+    return index2;
+  }
+
+  @Override
+  public void setIndex1(SampleIndex index) {
     this.index = index;
+  }
+
+  @Override
+  public void setIndex2(SampleIndex index) {
+    this.index2 = index;
   }
 
 }

@@ -30,10 +30,11 @@ public class HibernateSampleIndexDao extends HibernateSaveDao<SampleIndex> imple
   }
 
   @Override
-  public SampleIndex getByFamilyAndName(SampleIndexFamily family, String name) throws IOException {
+  public SampleIndex getByFamilyPositionAndName(SampleIndexFamily family, int position, String name) throws IOException {
     QueryBuilder<SampleIndex, SampleIndex> builder =
         new QueryBuilder<>(currentSession(), SampleIndex.class, SampleIndex.class);
     builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(SampleIndex_.family), family));
+    builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(SampleIndex_.position), position));
     builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(SampleIndex_.name), name));
     return builder.getSingleResultOrNull();
   }

@@ -79,14 +79,30 @@ public class DefaultSampleIndexService extends AbstractSaveService<SampleIndex> 
   protected void collectValidationErrors(SampleIndex object, SampleIndex beforeChange, List<ValidationError> errors)
       throws IOException {
     if (ValidationUtils.isChanged(SampleIndex::getName, object, beforeChange)
-        && sampleIndexDao.getByFamilyAndName(object.getFamily(), object.getName()) != null) {
-      errors.add(ValidationError.forDuplicate("sample index", "name"));
+        && sampleIndexDao.getByFamilyPositionAndName(object.getFamily(), object.getPosition(), object.getName()) != null) {
+      errors.add(new ValidationError("name", "This index family already contains an index with this name and position"));
+    }
+
+    if (ValidationUtils.isChanged(SampleIndex::getPosition, object, beforeChange)
+            && sampleIndexDao.getByFamilyPositionAndName(object.getFamily(), object.getPosition(), object.getName()) != null) {
+      errors.add(new ValidationError("position", "This index family already contains an index with this name and position"));
+    }
+
+    if (beforeChange != null && object.getPosition() != beforeChange.getPosition()) {
+      long usage = sampleIndexDao.getUsage(beforeChange);
+      if (usage > 0L) {
+        errors.add(new ValidationError("position",
+                String.format("Cannot change because the index is already used by %d %s", usage,
+                        Pluralizer.libraries(usage))));
+      }
     }
   }
 
   @Override
   protected void applyChanges(SampleIndex to, SampleIndex from) throws IOException {
     to.setName(from.getName());
+    to.setPosition(from.getPosition());
+    to.setSequence(from.getSequence());
   }
 
   @Override

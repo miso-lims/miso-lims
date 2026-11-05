@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -24,6 +27,24 @@ public class SampleIndexFamily implements Deletable, Serializable {
   private long indexFamilyId = UNSAVED_ID;
 
   private String name;
+  private boolean uniqueDualIndex;
+  private Boolean archived;
+
+  public Boolean getArchived() {
+    return archived;
+  }
+
+  public void setArchived(Boolean archived) {
+    this.archived = archived;
+  }
+
+  public void setUniqueDualIndex(boolean uniqueDualIndex) {
+    this.uniqueDualIndex = uniqueDualIndex;
+  }
+
+  public boolean isUniqueDualIndex() {
+    return uniqueDualIndex;
+  }
 
   @OneToMany(targetEntity = SampleIndex.class, mappedBy = "family", cascade = CascadeType.REMOVE)
   @OrderBy("name")
@@ -73,4 +94,25 @@ public class SampleIndexFamily implements Deletable, Serializable {
     return getName();
   }
 
+  public int hashCode() {
+    return new HashCodeBuilder(11, 41)
+            .append(archived)
+            .append(name)
+            .toHashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    SampleIndexFamily other = (SampleIndexFamily) obj;
+    return new EqualsBuilder()
+            .append(archived, other.archived)
+            .append(name, other.name)
+            .isEquals();
+  }
 }

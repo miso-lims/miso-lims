@@ -78,6 +78,7 @@ BulkTarget.sample = (function ($) {
   var originalSopIdsBySampleId = {};
   var originalEffectiveGroupIdsByRow = {};
   var parentLocationsByRow = null;
+  var previousIndex1NamesByRow = {};
   var metricCategories = [];
 
   var showLabColumn = false;
@@ -423,6 +424,7 @@ BulkTarget.sample = (function ($) {
     },
     prepareData: function (data, config) {
       parentLocationsByRow = {};
+      previousIndex1NamesByRow = {};
       data.forEach(function (sample, index) {
         originalEffectiveGroupIdsByRow[index] = sample.effectiveGroupId;
         if (Constants.isDetailedSample && sample.parentBoxPosition) {
@@ -1156,23 +1158,39 @@ BulkTarget.sample = (function ($) {
               Utils.array.namePredicate(newValue),
               Constants.sampleIndexFamilies
             );
-            var changes = {
-              required: !!family,
+            var index1Changes = {
+              source: [],
               disabled: !family,
+              required: !!family,
+            };
+            var index2Changes = {
+              source: [],
+              disabled: !family,
+              required: false,
             };
             if (family) {
-              changes.source = family.indices;
-            } else {
-              changes.source = [];
-              changes.value = null;
+              index1Changes.source = family.indices.filter(function (index) {
+                return index.position === 1;
+              });
+              index2Changes.source = family.indices.filter(function (index) {
+                return index.position === 2;
+              });
+              index2Changes.disabled = !index2Changes.source.length;
             }
-            api.updateField(rowIndex, "indexId", changes);
+            if (index1Changes.disabled) {
+              index1Changes.value = null;
+            }
+            if (index2Changes.disabled) {
+              index2Changes.value = null;
+            }
+            api.updateField(rowIndex, "index2Id", index2Changes);
+            api.updateField(rowIndex, "index1Id", index1Changes);
           },
         },
         {
-          title: "Index",
+          title: "Index 1",
           type: "dropdown",
-          data: "indexId",
+          data: "index1Id",
           include:
             ["Tissue Processing", "Stock"].includes(targetCategory) &&
             Constants.sampleIndexFamilies &&
@@ -1185,7 +1203,58 @@ BulkTarget.sample = (function ($) {
               Utils.array.idPredicate(sample.indexFamilyId),
               Constants.sampleIndexFamilies
             );
-            return indexFamily.indices;
+            return indexFamily.indices.filter(function (index) {
+              return index.position === 1;
+            });
+          },
+          sortSource: Utils.sorting.standardSort("name"),
+          getItemLabel: Utils.array.getName,
+          getItemValue: Utils.array.getId,
+          onChange: function (rowIndex, newValue, api) {
+            var previousIndex1Name = previousIndex1NamesByRow[rowIndex];
+            previousIndex1NamesByRow[rowIndex] = newValue || null;
+            if (previousIndex1Name === undefined || !newValue || newValue === previousIndex1Name) {
+              return;
+            }
+            var family = Utils.array.findFirstOrNull(
+              Utils.array.namePredicate(api.getValue(rowIndex, "indexFamilyId")),
+              Constants.sampleIndexFamilies
+            );
+            if (family && family.uniqueDualIndex) {
+              var index2Name = api.getValue(rowIndex, "index2Id");
+              if (index2Name && index2Name !== previousIndex1Name) {
+                return;
+              }
+              var index2 = family.indices.find(function (index) {
+                return index.position === 2 && index.name === newValue;
+              });
+              if (index2) {
+                api.updateField(rowIndex, "index2Id", {
+                  value: index2.name,
+                });
+              }
+            }
+          },
+        },
+        {
+          title: "Index 2",
+          type: "dropdown",
+          data: "index2Id",
+          include:
+            ["Tissue Processing", "Stock"].includes(targetCategory) &&
+            Constants.sampleIndexFamilies &&
+            Constants.sampleIndexFamilies.length,
+          source: function (sample, api) {
+            if (!sample.indexFamilyId) {
+              return [];
+            }
+            var indexFamily = Utils.array.findUniqueOrThrow(
+              Utils.array.idPredicate(sample.indexFamilyId),
+              Constants.sampleIndexFamilies
+            );
+            return indexFamily.indices.filter(function (index) {
+              return index.position === 2;
+            });
           },
           sortSource: Utils.sorting.standardSort("name"),
           getItemLabel: Utils.array.getName,

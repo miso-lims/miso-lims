@@ -518,7 +518,7 @@ INSERT INTO Requisition_SupplementalSample(requisitionId, sampleId) VALUES
 -- Tissue Processing - Slides
 INSERT INTO Sample(discriminator, sampleId, name, alias, project_projectId, sampleType,
   scientificNameId, lastModifier, lastModified, creator, created, sampleClassId, archived, parentId,
-  siblingNumber, isSynthetic, nonStandardAlias, initialSlides, slides, indexId) VALUES
+  siblingNumber, isSynthetic, nonStandardAlias, initialSlides, slides, index1Id) VALUES
 ('Slide', 25, 'SAM25', 'TEST_0001_SLIDE_1', 1, 'GENOMIC',
   1, 1, '2024-10-16 12:39:00', 1, '2024-10-16 12:39:00', 5, FALSE, 17,
   1, FALSE, FALSE, 3, 3, 3);

@@ -266,8 +266,8 @@ public enum LibraryAliquotProperty implements LabelledEnum {
       }
       SampleTissueProcessing tissueProcessing =
           LimsUtils.getParentOrSelf(SampleTissueProcessing.class, (DetailedSample) sample);
-      return tissueProcessing == null || tissueProcessing.getIndex() == null ? null
-          : tissueProcessing.getIndex().getName();
+      return tissueProcessing == null || tissueProcessing.getIndex1() == null ? null
+          : tissueProcessing.getIndex1().getName();
     }
   },
 

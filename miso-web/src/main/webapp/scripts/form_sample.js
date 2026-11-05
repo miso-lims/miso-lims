@@ -746,6 +746,10 @@ FormTarget.sample = (function ($) {
   }
 
   function makeIndexFields(sample) {
+    var initialFamily = findIndexFamily(sample.indexFamilyId);
+    var initialIndices2 = getIndices(initialFamily, 2);
+    var currentIndex1Id = sample.index1Id || null;
+
     return [
       {
         title: "Index Family",
@@ -758,37 +762,83 @@ FormTarget.sample = (function ($) {
         getItemLabel: Utils.array.getName,
         getItemValue: Utils.array.getId,
         onChange: function (newValue, form) {
-          var changes = {
-            disabled: !newValue,
-            required: !!newValue,
-          };
-          if (newValue) {
-            var family = Utils.array.findUniqueOrThrow(
-              Utils.array.idPredicate(newValue),
-              Constants.sampleIndexFamilies
-            );
-            changes.source = family.indices;
-          } else {
-            changes.source = [];
-          }
-          form.updateField("indexId", changes);
+          var family = findIndexFamily(newValue);
+          var indices2 = getIndices(family, 2);
+          form.updateField("index2Id", {
+            source: indices2,
+            disabled: !indices2.length,
+          });
+          form.updateField("index1Id", {
+            source: getIndices(family, 1),
+            disabled: !family,
+            required: !!family,
+          });
         },
       },
       {
-        title: "Index",
-        data: "indexId",
+        title: "Index 1",
+        data: "index1Id",
         type: "dropdown",
         include: Constants.sampleIndexFamilies && Constants.sampleIndexFamilies.length,
-        source: sample.indexFamilyId
-          ? Utils.array.findUniqueOrThrow(
-              Utils.array.idPredicate(sample.indexFamilyId),
-              Constants.sampleIndexFamilies
-            ).indices
-          : [],
+        source: getIndices(initialFamily, 1),
+        sortSource: Utils.sorting.standardSort("name"),
+        getItemLabel: Utils.array.getName,
+        getItemValue: Utils.array.getId,
+        nullLabel: "(Choose)",
+        onChange: function (newValue, form) {
+          var previousIndex1Id = currentIndex1Id;
+          currentIndex1Id = newValue || null;
+          if (!newValue || newValue == previousIndex1Id) {
+            return;
+          }
+          var family = findIndexFamily(form.get("indexFamilyId"));
+          if (!family || !family.uniqueDualIndex) {
+            return;
+          }
+          var index2Id = form.get("index2Id");
+          if (index2Id && !isIndexPair(family, previousIndex1Id, index2Id)) {
+            return;
+          }
+          var index1 = findIndex(family, newValue);
+          var index2 = index1 ? family.indices.find(function (index) {
+              return index.position === 2 && index.name === index1.name;
+            }) : null;
+          if (index2) {
+            form.updateField("index2Id", {
+              value: index2.id,
+            });
+          }
+        },
+      },
+      {
+        title: "Index 2",
+        data: "index2Id",
+        type: "dropdown",
+        include: Constants.sampleIndexFamilies && Constants.sampleIndexFamilies.length,
+        disabled: !initialIndices2.length,
+        source: initialIndices2,
         sortSource: Utils.sorting.standardSort("name"),
         getItemLabel: Utils.array.getName,
         getItemValue: Utils.array.getId,
       },
     ];
+  }
+
+  function findIndexFamily(familyId) {
+    return familyId ? Utils.array.findUniqueOrThrow(Utils.array.idPredicate(familyId), Constants.sampleIndexFamilies) : null;
+  }
+
+  function getIndices(family, position) {
+    return family ? family.indices.filter(function (index) {return index.position === position;}) : [];
+  }
+
+  function findIndex(family, indexId) {
+    return indexId ? Utils.array.findFirstOrNull(Utils.array.idPredicate(indexId), family.indices) : null;
+  }
+
+  function isIndexPair(family, index1Id, index2Id) {
+    var index1 = findIndex(family, index1Id);
+    var index2 = findIndex(family, index2Id);
+    return !!index1 && !!index2 && index1.name === index2.name;
   }
 })(jQuery);

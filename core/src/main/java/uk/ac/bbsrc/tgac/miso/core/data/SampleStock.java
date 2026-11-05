@@ -42,8 +42,10 @@ public interface SampleStock extends DetailedSample {
 
   void setReferenceSlideId(Long referenceSlideId);
 
-  SampleIndex getIndex();
+  SampleIndex getIndex1();
+  SampleIndex getIndex2();
 
-  void setIndex(SampleIndex index);
+  void setIndex1(SampleIndex index);
+  void setIndex2(SampleIndex index);
 
 }
