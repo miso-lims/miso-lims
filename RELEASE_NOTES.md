@@ -7,6 +7,25 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [4.2.0] - 2026-11-05
+
+### Added
+
+* Configuration options to show external names on sample, library, and library aliquot bulk/list pages.
+* Samples of any category except identity can now be added to arrays (detailed sample)
+* Pinery samples now include attributes for barcode names and sequences for all applicable types
+* Ability to create and edit sample sheet formats
+* Pinery samples now include sop alias and version
+
+### Changed
+
+* Sample indices now support a second index and unique dual indices (detailed sample)
+
+### Fixed
+
+* It was possible to save a pool containing library aliquots that did not match the pool's platform
+
+
 ## [4.1.0] - 2026-10-22
 
 ### Added

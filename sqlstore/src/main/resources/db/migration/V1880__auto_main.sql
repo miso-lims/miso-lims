@@ -1,3 +1,4 @@
+-- extend_sample_index
 ALTER TABLE SampleIndexFamily
   ADD COLUMN archived tinyint(1) NULL DEFAULT 0,
   ADD COLUMN uniqueDualIndex tinyint(1) NULL DEFAULT 0;
@@ -12,3 +13,4 @@ DROP INDEX uk_sampleIndex_family_name,
 ALTER TABLE Sample
     ADD COLUMN index2Id bigint NULL,
     RENAME COLUMN indexId TO index1Id;
+
