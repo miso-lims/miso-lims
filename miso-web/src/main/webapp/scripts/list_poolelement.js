@@ -117,6 +117,12 @@ ListTarget.poolelement = {
         0,
         true
       ),
+      {
+        sTitle: "External Name",
+        mData: "effectiveExternalNames",
+        include: Constants.isDetailedSample && Constants.showListLibraryExternalNames,
+        bSortable: false,
+      },
       ListUtils.idHyperlinkColumn(
         "Sample Name",
         Urls.ui.samples.edit,

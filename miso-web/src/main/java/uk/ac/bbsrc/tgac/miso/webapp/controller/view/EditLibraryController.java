@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Sop.SopCategory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.type.InstrumentType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
@@ -312,6 +313,12 @@ public class EditLibraryController {
         detailedDto.setEffectiveTissueOriginDescription(tissue.getTissueOrigin().getDescription());
         detailedDto.setEffectiveTissueTypeAlias(tissue.getTissueType().getAlias());
         detailedDto.setEffectiveTissueTypeDescription(tissue.getTissueType().getDescription());
+
+        ParentIdentityAttributes identity = sample.getIdentityAttributes();
+        if (identity != null) {
+          detailedDto.setEffectiveExternalNames(identity.getExternalName());
+        }
+
         dto = detailedDto;
       } else {
         dto = new LibraryDto();

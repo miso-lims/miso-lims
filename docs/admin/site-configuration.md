@@ -447,6 +447,17 @@ Defaults to `true` if unspecified. Set to `false` to hide parent/sample location
 create/edit pages. This hides Sample Location on libraries and Parent Location on samples and
 library aliquots.
 
+### `miso.display.bulk.externalName`
+
+Defaults to `false` if unspecified. Set to `true` in detailed sample mode to show External Names
+on sample, library, and library aliquot bulk create/edit pages.
+
+### `miso.display.list.libraryExternalNames`
+
+Defaults to `false` if unspecified. Set to `true` in detailed sample mode to show External Names
+on library and library aliquot list pages, including the library aliquots list on the Edit Pool
+page.
+
 ### `miso.display.bulk.workstation`
 
 Defaults to `true` if unspecified. Set to `false` to hide the Workstation column on bulk library

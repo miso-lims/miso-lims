@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.DetailedLibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAliquot;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentIdentityAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.BoxService;
@@ -129,8 +130,14 @@ public class EditLibraryAliquotController {
         DetailedLibrary detailedLibrary = (DetailedLibrary) item;
         detailed.setNonStandardAlias(detailedLibrary.hasNonStandardAlias());
         detailed.setLibraryDesignCodeId(detailedLibrary.getLibraryDesignCode().getId());
-        ParentTissueAttributes tissue = ((DetailedSample) detailedLibrary.getSample()).getTissueAttributes();
+        DetailedSample detailedSample = (DetailedSample) detailedLibrary.getSample();
+        ParentTissueAttributes tissue = detailedSample.getTissueAttributes();
         setEffectiveAttributes(detailed, detailedLibrary, tissue);
+
+        ParentIdentityAttributes identity = detailedSample.getIdentityAttributes();
+        if (identity != null) {
+          detailed.setEffectiveExternalNames(identity.getExternalName());
+        }
 
         dto = detailed;
       } else {
