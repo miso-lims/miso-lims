@@ -261,17 +261,45 @@ BulkUtils = (function ($) {
     },
 
     updateProjectAssays: function (projectSelected, api, rowIndex) {
-      var notArchivedProjectAssays = projectSelected.assayIds
-        .map(function (assayId) {
-          return Utils.array.findUniqueOrThrow(Utils.array.idPredicate(assayId), Constants.assays);
-        })
-        .filter(function (assay) {
-          return !assay.archived;
-        });
+      var applyChanges = function (assayIds) {
+        var assays = (assayIds || [])
+          .map(function (assayId) {
+            return Utils.array.findUniqueOrThrow(
+              Utils.array.idPredicate(assayId),
+              Constants.assays
+            );
+          })
+          .filter(function (assay) {
+            return !assay.archived;
+          });
+        var options = {
+          source: assays,
+          disabled: !assays.length,
+          value: null,
+        };
+        api.updateField(rowIndex, "requisitionAssayIds", options);
+      };
+      var cache = api.getCache("projectAssayIds");
+      var cacheKey = projectSelected.name;
+      if (cache[cacheKey]) {
+        applyChanges(cache[cacheKey]);
+        return;
+      }
       api.updateField(rowIndex, "requisitionAssayIds", {
-        source: notArchivedProjectAssays,
-        disabled: false,
+        source: [],
+        value: "(loading...)",
       });
+      $.ajax({
+        url: Urls.rest.projects.assayIds(projectSelected.id),
+        dataType: "json",
+      })
+        .done(function (data) {
+          cache[cacheKey] = data;
+          applyChanges(data);
+        })
+        .fail(function (response, textStatus, serverStatus) {
+          api.showError("Project assay lookup failed");
+        });
     },
 
     applyDefaultDetailedQcStatus: function (data, config) {
@@ -1102,7 +1130,7 @@ BulkUtils = (function ($) {
                   })(),
                   disabled: true,
                 });
-              } else if (requisition && projectSelected && projectSelected.assayIds !== null) {
+              } else if (requisition && projectSelected) {
                 // requisition without an ID (creating a new requisition)
                 BulkUtils.updateProjectAssays(projectSelected, api, rowIndex);
               } else {

@@ -468,7 +468,7 @@ public class EditLibraryController {
           config.putPOJO(Config.TARGET_SAMPLE_CLASS, Dtos.asDto(aliquotClass));
         }
         Map<Long, List<LibraryTemplateDto>> templatesByProjectId = new HashMap<>();
-        addJsonArray(mapper, config, "projects", projectService.list(), project -> Dtos.asDto(project, true));
+        addJsonArray(mapper, config, "projects", projectService.listMinimalViews(), Dtos::asDto);
         if (project == null) {
           List<LibraryTemplate> templates = libraryTemplateService.list();
           for (LibraryTemplate template : templates) {

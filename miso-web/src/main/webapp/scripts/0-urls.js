@@ -791,6 +791,7 @@ Urls = (function () {
     update: idUrlFunction(projectRestBase),
     search: projectRestBase + "/search",
     attachments: middleIdUrlFunction(projectRestBase, "/files"),
+    assayIds: middleIdUrlFunction(projectRestBase, "/assayIds"),
   };
 
   // QCs
