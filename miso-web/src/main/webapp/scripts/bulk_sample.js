@@ -595,7 +595,11 @@ BulkTarget.sample = (function ($) {
               disabled: true,
               preventImport: true,
               omit: true,
-              include: Constants.isDetailedSample && !show["Identity"] && !config.isLibraryReceipt && Constants.showExternalName,
+              include:
+                Constants.isDetailedSample &&
+                !show["Identity"] &&
+                !config.isLibraryReceipt &&
+                Constants.showExternalName,
             },
           ];
           if (config.pageMode === "propagate") {
@@ -648,7 +652,7 @@ BulkTarget.sample = (function ($) {
             var nonInterceptApi = api.bypassIntercept || api;
             if (nonInterceptApi.getValue(rowIndex, "requisitionId") === "Create New") {
               var projectSelected = api.getValueObject(rowIndex, "projectId");
-              if (projectSelected && projectSelected.assayIds !== null) {
+              if (projectSelected) {
                 BulkUtils.updateProjectAssays(projectSelected, nonInterceptApi, rowIndex);
               } else {
                 nonInterceptApi.updateField(rowIndex, "requisitionAssayIds", {

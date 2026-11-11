@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.persistence.impl;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Pipeline;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 
 public class HibernateProjectDaoIT extends AbstractHibernateSaveDaoTest<Project, HibernateProjectDao> {
@@ -78,9 +80,16 @@ public class HibernateProjectDaoIT extends AbstractHibernateSaveDaoTest<Project,
     String code = "TEST1";
     Set<Assay> assays = getTestSubject().getByCode(code).getAssays();
     assertNotNull(assays);
-    assertTrue(assays.size() == 2);
+    assertEquals(2, assays.size());
     assertTrue(assays.stream().anyMatch(a -> a.getId() == 1));
     assertTrue(assays.stream().anyMatch(a -> a.getId() == 2));
+  }
+
+  @Test
+  public void testListMinimalViews() throws Exception {
+    List<ProjectView> results = getTestSubject().listMinimalViews();
+    assertNotNull(results);
+    assertEquals(3, results.size());
   }
 
 }

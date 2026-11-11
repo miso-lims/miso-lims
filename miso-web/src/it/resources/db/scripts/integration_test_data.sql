@@ -508,6 +508,10 @@ INSERT INTO Assay(assayId, alias, version, archived, creator, created, lastModif
 (3, 'Alternate Assay', '2.0', FALSE, 1, '2026-04-07 08:05:00', 1, '2026-04-07 08:05:00'),
 (4, 'Bad Assay', '1.0', FALSE, 1, '2026-04-07 08:05:00', 1, '2026-04-07 08:05:00');
 
+INSERT INTO Project_Assay(projectId, assayId) VALUES
+(1, 2),
+(1, 3);
+
 INSERT INTO Metric(metricId, alias, category, thresholdType, units) VALUES
 (1, 'Container Intact', 'RECEIPT', 'BOOLEAN', NULL),
 (2, 'WG Library Yield', 'LIBRARY_PREP', 'GE', 'ng/μL'),

@@ -227,6 +227,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentSample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ParentTissueAttributes;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolElement;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.SequencingOrderSummaryView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.BoxableView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.box.SampleBoxableView;
@@ -2783,6 +2784,15 @@ public class Dtos {
       dto.setAssayIds(from.getAssays().stream().map(Assay::getId).collect(Collectors.toList()));
     }
     return dto;
+  }
+
+  public static ProjectDto asDto(@Nonnull ProjectView from) {
+    ProjectDto to = new ProjectDto();
+    setLong(to::setId, from.getId(), true);
+    setString(to::setName, from.getName());
+    setString(to::setCode, from.getCode());
+    setObject(to::setStatus, from.getStatus(), (progress) -> progress.getKey());
+    return to;
   }
 
   public static Project to(@Nonnull ProjectDto dto) {

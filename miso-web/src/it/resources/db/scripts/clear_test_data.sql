@@ -120,6 +120,7 @@ DELETE FROM SampleNumberPerProject;
 DELETE FROM Subproject;
 DELETE FROM ProjectChangeLog;
 DELETE FROM Project;
+DELETE FROM Project_Assay;
 DELETE FROM ReferenceGenome;
 DELETE FROM Note;
 DELETE FROM Deletion;

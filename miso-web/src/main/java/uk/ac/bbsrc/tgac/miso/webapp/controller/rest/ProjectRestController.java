@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Response.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Assay;
 import uk.ac.bbsrc.tgac.miso.core.service.ProjectService;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginationFilter;
@@ -41,6 +42,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.component.AdvancedSearchParser;
 @Controller
 @RequestMapping("/rest/projects")
 public class ProjectRestController extends AbstractRestController {
+
+  private static final String TYPE_LABEL = "Project";
 
   @Autowired
   private ProjectService projectService;
@@ -68,7 +71,7 @@ public class ProjectRestController extends AbstractRestController {
 
   @GetMapping(value = "/{projectId}", produces = "application/json")
   public @ResponseBody ProjectDto getProjectById(@PathVariable long projectId) throws IOException {
-    return RestUtils.getObject("Project", projectId, projectService, Dtos::asDto);
+    return RestUtils.getObject(TYPE_LABEL, projectId, projectService, Dtos::asDto);
   }
 
   @GetMapping(value = "/search")
@@ -91,14 +94,21 @@ public class ProjectRestController extends AbstractRestController {
     return project.getAttachments().stream().map(Dtos::asDto).collect(Collectors.toList());
   }
 
+  @GetMapping("/{projectId}/assayIds")
+  public @ResponseBody List<Long> getProjectAssays(@PathVariable(name = "projectId") long projectId)
+      throws IOException {
+    Project project = RestUtils.retrieve(TYPE_LABEL, projectId, projectService);
+    return project.getAssays().stream().map(Assay::getId).toList();
+  }
+
   @PostMapping
   public @ResponseBody ProjectDto create(@RequestBody ProjectDto dto) throws IOException {
-    return RestUtils.createObject("Project", dto, Dtos::to, projectService, project -> Dtos.asDto(project, true));
+    return RestUtils.createObject(TYPE_LABEL, dto, Dtos::to, projectService, project -> Dtos.asDto(project, true));
   }
 
   @PutMapping("/{projectId}")
   public @ResponseBody ProjectDto update(@PathVariable long projectId, @RequestBody ProjectDto dto) throws IOException {
-    return RestUtils.updateObject("Project", projectId, dto, Dtos::to, projectService,
+    return RestUtils.updateObject(TYPE_LABEL, projectId, dto, Dtos::to, projectService,
         project -> Dtos.asDto(project, true));
   }
 
@@ -106,7 +116,7 @@ public class ProjectRestController extends AbstractRestController {
   @ResponseBody
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void bulkDelete(@RequestBody(required = true) List<Long> ids) throws IOException {
-    RestUtils.bulkDelete("Project", ids, projectService);
+    RestUtils.bulkDelete(TYPE_LABEL, ids, projectService);
   }
 
   @GetMapping(value = "/dt", produces = "application/json")

@@ -25,6 +25,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.Contact;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Deliverable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectContact;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectView;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.security.AuthorizationManager;
 import uk.ac.bbsrc.tgac.miso.core.service.AssayService;
@@ -138,7 +139,8 @@ public class DefaultProjectService implements ProjectService {
     managed.setChangeDetails(authorizationManager.getCurrentUser());
     applyChanges(managed, project);
 
-    // Save and flush the project before making contact changes; otherwise, Hibernate saves the ProjectContact first and
+    // Save and flush the project before making contact changes; otherwise, Hibernate saves the
+    // ProjectContact first and
     // the change details haven't been updated when the changelog is generated
     projectStore.update(managed);
     hibernateUtilDao.flush();
@@ -351,6 +353,11 @@ public class DefaultProjectService implements ProjectService {
   public List<Project> list(Consumer<String> errorHandler, int offset, int limit, boolean sortDir, String sortCol,
       PaginationFilter... filter) throws IOException {
     return projectStore.list(errorHandler, offset, limit, sortDir, sortCol, filter);
+  }
+
+  @Override
+  public List<ProjectView> listMinimalViews() throws IOException {
+    return projectStore.listMinimalViews();
   }
 
 }

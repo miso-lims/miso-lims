@@ -8,6 +8,8 @@ import java.util.function.Consumer;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
@@ -20,6 +22,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl_;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectView;
 import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
 import uk.ac.bbsrc.tgac.miso.core.util.DateType;
 import uk.ac.bbsrc.tgac.miso.persistence.ProjectStore;
@@ -118,6 +121,15 @@ public class HibernateProjectDao extends HibernateSaveDao<Project>
     } else {
       builder.addPredicate(builder.getCriteriaBuilder().equal(builder.getRoot().get(ProjectImpl_.status), value));
     }
+  }
+
+  @Override
+  public List<ProjectView> listMinimalViews() throws IOException {
+    CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+    CriteriaQuery<ProjectView> query = builder.createQuery(ProjectView.class);
+    Root<ProjectView> root = query.from(ProjectView.class);
+    query.select(root);
+    return currentSession().createQuery(query).getResultList();
   }
 
 }

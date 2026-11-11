@@ -2,53 +2,24 @@ package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.*;
-import org.springframework.test.context.web.WebAppConfiguration;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.collections.map.MultiValueMap;
-import org.checkerframework.checker.units.qual.Temperature;
-import org.junit.jupiter.api.BeforeEach;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import org.springframework.test.web.servlet.ResultActions;
 
 import static org.hamcrest.Matchers.*;
 
-import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.dto.ProjectDto;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 
-import org.springframework.web.servlet.View;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.ProjectRestController;
-
 import org.springframework.security.test.context.support.WithMockUser;
-import com.jayway.jsonpath.JsonPath;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ReferenceGenomeImpl;
-import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.data.type.StatusType;
-import jakarta.transaction.Transactional;
-import java.util.Date;
-import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
 import java.util.Arrays;
-import java.util.ArrayList;
-
-import org.springframework.test.web.servlet.MockMvc;
 
 public class ProjectRestControllerST extends AbstractST {
 
@@ -123,7 +94,16 @@ public class ProjectRestControllerST extends AbstractST {
   public void testGetLibraryAliquots() throws Exception {
     testDtRequest(CONTROLLER_BASE + "/dt", Arrays.asList(1, 2, 3, 4, 5, 6, 7,
         100001, 110001, 120001, 200001, 200, 300, 400, 500, 4440, 2200));
+  }
 
-
+  @Test
+  public void testGetAssayIds() throws Exception {
+    getMockMvc().perform(get(CONTROLLER_BASE + "/1/assayIds").accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$").exists())
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$", hasItem(2)))
+        .andExpect(jsonPath("$", hasItem(3)));
   }
 }

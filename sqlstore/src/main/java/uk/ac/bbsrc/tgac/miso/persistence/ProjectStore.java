@@ -1,8 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.io.IOException;
+import java.util.List;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.view.ProjectView;
 import uk.ac.bbsrc.tgac.miso.core.util.PaginatedDataSource;
 
 /**
@@ -24,5 +26,7 @@ public interface ProjectStore extends PaginatedDataSource<Project>, SaveDao<Proj
   Project getByCode(String code) throws IOException;
 
   long getUsage(Project project) throws IOException;
+
+  List<ProjectView> listMinimalViews() throws IOException;
 
 }
