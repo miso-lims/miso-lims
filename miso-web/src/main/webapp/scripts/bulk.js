@@ -49,6 +49,12 @@ BulkUtils = (function ($) {
    *       and will cause an error if the import data does not match the data in the table. Should
    *       generally be used for read-only (disabled) identifier columns and other columns that can
    *       never be modified
+   *   convertImportValue: optional function(value, rowIndex, getEffectiveImportValue) returning
+   *       string; allows a raw imported cell value to be converted before it is applied to the
+   *       table. getEffectiveImportValue(dataProperty, rowIndex) returns the value another column
+   *       will hold for that row after import (the incoming imported value if present, otherwise the
+   *       current table value), which is useful for dropdown columns whose valid options depend on
+   *       another column. Return the value unchanged to leave it as-is
    *   data: required string; JSON property to use for value
    *   getData: optional function(object, limitedApi) returning string; get value from object
    *       instead of mapping normally. This should return the value to display in the cell (for
@@ -3167,6 +3173,35 @@ BulkUtils = (function ($) {
 
                         // set values from spreadsheet
                         var tableData = hot.getData();
+                        // index the imported data by column so that convertImportValue functions can
+                        // read the incoming value of another column in the same row (e.g. an index
+                        // column needs the index family being imported alongside it)
+                        var importedDataByColumn = {};
+                        importColumns.forEach(function (importColumn) {
+                          importedDataByColumn[hotHeaders.indexOf(importColumn.heading)] =
+                            importColumn.data;
+                        });
+                        var getEffectiveImportValue = function (dataProperty, rowIndex) {
+                          var colIndex = -1;
+                          for (var c = 0; c < hotColumns.length; c++) {
+                            if (hotColumns[c].data === dataProperty) {
+                              colIndex = c;
+                              break;
+                            }
+                          }
+                          if (colIndex === -1) {
+                            return null;
+                          }
+                          var imported = importedDataByColumn[colIndex];
+                          if (
+                            imported &&
+                            imported[rowIndex] !== undefined &&
+                            imported[rowIndex] !== ""
+                          ) {
+                            return imported[rowIndex];
+                          }
+                          return tableData[rowIndex][colIndex];
+                        };
                         var changes = [];
                         for (var i = 0; i < importColumns.length; i++) {
                           var importColumn = importColumns[i];
@@ -3184,7 +3219,17 @@ BulkUtils = (function ($) {
                                 return true;
                               }
                             } else {
-                              changes.push([rowIndex, columnIndex, importColumn.data[rowIndex]]);
+                              var importValue = importColumn.data[rowIndex];
+                              if (
+                                typeof hotColumns[columnIndex].convertImportValue === "function"
+                              ) {
+                                importValue = hotColumns[columnIndex].convertImportValue(
+                                  importValue,
+                                  rowIndex,
+                                  getEffectiveImportValue
+                                );
+                              }
+                              changes.push([rowIndex, columnIndex, importValue]);
                             }
                           }
                         }
