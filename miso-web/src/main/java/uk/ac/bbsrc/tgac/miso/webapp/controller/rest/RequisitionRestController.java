@@ -399,6 +399,7 @@ public class RequisitionRestController extends AbstractRestController {
   }
 
   @PostMapping("/bulk-stop")
+  @ResponseStatus(HttpStatus.ACCEPTED)
   public @ResponseBody ObjectNode bulkStop(@RequestBody BulkStopRequest request) throws IOException {
     if (request.requisitionIds == null || request.requisitionIds.isEmpty()) {
       throw new RestException("Requisition IDs must be specified", Status.BAD_REQUEST);
