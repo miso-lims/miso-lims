@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.springtest;
 
 import org.junit.jupiter.api.Test;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 import javax.ws.rs.core.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -12,9 +11,7 @@ import com.jayway.jsonpath.JsonPath;
 
 import static org.hamcrest.Matchers.*;
 import org.springframework.test.web.servlet.MvcResult;
-import java.util.stream.Stream;
 
-import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.Requisition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RequisitionPause;
@@ -328,7 +325,7 @@ public class RequisitionRestControllerST extends AbstractST {
     MvcResult mvcResult = ac.andExpect(status().isAccepted()).andReturn();
 
     String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
-    String response = pollingResponse(CONTROLLER_BASE + "/bulk/" + id);
+    pollingResponse(CONTROLLER_BASE + "/bulk/" + id);
 
     for (Long targetId : reqs) {
       Requisition resumed = currentSession().find(entityClass, targetId);
@@ -337,6 +334,26 @@ public class RequisitionRestControllerST extends AbstractST {
     }
   }
 
+  @Test
+  public void testBulkStop() throws Exception {
+    List<Long> requisitionIds = Arrays.asList(1L, 2L);
+    String stopReason = "For testing";
+    BulkStopRequest req = new BulkStopRequest(requisitionIds, stopReason);
 
+    MvcResult mvcResult = getMockMvc().perform(post(CONTROLLER_BASE + "/bulk-stop")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(makeJson(req)))
+        .andExpect(status().isAccepted())
+        .andReturn();
+
+    String operationId = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.operationId");
+    pollingResponse(CONTROLLER_BASE + "/bulk/" + operationId);
+
+    for (Long targetId : requisitionIds) {
+      Requisition requisition = currentSession().find(entityClass, targetId);
+      assertTrue(requisition.isStopped());
+      assertEquals(stopReason, requisition.getStopReason());
+    }
+  }
 
 }
