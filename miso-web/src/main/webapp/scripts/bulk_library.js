@@ -1084,6 +1084,45 @@ BulkTarget.library = (function ($) {
       sortSource: Utils.sorting.standardSort("label"),
       getItemLabel: Utils.array.get("label"),
       getItemValue: Utils.array.getId,
+      // On import, allow a cell to contain only the index sequence (e.g. "GAACTGAGCG") instead of
+      // the full dropdown label (e.g. "UDP0001 (GAACTGAGCG)"). If exactly one index in the row's
+      // index family and this position has that exact sequence, convert the cell to its label.
+      convertImportValue: function (value, rowIndex, getEffectiveImportValue) {
+        if (!value || typeof getEffectiveImportValue !== "function") {
+          return value;
+        }
+        var indexFamilyName = getEffectiveImportValue("indexFamilyId", rowIndex);
+        if (!indexFamilyName) {
+          return value;
+        }
+        var indexFamily = Utils.array.findFirstOrNull(
+          Utils.array.namePredicate(indexFamilyName),
+          Constants.libraryIndexFamilies
+        );
+        if (!indexFamily || indexFamily.fakeSequence) {
+          // Multi-sequence (fake sequence) families show only the name in the label, so there is no
+          // real sequence to match against. Leave the value as entered.
+          return value;
+        }
+        var candidates = indexFamily.indices.filter(function (index) {
+          return index.position === position;
+        });
+        // If the value is already a valid option (full label), don't modify it
+        if (
+          candidates.some(function (index) {
+            return index.label === value;
+          })
+        ) {
+          return value;
+        }
+        // Otherwise, attempt to resolve a bare sequence to its label by exact match
+        // (case-insensitive). Leave unchanged (invalid) if there is no match or more than one.
+        var sequence = value.trim().toUpperCase();
+        var matches = candidates.filter(function (index) {
+          return index.sequence && index.sequence.toUpperCase() === sequence;
+        });
+        return matches.length === 1 ? matches[0].label : value;
+      },
     };
     if (position === 1) {
       column.onChange = function (rowIndex, newValue, api) {
