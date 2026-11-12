@@ -875,6 +875,7 @@ Urls = (function () {
     search: requisitionRestBase + "/search",
     searchPausedByIds: requisitionRestBase + "/paused",
     bulkResume: requisitionRestBase + "/bulk-resume",
+    bulkStop: requisitionRestBase + "/bulk-stop",
     bulkSaveProgress: idUrlFunction(requisitionRestBase + "/bulk"),
     listRuns: middleIdUrlFunction(requisitionRestBase, "/runs"),
     listRunLibraries: middleIdUrlFunction(requisitionRestBase, "/runlibraries"),

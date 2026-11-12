@@ -1,6 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.parseLocalDate;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -391,6 +391,25 @@ public class RequisitionRestController extends AbstractRestController {
           pause.setEndDate(resumeDate);
         }
       }
+    }
+    return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, requisitions, requisitionService);
+  }
+
+  public record BulkStopRequest(List<Long> requisitionIds, String stopReason) {
+  }
+
+  @PostMapping("/bulk-stop")
+  public @ResponseBody ObjectNode bulkStop(@RequestBody BulkStopRequest request) throws IOException {
+    if (request.requisitionIds == null || request.requisitionIds.isEmpty()) {
+      throw new RestException("Requisition IDs must be specified", Status.BAD_REQUEST);
+    }
+    if (isStringBlankOrNull(request.stopReason)) {
+      throw new RestException("Stop reason must be specified", Status.BAD_REQUEST);
+    }
+    List<Requisition> requisitions = requisitionService.listByIdList(request.requisitionIds);
+    for (Requisition requisition : requisitions) {
+      requisition.setStopped(true);
+      requisition.setStopReason(request.stopReason());
     }
     return asyncOperationManager.startAsyncBulkUpdate(TYPE_LABEL, requisitions, requisitionService);
   }
