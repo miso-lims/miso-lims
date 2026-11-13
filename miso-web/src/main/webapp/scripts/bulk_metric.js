@@ -179,6 +179,13 @@ BulkTarget.metric = (function () {
             "match any of the defined criteria.";
           return column;
         })(),
+        (function () {
+          var column = BulkUtils.columns.makeBoolean("Top-Up", "topUp", true, true);
+          column.description =
+            "Failing to meet the threshold of a top-up metric does not mean that an item has failed, but rather " +
+            "that more of something is still needed";
+          return column;
+        })(),
       ];
     },
   };
