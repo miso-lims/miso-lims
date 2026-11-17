@@ -11,6 +11,10 @@ ListTarget.requisition = (function () {
     },
     createBulkActions: function (config, projectId) {
       var actions = BulkUtils.actions.qc("Requisition");
+      actions.push({
+        name: "Stop",
+        action: showBulkStopDialog,
+      });
       actions.push(
         ListUtils.createBulkDeleteAction(TYPE_LABEL, "requisitions", Utils.array.getAlias)
       );
@@ -102,4 +106,33 @@ ListTarget.requisition = (function () {
       ];
     },
   };
+
+  function showBulkStopDialog(items) {
+    Utils.showDialog(
+      "Stop Requisitions",
+      "Confirm",
+      [
+        {
+          label: "Reason",
+          property: "stopReason",
+          type: "text",
+          required: true,
+        },
+      ],
+      function (results) {
+        var data = {
+          requisitionIds: items.map(Utils.array.getId),
+          stopReason: results.stopReason,
+        };
+        Utils.saveWithProgressDialog(
+          "Stopping Requisitions",
+          "POST",
+          Urls.rest.requisitions.bulkStop,
+          data,
+          Urls.rest.requisitions.bulkSaveProgress,
+          Utils.page.pageReload
+        );
+      }
+    );
+  }
 })();
