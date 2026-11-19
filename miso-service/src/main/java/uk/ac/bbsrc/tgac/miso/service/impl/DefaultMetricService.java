@@ -113,6 +113,7 @@ public class DefaultMetricService extends AbstractSaveService<Metric> implements
     to.setReadLength(from.getReadLength());
     to.setReadLength2(from.getReadLength2());
     to.setOptional(from.isOptional());
+    to.setTopUp(from.isTopUp());
   }
 
   @Override

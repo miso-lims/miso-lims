@@ -1266,8 +1266,7 @@ public class MisoClient implements Lims {
       BATCH_ID("batch_id", "Batch ID"), //
       TIMEPOINT("timepoint", "Timepoint"), //
       REQUISITION_ID("requisitionId", "Requisition ID"), //
-      CONSENT("consentLevel", "Consent"),
-      SOP_VERSION("sopVersion", "SOP Version"), //
+      CONSENT("consentLevel", "Consent"), SOP_VERSION("sopVersion", "SOP Version"), //
       SOP_ALIAS("sopAlias", "SOP Alias");
 
       private final String sqlKey;
@@ -1658,6 +1657,10 @@ public class MisoClient implements Lims {
     boolean optional = rs.getBoolean("optional");
     if (!rs.wasNull()) {
       metric.setOptional(optional);
+    }
+    boolean topUp = rs.getBoolean("topUp");
+    if (!rs.wasNull()) {
+      metric.setTopUp(topUp);
     }
     return metric;
   };

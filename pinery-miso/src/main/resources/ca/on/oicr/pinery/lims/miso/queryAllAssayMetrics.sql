@@ -18,6 +18,7 @@ SElECT am.assayId
   ,m.readLength
   ,m.readLength2
   ,m.optional
+  ,m.topUp
 FROM Metric m
 JOIN Assay_Metric am ON am.metricId = m.metricId
 LEFT JOIN MetricSubcategory sub ON sub.subcategoryId = m.subcategoryId

@@ -69,10 +69,9 @@ public class Metric implements Aliasable, Deletable, Serializable {
   private SequencingContainerModel containerModel;
 
   private Integer readLength;
-
   private Integer readLength2;
-
   private boolean optional;
+  private boolean topUp;
 
   @Override
   public long getId() {
@@ -220,10 +219,18 @@ public class Metric implements Aliasable, Deletable, Serializable {
     this.optional = optional;
   }
 
+  public boolean isTopUp() {
+    return topUp;
+  }
+
+  public void setTopUp(boolean topUp) {
+    this.topUp = topUp;
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(metricId, alias, category, thresholdType, units, sortPriority, nucleicAcidType, tissueMaterial,
-        tissueType, negateTissueType, tissueOrigin, containerModel, readLength, readLength2, optional);
+        tissueType, negateTissueType, tissueOrigin, containerModel, readLength, readLength2, optional, topUp);
   }
 
   @Override
@@ -243,7 +250,8 @@ public class Metric implements Aliasable, Deletable, Serializable {
         Metric::getContainerModel,
         Metric::getReadLength,
         Metric::getReadLength2,
-        Metric::isOptional);
+        Metric::isOptional,
+        Metric::isTopUp);
   }
 
 }

@@ -33,6 +33,7 @@ public class MetricDto {
   private Integer readLength2;
   private String label;
   private boolean optional;
+  private boolean topUp;
 
   public static MetricDto from(Metric from) {
     MetricDto to = new MetricDto();
@@ -52,6 +53,7 @@ public class MetricDto {
     setInteger(to::setReadLength, from.getReadLength(), true);
     setInteger(to::setReadLength2, from.getReadLength2(), true);
     setBoolean(to::setOptional, from.isOptional(), false);
+    setBoolean(to::setTopUp, from.isTopUp(), false);
     to.setLabel(makeLabel(from));
     return to;
   }
@@ -226,6 +228,14 @@ public class MetricDto {
     this.optional = optional;
   }
 
+  public boolean isTopUp() {
+    return topUp;
+  }
+
+  public void setTopUp(boolean topUp) {
+    this.topUp = topUp;
+  }
+
   public String getLabel() {
     return label;
   }
@@ -252,6 +262,7 @@ public class MetricDto {
     setInteger(to::setReadLength, getReadLength(), true);
     setInteger(to::setReadLength2, getReadLength2(), true);
     setBoolean(to::setOptional, isOptional(), false);
+    setBoolean(to::setTopUp, isTopUp(), false);
     return to;
   }
 
