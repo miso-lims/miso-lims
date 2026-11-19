@@ -1,1 +1,3 @@
+-- topup_metrics
 ALTER TABLE Metric ADD COLUMN topUp BOOLEAN NOT NULL DEFAULT FALSE;
+

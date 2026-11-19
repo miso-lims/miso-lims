@@ -7,6 +7,19 @@ Starting with version 1.29.0, the format of this file is based on
 
 ---------------------------------------------------------------------------------------------------
 
+## [4.3.0] - 2026-11-19
+
+### Added
+
+* "Stop" action on the Requisitions list to stop multiple requisitions at once
+* Allow entering an index sequence alone (e.g. "GAACTGAGCG") instead of the full label (e.g. "UDP0001 (GAACTGAGCG)") when importing a spreadsheet on bulk library pages. When a cell contains only a sequence, it is matched against the indices in that row's index family and position, and converted to the full label if exactly one index has that exact sequence. This does not apply to multi-sequence index families.
+* metric field "Top-Up" to mark metrics that can be "topped up" (e.g. with additional sequencing) if the threshold has not yet been met
+
+### Fixed
+
+* Reduced loading time of Edit Sample, bulk Create/Edit Sample, and bulk Create Library pages
+
+
 ## [4.2.0] - 2026-11-05
 
 ### Added
